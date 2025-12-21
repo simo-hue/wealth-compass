@@ -408,6 +408,30 @@ export function useFinanceData() {
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [data.snapshots]);
 
+  const clearData = useCallback(async () => {
+    if (user) {
+      // Delete from Supabase
+      const { error: e1 } = await supabase.from('transactions').delete().eq('user_id', user.id);
+      const { error: e2 } = await supabase.from('assets').delete().eq('user_id', user.id);
+      const { error: e3 } = await supabase.from('liabilities').delete().eq('user_id', user.id);
+      const { error: e4 } = await supabase.from('liquidity_accounts').delete().eq('user_id', user.id);
+      const { error: e5 } = await supabase.from('portfolio_snapshots').delete().eq('user_id', user.id);
+
+      if (e1 || e2 || e3 || e4 || e5) {
+        console.error('Error clearing data', { e1, e2, e3, e4, e5 });
+        toast.error('Failed to wipe some data from cloud');
+      } else {
+        toast.success('All cloud data wiped');
+        fetchData();
+      }
+    } else {
+      // Local only
+      localStorage.removeItem(STORAGE_KEY);
+      setData(getInitialData());
+      toast.success('Local data wiped');
+    }
+  }, [user, fetchData]);
+
 
   return {
     data,
@@ -423,5 +447,6 @@ export function useFinanceData() {
     addCrypto, updateCrypto, deleteCrypto,
     addLiability, updateLiability, deleteLiability,
     addLiquidity, updateLiquidity, deleteLiquidity,
+    clearData
   };
 }

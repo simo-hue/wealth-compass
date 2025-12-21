@@ -11,6 +11,7 @@ import { Settings, Globe, Shield, Database, ArrowLeft, Eye, EyeOff, Download, Tr
 import { useSettings } from '@/contexts/SettingsContext';
 import { useFinance } from '@/contexts/FinanceContext';
 import { toast } from 'sonner';
+import { exportToJson } from '@/lib/exportUtils';
 
 export default function SettingsPage() {
     const navigate = useNavigate();
@@ -24,35 +25,15 @@ export default function SettingsPage() {
 
     const [deleteConfOpen, setDeleteConfOpen] = useState(false);
 
-    // Download Data as CSV
+    // Download Data as JSON Limit
     const handleExport = () => {
-        try {
-            // Flattens the complex object mainly to simple JSON for now, or multiple CSVs?
-            // Request asked for CSV. Let's do a simple JSON dump for backup as it's more robust for restore.
-            // Or if strictly CSV, we'd need multiple files. Let's do a JSON backup file named .csv or .json.
-            // Re-reading: "CSV file containing...". A single CSV is hard for relational data.
-            // Let's generate a JSON file but call it "wealth-compass-backup.json" for better utility.
-            // If the user insists on CSV processing, we might just dump the "Snapshots" history.
-
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `wealth-compass-backup-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            toast.success('Data export started');
-        } catch (e) {
-            toast.error('Export failed');
-        }
+        const filename = `wealth-compass-backup-${new Date().toISOString().split('T')[0]}`;
+        exportToJson(data, filename);
     };
 
-    const handleDelete = () => {
-        clearData();
+    const handleDelete = async () => {
+        await clearData();
         setDeleteConfOpen(false);
-        toast.success('All data wiped');
         navigate('/');
     };
 
@@ -146,9 +127,14 @@ export default function SettingsPage() {
                         <CardDescription>Export your history or wipe data.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <Button variant="outline" className="w-full justify-start" onClick={handleExport}>
-                            <Download className="h-4 w-4 mr-2" /> Export Data (JSON Backup)
-                        </Button>
+                        <div className="space-y-1">
+                            <Button variant="outline" className="w-full justify-start" onClick={handleExport} title="Use this file to restore your data if needed. Contains raw database structure.">
+                                <Download className="h-4 w-4 mr-2" /> Download Full System Backup
+                            </Button>
+                            <p className="text-[10px] text-muted-foreground ml-1">
+                                Contains complete database dump (Profiles, Assets, Transactions). Use for restore.
+                            </p>
+                        </div>
 
                         <Dialog open={deleteConfOpen} onOpenChange={setDeleteConfOpen}>
                             <DialogTrigger asChild>

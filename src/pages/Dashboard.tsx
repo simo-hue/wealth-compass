@@ -5,13 +5,13 @@ import { Button } from '@/components/ui/button';
 import { useFinance } from '@/contexts/FinanceContext';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { NetWorthChart } from '@/components/dashboard/NetWorthChart';
-import { AllocationChart } from '@/components/dashboard/AllocationChart';
 import { InvestmentTable } from '@/components/dashboard/InvestmentTable';
 import { CryptoTable } from '@/components/dashboard/CryptoTable';
 import { LiabilitiesTable } from '@/components/dashboard/LiabilitiesTable';
 import { LiquidityCards } from '@/components/dashboard/LiquidityCards';
 import { IncomeExpenseModule } from '@/components/dashboard/IncomeExpenseModule';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
+import { CashFlowTrendChart, AssetAllocationChart } from '@/components/dashboard/DashboardCharts';
 import { getCryptoPrice, getStockPrice } from '@/lib/api';
 import { toast } from 'sonner';
 import type { TimeRange } from '@/types/finance';
@@ -137,17 +137,22 @@ const Dashboard = () => {
 
         {/* Charts & Activity Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Chart - 2 cols */}
+          {/* Main Column */}
           <div className="lg:col-span-2 space-y-6">
+            {/* 1. Net Worth History */}
             <NetWorthChart data={chartData} currentRange={timeRange} onRangeChange={setTimeRange} />
-            {/* Allocation - 3 Pillars */}
-            <AllocationChart investments={finance.data.investments} groupBy="sector" />
+
+            {/* 2. Cash Flow Trend (New) */}
+            <CashFlowTrendChart />
           </div>
 
-          {/* Side Widgets - 1 col */}
+          {/* Side Column */}
           <div className="space-y-6">
+            {/* 3. Asset Allocation (Updated) */}
+            <AssetAllocationChart />
+
+            {/* 4. Recent Activity */}
             <RecentActivity />
-            {/* Quick breakdown of Cash vs Invest vs Crypto could go here too as a Donut */}
           </div>
         </div>
       </div>
