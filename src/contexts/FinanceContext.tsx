@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useFinanceData } from '@/hooks/useFinanceData';
 import { useSettings } from '@/contexts/SettingsContext';
 import type { FinancialData } from '@/types/finance';
@@ -16,6 +16,13 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     const calculateTotals = () => {
         return finance.calculateTotals(convertCurrency);
     };
+
+    // Background Refresh on Load
+    useEffect(() => {
+        if (finance.isLoaded) {
+            finance.refreshPrices(false); // Silent refresh if stale
+        }
+    }, [finance.isLoaded, finance.refreshPrices]);
 
 
 

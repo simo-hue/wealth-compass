@@ -12,7 +12,6 @@ import { LiquidityCards } from '@/components/dashboard/LiquidityCards';
 import { IncomeExpenseModule } from '@/components/dashboard/IncomeExpenseModule';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { CashFlowTrendChart, AssetAllocationChart } from '@/components/dashboard/DashboardCharts';
-import { getCryptoPrice, getStockPrice, getBatchCryptoPrices } from '@/lib/api';
 import { toast } from 'sonner';
 import type { TimeRange } from '@/types/finance';
 import { useSettings } from '@/contexts/SettingsContext';
@@ -105,7 +104,10 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gradient">Dashboard</h1>
-            <p className="text-muted-foreground">Financial Command Center</p>
+            <div className="flex items-center gap-2">
+              <p className="text-muted-foreground">Financial Command Center</p>
+              {lastUpdated && <span className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-md">Updated {lastUpdated.toLocaleTimeString()}</span>}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button

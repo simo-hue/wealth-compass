@@ -26,6 +26,8 @@ export interface Investment {
   quantity: number;
   costBasis: number; // Total cost
   currentValue: number;
+  currentPrice?: number; // Cached unit price
+  lastPriceUpdate?: string; // Cache timestamp
   currency?: string; // Original currency, defaults to USD
   geography: string;
   sector: string;
@@ -42,6 +44,7 @@ export interface CryptoHolding {
   quantity: number;
   avgBuyPrice: number;
   currentPrice: number;
+  lastPriceUpdate?: string; // Cache timestamp
   currency?: string;
   fees?: number;
   coinId?: string;
