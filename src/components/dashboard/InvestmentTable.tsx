@@ -217,7 +217,7 @@ export function InvestmentTable({ investments, onAdd, onUpdate, onDelete }: Inve
           <TrendingUp className="h-5 w-5 text-primary" />
           Investments
         </CardTitle>
-        <div className="flex gap-2">
+        <div className={cn("flex gap-2", isPrivacyMode && "blur-sm select-none pointer-events-none")}>
           {investments.length > 0 && (
             <Button variant="outline" size="sm" onClick={handleUpdateAll} disabled={isUpdating}>
               {isUpdating ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <RefreshCw className="h-4 w-4 mr-1" />}
@@ -434,7 +434,7 @@ export function InvestmentTable({ investments, onAdd, onUpdate, onDelete }: Inve
           </Dialog>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className={cn(isPrivacyMode && "blur-sm select-none pointer-events-none")}>
         {investments.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">No investments yet.</div>
         ) : (

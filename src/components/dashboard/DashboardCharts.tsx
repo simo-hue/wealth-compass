@@ -14,11 +14,12 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useChartData } from '@/hooks/useChartData';
 import { useSettings } from '@/contexts/SettingsContext';
+import { cn } from '@/lib/utils';
 
 // --- Cash Flow Trend (Bar) ---
 export function CashFlowTrendChart() {
     const { getCashFlowTrend } = useChartData();
-    const { formatCurrency } = useSettings();
+    const { formatCurrency, isPrivacyMode } = useSettings();
     const data = getCashFlowTrend(6); // Last 6 months
 
     return (
@@ -32,6 +33,7 @@ export function CashFlowTrendChart() {
                         <CartesianGrid strokeDasharray="3 3" opacity={0.1} vertical={false} />
                         <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
                         <YAxis
+                            hide={isPrivacyMode}
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}
@@ -40,7 +42,7 @@ export function CashFlowTrendChart() {
                         <Tooltip
                             cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                             contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a' }}
-                            formatter={(value: number) => formatCurrency(value)}
+                            formatter={(value: number) => isPrivacyMode ? "****" : formatCurrency(value)}
                         />
                         <Legend />
                         <Bar dataKey="Income" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={50} />
@@ -55,7 +57,7 @@ export function CashFlowTrendChart() {
 // --- Asset Allocation (Donut) ---
 export function AssetAllocationChart() {
     const { getAssetAllocation } = useChartData();
-    const { formatCurrency } = useSettings();
+    const { formatCurrency, isPrivacyMode } = useSettings();
     const data = getAssetAllocation();
 
     return (
@@ -63,7 +65,7 @@ export function AssetAllocationChart() {
             <CardHeader>
                 <CardTitle>Asset Allocation</CardTitle>
             </CardHeader>
-            <CardContent className="h-[300px]">
+            <CardContent className={cn("h-[300px]", isPrivacyMode && "blur-sm select-none pointer-events-none")}>
                 {data.length === 0 ? (
                     <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
                         No assets found
@@ -85,7 +87,7 @@ export function AssetAllocationChart() {
                                 ))}
                             </Pie>
                             <Tooltip
-                                formatter={(value: number) => formatCurrency(value)}
+                                formatter={(value: number) => isPrivacyMode ? "****" : formatCurrency(value)}
                                 labelFormatter={(label) => label}
                                 contentStyle={{ backgroundColor: "#1A1F2C", borderColor: "#403E43", color: "#FFFFFF" }}
                                 itemStyle={{ color: "#FFFFFF" }}

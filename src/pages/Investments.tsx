@@ -7,9 +7,12 @@ import { TrendingUp, PieChart, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { exportToCsv } from '@/lib/exportUtils';
 import { format } from 'date-fns';
+import { useSettings } from '@/contexts/SettingsContext';
+import { cn } from '@/lib/utils';
 
 export default function InvestmentsPage() {
     const finance = useFinance();
+    const { isPrivacyMode } = useSettings();
 
     const handleExportCsv = () => {
         const exportData = finance.data.investments.map(inv => ({
@@ -31,9 +34,9 @@ export default function InvestmentsPage() {
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold text-gradient">Investments</h1>
-                    <p className="text-muted-foreground">Manage your stock and ETF portfolio</p>
+                    <p className={cn("text-muted-foreground", isPrivacyMode && "blur-sm select-none")}>Manage your stock and ETF portfolio</p>
                 </div>
-                <Button variant="outline" onClick={handleExportCsv}>
+                <Button variant="outline" onClick={handleExportCsv} className={cn(isPrivacyMode && "blur-sm select-none pointer-events-none")}>
                     <FileSpreadsheet className="h-4 w-4 mr-2" /> Export CSV
                 </Button>
             </div>

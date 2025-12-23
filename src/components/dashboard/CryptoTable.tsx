@@ -253,7 +253,7 @@ export function CryptoTable({ holdings, onAdd, onUpdate, onDelete }: CryptoTable
           <Bitcoin className="h-5 w-5 text-warning" />
           Crypto Holdings
         </CardTitle>
-        <div className="flex gap-2">
+        <div className={cn("flex gap-2", isPrivacyMode && "blur-sm select-none pointer-events-none")}>
           {holdings.length > 0 && (
             <Button
               variant="outline"
@@ -403,7 +403,7 @@ export function CryptoTable({ holdings, onAdd, onUpdate, onDelete }: CryptoTable
           </Dialog>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className={cn(isPrivacyMode && "blur-sm select-none pointer-events-none")}>
         {holdings.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">No crypto holdings yet. Add your first one!</div>
         ) : (

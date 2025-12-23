@@ -42,7 +42,7 @@ export function AllocationChart({ investments, groupBy }: AllocationChartProps) 
           <HelpTooltip content="How your money is divided among different categories (Stocks, Crypto, Cash) to manage risk." />
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className={cn(isPrivacyMode && "blur-sm select-none pointer-events-none")}>
         {data.length === 0 ? (
           <div className="h-[250px] flex items-center justify-center text-muted-foreground">
             No investments yet

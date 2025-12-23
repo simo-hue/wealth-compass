@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useChartData, Period } from '@/hooks/useChartData';
 import { useSettings } from '@/contexts/SettingsContext';
+import { cn } from '@/lib/utils';
 
 const COLORS = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6366F1'];
 
@@ -42,7 +43,7 @@ export function CashFlowAnalytics() {
                     <CardHeader>
                         <CardTitle>Expense Structure</CardTitle>
                     </CardHeader>
-                    <CardContent className="h-[300px]">
+                    <CardContent className={cn("h-[300px]", isPrivacyMode && "blur-sm select-none pointer-events-none")}>
                         {expenseData.data.length === 0 ? (
                             <div className="h-full flex items-center justify-center text-muted-foreground">No expenses for this period</div>
                         ) : (
@@ -84,7 +85,7 @@ export function CashFlowAnalytics() {
                     <CardHeader>
                         <CardTitle>Spending Timeline</CardTitle>
                     </CardHeader>
-                    <CardContent className="h-[300px]">
+                    <CardContent className={cn("h-[300px]", isPrivacyMode && "blur-sm select-none pointer-events-none")}>
                         {timelineData.length === 0 ? (
                             <div className="h-full flex items-center justify-center text-muted-foreground">No activity for this period</div>
                         ) : (

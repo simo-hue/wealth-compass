@@ -213,7 +213,7 @@ export default function CashFlowPage() {
                 <CardHeader>
                     <CardTitle>Recent Transactions</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className={cn(isPrivacyMode && "blur-sm select-none pointer-events-none")}>
                     <Table>
                         <TableHeader>
                             <TableRow>
