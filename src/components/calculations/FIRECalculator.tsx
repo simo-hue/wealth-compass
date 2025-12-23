@@ -326,6 +326,47 @@ export default function FIRECalculator() {
                 </Card>
 
             </div>
+
+            {/* Definitions Section */}
+            <div className="lg:col-span-12 mt-6">
+                <Card className="glass-card border-none shadow-xl">
+                    <CardHeader>
+                        <CardTitle className="text-xl gradient-text">Definitions</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="space-y-2">
+                            <h3 className="font-bold text-orange-400 flex items-center gap-2">
+                                <Flame className="h-4 w-4" /> FIRE
+                            </h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                <strong>Financial Independence, Retire Early</strong>. The point where your investment portfolio can indefinitely support your annual expenses.
+                                Typically reached when you have <strong>25x</strong> your annual spending invested, based on the 4% Safe Withdrawal Rate rule.
+                            </p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <h3 className="font-bold text-red-400 flex items-center gap-2">
+                                <Target className="h-4 w-4" /> Lean FIRE
+                            </h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                A minimalist approach to financial independence. The target is lower (usually <strong>80%</strong> of standard expenses),
+                                covering only essential living costs like housing, food, and healthcare. It requires a stricter budget but allows for faster retirement.
+                            </p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <h3 className="font-bold text-purple-400 flex items-center gap-2">
+                                <Wallet className="h-4 w-4" /> Fat FIRE
+                            </h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                A more luxurious path to financial independence. The target is significantly higher (typically <strong>1.5x</strong> standard expenses)
+                                to support a higher standard of living, frequent travel, and indulgences without financial stress.
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
         </div>
     );
 }
