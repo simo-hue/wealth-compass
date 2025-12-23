@@ -39,7 +39,7 @@ export function LiabilitiesTable({ liabilities, onAdd, onUpdate, onDelete }: Lia
   };
 
   const totalDebt = liabilities.reduce((sum, l) => sum + convertCurrency(l.currentBalance, l.currency), 0);
-  const blurClass = isPrivacyMode ? 'privacy-blur' : '';
+
 
   return (
     <Card className="glass-card">
@@ -47,8 +47,8 @@ export function LiabilitiesTable({ liabilities, onAdd, onUpdate, onDelete }: Lia
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <CreditCard className="h-5 w-5 text-destructive" />
           Liabilities
-          <span className={cn("text-sm font-normal text-muted-foreground ml-2", blurClass)}>
-            Total: {formatCurrency(totalDebt)}
+          <span className="text-sm font-normal text-muted-foreground ml-2">
+            Total: {isPrivacyMode ? "****" : formatCurrency(totalDebt)}
           </span>
         </CardTitle>
         <Dialog open={open} onOpenChange={setOpen}>
@@ -140,10 +140,10 @@ export function LiabilitiesTable({ liabilities, onAdd, onUpdate, onDelete }: Lia
                   <TableRow key={l.id}>
                     <TableCell className="font-medium">{l.name}</TableCell>
                     <TableCell className="capitalize hidden sm:table-cell">{l.type.replace('_', ' ')}</TableCell>
-                    <TableCell className={cn("text-right", blurClass)}>{formatCurrency(l.principal, l.currency)}</TableCell>
-                    <TableCell className={cn("text-right text-destructive", blurClass)}>
+                    <TableCell className="text-right">{isPrivacyMode ? "****" : formatCurrency(l.principal, l.currency)}</TableCell>
+                    <TableCell className="text-right text-destructive">
                       <div className="flex flex-col items-end">
-                        <span>{formatCurrency(l.currentBalance, l.currency)}</span>
+                        <span>{isPrivacyMode ? "****" : formatCurrency(l.currentBalance, l.currency)}</span>
                         {l.currency && l.currency !== baseCurrency && (
                           <span className="text-[10px] text-muted-foreground">
                             {new Intl.NumberFormat('en-US', { style: 'currency', currency: l.currency }).format(l.currentBalance)}
@@ -152,7 +152,7 @@ export function LiabilitiesTable({ liabilities, onAdd, onUpdate, onDelete }: Lia
                       </div>
                     </TableCell>
                     <TableCell className="text-right hidden sm:table-cell">{l.interestRate}%</TableCell>
-                    <TableCell className={cn("text-right", blurClass)}>{formatCurrency(l.monthlyPayment, l.currency)}</TableCell>
+                    <TableCell className="text-right">{isPrivacyMode ? "****" : formatCurrency(l.monthlyPayment, l.currency)}</TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" onClick={() => onDelete(l.id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
@@ -165,6 +165,6 @@ export function LiabilitiesTable({ liabilities, onAdd, onUpdate, onDelete }: Lia
           </div>
         )}
       </CardContent>
-    </Card>
+    </Card >
   );
 }

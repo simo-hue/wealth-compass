@@ -39,7 +39,7 @@ export function RecentActivity() {
                                         <p className="text-xs text-muted-foreground">{format(new Date(t.date), 'MMM dd')}</p>
                                     </div>
                                 </div>
-                                <div className={cn("font-medium", t.type === 'income' ? "text-green-500" : "text-foreground")}>
+                                <div className={cn("font-medium", t.type === 'income' ? "text-green-500" : "text-red-500")}>
                                     {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
                                 </div>
                             </div>

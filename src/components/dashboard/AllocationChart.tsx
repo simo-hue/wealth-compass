@@ -32,6 +32,8 @@ export function AllocationChart({ investments, groupBy }: AllocationChartProps) 
 
 
 
+  const totalValue = data.reduce((sum, item) => sum + item.value, 0);
+
   return (
     <Card className="glass-card">
       <CardHeader>
@@ -46,7 +48,7 @@ export function AllocationChart({ investments, groupBy }: AllocationChartProps) 
             No investments yet
           </div>
         ) : (
-          <div className={cn(isPrivacyMode && "privacy-blur")}>
+          <div>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
@@ -63,7 +65,13 @@ export function AllocationChart({ investments, groupBy }: AllocationChartProps) 
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number) => formatCurrency(value)}
+                  formatter={(value: number) => {
+                    if (isPrivacyMode) {
+                      const percent = totalValue > 0 ? (value / totalValue) * 100 : 0;
+                      return [`${percent.toFixed(1)}%`, 'Allocation'];
+                    }
+                    return formatCurrency(value);
+                  }}
                   contentStyle={{ backgroundColor: "#1A1F2C", borderColor: "#403E43", color: "#FFFFFF" }}
                   itemStyle={{ color: "#FFFFFF" }}
                 />

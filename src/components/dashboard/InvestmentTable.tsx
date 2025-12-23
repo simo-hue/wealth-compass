@@ -208,7 +208,7 @@ export function InvestmentTable({ investments, onAdd, onUpdate, onDelete }: Inve
     }
   };
 
-  const blurClass = isPrivacyMode ? 'privacy-blur' : '';
+
 
   return (
     <Card className="glass-card">
@@ -472,14 +472,14 @@ export function InvestmentTable({ investments, onAdd, onUpdate, onDelete }: Inve
                         {/* Main Value in Base Currency */}
                         {/* Logic: IF (asset.currency === base_currency) THEN Direct math (No Conversion). ELSE -> Convert. */}
                         {/* formatCurrency handles this check internally. */}
-                        <span className={cn("font-medium", blurClass)}>
-                          {formatCurrency(inv.currentValue, inv.currency)}
+                        <span className="font-medium">
+                          {isPrivacyMode ? "****" : formatCurrency(inv.currentValue, inv.currency)}
                         </span>
 
                         {/* Secondary Value in Original Currency (if different) */}
                         {inv.currency && inv.currency !== baseCurrency && (
-                          <span className={cn("text-xs text-muted-foreground", blurClass)}>
-                            {new Intl.NumberFormat('en-US', { style: 'currency', currency: inv.currency }).format(inv.currentValue)}
+                          <span className="text-xs text-muted-foreground">
+                            {isPrivacyMode ? "****" : new Intl.NumberFormat('en-US', { style: 'currency', currency: inv.currency }).format(inv.currentValue)}
                           </span>
                         )}
 
@@ -505,8 +505,9 @@ export function InvestmentTable({ investments, onAdd, onUpdate, onDelete }: Inve
               </TableBody>
             </Table>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        )
+        }
+      </CardContent >
+    </Card >
   );
 }

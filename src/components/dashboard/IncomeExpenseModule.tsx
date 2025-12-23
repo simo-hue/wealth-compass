@@ -65,7 +65,7 @@ export function IncomeExpenseModule({
     setExpenseOpen(false);
   };
 
-  const blurClass = isPrivacyMode ? 'privacy-blur' : '';
+
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -75,8 +75,8 @@ export function IncomeExpenseModule({
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-success" />
             Monthly Income
-            <span className={cn("text-sm font-normal text-success ml-2", blurClass)}>
-              {formatCurrency(monthlyIncome)}
+            <span className="text-sm font-normal text-success ml-2">
+              {isPrivacyMode ? "****" : formatCurrency(monthlyIncome)}
             </span>
           </CardTitle>
           <Dialog open={incomeOpen} onOpenChange={setIncomeOpen}>
@@ -133,7 +133,7 @@ export function IncomeExpenseModule({
                     <div className="text-xs text-muted-foreground">{i.description}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={cn("text-success font-medium", blurClass)}>{formatCurrency(i.amount)}</span>
+                    <span className="text-success font-medium">{isPrivacyMode ? "****" : formatCurrency(i.amount)}</span>
                     <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100" onClick={() => onDeleteIncome(i.id)}>
                       <Trash2 className="h-3 w-3 text-destructive" />
                     </Button>
@@ -151,8 +151,8 @@ export function IncomeExpenseModule({
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
             <PiggyBank className="h-5 w-5 text-destructive" />
             Monthly Expenses
-            <span className={cn("text-sm font-normal text-destructive ml-2", blurClass)}>
-              {formatCurrency(monthlyExpenses)}
+            <span className="text-sm font-normal text-destructive ml-2">
+              {isPrivacyMode ? "****" : formatCurrency(monthlyExpenses)}
             </span>
           </CardTitle>
           <Dialog open={expenseOpen} onOpenChange={setExpenseOpen}>
@@ -201,7 +201,7 @@ export function IncomeExpenseModule({
                     <div className="text-xs text-muted-foreground">{e.description}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={cn("text-destructive font-medium", blurClass)}>{formatCurrency(e.amount)}</span>
+                    <span className="text-destructive font-medium">{isPrivacyMode ? "****" : formatCurrency(e.amount)}</span>
                     <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100" onClick={() => onDeleteExpense(e.id)}>
                       <Trash2 className="h-3 w-3 text-destructive" />
                     </Button>
@@ -224,7 +224,7 @@ export function IncomeExpenseModule({
             <span className="text-2xl font-bold text-primary">{savingsRate.toFixed(1)}%</span>
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            Saving <span className={blurClass}>{formatCurrency(monthlyIncome - monthlyExpenses)}</span> out of <span className={blurClass}>{formatCurrency(monthlyIncome)}</span> this month
+            Saving <span>{isPrivacyMode ? "****" : formatCurrency(monthlyIncome - monthlyExpenses)}</span> out of <span>{isPrivacyMode ? "****" : formatCurrency(monthlyIncome)}</span> this month
           </p>
         </CardContent>
       </Card>

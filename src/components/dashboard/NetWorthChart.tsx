@@ -45,15 +45,22 @@ export function NetWorthChart({ data, onRangeChange, currentRange }: NetWorthCha
             No data yet. Add some financial entries and take a snapshot to see your progress.
           </div>
         ) : (
-          <div className={cn(isPrivacyMode && "privacy-blur")}>
+          <div className="relative">
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickFormatter={formatCurrency} />
+                <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickFormatter={(value) => isPrivacyMode ? "" : formatCurrency(value)}
+                />
                 <Tooltip
                   labelFormatter={(date) => format(new Date(date), 'MMM d, yyyy')}
-                  formatter={(value: number) => [formatCurrency(value), 'Net Worth']}
+                  formatter={(value: number) => [
+                    isPrivacyMode ? "****" : formatCurrency(value),
+                    'Net Worth'
+                  ]}
                   contentStyle={{ backgroundColor: "#1A1F2C", borderColor: "#403E43", color: "#FFFFFF" }}
                   itemStyle={{ color: "#FFFFFF" }}
                 />

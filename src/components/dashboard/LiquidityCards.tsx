@@ -35,7 +35,7 @@ export function LiquidityCards({ accounts, onAdd, onUpdate, onDelete }: Liquidit
   };
 
   const totalLiquidity = accounts.reduce((sum, a) => sum + convertCurrency(a.balance, a.currency), 0);
-  const blurClass = isPrivacyMode ? 'privacy-blur' : '';
+
 
   return (
     <Card className="glass-card">
@@ -43,8 +43,8 @@ export function LiquidityCards({ accounts, onAdd, onUpdate, onDelete }: Liquidit
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <Wallet className="h-5 w-5 text-accent" />
           Cash & Liquidity
-          <span className={cn("text-sm font-normal text-muted-foreground ml-2", blurClass)}>
-            Total: {formatCurrency(totalLiquidity)}
+          <span className="text-sm font-normal text-muted-foreground ml-2">
+            Total: {isPrivacyMode ? "****" : formatCurrency(totalLiquidity)}
           </span>
         </CardTitle>
         <Dialog open={open} onOpenChange={setOpen}>
@@ -114,19 +114,20 @@ export function LiquidityCards({ accounts, onAdd, onUpdate, onDelete }: Liquidit
                 </Button>
                 <div className="text-sm text-muted-foreground capitalize">{a.type.replace('_', ' ')}</div>
                 <div className="font-medium">{a.name}</div>
-                <div className={cn("text-xl font-bold text-primary mt-1", blurClass)}>
-                  {formatCurrency(a.balance, a.currency)}
+                <div className="text-xl font-bold text-primary mt-1">
+                  {isPrivacyMode ? "****" : formatCurrency(a.balance, a.currency)}
                 </div>
                 {a.currency && a.currency !== baseCurrency && (
-                  <div className={cn("text-xs text-muted-foreground", blurClass)}>
-                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: a.currency }).format(a.balance)}
+                  <div className="text-xs text-muted-foreground">
+                    {isPrivacyMode ? "****" : new Intl.NumberFormat('en-US', { style: 'currency', currency: a.currency }).format(a.balance)}
                   </div>
                 )}
               </div>
-            ))}
-          </div>
+            ))
+            }
+          </div >
         )}
-      </CardContent>
-    </Card>
+      </CardContent >
+    </Card >
   );
 }

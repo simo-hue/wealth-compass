@@ -19,13 +19,11 @@ export function StatCard({ title, value, icon: Icon, trend, format = 'currency',
 
   const formattedValue =
     format === 'currency'
-      ? formatCurrency(value)
+      ? isPrivacyMode ? '****' : formatCurrency(value)
       : `${value.toFixed(1)}%`;
 
   const TrendIcon = trend && trend > 0 ? TrendingUp : trend && trend < 0 ? TrendingDown : Minus;
   const trendColor = trend && trend > 0 ? 'text-success' : trend && trend < 0 ? 'text-destructive' : 'text-muted-foreground';
-
-  const shouldBlur = format === 'currency' && isPrivacyMode;
 
   return (
     <Card className={cn('glass-card', className)}>
@@ -37,7 +35,7 @@ export function StatCard({ title, value, icon: Icon, trend, format = 'currency',
         <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className={cn("text-2xl font-bold tracking-tight", shouldBlur && "privacy-blur")}>
+        <div className="text-2xl font-bold tracking-tight">
           {formattedValue}
         </div>
         {trend !== undefined && (
