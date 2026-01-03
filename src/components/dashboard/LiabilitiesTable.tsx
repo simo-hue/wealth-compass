@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Trash2, CreditCard } from 'lucide-react';
 import type { Liability } from '@/types/finance';
 import { useSettings } from '@/contexts/SettingsContext';
@@ -61,6 +61,7 @@ export function LiabilitiesTable({ liabilities, onAdd, onUpdate, onDelete }: Lia
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add Liability</DialogTitle>
+              <DialogDescription>Enter the details of your liability (e.g. Mortgage, Loan).</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">

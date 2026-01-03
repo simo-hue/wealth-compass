@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Plus, Trash2, DollarSign, PiggyBank } from 'lucide-react';
 import type { IncomeEntry, ExpenseEntry } from '@/types/finance';
@@ -88,6 +88,7 @@ export function IncomeExpenseModule({
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Add Income</DialogTitle>
+                <DialogDescription>Log a new income source for this month.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleAddIncome} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -164,6 +165,7 @@ export function IncomeExpenseModule({
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Add Expense</DialogTitle>
+                <DialogDescription>Log a new expense for this month.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleAddExpense} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">

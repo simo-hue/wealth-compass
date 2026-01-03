@@ -118,7 +118,7 @@ export async function getBatchCryptoPrices(items: { symbol: string; coinId?: str
             try {
                 const cached: CachedCryptoData = JSON.parse(cachedRaw);
                 if (now - cached.timestamp < CACHE_DURATION) {
-                    console.log('Using cached crypto prices');
+                    // console.log('Using cached crypto prices');
                     // Filter cache for requested IDs
                     const result: Record<string, number> = {};
                     idsArray.forEach(id => {
@@ -239,10 +239,7 @@ export async function getStockPrice(symbol: string): Promise<number | null> {
         if (apiKey) {
             try {
                 const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`);
-                if (!res.ok) {
-                    // if (res.status === 429) throw new Error('Rate limit reached'); // Don't throw, just skip
-                    // throw new Error('Finnhub fetch failed');
-                } else {
+                if (res.ok) {
                     const data = await res.json();
                     if (data.c > 0) return data.c;
                 }
@@ -251,31 +248,43 @@ export async function getStockPrice(symbol: string): Promise<number | null> {
             }
         }
 
-        // Method 2: Yahoo Finance Proxy (Fallback with Suffix Logic)
+        // Method 2: Yahoo Finance Proxy (Smart Search First)
+        // Instead of guessing suffixes which causes 404s, we search for the symbol to get the correct Yahoo ticker.
         const proxyUrl = 'https://corsproxy.io/?';
-        const suffixes = ['', '.DE', '.MI', '.L', '.PA', '.AS']; // Common EU exchanges
 
-        // Helper to fetch single
-        const fetchYahoo = async (sym: string) => {
-            const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}`;
-            const res = await fetch(proxyUrl + encodeURIComponent(targetUrl));
-            if (!res.ok) return null; // Fetch failed
-            const data = await res.json();
-            return data?.chart?.result?.[0]?.meta?.regularMarketPrice || null;
-        };
+        let targetSymbol = symbol;
 
-        for (const suffix of suffixes) {
+        // If it doesn't look like a yahoo symbol (no dot), try to find it
+        if (!symbol.includes('.')) {
             try {
-                const trySymbol = symbol.toUpperCase().endsWith(suffix) ? symbol : symbol + suffix;
-                const price = await fetchYahoo(trySymbol);
-                if (price) return price;
+                // Search for the symbol to find the best match (e.g. searching "VWCE" might return "VWCE.DE")
+                const searchRes = await fetch(proxyUrl + encodeURIComponent(`https://query1.finance.yahoo.com/v1/finance/search?q=${symbol}&quotesCount=1&newsCount=0`));
+                if (searchRes.ok) {
+                    const searchData = await searchRes.json();
+                    const bestMatch = searchData.quotes?.[0];
+                    if (bestMatch && bestMatch.symbol) {
+                        targetSymbol = bestMatch.symbol;
+                    }
+                }
             } catch (e) {
-                // Continue to next suffix
+                // Ignore search failure, fallback to original symbol
             }
         }
 
-        console.warn(`Could not fetch price for ${symbol}. keeping old value.`);
-        return null;
+        const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${targetSymbol}`;
+        const res = await fetch(proxyUrl + encodeURIComponent(targetUrl));
+
+        if (!res.ok) {
+            // If direct fetch fails and we haven't tried suffixes yet (and we didn't just search), 
+            // we *could* try suffixes, but blindly trying them is what caused the 404 spam.
+            // Better to just fail silently or log a single warning if critical.
+            // console.warn(`Yahoo price fetch failed for ${targetSymbol}`); 
+            return null;
+        }
+
+        const data = await res.json();
+        return data?.chart?.result?.[0]?.meta?.regularMarketPrice || null;
+
     } catch (e) {
         console.error(`Unexpected error in getStockPrice for ${symbol}:`, e);
         return null;

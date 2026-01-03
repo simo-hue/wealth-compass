@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Menu } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 export default function MainLayout() {
@@ -21,6 +21,8 @@ export default function MainLayout() {
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 border-r w-64 bg-card">
+                        <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
+                        <SheetDescription className="sr-only">Navigation menu</SheetDescription>
                         <Sidebar />
                     </SheetContent>
                 </Sheet>

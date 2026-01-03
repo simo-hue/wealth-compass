@@ -1,73 +1,58 @@
-# Welcome to your Lovable project
+# Wealth Compass
 
-## Project info
+Wealth Compass is a modern, comprehensive personal finance dashboard designed to give you a complete 360-degree view of your financial health. Built with React, Supabase, and Tailwind CSS, it offers real-time tracking of assets, liabilities, and cash flow in a beautiful, privacy-focused interface.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+### 📊 Interactive Dashboard
+- **Net Worth Tracking**: Visual history of your net worth over time.
+- **Asset Allocation**: Breakdown of your portfolio by sector and asset class.
+- **Key Metrics**: Instant view of total liquidity, investments, and unnecessary expenses.
 
-There are several ways of editing your application.
+### 💰 Cash Flow Management
+- **Transaction Tracking**: Easy entry for income and expenses.
+- **Analytics**: Monthly savings rate, income vs. expense breakdown.
+- **Export**: Download your transaction history to CSV for external analysis.
 
-**Use Lovable**
+### 📈 Investment Portfolio
+- **Stock & ETF Tracking**: Real-time price updates via Finnhub and Yahoo Finance.
+- **Performance Metrics**: Track cost basis, current value, and profit/loss.
+- **Sector Analysis**: Visualize your exposure across different market sectors.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### ₿ Crypto Tracker
+- **Real-time Prices**: Live data fetching from CoinGecko.
+- **Portfolio Overview**: Track holdings, average buy price, and current value.
+- **Privacy Mode**: Blur sensitive values with a single click.
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🧮 Financial Calculators
+- **Compound Interest**: Project future wealth based on savings and returns.
+- **FIRE Calculator**: Estimate your "Financial Independence, Retire Early" timeline.
+- **Inflation Impact**: Understand how purchasing power changes over time.
+- **Monte Carlo Simulation**: Probability-based stress testing of your portfolio.
 
-**Use your preferred IDE**
+### 🔒 Privacy & Security
+- **Supabase Backend**: Secure data persistence with Row Level Security (RLS).
+- **Privacy Mode**: instantly blur all financial figures for discreet viewing in public.
+- **Local Caching**: Smart caching to minimize API calls and improve performance.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Tech Stack
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Frontend**: React, TypeScript, Vite
+- **UI Framework**: Tailwind CSS, shadcn/ui
+- **Backend & Auth**: Supabase
+- **Charts**: Recharts
+- **Icons**: Lucide React
+- **Data Providers**: Finnhub (Stocks), CoinGecko (Crypto), Frankfurter (Currency)
 
-Follow these steps:
+## Getting Started
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Ready to take control of your finances? Follow the installation guide to set up your own instance of Wealth Compass.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- [**Installation Guide (English)**](./INSTALLATION.md)
+- [**Guida all'Installazione (Italiano)**](./INSTALLATION_IT.md)
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+<p align="center">
+  <span style="color: #666; font-size: 0.8em;">Wealth Compass &copy; 2024</span>
+</p>
