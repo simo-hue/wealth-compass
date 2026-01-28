@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -50,23 +50,26 @@ const App = () => (
                   <Route path="/terms" element={<TermsOfService />} />
                 </Route>
 
-                {/* Auth Routes */}
-                <Route path="/login" element={<LoginPage />} />
+                {/* Application Routes prefixed with /sw */}
+                <Route path="sw">
+                  {/* Auth Routes */}
+                  <Route path="login" element={<LoginPage />} />
 
-                {/* Protected App Routes */}
-                <Route element={
-                  <ProtectedRoute>
-                    <MainLayout />
-                  </ProtectedRoute>
-                }>
-                  {/* Moved from "/" to "/dashboard" */}
-                  <Route path="/dashboard" element={<Dashboard />} />
-
-                  <Route path="/cash-flow" element={<CashFlowPage />} />
-                  <Route path="/investments" element={<InvestmentsPage />} />
-                  <Route path="/crypto" element={<CryptoPage />} />
-                  <Route path="/calculations" element={<CalculationsPage />} />
-                  <Route path="/settings" element={<SettingsPage />} />
+                  {/* Protected App Routes */}
+                  <Route element={
+                    <ProtectedRoute>
+                      <MainLayout />
+                    </ProtectedRoute>
+                  }>
+                    {/* Accessing /sw should redirect to dashboard */}
+                    <Route index element={<Navigate to="dashboard" replace />} />
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="cash-flow" element={<CashFlowPage />} />
+                    <Route path="investments" element={<InvestmentsPage />} />
+                    <Route path="crypto" element={<CryptoPage />} />
+                    <Route path="calculations" element={<CalculationsPage />} />
+                    <Route path="settings" element={<SettingsPage />} />
+                  </Route>
                 </Route>
 
                 <Route path="*" element={<NotFound />} />

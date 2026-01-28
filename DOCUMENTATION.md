@@ -163,3 +163,36 @@ Implemented a dual-access architecture where the public promotional website and 
 -   **Auth Redirection**:
     -   `Login.tsx`: Redirects successful logins to `/sw/dashboard`.
     -   `ProtectedRoute.tsx`: Redirects unauthenticated users to `/sw/login`.
+
+# Fix: Application Route Prefixing (/sw)
+
+## Overview
+Fixed the 404 errors when accessing `/sw/login` or other application routes by correctly nesting the application routes under a `/sw` path in `App.tsx`.
+
+## Changes
+1.  **App.tsx**
+    -   Implemented a parent `<Route path="sw">` to wrap all application routes.
+    -   Ensured `WebsiteLayout` remains at the root level (`/`).
+    -   Added `Navigate` to redirect `/sw` index to `/sw/dashboard`.
+
+2.  **Navbar.tsx**
+    -   Updated the "Get Started" button to "Login" and pointed it to `/sw/login` to match the new route structure.
+
+## Verification
+-   **Build**: Successfully built using `npm run build`.
+-   **Manual**:
+    -   Accessing `/` loads the website.
+    -   Accessing `/sw/login` loads the login page.
+    -   Login redirects to `/sw/dashboard`.
+
+# Fix: Login Page Hook Error
+
+## Overview
+Fixed a "Rendered fewer hooks than expected" error in `LoginPage` caused by an early return statement placed before a `useState` hook.
+
+## Changes
+1.  **Login.tsx**
+    -   Moved `const [cooldown, setCooldown] = useState(0);` before the `if (user) return` block to verify React's Rules of Hooks are followed.
+
+## Verification
+-   **Manual**: The error should no longer appear when accessing the login page, even if the authentication state changes.

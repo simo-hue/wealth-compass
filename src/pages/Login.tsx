@@ -11,13 +11,13 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [cooldown, setCooldown] = useState(0);
+
     const { signInWithEmail, user } = useAuth();
 
     if (user) {
         return <Navigate to="/sw/dashboard" replace />;
     }
-
-    const [cooldown, setCooldown] = useState(0);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

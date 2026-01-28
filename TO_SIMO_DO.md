@@ -26,3 +26,6 @@ This document tracks manual actions and considerations for you to address.
 - [ ] Verify the Website at `https://libriperilcambiamento.github.io/wealth-compass/` (Should see Landing Page).
 - [ ] Verify the login at `https://libriperilcambiamento.github.io/wealth-compass/sw/login` (Should see Login).
 - [ ] Verify Dashboard access `https://libriperilcambiamento.github.io/wealth-compass/sw/dashboard` (After login).
+- [ ] **Route Verification**: Verify that entering `/sw/login` manually works.
+- [ ] **Route Verification**: Verify that clicking "Login" on the homepage works.
+- [ ] **Route Verification**: Verify that after login, you are redirected to `/sw/dashboard`.
