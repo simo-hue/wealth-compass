@@ -26,3 +26,6 @@
 6.  **Home Page Verification**:
     - **Check Button**: Ensure the main Hero button says "Start Free".
     - **Check Link**: Click "Start Free" and verify it goes to the `/tutorial` page.
+7.  **Favicon Verification**:
+    - **Browser Tab**: Verify that the browser tab now shows a stylized compass icon instead of the default Vite logo.
+    - **Hard Refresh**: if you don't see it, try a hard refresh (Cmd+Shift+R) to clear the cache.

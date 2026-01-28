@@ -71,3 +71,7 @@ This documentation covers the implementation of the promotional website for Weal
 - **Change**: Renamed the "Get Started Free" button in the Hero section to "Start Free".
 - **Link**: Updated the button's destination from the GitHub repository to the internal `/tutorial` page.
 - **Affected Page**: `Home.tsx`.
+7.  **Favicon Update (Jan 28, 2026)**:
+    - **Change**: Replaced the default Vite favicon with a custom "Stylized Compass" icon (`favicon.png`).
+    - **Location**: `public/favicon.png`.
+    - **Affected File**: `index.html`.
