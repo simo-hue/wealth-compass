@@ -22,3 +22,7 @@
 5.  **Navbar Verification**:
     - **Check Button**: Ensure the button in the header says "Start" (not "LOGIN" or "Get Started").
     - **Check Link**: Click "Start" and verify it goes to the `/tutorial` page.
+
+6.  **Home Page Verification**:
+    - **Check Button**: Ensure the main Hero button says "Start Free".
+    - **Check Link**: Click "Start Free" and verify it goes to the `/tutorial` page.

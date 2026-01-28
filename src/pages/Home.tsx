@@ -28,14 +28,12 @@ export const Home = () => {
                         </p>
 
                         <div className="flex flex-col sm:flex-row justify-center gap-4">
-                            <a
-                                href="https://github.com/simo-hue/wealth-compass"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <Link
+                                to="/tutorial"
                                 className="px-8 py-4 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-lg transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] flex items-center justify-center gap-2"
                             >
-                                Get Started Free <ArrowRight className="h-5 w-5" />
-                            </a>
+                                Start Free <ArrowRight className="h-5 w-5" />
+                            </Link>
                             <Link
                                 to="/features"
                                 className="px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 text-white font-semibold text-lg border border-white/10 transition-colors backdrop-blur-sm"
