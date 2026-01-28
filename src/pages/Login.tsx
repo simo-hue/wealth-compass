@@ -14,7 +14,7 @@ export default function LoginPage() {
     const { signInWithEmail, user } = useAuth();
 
     if (user) {
-        return <Navigate to="/" replace />;
+        return <Navigate to="/sw/dashboard" replace />;
     }
 
     const [cooldown, setCooldown] = useState(0);

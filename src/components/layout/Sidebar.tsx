@@ -20,32 +20,32 @@ const sidebarItems = [
     {
         title: "Dashboard",
         icon: LayoutDashboard,
-        href: "/",
+        href: "/sw/dashboard",
     },
     {
         title: "Cash Flow",
         icon: ArrowRightLeft,
-        href: "/cash-flow",
+        href: "/sw/cash-flow",
     },
     {
         title: "Investments",
         icon: TrendingUp,
-        href: "/investments",
+        href: "/sw/investments",
     },
     {
         title: "Crypto",
         icon: Bitcoin,
-        href: "/crypto",
+        href: "/sw/crypto",
     },
     {
         title: "Settings",
         icon: Settings,
-        href: "/settings",
+        href: "/sw/settings",
     },
     {
         title: "Calculations",
         icon: Calculator,
-        href: "/calculations",
+        href: "/sw/calculations",
     },
 ];
 
