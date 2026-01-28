@@ -61,3 +61,8 @@ This documentation covers the implementation of the promotional website for Weal
     - **Layout**: Compressed to `grid-cols-2` on mobile (vs `grid-cols-1` stacked) for "Product" and "Connect".
     - **Content**: Hidden informative text paragraph on mobile to save vertical space.
     - **Spacing**: Reduced vertical padding and margins on mobile.
+
+## Header Button Update (Jan 28, 2026)
+- **Change**: Renamed the "Get Started" button in the navigation bar to "Start".
+- **Link**: Updated the button's destination from the GitHub repository to the internal `/tutorial` page.
+- **Affected Component**: `Navbar.tsx` (Desktop and Mobile views).

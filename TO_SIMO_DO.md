@@ -18,3 +18,7 @@
     - **Typography**: Check that the main title "Master Your Financial Destiny" looks balanced.
     - **Feature Check**: Verify "Powerful Projections" box is HIDDEN on mobile.
     - **Footer Check**: Verify Footer is compact, description is hidden, and links are 2-columns side-by-side.
+
+5.  **Navbar Verification**:
+    - **Check Button**: Ensure the button in the header says "Start" (not "LOGIN" or "Get Started").
+    - **Check Link**: Click "Start" and verify it goes to the `/tutorial` page.

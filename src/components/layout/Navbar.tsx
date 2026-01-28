@@ -43,14 +43,12 @@ export const Navbar = () => {
                                     <span>{item.name}</span>
                                 </Link>
                             ))}
-                            <a
-                                href="https://github.com/simo-hue/wealth-compass"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <Link
+                                to="/tutorial"
                                 className="ml-4 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-all duration-200 shadow-[0_0_15px_rgba(16,185,129,0.5)] hover:shadow-[0_0_25px_rgba(16,185,129,0.6)]"
                             >
-                                Get Started
-                            </a>
+                                Start
+                            </Link>
                         </div>
                     </div>
 
@@ -86,14 +84,13 @@ export const Navbar = () => {
                                 <span>{item.name}</span>
                             </Link>
                         ))}
-                        <a
-                            href="https://github.com/simo-hue/wealth-compass"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <Link
+                            to="/tutorial"
+                            onClick={() => setIsOpen(false)}
                             className="mt-4 flex w-full items-center justify-center px-4 py-3 rounded-md bg-emerald-600 text-white font-bold"
                         >
-                            Get Started
-                        </a>
+                            Start
+                        </Link>
                     </div>
                 </div>
             )}
