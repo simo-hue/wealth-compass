@@ -11,8 +11,8 @@ export const PrivacyPolicy = () => {
             >
                 <div>
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="p-3 bg-blue-500/10 rounded-xl">
-                            <Shield className="h-8 w-8 text-blue-400" />
+                        <div className="p-3 bg-emerald-500/10 rounded-xl">
+                            <Shield className="h-8 w-8 text-emerald-400" />
                         </div>
                         <h1 className="text-4xl font-bold text-white">Privacy Policy</h1>
                     </div>
@@ -22,7 +22,7 @@ export const PrivacyPolicy = () => {
                 <div className="space-y-6 text-gray-300 leading-relaxed">
                     <section className="bg-gray-900/50 p-6 rounded-2xl border border-white/10">
                         <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                            <Lock className="h-5 w-5 text-blue-400" />
+                            <Lock className="h-5 w-5 text-emerald-400" />
                             1. Data Protection
                         </h2>
                         <p>
@@ -59,7 +59,7 @@ export const PrivacyPolicy = () => {
                         <h2 className="text-xl font-bold text-white mb-4">4. Contact Us</h2>
                         <p>
                             If you have questions about this privacy policy, please contact us at
-                            <a href="mailto:privacy@wealthcompass.app" className="text-blue-400 ml-1 hover:underline">privacy@wealthcompass.app</a>.
+                            <a href="mailto:privacy@wealthcompass.app" className="text-emerald-400 ml-1 hover:underline">privacy@wealthcompass.app</a>.
                         </p>
                     </section>
                 </div>

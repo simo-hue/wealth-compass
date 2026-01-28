@@ -8,8 +8,8 @@ export const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     <div className="col-span-1 md:col-span-2">
                         <Link to="/" className="flex items-center space-x-2 mb-4">
-                            <Compass className="h-6 w-6 text-blue-500" />
-                            <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+                            <Compass className="h-8 w-8 text-emerald-500" />
+                            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-300">
                                 Wealth Compass
                             </span>
                         </Link>

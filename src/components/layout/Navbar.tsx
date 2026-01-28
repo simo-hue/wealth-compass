@@ -19,8 +19,8 @@ export const Navbar = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     <Link to="/" className="flex items-center space-x-2">
-                        <Shield className="h-8 w-8 text-blue-500" />
-                        <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                        <Shield className="h-8 w-8 text-emerald-500" />
+                        <span className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text text-transparent">
                             Wealth Compass
                         </span>
                     </Link>
@@ -35,7 +35,7 @@ export const Navbar = () => {
                                     className={cn(
                                         "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200",
                                         location.pathname === item.path
-                                            ? "text-blue-400 bg-blue-500/10"
+                                            ? "text-emerald-400 bg-emerald-500/10"
                                             : "text-gray-300 hover:text-white hover:bg-white/5"
                                     )}
                                 >
@@ -47,7 +47,7 @@ export const Navbar = () => {
                                 href="https://github.com/simo-hue/wealth-compass"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="ml-4 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-all duration-200 shadow-[0_0_15px_rgba(37,99,235,0.5)] hover:shadow-[0_0_25px_rgba(37,99,235,0.6)]"
+                                className="ml-4 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-all duration-200 shadow-[0_0_15px_rgba(16,185,129,0.5)] hover:shadow-[0_0_25px_rgba(16,185,129,0.6)]"
                             >
                                 Get Started
                             </a>
@@ -78,7 +78,7 @@ export const Navbar = () => {
                                 className={cn(
                                     "flex items-center space-x-3 px-3 py-3 rounded-md text-base font-medium",
                                     location.pathname === item.path
-                                        ? "text-blue-400 bg-blue-500/10"
+                                        ? "text-emerald-400 bg-emerald-500/10"
                                         : "text-gray-300 hover:text-white hover:bg-white/5"
                                 )}
                             >
@@ -90,7 +90,7 @@ export const Navbar = () => {
                             href="https://github.com/simo-hue/wealth-compass"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-4 flex w-full items-center justify-center px-4 py-3 rounded-md bg-blue-600 text-white font-bold"
+                            className="mt-4 flex w-full items-center justify-center px-4 py-3 rounded-md bg-emerald-600 text-white font-bold"
                         >
                             Get Started
                         </a>

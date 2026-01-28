@@ -42,7 +42,7 @@ const steps = [
         code: "npm run dev",
         content: (
             <p className="text-gray-400 mt-2">
-                Open <code className="text-blue-400">http://localhost:5173</code> in your browser to see the app running!
+                Open <code className="text-emerald-400">http://localhost:5173</code> in your browser to see the app running!
             </p>
         )
     }
@@ -57,7 +57,7 @@ export const Tutorial = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-16"
                 >
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent mb-4">
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text text-transparent mb-4">
                         Getting Started
                     </h1>
                     <p className="text-gray-400 text-lg">
@@ -76,19 +76,19 @@ export const Tutorial = () => {
                             className="relative pl-8 md:pl-0"
                         >
                             <div className="hidden md:flex flex-col items-center absolute left-0 top-0 h-full w-12 -ml-6">
-                                <div className="w-12 h-12 rounded-full bg-blue-600/20 border border-blue-500/50 flex items-center justify-center text-blue-400 font-bold z-10">
+                                <div className="w-12 h-12 rounded-full bg-emerald-600/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 font-bold z-10">
                                     {index + 1}
                                 </div>
-                                {index !== steps.length - 1 && <div className="w-0.5 h-full bg-blue-500/20 mt-2" />}
+                                {index !== steps.length - 1 && <div className="w-0.5 h-full bg-emerald-500/20 mt-2" />}
                             </div>
 
                             <div className="md:ml-12 p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <div className="md:hidden w-8 h-8 rounded-full bg-blue-600/20 border border-blue-500/50 flex items-center justify-center text-blue-400 font-bold text-sm">
+                                    <div className="md:hidden w-8 h-8 rounded-full bg-emerald-600/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 font-bold text-sm">
                                         {index + 1}
                                     </div>
                                     <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                                        <step.icon className="h-6 w-6 text-blue-400" />
+                                        <step.icon className="h-6 w-6 text-emerald-400" />
                                         {step.title}
                                     </h3>
                                 </div>

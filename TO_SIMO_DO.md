@@ -1,19 +1,14 @@
 # Actions for Simone
 
-1.  **Run the Development Server**:
-    - Execute `npm run dev` in the terminal.
-    - Open the local URL (usually `http://localhost:5173`) to view the promotional website.
+1.  **View Your Live Site**:
+    - Go to: `https://simo-hue.github.io/wealth-compass/`
+    - Verify that the site loads correctly and improvements are visible.
 
-2.  **Verify The "Real Dashboard" Demo**:
-    - **Authentic Layout**: Confirm the Home Page hero section now looks **exactly** like your real app dashboard.
-    - **Visual Details**: Check the Sidebar, 4 KPI cards (Net Worth, Cash, etc.), and the main Chart.
-    - **Live Simulation**: Watch for live updates in the "Net Worth" value and chart, just like a real monitoring tool.
-    - **3D Tilt**: The entire dashboard container should still tilt in 3D when you move your mouse.
+2.  **Repo Management**:
+    - The promotional site code is in the `promotional-website` branch.
+    - The deployment is in the `gh-pages` branch.
+    - Your main application code is safe in the `main` branch.
 
-3.  **Verify Features & Footer**:
-    - Check the new **Cash Flow** and **Portfolio** demos on the Features page.
-    - Confirm the **Footer** is compact and links work.
-
-4.  **Deployment**:
-    - When ready to publish, run `npm run build`.
-    - Deploy the `dist` folder to your hosting provider.
+3.  **Future Updates**:
+    - To update the site, make changes in `promotional-website` branch.
+    - Run `npm run deploy` to publish changes.

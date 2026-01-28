@@ -12,7 +12,7 @@ export const Founder = () => {
                 >
                     <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
                         {/* Profile Image Mockup with Initials if no image */}
-                        <div className="w-40 h-40 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-4xl font-bold text-white shadow-2xl shrink-0">
+                        <div className="w-40 h-40 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-400 flex items-center justify-center text-4xl font-bold text-white shadow-2xl shrink-0">
                             SM
                         </div>
 
@@ -29,10 +29,10 @@ export const Founder = () => {
                             </p>
 
                             <div className="pt-4 flex items-center justify-center md:justify-start gap-4">
-                                <a href="https://github.com/simo-hue" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-white/10 hover:bg-white/20 hover:text-blue-400 transition-colors">
+                                <a href="https://github.com/simo-hue" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-white/10 hover:bg-white/20 hover:text-emerald-400 transition-colors">
                                     <Github className="h-6 w-6" />
                                 </a>
-                                <a href="https://www.linkedin.com/in/simonemattioli2003/" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-white/10 hover:bg-white/20 hover:text-blue-400 transition-colors">
+                                <a href="https://www.linkedin.com/in/simonemattioli2003/" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-white/10 hover:bg-white/20 hover:text-emerald-400 transition-colors">
                                     <Linkedin className="h-6 w-6" />
                                 </a>
                             </div>

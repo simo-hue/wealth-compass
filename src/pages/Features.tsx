@@ -7,8 +7,8 @@ const features = [
         title: "Interactive Dashboard",
         description: "A complete 360-degree view of your financial health. Track net worth history, asset allocation by sector, and key liquidity metrics at a glance.",
         icon: Activity,
-        color: "text-blue-400",
-        bg: "bg-blue-400/10"
+        color: "text-emerald-400",
+        bg: "bg-emerald-400/10"
     },
     {
         title: "Cash Flow Management",
@@ -56,7 +56,7 @@ export const Features = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-20"
                 >
-                    <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent mb-4">
+                    <h2 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text text-transparent mb-4">
                         Powerful Features
                     </h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg">

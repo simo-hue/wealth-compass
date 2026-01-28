@@ -15,14 +15,14 @@ const netWorthData = [
 ];
 
 const allocationData = [
-    { name: 'Investments', value: 6206, color: '#3b82f6' },
+    { name: 'Investments', value: 6206, color: '#10b981' },
     { name: 'Crypto', value: 1744, color: '#f59e0b' },
-    { name: 'Cash', value: 3762, color: '#10b981' },
+    { name: 'Cash', value: 3762, color: '#059669' },
 ];
 
 const activities = [
-    { id: 1, name: 'Pane', date: 'Jan 27', amount: -1.36, type: 'expense' },
-    { id: 3, name: 'Cena', date: 'Jan 26', amount: -74.00, type: 'expense' },
+    { id: 1, name: 'Groceries', date: 'Jan 27', amount: -1.36, type: 'expense' },
+    { id: 3, name: 'Dinner', date: 'Jan 26', amount: -74.00, type: 'expense' },
 ];
 
 export const HeroDemo = () => {
@@ -110,7 +110,9 @@ export const HeroDemo = () => {
                             <p className="text-sm text-gray-500">Financial Command Center</p>
                         </div>
                         <div className="flex gap-3">
-                            <button className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors border border-white/5">
+                            <button
+                                className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors border border-white/5"
+                            >
                                 <RefreshCw size={14} /> Refresh
                             </button>
                             <button className="flex items-center gap-2 px-4 py-2 bg-[#10b981] hover:bg-[#059669] text-[#0B0E11] rounded-lg text-sm font-bold transition-colors shadow-lg shadow-emerald-900/20">
@@ -156,7 +158,7 @@ export const HeroDemo = () => {
                                     <AreaChart data={netWorthData}>
                                         <defs>
                                             <linearGradient id="colorNw" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
                                                 <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
@@ -164,7 +166,7 @@ export const HeroDemo = () => {
                                         <YAxis hide domain={['auto', 'auto']} />
                                         <Tooltip
                                             contentStyle={{ backgroundColor: '#0B0E11', borderColor: '#374151', borderRadius: '8px', color: '#fff' }}
-                                            itemStyle={{ color: '#10b981' }}
+                                            itemStyle={{ color: '#34d399', fontWeight: 600 }}
                                             formatter={(value: any) => [`€${value}`, 'Net Worth']}
                                         />
                                         <Area type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorNw)" />
@@ -187,7 +189,7 @@ export const HeroDemo = () => {
                                                 outerRadius={80}
                                                 paddingAngle={5}
                                                 dataKey="value"
-                                                stroke="none"
+                                                stroke="#10b981"
                                             >
                                                 {allocationData.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={entry.color} />
