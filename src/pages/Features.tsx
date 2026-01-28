@@ -111,6 +111,7 @@ export const Features = () => {
                             initial={{ opacity: 0, x: 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
+                            className="hidden md:block"
                         >
                             <h3 className="text-xl font-bold text-white mb-6 text-center">Powerful Projections</h3>
                             <GrowthPreview />

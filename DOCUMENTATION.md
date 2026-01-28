@@ -44,3 +44,20 @@ This documentation covers the implementation of the promotional website for Weal
 ## Development
 - **Run**: `npm run dev`
 - **Build**: `npm run build`
+
+## Mobile Optimization (Jan 28, 2026)
+- **Objective**: Ensure the Home page and specifically the Demo are fully usable on mobile devices without compromising the desktop experience.
+- **HeroDemo.tsx Improvements**:
+    - **Adaptive Height**: Switched from fixed height to `h-auto` on mobile to accommodate stacked content without internal scrolling (scroll trap prevention).
+    - **Overflow Handling**: Changed `overflow-hidden` to `visible` on mobile to allow natural page scrolling.
+    - **Grid Layout**: Optimized KPI cards to `grid-cols-2` on mobile (up from 1) to conserve vertical space.
+    - **Actions**: Hidden "Refresh" and "Snapshot" buttons on mobile (`hidden sm:flex`) to reduce visual clutter and save space.
+    - **Chart Controls**: Hidden timeframe selector ("1W", "1M" etc.) on mobile to simplify the chart view.
+- **Home.tsx Improvements**:
+    - **Typography**: Adjusted Hero H1 size from `5xl` to `4xl` on mobile to prevent aggressive wrapping/overflow.
+- **Features.tsx Improvements**:
+    - **Projections**: Hidden "Powerful Projections" box on mobile (`hidden md:block`) as requested.
+- **Footer.tsx Improvements**:
+    - **Layout**: Compressed to `grid-cols-2` on mobile (vs `grid-cols-1` stacked) for "Product" and "Connect".
+    - **Content**: Hidden informative text paragraph on mobile to save vertical space.
+    - **Spacing**: Reduced vertical padding and margins on mobile.

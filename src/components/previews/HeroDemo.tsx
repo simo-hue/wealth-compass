@@ -17,7 +17,7 @@ const netWorthData = [
 const allocationData = [
     { name: 'Investments', value: 6206, color: '#10b981' },
     { name: 'Crypto', value: 1744, color: '#f59e0b' },
-    { name: 'Cash', value: 3762, color: '#059669' },
+    { name: 'Cash', value: 3762, color: '#1208a2ff' },
 ];
 
 const activities = [
@@ -68,7 +68,7 @@ export const HeroDemo = () => {
                 style={{ rotateX: rotateXSpring, rotateY: rotateYSpring }}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                className="bg-[#0B0E11] rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative flex flex-col md:flex-row h-[800px] md:h-[700px]"
+                className="bg-[#0B0E11] rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative flex flex-col md:flex-row h-auto md:h-[700px]"
             >
                 {/* Sidebar */}
                 <div className="w-64 bg-[#0B0E11] border-r border-white/5 p-6 flex flex-col hidden md:flex">
@@ -102,14 +102,14 @@ export const HeroDemo = () => {
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 overflow-y-auto bg-[#0B0E11] p-6 sm:p-8">
+                <div className="flex-1 overflow-visible md:overflow-y-auto bg-[#0B0E11] p-6 sm:p-8">
                     {/* Header */}
                     <div className="flex justify-between items-start mb-8">
                         <div>
                             <h1 className="text-2xl font-bold text-white mb-1">Dashboard</h1>
                             <p className="text-sm text-gray-500">Financial Command Center</p>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="hidden sm:flex gap-3">
                             <button
                                 className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors border border-white/5"
                             >
@@ -122,7 +122,7 @@ export const HeroDemo = () => {
                     </div>
 
                     {/* KPI Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                         {[
                             { label: 'Net Worth', value: `€${currentNetWorth.toLocaleString(undefined, { maximumFractionDigits: 2 })}`, icon: Info, change: true },
                             { label: 'Cash Balance', value: '€3,762.32', icon: Wallet, change: null },
@@ -147,7 +147,7 @@ export const HeroDemo = () => {
                         <div className="lg:col-span-2 bg-[#151A21] p-6 rounded-2xl border border-white/5">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-white font-semibold">Net Worth Evolution</h3>
-                                <div className="flex bg-[#0B0E11] rounded-lg p-1">
+                                <div className="hidden sm:flex bg-[#0B0E11] rounded-lg p-1">
                                     {['1W', '1M', '6M', '1Y', 'ALL'].map((r, i) => (
                                         <div key={r} className={`px-3 py-1 text-xs font-medium rounded-md cursor-default ${i === 3 ? 'bg-[#10b981] text-[#0B0E11]' : 'text-gray-400'}`}>{r}</div>
                                     ))}
