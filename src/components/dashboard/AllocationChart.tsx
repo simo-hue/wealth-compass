@@ -87,9 +87,9 @@ export function AllocationChart({ investments, groupBy }: AllocationChartProps) 
             No investments yet
           </div>
         ) : (
-          <div className="flex flex-col md:flex-row items-center gap-8 h-full md:h-[300px]">
+          <div className="flex flex-col items-center gap-6 h-full">
             {/* Donut Chart */}
-            <div className="relative w-full md:w-1/2 h-[260px] flex-shrink-0">
+            <div className="relative w-full h-[260px] flex-shrink-0">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -98,8 +98,8 @@ export function AllocationChart({ investments, groupBy }: AllocationChartProps) 
                     data={data}
                     cx="50%"
                     cy="50%"
-                    innerRadius={isMobile ? 65 : 75}
-                    outerRadius={isMobile ? 85 : 95}
+                    innerRadius={isMobile ? 65 : 80}
+                    outerRadius={isMobile ? 85 : 100}
                     paddingAngle={4}
                     dataKey="value"
                     onMouseEnter={(_, index) => setActiveIndex(index)}
@@ -118,8 +118,8 @@ export function AllocationChart({ investments, groupBy }: AllocationChartProps) 
               </ResponsiveContainer>
             </div>
 
-            {/* Custom Legend */}
-            <div className="w-full md:w-1/2 flex flex-col gap-3 overflow-y-auto max-h-[260px] pr-2 custom-scrollbar">
+            {/* Custom Legend - Below Chart */}
+            <div className="w-full flex flex-col gap-3 px-2">
               {data.map((item, index) => (
                 <div
                   key={item.name}
