@@ -5,7 +5,7 @@
     "background_color": "#ffffff",
     "display": "standalone",
     "scope": "/wealth-compass/",
-    "start_url": "/wealth-compass/",
+    "start_url": "/wealth-compass/sw/dashboard",
     "icons": [
         {
             "src": "pwa-192x192.png",
