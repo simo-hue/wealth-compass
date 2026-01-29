@@ -35,8 +35,12 @@ This document tracks manual actions and considerations for you to address.
 - [ ] **Installable**: Verify "Install" icon appears in address bar (Chrome) or "Add to Home Screen" works on mobile.
 - [ ] **Icons on Mobile**: When added to home screen, verify the new icon is used.
 
-# GitHub Actions Setup (Manual Steps)
-- [ ] **Sync Fork**: Ensure your fork is synced with the latest changes (specifically the new `.github/workflows/deploy.yml` file).
+# GitHub Actions Setup (FORK - IMPORTANT)
+- [ ] **Enable Actions**: Go to the **Actions** tab in your Fork. If you see a warning or a big green button, verify/enable workflows.
+- [ ] **Trigger via Push**: GitHub might not recognize the "Manual Run" button yet. To force it to start:
+    -   Simply **Commit and Push** this file change.
+    -   This `push` will "wake up" the workflow.
+- [ ] **Check Success**: Go to the **Actions** tab and watch the "Deploy Web App" workflow run.
 - [ ] **Configure Pages**: Go to your Fork's repository settings -> **Pages**.
 - [ ] **Change Source**: Under "Build and deployment", change the **Branch** from `gh-pages` (or `None`) to `gh-pages-webapp`.
 - [ ] **Save**: Click Save.

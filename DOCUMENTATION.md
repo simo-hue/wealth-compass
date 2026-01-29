@@ -236,3 +236,11 @@ Implemented an automated deployment workflow using GitHub Actions to enable cont
     -   Observe action run in "Actions" tab.
     -   Verify branch `gh-pages-webapp` is created/updated.
     -   (User Action) Switch GitHub Pages source to this new branch.
+
+## Troubleshooting: Fork Deployment
+If the workflow does not run automatically on the Fork:
+1.  **Enable Actions**: GitHub disables Actions on forks by default. Go to the **Actions** tab and click the button to enable them.
+2.  **Manual Run**: If the sync happened *before* enabling actions, you may need to manually trigger the workflow:
+    -   Go to **Actions** tab.
+    -   Select **Deploy Web App**.
+    -   Click **Run workflow**.
