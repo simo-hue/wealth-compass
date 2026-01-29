@@ -1,0 +1,21 @@
+{
+    "name": "Wealth Compass",
+    "short_name": "Wealth Compass",
+    "theme_color": "#000000",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/wealth-compass/",
+    "start_url": "/wealth-compass/",
+    "icons": [
+        {
+            "src": "pwa-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "pwa-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
