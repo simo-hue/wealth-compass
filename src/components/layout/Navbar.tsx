@@ -63,7 +63,6 @@ export const Navbar = () => {
                     </div>
                 </div>
             </div>
-
             {/* Mobile Menu */}
             {isOpen && (
                 <div className="md:hidden bg-background/95 backdrop-blur-xl border-b border-white/10">
