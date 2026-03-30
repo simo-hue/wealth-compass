@@ -251,3 +251,13 @@ If the workflow does not run automatically on the Fork:
 For the application to connect to the database, you must configure the following **Repository Secrets** in the Fork settings (Settings > Secrets and variables > Actions):
 -   `VITE_SUPABASE_URL`: Your Supabase Project URL.
 -   `VITE_SUPABASE_ANON_KEY`: Your Supabase Anon Key.
+
+# Mobile Numpad Keyboard Force (Mar 30, 2026)
+
+## Overview
+Forced mobile devices (iOS/Android) to exclusively show the numeric keypad (numpad) when users are inputting numbers instead of the full keyboard with numbers.
+
+## Changes
+1.  **Input Component (`src/components/ui/input.tsx`)**
+    -   Automatically applied `inputMode="decimal"` to all input elements where `type="number"`.
+    -   This prevents the standard alphanumeric keyboard from appearing when focusing on number fields, streamlining data entry for the financial application.
