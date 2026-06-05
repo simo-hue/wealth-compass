@@ -5,6 +5,7 @@ struct InvestmentsView: View {
     @EnvironmentObject private var settings: AppSettings
     @State private var showingForm = false
     @State private var editingInvestment: Investment?
+    @State private var investmentPendingDeletion: Investment?
 
     var body: some View {
         ScrollView {
@@ -32,6 +33,16 @@ struct InvestmentsView: View {
             InvestmentFormView(investment: editingInvestment) { investment in
                 finance.upsertInvestment(investment, settings: settings)
             }
+        }
+        .alert(item: $investmentPendingDeletion) { investment in
+            Alert(
+                title: Text("Delete Investment?"),
+                message: Text("This permanently removes \(investment.symbol) from your investment portfolio."),
+                primaryButton: .destructive(Text("Delete")) {
+                    finance.deleteInvestment(investment, settings: settings)
+                },
+                secondaryButton: .cancel()
+            )
         }
     }
 
@@ -82,7 +93,7 @@ struct InvestmentsView: View {
                                 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
-                                        finance.deleteInvestment(investment, settings: settings)
+                                        investmentPendingDeletion = investment
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }

@@ -5,16 +5,46 @@ struct TransactionFormView: View {
     @EnvironmentObject private var settings: AppSettings
     let onSave: (TransactionType, Double, String, String, Date) -> Void
 
+    private static let customCategoryTag = "__wealth_compass_custom_category__"
+
     @State private var type: TransactionType = .expense
     @State private var amount = ""
     @State private var category = "Food"
     @State private var note = ""
     @State private var date = Date()
-    @State private var isAddingCategory = false
-    @State private var newCategory = ""
+    @State private var customCategory = ""
+    @FocusState private var isCustomCategoryFocused: Bool
 
     private var categories: [String] {
         settings.transactionCategories(for: type)
+    }
+
+    private var trimmedCustomCategory: String {
+        customCategory.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var currentCategoryName: String {
+        category == Self.customCategoryTag ? trimmedCustomCategory : category
+    }
+
+    private var isCustomCategorySelected: Bool {
+        category == Self.customCategoryTag
+    }
+
+    private var isSaveDisabled: Bool {
+        parsedAmount <= 0 || currentCategoryName.isEmpty
+    }
+
+    private var customCategoryHint: String {
+        if trimmedCustomCategory.isEmpty {
+            return "Enter a category name. It will be saved for future \(type.title.lowercased()) transactions."
+        }
+
+        if let existing = categories.first(where: { $0.caseInsensitiveCompare(trimmedCustomCategory) == .orderedSame }) {
+            return "\(existing) already exists and will be selected."
+        }
+
+        return "This category will be added to your \(type.title.lowercased()) categories."
     }
 
     private var parsedAmount: Double {
@@ -32,44 +62,46 @@ struct TransactionFormView: View {
                 .pickerStyle(.segmented)
                 .onChange(of: type) { _, newValue in
                     category = settings.transactionCategories(for: newValue).first ?? ""
-                    isAddingCategory = false
-                    newCategory = ""
+                    customCategory = ""
+                    isCustomCategoryFocused = false
                 }
 
-                Section {
+                Section("Details") {
                     TextField("Amount", text: $amount)
                         .keyboardType(.decimalPad)
-                    VStack(alignment: .leading, spacing: 10) {
-                        Picker("Category", selection: $category) {
-                            ForEach(categories, id: \.self) { category in
-                                Text(category).tag(category)
-                            }
-                        }
-
-                        if isAddingCategory {
-                            HStack(spacing: 10) {
-                                TextField("New category", text: $newCategory)
-                                    .textInputAutocapitalization(.words)
-                                Button("Save") {
-                                    if let saved = settings.addCustomTransactionCategory(newCategory, for: type) {
-                                        category = saved
-                                    }
-                                    newCategory = ""
-                                    isAddingCategory = false
-                                }
-                                .disabled(newCategory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                            }
-                        } else {
-                            Button {
-                                isAddingCategory = true
-                            } label: {
-                                Label("Add Custom Category", systemImage: "plus.circle")
-                            }
-                            .font(.subheadline.weight(.medium))
-                        }
-                    }
                     DatePicker("Date", selection: $date, displayedComponents: .date)
                     TextField("Description", text: $note)
+                }
+
+                Section("Category") {
+                    Picker("Category", selection: $category) {
+                        ForEach(categories, id: \.self) { category in
+                            Text(category).tag(category)
+                        }
+                        Text("Custom...").tag(Self.customCategoryTag)
+                    }
+                    .pickerStyle(.menu)
+                    .onChange(of: category) { _, newValue in
+                        if newValue == Self.customCategoryTag {
+                            Task { @MainActor in
+                                isCustomCategoryFocused = true
+                            }
+                        } else {
+                            customCategory = ""
+                            isCustomCategoryFocused = false
+                        }
+                    }
+
+                    if isCustomCategorySelected {
+                        TextField("Custom category name", text: $customCategory)
+                            .textInputAutocapitalization(.words)
+                            .autocorrectionDisabled()
+                            .focused($isCustomCategoryFocused)
+
+                        Text(customCategoryHint)
+                            .font(.caption)
+                            .foregroundStyle(WCColor.textSecondary)
+                    }
                 }
             }
             .navigationTitle("Add Transaction")
@@ -79,14 +111,30 @@ struct TransactionFormView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        onSave(type, parsedAmount, category, note, date)
-                        dismiss()
+                        saveTransaction()
                     }
-                    .disabled(parsedAmount <= 0 || category.isEmpty)
+                    .disabled(isSaveDisabled)
                 }
             }
         }
         .preferredColorScheme(.dark)
+    }
+
+    private func saveTransaction() {
+        guard parsedAmount > 0 else { return }
+
+        let selectedCategory: String
+        if isCustomCategorySelected {
+            guard let savedCategory = settings.addCustomTransactionCategory(trimmedCustomCategory, for: type) else {
+                return
+            }
+            selectedCategory = savedCategory
+        } else {
+            selectedCategory = category
+        }
+
+        onSave(type, parsedAmount, selectedCategory, note, date)
+        dismiss()
     }
 }
 
@@ -181,14 +229,18 @@ struct InvestmentFormView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    TextField(feeMode == .fixed ? "Fee Amount" : "Fee Percentage", text: $feeValue)
+                    TextField(feeMode == .fixed ? "Investment Transaction Fee" : "Investment Transaction Fee %", text: $feeValue)
                         .keyboardType(.decimalPad)
                     HStack {
-                        Text("Calculated Fee")
+                        Text("Investment Fee")
                         Spacer()
                         Text(calculatedFee.formatted(.currency(code: currency.rawValue)))
                             .font(.body.monospacedDigit())
                     }
+                } header: {
+                    Text("Investment Transaction Fee")
+                } footer: {
+                    Text("Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.")
                 }
             }
             .navigationTitle(investment == nil ? "Add Investment" : "Edit Investment")

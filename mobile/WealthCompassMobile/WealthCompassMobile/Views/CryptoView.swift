@@ -5,6 +5,7 @@ struct CryptoView: View {
     @EnvironmentObject private var settings: AppSettings
     @State private var showingForm = false
     @State private var editingHolding: CryptoHolding?
+    @State private var holdingPendingDeletion: CryptoHolding?
 
     var body: some View {
         ScrollView {
@@ -33,12 +34,22 @@ struct CryptoView: View {
                 finance.upsertCrypto(holding, settings: settings)
             }
         }
+        .alert(item: $holdingPendingDeletion) { holding in
+            Alert(
+                title: Text("Delete Crypto Holding?"),
+                message: Text("This permanently removes \(holding.symbol) from your crypto portfolio."),
+                primaryButton: .destructive(Text("Delete")) {
+                    finance.deleteCrypto(holding, settings: settings)
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
 
     private var summary: some View {
         let total = finance.calculateTotals(settings: settings).totalCrypto
         let costBasis = finance.data.crypto.reduce(0) {
-            $0 + settings.convert($1.costBasis, from: .usd)
+            $0 + settings.convert($1.costBasis, from: $1.currency)
         }
         let gain = total - costBasis
         let percent = costBasis > 0 ? (gain / costBasis) * 100 : 0
@@ -82,7 +93,7 @@ struct CryptoView: View {
                                 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
-                                        finance.deleteCrypto(holding, settings: settings)
+                                        holdingPendingDeletion = holding
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }
@@ -108,7 +119,7 @@ struct CryptoView: View {
                 Text("\(settings.privateNumber(holding.quantity, fractionDigits: 8)) units")
                     .font(.caption)
                     .foregroundStyle(WCColor.textSecondary)
-                Text("\(settings.privateCurrency(holding.currentPrice, sourceCurrency: .usd)) / unit")
+                Text("\(settings.privateCurrency(holding.currentPrice, sourceCurrency: holding.currency)) / unit")
                     .font(.caption)
                     .foregroundStyle(WCColor.textSecondary)
             }
@@ -116,12 +127,12 @@ struct CryptoView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
-                Text(settings.privateCurrency(holding.currentValue, sourceCurrency: .usd))
+                Text(settings.privateCurrency(holding.currentValue, sourceCurrency: holding.currency))
                     .font(.subheadline.monospacedDigit().weight(.bold))
                     .foregroundStyle(.white)
                 ValueDelta(
                     value: holding.gainLoss,
-                    formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: .usd),
+                    formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
                     percent: holding.gainLossPercent
                 )
                 Text("Updated \(holding.updatedAt.formatted(date: .abbreviated, time: .omitted))")
