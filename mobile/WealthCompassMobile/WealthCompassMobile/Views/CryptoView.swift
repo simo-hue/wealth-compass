@@ -30,7 +30,7 @@ struct CryptoView: View {
         .pageChrome()
         .sheet(isPresented: $showingForm, onDismiss: { editingHolding = nil }) {
             CryptoFormView(holding: editingHolding) { holding in
-                finance.upsertCrypto(holding)
+                finance.upsertCrypto(holding, settings: settings)
             }
         }
     }
@@ -82,7 +82,7 @@ struct CryptoView: View {
                                 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
-                                        finance.deleteCrypto(holding)
+                                        finance.deleteCrypto(holding, settings: settings)
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }

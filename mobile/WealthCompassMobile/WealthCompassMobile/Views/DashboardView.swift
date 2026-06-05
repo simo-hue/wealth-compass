@@ -5,7 +5,6 @@ struct DashboardView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @State private var timeRange: TimeRange = .oneYear
-    @State private var lastSnapshotAt: Date?
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -16,21 +15,20 @@ struct DashboardView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 PageHeader(title: "Dashboard", subtitle: "Financial Command Center") {
-                    Button {
-                        finance.takeSnapshot(settings: settings)
-                        lastSnapshotAt = Date()
-                    } label: {
-                        Image(systemName: "camera")
-                            .font(.headline)
+                    if let latestSnapshot = finance.data.snapshots.last {
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Label("Auto", systemImage: "camera.metering.center.weighted")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(WCColor.primary)
+                            Text(latestSnapshot.date.formatted(date: .abbreviated, time: .shortened))
+                                .font(.caption2)
+                                .foregroundStyle(WCColor.textSecondary)
+                        }
+                    } else {
+                        Label("Auto snapshots", systemImage: "camera.metering.center.weighted")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(WCColor.primary)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(WCColor.primary)
-                }
-
-                if let lastSnapshotAt {
-                    Text("Snapshot saved at \(lastSnapshotAt.formatted(date: .omitted, time: .shortened))")
-                        .font(.caption)
-                        .foregroundStyle(WCColor.textSecondary)
                 }
 
                 let totals = finance.calculateTotals(settings: settings)
@@ -70,7 +68,7 @@ struct DashboardView: View {
 
                 let points = finance.snapshots(range: timeRange)
                 if points.isEmpty {
-                    EmptyState(title: "Take a snapshot to build history", systemImage: "camera")
+                    EmptyState(title: "History will appear after your first update", systemImage: "camera.metering.center.weighted")
                 } else {
                     Chart(points) { point in
                         LineMark(

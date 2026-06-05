@@ -4,12 +4,14 @@ import SwiftUI
 struct WealthCompassMobileApp: App {
     @StateObject private var financeStore = FinanceStore()
     @StateObject private var settings = AppSettings()
+    @StateObject private var appLock = AppLockStore()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(financeStore)
                 .environmentObject(settings)
+                .environmentObject(appLock)
                 .preferredColorScheme(.dark)
         }
     }

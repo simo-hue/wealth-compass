@@ -30,7 +30,7 @@ struct InvestmentsView: View {
         .pageChrome()
         .sheet(isPresented: $showingForm, onDismiss: { editingInvestment = nil }) {
             InvestmentFormView(investment: editingInvestment) { investment in
-                finance.upsertInvestment(investment)
+                finance.upsertInvestment(investment, settings: settings)
             }
         }
     }
@@ -82,7 +82,7 @@ struct InvestmentsView: View {
                                 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
-                                        finance.deleteInvestment(investment)
+                                        finance.deleteInvestment(investment, settings: settings)
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }

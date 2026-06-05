@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
+    @EnvironmentObject private var appLock: AppLockStore
     @State private var backupURL: URL?
     @State private var backupError: String?
     @State private var showingDeleteConfirmation = false
@@ -23,6 +24,28 @@ struct SettingsView: View {
                         Label("Privacy Mode", systemImage: settings.isPrivacyMode ? "eye.slash" : "eye")
                     }
                     .tint(WCColor.primary)
+                }
+
+                Section("Security") {
+                    Toggle(isOn: biometricLockBinding) {
+                        Label("\(appLock.biometryName) App Lock", systemImage: "lock.shield")
+                    }
+                    .tint(WCColor.primary)
+
+                    if let error = appLock.lastError {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(WCColor.destructive)
+                    } else {
+                        Text("When enabled, Wealth Compass locks whenever the app leaves the foreground.")
+                            .font(.caption)
+                            .foregroundStyle(WCColor.textSecondary)
+                    }
+                }
+
+                Section("Custom Categories") {
+                    categoryGroup(title: "Income", type: .income, categories: settings.customIncomeCategories)
+                    categoryGroup(title: "Expense", type: .expense, categories: settings.customExpenseCategories)
                 }
 
                 Section("Data") {
@@ -103,5 +126,45 @@ struct SettingsView: View {
                 Text("This permanently removes all local Wealth Compass data from this device.")
             }
         }
+    }
+
+    private var biometricLockBinding: Binding<Bool> {
+        Binding {
+            appLock.isLockEnabled
+        } set: { isEnabled in
+            if isEnabled {
+                Task { await appLock.enableLock() }
+            } else {
+                appLock.disableLock()
+            }
+        }
+    }
+
+    private func categoryGroup(title: String, type: TransactionType, categories: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white)
+
+            if categories.isEmpty {
+                Text("No custom \(title.lowercased()) categories yet.")
+                    .font(.caption)
+                    .foregroundStyle(WCColor.textSecondary)
+            } else {
+                ForEach(categories, id: \.self) { category in
+                    HStack {
+                        Text(category)
+                        Spacer()
+                        Button(role: .destructive) {
+                            settings.removeCustomTransactionCategory(category, for: type)
+                        } label: {
+                            Image(systemName: "minus.circle")
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
