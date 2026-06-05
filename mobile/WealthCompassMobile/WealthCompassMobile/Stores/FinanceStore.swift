@@ -31,7 +31,7 @@ final class FinanceStore: ObservableObject {
         }
     }
 
-    func addTransaction(type: TransactionType, amount: Double, category: String, description: String, date: Date) {
+    func addTransaction(type: TransactionType, amount: Double, category: String, description: String, date: Date, settings: AppSettings) {
         let transaction = Transaction(
             type: type,
             category: category,
@@ -40,39 +40,45 @@ final class FinanceStore: ObservableObject {
             date: Calendar.current.startOfDay(for: date)
         )
         data.transactions.append(transaction)
+        appendSnapshot(settings: settings)
         save()
     }
 
-    func deleteTransaction(_ transaction: Transaction) {
+    func deleteTransaction(_ transaction: Transaction, settings: AppSettings) {
         data.transactions.removeAll { $0.id == transaction.id }
+        appendSnapshot(settings: settings)
         save()
     }
 
-    func upsertInvestment(_ investment: Investment) {
+    func upsertInvestment(_ investment: Investment, settings: AppSettings) {
         if let index = data.investments.firstIndex(where: { $0.id == investment.id }) {
             data.investments[index] = investment
         } else {
             data.investments.append(investment)
         }
+        appendSnapshot(settings: settings)
         save()
     }
 
-    func deleteInvestment(_ investment: Investment) {
+    func deleteInvestment(_ investment: Investment, settings: AppSettings) {
         data.investments.removeAll { $0.id == investment.id }
+        appendSnapshot(settings: settings)
         save()
     }
 
-    func upsertCrypto(_ holding: CryptoHolding) {
+    func upsertCrypto(_ holding: CryptoHolding, settings: AppSettings) {
         if let index = data.crypto.firstIndex(where: { $0.id == holding.id }) {
             data.crypto[index] = holding
         } else {
             data.crypto.append(holding)
         }
+        appendSnapshot(settings: settings)
         save()
     }
 
-    func deleteCrypto(_ holding: CryptoHolding) {
+    func deleteCrypto(_ holding: CryptoHolding, settings: AppSettings) {
         data.crypto.removeAll { $0.id == holding.id }
+        appendSnapshot(settings: settings)
         save()
     }
 
@@ -107,6 +113,11 @@ final class FinanceStore: ObservableObject {
     }
 
     func takeSnapshot(settings: AppSettings) {
+        appendSnapshot(settings: settings)
+        save()
+    }
+
+    private func appendSnapshot(settings: AppSettings) {
         let totals = calculateTotals(settings: settings)
         let snapshot = NetWorthSnapshot(
             date: Date(),
@@ -119,7 +130,6 @@ final class FinanceStore: ObservableObject {
         )
         data.snapshots.append(snapshot)
         data.snapshots.sort { $0.date < $1.date }
-        save()
     }
 
     func monthlyCashFlow(for month: Date) -> MonthlyCashFlow {

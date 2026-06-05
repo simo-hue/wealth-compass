@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TransactionFormView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var settings: AppSettings
     let onSave: (TransactionType, Double, String, String, Date) -> Void
 
     @State private var type: TransactionType = .expense
@@ -9,12 +10,11 @@ struct TransactionFormView: View {
     @State private var category = "Food"
     @State private var note = ""
     @State private var date = Date()
-
-    private let incomeCategories = ["Salary", "Freelance", "Dividends", "Other"]
-    private let expenseCategories = ["Housing", "Food", "Transport", "Utilities", "Fuel", "Entertainment", "Shopping", "Health", "Other"]
+    @State private var isAddingCategory = false
+    @State private var newCategory = ""
 
     private var categories: [String] {
-        type == .income ? incomeCategories : expenseCategories
+        settings.transactionCategories(for: type)
     }
 
     private var parsedAmount: Double {
@@ -31,15 +31,41 @@ struct TransactionFormView: View {
                 }
                 .pickerStyle(.segmented)
                 .onChange(of: type) { _, newValue in
-                    category = newValue == .income ? incomeCategories[0] : expenseCategories[1]
+                    category = settings.transactionCategories(for: newValue).first ?? ""
+                    isAddingCategory = false
+                    newCategory = ""
                 }
 
                 Section {
                     TextField("Amount", text: $amount)
                         .keyboardType(.decimalPad)
-                    Picker("Category", selection: $category) {
-                        ForEach(categories, id: \.self) { category in
-                            Text(category).tag(category)
+                    VStack(alignment: .leading, spacing: 10) {
+                        Picker("Category", selection: $category) {
+                            ForEach(categories, id: \.self) { category in
+                                Text(category).tag(category)
+                            }
+                        }
+
+                        if isAddingCategory {
+                            HStack(spacing: 10) {
+                                TextField("New category", text: $newCategory)
+                                    .textInputAutocapitalization(.words)
+                                Button("Save") {
+                                    if let saved = settings.addCustomTransactionCategory(newCategory, for: type) {
+                                        category = saved
+                                    }
+                                    newCategory = ""
+                                    isAddingCategory = false
+                                }
+                                .disabled(newCategory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                            }
+                        } else {
+                            Button {
+                                isAddingCategory = true
+                            } label: {
+                                Label("Add Custom Category", systemImage: "plus.circle")
+                            }
+                            .font(.subheadline.weight(.medium))
                         }
                     }
                     DatePicker("Date", selection: $date, displayedComponents: .date)

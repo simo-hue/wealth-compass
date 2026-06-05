@@ -35,7 +35,8 @@ struct CashFlowView: View {
                     amount: amount,
                     category: category,
                     description: description,
-                    date: date
+                    date: date,
+                    settings: settings
                 )
             }
         }
@@ -119,7 +120,7 @@ struct CashFlowView: View {
                             transactionRow(transaction)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
-                                        finance.deleteTransaction(transaction)
+                                        finance.deleteTransaction(transaction, settings: settings)
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }
