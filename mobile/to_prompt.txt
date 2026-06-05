@@ -1,0 +1,1 @@
+I want you to check that the backend for updating the value of the assets ( investments and cryptos ) it's working properly with the API KEY of finhub and coingecko.
