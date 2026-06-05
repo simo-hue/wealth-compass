@@ -1,0 +1,2151 @@
+{
+  "income": [],
+  "expenses": [],
+  "investments": [
+    {
+      "id": "48594da8-26ad-44c1-8447-169f53b0bb42",
+      "type": "etf",
+      "symbol": "VWCE",
+      "name": "VWCE All World",
+      "quantity": 41.453641,
+      "costBasis": 5999.99999834,
+      "currentValue": 6730.41315276,
+      "currentPrice": 162.36,
+      "lastPriceUpdate": "2026-06-05T21:03:24.656+00:00",
+      "currency": "EUR",
+      "sector": "All World",
+      "geography": "US",
+      "isin": null,
+      "fees": 0,
+      "createdAt": "2025-12-21T17:34:34.835+00:00",
+      "updatedAt": "2026-06-05T21:03:24.638+00:00"
+    },
+    {
+      "id": "65db7b7e-edca-4bee-a88a-be6f3a788750",
+      "type": "stock",
+      "symbol": "NFLX",
+      "name": "Netflix, Inc.",
+      "quantity": 0.6352,
+      "costBasis": 49.329632,
+      "currentValue": 52.200736000000006,
+      "currentPrice": 82.18,
+      "lastPriceUpdate": "2026-06-05T21:03:24.656+00:00",
+      "currency": "USD",
+      "sector": "Consumer",
+      "geography": "US",
+      "isin": "US64110L1061",
+      "fees": 0,
+      "createdAt": "2026-01-02T18:14:17.213+00:00",
+      "updatedAt": "2026-06-05T21:03:24.638+00:00"
+    },
+    {
+      "id": "f2927b9d-c89f-4b82-b71c-f03a233c9fd0",
+      "type": "stock",
+      "symbol": "GOOGL",
+      "name": "Alphabet Inc",
+      "quantity": 0.1873,
+      "costBasis": 49.718785,
+      "currentValue": 69.025669,
+      "currentPrice": 368.53,
+      "lastPriceUpdate": "2026-06-05T21:03:24.656+00:00",
+      "currency": "USD",
+      "sector": "Technology",
+      "geography": "US",
+      "isin": "US02079K3059",
+      "fees": 0,
+      "createdAt": "2025-12-29T16:29:02.418+00:00",
+      "updatedAt": "2026-06-05T21:03:24.638+00:00"
+    }
+  ],
+  "crypto": [
+    {
+      "id": "5412c65f-3cb4-4c6f-812d-36672b6dedea",
+      "symbol": "S",
+      "name": "Sonic",
+      "quantity": 1.73801,
+      "avgBuyPrice": 0,
+      "currentPrice": 0.00629474,
+      "lastPriceUpdate": "2026-06-05T21:03:24.656+00:00",
+      "currency": "USD",
+      "fees": 0,
+      "coinId": null,
+      "createdAt": "2025-12-21T17:38:31.87+00:00",
+      "updatedAt": "2025-12-21T17:38:32.024474+00:00"
+    },
+    {
+      "id": "a70d90e1-4aca-4492-a6a5-86b7c6326842",
+      "symbol": "BNB",
+      "name": "BNB",
+      "quantity": 0.21292,
+      "avgBuyPrice": 230,
+      "currentPrice": 851.45,
+      "lastPriceUpdate": "2025-12-21T21:59:19.918+00:00",
+      "currency": "USD",
+      "fees": 0,
+      "coinId": null,
+      "createdAt": "2025-12-21T17:39:09.613+00:00",
+      "updatedAt": "2025-12-21T17:39:09.699501+00:00"
+    },
+    {
+      "id": "1fe52dd5-fca8-4a45-912b-b102b83d7a4f",
+      "symbol": "BTC",
+      "name": "Bitcoin",
+      "quantity": 0.0197328,
+      "avgBuyPrice": 40000,
+      "currentPrice": 61614,
+      "lastPriceUpdate": "2026-06-05T21:03:24.656+00:00",
+      "currency": "USD",
+      "fees": 0,
+      "coinId": null,
+      "createdAt": "2025-12-21T17:40:23.195+00:00",
+      "updatedAt": "2025-12-21T17:40:23.492479+00:00"
+    },
+    {
+      "id": "0918c673-d13c-41a8-91b3-e6d3186ee492",
+      "symbol": "DOT",
+      "name": "Polkadot",
+      "quantity": 12.3609,
+      "avgBuyPrice": 1,
+      "currentPrice": 0.951744,
+      "lastPriceUpdate": "2026-06-05T21:03:24.656+00:00",
+      "currency": "USD",
+      "fees": 0,
+      "coinId": null,
+      "createdAt": "2025-12-21T17:37:30.514+00:00",
+      "updatedAt": "2025-12-21T17:37:30.673881+00:00"
+    },
+    {
+      "id": "32e17a24-ddea-4266-9a6c-131a24ead821",
+      "symbol": "ADA",
+      "name": "Cardano",
+      "quantity": 15.0638,
+      "avgBuyPrice": 1.02,
+      "currentPrice": 0.162127,
+      "lastPriceUpdate": "2026-06-05T21:03:24.656+00:00",
+      "currency": "USD",
+      "fees": 0,
+      "coinId": null,
+      "createdAt": "2025-12-21T17:38:51.435+00:00",
+      "updatedAt": "2025-12-21T17:38:51.537884+00:00"
+    },
+    {
+      "id": "d908764c-4c63-4464-bf7c-44fc4b8855ed",
+      "symbol": "CRO",
+      "name": "Cronos",
+      "quantity": 1246.99,
+      "avgBuyPrice": 0.4,
+      "currentPrice": 0.058495,
+      "lastPriceUpdate": "2026-06-05T21:03:24.656+00:00",
+      "currency": "USD",
+      "fees": 0,
+      "coinId": "crypto-com-chain",
+      "createdAt": "2025-12-22T14:28:27.145+00:00",
+      "updatedAt": "2025-12-22T14:28:27.297729+00:00"
+    }
+  ],
+  "liabilities": [],
+  "liquidity": [],
+  "transactions": [
+    {
+      "id": "fe2f4efb-a076-4b16-a201-f75fe12fc452",
+      "type": "income",
+      "category": "Freelance",
+      "amount": 750,
+      "description": "Hackathon win",
+      "date": "2026-06-04",
+      "createdAt": "2026-06-04T09:34:49.067091+00:00"
+    },
+    {
+      "id": "dbfe13de-3188-435f-9cb9-8dfb8904414b",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 5.12,
+      "description": "",
+      "date": "2026-06-01",
+      "createdAt": "2026-06-01T19:05:37.381476+00:00"
+    },
+    {
+      "id": "36f33f6b-4c85-4bcd-ad3e-3deeab7402f9",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 2.2,
+      "description": "",
+      "date": "2026-05-31",
+      "createdAt": "2026-05-31T12:36:34.958143+00:00"
+    },
+    {
+      "id": "c8ae5b33-366e-4d69-beb5-4afb4cf152e7",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 5.2,
+      "description": "",
+      "date": "2026-05-31",
+      "createdAt": "2026-05-31T12:37:04.151954+00:00"
+    },
+    {
+      "id": "ed25127a-e219-485b-9e86-21ebfb40e1e0",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 2000,
+      "description": "",
+      "date": "2026-05-29",
+      "createdAt": "2026-05-29T15:57:21.066484+00:00"
+    },
+    {
+      "id": "b4516ecb-dda9-47f1-88dd-8e0300db84f4",
+      "type": "expense",
+      "category": "Utilities",
+      "amount": 250,
+      "description": "",
+      "date": "2026-05-29",
+      "createdAt": "2026-05-29T15:57:44.251312+00:00"
+    },
+    {
+      "id": "6b8e048d-0e40-4253-8962-b0e69ab30b8b",
+      "type": "expense",
+      "category": "Utilities",
+      "amount": 500,
+      "description": "",
+      "date": "2026-05-29",
+      "createdAt": "2026-05-29T15:57:54.638017+00:00"
+    },
+    {
+      "id": "3f553024-e014-4cb4-b4b0-ddccc37b0461",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 6.6,
+      "description": "",
+      "date": "2026-05-28",
+      "createdAt": "2026-05-29T15:58:39.162654+00:00"
+    },
+    {
+      "id": "051b5490-e299-4158-8c94-aae4c7d84e9e",
+      "type": "expense",
+      "category": "Food",
+      "amount": 35,
+      "description": "",
+      "date": "2026-05-28",
+      "createdAt": "2026-05-29T15:58:52.309336+00:00"
+    },
+    {
+      "id": "c09a0974-3d6d-455b-a6dc-2f9f6bb827f7",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 6.5,
+      "description": "",
+      "date": "2026-05-28",
+      "createdAt": "2026-05-29T15:59:04.020777+00:00"
+    },
+    {
+      "id": "b44e41b2-728d-4207-8b4c-6ec6bc188b5a",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 4.4,
+      "description": "",
+      "date": "2026-05-26",
+      "createdAt": "2026-05-26T08:44:39.886421+00:00"
+    },
+    {
+      "id": "09c263da-873e-4737-8d45-ba5950a2f43e",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 4.4,
+      "description": "",
+      "date": "2026-05-25",
+      "createdAt": "2026-05-25T10:25:58.598996+00:00"
+    },
+    {
+      "id": "2b825015-d71c-46e3-97ce-59f3d1dca15e",
+      "type": "expense",
+      "category": "Food",
+      "amount": 14.1,
+      "description": "",
+      "date": "2026-05-25",
+      "createdAt": "2026-05-25T10:26:16.698147+00:00"
+    },
+    {
+      "id": "bf20edf1-31fe-4abc-b7ae-60648ab25ca1",
+      "type": "expense",
+      "category": "Utilities",
+      "amount": 21,
+      "description": "play store",
+      "date": "2026-05-25",
+      "createdAt": "2026-05-25T13:42:42.407724+00:00"
+    },
+    {
+      "id": "7d948523-348f-4d9b-bccb-0b5ab5334549",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 16.6,
+      "description": "",
+      "date": "2026-05-24",
+      "createdAt": "2026-05-25T10:27:20.959764+00:00"
+    },
+    {
+      "id": "ab46d260-86a7-4f44-90f9-ce9158ee27ec",
+      "type": "expense",
+      "category": "Fuel",
+      "amount": 4,
+      "description": "",
+      "date": "2026-05-23",
+      "createdAt": "2026-05-25T10:27:39.95066+00:00"
+    },
+    {
+      "id": "3a3598cb-8c20-411f-aa97-03bab1a6d972",
+      "type": "expense",
+      "category": "Food",
+      "amount": 6,
+      "description": "",
+      "date": "2026-05-22",
+      "createdAt": "2026-05-22T16:09:16.51643+00:00"
+    },
+    {
+      "id": "ee086e59-5b20-477b-ad67-3e9b02b1eeae",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 17.6,
+      "description": "",
+      "date": "2026-05-22",
+      "createdAt": "2026-05-25T10:27:07.514289+00:00"
+    },
+    {
+      "id": "5c02df51-ee7e-4a5d-923a-e5ba48f774a5",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 200,
+      "description": "",
+      "date": "2026-05-21",
+      "createdAt": "2026-05-21T11:24:18.660411+00:00"
+    },
+    {
+      "id": "fec84810-0fe7-48e0-8cb4-551d49b7060b",
+      "type": "expense",
+      "category": "Food",
+      "amount": 7,
+      "description": "",
+      "date": "2026-05-21",
+      "createdAt": "2026-05-21T11:24:30.024297+00:00"
+    },
+    {
+      "id": "155563f6-7b8c-4a17-9d6f-0ee711e595e3",
+      "type": "expense",
+      "category": "Utilities",
+      "amount": 99,
+      "description": "apple dev",
+      "date": "2026-05-19",
+      "createdAt": "2026-05-19T08:23:36.568442+00:00"
+    },
+    {
+      "id": "37b02e9a-43da-45c1-8ecb-ec57cf979416",
+      "type": "expense",
+      "category": "Utilities",
+      "amount": 24,
+      "description": "screen App Store",
+      "date": "2026-05-19",
+      "createdAt": "2026-05-19T08:23:49.485697+00:00"
+    },
+    {
+      "id": "ac564727-7a67-43e3-9bd2-41e47f72f600",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 17.6,
+      "description": "treno",
+      "date": "2026-05-15",
+      "createdAt": "2026-05-15T09:24:16.954796+00:00"
+    },
+    {
+      "id": "2a736412-8e00-4645-abed-0be8cf59a770",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 6.6,
+      "description": "metro",
+      "date": "2026-05-14",
+      "createdAt": "2026-05-14T16:06:00.298022+00:00"
+    },
+    {
+      "id": "b6eda2e5-30fe-4a2e-824f-8acd8c6572f4",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 43,
+      "description": "",
+      "date": "2026-05-10",
+      "createdAt": "2026-05-10T05:31:18.461845+00:00"
+    },
+    {
+      "id": "b1ffe608-6b25-4193-8b37-2ab405c66927",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 6,
+      "description": "Metro",
+      "date": "2026-05-10",
+      "createdAt": "2026-05-10T10:49:22.714426+00:00"
+    },
+    {
+      "id": "c6e52bbc-b2ed-4980-a2d9-1c82392b311f",
+      "type": "expense",
+      "category": "Food",
+      "amount": 21,
+      "description": "Pizza",
+      "date": "2026-05-08",
+      "createdAt": "2026-05-08T14:10:22.287621+00:00"
+    },
+    {
+      "id": "d731d2b7-2799-48ee-919b-aa4902d66935",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 43,
+      "description": "biglietto treno Milan",
+      "date": "2026-05-07",
+      "createdAt": "2026-05-07T18:19:53.649273+00:00"
+    },
+    {
+      "id": "4be91d62-6d90-4ec7-a3cc-3ba48f482c42",
+      "type": "expense",
+      "category": "Housing",
+      "amount": 236,
+      "description": "casa milano",
+      "date": "2026-05-07",
+      "createdAt": "2026-05-07T18:29:38.300321+00:00"
+    },
+    {
+      "id": "040f523a-0c83-475d-8c3c-4225e3976892",
+      "type": "expense",
+      "category": "Health",
+      "amount": 49,
+      "description": "Analisi sangue",
+      "date": "2026-05-06",
+      "createdAt": "2026-05-06T12:11:35.703405+00:00"
+    },
+    {
+      "id": "515b2ae8-0896-4ba3-9062-ab174fe495ac",
+      "type": "expense",
+      "category": "Entertainment",
+      "amount": 88,
+      "description": "Gardaland",
+      "date": "2026-04-27",
+      "createdAt": "2026-04-27T11:41:24.431062+00:00"
+    },
+    {
+      "id": "7c915948-0add-4417-96b7-d34d3b9828d7",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 300,
+      "description": "",
+      "date": "2026-04-27",
+      "createdAt": "2026-04-27T11:41:32.623603+00:00"
+    },
+    {
+      "id": "d5e4708a-9924-4b37-ad05-61e11a470dd2",
+      "type": "expense",
+      "category": "Food",
+      "amount": 21,
+      "description": "Lazise",
+      "date": "2026-04-21",
+      "createdAt": "2026-04-21T16:45:38.860778+00:00"
+    },
+    {
+      "id": "08396ef6-7bcd-4514-b19c-d525dd6c2720",
+      "type": "expense",
+      "category": "Food",
+      "amount": 55,
+      "description": "",
+      "date": "2026-04-21",
+      "createdAt": "2026-04-21T19:38:48.37244+00:00"
+    },
+    {
+      "id": "a73a5a91-2603-4cae-8d5c-f978a18a6bb5",
+      "type": "expense",
+      "category": "Fuel",
+      "amount": 52,
+      "description": "",
+      "date": "2026-04-20",
+      "createdAt": "2026-04-20T09:17:34.966458+00:00"
+    },
+    {
+      "id": "071dc32d-0235-41bd-bd3c-341c944c5763",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 65,
+      "description": "",
+      "date": "2026-04-19",
+      "createdAt": "2026-04-19T09:20:46.914615+00:00"
+    },
+    {
+      "id": "e371efec-8675-4b43-90d4-d7cfdb2117aa",
+      "type": "expense",
+      "category": "Food",
+      "amount": 67,
+      "description": "Pizza",
+      "date": "2026-04-19",
+      "createdAt": "2026-04-19T11:54:47.219857+00:00"
+    },
+    {
+      "id": "26a58e57-ce2c-4932-a612-0e25337daedb",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 3,
+      "description": "parcheggio aeroporto",
+      "date": "2026-04-19",
+      "createdAt": "2026-04-19T16:06:16.775601+00:00"
+    },
+    {
+      "id": "904c7ec3-49fb-448a-8120-315ebc63acaa",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 100,
+      "description": "",
+      "date": "2026-04-19",
+      "createdAt": "2026-04-19T19:11:39.128381+00:00"
+    },
+    {
+      "id": "d7082cdd-e694-47ce-8850-5052a07850aa",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 150,
+      "description": "",
+      "date": "2026-04-17",
+      "createdAt": "2026-04-17T05:00:18.820102+00:00"
+    },
+    {
+      "id": "846196e5-fa07-4e23-abab-c31925c6de97",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 70,
+      "description": "",
+      "date": "2026-04-17",
+      "createdAt": "2026-04-19T09:20:59.498935+00:00"
+    },
+    {
+      "id": "a411f3f5-3521-4f8f-ac6a-da17072e8833",
+      "type": "expense",
+      "category": "Food",
+      "amount": 25,
+      "description": "",
+      "date": "2026-04-17",
+      "createdAt": "2026-04-19T09:21:18.180466+00:00"
+    },
+    {
+      "id": "12ef04fe-b76f-480e-8419-aaa1b7700652",
+      "type": "expense",
+      "category": "Food",
+      "amount": 11,
+      "description": "spesa",
+      "date": "2026-04-16",
+      "createdAt": "2026-04-16T11:41:05.256313+00:00"
+    },
+    {
+      "id": "4ddcc84e-4c8c-4055-b287-8f509d03bc5a",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 21.5,
+      "description": "",
+      "date": "2026-04-16",
+      "createdAt": "2026-04-16T11:41:23.133338+00:00"
+    },
+    {
+      "id": "ed672716-5867-460b-8869-10927967585d",
+      "type": "income",
+      "category": "Freelance",
+      "amount": 30,
+      "description": "teaching Maxim",
+      "date": "2026-04-14",
+      "createdAt": "2026-04-14T17:32:55.273513+00:00"
+    },
+    {
+      "id": "ca8fe714-51eb-411e-8e63-ed9ccf27c14a",
+      "type": "expense",
+      "category": "Entertainment",
+      "amount": 20,
+      "description": "Venice tickets",
+      "date": "2026-04-12",
+      "createdAt": "2026-04-12T16:25:41.992292+00:00"
+    },
+    {
+      "id": "63e8b768-afbd-43ad-a464-085b70c44d14",
+      "type": "expense",
+      "category": "Utilities",
+      "amount": 75,
+      "description": "EIT application FEE",
+      "date": "2026-04-09",
+      "createdAt": "2026-04-09T15:52:28.31192+00:00"
+    },
+    {
+      "id": "8ef0f4c2-f4ae-468f-bf72-16e6aa28f666",
+      "type": "expense",
+      "category": "Food",
+      "amount": 10,
+      "description": "Spesa",
+      "date": "2026-04-07",
+      "createdAt": "2026-04-07T20:31:35.594874+00:00"
+    },
+    {
+      "id": "922e8a01-2abc-4694-96f2-b381a53c22c8",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 300,
+      "description": "",
+      "date": "2026-04-03",
+      "createdAt": "2026-04-03T18:49:55.999946+00:00"
+    },
+    {
+      "id": "16c410bd-c28d-486f-aeaf-a5e12f2acc30",
+      "type": "expense",
+      "category": "Shopping",
+      "amount": 100,
+      "description": "Clothes",
+      "date": "2026-04-01",
+      "createdAt": "2026-04-01T20:13:14.145105+00:00"
+    },
+    {
+      "id": "fe2cba13-3dd2-48f7-9fcd-74f0a1670bf0",
+      "type": "expense",
+      "category": "Food",
+      "amount": 34,
+      "description": "Cena con mia",
+      "date": "2026-04-01",
+      "createdAt": "2026-04-01T20:13:50.833197+00:00"
+    },
+    {
+      "id": "f7f404f2-c2a0-4a60-8e1b-c395acd76a88",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 50,
+      "description": "",
+      "date": "2026-03-30",
+      "createdAt": "2026-03-30T17:04:47.556993+00:00"
+    },
+    {
+      "id": "dc0d5568-bf43-4f42-9b81-3260e5c20389",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 100,
+      "description": "",
+      "date": "2026-03-27",
+      "createdAt": "2026-03-27T13:09:50.869901+00:00"
+    },
+    {
+      "id": "ff858855-b0d0-4b37-a742-c5aa6c0330fc",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 15.79,
+      "description": "Train",
+      "date": "2026-03-22",
+      "createdAt": "2026-03-21T11:41:19.741911+00:00"
+    },
+    {
+      "id": "028c6c1a-b54e-49e4-ab6f-a19e21004e8e",
+      "type": "expense",
+      "category": "Entertainment",
+      "amount": 10.37,
+      "description": "Poll",
+      "date": "2026-03-22",
+      "createdAt": "2026-03-22T08:22:17.010658+00:00"
+    },
+    {
+      "id": "4af88f25-eb00-4cad-a617-2b4a84ce8061",
+      "type": "expense",
+      "category": "Food",
+      "amount": 23.05,
+      "description": "Shake shack",
+      "date": "2026-03-22",
+      "createdAt": "2026-03-22T10:56:27.623894+00:00"
+    },
+    {
+      "id": "b8ea1612-1315-4ca4-93b5-1e40a0c8c24d",
+      "type": "expense",
+      "category": "Food",
+      "amount": 4.15,
+      "description": "Cappuccino",
+      "date": "2026-03-21",
+      "createdAt": "2026-03-21T11:39:53.682153+00:00"
+    },
+    {
+      "id": "9b3806ba-e92b-46d7-a3bf-0a9a880f4965",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 3,
+      "description": "Bus",
+      "date": "2026-03-21",
+      "createdAt": "2026-03-21T11:40:17.943191+00:00"
+    },
+    {
+      "id": "e3fba4ce-d79b-4419-8c4e-a926194fe65e",
+      "type": "expense",
+      "category": "Shopping",
+      "amount": 40.35,
+      "description": "Tea",
+      "date": "2026-03-21",
+      "createdAt": "2026-03-21T16:55:44.848512+00:00"
+    },
+    {
+      "id": "b1eb6ee9-22a5-4b87-a714-11ccae9aa0b7",
+      "type": "expense",
+      "category": "Food",
+      "amount": 24.09,
+      "description": "Indian",
+      "date": "2026-03-20",
+      "createdAt": "2026-03-21T11:40:50.341276+00:00"
+    },
+    {
+      "id": "55258397-9f59-4ccc-ac31-22a99ff3a0f6",
+      "type": "expense",
+      "category": "Health",
+      "amount": 7.49,
+      "description": "Pharmacy",
+      "date": "2026-03-19",
+      "createdAt": "2026-03-21T11:41:53.449314+00:00"
+    },
+    {
+      "id": "f3892b47-1421-4da2-9140-a7b46219add6",
+      "type": "expense",
+      "category": "Food",
+      "amount": 12.07,
+      "description": "",
+      "date": "2026-03-18",
+      "createdAt": "2026-03-18T13:16:30.241818+00:00"
+    },
+    {
+      "id": "a206171f-e420-4d7e-9191-792f9ab74951",
+      "type": "expense",
+      "category": "Food",
+      "amount": 12.04,
+      "description": "",
+      "date": "2026-03-18",
+      "createdAt": "2026-03-21T11:42:32.204265+00:00"
+    },
+    {
+      "id": "226ea65a-7ea4-4c0f-86d8-567db07d32d6",
+      "type": "income",
+      "category": "Other",
+      "amount": 9.22,
+      "description": "Refund padel",
+      "date": "2026-03-18",
+      "createdAt": "2026-03-21T11:43:00.154748+00:00"
+    },
+    {
+      "id": "78e19d8d-12a3-458a-92ec-c5038885af34",
+      "type": "expense",
+      "category": "Food",
+      "amount": 12.09,
+      "description": "chicken milanese",
+      "date": "2026-03-16",
+      "createdAt": "2026-03-17T17:54:18.677603+00:00"
+    },
+    {
+      "id": "25bfca94-57a8-4e47-9dcf-06fdad24160d",
+      "type": "expense",
+      "category": "Health",
+      "amount": 6.37,
+      "description": "medicines for cold",
+      "date": "2026-03-16",
+      "createdAt": "2026-03-17T17:54:42.373545+00:00"
+    },
+    {
+      "id": "95dbfee7-2afb-412e-92e1-e4ea3c40c466",
+      "type": "expense",
+      "category": "Food",
+      "amount": 20.83,
+      "description": "pizza",
+      "date": "2026-03-16",
+      "createdAt": "2026-03-17T17:55:14.673591+00:00"
+    },
+    {
+      "id": "ee48d869-8f24-4977-88d5-b0f020d0c9ae",
+      "type": "expense",
+      "category": "Utilities",
+      "amount": 5.79,
+      "description": "Esim",
+      "date": "2026-03-14",
+      "createdAt": "2026-03-14T15:21:56.122459+00:00"
+    },
+    {
+      "id": "30aaa09f-40f5-4591-83aa-52220d113da2",
+      "type": "expense",
+      "category": "Food",
+      "amount": 0.93,
+      "description": "Coffee ",
+      "date": "2026-03-14",
+      "createdAt": "2026-03-14T15:22:39.044351+00:00"
+    },
+    {
+      "id": "e341c856-54e3-4d1b-a0d8-aa41354ba05b",
+      "type": "expense",
+      "category": "Food",
+      "amount": 24.31,
+      "description": "",
+      "date": "2026-03-14",
+      "createdAt": "2026-03-14T19:27:39.951524+00:00"
+    },
+    {
+      "id": "5832cfb8-1d34-4029-a99f-ff93570e82b3",
+      "type": "expense",
+      "category": "Food",
+      "amount": 16.26,
+      "description": "",
+      "date": "2026-03-12",
+      "createdAt": "2026-03-12T14:15:44.345593+00:00"
+    },
+    {
+      "id": "e3cba8f7-4094-47fd-b910-f5a019aeb4aa",
+      "type": "expense",
+      "category": "Food",
+      "amount": 20.14,
+      "description": "Pizza",
+      "date": "2026-03-10",
+      "createdAt": "2026-03-10T13:09:21.693636+00:00"
+    },
+    {
+      "id": "af3a2e9b-a61b-4048-8e3d-59e5498075a8",
+      "type": "expense",
+      "category": "Food",
+      "amount": 12.06,
+      "description": "Chicken milanese",
+      "date": "2026-03-09",
+      "createdAt": "2026-03-09T13:04:36.933659+00:00"
+    },
+    {
+      "id": "f68e4f3a-1330-41c0-b8cd-b0ac79d63295",
+      "type": "expense",
+      "category": "Health",
+      "amount": 9.52,
+      "description": "Paddle second time",
+      "date": "2026-03-08",
+      "createdAt": "2026-03-08T23:03:45.937464+00:00"
+    },
+    {
+      "id": "1bcfa786-70f7-4f0f-801d-a66cd3e289d2",
+      "type": "expense",
+      "category": "Food",
+      "amount": 5.89,
+      "description": "London with mia",
+      "date": "2026-03-08",
+      "createdAt": "2026-03-10T17:01:08.475375+00:00"
+    },
+    {
+      "id": "5183fd61-6bd6-4bff-b98a-dc061e93332a",
+      "type": "expense",
+      "category": "Food",
+      "amount": 8.55,
+      "description": "Breakfast ",
+      "date": "2026-03-08",
+      "createdAt": "2026-03-10T17:01:53.853222+00:00"
+    },
+    {
+      "id": "aa7bf7e4-66c2-40ff-879b-08d7b3ff2be0",
+      "type": "expense",
+      "category": "Food",
+      "amount": 6.93,
+      "description": "",
+      "date": "2026-03-07",
+      "createdAt": "2026-03-10T17:02:27.429115+00:00"
+    },
+    {
+      "id": "c8adaf13-b689-4cdf-b77e-2ec16c180c3c",
+      "type": "expense",
+      "category": "Other",
+      "amount": 225.8,
+      "description": "Hotel london",
+      "date": "2026-03-06",
+      "createdAt": "2026-03-10T13:16:01.284199+00:00"
+    },
+    {
+      "id": "f2fa92ec-da84-4b5d-9ac0-d2303c4e854e",
+      "type": "expense",
+      "category": "Food",
+      "amount": 14.82,
+      "description": "Dinner",
+      "date": "2026-03-06",
+      "createdAt": "2026-03-10T17:03:34.726103+00:00"
+    },
+    {
+      "id": "ac95cb1c-d787-407b-b216-c913219da521",
+      "type": "expense",
+      "category": "Food",
+      "amount": 11.64,
+      "description": "Chicken + pasta",
+      "date": "2026-03-05",
+      "createdAt": "2026-03-05T16:50:50.41275+00:00"
+    },
+    {
+      "id": "b90407e3-0810-4a2b-aa94-17995d041be4",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 15.76,
+      "description": "Train to gatwick",
+      "date": "2026-03-05",
+      "createdAt": "2026-03-05T21:59:17.063168+00:00"
+    },
+    {
+      "id": "9cb05dbb-6242-447b-a133-91bcb7ba3131",
+      "type": "expense",
+      "category": "Food",
+      "amount": 6,
+      "description": "",
+      "date": "2026-03-05",
+      "createdAt": "2026-03-10T17:04:05.908576+00:00"
+    },
+    {
+      "id": "4219534a-faa2-4667-b00b-4034fd56786e",
+      "type": "expense",
+      "category": "Food",
+      "amount": 20.69,
+      "description": "Pizza",
+      "date": "2026-03-04",
+      "createdAt": "2026-03-04T12:58:38.311161+00:00"
+    },
+    {
+      "id": "a0370076-d9d1-400d-8c69-061c35617f27",
+      "type": "expense",
+      "category": "Health",
+      "amount": 9.47,
+      "description": "Sport",
+      "date": "2026-03-04",
+      "createdAt": "2026-03-04T17:18:13.674279+00:00"
+    },
+    {
+      "id": "3f90a79d-aa00-4636-91bd-18465bc39829",
+      "type": "expense",
+      "category": "Food",
+      "amount": 4,
+      "description": "Essa’s espresso",
+      "date": "2026-03-04",
+      "createdAt": "2026-03-04T18:57:28.139888+00:00"
+    },
+    {
+      "id": "3faf9a8a-2471-4999-b8f8-cffaae043593",
+      "type": "expense",
+      "category": "Food",
+      "amount": 15,
+      "description": "fatto a mano margherita",
+      "date": "2026-03-02",
+      "createdAt": "2026-03-02T22:18:01.353341+00:00"
+    },
+    {
+      "id": "2160ea48-02ee-4410-9b5e-bb618c7ae2a8",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 3.59,
+      "description": "monthly interests",
+      "date": "2026-03-01",
+      "createdAt": "2026-03-01T11:54:41.921655+00:00"
+    },
+    {
+      "id": "c276709d-9fb8-4f02-a6c5-59bb2d50d2e7",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 5.65,
+      "description": "Matcha latte",
+      "date": "2026-02-27",
+      "createdAt": "2026-02-27T13:55:43.539435+00:00"
+    },
+    {
+      "id": "cd3fb011-720a-447a-ab80-ecef5ead273f",
+      "type": "expense",
+      "category": "Food",
+      "amount": 4.35,
+      "description": "Coffè",
+      "date": "2026-02-23",
+      "createdAt": "2026-02-23T14:36:57.947005+00:00"
+    },
+    {
+      "id": "e9fa31e2-198c-4c42-bedd-a8b50e269563",
+      "type": "expense",
+      "category": "Food",
+      "amount": 7.7,
+      "description": "Affogato",
+      "date": "2026-02-21",
+      "createdAt": "2026-02-21T08:23:02.922281+00:00"
+    },
+    {
+      "id": "5a6ccf3d-e931-4346-86ab-39c97f4705c4",
+      "type": "expense",
+      "category": "Food",
+      "amount": 19.22,
+      "description": "Arab",
+      "date": "2026-02-21",
+      "createdAt": "2026-02-21T18:59:59.247786+00:00"
+    },
+    {
+      "id": "7261a5cf-d6ec-4646-9a01-f940c9bdb2ea",
+      "type": "expense",
+      "category": "Entertainment",
+      "amount": 11.37,
+      "description": "Bowling",
+      "date": "2026-02-21",
+      "createdAt": "2026-02-21T19:42:51.468899+00:00"
+    },
+    {
+      "id": "87f16e66-8f81-408f-b2fe-7f95edf5fe13",
+      "type": "expense",
+      "category": "Food",
+      "amount": 4,
+      "description": "Fries",
+      "date": "2026-02-20",
+      "createdAt": "2026-02-20T19:53:51.888269+00:00"
+    },
+    {
+      "id": "f49097bb-8e94-408a-830a-54a54b3cb1a3",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 3.5,
+      "description": "Bus",
+      "date": "2026-02-20",
+      "createdAt": "2026-02-20T19:54:20.510223+00:00"
+    },
+    {
+      "id": "a1bb62ae-a1b6-47c3-a58d-7658e1f29121",
+      "type": "expense",
+      "category": "Food",
+      "amount": 23.61,
+      "description": "Lunch with lee | pizza",
+      "date": "2026-02-19",
+      "createdAt": "2026-02-19T17:28:59.566713+00:00"
+    },
+    {
+      "id": "4f43808b-068f-411e-bbdc-f3366b9e9992",
+      "type": "expense",
+      "category": "Entertainment",
+      "amount": 27.4,
+      "description": "Elc activity",
+      "date": "2026-02-18",
+      "createdAt": "2026-02-18T10:39:07.7925+00:00"
+    },
+    {
+      "id": "71692bb4-1197-4458-a026-a279118adaab",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 113,
+      "description": "30days bus",
+      "date": "2026-02-17",
+      "createdAt": "2026-02-17T08:47:09.069483+00:00"
+    },
+    {
+      "id": "5b794ec9-bdf0-4fa4-bd42-bf79a51f0c7e",
+      "type": "expense",
+      "category": "Food",
+      "amount": 3.45,
+      "description": "Pancake activity",
+      "date": "2026-02-17",
+      "createdAt": "2026-02-17T10:35:10.821288+00:00"
+    },
+    {
+      "id": "9b940da0-ca5c-4ad1-8f37-4ef3ec8a2dba",
+      "type": "expense",
+      "category": "Food",
+      "amount": 8,
+      "description": "Chicken salad",
+      "date": "2026-02-17",
+      "createdAt": "2026-02-17T13:17:43.142926+00:00"
+    },
+    {
+      "id": "5bb359c3-1fa9-4fb3-8225-9519e1652063",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 80.52,
+      "description": "Taxi to hove",
+      "date": "2026-02-16",
+      "createdAt": "2026-02-16T00:07:30.178303+00:00"
+    },
+    {
+      "id": "3d4b880d-1a0e-4d3e-984e-e518a3bb5874",
+      "type": "expense",
+      "category": "Utilities",
+      "amount": 14.38,
+      "description": "esmi uk",
+      "date": "2026-02-15",
+      "createdAt": "2026-02-15T08:53:40.339855+00:00"
+    },
+    {
+      "id": "4cd62558-85e6-4879-b2bf-91760bc38445",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 300,
+      "description": "found nello zaino",
+      "date": "2026-02-13",
+      "createdAt": "2026-02-13T14:36:48.058547+00:00"
+    },
+    {
+      "id": "28dd792e-0747-4d8b-932c-774955036bda",
+      "type": "income",
+      "category": "Freelance",
+      "amount": 50,
+      "description": "bonus revolut mia",
+      "date": "2026-02-09",
+      "createdAt": "2026-02-09T13:17:13.251531+00:00"
+    },
+    {
+      "id": "8893b23c-b91c-4a50-845c-f09138890902",
+      "type": "expense",
+      "category": "Other",
+      "amount": 5,
+      "description": "transazione Revolut mia",
+      "date": "2026-02-07",
+      "createdAt": "2026-02-07T14:47:05.757198+00:00"
+    },
+    {
+      "id": "5b177d68-f694-4ce0-aa78-d48b9556b544",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 4500,
+      "description": "",
+      "date": "2026-02-05",
+      "createdAt": "2026-02-05T07:20:47.919697+00:00"
+    },
+    {
+      "id": "a6636a55-09de-482b-8343-13a0bee1c19d",
+      "type": "expense",
+      "category": "Other",
+      "amount": 4108,
+      "description": "brighton ELC",
+      "date": "2026-02-05",
+      "createdAt": "2026-02-05T07:22:58.724628+00:00"
+    },
+    {
+      "id": "938c857c-06b6-4e44-b514-fd19e61f480f",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 1500,
+      "description": "",
+      "date": "2026-02-05",
+      "createdAt": "2026-02-05T07:31:21.44622+00:00"
+    },
+    {
+      "id": "ca4e0e66-7831-4afe-8b84-4606829b8674",
+      "type": "expense",
+      "category": "Shopping",
+      "amount": 76.73,
+      "description": "supporto toracico + regalo San Valentino",
+      "date": "2026-02-05",
+      "createdAt": "2026-02-05T14:41:49.916959+00:00"
+    },
+    {
+      "id": "f6955c20-6794-4b3f-b0ac-6eab6c15b1e1",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 19.23,
+      "description": "ETA UK",
+      "date": "2026-02-04",
+      "createdAt": "2026-02-04T14:04:39.089634+00:00"
+    },
+    {
+      "id": "918d7df5-e8fe-4564-92d7-dd171f3ae615",
+      "type": "expense",
+      "category": "Transport",
+      "amount": 216.53,
+      "description": "aereo brighton",
+      "date": "2026-02-04",
+      "createdAt": "2026-02-04T19:35:13.247848+00:00"
+    },
+    {
+      "id": "d2b3ef9b-8437-4252-b10f-108dc0c2e9ac",
+      "type": "expense",
+      "category": "Food",
+      "amount": 25,
+      "description": "Mc con mia",
+      "date": "2026-02-03",
+      "createdAt": "2026-02-03T21:20:45.400781+00:00"
+    },
+    {
+      "id": "561e7064-4e4a-4c4c-8afd-ab72929667b6",
+      "type": "expense",
+      "category": "Fuel",
+      "amount": 50,
+      "description": "",
+      "date": "2026-01-31",
+      "createdAt": "2026-01-31T17:08:52.21767+00:00"
+    },
+    {
+      "id": "23427943-bcac-4f41-9fe4-d8cb600ecd2f",
+      "type": "expense",
+      "category": "Fuel",
+      "amount": 5,
+      "description": "Benzina",
+      "date": "2026-01-31",
+      "createdAt": "2026-01-31T17:57:06.809867+00:00"
+    },
+    {
+      "id": "b38c69f7-e7fc-415c-91db-16d02db1d9f8",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 100,
+      "description": "paghetta",
+      "date": "2026-01-29",
+      "createdAt": "2026-01-29T13:32:48.804+00:00"
+    },
+    {
+      "id": "d7e963da-6162-46b8-af5c-bf87f9f25d3b",
+      "type": "expense",
+      "category": "Shopping",
+      "amount": 31.2,
+      "description": "Maglietta david",
+      "date": "2026-01-29",
+      "createdAt": "2026-01-29T17:23:17.404209+00:00"
+    },
+    {
+      "id": "5ea23381-366f-423d-926d-065bd7d773c1",
+      "type": "expense",
+      "category": "Food",
+      "amount": 1.36,
+      "description": "Pane",
+      "date": "2026-01-27",
+      "createdAt": "2026-01-27T09:22:55.579903+00:00"
+    },
+    {
+      "id": "77f2cf69-6207-4dcb-b1b1-643dd187d753",
+      "type": "expense",
+      "category": "Food",
+      "amount": 12,
+      "description": "Aperitivo arena con mia",
+      "date": "2026-01-26",
+      "createdAt": "2026-01-26T18:11:20.259091+00:00"
+    },
+    {
+      "id": "bb5ab969-4a81-47f0-ab59-ab0a01bba031",
+      "type": "expense",
+      "category": "Entertainment",
+      "amount": 74,
+      "description": "Bowling con mia",
+      "date": "2026-01-26",
+      "createdAt": "2026-01-26T22:54:12.488919+00:00"
+    },
+    {
+      "id": "6e45fce1-e2f9-46ed-8423-a021a713e665",
+      "type": "expense",
+      "category": "Other",
+      "amount": 11.68,
+      "description": "Tasse trade republic",
+      "date": "2026-01-24",
+      "createdAt": "2026-01-24T11:26:25.152452+00:00"
+    },
+    {
+      "id": "12bb79ad-a029-410c-b604-a62adf18bf3d",
+      "type": "expense",
+      "category": "Shopping",
+      "amount": 62.5,
+      "description": "gorilla pod",
+      "date": "2026-01-22",
+      "createdAt": "2026-01-22T16:23:03.044731+00:00"
+    },
+    {
+      "id": "3e6b177a-6000-4531-a3b1-7bbad668ffc3",
+      "type": "expense",
+      "category": "Fuel",
+      "amount": 50,
+      "description": "",
+      "date": "2026-01-16",
+      "createdAt": "2026-01-16T16:14:23.149217+00:00"
+    },
+    {
+      "id": "62eb02a3-483a-4185-8c00-1788e9a075ac",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 6,
+      "description": "Resto pizza",
+      "date": "2026-01-15",
+      "createdAt": "2026-01-15T12:49:11.274162+00:00"
+    },
+    {
+      "id": "ac8b1939-a197-4b86-9146-02ecf709df11",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 100,
+      "description": "Paghetta",
+      "date": "2026-01-11",
+      "createdAt": "2026-01-11T07:37:01.673423+00:00"
+    },
+    {
+      "id": "f45522b5-a71a-439f-ae44-06e44b2babb8",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 21.5,
+      "description": "Resto cinema",
+      "date": "2026-01-08",
+      "createdAt": "2026-01-08T21:26:59.650189+00:00"
+    },
+    {
+      "id": "27504f9c-305c-4c90-8016-4e9208307dd3",
+      "type": "expense",
+      "category": "Utilities",
+      "amount": 699,
+      "description": "Corso + piattaforma Omney",
+      "date": "2026-01-08",
+      "createdAt": "2026-01-08T21:43:48.267968+00:00"
+    },
+    {
+      "id": "caf0a598-1169-414f-9c35-0f528cb9646d",
+      "type": "expense",
+      "category": "Food",
+      "amount": 9,
+      "description": "Spesa rovereto",
+      "date": "2026-01-07",
+      "createdAt": "2026-01-07T16:10:36.724499+00:00"
+    },
+    {
+      "id": "c6b6cd96-248e-48ca-808a-1f8f68ddcfd6",
+      "type": "expense",
+      "category": "Fuel",
+      "amount": 60,
+      "description": "",
+      "date": "2026-01-07",
+      "createdAt": "2026-01-07T20:49:13.693925+00:00"
+    },
+    {
+      "id": "bf30deea-96a2-400e-a26d-b41c544404ac",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 200,
+      "description": "paghetta",
+      "date": "2025-12-31",
+      "createdAt": "2025-12-31T12:51:07.705672+00:00"
+    },
+    {
+      "id": "5702ab5d-38c9-4489-8ee9-63cbb5efbdd9",
+      "type": "expense",
+      "category": "Fuel",
+      "amount": 50,
+      "description": "",
+      "date": "2025-12-30",
+      "createdAt": "2025-12-30T09:17:05.500575+00:00"
+    },
+    {
+      "id": "b7abbf0a-dab8-4bb6-be79-6d9f30915656",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 100,
+      "description": "paghetta",
+      "date": "2025-12-27",
+      "createdAt": "2025-12-27T12:42:51.885411+00:00"
+    },
+    {
+      "id": "461ea136-426e-420e-9e88-8fa96b7d854b",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 25,
+      "description": "resto pizza noir",
+      "date": "2025-12-24",
+      "createdAt": "2025-12-24T08:23:11.479405+00:00"
+    },
+    {
+      "id": "e12f903d-00b3-4b81-9b55-49a390a036f4",
+      "type": "expense",
+      "category": "Entertainment",
+      "amount": 100,
+      "description": "SPA san giacomo regalo per mia",
+      "date": "2025-12-23",
+      "createdAt": "2025-12-23T10:41:38.1841+00:00"
+    },
+    {
+      "id": "0ff52f0d-a6d0-4efe-b2bf-bf608501d921",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 100,
+      "description": "paghetta",
+      "date": "2025-12-23",
+      "createdAt": "2025-12-24T08:23:56.052863+00:00"
+    },
+    {
+      "id": "de3f6201-9886-4dd2-ade9-42e36500d949",
+      "type": "expense",
+      "category": "Fuel",
+      "amount": 65,
+      "description": "",
+      "date": "2025-12-22",
+      "createdAt": "2025-12-22T14:17:05.835661+00:00"
+    },
+    {
+      "id": "d7c3aebf-8004-413f-9443-c876dec8533b",
+      "type": "expense",
+      "category": "Food",
+      "amount": 8.34,
+      "description": "Loacker",
+      "date": "2025-12-22",
+      "createdAt": "2025-12-22T14:18:02.205296+00:00"
+    },
+    {
+      "id": "ab6a7381-9b3c-45a7-a47d-ea7825521ff7",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 3242.7,
+      "description": "cash su trade republic",
+      "date": "2025-12-21",
+      "createdAt": "2025-12-21T17:56:30.681219+00:00"
+    },
+    {
+      "id": "4c50dd68-4d7a-4764-94f6-c16b4ac78b01",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 200,
+      "description": "cash rabbbi",
+      "date": "2025-12-21",
+      "createdAt": "2025-12-21T21:43:56.790941+00:00"
+    },
+    {
+      "id": "0bcbe00f-791f-43ff-a3db-689155a1f5b2",
+      "type": "income",
+      "category": "Dividends",
+      "amount": 470,
+      "description": "cash rovereto",
+      "date": "2025-12-21",
+      "createdAt": "2025-12-21T22:00:06.032118+00:00"
+    },
+    {
+      "id": "5fed2754-4804-4a79-bc7e-62acef7712cd",
+      "type": "income",
+      "category": "Freelance",
+      "amount": 500,
+      "description": "Sito web Matteo",
+      "date": "2025-12-20",
+      "createdAt": "2025-12-21T17:29:27.099078+00:00"
+    }
+  ],
+  "snapshots": [
+    {
+      "id": "458396aa-a00c-4748-9233-52089cd3dcdc",
+      "date": "2025-12-21T18:16:49.894+00:00",
+      "netWorth": 10371.318058075194,
+      "totalAssets": 10371.318058075194,
+      "totalLiabilities": 0,
+      "liquidity": 3742.7,
+      "investments": 5122.950818254782,
+      "crypto": 1505.6672398204128,
+      "createdAt": "2025-12-21T18:16:50.160491+00:00"
+    },
+    {
+      "id": "4b0186e0-523f-414c-8b3d-498d14b3a470",
+      "date": "2025-12-21T22:00:11.149+00:00",
+      "netWorth": 11180.618517970004,
+      "totalAssets": 11180.618517970004,
+      "totalLiabilities": 0,
+      "liquidity": 4412.7,
+      "investments": 5105.253737909836,
+      "crypto": 1662.6647800601668,
+      "createdAt": "2025-12-21T22:00:11.281383+00:00"
+    },
+    {
+      "id": "af6fbeca-83db-47c3-8a75-162b04fd561c",
+      "date": "2025-12-21T22:03:55.766+00:00",
+      "netWorth": 12054.637957900166,
+      "totalAssets": 12054.637957900166,
+      "totalLiabilities": 0,
+      "liquidity": 4412.7,
+      "investments": 5979.27317784,
+      "crypto": 1662.6647800601668,
+      "createdAt": "2025-12-21T22:03:55.848066+00:00"
+    },
+    {
+      "id": "929c8895-bab7-4a3b-b900-b7b54206d4a6",
+      "date": "2025-12-22T14:18:14.352+00:00",
+      "netWorth": 12116.736845750918,
+      "totalAssets": 12116.736845750918,
+      "totalLiabilities": 0,
+      "liquidity": 4339.36,
+      "investments": 5979.27317784,
+      "crypto": 1798.1036679109184,
+      "createdAt": "2025-12-22T14:18:14.508448+00:00"
+    },
+    {
+      "id": "cea7e4d3-5c1a-42c7-8daf-45ae9f637de8",
+      "date": "2025-12-23T10:41:46.038+00:00",
+      "netWorth": 11972.049747498166,
+      "totalAssets": 11972.049747498166,
+      "totalLiabilities": 0,
+      "liquidity": 4239.36,
+      "investments": 5983.41854194,
+      "crypto": 1749.2712055581674,
+      "createdAt": "2025-12-23T10:41:46.179253+00:00"
+    },
+    {
+      "id": "aaac09a0-0582-4304-aad5-fddc3f1da7b8",
+      "date": "2025-12-23T10:41:49.83+00:00",
+      "netWorth": 11972.049747498166,
+      "totalAssets": 11972.049747498166,
+      "totalLiabilities": 0,
+      "liquidity": 4239.36,
+      "investments": 5983.41854194,
+      "crypto": 1749.2712055581674,
+      "createdAt": "2025-12-23T10:41:49.910008+00:00"
+    },
+    {
+      "id": "d14b3030-aad1-492a-9e94-ca3a4f15e3ad",
+      "date": "2025-12-23T21:55:40.796+00:00",
+      "netWorth": 11982.890242038426,
+      "totalAssets": 11982.890242038426,
+      "totalLiabilities": 0,
+      "liquidity": 4239.36,
+      "investments": 5998.341852699999,
+      "crypto": 1745.1883893384247,
+      "createdAt": "2025-12-23T21:55:41.006003+00:00"
+    },
+    {
+      "id": "8a3360da-cd3d-4fb5-9db3-72b6425b1a05",
+      "date": "2025-12-24T08:24:01.594+00:00",
+      "netWorth": 12094.997446614532,
+      "totalAssets": 12094.997446614532,
+      "totalLiabilities": 0,
+      "liquidity": 4364.36,
+      "investments": 5998.341852699999,
+      "crypto": 1732.295593914532,
+      "createdAt": "2025-12-24T08:24:01.893966+00:00"
+    },
+    {
+      "id": "ab61a6b5-0928-4249-9a3e-c1ace910aebe",
+      "date": "2025-12-27T12:42:55.914+00:00",
+      "netWorth": 12201.20663356915,
+      "totalAssets": 12201.20663356915,
+      "totalLiabilities": 0,
+      "liquidity": 4464.36,
+      "investments": 5998.341852699999,
+      "crypto": 1738.5047808691502,
+      "createdAt": "2025-12-27T12:42:56.171654+00:00"
+    },
+    {
+      "id": "6c817542-35eb-42f4-bdeb-a7c03cd78365",
+      "date": "2025-12-29T16:47:15.869+00:00",
+      "netWorth": 12270.673973421472,
+      "totalAssets": 12270.673973421472,
+      "totalLiabilities": 0,
+      "liquidity": 4464.36,
+      "investments": 6062.841719213867,
+      "crypto": 1743.4722542076045,
+      "createdAt": "2025-12-29T16:47:16.046527+00:00"
+    },
+    {
+      "id": "68a08bc6-c7e0-4bf1-bfad-6ebaf6bafce2",
+      "date": "2025-12-30T09:20:21.562+00:00",
+      "netWorth": 12228.950274478646,
+      "totalAssets": 12228.950274478646,
+      "totalLiabilities": 0,
+      "liquidity": 4414.36,
+      "investments": 6068.154429548791,
+      "crypto": 1746.435844929855,
+      "createdAt": "2025-12-30T09:20:21.809516+00:00"
+    },
+    {
+      "id": "092b38e4-d171-4c33-be5e-85af69595e8b",
+      "date": "2025-12-30T09:47:47.45+00:00",
+      "netWorth": 12229.182021206676,
+      "totalAssets": 12229.182021206676,
+      "totalLiabilities": 0,
+      "liquidity": 4414.36,
+      "investments": 6068.154429548791,
+      "crypto": 1746.667591657885,
+      "createdAt": "2025-12-30T09:47:47.597151+00:00"
+    },
+    {
+      "id": "3f2437b1-668f-409b-bd95-05d80ef22fae",
+      "date": "2025-12-31T12:51:20.967+00:00",
+      "netWorth": 12456.42674450142,
+      "totalAssets": 12456.42674450142,
+      "totalLiabilities": 0,
+      "liquidity": 4614.36,
+      "investments": 6078.187712971381,
+      "crypto": 1763.8790315300398,
+      "createdAt": "2025-12-31T12:51:21.067443+00:00"
+    },
+    {
+      "id": "21af2bad-77af-4708-a6ff-6925df0080fc",
+      "date": "2026-01-02T18:16:20.2+00:00",
+      "netWorth": 12534.065328262963,
+      "totalAssets": 12534.065328262963,
+      "totalLiabilities": 0,
+      "liquidity": 4614.36,
+      "investments": 6116.045229503244,
+      "crypto": 1803.6600987597199,
+      "createdAt": "2026-01-02T18:16:20.373462+00:00"
+    },
+    {
+      "id": "6b227e2a-763e-4f7c-9cdb-47feb45e56d4",
+      "date": "2026-01-07T10:47:21.09+00:00",
+      "netWorth": 12683.907925146774,
+      "totalAssets": 12683.907925146774,
+      "totalLiabilities": 0,
+      "liquidity": 4614.36,
+      "investments": 6226.3243181548305,
+      "crypto": 1843.223606991943,
+      "createdAt": "2026-01-07T10:47:21.324622+00:00"
+    },
+    {
+      "id": "e532a64d-7b9e-455d-ae6c-e1b973937161",
+      "date": "2026-01-07T20:49:48.243+00:00",
+      "netWorth": 12609.44022718253,
+      "totalAssets": 12609.44022718253,
+      "totalLiabilities": 0,
+      "liquidity": 4545.36,
+      "investments": 6235.772378356042,
+      "crypto": 1828.3078488264866,
+      "createdAt": "2026-01-07T20:49:48.417915+00:00"
+    },
+    {
+      "id": "de4c9ca2-d93d-4833-b959-24f48b2451dd",
+      "date": "2026-01-08T21:43:56.121+00:00",
+      "netWorth": 11924.939878892475,
+      "totalAssets": 11924.939878892475,
+      "totalLiabilities": 0,
+      "liquidity": 3867.8599999999997,
+      "investments": 6224.9961465928045,
+      "crypto": 1832.0837322996726,
+      "createdAt": "2026-01-08T21:43:56.295235+00:00"
+    },
+    {
+      "id": "833bb6aa-0dcf-4238-8b12-0f9bcd46a7f8",
+      "date": "2026-01-11T07:37:20.286+00:00",
+      "netWorth": 12069.990976459068,
+      "totalAssets": 12069.990976459068,
+      "totalLiabilities": 0,
+      "liquidity": 3967.8599999999997,
+      "investments": 6274.118810421388,
+      "crypto": 1828.0121660376806,
+      "createdAt": "2026-01-11T07:37:20.403813+00:00"
+    },
+    {
+      "id": "df5ce65b-ec72-4486-850d-3cfc238051a1",
+      "date": "2026-01-15T12:49:20.472+00:00",
+      "netWorth": 12214.881289795656,
+      "totalAssets": 12214.881289795656,
+      "totalLiabilities": 0,
+      "liquidity": 3973.8599999999997,
+      "investments": 6308.704851917305,
+      "crypto": 1932.3164378783515,
+      "createdAt": "2026-01-15T12:49:20.643154+00:00"
+    },
+    {
+      "id": "046e2912-fffe-4a7f-b693-1f04d9914363",
+      "date": "2026-01-16T16:14:35.41+00:00",
+      "netWorth": 12129.192053295312,
+      "totalAssets": 12129.192053295312,
+      "totalLiabilities": 0,
+      "liquidity": 3923.8599999999997,
+      "investments": 6306.091761707064,
+      "crypto": 1899.240291588248,
+      "createdAt": "2026-01-16T16:14:35.582232+00:00"
+    },
+    {
+      "id": "3cb29b36-9400-40e6-8409-9a18efda093f",
+      "date": "2026-01-26T22:54:21.837+00:00",
+      "netWorth": 11707.593932222788,
+      "totalAssets": 11707.593932222788,
+      "totalLiabilities": 0,
+      "liquidity": 3763.68,
+      "investments": 6202.363602360784,
+      "crypto": 1741.5503298620035,
+      "createdAt": "2026-01-26T22:54:22.004788+00:00"
+    },
+    {
+      "id": "387ca82d-b3c5-460d-bb15-9981d8ae4971",
+      "date": "2026-01-29T17:23:42.839+00:00",
+      "netWorth": 11726.792848839408,
+      "totalAssets": 11726.792848839408,
+      "totalLiabilities": 0,
+      "liquidity": 3831.12,
+      "investments": 6219.7144278983415,
+      "crypto": 1675.9584209410655,
+      "createdAt": "2026-01-29T17:23:42.983287+00:00"
+    },
+    {
+      "id": "bd1e3b8d-336d-4f5c-9320-18aeebd1acaa",
+      "date": "2026-02-13T14:36:13.284+00:00",
+      "netWorth": 13238.050074406674,
+      "totalAssets": 13238.050074406674,
+      "totalLiabilities": 0,
+      "liquidity": 5675.630000000002,
+      "investments": 6192.679209480728,
+      "crypto": 1369.7408649259453,
+      "createdAt": "2026-02-13T14:36:13.433738+00:00"
+    },
+    {
+      "id": "10b47af1-4dda-4928-8f62-cc9ad8654237",
+      "date": "2026-02-20T19:52:36.121+00:00",
+      "netWorth": 13099.528890151698,
+      "totalAssets": 13099.528890151698,
+      "totalLiabilities": 0,
+      "liquidity": 5405.270000000002,
+      "investments": 6305.76469004949,
+      "crypto": 1388.4942001022073,
+      "createdAt": "2026-02-20T19:52:36.200169+00:00"
+    },
+    {
+      "id": "74f4654b-c93f-4bee-923a-982740964e04",
+      "date": "2026-03-01T11:54:54.112+00:00",
+      "netWorth": 13029.161659633019,
+      "totalAssets": 13029.161659633019,
+      "totalLiabilities": 0,
+      "liquidity": 5353.070000000002,
+      "investments": 6311.833368825844,
+      "crypto": 1364.2582908071727,
+      "createdAt": "2026-03-01T11:54:54.210932+00:00"
+    },
+    {
+      "id": "d23e3ad4-2a3c-4441-bdf6-9c58c427542a",
+      "date": "2026-03-02T22:18:08.116+00:00",
+      "netWorth": 13082.199535668582,
+      "totalAssets": 13082.199535668582,
+      "totalLiabilities": 0,
+      "liquidity": 5338.070000000002,
+      "investments": 6320.672764280079,
+      "crypto": 1423.4567713885,
+      "createdAt": "2026-03-02T22:18:09.125251+00:00"
+    },
+    {
+      "id": "70ed307d-afa0-49fe-8ce5-6714e410175e",
+      "date": "2026-03-04T17:18:21.3+00:00",
+      "netWorth": 13107.808816561797,
+      "totalAssets": 13107.808816561797,
+      "totalLiabilities": 0,
+      "liquidity": 5307.910000000002,
+      "investments": 6291.753699591699,
+      "crypto": 1508.1451169700983,
+      "createdAt": "2026-03-04T17:18:21.457242+00:00"
+    },
+    {
+      "id": "fbad354b-0a24-4075-992b-fd4161570aee",
+      "date": "2026-03-17T17:55:49.796+00:00",
+      "netWorth": 12680.790699913194,
+      "totalAssets": 12680.790699913194,
+      "totalLiabilities": 0,
+      "liquidity": 4880.220000000002,
+      "investments": 6260.029480658081,
+      "crypto": 1540.5412192551098,
+      "createdAt": "2026-03-17T17:55:49.899221+00:00"
+    },
+    {
+      "id": "1970915c-a81d-4a94-8332-7f0c845bbfe8",
+      "date": "2026-03-21T16:55:55.607+00:00",
+      "netWorth": 12241.56106699194,
+      "totalAssets": 12241.56106699194,
+      "totalLiabilities": 0,
+      "liquidity": 4770.460000000001,
+      "investments": 6012.227156653673,
+      "crypto": 1458.873910338267,
+      "createdAt": "2026-03-21T16:55:55.748492+00:00"
+    },
+    {
+      "id": "13a5d5a6-e9e8-4504-bd0a-dfc8e095eaa4",
+      "date": "2026-03-21T16:55:57.954+00:00",
+      "netWorth": 12241.56106699194,
+      "totalAssets": 12241.56106699194,
+      "totalLiabilities": 0,
+      "liquidity": 4770.460000000001,
+      "investments": 6012.227156653673,
+      "crypto": 1458.873910338267,
+      "createdAt": "2026-03-21T16:55:58.04647+00:00"
+    },
+    {
+      "id": "baa31915-cb02-4252-8083-447100eaa71a",
+      "date": "2026-03-22T10:56:39.316+00:00",
+      "netWorth": 12176.944502890514,
+      "totalAssets": 12176.944502890514,
+      "totalLiabilities": 0,
+      "liquidity": 4737.040000000001,
+      "investments": 6012.212920392315,
+      "crypto": 1427.691582498198,
+      "createdAt": "2026-03-22T10:56:39.465005+00:00"
+    },
+    {
+      "id": "829999db-6b4a-4a55-af60-f4706b1b7d2c",
+      "date": "2026-03-27T13:09:55.345+00:00",
+      "netWorth": 12196.239996793054,
+      "totalAssets": 12196.239996793054,
+      "totalLiabilities": 0,
+      "liquidity": 4837.040000000001,
+      "investments": 5968.463275327009,
+      "crypto": 1390.7367214660435,
+      "createdAt": "2026-03-27T13:09:55.512824+00:00"
+    },
+    {
+      "id": "ac6c80aa-955a-4d19-9781-f8b44506ebb7",
+      "date": "2026-03-30T17:04:54.156+00:00",
+      "netWorth": 12273.535079456831,
+      "totalAssets": 12273.535079456831,
+      "totalLiabilities": 0,
+      "liquidity": 4887.039999999999,
+      "investments": 5978.662599209648,
+      "crypto": 1407.8324802471852,
+      "createdAt": "2026-03-30T17:04:54.293377+00:00"
+    },
+    {
+      "id": "fe6a9415-eb15-45bb-baee-56a214241db2",
+      "date": "2026-03-31T14:15:06.503+00:00",
+      "netWorth": 12279.036991232708,
+      "totalAssets": 12279.036991232708,
+      "totalLiabilities": 0,
+      "liquidity": 4887.039999999999,
+      "investments": 5986.200755414295,
+      "crypto": 1405.7962358184147,
+      "createdAt": "2026-03-31T14:15:06.638991+00:00"
+    },
+    {
+      "id": "accf6f58-68c4-46ff-8a98-045caf98a0f5",
+      "date": "2026-04-01T20:13:58.323+00:00",
+      "netWorth": 12267.228735942022,
+      "totalAssets": 12267.228735942022,
+      "totalLiabilities": 0,
+      "liquidity": 4753.039999999999,
+      "investments": 6106.929441735847,
+      "crypto": 1407.259294206176,
+      "createdAt": "2026-04-01T20:13:58.433514+00:00"
+    },
+    {
+      "id": "99402b6c-408b-40d6-83e8-f00bef608675",
+      "date": "2026-04-03T18:50:00.872+00:00",
+      "netWorth": 12777.742136476067,
+      "totalAssets": 12777.742136476067,
+      "totalLiabilities": 0,
+      "liquidity": 5053.039999999999,
+      "investments": 6118.08300134,
+      "crypto": 1606.6191351360678,
+      "createdAt": "2026-04-03T18:50:01.032692+00:00"
+    },
+    {
+      "id": "141951e4-c201-4c3e-805c-0cc170377cff",
+      "date": "2026-04-07T20:31:41.445+00:00",
+      "netWorth": 12784.606071727667,
+      "totalAssets": 12784.606071727667,
+      "totalLiabilities": 0,
+      "liquidity": 5043.039999999999,
+      "investments": 6085.9911347199995,
+      "crypto": 1655.5749370076674,
+      "createdAt": "2026-04-07T20:31:41.697391+00:00"
+    },
+    {
+      "id": "dd694ca6-0dc9-40b0-9af5-47df2588f78b",
+      "date": "2026-04-09T15:52:09.165+00:00",
+      "netWorth": 13001.532384789067,
+      "totalAssets": 13001.532384789067,
+      "totalLiabilities": 0,
+      "liquidity": 5043.039999999999,
+      "investments": 6246.864319519999,
+      "crypto": 1711.6280652690677,
+      "createdAt": "2026-04-09T15:52:09.285412+00:00"
+    },
+    {
+      "id": "7009e3a0-6987-466f-9b76-503f090ba82b",
+      "date": "2026-04-12T16:25:46.491+00:00",
+      "netWorth": 12915.855802463268,
+      "totalAssets": 12915.855802463268,
+      "totalLiabilities": 0,
+      "liquidity": 4948.039999999999,
+      "investments": 6283.22036096,
+      "crypto": 1684.5954415032677,
+      "createdAt": "2026-04-12T16:25:46.710359+00:00"
+    },
+    {
+      "id": "793813a8-b5a1-4ca6-bba8-ee5a9229e91e",
+      "date": "2026-04-14T17:32:59.288+00:00",
+      "netWorth": 13097.109847602265,
+      "totalAssets": 13097.109847602265,
+      "totalLiabilities": 0,
+      "liquidity": 4978.039999999999,
+      "investments": 6359.60071748,
+      "crypto": 1759.4691301222672,
+      "createdAt": "2026-04-14T17:32:59.424257+00:00"
+    },
+    {
+      "id": "a1d170f2-b3d7-4cf4-be3f-fdebfc568ca6",
+      "date": "2026-04-16T11:41:31.037+00:00",
+      "netWorth": 13160.347528235669,
+      "totalAssets": 13160.347528235669,
+      "totalLiabilities": 0,
+      "liquidity": 4988.540000000001,
+      "investments": 6415.10287078,
+      "crypto": 1756.7046574556675,
+      "createdAt": "2026-04-16T11:41:31.326009+00:00"
+    },
+    {
+      "id": "6c0431c4-f470-49b3-856d-f30d8d193166",
+      "date": "2026-04-19T16:06:01.698+00:00",
+      "netWorth": 13185.759601079868,
+      "totalAssets": 13185.759601079868,
+      "totalLiabilities": 0,
+      "liquidity": 4911.540000000002,
+      "investments": 6495.574452059999,
+      "crypto": 1778.6451490198674,
+      "createdAt": "2026-04-19T16:06:02.153369+00:00"
+    },
+    {
+      "id": "a466c27d-ad85-4bbc-b9d5-2b0cdaeb4a48",
+      "date": "2026-04-19T19:11:44.785+00:00",
+      "netWorth": 13271.128256995065,
+      "totalAssets": 13271.128256995065,
+      "totalLiabilities": 0,
+      "liquidity": 5008.54,
+      "investments": 6495.590902059998,
+      "crypto": 1766.9973549350675,
+      "createdAt": "2026-04-19T19:11:44.986689+00:00"
+    },
+    {
+      "id": "9748a58c-d85f-400b-82b2-46283aea7304",
+      "date": "2026-04-21T16:45:43.434+00:00",
+      "netWorth": 13167.940456380067,
+      "totalAssets": 13167.940456380067,
+      "totalLiabilities": 0,
+      "liquidity": 4935.54,
+      "investments": 6445.86254596,
+      "crypto": 1786.5379104200674,
+      "createdAt": "2026-04-21T16:45:43.590372+00:00"
+    },
+    {
+      "id": "cad93042-f1df-4f63-96e3-38f7d2f1af88",
+      "date": "2026-04-27T11:41:36.444+00:00",
+      "netWorth": 13418.721301382666,
+      "totalAssets": 13418.721301382666,
+      "totalLiabilities": 0,
+      "liquidity": 5092.54,
+      "investments": 6503.768430719999,
+      "crypto": 1822.4128706626675,
+      "createdAt": "2026-04-27T11:41:36.825187+00:00"
+    },
+    {
+      "id": "8342f08e-2e93-42c8-94be-455783217ad7",
+      "date": "2026-05-03T11:25:25.14+00:00",
+      "netWorth": 13418.721301382666,
+      "totalAssets": 13418.721301382666,
+      "totalLiabilities": 0,
+      "liquidity": 5092.54,
+      "investments": 6503.768430719999,
+      "crypto": 1822.4128706626675,
+      "createdAt": "2026-05-03T11:25:25.319565+00:00"
+    },
+    {
+      "id": "7c300d69-2bd9-40b5-9996-cd36bd812232",
+      "date": "2026-05-06T12:11:44.063+00:00",
+      "netWorth": 13469.960607007268,
+      "totalAssets": 13469.960607007268,
+      "totalLiabilities": 0,
+      "liquidity": 5043.54,
+      "investments": 6510.78323536,
+      "crypto": 1915.6373716472674,
+      "createdAt": "2026-05-06T12:11:44.168494+00:00"
+    },
+    {
+      "id": "6b55babb-4d52-4356-bbd5-1d83e8331065",
+      "date": "2026-05-07T18:19:56.651+00:00",
+      "netWorth": 13550.833539839667,
+      "totalAssets": 13550.833539839667,
+      "totalLiabilities": 0,
+      "liquidity": 5000.539999999999,
+      "investments": 6679.485874179999,
+      "crypto": 1870.8076656596677,
+      "createdAt": "2026-05-07T18:19:56.805328+00:00"
+    },
+    {
+      "id": "25fb025c-bb5e-4a24-8a1a-0fdc9aa0d406",
+      "date": "2026-05-07T18:29:41.116+00:00",
+      "netWorth": 13314.833539839667,
+      "totalAssets": 13314.833539839667,
+      "totalLiabilities": 0,
+      "liquidity": 4764.54,
+      "investments": 6679.485874179999,
+      "crypto": 1870.8076656596677,
+      "createdAt": "2026-05-07T18:29:41.427675+00:00"
+    },
+    {
+      "id": "9af11316-e234-47f2-86a5-e08dc1cdf4d3",
+      "date": "2026-05-08T14:10:32.254+00:00",
+      "netWorth": 13287.633973063668,
+      "totalAssets": 13287.633973063668,
+      "totalLiabilities": 0,
+      "liquidity": 4743.54,
+      "investments": 6680.180652,
+      "crypto": 1863.9133210636676,
+      "createdAt": "2026-05-08T14:10:32.56994+00:00"
+    },
+    {
+      "id": "49355582-9930-43ce-8e1e-15efb500e115",
+      "date": "2026-05-08T14:10:33.723+00:00",
+      "netWorth": 13287.633973063668,
+      "totalAssets": 13287.633973063668,
+      "totalLiabilities": 0,
+      "liquidity": 4743.54,
+      "investments": 6680.180652,
+      "crypto": 1863.9133210636676,
+      "createdAt": "2026-05-08T14:10:33.785076+00:00"
+    },
+    {
+      "id": "aebee5e3-85a1-4d49-9f9d-2851c1992c83",
+      "date": "2026-05-10T05:31:22+00:00",
+      "netWorth": 13271.146727617868,
+      "totalAssets": 13271.146727617868,
+      "totalLiabilities": 0,
+      "liquidity": 4700.54,
+      "investments": 6686.122275739999,
+      "crypto": 1884.4844518778675,
+      "createdAt": "2026-05-10T05:31:22.256718+00:00"
+    },
+    {
+      "id": "c0f2af27-a074-44eb-92fd-1f7b0db16cc3",
+      "date": "2026-05-10T10:49:29.238+00:00",
+      "netWorth": 13266.692381047667,
+      "totalAssets": 13266.692381047667,
+      "totalLiabilities": 0,
+      "liquidity": 4694.54,
+      "investments": 6686.122275739999,
+      "crypto": 1886.0301053076676,
+      "createdAt": "2026-05-10T10:49:29.513696+00:00"
+    },
+    {
+      "id": "4066c6ef-c4ce-488f-9ce2-4e13a8e1976c",
+      "date": "2026-05-14T16:06:02.47+00:00",
+      "netWorth": 13395.866423375666,
+      "totalAssets": 13395.866423375666,
+      "totalLiabilities": 0,
+      "liquidity": 4687.94,
+      "investments": 6806.15690682,
+      "crypto": 1901.7695165556675,
+      "createdAt": "2026-05-14T16:06:02.605437+00:00"
+    },
+    {
+      "id": "530c9bda-26e8-44da-9f4a-603a65155992",
+      "date": "2026-05-14T16:06:04.463+00:00",
+      "netWorth": 13395.866423375666,
+      "totalAssets": 13395.866423375666,
+      "totalLiabilities": 0,
+      "liquidity": 4687.94,
+      "investments": 6806.15690682,
+      "crypto": 1901.7695165556675,
+      "createdAt": "2026-05-14T16:06:04.561867+00:00"
+    },
+    {
+      "id": "af77914a-74d1-4662-9978-76095bee6577",
+      "date": "2026-05-15T09:24:26.231+00:00",
+      "netWorth": 13290.072438992467,
+      "totalAssets": 13290.072438992467,
+      "totalLiabilities": 0,
+      "liquidity": 4670.339999999999,
+      "investments": 6736.39692876,
+      "crypto": 1883.3355102324674,
+      "createdAt": "2026-05-15T09:24:26.388806+00:00"
+    },
+    {
+      "id": "f1c55836-7949-4abf-a238-8f37cb8b1045",
+      "date": "2026-05-19T08:23:52.687+00:00",
+      "netWorth": 13077.916811087267,
+      "totalAssets": 13077.916811087267,
+      "totalLiabilities": 0,
+      "liquidity": 4547.34,
+      "investments": 6722.421461,
+      "crypto": 1808.1553500872678,
+      "createdAt": "2026-05-19T08:23:52.843525+00:00"
+    },
+    {
+      "id": "7a972e62-71b6-4c44-a39e-27bc3db5581f",
+      "date": "2026-05-21T11:24:34.288+00:00",
+      "netWorth": 13289.326969961068,
+      "totalAssets": 13289.326969961068,
+      "totalLiabilities": 0,
+      "liquidity": 4740.34,
+      "investments": 6738.16613204,
+      "crypto": 1810.8208379210678,
+      "createdAt": "2026-05-21T11:24:34.907883+00:00"
+    },
+    {
+      "id": "5bdb467b-127e-4363-a634-1c3306f707e7",
+      "date": "2026-05-25T10:27:43.691+00:00",
+      "netWorth": 13362.25121586447,
+      "totalAssets": 13362.25121586447,
+      "totalLiabilities": 0,
+      "liquidity": 4677.64,
+      "investments": 6868.3710276,
+      "crypto": 1816.2401882644676,
+      "createdAt": "2026-05-25T10:27:43.905167+00:00"
+    },
+    {
+      "id": "27ed91fe-e5f3-49ba-87db-85e87f417726",
+      "date": "2026-05-25T13:42:46.031+00:00",
+      "netWorth": 13337.18491368747,
+      "totalAssets": 13337.18491368747,
+      "totalLiabilities": 0,
+      "liquidity": 4656.64,
+      "investments": 6869.21655042,
+      "crypto": 1811.3283632674675,
+      "createdAt": "2026-05-25T13:42:46.211337+00:00"
+    },
+    {
+      "id": "a33b2f27-3eec-4bdb-b1c7-731e277ab1a8",
+      "date": "2026-05-25T13:42:48.005+00:00",
+      "netWorth": 13337.18491368747,
+      "totalAssets": 13337.18491368747,
+      "totalLiabilities": 0,
+      "liquidity": 4656.64,
+      "investments": 6869.21655042,
+      "crypto": 1811.3283632674675,
+      "createdAt": "2026-05-25T13:42:48.134106+00:00"
+    },
+    {
+      "id": "1d378e34-ecbf-4960-a6bf-4945d3515e2d",
+      "date": "2026-05-26T08:44:43.672+00:00",
+      "netWorth": 13306.482446297667,
+      "totalAssets": 13306.482446297667,
+      "totalLiabilities": 0,
+      "liquidity": 4652.240000000001,
+      "investments": 6854.27678966,
+      "crypto": 1799.9656566376675,
+      "createdAt": "2026-05-26T08:44:43.869764+00:00"
+    },
+    {
+      "id": "537db84a-fda9-43f8-8520-78df46d3b033",
+      "date": "2026-05-29T15:59:08.378+00:00",
+      "netWorth": 14482.361207511665,
+      "totalAssets": 14482.361207511665,
+      "totalLiabilities": 0,
+      "liquidity": 5854.139999999999,
+      "investments": 6890.00089556,
+      "crypto": 1738.2203119516676,
+      "createdAt": "2026-05-29T15:59:08.592615+00:00"
+    },
+    {
+      "id": "c910ccfe-c63a-461b-a5b0-99d131aa2f9a",
+      "date": "2026-05-31T12:37:07.536+00:00",
+      "netWorth": 14476.800797978267,
+      "totalAssets": 14476.800797978267,
+      "totalLiabilities": 0,
+      "liquidity": 5846.74,
+      "investments": 6889.453651559999,
+      "crypto": 1740.6071464182676,
+      "createdAt": "2026-05-31T12:37:07.890765+00:00"
+    },
+    {
+      "id": "90f7a047-eac0-42af-a7f2-d3ff4c1dc96e",
+      "date": "2026-05-31T12:37:09.342+00:00",
+      "netWorth": 14476.800797978267,
+      "totalAssets": 14476.800797978267,
+      "totalLiabilities": 0,
+      "liquidity": 5846.74,
+      "investments": 6889.453651559999,
+      "crypto": 1740.6071464182676,
+      "createdAt": "2026-05-31T12:37:09.639369+00:00"
+    },
+    {
+      "id": "841b8ce0-cc54-4881-b394-61b50b07c830",
+      "date": "2026-06-01T19:05:40.545+00:00",
+      "netWorth": 14461.915981866468,
+      "totalAssets": 14461.915981866468,
+      "totalLiabilities": 0,
+      "liquidity": 5851.860000000002,
+      "investments": 6920.5404947199995,
+      "crypto": 1689.5154871464674,
+      "createdAt": "2026-06-01T19:05:40.827167+00:00"
+    },
+    {
+      "id": "2bd682e1-dd88-4f87-8412-eb02926d9219",
+      "date": "2026-06-04T09:35:02.23+00:00",
+      "netWorth": 14995.48620896907,
+      "totalAssets": 14995.48620896907,
+      "totalLiabilities": 0,
+      "liquidity": 6601.860000000002,
+      "investments": 6882.596396559999,
+      "crypto": 1511.0298124090675,
+      "createdAt": "2026-06-04T09:35:02.373011+00:00"
+    },
+    {
+      "id": "fa519123-d39d-4462-8cf2-be131ff6d259",
+      "date": "2026-06-05T21:03:25.524+00:00",
+      "netWorth": 14937.76731244327,
+      "totalAssets": 14937.76731244327,
+      "totalLiabilities": 0,
+      "liquidity": 6601.860000000002,
+      "investments": 6851.639557760001,
+      "crypto": 1484.2677546832674,
+      "createdAt": "2026-06-05T21:03:25.802009+00:00"
+    }
+  ]
+}
