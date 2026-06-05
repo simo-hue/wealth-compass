@@ -194,8 +194,18 @@ struct AllocationChart: View {
 
 extension View {
     func pageChrome() -> some View {
-        scrollContentBackground(.hidden)
+        modifier(PageChromeModifier())
+    }
+}
+
+private struct PageChromeModifier: ViewModifier {
+    private let topCollisionBuffer: CGFloat = 8
+
+    func body(content: Content) -> some View {
+        content
+            .scrollContentBackground(.hidden)
+            .padding(.top, topCollisionBuffer)
             .background(ScreenBackground())
-            .preferredColorScheme(.dark)
+        .preferredColorScheme(.dark)
     }
 }

@@ -73,10 +73,12 @@ enum FinanceImportError: LocalizedError {
 @MainActor
 final class FinanceStore: ObservableObject {
     @Published private(set) var data = FinancialData()
+    @Published private(set) var isRefreshingMarketPrices = false
 
     private let storageURL: URL
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
+    private var lastMarketPriceRefreshAttemptAt: Date?
 
     init() {
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
@@ -149,6 +151,114 @@ final class FinanceStore: ObservableObject {
         data.crypto.removeAll { $0.id == holding.id }
         appendSnapshot(settings: settings)
         save()
+    }
+
+    func shouldAutoRefreshMarketPrices(staleAfter: TimeInterval = 15 * 60, retryAfter: TimeInterval = 5 * 60, now: Date = Date()) -> Bool {
+        guard !data.investments.isEmpty || !data.crypto.isEmpty else { return false }
+        if let lastMarketPriceRefreshAttemptAt, now.timeIntervalSince(lastMarketPriceRefreshAttemptAt) < retryAfter {
+            return false
+        }
+
+        let oldestPriceDate = (data.investments.map(\.updatedAt) + data.crypto.map(\.updatedAt)).min()
+        guard let oldestPriceDate else { return true }
+        return now.timeIntervalSince(oldestPriceDate) >= staleAfter
+    }
+
+    func refreshMarketPrices(finnhubAPIKey: String?, coingeckoAPIKey: String?, settings: AppSettings) async -> MarketPriceRefreshResult {
+        guard !isRefreshingMarketPrices else {
+            return MarketPriceRefreshResult(wasAlreadyRunning: true)
+        }
+
+        isRefreshingMarketPrices = true
+        lastMarketPriceRefreshAttemptAt = Date()
+        defer { isRefreshingMarketPrices = false }
+
+        let trimmedFinnhubKey = finnhubAPIKey?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hasFinnhubKey = trimmedFinnhubKey?.isEmpty == false
+        let trimmedCoinGeckoKey = coingeckoAPIKey?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hasCoinGeckoKey = trimmedCoinGeckoKey?.isEmpty == false
+        var result = MarketPriceRefreshResult()
+        var investmentQuotes: [UUID: MarketPriceQuote] = [:]
+        var cryptoQuotes: [UUID: (id: String, quote: MarketPriceQuote)] = [:]
+
+        if data.investments.isEmpty {
+            result.skippedInvestments = []
+        } else if let trimmedFinnhubKey, hasFinnhubKey {
+            let client = FinnhubQuoteClient(apiKey: trimmedFinnhubKey)
+            for investment in data.investments {
+                do {
+                    investmentQuotes[investment.id] = try await client.quote(for: investment.symbol)
+                    try await Task.sleep(nanoseconds: 150_000_000)
+                } catch {
+                    result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error))")
+                }
+            }
+        } else {
+            result.skippedInvestments = data.investments.map { "\($0.symbol): Finnhub key missing" }
+        }
+
+        if !data.crypto.isEmpty, !hasCoinGeckoKey {
+            result.skippedCrypto = data.crypto.map { "\($0.symbol): CoinGecko key missing" }
+        }
+
+        let cryptoLookups: [UUID: String]
+        if hasCoinGeckoKey {
+            cryptoLookups = Dictionary(uniqueKeysWithValues: data.crypto.compactMap { holding -> (UUID, String)? in
+                guard let coinID = holding.coinGeckoID else { return nil }
+                return (holding.id, coinID)
+            })
+            let skippedCryptoIDs = Set(data.crypto.map(\.id)).subtracting(cryptoLookups.keys)
+            result.skippedCrypto = data.crypto
+                .filter { skippedCryptoIDs.contains($0.id) }
+                .map { "\($0.symbol): CoinGecko ID missing" }
+        } else {
+            cryptoLookups = [:]
+        }
+
+        if let trimmedCoinGeckoKey, hasCoinGeckoKey, !cryptoLookups.isEmpty {
+            do {
+                let prices = try await CoinGeckoPriceClient(apiKey: trimmedCoinGeckoKey).prices(for: Array(cryptoLookups.values))
+                for holding in data.crypto {
+                    guard let coinID = cryptoLookups[holding.id] else { continue }
+                    guard let quote = prices[coinID] else {
+                        result.failedCrypto.append("\(holding.symbol): no CoinGecko price for \(coinID)")
+                        continue
+                    }
+                    cryptoQuotes[holding.id] = (coinID, quote)
+                }
+            } catch {
+                result.failedCrypto = data.crypto
+                    .filter { cryptoLookups[$0.id] != nil }
+                    .map { "\($0.symbol): \(Self.errorMessage(error))" }
+            }
+        }
+
+        for index in data.investments.indices {
+            guard let quote = investmentQuotes[data.investments[index].id] else { continue }
+            data.investments[index].currentPrice = quote.price
+            data.investments[index].currentValue = data.investments[index].quantity * quote.price
+            data.investments[index].updatedAt = quote.asOf
+            result.updatedInvestments += 1
+        }
+
+        for index in data.crypto.indices {
+            guard let update = cryptoQuotes[data.crypto[index].id] else { continue }
+            data.crypto[index].currentPrice = update.quote.price
+            data.crypto[index].currency = update.quote.currency
+            if data.crypto[index].coinId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                data.crypto[index].coinId = update.id
+            }
+            data.crypto[index].updatedAt = update.quote.asOf
+            result.updatedCrypto += 1
+        }
+
+        if result.updatedRecordCount > 0 {
+            appendSnapshot(settings: settings)
+            save()
+        }
+
+        result.refreshedAt = Date()
+        return result
     }
 
     func calculateTotals(settings: AppSettings) -> FinanceTotals {
@@ -423,6 +533,10 @@ final class FinanceStore: ObservableObject {
         } catch {
             assertionFailure("Failed to save local finance data: \(error)")
         }
+    }
+
+    private static func errorMessage(_ error: Error) -> String {
+        (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
     }
 
     private func registerImportedCategories(from importedData: FinancialData, settings: AppSettings) -> Int {

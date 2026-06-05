@@ -10,8 +10,15 @@ struct SettingsView: View {
     @State private var importMode: FinanceImportMode = .merge
     @State private var showingImportOptions = false
     @State private var showingFileImporter = false
-    @State private var importAlert: ImportAlertState?
-    @State private var showingDeleteConfirmation = false
+    @State private var settingsAlert: SettingsAlertState?
+    @State private var credentialEditorAlert: SettingsAlertState?
+    @State private var activeCredentialEditor: MarketDataCredentialKind?
+    @State private var credentialDraft = ""
+    @State private var hasFinnhubAPIKey = false
+    @State private var hasCoinGeckoAPIKey = false
+    @State private var isSavingMarketDataCredential = false
+    @State private var isRefreshingPrices = false
+    @State private var pendingDestructiveAction: SettingsDestructiveAction?
 
     var body: some View {
         NavigationStack {
@@ -53,6 +60,8 @@ struct SettingsView: View {
                     categoryGroup(title: "Expense", type: .expense, categories: settings.customExpenseCategories)
                 }
 
+                marketDataSection
+
                 Section("Data") {
                     Button {
                         do {
@@ -84,7 +93,7 @@ struct SettingsView: View {
                     }
 
                     Button(role: .destructive) {
-                        showingDeleteConfirmation = true
+                        pendingDestructiveAction = .deleteAllData
                     } label: {
                         Label("Delete All Data", systemImage: "trash")
                     }
@@ -133,16 +142,10 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .background(ScreenBackground())
             .preferredColorScheme(.dark)
-            .alert("Delete All Data?", isPresented: $showingDeleteConfirmation) {
-                Button("Cancel", role: .cancel) {}
-                Button("Delete", role: .destructive) {
-                    finance.clearData()
-                    backupURL = nil
-                }
-            } message: {
-                Text("This permanently removes all local Wealth Compass data from this device.")
+            .onAppear {
+                refreshMarketDataKeyStatus()
             }
-            .confirmationDialog("Import JSON Backup", isPresented: $showingImportOptions, titleVisibility: .visible) {
+            .alert("Import JSON Backup", isPresented: $showingImportOptions) {
                 Button("Merge With Existing Data") {
                     importMode = .merge
                     showingFileImporter = true
@@ -160,14 +163,88 @@ struct SettingsView: View {
             .fileImporter(isPresented: $showingFileImporter, allowedContentTypes: [.json]) { result in
                 handleImportSelection(result)
             }
-            .alert(item: $importAlert) { alert in
+            .sheet(item: $activeCredentialEditor) { credential in
+                MarketDataCredentialEditor(
+                    credential: credential,
+                    apiKey: $credentialDraft,
+                    alert: $credentialEditorAlert,
+                    isSaving: isSavingMarketDataCredential,
+                    onCancel: {
+                        credentialDraft = ""
+                        credentialEditorAlert = nil
+                        activeCredentialEditor = nil
+                    },
+                    onSave: {
+                        Task { await saveAndTestMarketDataCredential(credential) }
+                    }
+                )
+            }
+            .alert(item: $settingsAlert) { alert in
                 Alert(
                     title: Text(alert.title),
                     message: Text(alert.message),
                     dismissButton: .default(Text("OK"))
                 )
             }
+            .alert(item: $pendingDestructiveAction) { action in
+                Alert(
+                    title: Text(action.title),
+                    message: Text(action.message),
+                    primaryButton: .destructive(Text(action.confirmButtonTitle)) {
+                        performDestructiveAction(action)
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
         }
+    }
+
+    private var marketDataSection: some View {
+        Section("Market Data") {
+            Button {
+                openCredentialEditor(.finnhub)
+            } label: {
+                credentialRow(
+                    title: "Finnhub API Key",
+                    systemImage: "chart.line.uptrend.xyaxis",
+                    isConfigured: hasFinnhubAPIKey
+                )
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                openCredentialEditor(.coingecko)
+            } label: {
+                credentialRow(
+                    title: "CoinGecko API Key",
+                    systemImage: "bitcoinsign.circle",
+                    isConfigured: hasCoinGeckoAPIKey
+                )
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                Task { await refreshMarketPrices() }
+            } label: {
+                Label(isRefreshingPrices ? "Refreshing Market Data" : "Refresh Market Data", systemImage: "arrow.triangle.2.circlepath")
+            }
+            .disabled(isRefreshingPrices || (finance.data.investments.isEmpty && finance.data.crypto.isEmpty))
+        }
+    }
+
+    private func credentialRow(title: String, systemImage: String, isConfigured: Bool) -> some View {
+        HStack(spacing: 12) {
+            Label(title, systemImage: systemImage)
+                .foregroundStyle(.white)
+            Spacer()
+            Text(isConfigured ? "Configured" : "Not Set")
+                .font(.subheadline)
+                .foregroundStyle(isConfigured ? WCColor.primary : WCColor.textSecondary)
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(WCColor.textSecondary)
+        }
+        .contentShape(Rectangle())
     }
 
     private var biometricLockBinding: Binding<Bool> {
@@ -198,7 +275,7 @@ struct SettingsView: View {
                         Text(category)
                         Spacer()
                         Button(role: .destructive) {
-                            settings.removeCustomTransactionCategory(category, for: type)
+                            pendingDestructiveAction = .deleteCustomCategory(category: category, type: type)
                         } label: {
                             Image(systemName: "minus.circle")
                         }
@@ -210,6 +287,16 @@ struct SettingsView: View {
         .padding(.vertical, 4)
     }
 
+    private func performDestructiveAction(_ action: SettingsDestructiveAction) {
+        switch action {
+        case .deleteAllData:
+            finance.clearData()
+            backupURL = nil
+        case .deleteCustomCategory(let category, let type):
+            settings.removeCustomTransactionCategory(category, for: type)
+        }
+    }
+
     private func handleImportSelection(_ result: Result<URL, Error>) {
         switch result {
         case .success(let url):
@@ -217,21 +304,230 @@ struct SettingsView: View {
                 let result = try finance.importBackup(from: url, mode: importMode, settings: settings)
                 backupURL = nil
                 backupError = nil
-                importAlert = ImportAlertState(title: "Import Complete", message: result.message)
+                settingsAlert = SettingsAlertState(title: "Import Complete", message: result.message)
             } catch {
-                importAlert = ImportAlertState(
+                settingsAlert = SettingsAlertState(
                     title: "Import Failed",
                     message: (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
                 )
             }
         case .failure(let error):
-            importAlert = ImportAlertState(title: "Import Failed", message: error.localizedDescription)
+            settingsAlert = SettingsAlertState(title: "Import Failed", message: error.localizedDescription)
+        }
+    }
+
+    private func refreshMarketDataKeyStatus() {
+        hasFinnhubAPIKey = KeychainCredentialStore.shared.contains(.finnhubAPIKey)
+        hasCoinGeckoAPIKey = KeychainCredentialStore.shared.contains(.coingeckoAPIKey)
+    }
+
+    private func openCredentialEditor(_ credential: MarketDataCredentialKind) {
+        credentialDraft = ""
+        credentialEditorAlert = nil
+        activeCredentialEditor = credential
+    }
+
+    private func currentStoredAPIKey(for credential: KeychainCredential) -> String {
+        do {
+            return (try KeychainCredentialStore.shared.string(for: credential) ?? "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        } catch {
+            return ""
+        }
+    }
+
+    private func saveAndTestMarketDataCredential(_ credential: MarketDataCredentialKind) async {
+        let key = credentialDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !key.isEmpty else { return }
+
+        isSavingMarketDataCredential = true
+        defer { isSavingMarketDataCredential = false }
+
+        do {
+            let message = try await validationMessage(for: credential, apiKey: key)
+            try KeychainCredentialStore.shared.save(key, for: credential.keychainCredential)
+            credentialDraft = ""
+            activeCredentialEditor = nil
+            refreshMarketDataKeyStatus()
+            settingsAlert = SettingsAlertState(
+                title: "\(credential.title) Saved",
+                message: "\(message)\n\nThe API key was saved securely in Keychain."
+            )
+        } catch {
+            credentialEditorAlert = SettingsAlertState(
+                title: "\(credential.title) Failed",
+                message: SettingsView.errorMessage(error)
+            )
+        }
+    }
+
+    private func validationMessage(for credential: MarketDataCredentialKind, apiKey: String) async throws -> String {
+        switch credential {
+        case .finnhub:
+            let quote = try await FinnhubQuoteClient(apiKey: apiKey).testConnection()
+            return "Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue)))."
+        case .coingecko:
+            let quote = try await CoinGeckoPriceClient(apiKey: apiKey).testConnection()
+            return "CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue)))."
+        }
+    }
+
+    private func refreshMarketPrices() async {
+        isRefreshingPrices = true
+        defer { isRefreshingPrices = false }
+
+        let currentKey = currentStoredAPIKey(for: .finnhubAPIKey)
+        let finnhubKey = currentKey.isEmpty ? nil : currentKey
+        let currentCoinGeckoKey = currentStoredAPIKey(for: .coingeckoAPIKey)
+        let coingeckoKey = currentCoinGeckoKey.isEmpty ? nil : currentCoinGeckoKey
+        let result = await finance.refreshMarketPrices(
+            finnhubAPIKey: finnhubKey,
+            coingeckoAPIKey: coingeckoKey,
+            settings: settings
+        )
+        refreshMarketDataKeyStatus()
+        settingsAlert = SettingsAlertState(title: result.title, message: result.message)
+    }
+
+    private static func errorMessage(_ error: Error) -> String {
+        (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+    }
+}
+
+private struct SettingsAlertState: Identifiable {
+    let id = UUID()
+    let title: String
+    let message: String
+}
+
+private enum MarketDataCredentialKind: String, Identifiable {
+    case finnhub
+    case coingecko
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .finnhub:
+            "Finnhub API Key"
+        case .coingecko:
+            "CoinGecko API Key"
+        }
+    }
+
+    var placeholder: String {
+        switch self {
+        case .finnhub:
+            "Paste Finnhub API key"
+        case .coingecko:
+            "Paste CoinGecko API key"
+        }
+    }
+
+    var keychainCredential: KeychainCredential {
+        switch self {
+        case .finnhub:
+            .finnhubAPIKey
+        case .coingecko:
+            .coingeckoAPIKey
         }
     }
 }
 
-private struct ImportAlertState: Identifiable {
-    let id = UUID()
-    let title: String
-    let message: String
+private struct MarketDataCredentialEditor: View {
+    let credential: MarketDataCredentialKind
+    @Binding var apiKey: String
+    @Binding var alert: SettingsAlertState?
+    let isSaving: Bool
+    let onCancel: () -> Void
+    let onSave: () -> Void
+
+    private var canSave: Bool {
+        !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isSaving
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section(credential.title) {
+                    SecureField(credential.placeholder, text: $apiKey)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .textContentType(.password)
+                        .privacySensitive()
+
+                    if isSaving {
+                        HStack(spacing: 10) {
+                            ProgressView()
+                            Text("Testing API key...")
+                                .foregroundStyle(WCColor.textSecondary)
+                        }
+                    }
+                }
+            }
+            .navigationTitle(credential.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .scrollContentBackground(.hidden)
+            .background(ScreenBackground())
+            .preferredColorScheme(.dark)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel", action: onCancel)
+                        .disabled(isSaving)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save", action: onSave)
+                        .disabled(!canSave)
+                }
+            }
+            .alert(item: $alert) { alert in
+                Alert(
+                    title: Text(alert.title),
+                    message: Text(alert.message),
+                    dismissButton: .default(Text("OK"))
+                )
+            }
+        }
+    }
+}
+
+private enum SettingsDestructiveAction: Identifiable {
+    case deleteAllData
+    case deleteCustomCategory(category: String, type: TransactionType)
+
+    var id: String {
+        switch self {
+        case .deleteAllData:
+            "delete-all-data"
+        case .deleteCustomCategory(let category, let type):
+            "delete-category-\(type.rawValue)-\(category.lowercased())"
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .deleteAllData:
+            "Delete All Data?"
+        case .deleteCustomCategory:
+            "Delete Custom Category?"
+        }
+    }
+
+    var message: String {
+        switch self {
+        case .deleteAllData:
+            "This permanently removes all local Wealth Compass data from this device."
+        case .deleteCustomCategory(let category, let type):
+            "This removes \(category) from your custom \(type.title.lowercased()) categories. Existing transactions using this category will keep their current label."
+        }
+    }
+
+    var confirmButtonTitle: String {
+        switch self {
+        case .deleteAllData:
+            "Delete"
+        case .deleteCustomCategory:
+            "Delete Category"
+        }
+    }
 }
