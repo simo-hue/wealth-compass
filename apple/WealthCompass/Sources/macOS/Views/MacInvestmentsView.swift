@@ -7,22 +7,24 @@ struct MacInvestmentsView: View {
     @State private var selection: Investment.ID?
     @State private var investmentPendingDeletion: Investment?
 
-    private let metricColumns = [
-        GridItem(.adaptive(minimum: 135), spacing: 12)
+    private let summaryColumns = [
+        GridItem(.adaptive(minimum: 190, maximum: 320), spacing: 16)
     ]
 
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            Divider()
-
-            HSplitView {
-                overview
-                    .frame(minWidth: 250, idealWidth: 340, maxWidth: 430)
-
-                investmentTable
-                    .frame(minWidth: 500)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                header
+                summaryCards
+                AllocationChart(
+                    title: "Allocation by Sector",
+                    slices: finance.investmentAllocation(settings: settings),
+                    settings: settings
+                )
+                investmentsSection
             }
+            .padding(24)
+            .frame(maxWidth: 1440, alignment: .leading)
         }
         .background(ScreenBackground())
         .navigationTitle("Investments")
@@ -46,28 +48,7 @@ struct MacInvestmentsView: View {
     }
 
     private var header: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Investments")
-                    .font(.largeTitle.bold())
-                Text("\(privateCount(finance.data.investments.count)) tracked positions")
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Button("Edit", systemImage: "pencil") {
-                guard let investment = selectedInvestment else { return }
-                appModel.editor = .investment(investment)
-            }
-            .disabled(selectedInvestment == nil)
-
-            Button(role: .destructive) {
-                guard let investment = selectedInvestment else { return }
-                investmentPendingDeletion = investment
-            } label: {
-                Label("Delete", systemImage: "trash")
-            }
-            .disabled(selectedInvestment == nil)
-
+        PageHeader(title: "Investments", subtitle: "\(privateCount(finance.data.investments.count)) tracked positions") {
             Button {
                 appModel.editor = .investment(nil)
             } label: {
@@ -76,26 +57,9 @@ struct MacInvestmentsView: View {
             .buttonStyle(.borderedProminent)
             .tint(WCColor.primary)
         }
-        .padding(24)
     }
 
-    private var overview: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                summary
-                AllocationChart(
-                    title: "Allocation by Sector",
-                    slices: finance.investmentAllocation(settings: settings),
-                    settings: settings
-                )
-                statusDetails
-            }
-            .padding(20)
-        }
-        .background(WCColor.background.opacity(0.35))
-    }
-
-    private var summary: some View {
+    private var summaryCards: some View {
         let total = finance.calculateTotals(settings: settings).totalInvestments
         let costBasis = finance.data.investments.reduce(0) {
             $0 + settings.convert($1.costBasis, from: $1.currency)
@@ -103,67 +67,75 @@ struct MacInvestmentsView: View {
         let gain = total - costBasis
         let percent = costBasis > 0 ? (gain / costBasis) * 100 : 0
 
-        return VStack(alignment: .leading, spacing: 12) {
-            LazyVGrid(columns: metricColumns, spacing: 12) {
-                MetricCard(
-                    title: "Portfolio Value",
-                    value: settings.privateCurrency(total),
-                    systemImage: "chart.line.uptrend.xyaxis",
-                    accent: .blue
-                )
-                MetricCard(
-                    title: "Positions",
-                    value: privateCount(finance.data.investments.count),
-                    systemImage: "number"
-                )
-                MetricCard(
-                    title: "Cost Basis",
-                    value: settings.privateCurrency(costBasis),
-                    systemImage: "banknote"
-                )
-                MetricCard(
-                    title: "Profit / Loss",
-                    value: settings.privateCurrency(gain),
-                    systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
-                    accent: gain >= 0 ? WCColor.primary : WCColor.destructive
-                )
-            }
-
+        return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
+            MetricCard(
+                title: "Portfolio Value",
+                value: settings.privateCurrency(total),
+                systemImage: "chart.line.uptrend.xyaxis",
+                accent: .blue
+            )
+            MetricCard(
+                title: "Positions",
+                value: privateCount(finance.data.investments.count),
+                systemImage: "number"
+            )
+            MetricCard(
+                title: "Cost Basis",
+                value: settings.privateCurrency(costBasis),
+                systemImage: "banknote"
+            )
+            MetricCard(
+                title: "Profit / Loss",
+                value: settings.privateCurrency(gain),
+                systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
+                accent: gain >= 0 ? WCColor.primary : WCColor.destructive
+            )
+            
             if !settings.isPrivacyMode {
-                Text("Performance \(percent.formatted(.number.precision(.fractionLength(1))))%")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(gain >= 0 ? WCColor.primary : WCColor.destructive)
+                MetricCard(
+                    title: "Performance",
+                    value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
+                    systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
+                    accent: percent >= 0 ? WCColor.primary : WCColor.destructive
+                )
             }
+            
+            let latestUpdate = finance.data.investments.map(\.updatedAt).max()
+            let sectorCount = Set(finance.data.investments.map(\.sector).filter(isNonEmpty)).count
+            MetricCard(
+                title: "Status • \(privateCount(sectorCount)) Sectors",
+                value: latestUpdate.map(formattedUpdate) ?? "Never",
+                systemImage: "checkmark.circle"
+            )
         }
     }
 
-    private var statusDetails: some View {
-        let investments = finance.data.investments
-        let sectorCount = Set(investments.map(\.sector).filter(isNonEmpty)).count
-        let identifierCount = investments.filter { isNonEmpty($0.isin) }.count
-        let pricedCount = investments.filter { $0.currentPrice > 0 }.count
-        let latestUpdate = investments.map(\.updatedAt).max()
 
-        return FinanceCard {
-            VStack(alignment: .leading, spacing: 12) {
-                Label("Portfolio Status", systemImage: "checkmark.circle")
-                    .font(.headline)
+    private var investmentsSection: some View {
+        FinanceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Investments")
+                        .font(.headline)
+                    Spacer()
+                    Button("Edit", systemImage: "pencil") {
+                        guard let investment = selectedInvestment else { return }
+                        appModel.editor = .investment(investment)
+                    }
+                    .disabled(selectedInvestment == nil)
 
-                LabeledContent("Last Updated") {
-                    Text(latestUpdate.map(formattedUpdate) ?? "Never")
+                    Button(role: .destructive) {
+                        guard let investment = selectedInvestment else { return }
+                        investmentPendingDeletion = investment
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                    .disabled(selectedInvestment == nil)
                 }
-                LabeledContent("Price Coverage") {
-                    Text("\(privateCount(pricedCount)) of \(privateCount(investments.count))")
-                }
-                LabeledContent("ISIN / IDs") {
-                    Text("\(privateCount(identifierCount)) of \(privateCount(investments.count))")
-                }
-                LabeledContent("Sectors") {
-                    Text(privateCount(sectorCount))
-                }
+
+                investmentTable
+                    .frame(minHeight: 360)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundStyle(.white)
         }
     }
 

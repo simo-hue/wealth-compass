@@ -282,3 +282,15 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [Sat Jun  6 14:50:04 CEST 2026] Added Additional Info to Cash Flow Cards
   - *Details*: Added "Transactions" (current month's count) and "Total Cash" metrics to MacCashFlowView to fill the empty space on the right of the summary cards row.
   - *Tech Notes*: Updated MacCashFlowView.swift to compute monthly transactions count and total liquidity.
+
+- [Sat Jun  6 14:55:47 CEST 2026] Unification of Investments and Crypto Layouts
+  - *Details*: Replaced the split-pane (HSplitView) layout in MacInvestmentsView and MacCryptoView with a vertically scrolling, full-width design. This mirrors the Cash Flow page structure for a more cohesive UI.
+  - *Tech Notes*: Replaced HSplitView with ScrollView containing a VStack. Adapted headers to use PageHeader. Extracted metrics into a LazyVGrid. Wrapped tables inside FinanceCards, and moved the 'Edit' and 'Delete' context actions to the table headers.
+
+- [Sat Jun  6 15:01:25 CEST 2026] Moved Status Details into Summary Metrics grid
+  - *Details*: Deleted the dedicated Portfolio Status and Holding Status cards and moved their critical info into the top metric grids as a new 'Status' box. Allocation charts now consume the full row width.
+  - *Tech Notes*: Removed the HStack wrapper in MacInvestmentsView and MacCryptoView. Added a new MetricCard inside summaryCards rendering 'Status • X Sectors' and 'Status • X IDs'.
+
+- [Sat Jun  6 15:04:17 CEST 2026] Updated Crypto Status Card metric
+  - *Details*: Changed the secondary metric in the MacCryptoView Status card from the number of Coin IDs to the number of unique Coins (symbols).
+  - *Tech Notes*: Updated MacCryptoView.swift to use 'Set(finance.data.crypto.map(\.symbol).filter(isNonEmpty)).count'.
