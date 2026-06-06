@@ -19,18 +19,42 @@ private struct MacTransactionEditor: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
+
+    private static let customCategoryTag = "__wealth_compass_custom_category__"
+
     @State private var type: TransactionType = .expense
     @State private var amount = ""
     @State private var category = "Food"
     @State private var note = ""
     @State private var date = Date()
+    @State private var customCategory = ""
+    @FocusState private var isCustomCategoryFocused: Bool
+
+    private var categories: [String] {
+        settings.transactionCategories(for: type)
+    }
+
+    private var trimmedCustomCategory: String {
+        customCategory.trimmed
+    }
+
+    private var selectedCategoryName: String {
+        category == Self.customCategoryTag ? trimmedCustomCategory : category
+    }
+
+    private var isCustomCategorySelected: Bool {
+        category == Self.customCategoryTag
+    }
 
     private var parsedAmount: Double {
         Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
     }
 
     var body: some View {
-        editorContainer(title: "New Transaction", saveDisabled: parsedAmount <= 0) {
+        editorContainer(
+            title: "New Transaction",
+            saveDisabled: parsedAmount <= 0 || selectedCategoryName.isEmpty
+        ) {
             Picker("Type", selection: $type) {
                 ForEach(TransactionType.allCases) {
                     Text($0.title).tag($0)
@@ -38,22 +62,54 @@ private struct MacTransactionEditor: View {
             }
             .pickerStyle(.segmented)
             .onChange(of: type) { _, newType in
-                category = settings.transactionCategories(for: newType).first ?? "Other"
+                category = settings.transactionCategories(for: newType).first ?? ""
+                customCategory = ""
+                isCustomCategoryFocused = false
             }
 
             TextField("Amount", text: $amount)
             Picker("Category", selection: $category) {
-                ForEach(settings.transactionCategories(for: type), id: \.self) {
+                ForEach(categories, id: \.self) {
                     Text($0).tag($0)
                 }
+                Text("Custom...").tag(Self.customCategoryTag)
+            }
+            .onChange(of: category) { _, newCategory in
+                if newCategory == Self.customCategoryTag {
+                    Task { @MainActor in
+                        isCustomCategoryFocused = true
+                    }
+                } else {
+                    customCategory = ""
+                    isCustomCategoryFocused = false
+                }
+            }
+
+            if isCustomCategorySelected {
+                TextField("Custom Category Name", text: $customCategory)
+                    .focused($isCustomCategoryFocused)
+
+                Text(customCategoryHint)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             DatePicker("Date", selection: $date, displayedComponents: .date)
             TextField("Description", text: $note)
         } onSave: {
+            let categoryToSave: String
+            if isCustomCategorySelected {
+                guard let savedCategory = settings.addCustomTransactionCategory(trimmedCustomCategory, for: type) else {
+                    return
+                }
+                categoryToSave = savedCategory
+            } else {
+                categoryToSave = category
+            }
+
             finance.addTransaction(
                 type: type,
                 amount: parsedAmount,
-                category: category,
+                category: categoryToSave,
                 description: note,
                 date: date,
                 settings: settings
@@ -95,7 +151,21 @@ private struct MacTransactionEditor: View {
             }
             .padding(16)
         }
-        .frame(width: 520, height: 430)
+        .frame(width: 520, height: 500)
+    }
+
+    private var customCategoryHint: String {
+        if trimmedCustomCategory.isEmpty {
+            return "Enter a category name. It will be saved for future \(type.title.lowercased()) transactions."
+        }
+
+        if let existing = categories.first(where: {
+            $0.caseInsensitiveCompare(trimmedCustomCategory) == .orderedSame
+        }) {
+            return "\(existing) already exists and will be selected."
+        }
+
+        return "This category will be added to your \(type.title.lowercased()) categories."
     }
 }
 
@@ -107,6 +177,7 @@ private struct MacInvestmentEditor: View {
 
     @State private var symbol: String
     @State private var name: String
+    @State private var isin: String
     @State private var type: InvestmentType
     @State private var currency: Currency
     @State private var sector: String
@@ -114,12 +185,23 @@ private struct MacInvestmentEditor: View {
     @State private var quantity: String
     @State private var averagePrice: String
     @State private var currentPrice: String
-    @State private var fees: String
+    @State private var feeMode: FeeMode = .fixed
+    @State private var feeValue: String
+
+    private let sectors = [
+        "Technology", "Finance", "Real Estate", "Healthcare",
+        "Energy", "Consumer", "All World", "Other"
+    ]
+    private let geographies = [
+        "US", "Europe", "UK", "Switzerland",
+        "Global", "Emerging Markets", "Other"
+    ]
 
     init(investment: Investment?) {
         self.investment = investment
         _symbol = State(initialValue: investment?.symbol ?? "")
         _name = State(initialValue: investment?.name ?? "")
+        _isin = State(initialValue: investment?.isin ?? "")
         _type = State(initialValue: investment?.type ?? .stock)
         _currency = State(initialValue: investment?.currency ?? .usd)
         _sector = State(initialValue: investment?.sector ?? "Technology")
@@ -128,13 +210,18 @@ private struct MacInvestmentEditor: View {
         let average = investment.map { $0.quantity > 0 ? max(0, ($0.costBasis - $0.fees) / $0.quantity) : 0 } ?? 0
         _averagePrice = State(initialValue: investment.map { _ in Self.input(average) } ?? "")
         _currentPrice = State(initialValue: investment.map { Self.input($0.currentPrice) } ?? "")
-        _fees = State(initialValue: investment.map { Self.input($0.fees) } ?? "0")
+        _feeValue = State(initialValue: investment.map { Self.input($0.fees) } ?? "0")
     }
 
     private var parsedQuantity: Double { parse(quantity) }
     private var parsedAveragePrice: Double { parse(averagePrice) }
     private var parsedCurrentPrice: Double { parse(currentPrice) }
-    private var parsedFees: Double { parse(fees) }
+    private var parsedFeeValue: Double { parse(feeValue) }
+    private var calculatedFee: Double {
+        feeMode == .fixed
+            ? parsedFeeValue
+            : (parsedQuantity * parsedAveragePrice) * (parsedFeeValue / 100)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -144,6 +231,7 @@ private struct MacInvestmentEditor: View {
                 Section("Identity") {
                     TextField("Symbol", text: $symbol)
                     TextField("Name", text: $name)
+                    TextField("ISIN / ID", text: $isin)
                     Picker("Type", selection: $type) {
                         ForEach(InvestmentType.allCases) { Text($0.title).tag($0) }
                     }
@@ -151,17 +239,49 @@ private struct MacInvestmentEditor: View {
 
                 Section("Classification") {
                     Picker("Currency", selection: $currency) {
-                        ForEach(Currency.allCases) { Text($0.rawValue).tag($0) }
+                        ForEach(Currency.allCases) {
+                            Text("\($0.displayName) (\($0.rawValue))").tag($0)
+                        }
                     }
-                    TextField("Sector", text: $sector)
-                    TextField("Geography", text: $geography)
+                    Picker("Sector", selection: $sector) {
+                        ForEach(sectors, id: \.self) {
+                            Text($0).tag($0)
+                        }
+                    }
+                    Picker("Geography", selection: $geography) {
+                        ForEach(geographies, id: \.self) {
+                            Text($0).tag($0)
+                        }
+                    }
                 }
 
                 Section("Position") {
                     TextField("Quantity", text: $quantity)
                     TextField("Average Buy Price", text: $averagePrice)
                     TextField("Current Price", text: $currentPrice)
-                    TextField("Fees", text: $fees)
+                }
+
+                Section("Investment Transaction Fee") {
+                    Picker("Fee Type", selection: $feeMode) {
+                        ForEach(FeeMode.allCases) {
+                            Text($0.title).tag($0)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    TextField(
+                        feeMode == .fixed ? "Investment Transaction Fee" : "Investment Transaction Fee %",
+                        text: $feeValue
+                    )
+
+                    LabeledContent("Investment Fee") {
+                        Text(calculatedFee.formatted(.currency(code: currency.rawValue)))
+                            .monospacedDigit()
+                    }
+
+                    Text("The broker or platform fee is added to the position cost basis.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
             .formStyle(.grouped)
@@ -170,11 +290,11 @@ private struct MacInvestmentEditor: View {
                 save()
             }
         }
-        .frame(width: 560, height: 620)
+        .frame(width: 580, height: 700)
     }
 
     private func save() {
-        let costBasis = parsedQuantity * parsedAveragePrice + parsedFees
+        let costBasis = parsedQuantity * parsedAveragePrice + calculatedFee
         var value = investment ?? Investment(
             type: type,
             symbol: symbol,
@@ -186,8 +306,8 @@ private struct MacInvestmentEditor: View {
             currency: currency,
             geography: geography,
             sector: sector,
-            isin: "",
-            fees: parsedFees
+            isin: isin,
+            fees: calculatedFee
         )
         value.type = type
         value.symbol = symbol.trimmed.uppercased()
@@ -199,7 +319,8 @@ private struct MacInvestmentEditor: View {
         value.currency = currency
         value.geography = geography.trimmed
         value.sector = sector.trimmed
-        value.fees = parsedFees
+        value.isin = isin.trimmed.uppercased()
+        value.fees = calculatedFee
         value.updatedAt = Date()
         finance.upsertInvestment(value, settings: settings)
         dismiss()
@@ -246,7 +367,8 @@ private struct MacCryptoEditor: View {
     @State private var quantity: String
     @State private var averagePrice: String
     @State private var currentPrice: String
-    @State private var fees: String
+    @State private var feeMode: FeeMode = .fixed
+    @State private var feeValue: String
 
     init(holding: CryptoHolding?) {
         self.holding = holding
@@ -257,13 +379,18 @@ private struct MacCryptoEditor: View {
         let average = holding.map { $0.quantity > 0 ? max(0, $0.avgBuyPrice - ($0.fees / $0.quantity)) : 0 } ?? 0
         _averagePrice = State(initialValue: holding.map { _ in Self.input(average) } ?? "")
         _currentPrice = State(initialValue: holding.map { Self.input($0.currentPrice) } ?? "")
-        _fees = State(initialValue: holding.map { Self.input($0.fees) } ?? "0")
+        _feeValue = State(initialValue: holding.map { Self.input($0.fees) } ?? "0")
     }
 
     private var parsedQuantity: Double { parse(quantity) }
     private var parsedAveragePrice: Double { parse(averagePrice) }
     private var parsedCurrentPrice: Double { parse(currentPrice) }
-    private var parsedFees: Double { parse(fees) }
+    private var parsedFeeValue: Double { parse(feeValue) }
+    private var calculatedFee: Double {
+        feeMode == .fixed
+            ? parsedFeeValue
+            : (parsedQuantity * parsedAveragePrice) * (parsedFeeValue / 100)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -287,7 +414,25 @@ private struct MacCryptoEditor: View {
                     TextField("Quantity", text: $quantity)
                     TextField("Average Buy Price", text: $averagePrice)
                     TextField("Current Price", text: $currentPrice)
-                    TextField("Fees", text: $fees)
+                }
+
+                Section("Transaction Fee") {
+                    Picker("Fee Type", selection: $feeMode) {
+                        ForEach(FeeMode.allCases) {
+                            Text($0.title).tag($0)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    TextField(
+                        feeMode == .fixed ? "Fee Amount" : "Fee Percentage",
+                        text: $feeValue
+                    )
+
+                    LabeledContent("Calculated Fee") {
+                        Text(calculatedFee.formatted(.currency(code: Currency.usd.rawValue)))
+                            .monospacedDigit()
+                    }
                 }
             }
             .formStyle(.grouped)
@@ -304,11 +449,11 @@ private struct MacCryptoEditor: View {
             }
             .padding(16)
         }
-        .frame(width: 540, height: 500)
+        .frame(width: 560, height: 600)
     }
 
     private func save() {
-        let totalCost = parsedQuantity * parsedAveragePrice + parsedFees
+        let totalCost = parsedQuantity * parsedAveragePrice + calculatedFee
         let effectiveAverage = parsedQuantity > 0 ? totalCost / parsedQuantity : 0
         var value = holding ?? CryptoHolding(
             symbol: symbol,
@@ -316,7 +461,7 @@ private struct MacCryptoEditor: View {
             quantity: parsedQuantity,
             avgBuyPrice: effectiveAverage,
             currentPrice: parsedCurrentPrice,
-            fees: parsedFees,
+            fees: calculatedFee,
             coinId: coinID
         )
         value.symbol = symbol.trimmed.uppercased()
@@ -325,7 +470,7 @@ private struct MacCryptoEditor: View {
         value.quantity = parsedQuantity
         value.avgBuyPrice = effectiveAverage
         value.currentPrice = parsedCurrentPrice
-        value.fees = parsedFees
+        value.fees = calculatedFee
         value.updatedAt = Date()
         finance.upsertCrypto(value, settings: settings)
         dismiss()

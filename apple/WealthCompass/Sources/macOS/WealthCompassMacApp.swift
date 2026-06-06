@@ -2,9 +2,11 @@ import SwiftUI
 
 @main
 struct WealthCompassMacApp: App {
+    @NSApplicationDelegateAdaptor(MacAppDelegate.self) private var appDelegate
     @StateObject private var finance = FinanceStore()
     @StateObject private var settings = AppSettings()
     @StateObject private var appModel = MacAppModel()
+    @StateObject private var appLock = MacAppLockStore()
 
     var body: some Scene {
         WindowGroup {
@@ -12,6 +14,7 @@ struct WealthCompassMacApp: App {
                 .environmentObject(finance)
                 .environmentObject(settings)
                 .environmentObject(appModel)
+                .environmentObject(appLock)
                 .preferredColorScheme(.dark)
         }
         .defaultSize(width: 1240, height: 780)
@@ -41,6 +44,7 @@ struct WealthCompassMacApp: App {
             MacSettingsView()
                 .environmentObject(finance)
                 .environmentObject(settings)
+                .environmentObject(appLock)
                 .preferredColorScheme(.dark)
         }
     }
