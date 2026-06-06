@@ -2,6 +2,34 @@
 
 Wealth Compass is a modern, comprehensive personal finance dashboard designed to give you a complete 360-degree view of your financial health. Built with React, Supabase, and Tailwind CSS, it offers real-time tracking of assets, liabilities, and cash flow in a beautiful, privacy-focused interface.
 
+## Repository Layout
+
+```text
+wealth-compass/
+├── src/                         Web application
+├── public/                      Web assets
+├── apple/
+│   └── WealthCompass/
+│       ├── Sources/Shared/      Shared iPhone and Mac domain code
+│       ├── Sources/iOS/         iPhone application and views
+│       ├── Sources/macOS/       Native macOS application and views
+│       ├── Resources/iOS/
+│       ├── Resources/macOS/
+│       └── WealthCompass.xcodeproj
+└── .github/workflows/           Web deployment
+```
+
+The web app remains at the repository root so its existing Vite and GitHub Pages deployment stays stable. Native Apple applications are managed by one Xcode project with separate iOS and macOS targets.
+
+### Apple Applications
+
+Open `apple/WealthCompass/WealthCompass.xcodeproj` and select:
+
+- `WealthCompassMobile` for the iPhone app
+- `WealthCompassMac` for the native macOS app
+
+See [`apple/README.md`](./apple/README.md) for architecture and build details.
+
 ## Features
 
 ### 📊 Interactive Dashboard

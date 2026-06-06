@@ -1,0 +1,557 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AD0000000000000000000001 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000001 /* FinanceModels.swift */; };
+		AD0000000000000000000002 /* FinancePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000002 /* FinancePersistence.swift */; };
+		AD0000000000000000000003 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000003 /* AppSettings.swift */; };
+		AD0000000000000000000004 /* FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000004 /* FinanceStore.swift */; };
+		AD0000000000000000000005 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000005 /* ExchangeRateService.swift */; };
+		AD0000000000000000000006 /* MarketDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000006 /* MarketDataService.swift */; };
+		AD0000000000000000000007 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000007 /* DesignSystem.swift */; };
+		AD0000000000000000000011 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000001 /* FinanceModels.swift */; };
+		AD0000000000000000000012 /* FinancePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000002 /* FinancePersistence.swift */; };
+		AD0000000000000000000013 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000003 /* AppSettings.swift */; };
+		AD0000000000000000000014 /* FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000004 /* FinanceStore.swift */; };
+		AD0000000000000000000015 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000005 /* ExchangeRateService.swift */; };
+		AD0000000000000000000016 /* MarketDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000006 /* MarketDataService.swift */; };
+		AD0000000000000000000017 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000007 /* DesignSystem.swift */; };
+		AD0000000000000000000020 /* WealthCompassMobileApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000010 /* WealthCompassMobileApp.swift */; };
+		AD0000000000000000000021 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000011 /* ContentView.swift */; };
+		AD0000000000000000000022 /* AppLockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000012 /* AppLockStore.swift */; };
+		AD0000000000000000000023 /* RecurringTransactionNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000013 /* RecurringTransactionNotificationService.swift */; };
+		AD0000000000000000000024 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000014 /* DashboardView.swift */; };
+		AD0000000000000000000025 /* CashFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000015 /* CashFlowView.swift */; };
+		AD0000000000000000000026 /* InvestmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000016 /* InvestmentsView.swift */; };
+		AD0000000000000000000027 /* CryptoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000017 /* CryptoView.swift */; };
+		AD0000000000000000000028 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000018 /* SettingsView.swift */; };
+		AD0000000000000000000029 /* Forms.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000019 /* Forms.swift */; };
+		AD000000000000000000002A /* LockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC000000000000000000001A /* LockView.swift */; };
+		AD0000000000000000000030 /* WealthCompassMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000020 /* WealthCompassMacApp.swift */; };
+		AD0000000000000000000031 /* MacAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000021 /* MacAppModel.swift */; };
+		AD0000000000000000000032 /* MacRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000022 /* MacRootView.swift */; };
+		AD0000000000000000000033 /* MacDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000023 /* MacDashboardView.swift */; };
+		AD0000000000000000000034 /* MacCashFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000024 /* MacCashFlowView.swift */; };
+		AD0000000000000000000035 /* MacInvestmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000025 /* MacInvestmentsView.swift */; };
+		AD0000000000000000000036 /* MacCryptoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000026 /* MacCryptoView.swift */; };
+		AD0000000000000000000037 /* MacEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000027 /* MacEditorSheet.swift */; };
+		AD0000000000000000000038 /* MacSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000028 /* MacSettingsView.swift */; };
+		AD0000000000000000000040 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000030 /* Assets.xcassets */; };
+		AD0000000000000000000041 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000031 /* PrivacyInfo.xcprivacy */; };
+		AD0000000000000000000042 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000032 /* Assets.xcassets */; };
+		AD0000000000000000000043 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000033 /* PrivacyInfo.xcprivacy */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AC0000000000000000000001 /* FinanceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/FinanceModels.swift; sourceTree = "<group>"; };
+		AC0000000000000000000002 /* FinancePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/FinancePersistence.swift; sourceTree = "<group>"; };
+		AC0000000000000000000003 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/AppSettings.swift; sourceTree = "<group>"; };
+		AC0000000000000000000004 /* FinanceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/FinanceStore.swift; sourceTree = "<group>"; };
+		AC0000000000000000000005 /* ExchangeRateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExchangeRateService.swift; sourceTree = "<group>"; };
+		AC0000000000000000000006 /* MarketDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/MarketDataService.swift; sourceTree = "<group>"; };
+		AC0000000000000000000007 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/DesignSystem.swift; sourceTree = "<group>"; };
+		AC0000000000000000000010 /* WealthCompassMobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WealthCompassMobileApp.swift; sourceTree = "<group>"; };
+		AC0000000000000000000011 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000012 /* AppLockStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AppLockStore.swift; sourceTree = "<group>"; };
+		AC0000000000000000000013 /* RecurringTransactionNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/RecurringTransactionNotificationService.swift; sourceTree = "<group>"; };
+		AC0000000000000000000014 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DashboardView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000015 /* CashFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CashFlowView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000016 /* InvestmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/InvestmentsView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000017 /* CryptoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CryptoView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SettingsView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000019 /* Forms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Forms.swift; sourceTree = "<group>"; };
+		AC000000000000000000001A /* LockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/LockView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000020 /* WealthCompassMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WealthCompassMacApp.swift; sourceTree = "<group>"; };
+		AC0000000000000000000021 /* MacAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAppModel.swift; sourceTree = "<group>"; };
+		AC0000000000000000000022 /* MacRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacRootView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000023 /* MacDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacDashboardView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000024 /* MacCashFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacCashFlowView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000025 /* MacInvestmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacInvestmentsView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000026 /* MacCryptoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacCryptoView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000027 /* MacEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacEditorSheet.swift; sourceTree = "<group>"; };
+		AC0000000000000000000028 /* MacSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacSettingsView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000030 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AC0000000000000000000031 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		AC0000000000000000000032 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AC0000000000000000000033 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		AC0000000000000000000034 /* WealthCompassMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WealthCompassMac.entitlements; sourceTree = "<group>"; };
+		AC0000000000000000000040 /* WealthCompassMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WealthCompassMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC0000000000000000000041 /* Wealth Compass.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wealth Compass.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AF0000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF0000000000000000000011 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AB0000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000002 /* Sources */,
+				AB0000000000000000000006 /* Resources */,
+				AB0000000000000000000009 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AB0000000000000000000002 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000003 /* Shared */,
+				AB0000000000000000000004 /* iOS */,
+				AB0000000000000000000005 /* macOS */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		AB0000000000000000000003 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				AC0000000000000000000001 /* FinanceModels.swift */,
+				AC0000000000000000000002 /* FinancePersistence.swift */,
+				AC0000000000000000000003 /* AppSettings.swift */,
+				AC0000000000000000000004 /* FinanceStore.swift */,
+				AC0000000000000000000005 /* ExchangeRateService.swift */,
+				AC0000000000000000000006 /* MarketDataService.swift */,
+				AC0000000000000000000007 /* DesignSystem.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		AB0000000000000000000004 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				AC0000000000000000000010 /* WealthCompassMobileApp.swift */,
+				AC0000000000000000000011 /* ContentView.swift */,
+				AC0000000000000000000012 /* AppLockStore.swift */,
+				AC0000000000000000000013 /* RecurringTransactionNotificationService.swift */,
+				AC0000000000000000000014 /* DashboardView.swift */,
+				AC0000000000000000000015 /* CashFlowView.swift */,
+				AC0000000000000000000016 /* InvestmentsView.swift */,
+				AC0000000000000000000017 /* CryptoView.swift */,
+				AC0000000000000000000018 /* SettingsView.swift */,
+				AC0000000000000000000019 /* Forms.swift */,
+				AC000000000000000000001A /* LockView.swift */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		AB0000000000000000000005 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				AC0000000000000000000020 /* WealthCompassMacApp.swift */,
+				AC0000000000000000000021 /* MacAppModel.swift */,
+				AC0000000000000000000022 /* MacRootView.swift */,
+				AC0000000000000000000023 /* MacDashboardView.swift */,
+				AC0000000000000000000024 /* MacCashFlowView.swift */,
+				AC0000000000000000000025 /* MacInvestmentsView.swift */,
+				AC0000000000000000000026 /* MacCryptoView.swift */,
+				AC0000000000000000000027 /* MacEditorSheet.swift */,
+				AC0000000000000000000028 /* MacSettingsView.swift */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
+		AB0000000000000000000006 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000007 /* iOS */,
+				AB0000000000000000000008 /* macOS */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		AB0000000000000000000007 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				AC0000000000000000000030 /* Assets.xcassets */,
+				AC0000000000000000000031 /* PrivacyInfo.xcprivacy */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		AB0000000000000000000008 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				AC0000000000000000000032 /* Assets.xcassets */,
+				AC0000000000000000000033 /* PrivacyInfo.xcprivacy */,
+				AC0000000000000000000034 /* WealthCompassMac.entitlements */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
+		AB0000000000000000000009 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AC0000000000000000000040 /* WealthCompassMobile.app */,
+				AC0000000000000000000041 /* Wealth Compass.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AE0000000000000000000001 /* WealthCompassMobile */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B10000000000000000000002 /* Build configuration list for PBXNativeTarget "WealthCompassMobile" */;
+			buildPhases = (
+				AF0000000000000000000002 /* Sources */,
+				AF0000000000000000000001 /* Frameworks */,
+				AF0000000000000000000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WealthCompassMobile;
+			productName = WealthCompassMobile;
+			productReference = AC0000000000000000000040 /* WealthCompassMobile.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AE0000000000000000000011 /* WealthCompassMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B10000000000000000000003 /* Build configuration list for PBXNativeTarget "WealthCompassMac" */;
+			buildPhases = (
+				AF0000000000000000000012 /* Sources */,
+				AF0000000000000000000011 /* Frameworks */,
+				AF0000000000000000000013 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WealthCompassMac;
+			productName = "Wealth Compass";
+			productReference = AC0000000000000000000041 /* Wealth Compass.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA0000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2650;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					AE0000000000000000000001 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					AE0000000000000000000011 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+				};
+			};
+			buildConfigurationList = B10000000000000000000001 /* Build configuration list for PBXProject "WealthCompass" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AB0000000000000000000001;
+			productRefGroup = AB0000000000000000000009 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AE0000000000000000000001 /* WealthCompassMobile */,
+				AE0000000000000000000011 /* WealthCompassMac */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AF0000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD0000000000000000000040 /* Assets.xcassets in Resources */,
+				AD0000000000000000000041 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF0000000000000000000013 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD0000000000000000000042 /* Assets.xcassets in Resources */,
+				AD0000000000000000000043 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AF0000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD0000000000000000000001 /* FinanceModels.swift in Sources */,
+				AD0000000000000000000002 /* FinancePersistence.swift in Sources */,
+				AD0000000000000000000003 /* AppSettings.swift in Sources */,
+				AD0000000000000000000004 /* FinanceStore.swift in Sources */,
+				AD0000000000000000000005 /* ExchangeRateService.swift in Sources */,
+				AD0000000000000000000006 /* MarketDataService.swift in Sources */,
+				AD0000000000000000000007 /* DesignSystem.swift in Sources */,
+				AD0000000000000000000020 /* WealthCompassMobileApp.swift in Sources */,
+				AD0000000000000000000021 /* ContentView.swift in Sources */,
+				AD0000000000000000000022 /* AppLockStore.swift in Sources */,
+				AD0000000000000000000023 /* RecurringTransactionNotificationService.swift in Sources */,
+				AD0000000000000000000024 /* DashboardView.swift in Sources */,
+				AD0000000000000000000025 /* CashFlowView.swift in Sources */,
+				AD0000000000000000000026 /* InvestmentsView.swift in Sources */,
+				AD0000000000000000000027 /* CryptoView.swift in Sources */,
+				AD0000000000000000000028 /* SettingsView.swift in Sources */,
+				AD0000000000000000000029 /* Forms.swift in Sources */,
+				AD000000000000000000002A /* LockView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF0000000000000000000012 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD0000000000000000000011 /* FinanceModels.swift in Sources */,
+				AD0000000000000000000012 /* FinancePersistence.swift in Sources */,
+				AD0000000000000000000013 /* AppSettings.swift in Sources */,
+				AD0000000000000000000014 /* FinanceStore.swift in Sources */,
+				AD0000000000000000000015 /* ExchangeRateService.swift in Sources */,
+				AD0000000000000000000016 /* MarketDataService.swift in Sources */,
+				AD0000000000000000000017 /* DesignSystem.swift in Sources */,
+				AD0000000000000000000030 /* WealthCompassMacApp.swift in Sources */,
+				AD0000000000000000000031 /* MacAppModel.swift in Sources */,
+				AD0000000000000000000032 /* MacRootView.swift in Sources */,
+				AD0000000000000000000033 /* MacDashboardView.swift in Sources */,
+				AD0000000000000000000034 /* MacCashFlowView.swift in Sources */,
+				AD0000000000000000000035 /* MacInvestmentsView.swift in Sources */,
+				AD0000000000000000000036 /* MacCryptoView.swift in Sources */,
+				AD0000000000000000000037 /* MacEditorSheet.swift in Sources */,
+				AD0000000000000000000038 /* MacSettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B0000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		B0000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B0000000000000000000011 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8528AN28A3;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Wealth Compass Tracker";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Use Face ID to unlock your local Wealth Compass data.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wealthcompass.mobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B0000000000000000000012 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8528AN28A3;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Wealth Compass Tracker";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Use Face ID to unlock your local Wealth Compass data.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wealthcompass.mobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		B0000000000000000000021 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Resources/macOS/WealthCompassMac.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8528AN28A3;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Wealth Compass";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wealthcompass.mac;
+				PRODUCT_NAME = "Wealth Compass";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B0000000000000000000022 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Resources/macOS/WealthCompassMac.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8528AN28A3;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Wealth Compass";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wealthcompass.mac;
+				PRODUCT_NAME = "Wealth Compass";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B10000000000000000000001 /* Build configuration list for PBXProject "WealthCompass" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B0000000000000000000001 /* Debug */,
+				B0000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B10000000000000000000002 /* Build configuration list for PBXNativeTarget "WealthCompassMobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B0000000000000000000011 /* Debug */,
+				B0000000000000000000012 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B10000000000000000000003 /* Build configuration list for PBXNativeTarget "WealthCompassMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B0000000000000000000021 /* Debug */,
+				B0000000000000000000022 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AA0000000000000000000001 /* Project object */;
+}
