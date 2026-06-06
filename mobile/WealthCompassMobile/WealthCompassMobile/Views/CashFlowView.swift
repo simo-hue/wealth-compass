@@ -35,6 +35,7 @@ struct CashFlowView: View {
     @State private var transactionTypeFilter: TransactionListTypeFilter = .all
     @State private var transactionPendingDeletion: Transaction?
     @State private var recurringTransactionPendingDeletion: RecurringTransaction?
+    @State private var recurringTransactionPendingCompletion: RecurringTransaction?
     @State private var recurringFeatureAlert: RecurringFeatureAlert?
 
     private let transactionDisplayLimit = 40
@@ -47,13 +48,13 @@ struct CashFlowView: View {
                         Button {
                             showingAddTransaction = true
                         } label: {
-                            Label("One-Time Transaction", systemImage: "plus.circle")
+                            Label("One-Time", systemImage: "plus.circle")
                         }
 
                         Button {
                             recurringEditor = RecurringTransactionEditor(schedule: nil)
                         } label: {
-                            Label("Recurring Transaction", systemImage: "repeat.circle")
+                            Label("Recurring", systemImage: "repeat.circle")
                         }
                     } label: {
                         Image(systemName: "plus")
@@ -107,6 +108,19 @@ struct CashFlowView: View {
                     Task {
                         await RecurringTransactionNotificationService.shared.cancel(scheduleID: schedule.id)
                     }
+                },
+                secondaryButton: .cancel()
+            )
+        }
+        .alert(item: $recurringTransactionPendingCompletion) { schedule in
+            Alert(
+                title: Text("Finish Recurring Transaction?"),
+                message: Text(
+                    "\(schedule.category) will be marked as completed. "
+                        + "No future occurrences will be added, and this action cannot be resumed."
+                ),
+                primaryButton: .default(Text("Finish")) {
+                    completeRecurringTransaction(schedule)
                 },
                 secondaryButton: .cancel()
             )
@@ -245,7 +259,11 @@ struct CashFlowView: View {
                     .font(.caption)
                     .foregroundStyle(WCColor.textSecondary)
 
-                if schedule.isActive {
+                if schedule.isCompleted {
+                    Text("Completed")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(WCColor.primary)
+                } else if schedule.isActive {
                     Text("Next: \(schedule.nextDueDate.formatted(date: .abbreviated, time: .shortened))")
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
@@ -265,12 +283,24 @@ struct CashFlowView: View {
                     .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
 
                 HStack(spacing: 14) {
-                    Button {
-                        toggleRecurringTransaction(schedule)
-                    } label: {
-                        Image(systemName: schedule.isActive ? "pause.fill" : "play.fill")
+                    if !schedule.isCompleted {
+                        Button {
+                            recurringTransactionPendingCompletion = schedule
+                        } label: {
+                            Image(systemName: "checkmark")
+                        }
+                        .accessibilityLabel("Finish schedule")
+
+                        Button {
+                            toggleRecurringTransaction(schedule)
+                        } label: {
+                            Image(systemName: schedule.isActive ? "pause.fill" : "play.fill")
+                        }
+                        .accessibilityLabel(schedule.isActive ? "Pause schedule" : "Resume schedule")
+                    } else {
+                        Image(systemName: "checkmark.circle.fill")
+                            .accessibilityLabel("Schedule completed")
                     }
-                    .accessibilityLabel(schedule.isActive ? "Pause schedule" : "Resume schedule")
 
                     Button {
                         recurringEditor = RecurringTransactionEditor(schedule: schedule)
@@ -459,6 +489,13 @@ struct CashFlowView: View {
     private func toggleRecurringTransaction(_ schedule: RecurringTransaction) {
         finance.setRecurringTransactionActive(schedule, isActive: !schedule.isActive)
         Task { await syncRecurringNotifications() }
+    }
+
+    private func completeRecurringTransaction(_ schedule: RecurringTransaction) {
+        finance.completeRecurringTransaction(schedule)
+        Task {
+            await RecurringTransactionNotificationService.shared.cancel(scheduleID: schedule.id)
+        }
     }
 
     private func syncRecurringNotifications() async {

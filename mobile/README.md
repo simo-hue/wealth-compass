@@ -12,6 +12,7 @@ Current app version: `1.1`.
 - Optional Finnhub and CoinGecko API keys, verified with a live price request before secure Keychain storage
 - Automatic ECB reference exchange rates with local caching and offline fallback rates
 - Automatic net-worth snapshots after local finance data changes
+- Recurring income and expense schedules with local due-date notifications and automatic catch-up insertion
 - Persistent custom cash-flow categories in addition to the default category set
 - Optional Face ID / Touch ID app lock
 

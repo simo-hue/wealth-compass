@@ -34,7 +34,7 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .recurringTransactionNotificationReceived)) { _ in
             Task { await processRecurringTransactions() }
         }
-        .onChange(of: finance.data.recurringTransactions) {
+        .onChange(of: finance.data.recurringTransactions) { _, _ in
             Task { await syncRecurringNotifications() }
         }
         .alert(item: $recurringInsertionAlert) { alert in

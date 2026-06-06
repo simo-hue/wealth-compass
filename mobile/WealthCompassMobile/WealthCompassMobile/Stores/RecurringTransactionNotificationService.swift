@@ -74,11 +74,12 @@ actor RecurringTransactionNotificationService {
         }
 
         let upcoming = schedules
-            .filter {
-                $0.isActive
-                    && $0.notificationsEnabled
-                    && $0.nextDueDate > now
-                    && ($0.endDate.map { $0.nextDueDate <= $0 } ?? true)
+            .filter { schedule in
+                schedule.isActive
+                    && !schedule.isCompleted
+                    && schedule.notificationsEnabled
+                    && schedule.nextDueDate > now
+                    && (schedule.endDate.map { schedule.nextDueDate <= $0 } ?? true)
             }
             .sorted { $0.nextDueDate < $1.nextDueDate }
             .prefix(60)
@@ -87,7 +88,9 @@ actor RecurringTransactionNotificationService {
             let content = UNMutableNotificationContent()
             content.title = "Recurring \(schedule.type.title.lowercased()) due"
             if showAmounts {
-                let amount = schedule.amount.formatted(.currency(code: currencyCode))
+                let amount = schedule.amount.formatted(
+                    FloatingPointFormatStyle<Double>.Currency(code: currencyCode)
+                )
                 content.body = "\(schedule.category): \(amount). Wealth Compass records it automatically when the app is active."
             } else {
                 content.body = "\(schedule.category) is scheduled. Open Wealth Compass to review it."

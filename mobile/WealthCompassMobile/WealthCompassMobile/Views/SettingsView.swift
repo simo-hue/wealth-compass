@@ -115,6 +115,12 @@ struct SettingsView: View {
                             .foregroundStyle(WCColor.textSecondary)
                     }
                     HStack {
+                        Label("Recurring", systemImage: "repeat")
+                        Spacer()
+                        Text("\(finance.data.recurringTransactions.count)")
+                            .foregroundStyle(WCColor.textSecondary)
+                    }
+                    HStack {
                         Label("Investments", systemImage: "chart.line.uptrend.xyaxis")
                         Spacer()
                         Text("\(finance.data.investments.count)")
@@ -351,6 +357,9 @@ struct SettingsView: View {
         case .deleteAllData:
             finance.clearData()
             backupURL = nil
+            Task {
+                await RecurringTransactionNotificationService.shared.cancelAll()
+            }
         case .deleteCustomCategory(let category, let type):
             settings.removeCustomTransactionCategory(category, for: type)
         }
