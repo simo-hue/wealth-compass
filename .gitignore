@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 
 .env
+
+# Xcode user state
+xcuserdata/
+*.xcuserstate
+DerivedData/

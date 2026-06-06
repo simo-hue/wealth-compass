@@ -76,16 +76,13 @@ final class FinanceStore: ObservableObject {
     @Published private(set) var data = FinancialData()
     @Published private(set) var isRefreshingMarketPrices = false
 
-    private let storageURL: URL
+    private let persistence: FinancePersistence
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
     private var lastMarketPriceRefreshAttemptAt: Date?
 
-    init() {
-        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-            ?? FileManager.default.temporaryDirectory
-        storageURL = documents.appendingPathComponent("wealth-compass-local-data.json")
-
+    init(persistence: FinancePersistence = LocalFinancePersistence()) {
+        self.persistence = persistence
         encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         encoder.dateEncodingStrategy = .iso8601
@@ -110,6 +107,10 @@ final class FinanceStore: ObservableObject {
                 if lhs.isActive != rhs.isActive { return lhs.isActive }
                 return lhs.nextDueDate < rhs.nextDueDate
             }
+    }
+
+    var storageLocationDescription: String {
+        persistence.locationDescription
     }
 
     func addTransaction(type: TransactionType, amount: Double, category: String, description: String, date: Date, settings: AppSettings) {
@@ -575,7 +576,11 @@ final class FinanceStore: ObservableObject {
 
     func clearData() {
         data = FinancialData()
-        try? FileManager.default.removeItem(at: storageURL)
+        do {
+            try persistence.clear()
+        } catch {
+            assertionFailure("Failed to clear local finance data: \(error)")
+        }
     }
 
     func exportBackupURL() throws -> URL {
@@ -664,10 +669,8 @@ final class FinanceStore: ObservableObject {
     }
 
     private func load() {
-        guard FileManager.default.fileExists(atPath: storageURL.path) else { return }
         do {
-            let payload = try Data(contentsOf: storageURL)
-            data = try decoder.decode(FinancialData.self, from: payload)
+            data = try persistence.load() ?? FinancialData()
         } catch {
             data = FinancialData()
         }
@@ -675,8 +678,7 @@ final class FinanceStore: ObservableObject {
 
     private func save() {
         do {
-            let payload = try encoder.encode(data)
-            try payload.write(to: storageURL, options: .atomic)
+            try persistence.save(data)
         } catch {
             assertionFailure("Failed to save local finance data: \(error)")
         }
