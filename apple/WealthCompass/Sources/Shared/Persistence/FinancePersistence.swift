@@ -6,6 +6,7 @@ protocol FinancePersistence {
     func load() throws -> FinancialData?
     func save(_ data: FinancialData) throws
     func clear() throws
+    func forceICloudSync() throws -> FinancialData?
 }
 
 struct LocalFinancePersistence: FinancePersistence {
@@ -74,6 +75,26 @@ struct LocalFinancePersistence: FinancePersistence {
         try fileManager.removeItem(at: storageURL)
     }
 
+    func forceICloudSync() throws -> FinancialData? {
+        let isICloudSyncEnabled = UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
+        guard isICloudSyncEnabled, let iCloudURL = getICloudURL() else { return try load() }
+        
+        let coordinator = NSFileCoordinator(filePresenter: nil)
+        var coordinationError: NSError?
+        
+        // Coordinate reading without .withoutChanges to force a synchronous download
+        coordinator.coordinate(readingItemAt: iCloudURL, options: [], error: &coordinationError) { _ in }
+        
+        if let error = coordinationError {
+            throw error
+        }
+        
+        try syncFromICloudIfNeeded()
+        try syncToICloud()
+        
+        return try load()
+    }
+
     private func createStorageDirectoryIfNeeded() throws {
         try fileManager.createDirectory(
             at: storageURL.deletingLastPathComponent(),
@@ -101,36 +122,74 @@ struct LocalFinancePersistence: FinancePersistence {
     }
 
     private func syncFromICloudIfNeeded() throws {
-        guard let iCloudURL = getICloudURL(), fileManager.fileExists(atPath: iCloudURL.path) else { return }
+        guard let iCloudURL = getICloudURL() else { return }
         
-        let localExists = fileManager.fileExists(atPath: storageURL.path)
-        
-        if localExists {
-            let localAttrs = try fileManager.attributesOfItem(atPath: storageURL.path)
-            let iCloudAttrs = try fileManager.attributesOfItem(atPath: iCloudURL.path)
-            
-            if let localDate = localAttrs[.modificationDate] as? Date,
-               let iCloudDate = iCloudAttrs[.modificationDate] as? Date {
-                // If iCloud file is newer, copy it over the local file
-                if iCloudDate > localDate {
-                    try? fileManager.removeItem(at: storageURL)
-                    try fileManager.copyItem(at: iCloudURL, to: storageURL)
-                }
+        do {
+            let values = try iCloudURL.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey])
+            if let status = values.ubiquitousItemDownloadingStatus, status != .current {
+                try fileManager.startDownloadingUbiquitousItem(at: iCloudURL)
+                return
             }
-        } else {
-            // Local file doesn't exist, but iCloud does, copy it
-            try createStorageDirectoryIfNeeded()
-            try fileManager.copyItem(at: iCloudURL, to: storageURL)
+        } catch {
+            // Ignore if file doesn't exist or is not ubiquitous yet
+        }
+        
+        let coordinator = NSFileCoordinator(filePresenter: nil)
+        var coordinationError: NSError?
+        var readError: Error?
+        
+        coordinator.coordinate(readingItemAt: iCloudURL, options: .withoutChanges, error: &coordinationError) { url in
+            do {
+                guard self.fileManager.fileExists(atPath: url.path) else { return }
+                
+                let localExists = self.fileManager.fileExists(atPath: self.storageURL.path)
+                
+                if localExists {
+                    let localAttrs = try self.fileManager.attributesOfItem(atPath: self.storageURL.path)
+                    let iCloudAttrs = try self.fileManager.attributesOfItem(atPath: url.path)
+                    
+                    if let localDate = localAttrs[.modificationDate] as? Date,
+                       let iCloudDate = iCloudAttrs[.modificationDate] as? Date {
+                        // If iCloud file is newer, copy to temp and replace safely
+                        if iCloudDate > localDate {
+                            let tempURL = self.fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+                            try self.fileManager.copyItem(at: url, to: tempURL)
+                            _ = try self.fileManager.replaceItemAt(self.storageURL, withItemAt: tempURL)
+                        }
+                    }
+                } else {
+                    // Local file doesn't exist, but iCloud does, copy it
+                    try self.createStorageDirectoryIfNeeded()
+                    try self.fileManager.copyItem(at: url, to: self.storageURL)
+                }
+            } catch {
+                readError = error
+            }
+        }
+        
+        if let error = readError ?? coordinationError {
+            throw error
         }
     }
 
     private func syncToICloud() throws {
         guard let iCloudURL = getICloudURL(), fileManager.fileExists(atPath: storageURL.path) else { return }
         
-        // Remove existing iCloud file if needed
-        if fileManager.fileExists(atPath: iCloudURL.path) {
-            try? fileManager.removeItem(at: iCloudURL)
+        let coordinator = NSFileCoordinator(filePresenter: nil)
+        var coordinationError: NSError?
+        var writeError: Error?
+        
+        coordinator.coordinate(writingItemAt: iCloudURL, options: .forReplacing, error: &coordinationError) { url in
+            do {
+                let data = try Data(contentsOf: self.storageURL)
+                try data.write(to: url, options: .atomic)
+            } catch {
+                writeError = error
+            }
         }
-        try fileManager.copyItem(at: storageURL, to: iCloudURL)
+        
+        if let error = writeError ?? coordinationError {
+            throw error
+        }
     }
 }

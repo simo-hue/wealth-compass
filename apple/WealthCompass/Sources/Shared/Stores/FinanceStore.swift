@@ -701,8 +701,24 @@ final class FinanceStore: ObservableObject {
                 forName: .NSMetadataQueryDidUpdate,
                 object: query,
                 queue: .main
-            ) { [weak self] _ in
-                self?.load()
+            ) { [weak self] notification in
+                guard let query = notification.object as? NSMetadataQuery else { return }
+                query.disableUpdates()
+                defer { query.enableUpdates() }
+                
+                if let item = query.results.first as? NSMetadataItem {
+                    let status = item.value(forAttribute: NSMetadataUbiquitousItemDownloadingStatusKey) as? String
+                    if status == NSMetadataUbiquitousItemDownloadingStatusCurrent {
+                        self?.load()
+                    } else if status == NSMetadataUbiquitousItemDownloadingStatusNotDownloaded {
+                        if let url = item.value(forAttribute: NSMetadataItemURLKey) as? URL {
+                            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+                        }
+                    }
+                } else {
+                    // Item not found in results, maybe it was deleted or doesn't exist yet
+                    self?.load()
+                }
             }
             
             query.start()
@@ -722,6 +738,13 @@ final class FinanceStore: ObservableObject {
             try persistence.save(data)
         } catch {
             assertionFailure("Failed to save local finance data: \(error)")
+        }
+    }
+
+    func forceICloudSync() async throws {
+        let newData = try persistence.forceICloudSync()
+        if let newData {
+            self.data = newData
         }
     }
 

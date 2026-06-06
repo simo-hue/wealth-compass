@@ -272,6 +272,25 @@ struct MacSettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+            
+            if settings.isICloudSyncEnabled {
+                Section {
+                    Button {
+                        Task {
+                            do {
+                                try await finance.forceICloudSync()
+                            } catch {
+                                settingsAlert = MacSettingsAlert(
+                                    title: "Sync Failed",
+                                    message: error.localizedDescription
+                                )
+                            }
+                        }
+                    } label: {
+                        Label("Force Sync iCloud", systemImage: "arrow.triangle.2.circlepath.icloud")
+                    }
+                }
+            }
         }
         .formStyle(.grouped)
         .padding()

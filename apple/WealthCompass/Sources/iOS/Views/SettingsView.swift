@@ -73,6 +73,24 @@ struct SettingsView: View {
                     Text("Your financial data is saved locally by default. When enabled, it securely syncs across your devices using iCloud Documents.")
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
+                    
+                    if settings.isICloudSyncEnabled {
+                        Button {
+                            Task {
+                                do {
+                                    try await finance.forceICloudSync()
+                                } catch {
+                                    settingsAlert = SettingsAlertState(
+                                        title: "Sync Failed",
+                                        message: error.localizedDescription
+                                    )
+                                }
+                            }
+                        } label: {
+                            Label("Force Sync iCloud", systemImage: "arrow.triangle.2.circlepath.icloud")
+                        }
+                        .tint(WCColor.primary)
+                    }
                 }
 
                 Section("Data") {
