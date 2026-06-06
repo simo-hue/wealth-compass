@@ -5,6 +5,9 @@ struct ContentView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appLock: AppLockStore
+    @State private var recurringInsertionAlert: RecurringInsertionAlert?
+
+    private let recurringCheckTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
     var body: some View {
         Group {
@@ -18,11 +21,28 @@ struct ContentView: View {
             if newPhase == .background || newPhase == .inactive {
                 appLock.lock()
             } else if newPhase == .active {
-                Task { await refreshMarketPricesIfNeeded() }
+                Task { await handleAppBecameActive() }
             }
         }
         .task {
-            await refreshMarketPricesIfNeeded()
+            await handleAppBecameActive()
+        }
+        .onReceive(recurringCheckTimer) { _ in
+            guard scenePhase == .active else { return }
+            Task { await processRecurringTransactions() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .recurringTransactionNotificationReceived)) { _ in
+            Task { await processRecurringTransactions() }
+        }
+        .onChange(of: finance.data.recurringTransactions) {
+            Task { await syncRecurringNotifications() }
+        }
+        .alert(item: $recurringInsertionAlert) { alert in
+            Alert(
+                title: Text("Recurring Transactions Added"),
+                message: Text(alert.message),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 
@@ -46,6 +66,43 @@ struct ContentView: View {
         .tint(WCColor.primary)
     }
 
+    private func handleAppBecameActive() async {
+        await processRecurringTransactions()
+        await refreshRemoteDataIfNeeded()
+    }
+
+    private func refreshRemoteDataIfNeeded() async {
+        await refreshExchangeRatesIfNeeded()
+        await refreshMarketPricesIfNeeded()
+    }
+
+    private func processRecurringTransactions() async {
+        let insertedCount = finance.processDueRecurringTransactions(settings: settings)
+        await syncRecurringNotifications()
+
+        guard insertedCount > 0 else { return }
+        let transactionWord = insertedCount == 1 ? "transaction was" : "transactions were"
+        recurringInsertionAlert = RecurringInsertionAlert(
+            message: "\(insertedCount) scheduled \(transactionWord) automatically added to Cash Flow."
+        )
+    }
+
+    private func syncRecurringNotifications() async {
+        await RecurringTransactionNotificationService.shared.sync(
+            schedules: finance.data.recurringTransactions,
+            currencyCode: settings.currency.rawValue,
+            showAmounts: !settings.isPrivacyMode
+        )
+    }
+
+    private func refreshExchangeRatesIfNeeded() async {
+        guard settings.shouldAutoRefreshExchangeRates() else { return }
+        let result = await settings.refreshExchangeRates()
+        if result.didChangeRates, finance.hasForeignCurrencyExposure(relativeTo: settings.currency) {
+            finance.takeSnapshot(settings: settings)
+        }
+    }
+
     private func refreshMarketPricesIfNeeded() async {
         guard finance.shouldAutoRefreshMarketPrices() else { return }
         let finnhubAPIKey: String?
@@ -66,4 +123,9 @@ struct ContentView: View {
             settings: settings
         )
     }
+}
+
+private struct RecurringInsertionAlert: Identifiable {
+    let id = UUID()
+    let message: String
 }

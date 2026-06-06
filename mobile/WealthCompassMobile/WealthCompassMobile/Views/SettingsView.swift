@@ -31,6 +31,8 @@ struct SettingsView: View {
                     }
                 }
 
+                exchangeRatesSection
+
                 Section("Privacy") {
                     Toggle(isOn: $settings.isPrivacyMode) {
                         Label("Privacy Mode", systemImage: settings.isPrivacyMode ? "eye.slash" : "eye")
@@ -195,6 +197,63 @@ struct SettingsView: View {
                     },
                     secondaryButton: .cancel()
                 )
+            }
+        }
+    }
+
+    private var exchangeRatesSection: some View {
+        Section("Exchange Rates") {
+            HStack {
+                Label("Source", systemImage: "building.columns")
+                Spacer()
+                if let snapshot = settings.exchangeRateSnapshot {
+                    Text("ECB")
+                        .foregroundStyle(WCColor.primary)
+                    Text("· \(snapshot.effectiveDate.formatted(date: .abbreviated, time: .omitted))")
+                        .foregroundStyle(WCColor.textSecondary)
+                } else {
+                    Text("Offline fallback")
+                        .foregroundStyle(WCColor.warning)
+                }
+            }
+
+            ForEach(Currency.allCases.filter { $0 != settings.currency }) { quoteCurrency in
+                let converted = settings.convert(1, from: settings.currency, to: quoteCurrency)
+                HStack {
+                    Text("1 \(settings.currency.rawValue)")
+                    Spacer()
+                    Text("\(converted.formatted(.number.precision(.fractionLength(2...4)))) \(quoteCurrency.rawValue)")
+                        .font(.subheadline.monospacedDigit())
+                        .foregroundStyle(WCColor.textSecondary)
+                }
+            }
+
+            Button {
+                Task { await refreshExchangeRates() }
+            } label: {
+                Label(
+                    settings.isRefreshingExchangeRates ? "Refreshing Exchange Rates" : "Refresh Exchange Rates",
+                    systemImage: "arrow.triangle.2.circlepath"
+                )
+            }
+            .disabled(settings.isRefreshingExchangeRates)
+
+            if settings.isRefreshingExchangeRates {
+                ProgressView()
+            }
+
+            if let error = settings.exchangeRateError {
+                Text("\(error) Cached or fallback rates remain active.")
+                    .font(.caption)
+                    .foregroundStyle(WCColor.destructive)
+            } else if let snapshot = settings.exchangeRateSnapshot {
+                Text("\(snapshot.provider). Fetched \(snapshot.fetchedAt.formatted(date: .abbreviated, time: .shortened)) and cached locally.")
+                    .font(.caption)
+                    .foregroundStyle(WCColor.textSecondary)
+            } else {
+                Text("ECB reference rates are refreshed automatically and cached locally for offline use.")
+                    .font(.caption)
+                    .foregroundStyle(WCColor.textSecondary)
             }
         }
     }
@@ -386,6 +445,14 @@ struct SettingsView: View {
             settings: settings
         )
         refreshMarketDataKeyStatus()
+        settingsAlert = SettingsAlertState(title: result.title, message: result.message)
+    }
+
+    private func refreshExchangeRates() async {
+        let result = await settings.refreshExchangeRates()
+        if result.didChangeRates, finance.hasForeignCurrencyExposure(relativeTo: settings.currency) {
+            finance.takeSnapshot(settings: settings)
+        }
         settingsAlert = SettingsAlertState(title: result.title, message: result.message)
     }
 

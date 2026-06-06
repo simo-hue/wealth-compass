@@ -19,6 +19,7 @@ struct FinanceImportResult {
     let sourceFileName: String
     let mode: FinanceImportMode
     let transactions: Int
+    let recurringTransactions: Int
     let investments: Int
     let crypto: Int
     let liabilities: Int
@@ -28,13 +29,13 @@ struct FinanceImportResult {
     let skippedRecords: Int
 
     var importedRecordCount: Int {
-        transactions + investments + crypto + liabilities + snapshots
+        transactions + recurringTransactions + investments + crypto + liabilities + snapshots
     }
 
     var message: String {
         var lines = [
             "\(mode.title) import completed for \(sourceFileName).",
-            "\(transactions) transactions, \(investments) investments, \(crypto) crypto holdings, \(liabilities) liabilities, and \(snapshots) snapshots were imported."
+            "\(transactions) transactions, \(recurringTransactions) recurring schedules, \(investments) investments, \(crypto) crypto holdings, \(liabilities) liabilities, and \(snapshots) snapshots were imported."
         ]
 
         if generatedSnapshots > 0 {
@@ -102,6 +103,13 @@ final class FinanceStore: ObservableObject {
         }
     }
 
+    var recurringTransactions: [RecurringTransaction] {
+        data.recurringTransactions.sorted { lhs, rhs in
+            if lhs.isActive != rhs.isActive { return lhs.isActive }
+            return lhs.nextDueDate < rhs.nextDueDate
+        }
+    }
+
     func addTransaction(type: TransactionType, amount: Double, category: String, description: String, date: Date, settings: AppSettings) {
         let transaction = Transaction(
             type: type,
@@ -119,6 +127,130 @@ final class FinanceStore: ObservableObject {
         data.transactions.removeAll { $0.id == transaction.id }
         appendSnapshot(settings: settings)
         save()
+    }
+
+    func upsertRecurringTransaction(_ recurringTransaction: RecurringTransaction) {
+        if let index = data.recurringTransactions.firstIndex(where: { $0.id == recurringTransaction.id }) {
+            data.recurringTransactions[index] = recurringTransaction
+        } else {
+            data.recurringTransactions.append(recurringTransaction)
+        }
+        save()
+    }
+
+    func deleteRecurringTransaction(_ recurringTransaction: RecurringTransaction) {
+        data.recurringTransactions.removeAll { $0.id == recurringTransaction.id }
+        save()
+    }
+
+    func setRecurringTransactionActive(_ recurringTransaction: RecurringTransaction, isActive: Bool, now: Date = Date()) {
+        guard let index = data.recurringTransactions.firstIndex(where: { $0.id == recurringTransaction.id }) else {
+            return
+        }
+
+        var updated = data.recurringTransactions[index]
+        if isActive {
+            guard let nextDueDate = updated.firstOccurrence(onOrAfter: now) else {
+                updated.isActive = false
+                updated.updatedAt = now
+                data.recurringTransactions[index] = updated
+                save()
+                return
+            }
+            updated.nextDueDate = nextDueDate
+        }
+        updated.isActive = isActive
+        updated.updatedAt = now
+        data.recurringTransactions[index] = updated
+        save()
+    }
+
+    func setRecurringNotificationsEnabled(id: UUID, isEnabled: Bool) {
+        guard let index = data.recurringTransactions.firstIndex(where: { $0.id == id }) else { return }
+        data.recurringTransactions[index].notificationsEnabled = isEnabled
+        data.recurringTransactions[index].updatedAt = Date()
+        save()
+    }
+
+    @discardableResult
+    func processDueRecurringTransactions(settings: AppSettings, now: Date = Date()) -> Int {
+        guard !data.recurringTransactions.isEmpty else { return 0 }
+
+        let calendar = Calendar.current
+        var generatedCount = 0
+        var schedulesChanged = false
+
+        for index in data.recurringTransactions.indices {
+            var schedule = data.recurringTransactions[index]
+            guard schedule.isActive else { continue }
+
+            var occurrence = schedule.nextDueDate
+            var processedOccurrences = 0
+
+            while occurrence <= now && processedOccurrences < 1_000 {
+                if let endDate = schedule.endDate, occurrence > endDate {
+                    schedule.isActive = false
+                    schedulesChanged = true
+                    break
+                }
+
+                let alreadyGenerated = data.transactions.contains { transaction in
+                    guard
+                        transaction.recurringTransactionID == schedule.id,
+                        let generatedDate = transaction.recurringOccurrenceDate
+                    else {
+                        return false
+                    }
+                    return abs(generatedDate.timeIntervalSince(occurrence)) < 1
+                }
+
+                if !alreadyGenerated {
+                    data.transactions.append(
+                        Transaction(
+                            type: schedule.type,
+                            category: schedule.category,
+                            amount: schedule.amount,
+                            description: schedule.description,
+                            date: calendar.startOfDay(for: occurrence),
+                            recurringTransactionID: schedule.id,
+                            recurringOccurrenceDate: occurrence
+                        )
+                    )
+                    generatedCount += 1
+                }
+
+                guard let next = schedule.frequency.nextDate(
+                    after: occurrence,
+                    anchoredTo: schedule.startDate,
+                    calendar: calendar
+                ) else {
+                    schedule.isActive = false
+                    schedulesChanged = true
+                    break
+                }
+
+                occurrence = next
+                schedule.nextDueDate = next
+                schedule.updatedAt = now
+                schedulesChanged = true
+                processedOccurrences += 1
+            }
+
+            if let endDate = schedule.endDate, schedule.nextDueDate > endDate {
+                schedule.isActive = false
+                schedulesChanged = true
+            }
+
+            data.recurringTransactions[index] = schedule
+        }
+
+        if generatedCount > 0 {
+            appendSnapshot(settings: settings)
+        }
+        if generatedCount > 0 || schedulesChanged {
+            save()
+        }
+        return generatedCount
     }
 
     func upsertInvestment(_ investment: Investment, settings: AppSettings) {
@@ -289,6 +421,12 @@ final class FinanceStore: ObservableObject {
             totalLiabilities: totalLiabilities,
             netWorth: totalAssets - totalLiabilities
         )
+    }
+
+    func hasForeignCurrencyExposure(relativeTo baseCurrency: Currency) -> Bool {
+        data.investments.contains { $0.currency != baseCurrency }
+            || data.crypto.contains { $0.currency != baseCurrency }
+            || data.liabilities.contains { $0.currency != baseCurrency }
     }
 
     func takeSnapshot(settings: AppSettings) {
@@ -485,6 +623,7 @@ final class FinanceStore: ObservableObject {
             sourceFileName: url.lastPathComponent,
             mode: mode,
             transactions: normalized.data.transactions.count,
+            recurringTransactions: normalized.data.recurringTransactions.count,
             investments: normalized.data.investments.count,
             crypto: normalized.data.crypto.count,
             liabilities: normalized.data.liabilities.count,
@@ -541,13 +680,16 @@ final class FinanceStore: ObservableObject {
 
     private func registerImportedCategories(from importedData: FinancialData, settings: AppSettings) -> Int {
         var added = 0
-        for transaction in importedData.transactions {
-            let existing = settings.transactionCategories(for: transaction.type)
-            guard !existing.contains(where: { $0.caseInsensitiveCompare(transaction.category) == .orderedSame }) else {
+        let categories = importedData.transactions.map { ($0.type, $0.category) }
+            + importedData.recurringTransactions.map { ($0.type, $0.category) }
+
+        for (type, category) in categories {
+            let existing = settings.transactionCategories(for: type)
+            guard !existing.contains(where: { $0.caseInsensitiveCompare(category) == .orderedSame }) else {
                 continue
             }
 
-            if settings.addCustomTransactionCategory(transaction.category, for: transaction.type) != nil {
+            if settings.addCustomTransactionCategory(category, for: type) != nil {
                 added += 1
             }
         }
@@ -568,6 +710,7 @@ private struct ImportedFinancialData: Decodable {
     private let liabilities: LossyArray<ImportedLiability>
     private let liquidity: LossyArray<ImportedLiquidityAccount>
     private let transactions: LossyArray<ImportedTransaction>
+    private let recurringTransactions: LossyArray<ImportedRecurringTransaction>
     private let snapshots: LossyArray<ImportedSnapshot>
 
     private enum CodingKeys: String, CodingKey {
@@ -578,6 +721,7 @@ private struct ImportedFinancialData: Decodable {
         case liabilities
         case liquidity
         case transactions
+        case recurringTransactions
         case snapshots
     }
 
@@ -590,12 +734,14 @@ private struct ImportedFinancialData: Decodable {
         liabilities = container.decodeLossyArrayIfPresent(ImportedLiability.self, forKey: .liabilities)
         liquidity = container.decodeLossyArrayIfPresent(ImportedLiquidityAccount.self, forKey: .liquidity)
         transactions = container.decodeLossyArrayIfPresent(ImportedTransaction.self, forKey: .transactions)
+        recurringTransactions = container.decodeLossyArrayIfPresent(ImportedRecurringTransaction.self, forKey: .recurringTransactions)
         snapshots = container.decodeLossyArrayIfPresent(ImportedSnapshot.self, forKey: .snapshots)
     }
 
     @MainActor
     func normalized(settings: AppSettings) -> NormalizedFinanceImport {
         let importedTransactions = transactions.elements.compactMap { $0.model() }
+        let importedRecurringTransactions = recurringTransactions.elements.compactMap { $0.model() }
         let importedIncome = income.elements.compactMap { $0.transaction() }
         let importedExpenses = expenses.elements.compactMap { $0.transaction() }
         let importedLiquidity = liquidity.elements.compactMap { $0.transaction(settings: settings) }
@@ -605,6 +751,8 @@ private struct ImportedFinancialData: Decodable {
         let importedSnapshots = snapshots.elements.compactMap { $0.model() }
 
         let skippedTransactions = transactions.skippedCount + max(0, transactions.elements.count - importedTransactions.count)
+        let skippedRecurringTransactions = recurringTransactions.skippedCount
+            + max(0, recurringTransactions.elements.count - importedRecurringTransactions.count)
         let skippedIncome = income.skippedCount + max(0, income.elements.count - importedIncome.count)
         let skippedExpenses = expenses.skippedCount + max(0, expenses.elements.count - importedExpenses.count)
         let skippedLiquidity = liquidity.skippedCount + max(0, liquidity.elements.count - importedLiquidity.count)
@@ -612,11 +760,13 @@ private struct ImportedFinancialData: Decodable {
         let skippedCrypto = crypto.skippedCount + max(0, crypto.elements.count - importedCrypto.count)
         let skippedLiabilities = liabilities.skippedCount + max(0, liabilities.elements.count - importedLiabilities.count)
         let skippedSnapshots = snapshots.skippedCount + max(0, snapshots.elements.count - importedSnapshots.count)
-        let skippedRecords = skippedTransactions + skippedIncome + skippedExpenses + skippedLiquidity + skippedInvestments + skippedCrypto + skippedLiabilities + skippedSnapshots
+        let skippedRecords = skippedTransactions + skippedRecurringTransactions + skippedIncome + skippedExpenses
+            + skippedLiquidity + skippedInvestments + skippedCrypto + skippedLiabilities + skippedSnapshots
 
         return NormalizedFinanceImport(
             data: FinancialData(
                 transactions: (importedTransactions + importedIncome + importedExpenses + importedLiquidity).uniquedByID(),
+                recurringTransactions: importedRecurringTransactions.uniquedByID(),
                 investments: importedInvestments.uniquedByID(),
                 crypto: importedCrypto.uniquedByID(),
                 liabilities: importedLiabilities.uniquedByID(),
@@ -675,6 +825,88 @@ private struct ImportedTransaction: Decodable {
             description: description ?? "",
             date: date,
             createdAt: ImportDateParser.parse(createdAt) ?? date
+        )
+    }
+}
+
+private struct ImportedRecurringTransaction: Decodable {
+    let id: UUID?
+    let type: String?
+    let category: String?
+    let amount: Double?
+    let description: String?
+    let startDate: String?
+    let frequency: String?
+    let nextDueDate: String?
+    let endDate: String?
+    let notificationsEnabled: Bool?
+    let isActive: Bool?
+    let createdAt: String?
+    let updatedAt: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case type
+        case category
+        case amount
+        case description
+        case startDate
+        case frequency
+        case nextDueDate
+        case endDate
+        case notificationsEnabled
+        case isActive
+        case createdAt
+        case updatedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = container.decodeUUIDIfPresent(forKey: .id)
+        type = container.decodeImportedStringIfPresent(forKey: .type)
+        category = container.decodeImportedStringIfPresent(forKey: .category)
+        amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
+        description = container.decodeImportedStringIfPresent(forKey: .description)
+        startDate = container.decodeImportedStringIfPresent(forKey: .startDate)
+        frequency = container.decodeImportedStringIfPresent(forKey: .frequency)
+        nextDueDate = container.decodeImportedStringIfPresent(forKey: .nextDueDate)
+        endDate = container.decodeImportedStringIfPresent(forKey: .endDate)
+        notificationsEnabled = container.decodeImportedBoolIfPresent(forKey: .notificationsEnabled)
+        isActive = container.decodeImportedBoolIfPresent(forKey: .isActive)
+        createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
+        updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
+    }
+
+    func model() -> RecurringTransaction? {
+        guard
+            let rawType = type?.lowercased(),
+            let transactionType = TransactionType(rawValue: rawType),
+            let amount = amount?.positiveImportedAmount,
+            let startDate = ImportDateParser.parse(startDate),
+            let rawFrequency = frequency?.lowercased(),
+            let frequency = RecurringTransactionFrequency(rawValue: rawFrequency),
+            let nextDueDate = ImportDateParser.parse(nextDueDate)
+        else {
+            return nil
+        }
+
+        let parsedEndDate = ImportDateParser.parse(endDate)
+        guard parsedEndDate.map({ $0 >= startDate }) ?? true else { return nil }
+
+        return RecurringTransaction(
+            id: id ?? UUID(),
+            type: transactionType,
+            category: category ?? "Other",
+            amount: amount,
+            description: description ?? "",
+            startDate: startDate,
+            frequency: frequency,
+            nextDueDate: nextDueDate,
+            endDate: parsedEndDate,
+            notificationsEnabled: notificationsEnabled ?? true,
+            isActive: isActive ?? true,
+            createdAt: ImportDateParser.parse(createdAt) ?? startDate,
+            updatedAt: ImportDateParser.parse(updatedAt) ?? startDate
         )
     }
 }
@@ -1271,6 +1503,21 @@ private extension KeyedDecodingContainer {
         guard let rawValue = decodeImportedStringIfPresent(forKey: key) else { return nil }
         return UUID(uuidString: rawValue)
     }
+
+    func decodeImportedBoolIfPresent(forKey key: Key) -> Bool? {
+        if let value = try? decode(Bool.self, forKey: key) {
+            return value
+        }
+        guard let value = try? decode(String.self, forKey: key) else { return nil }
+        switch value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+        case "true", "1", "yes":
+            return true
+        case "false", "0", "no":
+            return false
+        default:
+            return nil
+        }
+    }
 }
 
 private extension Currency {
@@ -1282,12 +1529,14 @@ private extension Currency {
 
 private extension FinancialData {
     var hasImportableContent: Bool {
-        !transactions.isEmpty || !investments.isEmpty || !crypto.isEmpty || !liabilities.isEmpty || !snapshots.isEmpty
+        !transactions.isEmpty || !recurringTransactions.isEmpty || !investments.isEmpty
+            || !crypto.isEmpty || !liabilities.isEmpty || !snapshots.isEmpty
     }
 
     func merged(with incoming: FinancialData) -> FinancialData {
         FinancialData(
             transactions: transactions.mergedByID(with: incoming.transactions),
+            recurringTransactions: recurringTransactions.mergedByID(with: incoming.recurringTransactions),
             investments: investments.mergedByID(with: incoming.investments),
             crypto: crypto.mergedByID(with: incoming.crypto),
             liabilities: liabilities.mergedByID(with: incoming.liabilities),
@@ -1300,6 +1549,10 @@ private extension FinancialData {
             transactions: transactions.sorted {
                 if $0.date == $1.date { return $0.createdAt > $1.createdAt }
                 return $0.date > $1.date
+            },
+            recurringTransactions: recurringTransactions.sorted {
+                if $0.isActive != $1.isActive { return $0.isActive }
+                return $0.nextDueDate < $1.nextDueDate
             },
             investments: investments.sorted { $0.currentValue > $1.currentValue },
             crypto: crypto.sorted { $0.currentValue > $1.currentValue },
