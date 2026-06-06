@@ -23,6 +23,12 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    settingsOverview
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                .listRowBackground(Color.clear)
+
                 Section("Currency") {
                     Picker("Base Currency", selection: $settings.currency) {
                         ForEach(Currency.allCases) { currency in
@@ -191,6 +197,11 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.large)
+            .listStyle(.insetGrouped)
+            .contentMargins(.top, 6, for: .scrollContent)
+            .environment(\.defaultMinListRowHeight, 50)
+            .tint(WCColor.primary)
             .scrollContentBackground(.hidden)
             .background(ScreenBackground())
             .preferredColorScheme(.dark)
@@ -249,6 +260,58 @@ struct SettingsView: View {
                 )
             }
         }
+    }
+
+    private var settingsOverview: some View {
+        FinanceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(spacing: 13) {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(WCColor.primary)
+                        .frame(width: 42, height: 42)
+                        .background(WCColor.primary.opacity(0.11), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Your preferences")
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text("Privacy, sync, currency, and market data")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.44))
+                    }
+                }
+
+                HStack(spacing: 8) {
+                    settingsStatusChip(
+                        settings.currency.rawValue,
+                        systemImage: "coloncurrencysign",
+                        color: WCColor.accent
+                    )
+                    settingsStatusChip(
+                        settings.isPrivacyMode ? "Private" : "Visible",
+                        systemImage: settings.isPrivacyMode ? "eye.slash.fill" : "eye.fill",
+                        color: WCColor.primary
+                    )
+                    settingsStatusChip(
+                        settings.isICloudSyncEnabled ? "iCloud" : "Local",
+                        systemImage: settings.isICloudSyncEnabled ? "icloud.fill" : "internaldrive.fill",
+                        color: .blue
+                    )
+                }
+            }
+        }
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+    }
+
+    private func settingsStatusChip(_ title: String, systemImage: String, color: Color) -> some View {
+        Label(title, systemImage: systemImage)
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(color)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 7)
+            .background(color.opacity(0.1), in: Capsule())
     }
 
     private var exchangeRatesSection: some View {

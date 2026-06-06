@@ -40,7 +40,7 @@ struct CashFlowView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                PageHeader(title: "Cash Flow", subtitle: "Track your income and expenses") {
+                PageHeader(title: "Cash flow", subtitle: "Understand what comes in and where it goes.") {
                     Menu {
                         Button {
                             showingAddTransaction = true
@@ -55,10 +55,13 @@ struct CashFlowView: View {
                         }
                     } label: {
                         Image(systemName: "plus")
-                            .font(.headline)
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundStyle(.black.opacity(0.82))
+                            .frame(width: 42, height: 42)
+                            .background(WCColor.primary.gradient, in: Circle())
+                            .shadow(color: WCColor.primary.opacity(0.24), radius: 10, y: 5)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(WCColor.primary)
+                    .buttonStyle(.plain)
                 }
 
                 summaryCards
@@ -92,20 +95,18 @@ struct CashFlowView: View {
     private var summaryCards: some View {
         let cashFlow = finance.monthlyCashFlow(for: Date())
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            MetricCard(title: "Monthly Income", value: settings.privateCurrency(cashFlow.monthlyIncome), systemImage: "arrow.up.right", accent: WCColor.primary)
-            MetricCard(title: "Monthly Expenses", value: settings.privateCurrency(cashFlow.monthlyExpenses), systemImage: "arrow.down.right", accent: WCColor.destructive)
-            MetricCard(title: "Net Savings", value: settings.privateCurrency(cashFlow.netSavings), systemImage: "wallet.pass", accent: cashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive)
-            MetricCard(title: "Savings Rate", value: settings.isPrivacyMode ? "****" : "\(cashFlow.savingsRate.formatted(.number.precision(.fractionLength(1))))%", systemImage: "percent")
+            MetricCard(title: "Monthly Income", value: settings.privateCurrency(cashFlow.monthlyIncome), systemImage: "arrow.down.left", accent: WCColor.primary, detail: "This month")
+            MetricCard(title: "Monthly Expenses", value: settings.privateCurrency(cashFlow.monthlyExpenses), systemImage: "arrow.up.right", accent: WCColor.destructive, detail: "This month")
+            MetricCard(title: "Net Savings", value: settings.privateCurrency(cashFlow.netSavings), systemImage: "wallet.pass.fill", accent: cashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive, detail: "Income less expenses")
+            MetricCard(title: "Savings Rate", value: settings.isPrivacyMode ? "****" : "\(cashFlow.savingsRate.formatted(.number.precision(.fractionLength(1))))%", systemImage: "percent", detail: "Of monthly income")
         }
     }
 
     private var analytics: some View {
         FinanceCard {
             VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Text("Analytics")
-                        .font(.headline)
-                        .foregroundStyle(.white)
+                HStack(alignment: .top) {
+                    SectionHeading("Spending analytics", subtitle: "Expenses grouped by category")
                     Spacer()
                     Picker("Period", selection: $period) {
                         ForEach(AnalyticsPeriod.allCases) { item in
@@ -155,10 +156,8 @@ struct CashFlowView: View {
     private var recurringTransactions: some View {
         FinanceCard {
             VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Text("Recurring Transactions")
-                        .font(.headline)
-                        .foregroundStyle(.white)
+                HStack(alignment: .top) {
+                    SectionHeading("Recurring Transactions", subtitle: "Automatic income and expenses")
                     Spacer()
                     Button {
                         recurringEditor = RecurringTransactionEditor(schedule: nil)
@@ -195,81 +194,86 @@ struct CashFlowView: View {
     }
 
     private func recurringTransactionRow(_ schedule: RecurringTransaction) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: schedule.type == .income ? "arrow.up.right.circle.fill" : "arrow.down.right.circle.fill")
-                .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
-                .font(.title3)
+        InsetFinanceRow {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: schedule.type == .income ? "arrow.down.left" : "arrow.up.right")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
+                    .frame(width: 34, height: 34)
+                    .background(
+                        (schedule.type == .income ? WCColor.primary : WCColor.destructive).opacity(0.11),
+                        in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    )
 
-            VStack(alignment: .leading, spacing: 5) {
-                HStack(spacing: 6) {
-                    Text(schedule.category)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.white)
-                    Image(systemName: schedule.notificationsEnabled ? "bell.fill" : "bell.slash")
-                        .font(.caption2)
-                        .foregroundStyle(WCColor.textSecondary)
-                }
+                VStack(alignment: .leading, spacing: 5) {
+                    HStack(spacing: 6) {
+                        Text(schedule.category)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Image(systemName: schedule.notificationsEnabled ? "bell.fill" : "bell.slash")
+                            .font(.caption2)
+                            .foregroundStyle(WCColor.textSecondary)
+                    }
 
-                Text(schedule.frequency.title)
-                    .font(.caption)
-                    .foregroundStyle(WCColor.textSecondary)
-
-                if schedule.isCompleted {
-                    Text("Completed")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(WCColor.primary)
-                } else if schedule.isActive {
-                    Text("Next: \(schedule.nextDueDate.formatted(date: .abbreviated, time: .shortened))")
+                    Text(schedule.frequency.title)
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
-                } else {
-                    Text("Paused")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(WCColor.warning)
-                }
-            }
 
-            Spacer()
-
-            VStack(alignment: .trailing, spacing: 9) {
-                let prefix = schedule.type == .income ? "+" : "-"
-                Text("\(prefix)\(settings.privateCurrency(schedule.amount))")
-                    .font(.subheadline.monospacedDigit().weight(.bold))
-                    .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
-
-                HStack(spacing: 14) {
-                    if !schedule.isCompleted {
-                        Button {
-                            activeAlert = .finishRecurringTransaction(schedule)
-                        } label: {
-                            Image(systemName: "checkmark")
-                        }
-                        .accessibilityLabel("Finish schedule")
-
-                        Button {
-                            toggleRecurringTransaction(schedule)
-                        } label: {
-                            Image(systemName: schedule.isActive ? "pause.fill" : "play.fill")
-                        }
-                        .accessibilityLabel(schedule.isActive ? "Pause schedule" : "Resume schedule")
+                    if schedule.isCompleted {
+                        Text("Completed")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(WCColor.primary)
+                    } else if schedule.isActive {
+                        Text("Next: \(schedule.nextDueDate.formatted(date: .abbreviated, time: .shortened))")
+                            .font(.caption)
+                            .foregroundStyle(WCColor.textSecondary)
                     } else {
-                        Image(systemName: "checkmark.circle.fill")
-                            .accessibilityLabel("Schedule completed")
+                        Text("Paused")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(WCColor.warning)
                     }
-
-                    Button {
-                        recurringEditor = RecurringTransactionEditor(schedule: schedule)
-                    } label: {
-                        Image(systemName: "pencil")
-                    }
-                    .accessibilityLabel("Edit schedule")
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(WCColor.primary)
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 9) {
+                    let prefix = schedule.type == .income ? "+" : "-"
+                    Text("\(prefix)\(settings.privateCurrency(schedule.amount))")
+                        .font(.subheadline.monospacedDigit().weight(.bold))
+                        .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
+
+                    HStack(spacing: 14) {
+                        if !schedule.isCompleted {
+                            Button {
+                                activeAlert = .finishRecurringTransaction(schedule)
+                            } label: {
+                                Image(systemName: "checkmark")
+                            }
+                            .accessibilityLabel("Finish schedule")
+
+                            Button {
+                                toggleRecurringTransaction(schedule)
+                            } label: {
+                                Image(systemName: schedule.isActive ? "pause.fill" : "play.fill")
+                            }
+                            .accessibilityLabel(schedule.isActive ? "Pause schedule" : "Resume schedule")
+                        } else {
+                            Image(systemName: "checkmark.circle.fill")
+                                .accessibilityLabel("Schedule completed")
+                        }
+
+                        Button {
+                            recurringEditor = RecurringTransactionEditor(schedule: schedule)
+                        } label: {
+                            Image(systemName: "pencil")
+                        }
+                        .accessibilityLabel("Edit schedule")
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(WCColor.primary)
+                }
             }
         }
-        .padding(12)
-        .background(WCColor.cardElevated, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
     private var transactions: some View {
@@ -386,41 +390,46 @@ struct CashFlowView: View {
     }
 
     private func transactionRow(_ transaction: Transaction) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: transaction.type == .income ? "arrow.up.right.circle.fill" : "arrow.down.right.circle.fill")
-                .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
-                .font(.title3)
+        InsetFinanceRow {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: transaction.type == .income ? "arrow.down.left" : "arrow.up.right")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
+                    .frame(width: 34, height: 34)
+                    .background(
+                        (transaction.type == .income ? WCColor.primary : WCColor.destructive).opacity(0.11),
+                        in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    )
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
-                    Text(transaction.category)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.white)
-                    if transaction.recurringTransactionID != nil {
-                        Image(systemName: "repeat")
-                            .font(.caption2)
-                            .foregroundStyle(WCColor.primary)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Text(transaction.category)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.white)
+                        if transaction.recurringTransactionID != nil {
+                            Image(systemName: "repeat")
+                                .font(.caption2)
+                                .foregroundStyle(WCColor.primary)
+                        }
+                        Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
+                            .font(.caption)
+                            .foregroundStyle(WCColor.textSecondary)
                     }
-                    Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
-                        .font(.caption)
-                        .foregroundStyle(WCColor.textSecondary)
+                    if !transaction.description.isEmpty {
+                        Text(transaction.description)
+                            .font(.caption)
+                            .foregroundStyle(WCColor.textSecondary)
+                    }
                 }
-                if !transaction.description.isEmpty {
-                    Text(transaction.description)
-                        .font(.caption)
-                        .foregroundStyle(WCColor.textSecondary)
-                }
+
+                Spacer()
+
+                let prefix = transaction.type == .income ? "+" : "-"
+                Text("\(prefix)\(settings.privateCurrency(transaction.amount))")
+                    .font(.subheadline.monospacedDigit().weight(.bold))
+                    .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
             }
-
-            Spacer()
-
-            let prefix = transaction.type == .income ? "+" : "-"
-            Text("\(prefix)\(settings.privateCurrency(transaction.amount))")
-                .font(.subheadline.monospacedDigit().weight(.bold))
-                .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
         }
-        .padding(12)
-        .background(WCColor.cardElevated, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
     private func saveRecurringTransaction(_ schedule: RecurringTransaction) {

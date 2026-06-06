@@ -10,16 +10,11 @@ struct CryptoView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                PageHeader(title: "Crypto Assets", subtitle: "Manage your cryptocurrency holdings") {
-                    Button {
+                PageHeader(title: "Crypto assets", subtitle: "Track holdings, allocation, and performance.") {
+                    PrimaryActionButton(systemImage: "plus", accessibilityLabel: "Add Crypto Holding") {
                         editingHolding = nil
                         showingForm = true
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.headline)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(WCColor.primary)
                 }
 
                 summary
@@ -55,26 +50,23 @@ struct CryptoView: View {
         let percent = costBasis > 0 ? (gain / costBasis) * 100 : 0
 
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            MetricCard(title: "Crypto Value", value: settings.privateCurrency(total), systemImage: "bitcoinsign.circle", accent: WCColor.warning)
-            MetricCard(title: "Holdings", value: settings.isPrivacyMode ? "****" : "\(finance.data.crypto.count)", systemImage: "number")
-            MetricCard(title: "Cost Basis", value: settings.privateCurrency(costBasis), systemImage: "banknote")
-            MetricCard(title: "Profit / Loss", value: settings.privateCurrency(gain), systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right", accent: gain >= 0 ? WCColor.primary : WCColor.destructive)
-
-            if !settings.isPrivacyMode {
-                Text("Performance \(percent.formatted(.number.precision(.fractionLength(1))))%")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(gain >= 0 ? WCColor.primary : WCColor.destructive)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
+            MetricCard(title: "Crypto Value", value: settings.privateCurrency(total), systemImage: "bitcoinsign.circle.fill", accent: WCColor.warning, detail: "Current market value")
+            MetricCard(title: "Holdings", value: settings.isPrivacyMode ? "****" : "\(finance.data.crypto.count)", systemImage: "square.stack.3d.up.fill", detail: "Tracked assets")
+            MetricCard(title: "Cost Basis", value: settings.privateCurrency(costBasis), systemImage: "banknote.fill", detail: "Capital invested")
+            MetricCard(
+                title: "Profit / Loss",
+                value: settings.privateCurrency(gain),
+                systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
+                accent: gain >= 0 ? WCColor.primary : WCColor.destructive,
+                detail: settings.isPrivacyMode ? "Performance hidden" : "\(percent.formatted(.number.precision(.fractionLength(1))))% performance"
+            )
         }
     }
 
     private var holdingsList: some View {
         FinanceCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Crypto Holdings")
-                    .font(.headline)
-                    .foregroundStyle(.white)
+                SectionHeading("Crypto holdings", subtitle: "Tap a holding to edit its details")
 
                 if finance.data.crypto.isEmpty {
                     EmptyState(title: "No crypto holdings yet", systemImage: "bitcoinsign.circle")
@@ -106,42 +98,49 @@ struct CryptoView: View {
     }
 
     private func holdingRow(_ holding: CryptoHolding) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 8) {
-                    Text(holding.symbol)
-                        .font(.headline.monospaced())
-                        .foregroundStyle(.white)
-                    Text(holding.name)
+        InsetFinanceRow {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "bitcoinsign")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(WCColor.warning)
+                    .frame(width: 38, height: 38)
+                    .background(WCColor.warning.opacity(0.11), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 8) {
+                        Text(holding.symbol)
+                            .font(.headline.monospaced())
+                            .foregroundStyle(.white)
+                        Text(holding.name)
+                            .font(.caption)
+                            .foregroundStyle(WCColor.textSecondary)
+                            .lineLimit(1)
+                    }
+                    Text("\(settings.privateNumber(holding.quantity, fractionDigits: 8)) units")
+                        .font(.caption)
+                        .foregroundStyle(WCColor.textSecondary)
+                    Text("\(settings.privateCurrency(holding.currentPrice, sourceCurrency: holding.currency)) / unit")
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
                 }
-                Text("\(settings.privateNumber(holding.quantity, fractionDigits: 8)) units")
-                    .font(.caption)
-                    .foregroundStyle(WCColor.textSecondary)
-                Text("\(settings.privateCurrency(holding.currentPrice, sourceCurrency: holding.currency)) / unit")
-                    .font(.caption)
-                    .foregroundStyle(WCColor.textSecondary)
-            }
 
-            Spacer()
+                Spacer()
 
-            VStack(alignment: .trailing, spacing: 4) {
-                Text(settings.privateCurrency(holding.currentValue, sourceCurrency: holding.currency))
-                    .font(.subheadline.monospacedDigit().weight(.bold))
-                    .foregroundStyle(.white)
-                ValueDelta(
-                    value: holding.gainLoss,
-                    formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
-                    percent: holding.gainLossPercent
-                )
-                Text("Updated \(holding.updatedAt.formatted(date: .abbreviated, time: .omitted))")
-                    .font(.caption2)
-                    .foregroundStyle(WCColor.textSecondary)
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text(settings.privateCurrency(holding.currentValue, sourceCurrency: holding.currency))
+                        .font(.subheadline.monospacedDigit().weight(.bold))
+                        .foregroundStyle(.white)
+                    ValueDelta(
+                        value: holding.gainLoss,
+                        formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
+                        percent: holding.gainLossPercent
+                    )
+                    Text("Updated \(holding.updatedAt.formatted(date: .abbreviated, time: .omitted))")
+                        .font(.caption2)
+                        .foregroundStyle(WCColor.textSecondary)
+                }
             }
         }
-        .padding(12)
-        .background(WCColor.cardElevated, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .contentShape(Rectangle())
         .onTapGesture {
             editingHolding = holding
