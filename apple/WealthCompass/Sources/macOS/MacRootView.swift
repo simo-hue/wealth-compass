@@ -101,6 +101,8 @@ struct MacRootView: View {
             MacInvestmentsView()
         case .crypto:
             MacCryptoView()
+        case .settings:
+            MacSettingsView()
         }
     }
 

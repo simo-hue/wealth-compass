@@ -261,3 +261,17 @@ Forced mobile devices (iOS/Android) to exclusively show the numeric keypad (nump
 1.  **Input Component (`src/components/ui/input.tsx`)**
     -   Automatically applied `inputMode="decimal"` to all input elements where `type="number"`.
     -   This prevents the standard alphanumeric keyboard from appearing when focusing on number fields, streamlining data entry for the financial application.
+
+# macOS Settings Sidebar Link (June 06, 2026)
+
+## Overview
+Added a dedicated Settings link to the main navigation sidebar in the macOS app implementation.
+
+## Changes
+1.  **MacAppModel (`MacDestination`)**
+    -   Added `.settings` enum case.
+    -   Configured title as "Settings" and system icon as `gear`.
+    -   Mapped selection to `.transaction` editor default appropriately.
+
+2.  **MacRootView**
+    -   Added `case .settings:` in the `detail` view builder to render `MacSettingsView()`.

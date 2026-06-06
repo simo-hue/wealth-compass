@@ -5,6 +5,7 @@ enum MacDestination: String, CaseIterable, Identifiable {
     case cashFlow
     case investments
     case crypto
+    case settings
 
     var id: String { rawValue }
 
@@ -14,6 +15,7 @@ enum MacDestination: String, CaseIterable, Identifiable {
         case .cashFlow: "Cash Flow"
         case .investments: "Investments"
         case .crypto: "Crypto"
+        case .settings: "Settings"
         }
     }
 
@@ -23,6 +25,7 @@ enum MacDestination: String, CaseIterable, Identifiable {
         case .cashFlow: "arrow.left.arrow.right"
         case .investments: "chart.line.uptrend.xyaxis"
         case .crypto: "bitcoinsign.circle"
+        case .settings: "gear"
         }
     }
 }
@@ -55,7 +58,7 @@ final class MacAppModel: ObservableObject {
             editor = .investment(nil)
         case .crypto:
             editor = .crypto(nil)
-        case .dashboard, .cashFlow, nil:
+        case .dashboard, .cashFlow, .settings, nil:
             editor = .transaction
         }
     }

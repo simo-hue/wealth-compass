@@ -377,6 +377,13 @@ struct MacDashboardView: View {
                     tint: WCColor.warning
                 )
                 PositionMetricCard(
+                    title: "Total Assets",
+                    value: settings.privateCurrency(totals.totalAssets),
+                    detail: "Liquidity, investments & crypto",
+                    systemImage: "building.columns.fill",
+                    tint: .indigo
+                )
+                PositionMetricCard(
                     title: "Liabilities",
                     value: settings.privateCurrency(totals.totalLiabilities),
                     detail: countLabel(finance.data.liabilities.count, singular: "liability"),
