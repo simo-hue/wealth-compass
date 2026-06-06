@@ -265,24 +265,10 @@ struct MacSettingsView: View {
 
     private var syncSettings: some View {
         Form {
-            Section("Status") {
-                LabeledContent("iCloud Sync", value: "Not Configured")
-                LabeledContent("Local Database", value: "Active")
-            }
-
-            Section("Planned Architecture") {
-                Text(
-                    "The app now stores data behind a shared persistence interface. "
-                        + "CloudKit sync can be added without changing the iPhone or Mac interfaces."
-                )
-                Text(
-                    "The production sync layer should use one CloudKit record per transaction, "
-                        + "holding, liability, recurring schedule, and snapshot so edits can merge safely."
-                )
-            }
-
-            Section {
-                Text("An iCloud container and App Store provisioning profile are required before sync can be enabled.")
+            Section("iCloud") {
+                Toggle("Sync Data with iCloud", isOn: $settings.isICloudSyncEnabled)
+                
+                Text("Your financial data is saved locally by default. When enabled, it securely syncs across your devices using iCloud Documents.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

@@ -80,6 +80,7 @@ final class FinanceStore: ObservableObject {
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
     private var lastMarketPriceRefreshAttemptAt: Date?
+    private var metadataQuery: NSMetadataQuery?
 
     init(persistence: FinancePersistence = LocalFinancePersistence()) {
         self.persistence = persistence
@@ -91,6 +92,7 @@ final class FinanceStore: ObservableObject {
         decoder.dateDecodingStrategy = .iso8601
 
         load()
+        setupICloudObserver()
     }
 
     var transactions: [Transaction] {
@@ -673,6 +675,45 @@ final class FinanceStore: ObservableObject {
             data = try persistence.load() ?? FinancialData()
         } catch {
             data = FinancialData()
+        }
+    }
+
+    private func setupICloudObserver() {
+        NotificationCenter.default.addObserver(
+            forName: UserDefaults.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateICloudObserverState()
+        }
+        updateICloudObserverState()
+    }
+
+    private func updateICloudObserverState() {
+        let isEnabled = UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
+        
+        if isEnabled, metadataQuery == nil {
+            let query = NSMetadataQuery()
+            query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
+            query.predicate = NSPredicate(format: "%K == %@", NSMetadataItemFSNameKey, "wealth-compass-local-data.json")
+            
+            NotificationCenter.default.addObserver(
+                forName: .NSMetadataQueryDidUpdate,
+                object: query,
+                queue: .main
+            ) { [weak self] _ in
+                self?.load()
+            }
+            
+            query.start()
+            metadataQuery = query
+            
+            // Trigger an initial load in case iCloud data was downloaded while the query was off
+            load()
+        } else if !isEnabled, let query = metadataQuery {
+            query.stop()
+            NotificationCenter.default.removeObserver(self, name: .NSMetadataQueryDidUpdate, object: query)
+            metadataQuery = nil
         }
     }
 

@@ -13,6 +13,10 @@ final class AppSettings: ObservableObject {
         didSet { userDefaults.set(isPrivacyMode, forKey: Keys.privacyMode) }
     }
 
+    @Published var isICloudSyncEnabled: Bool {
+        didSet { userDefaults.set(isICloudSyncEnabled, forKey: Keys.iCloudSyncEnabled) }
+    }
+
     @Published private(set) var customIncomeCategories: [String] = [] {
         didSet { saveStringArray(customIncomeCategories, key: Keys.customIncomeCategories) }
     }
@@ -34,6 +38,7 @@ final class AppSettings: ObservableObject {
         static let customIncomeCategories = "wc_mobile_custom_income_categories"
         static let customExpenseCategories = "wc_mobile_custom_expense_categories"
         static let exchangeRateSnapshot = "wc_mobile_exchange_rate_snapshot"
+        static let iCloudSyncEnabled = "wc_mobile_icloud_sync_enabled"
     }
 
     init(userDefaults: UserDefaults = .standard) {
@@ -43,6 +48,7 @@ final class AppSettings: ObservableObject {
             .flatMap(Currency.init(rawValue:)) ?? .eur
         currency = storedCurrency
         isPrivacyMode = userDefaults.bool(forKey: Keys.privacyMode)
+        isICloudSyncEnabled = userDefaults.bool(forKey: Keys.iCloudSyncEnabled)
         customIncomeCategories = Self.loadStringArray(key: Keys.customIncomeCategories, userDefaults: userDefaults)
         customExpenseCategories = Self.loadStringArray(key: Keys.customExpenseCategories, userDefaults: userDefaults)
 
