@@ -67,6 +67,7 @@ struct ContentView: View {
     }
 
     private func handleAppBecameActive() async {
+        await finance.refreshICloudSyncIfNeeded()
         await processRecurringTransactions()
         await refreshRemoteDataIfNeeded()
     }

@@ -76,24 +76,52 @@ final class FinanceStore: ObservableObject {
     @Published private(set) var data = FinancialData()
     @Published private(set) var isRefreshingMarketPrices = false
     @Published private(set) var iCloudSyncError: String?
+    @Published private(set) var cloudSyncStatus: CloudSyncStatus = .disabled
 
     private let persistence: FinancePersistence
     private let encoder: JSONEncoder
-    private let decoder: JSONDecoder
+    private let syncMetadataStore: CloudSyncMetadataStore
+    private weak var settings: AppSettings?
+    private var persistedData = FinancialData()
+    private var localPersistenceError: Error?
     private var lastMarketPriceRefreshAttemptAt: Date?
-    private var metadataQuery: NSMetadataQuery?
 
-    init(persistence: FinancePersistence = LocalFinancePersistence()) {
+    private lazy var cloudSyncService = CloudKitSyncService(
+        metadataStore: syncMetadataStore,
+        snapshotProvider: { [weak self] in
+            guard let self else { return [:] }
+            return try self.data.cloudSyncRecords()
+        },
+        remoteMutationHandler: { [weak self] mutations in
+            guard let self else { return [] }
+            return try self.applyRemoteMutations(mutations)
+        },
+        statusHandler: { [weak self] status in
+            self?.updateCloudSyncStatus(status)
+        },
+        disableHandler: { [weak self] in
+            self?.settings?.isICloudSyncEnabled = false
+        }
+    )
+
+    init(
+        persistence: FinancePersistence = LocalFinancePersistence(),
+        settings: AppSettings? = nil,
+        syncMetadataStore: CloudSyncMetadataStore = CloudSyncMetadataStore()
+    ) {
         self.persistence = persistence
-        encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        encoder.dateEncodingStrategy = .iso8601
-
-        decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
+        self.settings = settings
+        self.syncMetadataStore = syncMetadataStore
+        encoder = FinanceJSONCoding.makeEncoder(prettyPrinted: true)
 
         load()
-        setupICloudObserver()
+        let isSyncEnabled = settings?.isICloudSyncEnabled
+            ?? UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
+        if isSyncEnabled {
+            Task { [weak self] in
+                await self?.setICloudSyncEnabled(true, userInitiated: false)
+            }
+        }
     }
 
     var transactions: [Transaction] {
@@ -136,10 +164,12 @@ final class FinanceStore: ObservableObject {
     }
 
     func upsertRecurringTransaction(_ recurringTransaction: RecurringTransaction) {
-        if let index = data.recurringTransactions.firstIndex(where: { $0.id == recurringTransaction.id }) {
-            data.recurringTransactions[index] = recurringTransaction
+        var updated = recurringTransaction
+        updated.updatedAt = Date()
+        if let index = data.recurringTransactions.firstIndex(where: { $0.id == updated.id }) {
+            data.recurringTransactions[index] = updated
         } else {
-            data.recurringTransactions.append(recurringTransaction)
+            data.recurringTransactions.append(updated)
         }
         save()
     }
@@ -266,10 +296,12 @@ final class FinanceStore: ObservableObject {
     }
 
     func upsertInvestment(_ investment: Investment, settings: AppSettings) {
-        if let index = data.investments.firstIndex(where: { $0.id == investment.id }) {
-            data.investments[index] = investment
+        var updated = investment
+        updated.updatedAt = Date()
+        if let index = data.investments.firstIndex(where: { $0.id == updated.id }) {
+            data.investments[index] = updated
         } else {
-            data.investments.append(investment)
+            data.investments.append(updated)
         }
         appendSnapshot(settings: settings)
         save()
@@ -282,10 +314,12 @@ final class FinanceStore: ObservableObject {
     }
 
     func upsertCrypto(_ holding: CryptoHolding, settings: AppSettings) {
-        if let index = data.crypto.firstIndex(where: { $0.id == holding.id }) {
-            data.crypto[index] = holding
+        var updated = holding
+        updated.updatedAt = Date()
+        if let index = data.crypto.firstIndex(where: { $0.id == updated.id }) {
+            data.crypto[index] = updated
         } else {
-            data.crypto.append(holding)
+            data.crypto.append(updated)
         }
         appendSnapshot(settings: settings)
         save()
@@ -579,11 +613,7 @@ final class FinanceStore: ObservableObject {
 
     func clearData() {
         data = FinancialData()
-        do {
-            try persistence.clear()
-        } catch {
-            assertionFailure("Failed to clear local finance data: \(error)")
-        }
+        save()
     }
 
     func exportBackupURL() throws -> URL {
@@ -676,95 +706,48 @@ final class FinanceStore: ObservableObject {
             let loadedData = try persistence.load() ?? FinancialData()
             withAnimation {
                 self.data = loadedData
+                self.persistedData = loadedData
+                self.localPersistenceError = nil
                 self.iCloudSyncError = nil
+            }
+
+            do {
+                let records = try loadedData.cloudSyncRecords()
+                try syncMetadataStore.reconcileLocalInventory(records)
+            } catch {
+                iCloudSyncError = "Local data loaded, but iCloud sync metadata could not be prepared. \(error.localizedDescription)"
+                cloudSyncStatus = .error(iCloudSyncError ?? error.localizedDescription)
             }
         } catch {
             withAnimation {
-                self.data = FinancialData()
+                self.localPersistenceError = error
                 self.iCloudSyncError = error.localizedDescription
+                self.cloudSyncStatus = .error(
+                    "The local database could not be loaded. The original file was left untouched. \(error.localizedDescription)"
+                )
             }
-        }
-    }
-
-    private func setupICloudObserver() {
-        NotificationCenter.default.addObserver(
-            forName: UserDefaults.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.updateICloudObserverState()
-        }
-        
-        NotificationCenter.default.addObserver(
-            forName: .NSUbiquityIdentityDidChange,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.handleUbiquityIdentityChange()
-        }
-        
-        updateICloudObserverState()
-        handleUbiquityIdentityChange()
-    }
-
-    private func handleUbiquityIdentityChange() {
-        if FileManager.default.ubiquityIdentityToken == nil {
-            let isEnabled = UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
-            if isEnabled {
-                UserDefaults.standard.set(false, forKey: "wc_mobile_icloud_sync_enabled")
-                self.iCloudSyncError = "iCloud session expired or user logged out. Sync disabled."
-            }
-        }
-    }
-
-    private func updateICloudObserverState() {
-        let isEnabled = UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
-        
-        if isEnabled, metadataQuery == nil {
-            let query = NSMetadataQuery()
-            query.searchScopes = [NSMetadataQueryUbiquitousDataScope]
-            query.predicate = NSPredicate(format: "%K == %@", NSMetadataItemFSNameKey, "wealth-compass-local-data.json")
-            
-            NotificationCenter.default.addObserver(
-                forName: .NSMetadataQueryDidUpdate,
-                object: query,
-                queue: .main
-            ) { [weak self] notification in
-                guard let query = notification.object as? NSMetadataQuery else { return }
-                query.disableUpdates()
-                defer { query.enableUpdates() }
-                
-                if let item = query.results.first as? NSMetadataItem {
-                    let status = item.value(forAttribute: NSMetadataUbiquitousItemDownloadingStatusKey) as? String
-                    if status == NSMetadataUbiquitousItemDownloadingStatusCurrent {
-                        self?.load()
-                    } else if status == NSMetadataUbiquitousItemDownloadingStatusNotDownloaded {
-                        if let url = item.value(forAttribute: NSMetadataItemURLKey) as? URL {
-                            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
-                        }
-                    }
-                } else {
-                    // Item not found in results, maybe it was deleted or doesn't exist yet
-                    self?.load()
-                }
-            }
-            
-            query.start()
-            metadataQuery = query
-            
-            // Trigger an initial load in case iCloud data was downloaded while the query was off
-            load()
-        } else if !isEnabled, let query = metadataQuery {
-            query.stop()
-            NotificationCenter.default.removeObserver(self, name: .NSMetadataQueryDidUpdate, object: query)
-            metadataQuery = nil
         }
     }
 
     private func save() {
+        guard localPersistenceError == nil else {
+            iCloudSyncError = "Changes cannot be saved until the local database load error is resolved."
+            return
+        }
+
         do {
+            let oldRecords = try persistedData.cloudSyncRecords()
+            let newRecords = try data.cloudSyncRecords()
+            let changes = CloudSyncChangeSet.difference(from: oldRecords, to: newRecords)
             try persistence.save(data)
+            try syncMetadataStore.recordLocalChanges(changes, currentRecords: newRecords)
+            persistedData = data
             self.iCloudSyncError = nil
+            if !changes.isEmpty {
+                Task { [weak self] in
+                    await self?.cloudSyncService.localChangesRecorded()
+                }
+            }
         } catch {
             self.iCloudSyncError = error.localizedDescription
             assertionFailure("Failed to save local finance data: \(error)")
@@ -772,17 +755,71 @@ final class FinanceStore: ObservableObject {
     }
 
     func forceICloudSync() async throws {
-        do {
-            let newData = try persistence.forceICloudSync()
-            if let newData {
-                withAnimation {
-                    self.data = newData
-                    self.iCloudSyncError = nil
-                }
+        guard settings?.isICloudSyncEnabled
+            ?? UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
+        else {
+            throw CloudSyncError.notRunning
+        }
+        await cloudSyncService.synchronize()
+        switch cloudSyncStatus {
+        case .error(let message), .accountUnavailable(let message):
+            throw CloudSyncError.invalidRecord(message)
+        case .disabled, .starting, .syncing, .upToDate:
+            break
+        }
+    }
+
+    func setICloudSyncEnabled(_ isEnabled: Bool, userInitiated: Bool = true) async {
+        if isEnabled {
+            guard localPersistenceError == nil else { return }
+            await cloudSyncService.start(allowAccountReplacement: userInitiated)
+        } else {
+            await cloudSyncService.stop()
+        }
+    }
+
+    func refreshICloudSyncIfNeeded() async {
+        guard settings?.isICloudSyncEnabled
+            ?? UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
+        else {
+            return
+        }
+        await cloudSyncService.start(allowAccountReplacement: false)
+    }
+
+    private func applyRemoteMutations(
+        _ mutations: [CloudSyncRemoteMutation]
+    ) throws -> Set<CloudSyncRecordKey> {
+        guard localPersistenceError == nil else {
+            throw localPersistenceError ?? CloudSyncError.invalidRecord("The local database is unavailable.")
+        }
+
+        let applicableMutations = mutations.filter {
+            syncMetadataStore.pendingRevision(for: $0.key) == $0.expectedPendingRevision
+        }
+        guard !applicableMutations.isEmpty else { return [] }
+
+        var updatedData = data
+        try updatedData.applyCloudSyncMutations(applicableMutations)
+        updatedData = updatedData.sortedForStorage()
+        try persistence.save(updatedData)
+        withAnimation {
+            data = updatedData
+            persistedData = updatedData
+            iCloudSyncError = nil
+        }
+        return Set(applicableMutations.map(\.key))
+    }
+
+    private func updateCloudSyncStatus(_ status: CloudSyncStatus) {
+        cloudSyncStatus = status
+        switch status {
+        case .error(let message), .accountUnavailable(let message):
+            iCloudSyncError = message
+        case .disabled, .starting, .syncing, .upToDate:
+            if localPersistenceError == nil {
+                iCloudSyncError = nil
             }
-        } catch {
-            self.iCloudSyncError = error.localizedDescription
-            throw error
         }
     }
 
@@ -1652,7 +1689,7 @@ private extension Currency {
     }
 }
 
-private extension FinancialData {
+extension FinancialData {
     var hasImportableContent: Bool {
         !transactions.isEmpty || !recurringTransactions.isEmpty || !investments.isEmpty
             || !crypto.isEmpty || !liabilities.isEmpty || !snapshots.isEmpty

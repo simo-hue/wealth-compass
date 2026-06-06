@@ -69,10 +69,24 @@ struct SettingsView: View {
                         Label("Sync Data with iCloud", systemImage: "icloud")
                     }
                     .tint(WCColor.primary)
+                    .onChange(of: settings.isICloudSyncEnabled) { _, isEnabled in
+                        Task {
+                            await finance.setICloudSyncEnabled(isEnabled)
+                        }
+                    }
 
-                    Text("Your financial data is saved locally by default. When enabled, it securely syncs across your devices using iCloud Documents.")
+                    Text("Your financial data stays available locally and syncs across your devices through your private CloudKit database.")
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
+
+                    LabeledContent("Status", value: finance.cloudSyncStatus.title)
+                    if let detail = finance.cloudSyncStatus.detail {
+                        Text(detail)
+                            .font(.caption)
+                            .foregroundStyle(
+                                finance.iCloudSyncError == nil ? WCColor.textSecondary : WCColor.destructive
+                            )
+                    }
                     
                     if settings.isICloudSyncEnabled {
                         Button {
@@ -90,6 +104,7 @@ struct SettingsView: View {
                             Label("Force Sync iCloud", systemImage: "arrow.triangle.2.circlepath.icloud")
                         }
                         .tint(WCColor.primary)
+                        .disabled(finance.cloudSyncStatus.isBusy)
                     }
                 }
 
