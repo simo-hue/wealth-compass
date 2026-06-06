@@ -3,10 +3,16 @@ import SwiftUI
 @main
 struct WealthCompassMacApp: App {
     @NSApplicationDelegateAdaptor(MacAppDelegate.self) private var appDelegate
-    @StateObject private var finance = FinanceStore()
-    @StateObject private var settings = AppSettings()
+    @StateObject private var finance: FinanceStore
+    @StateObject private var settings: AppSettings
     @StateObject private var appModel = MacAppModel()
     @StateObject private var appLock = MacAppLockStore()
+
+    init() {
+        let settings = AppSettings()
+        _settings = StateObject(wrappedValue: settings)
+        _finance = StateObject(wrappedValue: FinanceStore(settings: settings))
+    }
 
     var body: some Scene {
         WindowGroup {

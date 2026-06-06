@@ -267,10 +267,22 @@ struct MacSettingsView: View {
         Form {
             Section("iCloud") {
                 Toggle("Sync Data with iCloud", isOn: $settings.isICloudSyncEnabled)
+                    .onChange(of: settings.isICloudSyncEnabled) { _, isEnabled in
+                        Task {
+                            await finance.setICloudSyncEnabled(isEnabled)
+                        }
+                    }
                 
-                Text("Your financial data is saved locally by default. When enabled, it securely syncs across your devices using iCloud Documents.")
+                Text("Your financial data stays available locally and syncs across your devices through your private CloudKit database.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+
+                LabeledContent("Status", value: finance.cloudSyncStatus.title)
+                if let detail = finance.cloudSyncStatus.detail {
+                    Text(detail)
+                        .font(.caption)
+                        .foregroundStyle(finance.iCloudSyncError == nil ? Color.secondary : Color.red)
+                }
             }
             
             if settings.isICloudSyncEnabled {
@@ -289,6 +301,7 @@ struct MacSettingsView: View {
                     } label: {
                         Label("Force Sync iCloud", systemImage: "arrow.triangle.2.circlepath.icloud")
                     }
+                    .disabled(finance.cloudSyncStatus.isBusy)
                 }
             }
         }
