@@ -33,10 +33,7 @@ struct CashFlowView: View {
     @State private var period: AnalyticsPeriod = .thirtyDays
     @State private var transactionPeriod: AnalyticsPeriod = .thirtyDays
     @State private var transactionTypeFilter: TransactionListTypeFilter = .all
-    @State private var transactionPendingDeletion: Transaction?
-    @State private var recurringTransactionPendingDeletion: RecurringTransaction?
-    @State private var recurringTransactionPendingCompletion: RecurringTransaction?
-    @State private var recurringFeatureAlert: RecurringFeatureAlert?
+    @State private var activeAlert: CashFlowAlert?
 
     private let transactionDisplayLimit = 40
 
@@ -89,49 +86,7 @@ struct CashFlowView: View {
                 saveRecurringTransaction(schedule)
             }
         }
-        .alert(item: $transactionPendingDeletion) { transaction in
-            Alert(
-                title: Text("Delete Transaction?"),
-                message: Text("This permanently removes the \(transaction.category) transaction from \(transaction.date.formatted(date: .abbreviated, time: .omitted))."),
-                primaryButton: .destructive(Text("Delete")) {
-                    finance.deleteTransaction(transaction, settings: settings)
-                },
-                secondaryButton: .cancel()
-            )
-        }
-        .alert(item: $recurringTransactionPendingDeletion) { schedule in
-            Alert(
-                title: Text("Delete Recurring Transaction?"),
-                message: Text("Future \(schedule.frequency.title.lowercased()) occurrences for \(schedule.category) will no longer be created."),
-                primaryButton: .destructive(Text("Delete")) {
-                    finance.deleteRecurringTransaction(schedule)
-                    Task {
-                        await RecurringTransactionNotificationService.shared.cancel(scheduleID: schedule.id)
-                    }
-                },
-                secondaryButton: .cancel()
-            )
-        }
-        .alert(item: $recurringTransactionPendingCompletion) { schedule in
-            Alert(
-                title: Text("Finish Recurring Transaction?"),
-                message: Text(
-                    "\(schedule.category) will be marked as completed. "
-                        + "No future occurrences will be added, and this action cannot be resumed."
-                ),
-                primaryButton: .default(Text("Finish")) {
-                    completeRecurringTransaction(schedule)
-                },
-                secondaryButton: .cancel()
-            )
-        }
-        .alert(item: $recurringFeatureAlert) { alert in
-            Alert(
-                title: Text(alert.title),
-                message: Text(alert.message),
-                dismissButton: .default(Text("OK"))
-            )
-        }
+        .alert(item: $activeAlert, content: alert(for:))
     }
 
     private var summaryCards: some View {
@@ -223,7 +178,7 @@ struct CashFlowView: View {
                             recurringTransactionRow(schedule)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
-                                        recurringTransactionPendingDeletion = schedule
+                                        activeAlert = .deleteRecurringTransaction(schedule)
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }
@@ -285,7 +240,7 @@ struct CashFlowView: View {
                 HStack(spacing: 14) {
                     if !schedule.isCompleted {
                         Button {
-                            recurringTransactionPendingCompletion = schedule
+                            activeAlert = .finishRecurringTransaction(schedule)
                         } label: {
                             Image(systemName: "checkmark")
                         }
@@ -333,7 +288,7 @@ struct CashFlowView: View {
                             transactionRow(transaction)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
-                                        transactionPendingDeletion = transaction
+                                        activeAlert = .deleteTransaction(transaction)
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }
@@ -476,7 +431,7 @@ struct CashFlowView: View {
                 let authorized = await RecurringTransactionNotificationService.shared.requestAuthorization()
                 if !authorized {
                     finance.setRecurringNotificationsEnabled(id: schedule.id, isEnabled: false)
-                    recurringFeatureAlert = RecurringFeatureAlert(
+                    activeAlert = .message(
                         title: "Notifications Disabled",
                         message: "The schedule was saved, but notifications are not authorized. You can enable them in iOS Settings and then edit this schedule."
                     )
@@ -505,6 +460,59 @@ struct CashFlowView: View {
             showAmounts: !settings.isPrivacyMode
         )
     }
+
+    private func alert(for alert: CashFlowAlert) -> Alert {
+        switch alert {
+        case .deleteTransaction(let transaction):
+            return Alert(
+                title: Text("Delete Transaction?"),
+                message: Text(
+                    "This permanently removes the \(transaction.category) transaction from "
+                        + "\(transaction.date.formatted(date: .abbreviated, time: .omitted))."
+                ),
+                primaryButton: .destructive(Text("Delete")) {
+                    finance.deleteTransaction(transaction, settings: settings)
+                },
+                secondaryButton: .cancel()
+            )
+
+        case .deleteRecurringTransaction(let schedule):
+            return Alert(
+                title: Text("Delete Recurring Transaction?"),
+                message: Text(
+                    "Future \(schedule.frequency.title.lowercased()) occurrences for "
+                        + "\(schedule.category) will no longer be created."
+                ),
+                primaryButton: .destructive(Text("Delete")) {
+                    finance.deleteRecurringTransaction(schedule)
+                    Task {
+                        await RecurringTransactionNotificationService.shared.cancel(scheduleID: schedule.id)
+                    }
+                },
+                secondaryButton: .cancel()
+            )
+
+        case .finishRecurringTransaction(let schedule):
+            return Alert(
+                title: Text("Finish Recurring Transaction?"),
+                message: Text(
+                    "\(schedule.category) will disappear from Recurring Transactions and "
+                        + "no future occurrences will be inserted automatically."
+                ),
+                primaryButton: .default(Text("Yes")) {
+                    completeRecurringTransaction(schedule)
+                },
+                secondaryButton: .cancel()
+            )
+
+        case .message(let title, let message):
+            return Alert(
+                title: Text(title),
+                message: Text(message),
+                dismissButton: .default(Text("OK"))
+            )
+        }
+    }
 }
 
 private struct RecurringTransactionEditor: Identifiable {
@@ -512,8 +520,22 @@ private struct RecurringTransactionEditor: Identifiable {
     let schedule: RecurringTransaction?
 }
 
-private struct RecurringFeatureAlert: Identifiable {
-    let id = UUID()
-    let title: String
-    let message: String
+private enum CashFlowAlert: Identifiable {
+    case deleteTransaction(Transaction)
+    case deleteRecurringTransaction(RecurringTransaction)
+    case finishRecurringTransaction(RecurringTransaction)
+    case message(title: String, message: String)
+
+    var id: String {
+        switch self {
+        case .deleteTransaction(let transaction):
+            return "delete-transaction-\(transaction.id)"
+        case .deleteRecurringTransaction(let schedule):
+            return "delete-recurring-\(schedule.id)"
+        case .finishRecurringTransaction(let schedule):
+            return "finish-recurring-\(schedule.id)"
+        case .message(let title, let message):
+            return "message-\(title)-\(message)"
+        }
+    }
 }

@@ -104,11 +104,12 @@ final class FinanceStore: ObservableObject {
     }
 
     var recurringTransactions: [RecurringTransaction] {
-        data.recurringTransactions.sorted { lhs, rhs in
-            if lhs.isCompleted != rhs.isCompleted { return !lhs.isCompleted }
-            if lhs.isActive != rhs.isActive { return lhs.isActive }
-            return lhs.nextDueDate < rhs.nextDueDate
-        }
+        data.recurringTransactions
+            .filter { !$0.isCompleted }
+            .sorted { lhs, rhs in
+                if lhs.isActive != rhs.isActive { return lhs.isActive }
+                return lhs.nextDueDate < rhs.nextDueDate
+            }
     }
 
     func addTransaction(type: TransactionType, amount: Double, category: String, description: String, date: Date, settings: AppSettings) {
@@ -167,14 +168,8 @@ final class FinanceStore: ObservableObject {
         save()
     }
 
-    func completeRecurringTransaction(_ recurringTransaction: RecurringTransaction, completedAt: Date = Date()) {
-        guard let index = data.recurringTransactions.firstIndex(where: { $0.id == recurringTransaction.id }) else {
-            return
-        }
-
-        data.recurringTransactions[index].isActive = false
-        data.recurringTransactions[index].completedAt = completedAt
-        data.recurringTransactions[index].updatedAt = completedAt
+    func completeRecurringTransaction(_ recurringTransaction: RecurringTransaction) {
+        data.recurringTransactions.removeAll { $0.id == recurringTransaction.id }
         save()
     }
 
