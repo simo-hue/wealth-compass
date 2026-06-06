@@ -22,3 +22,7 @@
 - [2026-06-06 15:48]: iCloud Sync Critical Bug Fixes
   - *Details*: Resolved critical data loss bugs caused by unsafe local file deletions, missing file coordination, and incorrect iCloud file replacement behaviors.
   - *Tech Notes*: Introduced `NSFileCoordinator` in `FinancePersistence` for atomic read/write operations to iCloud container URLs. Replaced destructive iCloud sync logic with safe temporary file replacement and `options: .atomic` writing. Fixed `NSMetadataQuery` in `FinanceStore` to respect `NSMetadataUbiquitousItemDownloadingStatusKey` and automatically trigger `startDownloadingUbiquitousItem` if the updated file is not fully downloaded before attempting to load data.
+
+- [2026-06-06 15:59]: Production iCloud Sync Capabilities
+  - *Details*: Added conflict resolution (merging), account status observation, and UI animations.
+  - *Tech Notes*: Modified `FinanceModels.swift` to introduce `MergeableRecord` and `updatedAt` for conflict resolution based on timestamp. Refactored `FinancePersistence` to decode and merge local and incoming iCloud JSON data before saving. Added `NSUbiquityIdentityDidChange` observer to `FinanceStore` to safely disable sync upon iCloud logout. Wrapped data reloading in `withAnimation`. Exposed `@Published var iCloudSyncError` for graceful error handling.

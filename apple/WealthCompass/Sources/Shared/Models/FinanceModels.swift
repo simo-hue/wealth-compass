@@ -113,6 +113,7 @@ struct Transaction: Identifiable, Codable, Equatable {
     var description: String
     var date: Date
     var createdAt: Date = Date()
+    var updatedAt: Date = Date()
     var recurringTransactionID: UUID?
     var recurringOccurrenceDate: Date?
 }
@@ -289,6 +290,7 @@ struct NetWorthSnapshot: Identifiable, Codable, Equatable {
     var investments: Double
     var crypto: Double
     var createdAt: Date = Date()
+    var updatedAt: Date = Date()
 }
 
 struct FinancialData: Codable, Equatable {
@@ -378,4 +380,44 @@ struct NetWorthPoint: Identifiable, Equatable {
     var id: Date { date }
     var date: Date
     var value: Double
+}
+
+protocol MergeableRecord: Identifiable where ID == UUID {
+    var updatedAt: Date { get }
+}
+
+extension Transaction: MergeableRecord {}
+extension RecurringTransaction: MergeableRecord {}
+extension Investment: MergeableRecord {}
+extension CryptoHolding: MergeableRecord {}
+extension Liability: MergeableRecord {}
+extension NetWorthSnapshot: MergeableRecord {}
+
+extension Array where Element: MergeableRecord {
+    func mergedByID(with incoming: [Element]) -> [Element] {
+        var merged = self
+        for item in incoming {
+            if let index = merged.firstIndex(where: { $0.id == item.id }) {
+                if item.updatedAt > merged[index].updatedAt {
+                    merged[index] = item
+                }
+            } else {
+                merged.append(item)
+            }
+        }
+        return merged
+    }
+}
+
+extension FinancialData {
+    func merged(with incoming: FinancialData) -> FinancialData {
+        FinancialData(
+            transactions: transactions.mergedByID(with: incoming.transactions),
+            recurringTransactions: recurringTransactions.mergedByID(with: incoming.recurringTransactions),
+            investments: investments.mergedByID(with: incoming.investments),
+            crypto: crypto.mergedByID(with: incoming.crypto),
+            liabilities: liabilities.mergedByID(with: incoming.liabilities),
+            snapshots: snapshots.mergedByID(with: incoming.snapshots)
+        )
+    }
 }
