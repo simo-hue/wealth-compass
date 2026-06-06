@@ -158,6 +158,7 @@ struct MacCryptoView: View {
                     Text("\(privateCount(identifierCount)) of \(privateCount(holdings.count))")
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .foregroundStyle(.white)
         }
     }

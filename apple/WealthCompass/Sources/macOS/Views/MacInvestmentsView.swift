@@ -162,6 +162,7 @@ struct MacInvestmentsView: View {
                     Text(privateCount(sectorCount))
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .foregroundStyle(.white)
         }
     }

@@ -476,6 +476,7 @@ struct MacDashboardView: View {
                     }
                 }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
     }
 
@@ -577,6 +578,7 @@ struct MacDashboardView: View {
                     }
                 }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
     }
 
@@ -659,6 +661,7 @@ struct MacDashboardView: View {
                     .frame(minHeight: 246, alignment: .top)
                 }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
         .frame(maxWidth: .infinity)
     }
@@ -707,6 +710,7 @@ struct MacDashboardView: View {
                     .frame(minHeight: 246, alignment: .top)
                 }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
         .frame(maxWidth: .infinity)
     }

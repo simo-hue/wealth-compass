@@ -275,3 +275,6 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 
 2.  **MacRootView**
     -   Added `case .settings:` in the `detail` view builder to render `MacSettingsView()`.
+- [Sat Jun  6 14:40:51 CEST 2026] Fixed UI bug in crypto and investments pages
+  - *Details*: Added .frame(maxWidth: .infinity, alignment: .leading) to the inner VStack of FinanceCard in MacInvestmentsView.swift and MacCryptoView.swift to make the status cards use all available width space.
+  - *Tech Notes*: Modified MacInvestmentsView.swift and MacCryptoView.swift.
