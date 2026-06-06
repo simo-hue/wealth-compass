@@ -29,10 +29,13 @@ struct CashFlowView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @State private var showingAddTransaction = false
+    @State private var recurringEditor: RecurringTransactionEditor?
     @State private var period: AnalyticsPeriod = .thirtyDays
     @State private var transactionPeriod: AnalyticsPeriod = .thirtyDays
     @State private var transactionTypeFilter: TransactionListTypeFilter = .all
     @State private var transactionPendingDeletion: Transaction?
+    @State private var recurringTransactionPendingDeletion: RecurringTransaction?
+    @State private var recurringFeatureAlert: RecurringFeatureAlert?
 
     private let transactionDisplayLimit = 40
 
@@ -40,8 +43,18 @@ struct CashFlowView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 PageHeader(title: "Cash Flow", subtitle: "Track your income and expenses") {
-                    Button {
-                        showingAddTransaction = true
+                    Menu {
+                        Button {
+                            showingAddTransaction = true
+                        } label: {
+                            Label("One-Time Transaction", systemImage: "plus.circle")
+                        }
+
+                        Button {
+                            recurringEditor = RecurringTransactionEditor(schedule: nil)
+                        } label: {
+                            Label("Recurring Transaction", systemImage: "repeat.circle")
+                        }
                     } label: {
                         Image(systemName: "plus")
                             .font(.headline)
@@ -51,6 +64,7 @@ struct CashFlowView: View {
                 }
 
                 summaryCards
+                recurringTransactions
                 analytics
                 transactions
             }
@@ -69,6 +83,11 @@ struct CashFlowView: View {
                 )
             }
         }
+        .sheet(item: $recurringEditor) { editor in
+            RecurringTransactionFormView(schedule: editor.schedule) { schedule in
+                saveRecurringTransaction(schedule)
+            }
+        }
         .alert(item: $transactionPendingDeletion) { transaction in
             Alert(
                 title: Text("Delete Transaction?"),
@@ -77,6 +96,26 @@ struct CashFlowView: View {
                     finance.deleteTransaction(transaction, settings: settings)
                 },
                 secondaryButton: .cancel()
+            )
+        }
+        .alert(item: $recurringTransactionPendingDeletion) { schedule in
+            Alert(
+                title: Text("Delete Recurring Transaction?"),
+                message: Text("Future \(schedule.frequency.title.lowercased()) occurrences for \(schedule.category) will no longer be created."),
+                primaryButton: .destructive(Text("Delete")) {
+                    finance.deleteRecurringTransaction(schedule)
+                    Task {
+                        await RecurringTransactionNotificationService.shared.cancel(scheduleID: schedule.id)
+                    }
+                },
+                secondaryButton: .cancel()
+            )
+        }
+        .alert(item: $recurringFeatureAlert) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .default(Text("OK"))
             )
         }
     }
@@ -142,6 +181,110 @@ struct CashFlowView: View {
                 }
             }
         }
+    }
+
+    private var recurringTransactions: some View {
+        FinanceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    Text("Recurring Transactions")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                    Spacer()
+                    Button {
+                        recurringEditor = RecurringTransactionEditor(schedule: nil)
+                    } label: {
+                        Label("Add", systemImage: "plus")
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(WCColor.primary)
+                }
+
+                if finance.recurringTransactions.isEmpty {
+                    EmptyState(title: "No recurring transactions", systemImage: "repeat")
+                } else {
+                    VStack(spacing: 12) {
+                        ForEach(finance.recurringTransactions) { schedule in
+                            recurringTransactionRow(schedule)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    Button(role: .destructive) {
+                                        recurringTransactionPendingDeletion = schedule
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
+                        }
+                    }
+                }
+
+                Text("Due schedules are recorded automatically while the app is active and caught up the next time it opens.")
+                    .font(.caption)
+                    .foregroundStyle(WCColor.textSecondary)
+            }
+        }
+    }
+
+    private func recurringTransactionRow(_ schedule: RecurringTransaction) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: schedule.type == .income ? "arrow.up.right.circle.fill" : "arrow.down.right.circle.fill")
+                .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
+                .font(.title3)
+
+            VStack(alignment: .leading, spacing: 5) {
+                HStack(spacing: 6) {
+                    Text(schedule.category)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Image(systemName: schedule.notificationsEnabled ? "bell.fill" : "bell.slash")
+                        .font(.caption2)
+                        .foregroundStyle(WCColor.textSecondary)
+                }
+
+                Text(schedule.frequency.title)
+                    .font(.caption)
+                    .foregroundStyle(WCColor.textSecondary)
+
+                if schedule.isActive {
+                    Text("Next: \(schedule.nextDueDate.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.caption)
+                        .foregroundStyle(WCColor.textSecondary)
+                } else {
+                    Text("Paused")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(WCColor.warning)
+                }
+            }
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 9) {
+                let prefix = schedule.type == .income ? "+" : "-"
+                Text("\(prefix)\(settings.privateCurrency(schedule.amount))")
+                    .font(.subheadline.monospacedDigit().weight(.bold))
+                    .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
+
+                HStack(spacing: 14) {
+                    Button {
+                        toggleRecurringTransaction(schedule)
+                    } label: {
+                        Image(systemName: schedule.isActive ? "pause.fill" : "play.fill")
+                    }
+                    .accessibilityLabel(schedule.isActive ? "Pause schedule" : "Resume schedule")
+
+                    Button {
+                        recurringEditor = RecurringTransactionEditor(schedule: schedule)
+                    } label: {
+                        Image(systemName: "pencil")
+                    }
+                    .accessibilityLabel("Edit schedule")
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(WCColor.primary)
+            }
+        }
+        .padding(12)
+        .background(WCColor.cardElevated, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
     private var transactions: some View {
@@ -268,6 +411,11 @@ struct CashFlowView: View {
                     Text(transaction.category)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
+                    if transaction.recurringTransactionID != nil {
+                        Image(systemName: "repeat")
+                            .font(.caption2)
+                            .foregroundStyle(WCColor.primary)
+                    }
                     Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
@@ -289,4 +437,46 @@ struct CashFlowView: View {
         .padding(12)
         .background(WCColor.cardElevated, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
+
+    private func saveRecurringTransaction(_ schedule: RecurringTransaction) {
+        finance.upsertRecurringTransaction(schedule)
+
+        Task {
+            if schedule.notificationsEnabled {
+                let authorized = await RecurringTransactionNotificationService.shared.requestAuthorization()
+                if !authorized {
+                    finance.setRecurringNotificationsEnabled(id: schedule.id, isEnabled: false)
+                    recurringFeatureAlert = RecurringFeatureAlert(
+                        title: "Notifications Disabled",
+                        message: "The schedule was saved, but notifications are not authorized. You can enable them in iOS Settings and then edit this schedule."
+                    )
+                }
+            }
+            await syncRecurringNotifications()
+        }
+    }
+
+    private func toggleRecurringTransaction(_ schedule: RecurringTransaction) {
+        finance.setRecurringTransactionActive(schedule, isActive: !schedule.isActive)
+        Task { await syncRecurringNotifications() }
+    }
+
+    private func syncRecurringNotifications() async {
+        await RecurringTransactionNotificationService.shared.sync(
+            schedules: finance.data.recurringTransactions,
+            currencyCode: settings.currency.rawValue,
+            showAmounts: !settings.isPrivacyMode
+        )
+    }
+}
+
+private struct RecurringTransactionEditor: Identifiable {
+    let id = UUID()
+    let schedule: RecurringTransaction?
+}
+
+private struct RecurringFeatureAlert: Identifiable {
+    let id = UUID()
+    let title: String
+    let message: String
 }

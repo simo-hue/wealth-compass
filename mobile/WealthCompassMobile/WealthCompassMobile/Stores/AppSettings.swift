@@ -6,11 +6,11 @@ final class AppSettings: ObservableObject {
     let defaultExpenseCategories = ["Housing", "Food", "Transport", "Utilities", "Fuel", "Entertainment", "Shopping", "Health", "Other"]
 
     @Published var currency: Currency {
-        didSet { UserDefaults.standard.set(currency.rawValue, forKey: Keys.currency) }
+        didSet { userDefaults.set(currency.rawValue, forKey: Keys.currency) }
     }
 
     @Published var isPrivacyMode: Bool {
-        didSet { UserDefaults.standard.set(isPrivacyMode, forKey: Keys.privacyMode) }
+        didSet { userDefaults.set(isPrivacyMode, forKey: Keys.privacyMode) }
     }
 
     @Published private(set) var customIncomeCategories: [String] = [] {
@@ -21,20 +21,40 @@ final class AppSettings: ObservableObject {
         didSet { saveStringArray(customExpenseCategories, key: Keys.customExpenseCategories) }
     }
 
+    @Published private(set) var exchangeRateSnapshot: ExchangeRateSnapshot?
+    @Published private(set) var isRefreshingExchangeRates = false
+    @Published private(set) var exchangeRateError: String?
+
+    private let userDefaults: UserDefaults
+    private var lastExchangeRateRefreshAttemptAt: Date?
+
     private enum Keys {
         static let currency = "wc_mobile_currency"
         static let privacyMode = "wc_mobile_privacy_mode"
         static let customIncomeCategories = "wc_mobile_custom_income_categories"
         static let customExpenseCategories = "wc_mobile_custom_expense_categories"
+        static let exchangeRateSnapshot = "wc_mobile_exchange_rate_snapshot"
     }
 
-    init() {
-        let storedCurrency = UserDefaults.standard.string(forKey: Keys.currency)
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+
+        let storedCurrency = userDefaults.string(forKey: Keys.currency)
             .flatMap(Currency.init(rawValue:)) ?? .eur
         currency = storedCurrency
-        isPrivacyMode = UserDefaults.standard.bool(forKey: Keys.privacyMode)
-        customIncomeCategories = Self.loadStringArray(key: Keys.customIncomeCategories)
-        customExpenseCategories = Self.loadStringArray(key: Keys.customExpenseCategories)
+        isPrivacyMode = userDefaults.bool(forKey: Keys.privacyMode)
+        customIncomeCategories = Self.loadStringArray(key: Keys.customIncomeCategories, userDefaults: userDefaults)
+        customExpenseCategories = Self.loadStringArray(key: Keys.customExpenseCategories, userDefaults: userDefaults)
+
+        if
+            let data = userDefaults.data(forKey: Keys.exchangeRateSnapshot),
+            let snapshot = try? JSONDecoder().decode(ExchangeRateSnapshot.self, from: data),
+            snapshot.isValid
+        {
+            exchangeRateSnapshot = snapshot
+        } else {
+            exchangeRateSnapshot = nil
+        }
     }
 
     func transactionCategories(for type: TransactionType) -> [String] {
@@ -75,9 +95,69 @@ final class AppSettings: ObservableObject {
     }
 
     func convert(_ value: Double, from sourceCurrency: Currency?) -> Double {
-        guard let sourceCurrency, sourceCurrency != currency else { return value }
-        let valueInEUR = value * sourceCurrency.eurValue
-        return valueInEUR / currency.eurValue
+        guard let sourceCurrency else { return value }
+        return convert(value, from: sourceCurrency, to: currency)
+    }
+
+    func convert(_ value: Double, from sourceCurrency: Currency, to targetCurrency: Currency) -> Double {
+        guard sourceCurrency != targetCurrency else { return value }
+
+        let sourceUnitsPerEuro = unitsPerEuro(for: sourceCurrency)
+        let targetUnitsPerEuro = unitsPerEuro(for: targetCurrency)
+        return value / sourceUnitsPerEuro * targetUnitsPerEuro
+    }
+
+    func shouldAutoRefreshExchangeRates(
+        staleAfter: TimeInterval = 12 * 60 * 60,
+        retryAfter: TimeInterval = 15 * 60,
+        now: Date = Date()
+    ) -> Bool {
+        if let lastExchangeRateRefreshAttemptAt,
+           now.timeIntervalSince(lastExchangeRateRefreshAttemptAt) < retryAfter {
+            return false
+        }
+
+        guard let exchangeRateSnapshot else { return true }
+        return now.timeIntervalSince(exchangeRateSnapshot.fetchedAt) >= staleAfter
+    }
+
+    func refreshExchangeRates(client: ExchangeRateClient = ExchangeRateClient()) async -> ExchangeRateRefreshResult {
+        guard !isRefreshingExchangeRates else {
+            return ExchangeRateRefreshResult(
+                snapshot: nil,
+                errorMessage: nil,
+                didChangeRates: false,
+                wasAlreadyRunning: true
+            )
+        }
+
+        isRefreshingExchangeRates = true
+        lastExchangeRateRefreshAttemptAt = Date()
+        defer { isRefreshingExchangeRates = false }
+
+        do {
+            let previousSnapshot = exchangeRateSnapshot
+            let snapshot = try await client.latestRates()
+            exchangeRateSnapshot = snapshot
+            exchangeRateError = nil
+            saveExchangeRateSnapshot(snapshot)
+
+            return ExchangeRateRefreshResult(
+                snapshot: snapshot,
+                errorMessage: nil,
+                didChangeRates: previousSnapshot?.rates != snapshot.rates,
+                wasAlreadyRunning: false
+            )
+        } catch {
+            let message = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            exchangeRateError = message
+            return ExchangeRateRefreshResult(
+                snapshot: exchangeRateSnapshot,
+                errorMessage: message,
+                didChangeRates: false,
+                wasAlreadyRunning: false
+            )
+        }
     }
 
     func formatCurrency(_ value: Double, sourceCurrency: Currency? = nil) -> String {
@@ -100,12 +180,21 @@ final class AppSettings: ObservableObject {
 
     private func saveStringArray(_ values: [String], key: String) {
         guard let data = try? JSONEncoder().encode(values) else { return }
-        UserDefaults.standard.set(data, forKey: key)
+        userDefaults.set(data, forKey: key)
     }
 
-    private static func loadStringArray(key: String) -> [String] {
+    private func unitsPerEuro(for currency: Currency) -> Double {
+        exchangeRateSnapshot?.unitsPerBaseCurrency(for: currency) ?? currency.fallbackUnitsPerEuro
+    }
+
+    private func saveExchangeRateSnapshot(_ snapshot: ExchangeRateSnapshot) {
+        guard let data = try? JSONEncoder().encode(snapshot) else { return }
+        userDefaults.set(data, forKey: Keys.exchangeRateSnapshot)
+    }
+
+    private static func loadStringArray(key: String, userDefaults: UserDefaults) -> [String] {
         guard
-            let data = UserDefaults.standard.data(forKey: key),
+            let data = userDefaults.data(forKey: key),
             let values = try? JSONDecoder().decode([String].self, from: data)
         else {
             return []

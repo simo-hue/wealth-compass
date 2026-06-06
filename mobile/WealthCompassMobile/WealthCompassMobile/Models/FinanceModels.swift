@@ -27,12 +27,12 @@ enum Currency: String, CaseIterable, Codable, Identifiable {
         }
     }
 
-    var eurValue: Double {
+    var fallbackUnitsPerEuro: Double {
         switch self {
         case .eur: 1.0
-        case .usd: 0.92
-        case .gbp: 1.17
-        case .chf: 1.05
+        case .usd: 1 / 0.92
+        case .gbp: 1 / 1.17
+        case .chf: 1 / 1.05
         }
     }
 }
@@ -113,6 +113,116 @@ struct Transaction: Identifiable, Codable, Equatable {
     var description: String
     var date: Date
     var createdAt: Date = Date()
+    var recurringTransactionID: UUID?
+    var recurringOccurrenceDate: Date?
+}
+
+enum RecurringTransactionFrequency: String, CaseIterable, Codable, Identifiable {
+    case daily
+    case weekly
+    case monthly
+    case yearly
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .daily: "Daily"
+        case .weekly: "Weekly"
+        case .monthly: "Monthly"
+        case .yearly: "Yearly"
+        }
+    }
+
+    func nextDate(after date: Date, anchoredTo startDate: Date, calendar: Calendar = .current) -> Date? {
+        switch self {
+        case .daily:
+            return calendar.date(byAdding: .day, value: 1, to: date)
+        case .weekly:
+            return calendar.date(byAdding: .weekOfYear, value: 1, to: date)
+        case .monthly:
+            return Self.nextMonthlyDate(after: date, anchoredTo: startDate, calendar: calendar)
+        case .yearly:
+            return Self.nextYearlyDate(after: date, anchoredTo: startDate, calendar: calendar)
+        }
+    }
+
+    private static func nextMonthlyDate(after date: Date, anchoredTo startDate: Date, calendar: Calendar) -> Date? {
+        let currentMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date))
+        guard
+            let currentMonth,
+            let nextMonth = calendar.date(byAdding: .month, value: 1, to: currentMonth),
+            let dayRange = calendar.range(of: .day, in: .month, for: nextMonth)
+        else {
+            return nil
+        }
+
+        let anchor = calendar.dateComponents([.day, .hour, .minute, .second], from: startDate)
+        var components = calendar.dateComponents([.year, .month], from: nextMonth)
+        components.day = min(anchor.day ?? 1, dayRange.count)
+        components.hour = anchor.hour
+        components.minute = anchor.minute
+        components.second = anchor.second
+        return calendar.date(from: components)
+    }
+
+    private static func nextYearlyDate(after date: Date, anchoredTo startDate: Date, calendar: Calendar) -> Date? {
+        let currentYear = calendar.component(.year, from: date)
+        let anchor = calendar.dateComponents([.month, .day, .hour, .minute, .second], from: startDate)
+        guard let month = anchor.month else { return nil }
+
+        var monthComponents = DateComponents()
+        monthComponents.calendar = calendar
+        monthComponents.year = currentYear + 1
+        monthComponents.month = month
+        monthComponents.day = 1
+
+        guard
+            let monthDate = calendar.date(from: monthComponents),
+            let dayRange = calendar.range(of: .day, in: .month, for: monthDate)
+        else {
+            return nil
+        }
+
+        var components = monthComponents
+        components.day = min(anchor.day ?? 1, dayRange.count)
+        components.hour = anchor.hour
+        components.minute = anchor.minute
+        components.second = anchor.second
+        return calendar.date(from: components)
+    }
+}
+
+struct RecurringTransaction: Identifiable, Codable, Equatable {
+    var id: UUID = UUID()
+    var type: TransactionType
+    var category: String
+    var amount: Double
+    var description: String
+    var startDate: Date
+    var frequency: RecurringTransactionFrequency
+    var nextDueDate: Date
+    var endDate: Date?
+    var notificationsEnabled: Bool = true
+    var isActive: Bool = true
+    var createdAt: Date = Date()
+    var updatedAt: Date = Date()
+
+    func firstOccurrence(onOrAfter threshold: Date, calendar: Calendar = .current) -> Date? {
+        var occurrence = startDate
+        var iterationCount = 0
+
+        while occurrence < threshold && iterationCount < 20_000 {
+            guard let next = frequency.nextDate(after: occurrence, anchoredTo: startDate, calendar: calendar) else {
+                return nil
+            }
+            occurrence = next
+            iterationCount += 1
+        }
+
+        guard endDate.map({ occurrence <= $0 }) ?? true else { return nil }
+        return occurrence
+    }
 }
 
 struct Investment: Identifiable, Codable, Equatable {
@@ -178,10 +288,46 @@ struct NetWorthSnapshot: Identifiable, Codable, Equatable {
 
 struct FinancialData: Codable, Equatable {
     var transactions: [Transaction] = []
+    var recurringTransactions: [RecurringTransaction] = []
     var investments: [Investment] = []
     var crypto: [CryptoHolding] = []
     var liabilities: [Liability] = []
     var snapshots: [NetWorthSnapshot] = []
+
+    private enum CodingKeys: String, CodingKey {
+        case transactions
+        case recurringTransactions
+        case investments
+        case crypto
+        case liabilities
+        case snapshots
+    }
+
+    init(
+        transactions: [Transaction] = [],
+        recurringTransactions: [RecurringTransaction] = [],
+        investments: [Investment] = [],
+        crypto: [CryptoHolding] = [],
+        liabilities: [Liability] = [],
+        snapshots: [NetWorthSnapshot] = []
+    ) {
+        self.transactions = transactions
+        self.recurringTransactions = recurringTransactions
+        self.investments = investments
+        self.crypto = crypto
+        self.liabilities = liabilities
+        self.snapshots = snapshots
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        transactions = try container.decodeIfPresent([Transaction].self, forKey: .transactions) ?? []
+        recurringTransactions = try container.decodeIfPresent([RecurringTransaction].self, forKey: .recurringTransactions) ?? []
+        investments = try container.decodeIfPresent([Investment].self, forKey: .investments) ?? []
+        crypto = try container.decodeIfPresent([CryptoHolding].self, forKey: .crypto) ?? []
+        liabilities = try container.decodeIfPresent([Liability].self, forKey: .liabilities) ?? []
+        snapshots = try container.decodeIfPresent([NetWorthSnapshot].self, forKey: .snapshots) ?? []
+    }
 }
 
 struct FinanceTotals: Equatable {

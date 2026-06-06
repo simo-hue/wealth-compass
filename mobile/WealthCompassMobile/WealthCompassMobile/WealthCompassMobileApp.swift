@@ -2,6 +2,7 @@ import SwiftUI
 
 @main
 struct WealthCompassMobileApp: App {
+    @UIApplicationDelegateAdaptor(AppNotificationDelegate.self) private var notificationDelegate
     @StateObject private var financeStore = FinanceStore()
     @StateObject private var settings = AppSettings()
     @StateObject private var appLock = AppLockStore()
