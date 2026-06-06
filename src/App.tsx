@@ -26,6 +26,7 @@ import { FAQ } from "./pages/FAQ";
 import { Tutorial } from "./pages/Tutorial";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { TermsOfService } from "./pages/TermsOfService";
+import { Support } from "./pages/Support";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/tutorial" element={<Tutorial />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/support" element={<Support />} />
                   <Route path="/terms" element={<TermsOfService />} />
                 </Route>
 

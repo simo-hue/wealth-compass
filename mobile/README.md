@@ -2,7 +2,7 @@
 
 Native iOS implementation of the Wealth Compass app.
 
-Current app version: `1.1`.
+Current app version: `1.0`.
 
 ## Scope
 

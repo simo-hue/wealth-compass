@@ -37,7 +37,7 @@ export const Footer = () => {
                             <a href="https://www.linkedin.com/in/simonemattioli2003/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                 <Linkedin className="h-4 w-4" />
                             </a>
-                            <a href="mailto:simo.mattioli@example.com" className="text-gray-400 hover:text-white transition-colors">
+                            <a href="mailto:mattioli.simone.10@gmail.com" aria-label="Email support" className="text-gray-400 hover:text-white transition-colors">
                                 <Mail className="h-4 w-4" />
                             </a>
                         </div>
@@ -50,6 +50,7 @@ export const Footer = () => {
                 <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
                     <p>&copy; {new Date().getFullYear()} Wealth Compass. All rights reserved.</p>
                     <div className="flex space-x-6 mt-4 md:mt-0">
+                        <Link to="/support" className="hover:text-white transition-colors">Support</Link>
                         <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
                         <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
                     </div>
