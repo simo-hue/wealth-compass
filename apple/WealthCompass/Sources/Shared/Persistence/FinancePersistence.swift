@@ -93,11 +93,11 @@ struct LocalFinancePersistence: FinancePersistence {
 
     private func getICloudURL() -> URL? {
         guard let containerURL = fileManager.url(forUbiquityContainerIdentifier: nil) else { return nil }
-        let documentsURL = containerURL.appendingPathComponent("Documents")
-        if !fileManager.fileExists(atPath: documentsURL.path) {
-            try? fileManager.createDirectory(at: documentsURL, withIntermediateDirectories: true)
+        let dataURL = containerURL.appendingPathComponent("Data")
+        if !fileManager.fileExists(atPath: dataURL.path) {
+            try? fileManager.createDirectory(at: dataURL, withIntermediateDirectories: true)
         }
-        return documentsURL.appendingPathComponent(fileName)
+        return dataURL.appendingPathComponent(fileName)
     }
 
     private func syncFromICloudIfNeeded() throws {

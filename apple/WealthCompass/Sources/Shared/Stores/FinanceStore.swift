@@ -694,7 +694,7 @@ final class FinanceStore: ObservableObject {
         
         if isEnabled, metadataQuery == nil {
             let query = NSMetadataQuery()
-            query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
+            query.searchScopes = [NSMetadataQueryUbiquitousDataScope]
             query.predicate = NSPredicate(format: "%K == %@", NSMetadataItemFSNameKey, "wealth-compass-local-data.json")
             
             NotificationCenter.default.addObserver(
