@@ -64,6 +64,17 @@ struct SettingsView: View {
 
                 marketDataSection
 
+                Section("iCloud Sync") {
+                    Toggle(isOn: $settings.isICloudSyncEnabled) {
+                        Label("Sync Data with iCloud", systemImage: "icloud")
+                    }
+                    .tint(WCColor.primary)
+
+                    Text("Your financial data is saved locally by default. When enabled, it securely syncs across your devices using iCloud Documents.")
+                        .font(.caption)
+                        .foregroundStyle(WCColor.textSecondary)
+                }
+
                 Section("Data") {
                     Button {
                         do {
