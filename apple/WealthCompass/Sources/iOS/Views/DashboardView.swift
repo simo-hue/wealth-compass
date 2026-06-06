@@ -1,163 +1,602 @@
-import SwiftUI
 import Charts
+import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @State private var timeRange: TimeRange = .oneYear
+    @State private var showingAddTransaction = false
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12)
     ]
 
+    private var totals: FinanceTotals {
+        finance.calculateTotals(settings: settings)
+    }
+
+    private var currentMonthCashFlow: MonthlyCashFlow {
+        finance.monthlyCashFlow(for: Date())
+    }
+
+    private var isCompletelyEmpty: Bool {
+        finance.data.transactions.isEmpty
+            && finance.data.investments.isEmpty
+            && finance.data.crypto.isEmpty
+            && finance.data.liabilities.isEmpty
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                PageHeader(title: "Dashboard", subtitle: "Financial Command Center") {
-                    if let latestSnapshot = finance.data.snapshots.last {
-                        VStack(alignment: .trailing, spacing: 2) {
-                            Label("Auto", systemImage: "camera.metering.center.weighted")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(WCColor.primary)
-                            Text(latestSnapshot.date.formatted(date: .abbreviated, time: .shortened))
-                                .font(.caption2)
-                                .foregroundStyle(WCColor.textSecondary)
-                        }
-                    } else {
-                        Label("Auto snapshots", systemImage: "camera.metering.center.weighted")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(WCColor.primary)
+                dashboardHeader
+
+                if isCompletelyEmpty {
+                    onboardingCard
+                }
+
+                netWorthHero
+                positionSection
+                cashFlowTrend
+                AllocationChart(
+                    title: "Asset Allocation",
+                    slices: finance.assetAllocation(settings: settings),
+                    settings: settings
+                )
+                topExpenses
+                recentActivity
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 28)
+        }
+        .pageChrome()
+        .sheet(isPresented: $showingAddTransaction) {
+            TransactionFormView { type, amount, category, description, date in
+                finance.addTransaction(
+                    type: type,
+                    amount: amount,
+                    category: category,
+                    description: description,
+                    date: date,
+                    settings: settings
+                )
+            }
+        }
+    }
+
+    private var dashboardHeader: some View {
+        PageHeader(
+            title: "Financial horizon",
+            subtitle: "Everything you own, owe, earn, and spend."
+        ) {
+            PrimaryActionButton(systemImage: "plus", accessibilityLabel: "Add Transaction") {
+                showingAddTransaction = true
+            }
+        }
+    }
+
+    private var onboardingCard: some View {
+        FinanceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(spacing: 12) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(WCColor.primary)
+                        .frame(width: 38, height: 38)
+                        .background(WCColor.primary.opacity(0.11), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Build your first financial view")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text("Record cash flow or add a position to bring this dashboard to life.")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.48))
                     }
                 }
 
-                let totals = finance.calculateTotals(settings: settings)
-                LazyVGrid(columns: columns, spacing: 12) {
-                    MetricCard(title: "Net Worth", value: settings.privateCurrency(totals.netWorth), systemImage: "chart.line.uptrend.xyaxis")
-                    MetricCard(title: "Cash Balance", value: settings.privateCurrency(totals.totalLiquidity), systemImage: "wallet.pass")
-                    MetricCard(title: "Investments", value: settings.privateCurrency(totals.totalInvestments), systemImage: "chart.xyaxis.line", accent: .blue)
-                    MetricCard(title: "Crypto", value: settings.privateCurrency(totals.totalCrypto), systemImage: "bitcoinsign.circle", accent: WCColor.warning)
+                Button {
+                    showingAddTransaction = true
+                } label: {
+                    Label("Add your first transaction", systemImage: "plus")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
                 }
-
-                netWorthHistory
-                cashFlowTrend
-                topExpenses
-                AllocationChart(title: "Asset Allocation", slices: finance.assetAllocation(settings: settings), settings: settings)
+                .buttonStyle(.borderedProminent)
+                .tint(WCColor.primary)
             }
-            .padding(16)
         }
-        .pageChrome()
     }
 
-    private var netWorthHistory: some View {
-        FinanceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Text("Net Worth History")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                    Spacer()
-                    Picker("Range", selection: $timeRange) {
+    private var netWorthHero: some View {
+        let points = finance.snapshots(range: timeRange)
+        let rangeChange = netWorthChange(in: points)
+
+        return FinanceCard {
+            ZStack {
+                MobileHeroScenery()
+                    .padding(-18)
+
+                VStack(alignment: .leading, spacing: 17) {
+                    HStack(alignment: .top, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("NET WORTH")
+                                .font(.caption2.weight(.bold))
+                                .tracking(1.7)
+                                .foregroundStyle(.white.opacity(0.48))
+                            Text(settings.privateCurrency(totals.netWorth))
+                                .font(.system(size: 35, weight: .bold, design: .rounded))
+                                .monospacedDigit()
+                                .foregroundStyle(.white)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.58)
+
+                            if let rangeChange {
+                                HStack(spacing: 6) {
+                                    Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
+                                    Text(settings.privateCurrency(abs(rangeChange.value)))
+                                    Text(privatePercent(abs(rangeChange.percentage)))
+                                    Text(timeRange.rawValue)
+                                        .foregroundStyle(.white.opacity(0.42))
+                                }
+                                .font(.caption.monospacedDigit().weight(.semibold))
+                                .foregroundStyle(rangeChange.value >= 0 ? WCColor.primary : WCColor.destructive)
+                            } else {
+                                Text("Add another snapshot to see movement")
+                                    .font(.caption)
+                                    .foregroundStyle(.white.opacity(0.43))
+                            }
+                        }
+
+                        Spacer(minLength: 6)
+                        snapshotFreshness
+                    }
+
+                    Picker("Net worth range", selection: $timeRange) {
                         ForEach(TimeRange.allCases) { range in
                             Text(range.rawValue).tag(range)
                         }
                     }
+                    .labelsHidden()
                     .pickerStyle(.segmented)
-                    .frame(width: 220)
-                }
 
-                let points = finance.snapshots(range: timeRange)
-                if points.isEmpty {
-                    EmptyState(title: "History will appear after your first update", systemImage: "camera.metering.center.weighted")
-                } else {
-                    Chart(points) { point in
-                        LineMark(
-                            x: .value("Date", point.date),
-                            y: .value("Net Worth", point.value)
+                    if points.isEmpty {
+                        EmptyState(
+                            title: "Your net-worth trail starts here",
+                            systemImage: "chart.line.uptrend.xyaxis"
                         )
-                        .foregroundStyle(WCColor.primary)
-                        .interpolationMethod(.catmullRom)
+                        .frame(height: 205)
+                    } else if settings.isPrivacyMode {
+                        MobilePrivacyChartCover(
+                            title: "Net-worth history concealed",
+                            message: "Turn off Privacy Mode to reveal values and movement."
+                        )
+                        .frame(height: 205)
+                    } else {
+                        Chart {
+                            ForEach(points) { point in
+                                AreaMark(
+                                    x: .value("Date", point.date),
+                                    yStart: .value("Range floor", chartDomain(for: points).lowerBound),
+                                    yEnd: .value("Net Worth", point.value)
+                                )
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [WCColor.primary.opacity(0.3), WCColor.primary.opacity(0.01)],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                .interpolationMethod(.monotone)
 
-                        AreaMark(
-                            x: .value("Date", point.date),
-                            y: .value("Net Worth", point.value)
-                        )
-                        .foregroundStyle(WCColor.primary.opacity(0.18))
-                        .interpolationMethod(.catmullRom)
+                                LineMark(
+                                    x: .value("Date", point.date),
+                                    y: .value("Net Worth", point.value)
+                                )
+                                .foregroundStyle(.white.opacity(0.92))
+                                .lineStyle(StrokeStyle(lineWidth: 2.3, lineCap: .round, lineJoin: .round))
+                                .interpolationMethod(.monotone)
+                            }
+                        }
+                        .chartYScale(domain: chartDomain(for: points))
+                        .chartXAxis {
+                            AxisMarks(values: .automatic(desiredCount: 4)) { _ in
+                                AxisGridLine()
+                                    .foregroundStyle(.white.opacity(0.055))
+                                AxisValueLabel(format: .dateTime.month(.abbreviated))
+                                    .foregroundStyle(.white.opacity(0.4))
+                            }
+                        }
+                        .chartYAxis {
+                            AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
+                                AxisGridLine()
+                                    .foregroundStyle(.white.opacity(0.07))
+                                AxisValueLabel {
+                                    if let amount = value.as(Double.self) {
+                                        Text(compactCurrency(amount))
+                                            .foregroundStyle(.white.opacity(0.4))
+                                    }
+                                }
+                            }
+                        }
+                        .frame(height: 205)
                     }
-                    .chartYAxis(settings.isPrivacyMode ? .hidden : .automatic)
-                    .frame(height: 210)
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var snapshotFreshness: some View {
+        if let snapshot = finance.data.snapshots.max(by: { $0.date < $1.date }) {
+            VStack(alignment: .trailing, spacing: 5) {
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(snapshotFreshnessColor(snapshot.date))
+                        .frame(width: 6, height: 6)
+                        .shadow(color: snapshotFreshnessColor(snapshot.date).opacity(0.75), radius: 4)
+                    Text(freshnessText(snapshot.date))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.66))
+                }
+                Text(snapshot.date.formatted(date: .abbreviated, time: .omitted))
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.34))
+            }
+        } else {
+            Label("No snapshots", systemImage: "camera.metering.center.weighted")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.48))
+        }
+    }
+
+    private var positionSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeading(
+                "Position",
+                subtitle: "Balances derived from your activity and holdings"
+            )
+
+            LazyVGrid(columns: columns, spacing: 12) {
+                MetricCard(
+                    title: "Recorded Cash",
+                    value: settings.privateCurrency(totals.totalLiquidity),
+                    systemImage: "banknote.fill",
+                    detail: finance.data.transactions.isEmpty ? "No activity yet" : "Income less expenses"
+                )
+                MetricCard(
+                    title: "Investments",
+                    value: settings.privateCurrency(totals.totalInvestments),
+                    systemImage: "chart.line.uptrend.xyaxis",
+                    accent: .cyan,
+                    detail: countLabel(finance.data.investments.count, singular: "position")
+                )
+                MetricCard(
+                    title: "Crypto",
+                    value: settings.privateCurrency(totals.totalCrypto),
+                    systemImage: "bitcoinsign.circle.fill",
+                    accent: WCColor.warning,
+                    detail: countLabel(finance.data.crypto.count, singular: "holding")
+                )
+                MetricCard(
+                    title: "Total Assets",
+                    value: settings.privateCurrency(totals.totalAssets),
+                    systemImage: "building.columns.fill",
+                    accent: .indigo,
+                    detail: "Across every asset"
+                )
+                MetricCard(
+                    title: "Liabilities",
+                    value: settings.privateCurrency(totals.totalLiabilities),
+                    systemImage: "creditcard.fill",
+                    accent: WCColor.destructive,
+                    detail: countLabel(finance.data.liabilities.count, singular: "liability")
+                )
+                MetricCard(
+                    title: "Net Savings",
+                    value: settings.privateCurrency(currentMonthCashFlow.netSavings),
+                    systemImage: currentMonthCashFlow.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
+                    accent: currentMonthCashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive,
+                    detail: Date().formatted(.dateTime.month(.wide))
+                )
             }
         }
     }
 
     private var cashFlowTrend: some View {
-        FinanceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Cash Flow Trend")
-                    .font(.headline)
-                    .foregroundStyle(.white)
+        let trend = finance.cashFlowTrend(months: 6)
+        let hasCashFlow = trend.contains { $0.income != 0 || $0.expense != 0 }
+        let totalIncome = trend.reduce(0) { $0 + $1.income }
+        let totalExpense = trend.reduce(0) { $0 + $1.expense }
 
-                let trend = finance.cashFlowTrend(months: 6)
-                Chart(trend) { month in
-                    BarMark(
-                        x: .value("Month", month.monthLabel),
-                        y: .value("Income", month.income)
+        return FinanceCard {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeading("Six-Month Cash Flow", subtitle: "Income and expenses by month")
+
+                if !hasCashFlow {
+                    EmptyState(title: "No recent cash flow", systemImage: "chart.bar.xaxis")
+                        .frame(height: 210)
+                } else if settings.isPrivacyMode {
+                    MobilePrivacyChartCover(
+                        title: "Cash-flow chart concealed",
+                        message: "Monthly amounts and proportions are hidden."
                     )
-                    .foregroundStyle(WCColor.primary)
-                    .position(by: .value("Type", "Income"))
+                    .frame(height: 210)
+                } else {
+                    Chart(trend) { month in
+                        BarMark(
+                            x: .value("Month", month.monthLabel),
+                            y: .value("Amount", month.income)
+                        )
+                        .foregroundStyle(WCColor.primary.gradient)
+                        .position(by: .value("Type", "Income"))
+                        .cornerRadius(4)
 
-                    BarMark(
-                        x: .value("Month", month.monthLabel),
-                        y: .value("Expense", month.expense)
-                    )
-                    .foregroundStyle(WCColor.destructive)
-                    .position(by: .value("Type", "Expense"))
+                        BarMark(
+                            x: .value("Month", month.monthLabel),
+                            y: .value("Amount", month.expense)
+                        )
+                        .foregroundStyle(WCColor.destructive.opacity(0.8).gradient)
+                        .position(by: .value("Type", "Expenses"))
+                        .cornerRadius(4)
+                    }
+                    .chartLegend(.hidden)
+                    .chartXAxis {
+                        AxisMarks { _ in
+                            AxisValueLabel()
+                                .foregroundStyle(.white.opacity(0.42))
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
+                            AxisGridLine()
+                                .foregroundStyle(.white.opacity(0.07))
+                            AxisValueLabel {
+                                if let amount = value.as(Double.self) {
+                                    Text(compactCurrency(amount))
+                                        .foregroundStyle(.white.opacity(0.4))
+                                }
+                            }
+                        }
+                    }
+                    .frame(height: 210)
                 }
-                .chartYAxis(settings.isPrivacyMode ? .hidden : .automatic)
-                .frame(height: 220)
 
-                HStack(spacing: 16) {
-                    Label("Income", systemImage: "circle.fill")
-                        .foregroundStyle(WCColor.primary)
-                    Label("Expense", systemImage: "circle.fill")
-                        .foregroundStyle(WCColor.destructive)
+                HStack(spacing: 18) {
+                    cashFlowLegend(title: "Income", value: totalIncome, color: WCColor.primary)
+                    cashFlowLegend(title: "Expenses", value: totalExpense, color: WCColor.destructive)
+                    Spacer(minLength: 0)
+                    VStack(alignment: .trailing, spacing: 3) {
+                        Text("6M NET")
+                            .font(.caption2.weight(.bold))
+                            .tracking(1)
+                            .foregroundStyle(.white.opacity(0.38))
+                        Text(settings.privateCurrency(totalIncome - totalExpense))
+                            .font(.caption.monospacedDigit().weight(.bold))
+                            .foregroundStyle(totalIncome - totalExpense >= 0 ? WCColor.primary : WCColor.destructive)
+                    }
                 }
-                .font(.caption)
+            }
+        }
+    }
+
+    private func cashFlowLegend(title: String, value: Double, color: Color) -> some View {
+        HStack(spacing: 8) {
+            RoundedRectangle(cornerRadius: 3)
+                .fill(color.gradient)
+                .frame(width: 8, height: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.4))
+                Text(settings.privateCurrency(value))
+                    .font(.caption.monospacedDigit().weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.82))
             }
         }
     }
 
     private var topExpenses: some View {
-        FinanceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Top Expenses")
-                    .font(.headline)
-                    .foregroundStyle(.white)
+        let expenses = Array(finance.expensesByCategory(period: .thirtyDays).prefix(5))
 
-                let expenses = Array(finance.expensesByCategory(period: .thirtyDays).prefix(5))
+        return FinanceCard {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeading(
+                    "Top Expense Categories",
+                    subtitle: "Where spending was concentrated in the last 30 days"
+                )
+
                 if expenses.isEmpty {
                     EmptyState(title: "No expenses in the last 30 days", systemImage: "list.bullet.rectangle")
                 } else {
-                    VStack(spacing: 12) {
-                        ForEach(expenses) { item in
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack {
+                    VStack(spacing: 15) {
+                        ForEach(Array(expenses.enumerated()), id: \.element.id) { index, item in
+                            VStack(spacing: 8) {
+                                HStack(spacing: 9) {
+                                    Text("\(index + 1)")
+                                        .font(.caption2.monospacedDigit().weight(.bold))
+                                        .foregroundStyle(.white.opacity(0.34))
+                                        .frame(width: 17)
                                     Text(item.name)
-                                        .foregroundStyle(.white)
+                                        .font(.subheadline.weight(.medium))
+                                        .foregroundStyle(.white.opacity(0.8))
+                                        .lineLimit(1)
                                     Spacer()
                                     Text(settings.privateCurrency(item.value))
                                         .font(.subheadline.monospacedDigit().weight(.semibold))
                                         .foregroundStyle(.white)
                                 }
-                                ProgressView(value: item.percentage, total: 100)
-                                    .tint(WCColor.destructive)
+
+                                GeometryReader { geometry in
+                                    ZStack(alignment: .leading) {
+                                        Capsule()
+                                            .fill(.white.opacity(0.06))
+                                        Capsule()
+                                            .fill(
+                                                LinearGradient(
+                                                    colors: [WCColor.warning, WCColor.destructive.opacity(0.82)],
+                                                    startPoint: .leading,
+                                                    endPoint: .trailing
+                                                )
+                                            )
+                                            .frame(width: settings.isPrivacyMode ? 0 : geometry.size.width * max(0, min(item.percentage / 100, 1)))
+                                    }
+                                }
+                                .frame(height: 5)
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    private var recentActivity: some View {
+        let transactions = Array(finance.transactions.prefix(5))
+
+        return FinanceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeading("Recent Activity", subtitle: "Your latest recorded cash movements")
+
+                if transactions.isEmpty {
+                    EmptyState(title: "No activity yet", systemImage: "clock.arrow.circlepath")
+                } else {
+                    VStack(spacing: 10) {
+                        ForEach(transactions) { transaction in
+                            InsetFinanceRow {
+                                HStack(spacing: 12) {
+                                    Image(systemName: transaction.type == .income ? "arrow.down.left" : "arrow.up.right")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
+                                        .frame(width: 32, height: 32)
+                                        .background(
+                                            (transaction.type == .income ? WCColor.primary : WCColor.destructive).opacity(0.11),
+                                            in: RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                        )
+
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        Text(transaction.category)
+                                            .font(.subheadline.weight(.medium))
+                                            .foregroundStyle(.white.opacity(0.84))
+                                            .lineLimit(1)
+                                        Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
+                                            .font(.caption2)
+                                            .foregroundStyle(.white.opacity(0.38))
+                                    }
+
+                                    Spacer(minLength: 8)
+                                    Text(signedAmount(for: transaction))
+                                        .font(.subheadline.monospacedDigit().weight(.semibold))
+                                        .foregroundStyle(transaction.type == .income ? WCColor.primary : .white.opacity(0.82))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func netWorthChange(in points: [NetWorthPoint]) -> (value: Double, percentage: Double)? {
+        guard let first = points.first, let last = points.last, first.date != last.date else {
+            return nil
+        }
+        let change = last.value - first.value
+        let percentage = first.value != 0 ? change / abs(first.value) * 100 : 0
+        return (change, percentage)
+    }
+
+    private func chartDomain(for points: [NetWorthPoint]) -> ClosedRange<Double> {
+        let values = points.map(\.value)
+        guard let minimum = values.min(), let maximum = values.max() else {
+            return 0...1
+        }
+        let spread = max(maximum - minimum, max(abs(maximum), 1) * 0.08)
+        let padding = spread * 0.18
+        return (minimum - padding)...(maximum + padding)
+    }
+
+    private func compactCurrency(_ value: Double) -> String {
+        let compactValue = value.formatted(
+            .number
+                .notation(.compactName)
+                .precision(.fractionLength(0...1))
+        )
+        return "\(settings.currency.symbol)\(compactValue)"
+    }
+
+    private func privatePercent(_ value: Double) -> String {
+        settings.isPrivacyMode
+            ? "••••"
+            : "\(value.formatted(.number.precision(.fractionLength(1))))%"
+    }
+
+    private func signedAmount(for transaction: Transaction) -> String {
+        guard !settings.isPrivacyMode else { return "••••" }
+        let prefix = transaction.type == .income ? "+" : "−"
+        return prefix + settings.formatCurrency(transaction.amount)
+    }
+
+    private func countLabel(_ count: Int, singular: String) -> String {
+        "\(count) \(count == 1 ? singular : singular + "s")"
+    }
+
+    private func freshnessText(_ date: Date) -> String {
+        let interval = max(0, Date().timeIntervalSince(date))
+        switch interval {
+        case 0..<60:
+            return "Just now"
+        case 60..<(60 * 60):
+            return "\(Int(interval / 60))m ago"
+        case (60 * 60)..<(24 * 60 * 60):
+            return "\(Int(interval / (60 * 60)))h ago"
+        case (24 * 60 * 60)..<(7 * 24 * 60 * 60):
+            return "\(Int(interval / (24 * 60 * 60)))d ago"
+        default:
+            return date.formatted(date: .abbreviated, time: .omitted)
+        }
+    }
+
+    private func snapshotFreshnessColor(_ date: Date) -> Color {
+        let interval = max(0, Date().timeIntervalSince(date))
+        if interval < 24 * 60 * 60 {
+            return WCColor.primary
+        }
+        if interval < 7 * 24 * 60 * 60 {
+            return WCColor.warning
+        }
+        return .white.opacity(0.35)
+    }
+}
+
+private struct MobileHeroScenery: View {
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.025, green: 0.12, blue: 0.13),
+                        Color(red: 0.035, green: 0.07, blue: 0.12),
+                        Color(red: 0.025, green: 0.04, blue: 0.075)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+
+                Circle()
+                    .fill(WCColor.primary.opacity(0.14))
+                    .frame(width: 240, height: 240)
+                    .blur(radius: 58)
+                    .offset(x: proxy.size.width * 0.38, y: -proxy.size.height * 0.3)
+
+                Circle()
+                    .fill(WCColor.accent.opacity(0.08))
+                    .frame(width: 200, height: 200)
+                    .blur(radius: 55)
+                    .offset(x: -proxy.size.width * 0.38, y: proxy.size.height * 0.35)
+            }
+        }
+        .allowsHitTesting(false)
     }
 }

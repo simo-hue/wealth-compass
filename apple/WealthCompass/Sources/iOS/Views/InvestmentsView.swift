@@ -10,16 +10,11 @@ struct InvestmentsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                PageHeader(title: "Investments", subtitle: "Manage your stock and ETF portfolio") {
-                    Button {
+                PageHeader(title: "Investments", subtitle: "Follow positions, allocation, and performance.") {
+                    PrimaryActionButton(systemImage: "plus", accessibilityLabel: "Add Investment") {
                         editingInvestment = nil
                         showingForm = true
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.headline)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(WCColor.primary)
                 }
 
                 summary
@@ -55,26 +50,23 @@ struct InvestmentsView: View {
         let percent = costBasis > 0 ? (gain / costBasis) * 100 : 0
 
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            MetricCard(title: "Portfolio Value", value: settings.privateCurrency(total), systemImage: "chart.line.uptrend.xyaxis", accent: .blue)
-            MetricCard(title: "Positions", value: settings.isPrivacyMode ? "****" : "\(finance.data.investments.count)", systemImage: "number")
-            MetricCard(title: "Cost Basis", value: settings.privateCurrency(costBasis), systemImage: "banknote")
-            MetricCard(title: "Profit / Loss", value: settings.privateCurrency(gain), systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right", accent: gain >= 0 ? WCColor.primary : WCColor.destructive)
-
-            if !settings.isPrivacyMode {
-                Text("Performance \(percent.formatted(.number.precision(.fractionLength(1))))%")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(gain >= 0 ? WCColor.primary : WCColor.destructive)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
+            MetricCard(title: "Portfolio Value", value: settings.privateCurrency(total), systemImage: "chart.line.uptrend.xyaxis", accent: .cyan, detail: "Current market value")
+            MetricCard(title: "Positions", value: settings.isPrivacyMode ? "****" : "\(finance.data.investments.count)", systemImage: "square.stack.3d.up.fill", detail: "Stocks, ETFs, and more")
+            MetricCard(title: "Cost Basis", value: settings.privateCurrency(costBasis), systemImage: "banknote.fill", detail: "Capital invested")
+            MetricCard(
+                title: "Profit / Loss",
+                value: settings.privateCurrency(gain),
+                systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
+                accent: gain >= 0 ? WCColor.primary : WCColor.destructive,
+                detail: settings.isPrivacyMode ? "Performance hidden" : "\(percent.formatted(.number.precision(.fractionLength(1))))% performance"
+            )
         }
     }
 
     private var investmentList: some View {
         FinanceCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Investments")
-                    .font(.headline)
-                    .foregroundStyle(.white)
+                SectionHeading("Positions", subtitle: "Tap a position to edit its details")
 
                 if finance.data.investments.isEmpty {
                     EmptyState(title: "No investments yet", systemImage: "chart.xyaxis.line")
@@ -106,49 +98,55 @@ struct InvestmentsView: View {
     }
 
     private func investmentRow(_ investment: Investment) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 8) {
-                    Text(investment.symbol)
-                        .font(.headline.monospaced())
+        InsetFinanceRow {
+            HStack(alignment: .top, spacing: 12) {
+                Text(String(investment.symbol.prefix(2)))
+                    .font(.caption.monospaced().weight(.bold))
+                    .foregroundStyle(.cyan)
+                    .frame(width: 38, height: 38)
+                    .background(Color.cyan.opacity(0.11), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 8) {
+                        Text(investment.symbol)
+                            .font(.headline.monospaced())
+                            .foregroundStyle(.white)
+                        Text(investment.type.title.uppercased())
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(WCColor.primary)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(WCColor.primary.opacity(0.11), in: Capsule())
+                    }
+                    Text(investment.name)
+                        .font(.subheadline)
+                        .foregroundStyle(WCColor.textSecondary)
+                        .lineLimit(1)
+                    HStack(spacing: 10) {
+                        Text(settings.privateNumber(investment.quantity, fractionDigits: 6))
+                        Text(investment.sector)
+                    }
+                    .font(.caption)
+                    .foregroundStyle(WCColor.textSecondary)
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text(settings.privateCurrency(investment.currentValue, sourceCurrency: investment.currency))
+                        .font(.subheadline.monospacedDigit().weight(.bold))
                         .foregroundStyle(.white)
-                    Text(investment.type.title.uppercased())
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(.black)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(WCColor.primary, in: Capsule())
+                    ValueDelta(
+                        value: investment.gainLoss,
+                        formattedValue: settings.privateCurrency(investment.gainLoss, sourceCurrency: investment.currency),
+                        percent: investment.gainLossPercent
+                    )
+                    Text("Updated \(investment.updatedAt.formatted(date: .abbreviated, time: .omitted))")
+                        .font(.caption2)
+                        .foregroundStyle(WCColor.textSecondary)
                 }
-                Text(investment.name)
-                    .font(.subheadline)
-                    .foregroundStyle(WCColor.textSecondary)
-                    .lineLimit(1)
-                HStack(spacing: 10) {
-                    Text(settings.privateNumber(investment.quantity, fractionDigits: 6))
-                    Text(investment.sector)
-                }
-                .font(.caption)
-                .foregroundStyle(WCColor.textSecondary)
-            }
-
-            Spacer()
-
-            VStack(alignment: .trailing, spacing: 4) {
-                Text(settings.privateCurrency(investment.currentValue, sourceCurrency: investment.currency))
-                    .font(.subheadline.monospacedDigit().weight(.bold))
-                    .foregroundStyle(.white)
-                ValueDelta(
-                    value: investment.gainLoss,
-                    formattedValue: settings.privateCurrency(investment.gainLoss, sourceCurrency: investment.currency),
-                    percent: investment.gainLossPercent
-                )
-                Text("Updated \(investment.updatedAt.formatted(date: .abbreviated, time: .omitted))")
-                    .font(.caption2)
-                    .foregroundStyle(WCColor.textSecondary)
             }
         }
-        .padding(12)
-        .background(WCColor.cardElevated, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .contentShape(Rectangle())
         .onTapGesture {
             editingInvestment = investment
