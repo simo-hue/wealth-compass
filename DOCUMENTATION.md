@@ -294,3 +294,7 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [Sat Jun  6 15:04:17 CEST 2026] Updated Crypto Status Card metric
   - *Details*: Changed the secondary metric in the MacCryptoView Status card from the number of Coin IDs to the number of unique Coins (symbols).
   - *Tech Notes*: Updated MacCryptoView.swift to use 'Set(finance.data.crypto.map(\.symbol).filter(isNonEmpty)).count'.
+
+- [2026-06-07T00:16:00+02:00]: App Version Bump
+  - *Details*: Incremented the app version number for store publication.
+  - *Tech Notes*: Bumped MARKETING_VERSION to 1.0.1 and CURRENT_PROJECT_VERSION to 2 in WealthCompass.xcodeproj/project.pbxproj.
