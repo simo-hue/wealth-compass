@@ -342,12 +342,15 @@ struct RecurringTransactionFormView: View {
             endDate: normalizedEndDate,
             notificationsEnabled: notificationsEnabled,
             isActive: existingSchedule?.isActive ?? true,
+            completedAt: existingSchedule?.completedAt,
             createdAt: existingSchedule?.createdAt ?? Date(),
             updatedAt: Date()
         )
 
         var savedSchedule = seed
-        if !scheduleChanged, let existingSchedule {
+        if savedSchedule.isCompleted {
+            savedSchedule.isActive = false
+        } else if !scheduleChanged, let existingSchedule {
             savedSchedule.nextDueDate = existingSchedule.nextDueDate
         } else if let nextDueDate = seed.firstOccurrence(onOrAfter: Date()) {
             savedSchedule.nextDueDate = nextDueDate

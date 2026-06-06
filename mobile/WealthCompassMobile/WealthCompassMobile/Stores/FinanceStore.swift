@@ -105,6 +105,7 @@ final class FinanceStore: ObservableObject {
 
     var recurringTransactions: [RecurringTransaction] {
         data.recurringTransactions.sorted { lhs, rhs in
+            if lhs.isCompleted != rhs.isCompleted { return !lhs.isCompleted }
             if lhs.isActive != rhs.isActive { return lhs.isActive }
             return lhs.nextDueDate < rhs.nextDueDate
         }
@@ -149,6 +150,7 @@ final class FinanceStore: ObservableObject {
         }
 
         var updated = data.recurringTransactions[index]
+        guard !updated.isCompleted else { return }
         if isActive {
             guard let nextDueDate = updated.firstOccurrence(onOrAfter: now) else {
                 updated.isActive = false
@@ -162,6 +164,17 @@ final class FinanceStore: ObservableObject {
         updated.isActive = isActive
         updated.updatedAt = now
         data.recurringTransactions[index] = updated
+        save()
+    }
+
+    func completeRecurringTransaction(_ recurringTransaction: RecurringTransaction, completedAt: Date = Date()) {
+        guard let index = data.recurringTransactions.firstIndex(where: { $0.id == recurringTransaction.id }) else {
+            return
+        }
+
+        data.recurringTransactions[index].isActive = false
+        data.recurringTransactions[index].completedAt = completedAt
+        data.recurringTransactions[index].updatedAt = completedAt
         save()
     }
 
@@ -182,7 +195,7 @@ final class FinanceStore: ObservableObject {
 
         for index in data.recurringTransactions.indices {
             var schedule = data.recurringTransactions[index]
-            guard schedule.isActive else { continue }
+            guard schedule.isActive, !schedule.isCompleted else { continue }
 
             var occurrence = schedule.nextDueDate
             var processedOccurrences = 0
@@ -785,6 +798,8 @@ private struct ImportedTransaction: Decodable {
     let description: String?
     let date: String?
     let createdAt: String?
+    let recurringTransactionID: UUID?
+    let recurringOccurrenceDate: String?
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -794,6 +809,8 @@ private struct ImportedTransaction: Decodable {
         case description
         case date
         case createdAt
+        case recurringTransactionID
+        case recurringOccurrenceDate
     }
 
     init(from decoder: Decoder) throws {
@@ -805,6 +822,8 @@ private struct ImportedTransaction: Decodable {
         description = container.decodeImportedStringIfPresent(forKey: .description)
         date = container.decodeImportedStringIfPresent(forKey: .date)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
+        recurringTransactionID = container.decodeUUIDIfPresent(forKey: .recurringTransactionID)
+        recurringOccurrenceDate = container.decodeImportedStringIfPresent(forKey: .recurringOccurrenceDate)
     }
 
     func model() -> Transaction? {
@@ -824,7 +843,9 @@ private struct ImportedTransaction: Decodable {
             amount: amount,
             description: description ?? "",
             date: date,
-            createdAt: ImportDateParser.parse(createdAt) ?? date
+            createdAt: ImportDateParser.parse(createdAt) ?? date,
+            recurringTransactionID: recurringTransactionID,
+            recurringOccurrenceDate: ImportDateParser.parse(recurringOccurrenceDate)
         )
     }
 }
@@ -841,6 +862,7 @@ private struct ImportedRecurringTransaction: Decodable {
     let endDate: String?
     let notificationsEnabled: Bool?
     let isActive: Bool?
+    let completedAt: String?
     let createdAt: String?
     let updatedAt: String?
 
@@ -856,6 +878,7 @@ private struct ImportedRecurringTransaction: Decodable {
         case endDate
         case notificationsEnabled
         case isActive
+        case completedAt
         case createdAt
         case updatedAt
     }
@@ -873,6 +896,7 @@ private struct ImportedRecurringTransaction: Decodable {
         endDate = container.decodeImportedStringIfPresent(forKey: .endDate)
         notificationsEnabled = container.decodeImportedBoolIfPresent(forKey: .notificationsEnabled)
         isActive = container.decodeImportedBoolIfPresent(forKey: .isActive)
+        completedAt = container.decodeImportedStringIfPresent(forKey: .completedAt)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
         updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
     }
@@ -891,6 +915,7 @@ private struct ImportedRecurringTransaction: Decodable {
         }
 
         let parsedEndDate = ImportDateParser.parse(endDate)
+        let parsedCompletedAt = ImportDateParser.parse(completedAt)
         guard parsedEndDate.map({ $0 >= startDate }) ?? true else { return nil }
 
         return RecurringTransaction(
@@ -904,7 +929,8 @@ private struct ImportedRecurringTransaction: Decodable {
             nextDueDate: nextDueDate,
             endDate: parsedEndDate,
             notificationsEnabled: notificationsEnabled ?? true,
-            isActive: isActive ?? true,
+            isActive: parsedCompletedAt == nil && (isActive ?? true),
+            completedAt: parsedCompletedAt,
             createdAt: ImportDateParser.parse(createdAt) ?? startDate,
             updatedAt: ImportDateParser.parse(updatedAt) ?? startDate
         )
@@ -1551,6 +1577,7 @@ private extension FinancialData {
                 return $0.date > $1.date
             },
             recurringTransactions: recurringTransactions.sorted {
+                if $0.isCompleted != $1.isCompleted { return !$0.isCompleted }
                 if $0.isActive != $1.isActive { return $0.isActive }
                 return $0.nextDueDate < $1.nextDueDate
             },

@@ -205,8 +205,13 @@ struct RecurringTransaction: Identifiable, Codable, Equatable {
     var endDate: Date?
     var notificationsEnabled: Bool = true
     var isActive: Bool = true
+    var completedAt: Date?
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
+
+    var isCompleted: Bool {
+        completedAt != nil
+    }
 
     func firstOccurrence(onOrAfter threshold: Date, calendar: Calendar = .current) -> Date? {
         var occurrence = startDate
