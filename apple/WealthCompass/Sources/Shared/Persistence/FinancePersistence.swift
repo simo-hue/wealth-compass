@@ -145,22 +145,35 @@ struct LocalFinancePersistence: FinancePersistence {
                 let localExists = self.fileManager.fileExists(atPath: self.storageURL.path)
                 
                 if localExists {
-                    let localAttrs = try self.fileManager.attributesOfItem(atPath: self.storageURL.path)
                     let iCloudAttrs = try self.fileManager.attributesOfItem(atPath: url.path)
-                    
-                    if let localDate = localAttrs[.modificationDate] as? Date,
-                       let iCloudDate = iCloudAttrs[.modificationDate] as? Date {
-                        // If iCloud file is newer, copy to temp and replace safely
-                        if iCloudDate > localDate {
-                            let tempURL = self.fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-                            try self.fileManager.copyItem(at: url, to: tempURL)
-                            _ = try self.fileManager.replaceItemAt(self.storageURL, withItemAt: tempURL)
+                    if let iCloudDate = iCloudAttrs[.modificationDate] as? Date {
+                        let lastSynced = UserDefaults.standard.object(forKey: "wc_last_synced_icloud_date") as? Date
+                        
+                        if lastSynced == nil || iCloudDate != lastSynced {
+                            if let iCloudData = try? self.decoder.decode(FinancialData.self, from: Data(contentsOf: url)),
+                               let localData = try? self.decoder.decode(FinancialData.self, from: Data(contentsOf: self.storageURL)) {
+                                
+                                let mergedData = localData.merged(with: iCloudData)
+                                let tempURL = self.fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+                                try self.encoder.encode(mergedData).write(to: tempURL, options: .atomic)
+                                _ = try self.fileManager.replaceItemAt(self.storageURL, withItemAt: tempURL)
+                            } else {
+                                // Fallback: just copy if decoding fails
+                                let tempURL = self.fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+                                try self.fileManager.copyItem(at: url, to: tempURL)
+                                _ = try self.fileManager.replaceItemAt(self.storageURL, withItemAt: tempURL)
+                            }
+                            UserDefaults.standard.set(iCloudDate, forKey: "wc_last_synced_icloud_date")
                         }
                     }
                 } else {
                     // Local file doesn't exist, but iCloud does, copy it
                     try self.createStorageDirectoryIfNeeded()
                     try self.fileManager.copyItem(at: url, to: self.storageURL)
+                    if let iCloudAttrs = try? self.fileManager.attributesOfItem(atPath: url.path),
+                       let iCloudDate = iCloudAttrs[.modificationDate] as? Date {
+                        UserDefaults.standard.set(iCloudDate, forKey: "wc_last_synced_icloud_date")
+                    }
                 }
             } catch {
                 readError = error
@@ -183,6 +196,11 @@ struct LocalFinancePersistence: FinancePersistence {
             do {
                 let data = try Data(contentsOf: self.storageURL)
                 try data.write(to: url, options: .atomic)
+                
+                if let iCloudAttrs = try? self.fileManager.attributesOfItem(atPath: url.path),
+                   let iCloudDate = iCloudAttrs[.modificationDate] as? Date {
+                    UserDefaults.standard.set(iCloudDate, forKey: "wc_last_synced_icloud_date")
+                }
             } catch {
                 writeError = error
             }

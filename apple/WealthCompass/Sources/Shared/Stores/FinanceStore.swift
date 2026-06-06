@@ -75,6 +75,7 @@ enum FinanceImportError: LocalizedError {
 final class FinanceStore: ObservableObject {
     @Published private(set) var data = FinancialData()
     @Published private(set) var isRefreshingMarketPrices = false
+    @Published private(set) var iCloudSyncError: String?
 
     private let persistence: FinancePersistence
     private let encoder: JSONEncoder
@@ -672,9 +673,16 @@ final class FinanceStore: ObservableObject {
 
     private func load() {
         do {
-            data = try persistence.load() ?? FinancialData()
+            let loadedData = try persistence.load() ?? FinancialData()
+            withAnimation {
+                self.data = loadedData
+                self.iCloudSyncError = nil
+            }
         } catch {
-            data = FinancialData()
+            withAnimation {
+                self.data = FinancialData()
+                self.iCloudSyncError = error.localizedDescription
+            }
         }
     }
 
@@ -686,7 +694,27 @@ final class FinanceStore: ObservableObject {
         ) { [weak self] _ in
             self?.updateICloudObserverState()
         }
+        
+        NotificationCenter.default.addObserver(
+            forName: .NSUbiquityIdentityDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleUbiquityIdentityChange()
+        }
+        
         updateICloudObserverState()
+        handleUbiquityIdentityChange()
+    }
+
+    private func handleUbiquityIdentityChange() {
+        if FileManager.default.ubiquityIdentityToken == nil {
+            let isEnabled = UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
+            if isEnabled {
+                UserDefaults.standard.set(false, forKey: "wc_mobile_icloud_sync_enabled")
+                self.iCloudSyncError = "iCloud session expired or user logged out. Sync disabled."
+            }
+        }
     }
 
     private func updateICloudObserverState() {
@@ -736,15 +764,25 @@ final class FinanceStore: ObservableObject {
     private func save() {
         do {
             try persistence.save(data)
+            self.iCloudSyncError = nil
         } catch {
+            self.iCloudSyncError = error.localizedDescription
             assertionFailure("Failed to save local finance data: \(error)")
         }
     }
 
     func forceICloudSync() async throws {
-        let newData = try persistence.forceICloudSync()
-        if let newData {
-            self.data = newData
+        do {
+            let newData = try persistence.forceICloudSync()
+            if let newData {
+                withAnimation {
+                    self.data = newData
+                    self.iCloudSyncError = nil
+                }
+            }
+        } catch {
+            self.iCloudSyncError = error.localizedDescription
+            throw error
         }
     }
 
@@ -1620,17 +1658,6 @@ private extension FinancialData {
             || !crypto.isEmpty || !liabilities.isEmpty || !snapshots.isEmpty
     }
 
-    func merged(with incoming: FinancialData) -> FinancialData {
-        FinancialData(
-            transactions: transactions.mergedByID(with: incoming.transactions),
-            recurringTransactions: recurringTransactions.mergedByID(with: incoming.recurringTransactions),
-            investments: investments.mergedByID(with: incoming.investments),
-            crypto: crypto.mergedByID(with: incoming.crypto),
-            liabilities: liabilities.mergedByID(with: incoming.liabilities),
-            snapshots: snapshots.mergedByID(with: incoming.snapshots)
-        )
-    }
-
     func sortedForStorage() -> FinancialData {
         FinancialData(
             transactions: transactions.sorted {
@@ -1651,18 +1678,6 @@ private extension FinancialData {
 }
 
 private extension Array where Element: Identifiable, Element.ID == UUID {
-    func mergedByID(with incoming: [Element]) -> [Element] {
-        var merged = self
-        for item in incoming {
-            if let index = merged.firstIndex(where: { $0.id == item.id }) {
-                merged[index] = item
-            } else {
-                merged.append(item)
-            }
-        }
-        return merged
-    }
-
     func uniquedByID() -> [Element] {
         var seen = Set<UUID>()
         return filter { item in
