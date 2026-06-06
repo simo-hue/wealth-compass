@@ -207,10 +207,14 @@ struct FinnhubQuoteClient {
     var session: URLSession = .shared
 
     func testConnection() async throws -> MarketPriceQuote {
-        try await quote(for: "AAPL")
+        try await quote(for: "AAPL", validationNonce: UUID().uuidString)
     }
 
     func quote(for symbol: String) async throws -> MarketPriceQuote {
+        try await quote(for: symbol, validationNonce: nil)
+    }
+
+    private func quote(for symbol: String, validationNonce: String?) async throws -> MarketPriceQuote {
         let normalizedSymbol = symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         guard !normalizedSymbol.isEmpty else {
             throw MarketDataError.noQuote(provider: "Finnhub", symbol: symbol)
@@ -223,14 +227,23 @@ struct FinnhubQuoteClient {
         components.queryItems = [
             URLQueryItem(name: "symbol", value: normalizedSymbol)
         ]
+        if let validationNonce {
+            components.queryItems?.append(URLQueryItem(name: "_validation_nonce", value: validationNonce))
+        }
 
         guard let url = components.url else {
             throw MarketDataError.invalidURL
         }
 
-        var request = URLRequest(url: url)
+        var request = URLRequest(
+            url: url,
+            cachePolicy: validationNonce == nil ? .useProtocolCachePolicy : .reloadIgnoringLocalAndRemoteCacheData,
+            timeoutInterval: 20
+        )
         request.setValue(apiKey, forHTTPHeaderField: "X-Finnhub-Token")
-        request.timeoutInterval = 20
+        if validationNonce != nil {
+            request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+        }
 
         let (data, response) = try await session.data(for: request)
         try Self.validate(response: response, provider: "Finnhub")
@@ -273,7 +286,8 @@ struct CoinGeckoPriceClient {
     var session: URLSession = .shared
 
     func testConnection() async throws -> MarketPriceQuote {
-        guard let quote = try await prices(for: ["bitcoin"])["bitcoin"] else {
+        let quotes = try await pricesForChunk(["bitcoin"], validationNonce: UUID().uuidString)
+        guard let quote = quotes["bitcoin"] else {
             throw MarketDataError.noQuote(provider: "CoinGecko", symbol: "bitcoin")
         }
         return quote
@@ -287,13 +301,13 @@ struct CoinGeckoPriceClient {
 
         var quotes: [String: MarketPriceQuote] = [:]
         for chunk in ids.chunked(into: 100) {
-            let partial = try await pricesForChunk(chunk)
+            let partial = try await pricesForChunk(chunk, validationNonce: nil)
             quotes.merge(partial) { _, incoming in incoming }
         }
         return quotes
     }
 
-    private func pricesForChunk(_ coinIDs: [String]) async throws -> [String: MarketPriceQuote] {
+    private func pricesForChunk(_ coinIDs: [String], validationNonce: String?) async throws -> [String: MarketPriceQuote] {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "api.coingecko.com"
@@ -303,14 +317,23 @@ struct CoinGeckoPriceClient {
             URLQueryItem(name: "vs_currencies", value: "usd"),
             URLQueryItem(name: "include_last_updated_at", value: "true")
         ]
+        if let validationNonce {
+            components.queryItems?.append(URLQueryItem(name: "_validation_nonce", value: validationNonce))
+        }
 
         guard let url = components.url else {
             throw MarketDataError.invalidURL
         }
 
-        var request = URLRequest(url: url)
+        var request = URLRequest(
+            url: url,
+            cachePolicy: validationNonce == nil ? .useProtocolCachePolicy : .reloadIgnoringLocalAndRemoteCacheData,
+            timeoutInterval: 20
+        )
         addAPIKeyHeader(to: &request)
-        request.timeoutInterval = 20
+        if validationNonce != nil {
+            request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+        }
 
         let (data, response) = try await session.data(for: request)
         try Self.validate(response: response, provider: "CoinGecko")

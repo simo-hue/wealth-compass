@@ -9,7 +9,7 @@ Current app version: `1.1`.
 - SwiftUI iPhone app under `WealthCompassMobile/`
 - Local-only JSON persistence in the app sandbox
 - No Supabase client, credentials, auth flow, or remote database dependency
-- Manual current prices for investments and crypto so the app remains local-only
+- Optional Finnhub and CoinGecko API keys, verified with a live price request before secure Keychain storage
 - Automatic net-worth snapshots after local finance data changes
 - Persistent custom cash-flow categories in addition to the default category set
 - Optional Face ID / Touch ID app lock

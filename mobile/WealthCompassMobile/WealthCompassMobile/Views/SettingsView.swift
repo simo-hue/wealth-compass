@@ -432,6 +432,15 @@ private enum MarketDataCredentialKind: String, Identifiable {
             .coingeckoAPIKey
         }
     }
+
+    var testAssetName: String {
+        switch self {
+        case .finnhub:
+            "Apple (AAPL)"
+        case .coingecko:
+            "Bitcoin"
+        }
+    }
 }
 
 private struct MarketDataCredentialEditor: View {
@@ -456,10 +465,14 @@ private struct MarketDataCredentialEditor: View {
                         .textContentType(.password)
                         .privacySensitive()
 
+                    Text("The key is saved only after \(credential.testAssetName) returns a live USD price.")
+                        .font(.caption)
+                        .foregroundStyle(WCColor.textSecondary)
+
                     if isSaving {
                         HStack(spacing: 10) {
                             ProgressView()
-                            Text("Testing API key...")
+                            Text("Retrieving \(credential.testAssetName) price...")
                                 .foregroundStyle(WCColor.textSecondary)
                         }
                     }
@@ -476,7 +489,7 @@ private struct MarketDataCredentialEditor: View {
                         .disabled(isSaving)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save", action: onSave)
+                    Button("Verify & Save", action: onSave)
                         .disabled(!canSave)
                 }
             }
