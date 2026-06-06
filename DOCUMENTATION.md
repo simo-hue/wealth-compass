@@ -278,3 +278,7 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [Sat Jun  6 14:40:51 CEST 2026] Fixed UI bug in crypto and investments pages
   - *Details*: Added .frame(maxWidth: .infinity, alignment: .leading) to the inner VStack of FinanceCard in MacInvestmentsView.swift and MacCryptoView.swift to make the status cards use all available width space.
   - *Tech Notes*: Modified MacInvestmentsView.swift and MacCryptoView.swift.
+
+- [Sat Jun  6 14:50:04 CEST 2026] Added Additional Info to Cash Flow Cards
+  - *Details*: Added "Transactions" (current month's count) and "Total Cash" metrics to MacCashFlowView to fill the empty space on the right of the summary cards row.
+  - *Tech Notes*: Updated MacCashFlowView.swift to compute monthly transactions count and total liquidity.

@@ -137,6 +137,9 @@ struct MacCashFlowView: View {
 
     private var summaryCards: some View {
         let cashFlow = finance.monthlyCashFlow(for: Date())
+        let totals = finance.calculateTotals(settings: settings)
+        let monthlyTransactionsCount = finance.transactions.filter { Calendar.current.isDate($0.date, equalTo: Date(), toGranularity: .month) }.count
+
         return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
             MetricCard(
                 title: "Monthly Income",
@@ -162,6 +165,17 @@ struct MacCashFlowView: View {
                     ? "****"
                     : "\(cashFlow.savingsRate.formatted(.number.precision(.fractionLength(1))))%",
                 systemImage: "percent"
+            )
+            MetricCard(
+                title: "Transactions",
+                value: settings.isPrivacyMode ? "****" : "\(monthlyTransactionsCount)",
+                systemImage: "arrow.left.arrow.right"
+            )
+            MetricCard(
+                title: "Total Cash",
+                value: settings.privateCurrency(totals.totalLiquidity),
+                systemImage: "banknote",
+                accent: totals.totalLiquidity >= 0 ? WCColor.primary : WCColor.destructive
             )
         }
     }
