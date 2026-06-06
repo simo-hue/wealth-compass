@@ -7,22 +7,24 @@ struct MacCryptoView: View {
     @State private var selection: CryptoHolding.ID?
     @State private var holdingPendingDeletion: CryptoHolding?
 
-    private let metricColumns = [
-        GridItem(.adaptive(minimum: 135), spacing: 12)
+    private let summaryColumns = [
+        GridItem(.adaptive(minimum: 190, maximum: 320), spacing: 16)
     ]
 
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            Divider()
-
-            HSplitView {
-                overview
-                    .frame(minWidth: 250, idealWidth: 340, maxWidth: 430)
-
-                cryptoTable
-                    .frame(minWidth: 500)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                header
+                summaryCards
+                AllocationChart(
+                    title: "Crypto Allocation",
+                    slices: finance.cryptoAllocation(settings: settings),
+                    settings: settings
+                )
+                cryptoSection
             }
+            .padding(24)
+            .frame(maxWidth: 1440, alignment: .leading)
         }
         .background(ScreenBackground())
         .navigationTitle("Crypto")
@@ -46,28 +48,7 @@ struct MacCryptoView: View {
     }
 
     private var header: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Crypto")
-                    .font(.largeTitle.bold())
-                Text("\(privateCount(finance.data.crypto.count)) tracked holdings")
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Button("Edit", systemImage: "pencil") {
-                guard let holding = selectedHolding else { return }
-                appModel.editor = .crypto(holding)
-            }
-            .disabled(selectedHolding == nil)
-
-            Button(role: .destructive) {
-                guard let holding = selectedHolding else { return }
-                holdingPendingDeletion = holding
-            } label: {
-                Label("Delete", systemImage: "trash")
-            }
-            .disabled(selectedHolding == nil)
-
+        PageHeader(title: "Crypto", subtitle: "\(privateCount(finance.data.crypto.count)) tracked holdings") {
             Button {
                 appModel.editor = .crypto(nil)
             } label: {
@@ -76,26 +57,9 @@ struct MacCryptoView: View {
             .buttonStyle(.borderedProminent)
             .tint(WCColor.primary)
         }
-        .padding(24)
     }
 
-    private var overview: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                summary
-                AllocationChart(
-                    title: "Crypto Allocation",
-                    slices: finance.cryptoAllocation(settings: settings),
-                    settings: settings
-                )
-                statusDetails
-            }
-            .padding(20)
-        }
-        .background(WCColor.background.opacity(0.35))
-    }
-
-    private var summary: some View {
+    private var summaryCards: some View {
         let total = finance.calculateTotals(settings: settings).totalCrypto
         let costBasis = finance.data.crypto.reduce(0) {
             $0 + settings.convert($1.costBasis, from: $1.currency)
@@ -103,63 +67,75 @@ struct MacCryptoView: View {
         let gain = total - costBasis
         let percent = costBasis > 0 ? (gain / costBasis) * 100 : 0
 
-        return VStack(alignment: .leading, spacing: 12) {
-            LazyVGrid(columns: metricColumns, spacing: 12) {
-                MetricCard(
-                    title: "Crypto Value",
-                    value: settings.privateCurrency(total),
-                    systemImage: "bitcoinsign.circle",
-                    accent: WCColor.warning
-                )
-                MetricCard(
-                    title: "Holdings",
-                    value: privateCount(finance.data.crypto.count),
-                    systemImage: "number"
-                )
-                MetricCard(
-                    title: "Cost Basis",
-                    value: settings.privateCurrency(costBasis),
-                    systemImage: "banknote"
-                )
-                MetricCard(
-                    title: "Profit / Loss",
-                    value: settings.privateCurrency(gain),
-                    systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
-                    accent: gain >= 0 ? WCColor.primary : WCColor.destructive
-                )
-            }
-
+        return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
+            MetricCard(
+                title: "Crypto Value",
+                value: settings.privateCurrency(total),
+                systemImage: "bitcoinsign.circle",
+                accent: WCColor.warning
+            )
+            MetricCard(
+                title: "Holdings",
+                value: privateCount(finance.data.crypto.count),
+                systemImage: "number"
+            )
+            MetricCard(
+                title: "Cost Basis",
+                value: settings.privateCurrency(costBasis),
+                systemImage: "banknote"
+            )
+            MetricCard(
+                title: "Profit / Loss",
+                value: settings.privateCurrency(gain),
+                systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
+                accent: gain >= 0 ? WCColor.primary : WCColor.destructive
+            )
+            
             if !settings.isPrivacyMode {
-                Text("Performance \(percent.formatted(.number.precision(.fractionLength(1))))%")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(gain >= 0 ? WCColor.primary : WCColor.destructive)
+                MetricCard(
+                    title: "Performance",
+                    value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
+                    systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
+                    accent: percent >= 0 ? WCColor.primary : WCColor.destructive
+                )
             }
+            
+            let latestUpdate = finance.data.crypto.map(\.updatedAt).max()
+            let uniqueCryptoCount = Set(finance.data.crypto.map(\.symbol).filter(isNonEmpty)).count
+            MetricCard(
+                title: "Status • \(privateCount(uniqueCryptoCount)) Coins",
+                value: latestUpdate.map(formattedUpdate) ?? "Never",
+                systemImage: "checkmark.circle"
+            )
         }
     }
 
-    private var statusDetails: some View {
-        let holdings = finance.data.crypto
-        let identifierCount = holdings.filter { isNonEmpty($0.coinId) }.count
-        let pricedCount = holdings.filter { $0.currentPrice > 0 }.count
-        let latestUpdate = holdings.map(\.updatedAt).max()
 
-        return FinanceCard {
-            VStack(alignment: .leading, spacing: 12) {
-                Label("Holding Status", systemImage: "checkmark.circle")
-                    .font(.headline)
+    private var cryptoSection: some View {
+        FinanceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Holdings")
+                        .font(.headline)
+                    Spacer()
+                    Button("Edit", systemImage: "pencil") {
+                        guard let holding = selectedHolding else { return }
+                        appModel.editor = .crypto(holding)
+                    }
+                    .disabled(selectedHolding == nil)
 
-                LabeledContent("Last Updated") {
-                    Text(latestUpdate.map(formattedUpdate) ?? "Never")
+                    Button(role: .destructive) {
+                        guard let holding = selectedHolding else { return }
+                        holdingPendingDeletion = holding
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                    .disabled(selectedHolding == nil)
                 }
-                LabeledContent("Price Coverage") {
-                    Text("\(privateCount(pricedCount)) of \(privateCount(holdings.count))")
-                }
-                LabeledContent("Coin IDs") {
-                    Text("\(privateCount(identifierCount)) of \(privateCount(holdings.count))")
-                }
+
+                cryptoTable
+                    .frame(minHeight: 360)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundStyle(.white)
         }
     }
 
