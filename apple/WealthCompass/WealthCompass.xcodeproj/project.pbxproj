@@ -41,6 +41,8 @@
 		AD0000000000000000000036 /* MacCryptoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000026 /* MacCryptoView.swift */; };
 		AD0000000000000000000037 /* MacEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000027 /* MacEditorSheet.swift */; };
 		AD0000000000000000000038 /* MacSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000028 /* MacSettingsView.swift */; };
+		AD0000000000000000000039 /* MacPlatformServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000029 /* MacPlatformServices.swift */; };
+		AD000000000000000000003A /* MacRecurringTransactionEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC000000000000000000002A /* MacRecurringTransactionEditor.swift */; };
 		AD0000000000000000000040 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000030 /* Assets.xcassets */; };
 		AD0000000000000000000041 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000031 /* PrivacyInfo.xcprivacy */; };
 		AD0000000000000000000042 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000032 /* Assets.xcassets */; };
@@ -75,6 +77,8 @@
 		AC0000000000000000000026 /* MacCryptoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacCryptoView.swift; sourceTree = "<group>"; };
 		AC0000000000000000000027 /* MacEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacEditorSheet.swift; sourceTree = "<group>"; };
 		AC0000000000000000000028 /* MacSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacSettingsView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000029 /* MacPlatformServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPlatformServices.swift; sourceTree = "<group>"; };
+		AC000000000000000000002A /* MacRecurringTransactionEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacRecurringTransactionEditor.swift; sourceTree = "<group>"; };
 		AC0000000000000000000030 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AC0000000000000000000031 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AC0000000000000000000032 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -159,11 +163,13 @@
 				AC0000000000000000000020 /* WealthCompassMacApp.swift */,
 				AC0000000000000000000021 /* MacAppModel.swift */,
 				AC0000000000000000000022 /* MacRootView.swift */,
+				AC0000000000000000000029 /* MacPlatformServices.swift */,
 				AC0000000000000000000023 /* MacDashboardView.swift */,
 				AC0000000000000000000024 /* MacCashFlowView.swift */,
 				AC0000000000000000000025 /* MacInvestmentsView.swift */,
 				AC0000000000000000000026 /* MacCryptoView.swift */,
 				AC0000000000000000000027 /* MacEditorSheet.swift */,
+				AC000000000000000000002A /* MacRecurringTransactionEditor.swift */,
 				AC0000000000000000000028 /* MacSettingsView.swift */,
 			);
 			path = macOS;
@@ -341,11 +347,13 @@
 				AD0000000000000000000030 /* WealthCompassMacApp.swift in Sources */,
 				AD0000000000000000000031 /* MacAppModel.swift in Sources */,
 				AD0000000000000000000032 /* MacRootView.swift in Sources */,
+				AD0000000000000000000039 /* MacPlatformServices.swift in Sources */,
 				AD0000000000000000000033 /* MacDashboardView.swift in Sources */,
 				AD0000000000000000000034 /* MacCashFlowView.swift in Sources */,
 				AD0000000000000000000035 /* MacInvestmentsView.swift in Sources */,
 				AD0000000000000000000036 /* MacCryptoView.swift in Sources */,
 				AD0000000000000000000037 /* MacEditorSheet.swift in Sources */,
+				AD000000000000000000003A /* MacRecurringTransactionEditor.swift in Sources */,
 				AD0000000000000000000038 /* MacSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

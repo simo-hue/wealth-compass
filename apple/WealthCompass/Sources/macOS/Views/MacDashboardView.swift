@@ -4,127 +4,1075 @@ import SwiftUI
 struct MacDashboardView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
+    @EnvironmentObject private var appModel: MacAppModel
+
     @State private var timeRange: TimeRange = .oneYear
+    @State private var expensePeriod: AnalyticsPeriod = .thirtyDays
+    @State private var selectedNetWorthDate: Date?
 
-    private let columns = [
-        GridItem(.adaptive(minimum: 210, maximum: 320), spacing: 16)
-    ]
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
-                PageHeader(title: "Dashboard", subtitle: "Your financial position at a glance") {
-                    Picker("Range", selection: $timeRange) {
-                        ForEach(TimeRange.allCases) { range in
-                            Text(range.rawValue).tag(range)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 260)
-                }
-
-                let totals = finance.calculateTotals(settings: settings)
-                LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
-                    MetricCard(
-                        title: "Net Worth",
-                        value: settings.privateCurrency(totals.netWorth),
-                        systemImage: "chart.line.uptrend.xyaxis"
-                    )
-                    MetricCard(
-                        title: "Cash Balance",
-                        value: settings.privateCurrency(totals.totalLiquidity),
-                        systemImage: "wallet.pass"
-                    )
-                    MetricCard(
-                        title: "Investments",
-                        value: settings.privateCurrency(totals.totalInvestments),
-                        systemImage: "chart.xyaxis.line",
-                        accent: .blue
-                    )
-                    MetricCard(
-                        title: "Crypto",
-                        value: settings.privateCurrency(totals.totalCrypto),
-                        systemImage: "bitcoinsign.circle",
-                        accent: WCColor.warning
-                    )
-                }
-
-                HStack(alignment: .top, spacing: 16) {
-                    netWorthChart
-                    AllocationChart(
-                        title: "Asset Allocation",
-                        slices: finance.assetAllocation(settings: settings),
-                        settings: settings
-                    )
-                    .frame(minWidth: 300, maxWidth: 380)
-                }
-
-                cashFlowChart
-            }
-            .padding(24)
-            .frame(maxWidth: 1440, alignment: .leading)
-        }
-        .background(ScreenBackground())
-        .navigationTitle("Dashboard")
+    private var totals: FinanceTotals {
+        finance.calculateTotals(settings: settings)
     }
 
-    private var netWorthChart: some View {
-        FinanceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Net Worth History")
-                    .font(.headline)
+    private var currentMonthCashFlow: MonthlyCashFlow {
+        finance.monthlyCashFlow(for: Date())
+    }
 
-                let points = finance.snapshots(range: timeRange)
-                if points.isEmpty {
-                    EmptyState(title: "History appears after your first update", systemImage: "chart.xyaxis.line")
-                } else {
-                    Chart(points) { point in
-                        LineMark(
-                            x: .value("Date", point.date),
-                            y: .value("Net Worth", point.value)
-                        )
-                        .foregroundStyle(WCColor.primary)
-                        .interpolationMethod(.catmullRom)
+    private var isCompletelyEmpty: Bool {
+        finance.data.transactions.isEmpty
+            && finance.data.investments.isEmpty
+            && finance.data.crypto.isEmpty
+            && finance.data.liabilities.isEmpty
+    }
 
-                        AreaMark(
-                            x: .value("Date", point.date),
-                            y: .value("Net Worth", point.value)
-                        )
-                        .foregroundStyle(WCColor.primary.opacity(0.14))
-                        .interpolationMethod(.catmullRom)
+    var body: some View {
+        GeometryReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    dashboardHeader
+
+                    if isCompletelyEmpty {
+                        onboardingCard
                     }
-                    .chartYAxis(settings.isPrivacyMode ? .hidden : .automatic)
-                    .frame(height: 250)
+
+                    netWorthHero
+                    positionSection
+
+                    if proxy.size.width >= 1_090 {
+                        HStack(alignment: .top, spacing: 20) {
+                            allocationCard
+                                .frame(width: max(340, proxy.size.width * 0.34))
+                            cashFlowCard
+                        }
+                    } else {
+                        VStack(spacing: 20) {
+                            cashFlowCard
+                            allocationCard
+                        }
+                    }
+
+                    if proxy.size.width >= 1_020 {
+                        HStack(alignment: .top, spacing: 20) {
+                            topExpensesCard
+                            recentActivityCard
+                        }
+                    } else {
+                        VStack(spacing: 20) {
+                            topExpensesCard
+                            recentActivityCard
+                        }
+                    }
+                }
+                .padding(.horizontal, proxy.size.width < 900 ? 20 : 28)
+                .padding(.top, 24)
+                .padding(.bottom, 36)
+                .frame(maxWidth: 1_520, alignment: .leading)
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .background(MacDashboardBackdrop())
+        .navigationTitle("Dashboard")
+        .onChange(of: timeRange) {
+            selectedNetWorthDate = nil
+        }
+    }
+
+    private var dashboardHeader: some View {
+        HStack(alignment: .center, spacing: 20) {
+            VStack(alignment: .leading, spacing: 5) {
+                Text("Your financial horizon")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.white, WCColor.primary.opacity(0.92)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                Text("A clear view of what you own, owe, earn, and spend.")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.58))
+            }
+
+            Spacer(minLength: 16)
+
+            if settings.isPrivacyMode {
+                Label("Privacy on", systemImage: "eye.slash.fill")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.72))
+                    .padding(.horizontal, 11)
+                    .padding(.vertical, 7)
+                    .background(.white.opacity(0.07), in: Capsule())
+            }
+
+            Button {
+                appModel.presentNewItem(for: .cashFlow)
+            } label: {
+                Label("Add Transaction", systemImage: "plus")
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .tint(WCColor.primary)
+        }
+    }
+
+    private var onboardingCard: some View {
+        DashboardGlassCard(padding: 0) {
+            HStack(spacing: 24) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Label("Build your first financial view", systemImage: "sparkles")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text("Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically.")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.64))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 8)
+
+                HStack(spacing: 10) {
+                    onboardingButton("Cash Flow", systemImage: "arrow.left.arrow.right", destination: .cashFlow)
+                    onboardingButton("Investment", systemImage: "chart.line.uptrend.xyaxis", destination: .investments)
+                    onboardingButton("Crypto", systemImage: "bitcoinsign.circle", destination: .crypto)
+                }
+            }
+            .padding(22)
+            .background(
+                LinearGradient(
+                    colors: [WCColor.primary.opacity(0.14), WCColor.accent.opacity(0.05)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+        }
+    }
+
+    private func onboardingButton(
+        _ title: String,
+        systemImage: String,
+        destination: MacDestination
+    ) -> some View {
+        Button {
+            appModel.presentNewItem(for: destination)
+        } label: {
+            Label(title, systemImage: systemImage)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.large)
+    }
+
+    private var netWorthHero: some View {
+        let points = finance.snapshots(range: timeRange)
+        let selectedPoint = selectedPoint(in: points)
+        let rangeChange = netWorthChange(in: points)
+
+        return DashboardGlassCard(padding: 0) {
+            ZStack {
+                HeroScenery()
+
+                VStack(alignment: .leading, spacing: 18) {
+                    HStack(alignment: .top, spacing: 24) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("NET WORTH")
+                                .font(.caption.weight(.bold))
+                                .tracking(1.8)
+                                .foregroundStyle(.white.opacity(0.52))
+                            Text(settings.privateCurrency(totals.netWorth))
+                                .font(.system(size: 42, weight: .bold, design: .rounded))
+                                .monospacedDigit()
+                                .foregroundStyle(.white)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.65)
+
+                            if let rangeChange {
+                                HStack(spacing: 7) {
+                                    Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
+                                    Text(settings.privateCurrency(abs(rangeChange.value)))
+                                    Text(privatePercent(abs(rangeChange.percentage)))
+                                    Text("for \(timeRange.rawValue)")
+                                        .foregroundStyle(.white.opacity(0.48))
+                                }
+                                .font(.subheadline.monospacedDigit().weight(.semibold))
+                                .foregroundStyle(rangeChange.value >= 0 ? WCColor.primary : WCColor.destructive)
+                            } else {
+                                Text("Add another snapshot to see movement over time")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.white.opacity(0.5))
+                            }
+                        }
+
+                        Spacer(minLength: 16)
+
+                        VStack(alignment: .trailing, spacing: 12) {
+                            Picker("Net worth range", selection: $timeRange) {
+                                ForEach(TimeRange.allCases) { range in
+                                    Text(range.rawValue).tag(range)
+                                }
+                            }
+                            .labelsHidden()
+                            .pickerStyle(.segmented)
+                            .frame(width: 286)
+
+                            snapshotFreshness
+                        }
+                    }
+
+                    if points.isEmpty {
+                        DashboardEmptyState(
+                            title: "Your net-worth trail starts here",
+                            message: "Adding a transaction or position records a snapshot for this chart.",
+                            systemImage: "chart.line.uptrend.xyaxis",
+                            actionTitle: "Add Transaction"
+                        ) {
+                            appModel.presentNewItem(for: .cashFlow)
+                        }
+                        .frame(height: 238)
+                    } else if settings.isPrivacyMode {
+                        PrivacyChartCover(
+                            title: "Net-worth history concealed",
+                            message: "Turn off Privacy Mode to reveal values and movement."
+                        )
+                        .frame(height: 238)
+                    } else {
+                        Chart {
+                            ForEach(points) { point in
+                                AreaMark(
+                                    x: .value("Date", point.date),
+                                    yStart: .value("Range floor", chartDomain(for: points).lowerBound),
+                                    yEnd: .value("Net Worth", point.value)
+                                )
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [WCColor.primary.opacity(0.28), WCColor.primary.opacity(0.015)],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                .interpolationMethod(.monotone)
+
+                                LineMark(
+                                    x: .value("Date", point.date),
+                                    y: .value("Net Worth", point.value)
+                                )
+                                .foregroundStyle(.white.opacity(0.9))
+                                .lineStyle(StrokeStyle(lineWidth: 2.3, lineCap: .round, lineJoin: .round))
+                                .interpolationMethod(.monotone)
+                            }
+
+                            if let selectedPoint {
+                                RuleMark(x: .value("Selected date", selectedPoint.date))
+                                    .foregroundStyle(.white.opacity(0.34))
+                                    .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
+
+                                PointMark(
+                                    x: .value("Selected date", selectedPoint.date),
+                                    y: .value("Selected net worth", selectedPoint.value)
+                                )
+                                .foregroundStyle(WCColor.primary)
+                                .symbolSize(64)
+                            }
+                        }
+                        .chartYScale(domain: chartDomain(for: points))
+                        .chartXAxis {
+                            AxisMarks(values: .automatic(desiredCount: 6)) { _ in
+                                AxisGridLine()
+                                    .foregroundStyle(.white.opacity(0.06))
+                                AxisValueLabel()
+                                    .foregroundStyle(.white.opacity(0.45))
+                            }
+                        }
+                        .chartYAxis {
+                            AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { value in
+                                AxisGridLine()
+                                    .foregroundStyle(.white.opacity(0.08))
+                                AxisValueLabel {
+                                    if let amount = value.as(Double.self) {
+                                        Text(compactCurrency(amount))
+                                            .foregroundStyle(.white.opacity(0.45))
+                                    }
+                                }
+                            }
+                        }
+                        .chartXSelection(value: $selectedNetWorthDate)
+                        .frame(height: 238)
+
+                        if let selectedPoint {
+                            HStack(spacing: 10) {
+                                Image(systemName: "scope")
+                                    .foregroundStyle(WCColor.primary)
+                                Text(selectedPoint.date.formatted(date: .long, time: .shortened))
+                                    .foregroundStyle(.white.opacity(0.62))
+                                Spacer()
+                                Text(settings.privateCurrency(selectedPoint.value))
+                                    .font(.subheadline.monospacedDigit().weight(.bold))
+                                    .foregroundStyle(.white)
+                            }
+                            .padding(.horizontal, 13)
+                            .padding(.vertical, 10)
+                            .background(.black.opacity(0.16), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        }
+                    }
+                }
+                .padding(24)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var snapshotFreshness: some View {
+        if let snapshot = finance.data.snapshots.max(by: { $0.date < $1.date }) {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(snapshotFreshnessColor(snapshot.date))
+                    .frame(width: 7, height: 7)
+                    .shadow(color: snapshotFreshnessColor(snapshot.date).opacity(0.8), radius: 4)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Latest snapshot \(freshnessText(snapshot.date))")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.78))
+                    Text(snapshot.date.formatted(date: .abbreviated, time: .shortened))
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.42))
+                }
+            }
+        } else {
+            Label("No snapshots yet", systemImage: "camera.metering.center.weighted")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.52))
+        }
+    }
+
+    private var positionSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionHeading(
+                "Position",
+                subtitle: "Balances derived from your recorded activity and holdings"
+            )
+
+            LazyVGrid(
+                columns: [GridItem(.adaptive(minimum: 178, maximum: 290), spacing: 14)],
+                alignment: .leading,
+                spacing: 14
+            ) {
+                PositionMetricCard(
+                    title: "Recorded Cash",
+                    value: settings.privateCurrency(totals.totalLiquidity),
+                    detail: finance.data.transactions.isEmpty ? "No cash activity yet" : "Income less expenses",
+                    systemImage: "banknote.fill",
+                    tint: WCColor.primary
+                )
+                PositionMetricCard(
+                    title: "Investments",
+                    value: settings.privateCurrency(totals.totalInvestments),
+                    detail: countLabel(finance.data.investments.count, singular: "position"),
+                    systemImage: "chart.line.uptrend.xyaxis",
+                    tint: .cyan
+                )
+                PositionMetricCard(
+                    title: "Crypto",
+                    value: settings.privateCurrency(totals.totalCrypto),
+                    detail: countLabel(finance.data.crypto.count, singular: "holding"),
+                    systemImage: "bitcoinsign.circle.fill",
+                    tint: WCColor.warning
+                )
+                PositionMetricCard(
+                    title: "Liabilities",
+                    value: settings.privateCurrency(totals.totalLiabilities),
+                    detail: countLabel(finance.data.liabilities.count, singular: "liability"),
+                    systemImage: "creditcard.trianglebadge.exclamationmark",
+                    tint: WCColor.destructive
+                )
+                PositionMetricCard(
+                    title: "Net Savings",
+                    value: settings.privateCurrency(currentMonthCashFlow.netSavings),
+                    detail: Date().formatted(.dateTime.month(.wide)),
+                    systemImage: currentMonthCashFlow.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
+                    tint: currentMonthCashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive
+                )
+            }
+        }
+    }
+
+    private var allocationCard: some View {
+        let slices = finance.assetAllocation(settings: settings)
+        let allocationTotal = slices.reduce(0) { $0 + $1.value }
+
+        return DashboardGlassCard {
+            VStack(alignment: .leading, spacing: 18) {
+                sectionHeading("Asset Allocation", subtitle: "How investable assets are distributed")
+
+                if slices.isEmpty {
+                    DashboardEmptyState(
+                        title: "No assets to allocate",
+                        message: "Add recorded cash, an investment, or a crypto holding.",
+                        systemImage: "chart.pie",
+                        actionTitle: "Add Investment"
+                    ) {
+                        appModel.presentNewItem(for: .investments)
+                    }
+                    .frame(minHeight: 260)
+                } else {
+                    ZStack {
+                        if settings.isPrivacyMode {
+                            PrivacyChartCover(
+                                title: "Allocation concealed",
+                                message: "Values and proportions are hidden."
+                            )
+                        } else {
+                            Chart(slices) { slice in
+                                SectorMark(
+                                    angle: .value("Value", slice.value),
+                                    innerRadius: .ratio(0.67),
+                                    angularInset: 2.5
+                                )
+                                .foregroundStyle(slice.color.gradient)
+                                .cornerRadius(5)
+                            }
+                            .chartLegend(.hidden)
+
+                            VStack(spacing: 3) {
+                                Text("ASSETS")
+                                    .font(.caption2.weight(.bold))
+                                    .tracking(1.3)
+                                    .foregroundStyle(.white.opacity(0.45))
+                                Text(settings.privateCurrency(allocationTotal))
+                                    .font(.headline.monospacedDigit().weight(.bold))
+                                    .foregroundStyle(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
+                            }
+                        }
+                    }
+                    .frame(height: 210)
+
+                    VStack(spacing: 11) {
+                        ForEach(slices) { slice in
+                            HStack(spacing: 10) {
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(slice.color.gradient)
+                                    .frame(width: 10, height: 10)
+                                Text(slice.name)
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(.white.opacity(0.76))
+                                Spacer()
+                                VStack(alignment: .trailing, spacing: 2) {
+                                    Text(settings.privateCurrency(slice.value))
+                                        .font(.subheadline.monospacedDigit().weight(.semibold))
+                                        .foregroundStyle(.white)
+                                    Text(privatePercent(allocationTotal > 0 ? slice.value / allocationTotal * 100 : 0))
+                                        .font(.caption2.monospacedDigit())
+                                        .foregroundStyle(.white.opacity(0.42))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var cashFlowCard: some View {
+        let trend = finance.cashFlowTrend(months: 6)
+        let hasCashFlow = trend.contains { $0.income != 0 || $0.expense != 0 }
+        let totalIncome = trend.reduce(0) { $0 + $1.income }
+        let totalExpense = trend.reduce(0) { $0 + $1.expense }
+
+        return DashboardGlassCard {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .top) {
+                    sectionHeading("Six-Month Cash Flow", subtitle: "Income and expenses by month")
+                    Spacer()
+                    Button("View Cash Flow") {
+                        appModel.selection = .cashFlow
+                    }
+                    .buttonStyle(.plain)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(WCColor.primary)
+                }
+
+                if !hasCashFlow {
+                    DashboardEmptyState(
+                        title: "No recent cash flow",
+                        message: "Record income or an expense to reveal the monthly pattern.",
+                        systemImage: "chart.bar.xaxis",
+                        actionTitle: "Add Transaction"
+                    ) {
+                        appModel.presentNewItem(for: .cashFlow)
+                    }
+                    .frame(height: 244)
+                } else if settings.isPrivacyMode {
+                    PrivacyChartCover(
+                        title: "Cash-flow chart concealed",
+                        message: "Monthly amounts and proportions are hidden."
+                    )
+                    .frame(height: 244)
+                } else {
+                    Chart(trend) { month in
+                        BarMark(
+                            x: .value("Month", month.monthLabel),
+                            y: .value("Amount", month.income)
+                        )
+                        .foregroundStyle(WCColor.primary.gradient)
+                        .position(by: .value("Type", "Income"))
+                        .cornerRadius(4)
+
+                        BarMark(
+                            x: .value("Month", month.monthLabel),
+                            y: .value("Amount", month.expense)
+                        )
+                        .foregroundStyle(WCColor.destructive.opacity(0.78).gradient)
+                        .position(by: .value("Type", "Expenses"))
+                        .cornerRadius(4)
+                    }
+                    .chartLegend(.hidden)
+                    .chartXAxis {
+                        AxisMarks { _ in
+                            AxisValueLabel()
+                                .foregroundStyle(.white.opacity(0.48))
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { value in
+                            AxisGridLine()
+                                .foregroundStyle(.white.opacity(0.07))
+                            AxisValueLabel {
+                                if let amount = value.as(Double.self) {
+                                    Text(compactCurrency(amount))
+                                        .foregroundStyle(.white.opacity(0.45))
+                                }
+                            }
+                        }
+                    }
+                    .frame(height: 244)
+                }
+
+                HStack(spacing: 20) {
+                    CashFlowLegendItem(
+                        title: "Income",
+                        value: settings.privateCurrency(totalIncome),
+                        color: WCColor.primary
+                    )
+                    CashFlowLegendItem(
+                        title: "Expenses",
+                        value: settings.privateCurrency(totalExpense),
+                        color: WCColor.destructive
+                    )
+                    Spacer(minLength: 0)
+                    VStack(alignment: .trailing, spacing: 3) {
+                        Text("6M NET")
+                            .font(.caption2.weight(.bold))
+                            .tracking(1)
+                            .foregroundStyle(.white.opacity(0.4))
+                        Text(settings.privateCurrency(totalIncome - totalExpense))
+                            .font(.subheadline.monospacedDigit().weight(.bold))
+                            .foregroundStyle(totalIncome - totalExpense >= 0 ? WCColor.primary : WCColor.destructive)
+                    }
+                }
+            }
+        }
+    }
+
+    private var topExpensesCard: some View {
+        let expenses = Array(finance.expensesByCategory(period: expensePeriod).prefix(5))
+
+        return DashboardGlassCard {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .top, spacing: 16) {
+                    sectionHeading("Top Expense Categories", subtitle: "Where recorded spending is concentrated")
+                    Spacer()
+                    Picker("Expense period", selection: $expensePeriod) {
+                        ForEach(AnalyticsPeriod.allCases) { period in
+                            Text(period.title).tag(period)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .frame(width: 142)
+                }
+
+                if expenses.isEmpty {
+                    DashboardEmptyState(
+                        title: "No expenses for this period",
+                        message: "Choose another period or record an expense.",
+                        systemImage: "list.bullet.rectangle.portrait",
+                        actionTitle: "Add Transaction"
+                    ) {
+                        appModel.presentNewItem(for: .cashFlow)
+                    }
+                    .frame(minHeight: 246)
+                } else {
+                    VStack(spacing: 15) {
+                        ForEach(Array(expenses.enumerated()), id: \.element.id) { index, item in
+                            VStack(spacing: 8) {
+                                HStack(spacing: 10) {
+                                    Text("\(index + 1)")
+                                        .font(.caption2.monospacedDigit().weight(.bold))
+                                        .foregroundStyle(.white.opacity(0.38))
+                                        .frame(width: 18)
+                                    Text(item.name)
+                                        .font(.subheadline.weight(.medium))
+                                        .foregroundStyle(.white.opacity(0.82))
+                                        .lineLimit(1)
+                                    Spacer()
+                                    Text(settings.privateCurrency(item.value))
+                                        .font(.subheadline.monospacedDigit().weight(.semibold))
+                                        .foregroundStyle(.white)
+                                    Text(privatePercent(item.percentage))
+                                        .font(.caption.monospacedDigit().weight(.medium))
+                                        .foregroundStyle(.white.opacity(0.44))
+                                        .frame(width: 48, alignment: .trailing)
+                                }
+
+                                if settings.isPrivacyMode {
+                                    Capsule()
+                                        .fill(.white.opacity(0.07))
+                                        .frame(height: 5)
+                                } else {
+                                    GeometryReader { geometry in
+                                        ZStack(alignment: .leading) {
+                                            Capsule()
+                                                .fill(.white.opacity(0.06))
+                                            Capsule()
+                                                .fill(
+                                                    LinearGradient(
+                                                        colors: [WCColor.warning, WCColor.destructive.opacity(0.82)],
+                                                        startPoint: .leading,
+                                                        endPoint: .trailing
+                                                    )
+                                                )
+                                                .frame(width: geometry.size.width * max(0, min(item.percentage / 100, 1)))
+                                        }
+                                    }
+                                    .frame(height: 5)
+                                }
+                            }
+                        }
+                    }
+                    .frame(minHeight: 246, alignment: .top)
                 }
             }
         }
         .frame(maxWidth: .infinity)
     }
 
-    private var cashFlowChart: some View {
-        FinanceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Six-Month Cash Flow")
-                    .font(.headline)
+    private var recentActivityCard: some View {
+        let transactions = Array(finance.transactions.prefix(6))
 
-                Chart(finance.cashFlowTrend()) { month in
-                    BarMark(
-                        x: .value("Month", month.monthLabel),
-                        y: .value("Income", month.income)
-                    )
+        return DashboardGlassCard {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .top) {
+                    sectionHeading("Recent Activity", subtitle: "Your latest recorded cash movements")
+                    Spacer()
+                    Button("View All") {
+                        appModel.selection = .cashFlow
+                    }
+                    .buttonStyle(.plain)
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(WCColor.primary)
-                    .position(by: .value("Type", "Income"))
-
-                    BarMark(
-                        x: .value("Month", month.monthLabel),
-                        y: .value("Expenses", month.expense)
-                    )
-                    .foregroundStyle(WCColor.destructive)
-                    .position(by: .value("Type", "Expenses"))
                 }
-                .chartYAxis(settings.isPrivacyMode ? .hidden : .automatic)
-                .frame(height: 230)
+
+                if transactions.isEmpty {
+                    DashboardEmptyState(
+                        title: "No activity yet",
+                        message: "Your latest income and expenses will appear here.",
+                        systemImage: "clock.arrow.circlepath",
+                        actionTitle: "Add Transaction"
+                    ) {
+                        appModel.presentNewItem(for: .cashFlow)
+                    }
+                    .frame(minHeight: 246)
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(Array(transactions.enumerated()), id: \.element.id) { index, transaction in
+                            ActivityRow(
+                                transaction: transaction,
+                                formattedAmount: signedAmount(for: transaction)
+                            )
+
+                            if index < transactions.count - 1 {
+                                Divider()
+                                    .overlay(.white.opacity(0.06))
+                                    .padding(.leading, 45)
+                            }
+                        }
+                    }
+                    .frame(minHeight: 246, alignment: .top)
+                }
             }
         }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func sectionHeading(_ title: String, subtitle: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.white)
+            Text(subtitle)
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.45))
+        }
+    }
+
+    private func selectedPoint(in points: [NetWorthPoint]) -> NetWorthPoint? {
+        guard let selectedNetWorthDate else { return nil }
+        return points.min {
+            abs($0.date.timeIntervalSince(selectedNetWorthDate))
+                < abs($1.date.timeIntervalSince(selectedNetWorthDate))
+        }
+    }
+
+    private func netWorthChange(in points: [NetWorthPoint]) -> (value: Double, percentage: Double)? {
+        guard let first = points.first, let last = points.last, first.date != last.date else {
+            return nil
+        }
+        let change = last.value - first.value
+        let percentage = first.value != 0 ? change / abs(first.value) * 100 : 0
+        return (change, percentage)
+    }
+
+    private func chartDomain(for points: [NetWorthPoint]) -> ClosedRange<Double> {
+        let values = points.map(\.value)
+        guard let minimum = values.min(), let maximum = values.max() else {
+            return 0...1
+        }
+        let spread = max(maximum - minimum, max(abs(maximum), 1) * 0.08)
+        let padding = spread * 0.18
+        return (minimum - padding)...(maximum + padding)
+    }
+
+    private func privatePercent(_ value: Double) -> String {
+        settings.isPrivacyMode
+            ? "••••"
+            : "\(value.formatted(.number.precision(.fractionLength(1))))%"
+    }
+
+    private func compactCurrency(_ value: Double) -> String {
+        let compactValue = value.formatted(
+            .number
+                .notation(.compactName)
+                .precision(.fractionLength(0...1))
+        )
+        return "\(settings.currency.symbol)\(compactValue)"
+    }
+
+    private func signedAmount(for transaction: Transaction) -> String {
+        guard !settings.isPrivacyMode else { return "••••" }
+        let prefix = transaction.type == .income ? "+" : "−"
+        return prefix + settings.formatCurrency(transaction.amount)
+    }
+
+    private func countLabel(_ count: Int, singular: String) -> String {
+        "\(count) \(count == 1 ? singular : singular + "s")"
+    }
+
+    private func freshnessText(_ date: Date) -> String {
+        let interval = max(0, Date().timeIntervalSince(date))
+        switch interval {
+        case 0..<60:
+            return "just now"
+        case 60..<(60 * 60):
+            return "\(Int(interval / 60))m ago"
+        case (60 * 60)..<(24 * 60 * 60):
+            return "\(Int(interval / (60 * 60)))h ago"
+        case (24 * 60 * 60)..<(7 * 24 * 60 * 60):
+            return "\(Int(interval / (24 * 60 * 60)))d ago"
+        default:
+            return date.formatted(date: .abbreviated, time: .omitted)
+        }
+    }
+
+    private func snapshotFreshnessColor(_ date: Date) -> Color {
+        let interval = max(0, Date().timeIntervalSince(date))
+        if interval < 24 * 60 * 60 {
+            return WCColor.primary
+        }
+        if interval < 7 * 24 * 60 * 60 {
+            return WCColor.warning
+        }
+        return .white.opacity(0.35)
+    }
+}
+
+private struct DashboardGlassCard<Content: View>: View {
+    var padding: CGFloat = 20
+    @ViewBuilder let content: Content
+
+    init(padding: CGFloat = 20, @ViewBuilder content: () -> Content) {
+        self.padding = padding
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .padding(padding)
+            .background {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [.white.opacity(0.055), .clear],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(.white.opacity(0.08), lineWidth: 1)
+            }
+            .shadow(color: .black.opacity(0.18), radius: 18, y: 10)
+    }
+}
+
+private struct PositionMetricCard: View {
+    let title: String
+    let value: String
+    let detail: String
+    let systemImage: String
+    let tint: Color
+
+    var body: some View {
+        DashboardGlassCard(padding: 16) {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    Image(systemName: systemImage)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(tint)
+                        .frame(width: 32, height: 32)
+                        .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                    Spacer()
+                    Circle()
+                        .fill(tint.opacity(0.7))
+                        .frame(width: 5, height: 5)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.48))
+                    Text(value)
+                        .font(.title3.monospacedDigit().weight(.bold))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.66)
+                    Text(detail)
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.36))
+                        .lineLimit(1)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+private struct CashFlowLegendItem: View {
+    let title: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 9) {
+            RoundedRectangle(cornerRadius: 3)
+                .fill(color.gradient)
+                .frame(width: 9, height: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.42))
+                Text(value)
+                    .font(.caption.monospacedDigit().weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.82))
+            }
+        }
+    }
+}
+
+private struct ActivityRow: View {
+    let transaction: Transaction
+    let formattedAmount: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: transaction.type == .income ? "arrow.down.left" : "arrow.up.right")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
+                .frame(width: 32, height: 32)
+                .background(
+                    (transaction.type == .income ? WCColor.primary : WCColor.destructive).opacity(0.11),
+                    in: RoundedRectangle(cornerRadius: 9, style: .continuous)
+                )
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(transaction.category)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.84))
+                    .lineLimit(1)
+                Text(transaction.description.isEmpty ? transaction.type.title : transaction.description)
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.38))
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 10)
+
+            VStack(alignment: .trailing, spacing: 3) {
+                Text(formattedAmount)
+                    .font(.subheadline.monospacedDigit().weight(.semibold))
+                    .foregroundStyle(transaction.type == .income ? WCColor.primary : .white.opacity(0.8))
+                Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.35))
+            }
+        }
+        .padding(.vertical, 9)
+    }
+}
+
+private struct DashboardEmptyState: View {
+    let title: String
+    let message: String
+    let systemImage: String
+    let actionTitle: String?
+    let action: (() -> Void)?
+
+    init(
+        title: String,
+        message: String,
+        systemImage: String,
+        actionTitle: String? = nil,
+        action: (() -> Void)? = nil
+    ) {
+        self.title = title
+        self.message = message
+        self.systemImage = systemImage
+        self.actionTitle = actionTitle
+        self.action = action
+    }
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Image(systemName: systemImage)
+                .font(.system(size: 24, weight: .medium))
+                .foregroundStyle(WCColor.primary.opacity(0.78))
+                .frame(width: 48, height: 48)
+                .background(WCColor.primary.opacity(0.09), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.84))
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.42))
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 330)
+
+            if let actionTitle, let action {
+                Button(actionTitle, action: action)
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .tint(WCColor.primary)
+                    .padding(.top, 2)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.vertical, 18)
+    }
+}
+
+private struct PrivacyChartCover: View {
+    let title: String
+    let message: String
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(.black.opacity(0.12))
+
+            VStack(spacing: 9) {
+                Image(systemName: "eye.slash.fill")
+                    .font(.title2)
+                    .foregroundStyle(WCColor.primary.opacity(0.75))
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.82))
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.4))
+                    .multilineTextAlignment(.center)
+            }
+            .padding()
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(.white.opacity(0.05), lineWidth: 1)
+        }
+    }
+}
+
+private struct HeroScenery: View {
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.025, green: 0.12, blue: 0.13),
+                        Color(red: 0.035, green: 0.07, blue: 0.12),
+                        Color(red: 0.025, green: 0.04, blue: 0.075)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+
+                Circle()
+                    .fill(WCColor.primary.opacity(0.13))
+                    .frame(width: 340, height: 340)
+                    .blur(radius: 70)
+                    .offset(x: proxy.size.width * 0.33, y: -proxy.size.height * 0.34)
+
+                Circle()
+                    .fill(WCColor.accent.opacity(0.08))
+                    .frame(width: 260, height: 260)
+                    .blur(radius: 64)
+                    .offset(x: -proxy.size.width * 0.36, y: proxy.size.height * 0.34)
+
+                LinearGradient(
+                    colors: [.white.opacity(0.055), .clear],
+                    startPoint: .top,
+                    endPoint: .center
+                )
+            }
+        }
+        .allowsHitTesting(false)
+    }
+}
+
+private struct MacDashboardBackdrop: View {
+    var body: some View {
+        ZStack {
+            Color(red: 0.015, green: 0.026, blue: 0.047)
+
+            LinearGradient(
+                colors: [
+                    Color(red: 0.035, green: 0.085, blue: 0.105).opacity(0.8),
+                    .clear,
+                    Color(red: 0.035, green: 0.045, blue: 0.085).opacity(0.65)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+            Circle()
+                .fill(WCColor.primary.opacity(0.055))
+                .frame(width: 520, height: 520)
+                .blur(radius: 110)
+                .offset(x: 420, y: -330)
+        }
+        .ignoresSafeArea()
     }
 }
