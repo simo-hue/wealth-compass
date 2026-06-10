@@ -1,11 +1,24 @@
 import SwiftUI
 
+private enum MacCryptoTab: MacSelectorTab {
+    case overview
+    case holdings
+
+    var title: String {
+        switch self {
+        case .overview: return "Overview"
+        case .holdings: return "Holdings"
+        }
+    }
+}
+
 struct MacCryptoView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appModel: MacAppModel
     @State private var selection: CryptoHolding.ID?
     @State private var holdingPendingDeletion: CryptoHolding?
+    @State private var selectedTab: MacCryptoTab = .overview
 
     private let summaryColumns = [
         GridItem(.adaptive(minimum: 190, maximum: 320), spacing: 16)
@@ -13,26 +26,30 @@ struct MacCryptoView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Scrollable summary area (cards + chart)
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    summaryCards
-                    AllocationChart(
-                        title: "Crypto Allocation",
-                        slices: finance.cryptoAllocation(settings: settings),
-                        settings: settings
-                    )
-                }
-                .padding(24)
-                .frame(maxWidth: 1440, alignment: .leading)
+            HStack {
+                Spacer()
+                MacSelectorIsland(selection: $selectedTab)
+                Spacer()
             }
-            .frame(maxHeight: 420)
+            .padding(.vertical, 16)
 
-            Divider()
-
-            // Native Table — outside ScrollView for proper NSTableView behavior
-            cryptoTable
-                .layoutPriority(1)
+            if selectedTab == .overview {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        summaryCards
+                        AllocationChart(
+                            title: "Crypto Allocation",
+                            slices: finance.cryptoAllocation(settings: settings),
+                            settings: settings
+                        )
+                    }
+                    .padding(24)
+                    .frame(maxWidth: 1440, alignment: .leading)
+                }
+            } else {
+                cryptoTable
+                    .layoutPriority(1)
+            }
         }
         .background(ScreenBackground())
         .navigationTitle("Crypto")

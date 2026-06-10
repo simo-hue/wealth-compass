@@ -476,3 +476,56 @@ struct CryptoIconView: View {
         return colors[abs(hash) % colors.count]
     }
 }
+
+protocol MacSelectorTab: Hashable, CaseIterable, Equatable where AllCases: RandomAccessCollection, AllCases.Index == Int, AllCases.Element == Self {
+    var title: String { get }
+}
+
+struct MacSelectorIsland<Tab: MacSelectorTab>: View {
+    @Binding var selection: Tab
+    @Namespace private var namespace
+
+    var body: some View {
+        HStack(spacing: 0) {
+            let cases = Array(Tab.allCases)
+            ForEach(Array(cases.enumerated()), id: \.element) { index, tab in
+                Button {
+                    selection = tab
+                } label: {
+                    Text(tab.title)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(selection == tab ? .white : .white.opacity(0.8))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 6)
+                        .background {
+                            if selection == tab {
+                                Capsule()
+                                    .fill(Color.white.opacity(0.18))
+                                    .matchedGeometryEffect(id: "selector_background", in: namespace)
+                            }
+                        }
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+
+                if index < cases.count - 1 {
+                    Divider()
+                        .frame(height: 14)
+                        .background(Color.white.opacity(0.2))
+                        .padding(.horizontal, 6)
+                }
+            }
+        }
+        .padding(4)
+        .background(
+            Capsule()
+                .fill(Color(white: 0.12))
+                .overlay(
+                    Capsule()
+                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                )
+        )
+        .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selection)
+    }
+}

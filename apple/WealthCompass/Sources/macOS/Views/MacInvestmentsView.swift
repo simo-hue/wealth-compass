@@ -1,11 +1,24 @@
 import SwiftUI
 
+private enum MacInvestmentsTab: MacSelectorTab {
+    case overview
+    case positions
+
+    var title: String {
+        switch self {
+        case .overview: return "Overview"
+        case .positions: return "Positions"
+        }
+    }
+}
+
 struct MacInvestmentsView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appModel: MacAppModel
     @State private var selection: Investment.ID?
     @State private var investmentPendingDeletion: Investment?
+    @State private var selectedTab: MacInvestmentsTab = .overview
 
     private let summaryColumns = [
         GridItem(.adaptive(minimum: 190, maximum: 320), spacing: 16)
@@ -13,26 +26,30 @@ struct MacInvestmentsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Scrollable summary area (cards + chart)
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    summaryCards
-                    AllocationChart(
-                        title: "Allocation by Sector",
-                        slices: finance.investmentAllocation(settings: settings),
-                        settings: settings
-                    )
-                }
-                .padding(24)
-                .frame(maxWidth: 1440, alignment: .leading)
+            HStack {
+                Spacer()
+                MacSelectorIsland(selection: $selectedTab)
+                Spacer()
             }
-            .frame(maxHeight: 420)
+            .padding(.vertical, 16)
 
-            Divider()
-
-            // Native Table — outside ScrollView for proper NSTableView behavior
-            investmentTable
-                .layoutPriority(1)
+            if selectedTab == .overview {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        summaryCards
+                        AllocationChart(
+                            title: "Allocation by Sector",
+                            slices: finance.investmentAllocation(settings: settings),
+                            settings: settings
+                        )
+                    }
+                    .padding(24)
+                    .frame(maxWidth: 1440, alignment: .leading)
+                }
+            } else {
+                investmentTable
+                    .layoutPriority(1)
+            }
         }
         .background(ScreenBackground())
         .navigationTitle("Investments")
