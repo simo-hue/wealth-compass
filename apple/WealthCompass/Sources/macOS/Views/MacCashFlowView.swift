@@ -392,28 +392,49 @@ struct MacCashFlowView: View {
     }
 
     private var transactionFilters: some View {
-        HStack(spacing: 14) {
-            Picker("Type", selection: $transactionTypeFilter) {
-                ForEach(MacTransactionTypeFilter.allCases) { filter in
-                    Text(filter.title).tag(filter)
+        HStack(spacing: 24) {
+            HStack(spacing: 10) {
+                Text("Type")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
+                Picker("", selection: $transactionTypeFilter) {
+                    ForEach(MacTransactionTypeFilter.allCases) { filter in
+                        Text(filter.title).tag(filter)
+                    }
                 }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .frame(width: 220)
             }
-            .pickerStyle(.segmented)
-            .frame(width: 280)
 
-            Picker("Period", selection: $transactionPeriod) {
-                ForEach(AnalyticsPeriod.allCases) { period in
-                    Text(period.title).tag(period)
+            HStack(spacing: 10) {
+                Text("Period")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
+                Picker("", selection: $transactionPeriod) {
+                    ForEach(AnalyticsPeriod.allCases) { period in
+                        Text(period.title).tag(period)
+                    }
                 }
+                .labelsHidden()
+                .frame(width: 160)
             }
-            .frame(width: 180)
-
-            Spacer()
 
             Text("Showing \(filteredTransactions.count) of \(finance.transactions.count)")
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(.secondary)
         }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .background {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(WCColor.border, lineWidth: 1)
+                )
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 
     private var transactionTable: some View {
@@ -480,6 +501,8 @@ struct MacCashFlowView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 
+                Spacer(minLength: 0)
+                
                 Divider().background(WCColor.border)
                 
                 HStack(alignment: .center) {
@@ -494,6 +517,7 @@ struct MacCashFlowView: View {
                     Spacer()
                 }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
         .contentShape(Rectangle())
         .contextMenu {
