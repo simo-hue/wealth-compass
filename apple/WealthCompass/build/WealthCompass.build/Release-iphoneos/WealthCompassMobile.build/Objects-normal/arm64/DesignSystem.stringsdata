@@ -1,0 +1,32 @@
+{
+  "source": "/Users/simo/Developer/wealth-compass-1/apple/WealthCompass/Sources/Shared/UI/DesignSystem.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%@ (%@%%)",
+        "location": {
+          "startingColumn": 14,
+          "startingLine": 203
+        }
+      },
+      {
+        "comment": "",
+        "key": "Value",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 226
+        }
+      },
+      {
+        "comment": "",
+        "key": "TOTAL",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 239
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,176 @@
+{
+  "source": "/Users/simo/Developer/wealth-compass-1/apple/WealthCompass/Sources/iOS/Views/DashboardView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Build your first financial view",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "Record cash flow or add a position to bring this dashboard to life.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 94
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add your first transaction",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 103
+        }
+      },
+      {
+        "comment": "",
+        "key": "Net worth range",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 157
+        }
+      },
+      {
+        "comment": "",
+        "key": "NET WORTH",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 125
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add another snapshot to see movement",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 147
+        }
+      },
+      {
+        "comment": "",
+        "key": "No snapshots",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 263
+        }
+      },
+      {
+        "comment": "",
+        "key": "Selected Date",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 202
+        }
+      },
+      {
+        "comment": "",
+        "key": "Range floor",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 203
+        }
+      },
+      {
+        "comment": "",
+        "key": "Net Worth",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 204
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 216
+        }
+      },
+      {
+        "comment": "",
+        "key": "Net Worth",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 217
+        }
+      },
+      {
+        "comment": "",
+        "key": "Month",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 344
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 345
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 348
+        }
+      },
+      {
+        "comment": "",
+        "key": "Month",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 352
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 353
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 356
+        }
+      },
+      {
+        "comment": "",
+        "key": "6M NET",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 376
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 422
+        }
+      }
+    ]
+  },
+  "version": 1
+}

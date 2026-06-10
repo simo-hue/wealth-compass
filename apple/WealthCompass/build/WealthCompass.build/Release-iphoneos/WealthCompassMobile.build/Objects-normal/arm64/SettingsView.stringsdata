@@ -1,0 +1,536 @@
+{
+  "source": "/Users/simo/Developer/wealth-compass-1/apple/WealthCompass/Sources/iOS/Views/SettingsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Settings",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 199
+        }
+      },
+      {
+        "comment": "",
+        "key": "Import JSON Backup",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 211
+        }
+      },
+      {
+        "comment": "",
+        "key": "Currency",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 32
+        }
+      },
+      {
+        "comment": "",
+        "key": "Privacy",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 42
+        }
+      },
+      {
+        "comment": "",
+        "key": "Security",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom Categories",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 66
+        }
+      },
+      {
+        "comment": "",
+        "key": "iCloud Sync",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 73
+        }
+      },
+      {
+        "comment": "",
+        "key": "Data",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 117
+        }
+      },
+      {
+        "comment": "",
+        "key": "Storage",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 154
+        }
+      },
+      {
+        "comment": "",
+        "key": "Base Currency",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 33
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ (%@)",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "Exchange Rates",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 318
+        }
+      },
+      {
+        "comment": "",
+        "key": "Privacy Mode",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 44
+        }
+      },
+      {
+        "comment": "",
+        "key": "When enabled, Wealth Compass locks whenever the app leaves the foreground.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 60
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ App Lock",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 51
+        }
+      },
+      {
+        "comment": "",
+        "key": "Market Data",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 375
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your financial data stays available locally and syncs across your devices through your private CloudKit database.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 84
+        }
+      },
+      {
+        "comment": "",
+        "key": "Status",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 88
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sync Data with iCloud",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 75
+        }
+      },
+      {
+        "comment": "",
+        "key": "Force Sync iCloud",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "Prepare Backup",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 126
+        }
+      },
+      {
+        "comment": "",
+        "key": "Import JSON Backup",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 132
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share Backup",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 137
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete All Data",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 150
+        }
+      },
+      {
+        "comment": "",
+        "key": "Local Only",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 158
+        }
+      },
+      {
+        "comment": "",
+        "key": "Mode",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 156
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 164
+        }
+      },
+      {
+        "comment": "",
+        "key": "Transactions",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 162
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 170
+        }
+      },
+      {
+        "comment": "",
+        "key": "Recurring",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 168
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 176
+        }
+      },
+      {
+        "comment": "",
+        "key": "Investments",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 174
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 182
+        }
+      },
+      {
+        "comment": "",
+        "key": "Crypto",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 180
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 188
+        }
+      },
+      {
+        "comment": "",
+        "key": "Liabilities",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 186
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 194
+        }
+      },
+      {
+        "comment": "",
+        "key": "Snapshots",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 192
+        }
+      },
+      {
+        "comment": "",
+        "key": "Merge With Existing Data",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 212
+        }
+      },
+      {
+        "comment": "",
+        "key": "Replace Existing Data",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 217
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 222
+        }
+      },
+      {
+        "comment": "",
+        "key": "Merge adds new records and updates matching IDs. Replace clears current local finance data before importing.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 224
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 249
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your preferences",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 276
+        }
+      },
+      {
+        "comment": "",
+        "key": "Privacy, sync, currency, and market data",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 279
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ Cached or fallback rates remain active.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 359
+        }
+      },
+      {
+        "comment": "",
+        "key": "ECB reference rates are refreshed automatically and cached locally for offline use.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 367
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@. Fetched %@ and cached locally.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 363
+        }
+      },
+      {
+        "comment": "",
+        "key": "Offline fallback",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 328
+        }
+      },
+      {
+        "comment": "",
+        "key": "ECB",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 323
+        }
+      },
+      {
+        "comment": "",
+        "key": "· %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 325
+        }
+      },
+      {
+        "comment": "",
+        "key": "Source",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 320
+        }
+      },
+      {
+        "comment": "",
+        "key": "1 %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 336
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 338
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refreshing Exchange Rates",
+        "location": {
+          "startingColumn": 58,
+          "startingLine": 348
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refresh Exchange Rates",
+        "location": {
+          "startingColumn": 88,
+          "startingLine": 348
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refreshing Market Data",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 401
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refresh Market Data",
+        "location": {
+          "startingColumn": 71,
+          "startingLine": 401
+        }
+      },
+      {
+        "comment": "",
+        "key": "Configured",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 412
+        }
+      },
+      {
+        "comment": "",
+        "key": "Not Set",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 412
+        }
+      },
+      {
+        "comment": "",
+        "key": "No custom %@ categories yet.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 441
+        }
+      },
+      {
+        "comment": "",
+        "key": "The key is saved only after %@ returns a live USD price.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 651
+        }
+      },
+      {
+        "comment": "",
+        "key": "Retrieving %@ price...",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 658
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 671
+        }
+      },
+      {
+        "comment": "",
+        "key": "Verify & Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 675
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 683
+        }
+      }
+    ]
+  },
+  "version": 1
+}

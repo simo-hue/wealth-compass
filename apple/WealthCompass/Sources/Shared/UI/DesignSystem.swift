@@ -221,30 +221,36 @@ struct AllocationChart: View {
                 } else {
                     let total = slices.reduce(0) { $0 + $1.value }
 
-                    ZStack {
-                        Chart(slices) { slice in
-                            SectorMark(
-                                angle: .value("Value", slice.value),
-                                innerRadius: .ratio(0.67),
-                                angularInset: 2.5
-                            )
-                            .foregroundStyle(slice.color.gradient)
-                            .cornerRadius(5)
-                        }
-                        .chartLegend(.hidden)
-
-                        VStack(spacing: 3) {
-                            Text("TOTAL")
-                                .font(.caption2.weight(.bold))
-                                .tracking(1.3)
-                                .foregroundStyle(.white.opacity(0.4))
-                            Text(settings.privateCurrency(total))
-                                .font(.headline.monospacedDigit().weight(.bold))
-                                .foregroundStyle(.white)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.68)
+                    Chart(slices) { slice in
+                        SectorMark(
+                            angle: .value("Value", slice.value),
+                            innerRadius: .ratio(0.72),
+                            angularInset: 2.5
+                        )
+                        .foregroundStyle(slice.color.gradient)
+                        .cornerRadius(5)
+                    }
+                    .chartLegend(.hidden)
+                    .chartBackground { proxy in
+                        GeometryReader { geometry in
+                            if let plotFrame = proxy.plotFrame {
+                                let frame = geometry[plotFrame]
+                                VStack(spacing: 3) {
+                                    Text("TOTAL")
+                                        .font(.caption2.weight(.bold))
+                                        .tracking(1.3)
+                                        .foregroundStyle(.white.opacity(0.4))
+                                    Text(settings.privateCurrency(total))
+                                        .font(.headline.monospacedDigit().weight(.bold))
+                                        .foregroundStyle(.white)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.68)
+                                }
+                                .position(x: frame.midX, y: frame.midY)
+                            }
                         }
                     }
+                    .animation(.spring(response: 0.5, dampingFraction: 0.8), value: slices.map(\.value))
                     .frame(height: 200)
 
                     VStack(spacing: 12) {

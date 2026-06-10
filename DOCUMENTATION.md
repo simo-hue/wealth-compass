@@ -298,3 +298,11 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-06-07T00:16:00+02:00]: App Version Bump
   - *Details*: Incremented the app version number for store publication.
   - *Tech Notes*: Bumped MARKETING_VERSION to 1.0.1 and CURRENT_PROJECT_VERSION to 2 in WealthCompass.xcodeproj/project.pbxproj.
+
+- [2026-06-10T15:20:00+02:00]: SwiftUI Charts UI Enhancement
+  - *Details*: Modernized the Net Worth, Cash Flow, and Asset Allocation charts across the iOS and macOS app. Removed Y-axes for a cleaner look, added interactive scrubbing to the Net Worth chart, improved styling (glows, points, corner radii), and integrated entry/morphing animations.
+  - *Tech Notes*: Updated `DesignSystem.swift`, `DashboardView.swift`, and `MacDashboardView.swift`.
+
+- [2026-06-10T15:24:00+02:00]: Fix: SwiftUI Charts Symbol Error
+  - *Details*: Fixed a build error regarding `ChartSymbolShape` conformity.
+  - *Tech Notes*: Replaced `.symbol(Circle().strokeBorder(...))` with `.symbol(Circle())` in `DashboardView.swift` and `MacDashboardView.swift` because `LineMark.symbol` requires basic shapes, not stroked view modifiers. Verified with successful `xcodebuild`.
