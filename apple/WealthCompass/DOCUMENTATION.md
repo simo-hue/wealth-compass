@@ -81,3 +81,7 @@
 - [2026-06-10 18:35]: Shared Selector Island & Table Redesign
   - *Details*: Extracted the custom selector island into a shared generic component and applied the exact same split-view layout to the Investments and Crypto pages.
   - *Tech Notes*: Created `MacSelectorIsland<Tab: MacSelectorTab>` in `DesignSystem.swift`. Updated `MacCashFlowView`, `MacInvestmentsView`, and `MacCryptoView` to adopt the shared component, splitting their UIs cleanly into "Overview" and "Transactions"/"Holdings" tabs.
+
+- [2026-06-10 18:41]: Settings Redesign — Custom Island UI
+  - *Details*: Redesigned the macOS Settings view to match the custom dark glassmorphism aesthetic of the rest of the app, completely removing the native `Form` and `TabView` layout.
+  - *Tech Notes*: Refactored `MacSettingsView` to use `MacSelectorIsland`, `FinanceCard`, and `ScreenBackground`. Created `SettingsSection` and `SettingsRow` helper components to ensure uniform padding, layouts, and typography across all settings options.
