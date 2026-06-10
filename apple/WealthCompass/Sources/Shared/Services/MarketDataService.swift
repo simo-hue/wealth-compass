@@ -24,38 +24,38 @@ struct MarketPriceRefreshResult: Equatable {
 
     var title: String {
         if wasAlreadyRunning {
-            return "Refresh Already Running"
+            return String(localized: "Refresh Already Running")
         }
-        return updatedRecordCount > 0 ? "Prices Updated" : "No Prices Updated"
+        return updatedRecordCount > 0 ? String(localized: "Prices Updated") : String(localized: "No Prices Updated")
     }
 
     var message: String {
         if wasAlreadyRunning {
-            return "A market price refresh is already in progress."
+            return String(localized: "A market price refresh is already in progress.")
         }
 
         var lines: [String] = []
         if updatedRecordCount > 0 {
-            lines.append("Updated \(updatedInvestments) investments and \(updatedCrypto) crypto holdings.")
-            lines.append("Last refresh: \(refreshedAt.formatted(date: .abbreviated, time: .shortened)).")
+            lines.append(String(localized: "Updated \(updatedInvestments) investments and \(updatedCrypto) crypto holdings."))
+            lines.append(String(localized: "Last refresh: \(refreshedAt.formatted(date: .abbreviated, time: .shortened))."))
         } else {
-            lines.append("No holdings were updated.")
+            lines.append(String(localized: "No holdings were updated."))
         }
 
         if !skippedInvestments.isEmpty {
-            lines.append("Investments skipped: \(Self.compactList(skippedInvestments)).")
+            lines.append(String(localized: "Investments skipped: \(Self.compactList(skippedInvestments))."))
         }
 
         if !skippedCrypto.isEmpty {
-            lines.append("Crypto skipped: \(Self.compactList(skippedCrypto)).")
+            lines.append(String(localized: "Crypto skipped: \(Self.compactList(skippedCrypto))."))
         }
 
         if !failedInvestments.isEmpty {
-            lines.append("Investment failures: \(Self.compactList(failedInvestments)).")
+            lines.append(String(localized: "Investment failures: \(Self.compactList(failedInvestments))."))
         }
 
         if !failedCrypto.isEmpty {
-            lines.append("Crypto failures: \(Self.compactList(failedCrypto)).")
+            lines.append(String(localized: "Crypto failures: \(Self.compactList(failedCrypto))."))
         }
 
         return lines.joined(separator: "\n\n")
@@ -80,19 +80,19 @@ enum MarketDataError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingAPIKey:
-            return "A Finnhub API key is required to update investment prices."
+            return String(localized: "A Finnhub API key is required to update investment prices.")
         case .invalidURL:
-            return "The market data request could not be created."
+            return String(localized: "The market data request could not be created.")
         case .unauthorized(let provider):
-            return "\(provider) rejected the API key."
+            return String(localized: "\(provider) rejected the API key.")
         case .rateLimited(let provider):
-            return "\(provider) rate limit reached. Try again later."
+            return String(localized: "\(provider) rate limit reached. Try again later.")
         case .providerError(let provider, let statusCode):
-            return "\(provider) returned HTTP \(statusCode)."
+            return String(localized: "\(provider) returned HTTP \(statusCode).")
         case .invalidResponse(let provider):
-            return "\(provider) returned an invalid response."
+            return String(localized: "\(provider) returned an invalid response.")
         case .noQuote(let provider, let symbol):
-            return "\(provider) did not return a usable quote for \(symbol)."
+            return String(localized: "\(provider) did not return a usable quote for \(symbol).")
         }
     }
 }
@@ -109,9 +109,9 @@ enum KeychainServiceError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unexpectedStatus(let status):
-            return "Keychain operation failed with status \(status)."
+            return String(localized: "Keychain operation failed with status \(status).")
         case .invalidData:
-            return "The stored Keychain value could not be read."
+            return String(localized: "The stored Keychain value could not be read.")
         }
     }
 }

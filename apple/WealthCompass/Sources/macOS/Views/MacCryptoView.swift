@@ -4,7 +4,7 @@ private enum MacCryptoTab: MacSelectorTab {
     case overview
     case holdings
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
         case .overview: return "Overview"
         case .holdings: return "Holdings"
@@ -85,23 +85,23 @@ struct MacCryptoView: View {
 
         return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
             MetricCard(
-                title: "Crypto Value",
+                title: LocalizedStringKey( "Crypto Value"),
                 value: settings.privateCurrency(total),
                 systemImage: "bitcoinsign.circle",
                 accent: WCColor.warning
             )
             MetricCard(
-                title: "Holdings",
+                title: LocalizedStringKey( "Holdings"),
                 value: privateCount(finance.data.crypto.count),
                 systemImage: "number"
             )
             MetricCard(
-                title: "Cost Basis",
+                title: LocalizedStringKey( "Cost Basis"),
                 value: settings.privateCurrency(costBasis),
                 systemImage: "banknote"
             )
             MetricCard(
-                title: "Profit / Loss",
+                title: LocalizedStringKey( "Profit / Loss"),
                 value: settings.privateCurrency(gain),
                 systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
                 accent: gain >= 0 ? WCColor.primary : WCColor.destructive
@@ -109,8 +109,8 @@ struct MacCryptoView: View {
             
             if !settings.isPrivacyMode {
                 MetricCard(
-                    title: "Performance",
-                    value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
+                    title: LocalizedStringKey( "Performance"),
+                    value: String(localized:  "\(percent.formatted(.number.precision(.fractionLength(1))))%"),
                     systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
                     accent: percent >= 0 ? WCColor.primary : WCColor.destructive
                 )
@@ -119,8 +119,8 @@ struct MacCryptoView: View {
             let latestUpdate = finance.data.crypto.map(\.updatedAt).max()
             let uniqueCryptoCount = Set(finance.data.crypto.map(\.symbol).filter(isNonEmpty)).count
             MetricCard(
-                title: "Status • \(privateCount(uniqueCryptoCount)) Coins",
-                value: latestUpdate.map(formattedUpdate) ?? "Never",
+                title: LocalizedStringKey( "Status • \(privateCount(uniqueCryptoCount)) Coins"),
+                value: latestUpdate.map(formattedUpdate) ?? String(localized: "Never"),
                 systemImage: "checkmark.circle"
             )
         }
@@ -132,7 +132,7 @@ struct MacCryptoView: View {
             
             HStack(spacing: 24) {
                 AllocationChart(
-                    title: "Crypto Allocation",
+                    title: LocalizedStringKey( "Crypto Allocation"),
                     slices: finance.cryptoAllocation(settings: settings),
                     settings: settings,
                     showLegend: false
@@ -161,7 +161,7 @@ struct MacCryptoView: View {
             FinanceCard {
                 VStack(spacing: 24) {
                     if let best, best.gainLossPercent > 0 {
-                        performanceCard(title: "Top Performer", holding: best)
+                        performanceCard(title: String(localized:  "Top Performer"), holding: best)
                     }
                     
                     if hasBest && hasWorst {
@@ -169,7 +169,7 @@ struct MacCryptoView: View {
                     }
                     
                     if let worst, worst.gainLossPercent < 0 {
-                        performanceCard(title: "Biggest Loser", holding: worst)
+                        performanceCard(title: String(localized:  "Biggest Loser"), holding: worst)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

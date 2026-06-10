@@ -73,7 +73,7 @@ private struct MacTransactionEditor: View {
                     TextField("Amount", text: $amount)
                     Picker("Category", selection: $category) {
                         ForEach(categories, id: \.self) {
-                            Text($0).tag($0)
+                            Text(LocalizedStringKey($0)).tag($0)
                         }
                         Text("Custom...").tag(Self.customCategoryTag)
                     }
@@ -140,16 +140,16 @@ private struct MacTransactionEditor: View {
 
     private var customCategoryHint: String {
         if trimmedCustomCategory.isEmpty {
-            return "Enter a category name. It will be saved for future \(type.title.lowercased()) transactions."
+            return String(localized: "Enter a category name. It will be saved for future \(type.title.lowercased()) transactions.")
         }
 
         if let existing = categories.first(where: {
             $0.caseInsensitiveCompare(trimmedCustomCategory) == .orderedSame
         }) {
-            return "\(existing) already exists and will be selected."
+            return String(localized: "\(existing) already exists and will be selected.")
         }
 
-        return "This category will be added to your \(type.title.lowercased()) categories."
+        return String(localized: "This category will be added to your \(type.title.lowercased()) categories.")
     }
 }
 
@@ -231,12 +231,12 @@ private struct MacInvestmentEditor: View {
                     }
                     Picker("Sector", selection: $sector) {
                         ForEach(sectors, id: \.self) {
-                            Text($0).tag($0)
+                            Text(LocalizedStringKey($0)).tag($0)
                         }
                     }
                     Picker("Geography", selection: $geography) {
                         ForEach(geographies, id: \.self) {
-                            Text($0).tag($0)
+                            Text(LocalizedStringKey($0)).tag($0)
                         }
                     }
                 }
@@ -256,7 +256,7 @@ private struct MacInvestmentEditor: View {
                     .pickerStyle(.segmented)
 
                     TextField(
-                        feeMode == .fixed ? "Investment Transaction Fee" : "Investment Transaction Fee %",
+                        feeMode == .fixed ? String(localized: "Investment Transaction Fee") : String(localized: "Investment Transaction Fee %"),
                         text: $feeValue
                     )
 
@@ -271,7 +271,7 @@ private struct MacInvestmentEditor: View {
                 }
             }
             .formStyle(.grouped)
-            .navigationTitle(investment == nil ? "New Investment" : "Edit Investment")
+            .navigationTitle(investment == nil ? String(localized: "New Investment") : String(localized: "Edit Investment"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -393,7 +393,7 @@ private struct MacCryptoEditor: View {
                     .pickerStyle(.segmented)
 
                     TextField(
-                        feeMode == .fixed ? "Fee Amount" : "Fee Percentage",
+                        feeMode == .fixed ? String(localized: "Fee Amount") : String(localized: "Fee Percentage"),
                         text: $feeValue
                     )
 
@@ -404,7 +404,7 @@ private struct MacCryptoEditor: View {
                 }
             }
             .formStyle(.grouped)
-            .navigationTitle(holding == nil ? "New Crypto Holding" : "Edit Crypto Holding")
+            .navigationTitle(holding == nil ? String(localized: "New Crypto Holding") : String(localized: "Edit Crypto Holding"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }

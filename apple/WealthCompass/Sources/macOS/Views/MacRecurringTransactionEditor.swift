@@ -77,16 +77,16 @@ struct MacRecurringTransactionEditor: View {
 
     private var validationMessage: String? {
         if !amount.isEmpty, parsedAmount <= 0 {
-            return "Enter an amount greater than zero."
+            return String(localized: "Enter an amount greater than zero.")
         }
         if isCustomCategorySelected, trimmedCustomCategory.isEmpty {
-            return "Enter a custom category name."
+            return String(localized: "Enter a custom category name.")
         }
         if existingSchedule == nil, startDate <= Date() {
-            return "The first occurrence must be in the future."
+            return String(localized: "The first occurrence must be in the future.")
         }
         if normalizedEndDate.map({ $0 < startDate }) ?? false {
-            return "The end date cannot be before the first occurrence."
+            return String(localized: "The end date cannot be before the first occurrence.")
         }
         return nil
     }
@@ -164,10 +164,7 @@ struct MacRecurringTransactionEditor: View {
                     Toggle("Notify When Due", isOn: $notificationsEnabled)
                         .tint(WCColor.primary)
 
-                    Text(
-                        "Wealth Compass records due occurrences while the app is active. "
-                            + "If the app was closed, missed occurrences are added automatically the next time it opens."
-                    )
+                    Text("Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 }

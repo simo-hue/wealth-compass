@@ -108,7 +108,7 @@ struct SettingsView: View {
                                     try await finance.forceICloudSync()
                                 } catch {
                                     settingsAlert = SettingsAlertState(
-                                        title: "Sync Failed",
+                                        title: String(localized: "Sync Failed"),
                                         message: error.localizedDescription
                                     )
                                 }
@@ -296,12 +296,12 @@ struct SettingsView: View {
                         color: WCColor.accent
                     )
                     settingsStatusChip(
-                        settings.isPrivacyMode ? "Private" : "Visible",
+                        settings.isPrivacyMode ? String(localized: "Private") : String(localized: "Visible"),
                         systemImage: settings.isPrivacyMode ? "eye.slash.fill" : "eye.fill",
                         color: WCColor.primary
                     )
                     settingsStatusChip(
-                        settings.isICloudSyncEnabled ? "iCloud" : "Local",
+                        settings.isICloudSyncEnabled ? String(localized: "iCloud") : String(localized: "Local"),
                         systemImage: settings.isICloudSyncEnabled ? "icloud.fill" : "internaldrive.fill",
                         color: .blue
                     )
@@ -352,7 +352,7 @@ struct SettingsView: View {
                 Task { await refreshExchangeRates() }
             } label: {
                 Label(
-                    settings.isRefreshingExchangeRates ? "Refreshing Exchange Rates" : "Refresh Exchange Rates",
+                    settings.isRefreshingExchangeRates ? String(localized: "Refreshing Exchange Rates") : String(localized: "Refresh Exchange Rates"),
                     systemImage: "arrow.triangle.2.circlepath"
                 )
             }
@@ -405,7 +405,7 @@ struct SettingsView: View {
             Button {
                 Task { await refreshMarketPrices() }
             } label: {
-                Label(isRefreshingPrices ? "Refreshing Market Data" : "Refresh Market Data", systemImage: "arrow.triangle.2.circlepath")
+                Label(isRefreshingPrices ? String(localized: "Refreshing Market Data") : String(localized: "Refresh Market Data"), systemImage: "arrow.triangle.2.circlepath")
             }
             .disabled(isRefreshingPrices || (finance.data.investments.isEmpty && finance.data.crypto.isEmpty))
         }
@@ -416,7 +416,7 @@ struct SettingsView: View {
             Label(title, systemImage: systemImage)
                 .foregroundStyle(.white)
             Spacer()
-            Text(isConfigured ? "Configured" : "Not Set")
+            Text(isConfigured ? String(localized: "Configured") : String(localized: "Not Set"))
                 .font(.subheadline)
                 .foregroundStyle(isConfigured ? WCColor.primary : WCColor.textSecondary)
             Image(systemName: "chevron.right")
@@ -486,15 +486,15 @@ struct SettingsView: View {
                 let result = try finance.importBackup(from: url, mode: importMode, settings: settings)
                 backupURL = nil
                 backupError = nil
-                settingsAlert = SettingsAlertState(title: "Import Complete", message: result.message)
+                settingsAlert = SettingsAlertState(title: String(localized: "Import Complete"), message: result.message)
             } catch {
                 settingsAlert = SettingsAlertState(
-                    title: "Import Failed",
+                    title: String(localized: "Import Failed"),
                     message: (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
                 )
             }
         case .failure(let error):
-            settingsAlert = SettingsAlertState(title: "Import Failed", message: error.localizedDescription)
+            settingsAlert = SettingsAlertState(title: String(localized: "Import Failed"), message: error.localizedDescription)
         }
     }
 
@@ -532,12 +532,12 @@ struct SettingsView: View {
             activeCredentialEditor = nil
             refreshMarketDataKeyStatus()
             settingsAlert = SettingsAlertState(
-                title: "\(credential.title) Saved",
-                message: "\(message)\n\nThe API key was saved securely in Keychain."
+                title: String(localized: "\(credential.title) Saved"),
+                message: "\(message)\n\n\(String(localized: "The API key was saved securely in Keychain."))"
             )
         } catch {
             credentialEditorAlert = SettingsAlertState(
-                title: "\(credential.title) Failed",
+                title: String(localized: "\(credential.title) Failed"),
                 message: SettingsView.errorMessage(error)
             )
         }
@@ -547,10 +547,10 @@ struct SettingsView: View {
         switch credential {
         case .finnhub:
             let quote = try await FinnhubQuoteClient(apiKey: apiKey).testConnection()
-            return "Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue)))."
+            return String(localized: "Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
         case .coingecko:
             let quote = try await CoinGeckoPriceClient(apiKey: apiKey).testConnection()
-            return "CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue)))."
+            return String(localized: "CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
         }
     }
 
@@ -599,18 +599,18 @@ private enum MarketDataCredentialKind: String, Identifiable {
     var title: String {
         switch self {
         case .finnhub:
-            "Finnhub API Key"
+            String(localized: "Finnhub API Key")
         case .coingecko:
-            "CoinGecko API Key"
+            String(localized: "CoinGecko API Key")
         }
     }
 
     var placeholder: String {
         switch self {
         case .finnhub:
-            "Paste Finnhub API key"
+            String(localized: "Paste Finnhub API key")
         case .coingecko:
-            "Paste CoinGecko API key"
+            String(localized: "Paste CoinGecko API key")
         }
     }
 
@@ -626,9 +626,9 @@ private enum MarketDataCredentialKind: String, Identifiable {
     var testAssetName: String {
         switch self {
         case .finnhub:
-            "Apple (AAPL)"
+            String(localized: "Apple (AAPL)")
         case .coingecko:
-            "Bitcoin"
+            String(localized: "Bitcoin")
         }
     }
 }
@@ -710,27 +710,27 @@ private enum SettingsDestructiveAction: Identifiable {
     var title: String {
         switch self {
         case .deleteAllData:
-            "Delete All Data?"
+            String(localized: "Delete All Data?")
         case .deleteCustomCategory:
-            "Delete Custom Category?"
+            String(localized: "Delete Custom Category?")
         }
     }
 
     var message: String {
         switch self {
         case .deleteAllData:
-            "This permanently removes all local Wealth Compass data from this device."
+            String(localized: "This permanently removes all local Wealth Compass data from this device.")
         case .deleteCustomCategory(let category, let type):
-            "This removes \(category) from your custom \(type.title.lowercased()) categories. Existing transactions using this category will keep their current label."
+            String(localized: "This removes \(category) from your custom \(type.title) categories. Existing transactions using this category will keep their current label.")
         }
     }
 
     var confirmButtonTitle: String {
         switch self {
         case .deleteAllData:
-            "Delete"
+            String(localized: "Delete")
         case .deleteCustomCategory:
-            "Delete Category"
+            String(localized: "Delete Category")
         }
     }
 }

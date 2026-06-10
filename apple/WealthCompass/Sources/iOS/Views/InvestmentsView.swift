@@ -10,15 +10,15 @@ struct InvestmentsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                PageHeader(title: "Investments", subtitle: "Follow positions, allocation, and performance.") {
-                    PrimaryActionButton(systemImage: "plus", accessibilityLabel: "Add Investment") {
+                PageHeader(title: LocalizedStringKey( "Investments"), subtitle: LocalizedStringKey( "Follow positions, allocation, and performance.")) {
+                    PrimaryActionButton(systemImage: "plus", accessibilityLabel: String(localized: "Add Investment")) {
                         editingInvestment = nil
                         showingForm = true
                     }
                 }
 
                 summary
-                AllocationChart(title: "Allocation by Sector", slices: finance.investmentAllocation(settings: settings), settings: settings)
+                AllocationChart(title: LocalizedStringKey( "Allocation by Sector"), slices: finance.investmentAllocation(settings: settings), settings: settings)
                 investmentList
             }
             .padding(16)
@@ -50,15 +50,15 @@ struct InvestmentsView: View {
         let percent = costBasis > 0 ? (gain / costBasis) * 100 : 0
 
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            MetricCard(title: "Portfolio Value", value: settings.privateCurrency(total), systemImage: "chart.line.uptrend.xyaxis", accent: .cyan, detail: "Current market value")
-            MetricCard(title: "Positions", value: settings.isPrivacyMode ? "****" : "\(finance.data.investments.count)", systemImage: "square.stack.3d.up.fill", detail: "Stocks, ETFs, and more")
-            MetricCard(title: "Cost Basis", value: settings.privateCurrency(costBasis), systemImage: "banknote.fill", detail: "Capital invested")
+            MetricCard(title: LocalizedStringKey( "Portfolio Value"), value: settings.privateCurrency(total), systemImage: "chart.line.uptrend.xyaxis", accent: .cyan, detail: LocalizedStringKey( "Current market value"))
+            MetricCard(title: LocalizedStringKey( "Positions"), value: settings.isPrivacyMode ? "****" : "\(finance.data.investments.count)", systemImage: "square.stack.3d.up.fill", detail: LocalizedStringKey( "Stocks, ETFs, and more"))
+            MetricCard(title: LocalizedStringKey( "Cost Basis"), value: settings.privateCurrency(costBasis), systemImage: "banknote.fill", detail: LocalizedStringKey( "Capital invested"))
             MetricCard(
-                title: "Profit / Loss",
+                title: LocalizedStringKey( "Profit / Loss"),
                 value: settings.privateCurrency(gain),
                 systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
                 accent: gain >= 0 ? WCColor.primary : WCColor.destructive,
-                detail: settings.isPrivacyMode ? "Performance hidden" : "\(percent.formatted(.number.precision(.fractionLength(1))))% performance"
+                detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(percent.formatted(.number.precision(.fractionLength(1))))% performance")
             )
         }
     }
@@ -66,10 +66,10 @@ struct InvestmentsView: View {
     private var investmentList: some View {
         FinanceCard {
             VStack(alignment: .leading, spacing: 14) {
-                SectionHeading("Positions", subtitle: "Tap a position to edit its details")
+                SectionHeading(LocalizedStringKey( "Positions"), subtitle: LocalizedStringKey( "Tap a position to edit its details"))
 
                 if finance.data.investments.isEmpty {
-                    EmptyState(title: "No investments yet", systemImage: "chart.xyaxis.line")
+                    EmptyState(title: LocalizedStringKey( "No investments yet"), systemImage: "chart.xyaxis.line")
                 } else {
                     VStack(spacing: 12) {
                         ForEach(finance.data.investments.sorted { $0.currentValue > $1.currentValue }) { investment in
@@ -111,7 +111,8 @@ struct InvestmentsView: View {
                             .foregroundStyle(.white)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
-                        Text(investment.type.title.uppercased())
+                        Text(investment.type.title)
+                            .textCase(.uppercase)
                             .font(.caption2.weight(.bold))
                             .foregroundStyle(WCColor.primary)
                             .padding(.horizontal, 7)
@@ -146,7 +147,7 @@ struct InvestmentsView: View {
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    Text("Updated \(investment.updatedAt.formatted(date: .abbreviated, time: .omitted))")
+                    Text(String(localized: "Updated \(investment.updatedAt.formatted(date: .abbreviated, time: .omitted))"))
                         .font(.caption2)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)

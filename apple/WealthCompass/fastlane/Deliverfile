@@ -1,0 +1,6 @@
+# Deliverfile to ONLY manage metadata, completely ignoring screenshots
+
+skip_screenshots(true)
+overwrite_screenshots(false)
+submit_for_review(false)
+automatic_release(false)

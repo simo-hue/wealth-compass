@@ -243,7 +243,7 @@ extension FinancialData {
 
         let value = try FinanceJSONCoding.decode(type, from: payload)
         guard value.id == mutation.key.id else {
-            throw CloudSyncError.invalidRecord("Record ID and payload ID do not match.")
+            throw CloudSyncError.invalidRecord(String(localized: "Record ID and payload ID do not match."))
         }
         if let index = updatedCollection.firstIndex(where: { $0.id == value.id }) {
             updatedCollection[index] = value
@@ -493,7 +493,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         do {
             guard try await container.accountStatus() == .available else {
                 throw CloudSyncError.accountUnavailable(
-                    "Sign in to iCloud and allow iCloud access for this app before turning on sync."
+                    String(localized: "Sign in to iCloud and allow iCloud access for this app before turning on sync.")
                 )
             }
 
@@ -758,7 +758,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             }
 
             guard let payload = record["payload"] as? Data else {
-                throw CloudSyncError.invalidRecord("CloudKit record \(record.recordID.recordName) has no payload.")
+                throw CloudSyncError.invalidRecord(String(localized: "CloudKit record \(record.recordID.recordName) has no payload."))
             }
             let remoteSnapshot = CloudSyncRecordSnapshot(
                 key: key,
@@ -1179,11 +1179,11 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         if let cloudError = error as? CKError {
             switch cloudError.code {
             case .notAuthenticated:
-                await statusHandler(.accountUnavailable("Sign in to iCloud to continue syncing."))
+                await statusHandler(.accountUnavailable(String(localized: "Sign in to iCloud to continue syncing.")))
             case .networkUnavailable, .networkFailure:
-                await statusHandler(.error("The network is unavailable. Local changes are saved and will retry automatically."))
+                await statusHandler(.error(String(localized: "The network is unavailable. Local changes are saved and will retry automatically.")))
             case .quotaExceeded:
-                await statusHandler(.error("The iCloud account does not have enough available storage."))
+                await statusHandler(.error(String(localized: "The iCloud account does not have enough available storage.")))
             default:
                 await statusHandler(.error(cloudError.localizedDescription))
             }

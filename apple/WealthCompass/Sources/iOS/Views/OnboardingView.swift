@@ -34,7 +34,11 @@ struct OnboardingView: View {
         .alert("Validation Failed", isPresented: $showingErrorAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text(validationError ?? "Invalid API Key")
+            if let validationError {
+                Text(validationError)
+            } else {
+                Text("Invalid API Key")
+            }
         }
     }
     
@@ -195,8 +199,10 @@ struct OnboardingView: View {
                             ProgressView()
                                 .tint(.black)
                                 .padding(.trailing, 5)
+                            Text("Validating...")
+                        } else {
+                            Text("Get Started")
                         }
-                        Text(isValidating ? "Validating..." : "Get Started")
                     }
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.black)
@@ -223,7 +229,7 @@ struct OnboardingView: View {
         let coinGecko = coinGeckoKey.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if finnhub.isEmpty && coinGecko.isEmpty {
-            validationError = "Please insert at least one API key, or tap 'Skip for now' if you wish to proceed without them."
+            validationError = String(localized: "Please insert at least one API key, or tap 'Skip for now' if you wish to proceed without them.")
             showingErrorAlert = true
             return
         }

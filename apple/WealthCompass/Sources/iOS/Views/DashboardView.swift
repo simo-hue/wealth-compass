@@ -278,14 +278,14 @@ struct DashboardView: View {
                     value: settings.privateCurrency(totals.totalInvestments),
                     systemImage: "chart.line.uptrend.xyaxis",
                     accent: .cyan,
-                    detail: countLabel(finance.data.investments.count, singular: "position")
+                    detail: finance.data.investments.count == 1 ? LocalizedStringKey("1 position") : LocalizedStringKey("\(finance.data.investments.count) positions")
                 )
                 MetricCard(
                     title: "Crypto",
                     value: settings.privateCurrency(totals.totalCrypto),
                     systemImage: "bitcoinsign.circle.fill",
                     accent: WCColor.warning,
-                    detail: countLabel(finance.data.crypto.count, singular: "holding")
+                    detail: finance.data.crypto.count == 1 ? LocalizedStringKey("1 holding") : LocalizedStringKey("\(finance.data.crypto.count) holdings")
                 )
                 MetricCard(
                     title: "Total Assets",
@@ -299,14 +299,14 @@ struct DashboardView: View {
                     value: settings.privateCurrency(totals.totalLiabilities),
                     systemImage: "creditcard.fill",
                     accent: WCColor.destructive,
-                    detail: countLabel(finance.data.liabilities.count, singular: "liability")
+                    detail: finance.data.liabilities.count == 1 ? LocalizedStringKey("1 liability") : LocalizedStringKey("\(finance.data.liabilities.count) liabilities")
                 )
                 MetricCard(
                     title: "Net Savings",
                     value: settings.privateCurrency(currentMonthCashFlow.netSavings),
                     systemImage: currentMonthCashFlow.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
                     accent: currentMonthCashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive,
-                    detail: Date().formatted(.dateTime.month(.wide))
+                    detail: LocalizedStringKey(Date().formatted(.dateTime.month(.wide)))
                 )
             }
         }
@@ -334,19 +334,19 @@ struct DashboardView: View {
                 } else {
                     Chart(trend) { month in
                         BarMark(
-                            x: .value("Month", month.monthLabel),
-                            y: .value("Amount", month.income)
+                            x: .value(String(localized: "Month"), month.monthLabel),
+                            y: .value(String(localized: "Amount"), month.income)
                         )
                         .foregroundStyle(WCColor.primary.gradient)
-                        .position(by: .value("Type", "Income"))
+                        .position(by: .value(String(localized: "Type"), String(localized: "Income")))
                         .cornerRadius(6)
 
                         BarMark(
-                            x: .value("Month", month.monthLabel),
-                            y: .value("Amount", month.expense)
+                            x: .value(String(localized: "Month"), month.monthLabel),
+                            y: .value(String(localized: "Amount"), month.expense)
                         )
                         .foregroundStyle(WCColor.destructive.opacity(0.8).gradient)
-                        .position(by: .value("Type", "Expenses"))
+                        .position(by: .value(String(localized: "Type"), String(localized: "Expenses")))
                         .cornerRadius(6)
                     }
                     .chartLegend(.hidden)
@@ -362,8 +362,8 @@ struct DashboardView: View {
                 }
 
                 HStack(spacing: 18) {
-                    cashFlowLegend(title: "Income", value: totalIncome, color: WCColor.primary)
-                    cashFlowLegend(title: "Expenses", value: totalExpense, color: WCColor.destructive)
+                    cashFlowLegend(title: String(localized: "Income"), value: totalIncome, color: WCColor.primary)
+                    cashFlowLegend(title: String(localized: "Expenses"), value: totalExpense, color: WCColor.destructive)
                     Spacer(minLength: 0)
                     VStack(alignment: .trailing, spacing: 3) {
                         Text("6M NET")
@@ -536,21 +536,22 @@ struct DashboardView: View {
         return prefix + settings.formatCurrency(transaction.amount)
     }
 
-    private func countLabel(_ count: Int, singular: String) -> String {
-        "\(count) \(count == 1 ? singular : singular + "s")"
-    }
+
 
     private func freshnessText(_ date: Date) -> String {
         let interval = max(0, Date().timeIntervalSince(date))
         switch interval {
         case 0..<60:
-            return "Just now"
+            return String(localized: "Just now")
         case 60..<(60 * 60):
-            return "\(Int(interval / 60))m ago"
+            let m = Int(interval / 60)
+            return String(localized: "\(m)m ago")
         case (60 * 60)..<(24 * 60 * 60):
-            return "\(Int(interval / (60 * 60)))h ago"
+            let h = Int(interval / (60 * 60))
+            return String(localized: "\(h)h ago")
         case (24 * 60 * 60)..<(7 * 24 * 60 * 60):
-            return "\(Int(interval / (24 * 60 * 60)))d ago"
+            let d = Int(interval / (24 * 60 * 60))
+            return String(localized: "\(d)d ago")
         default:
             return date.formatted(date: .abbreviated, time: .omitted)
         }
