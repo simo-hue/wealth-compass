@@ -101,3 +101,11 @@
 - [2026-06-10 18:47]: Cash Flow Transactions Custom Card Grid
   - *Details*: Replaced the native `NSTableView` in the Cash Flow "Transactions" tab with a fully responsive `FinanceCard` grid layout.
   - *Tech Notes*: Replaced `Table` with `ScrollView` and `LazyVGrid` in `MacCashFlowView.swift`. Designed `transactionCard(for:)` to handle income/expense styling dynamically, support recurring schedule badges, and maintain delete context menus.
+
+- [2026-06-10 18:50]: Cash Flow Grid Height & Filter Polish
+  - *Details*: Equalized the vertical heights of all transaction cards regardless of description presence, and styled the filter pickers with a custom glassmorphic pill background.
+  - *Tech Notes*: Added `Spacer(minLength: 0)` and `.frame(maxHeight: .infinity, alignment: .top)` to the `FinanceCard` inner `VStack`. Wrapped the top pickers in an `.ultraThinMaterial` background with custom border radii.
+
+- [2026-06-10 18:51]: Centered Cash Flow Filters
+  - *Details*: Centered the transaction filter pill horizontally on the Cash Flow page.
+  - *Tech Notes*: Removed internal `Spacer()` and applied `.frame(maxWidth: .infinity, alignment: .center)` to the `transactionFilters` component in `MacCashFlowView.swift`.
