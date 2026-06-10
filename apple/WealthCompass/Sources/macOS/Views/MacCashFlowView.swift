@@ -83,6 +83,8 @@ struct MacCashFlowView: View {
     @State private var activeAlert: MacCashFlowAlert?
     @State private var selectedTab: MacCashFlowTab = .overview
     @State private var cashFlowRange: CashFlowTimeframe = .sixMonths
+    @State private var hoveredExpenseCategory: CategoryTotal?
+    @State private var hoveredCashFlowMonth: CashFlowMonth?
 
     private let summaryColumns = [
         GridItem(.adaptive(minimum: 190, maximum: 320), spacing: 16)
@@ -275,6 +277,7 @@ struct MacCashFlowView: View {
                         .foregroundStyle(WCColor.primary.gradient)
                         .position(by: .value("Type", "Income"))
                         .cornerRadius(6)
+                        .opacity(hoveredCashFlowMonth == nil || hoveredCashFlowMonth?.id == month.id ? 1.0 : 0.3)
 
                         BarMark(
                             x: .value("Month", month.monthLabel),
@@ -283,8 +286,32 @@ struct MacCashFlowView: View {
                         .foregroundStyle(WCColor.destructive.opacity(0.78).gradient)
                         .position(by: .value("Type", "Expenses"))
                         .cornerRadius(6)
+                        .opacity(hoveredCashFlowMonth == nil || hoveredCashFlowMonth?.id == month.id ? 1.0 : 0.3)
                     }
                     .chartLegend(.hidden)
+                    .chartOverlay { proxy in
+                        GeometryReader { geometry in
+                            Rectangle().fill(.clear).contentShape(Rectangle())
+                                .onContinuousHover { phase in
+                                    switch phase {
+                                    case .active(let location):
+                                        if let plotFrame = proxy.plotFrame {
+                                            let frame = geometry[plotFrame]
+                                            let x = location.x - frame.origin.x
+                                            if let monthLabel: String = proxy.value(atX: x) {
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    hoveredCashFlowMonth = trend.first { $0.monthLabel == monthLabel }
+                                                }
+                                            }
+                                        }
+                                    case .ended:
+                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                            hoveredCashFlowMonth = nil
+                                        }
+                                    }
+                                }
+                        }
+                    }
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: trend)
                     .frame(height: 244)
                 }
@@ -292,23 +319,24 @@ struct MacCashFlowView: View {
                 HStack(spacing: 20) {
                     CashFlowLegendItem(
                         title: "Income",
-                        value: settings.privateCurrency(totalIncome),
+                        value: settings.privateCurrency(hoveredCashFlowMonth?.income ?? totalIncome),
                         color: WCColor.primary
                     )
                     CashFlowLegendItem(
                         title: "Expenses",
-                        value: settings.privateCurrency(totalExpense),
+                        value: settings.privateCurrency(hoveredCashFlowMonth?.expense ?? totalExpense),
                         color: WCColor.destructive
                     )
                     Spacer(minLength: 0)
                     VStack(alignment: .trailing, spacing: 3) {
-                        Text("\(cashFlowRange.label) NET")
+                        Text(hoveredCashFlowMonth != nil ? hoveredCashFlowMonth!.monthLabel.uppercased() : "\(cashFlowRange.label) NET")
                             .font(.caption2.weight(.bold))
                             .tracking(1)
                             .foregroundStyle(.secondary)
-                        Text(settings.privateCurrency(totalIncome - totalExpense))
+                        let net = hoveredCashFlowMonth != nil ? (hoveredCashFlowMonth!.income - hoveredCashFlowMonth!.expense) : (totalIncome - totalExpense)
+                        Text(settings.privateCurrency(net))
                             .font(.subheadline.monospacedDigit().weight(.bold))
-                            .foregroundStyle(totalIncome - totalExpense >= 0 ? WCColor.primary : WCColor.destructive)
+                            .foregroundStyle(net >= 0 ? WCColor.primary : WCColor.destructive)
                     }
                 }
             }
@@ -328,16 +356,11 @@ struct MacCashFlowView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Picker("", selection: $analyticsPeriod) {
-                        ForEach(AnalyticsPeriod.allCases) { period in
-                            Text(period.title).tag(period)
-                        }
-                    }
-                    .labelsHidden()
-                    .frame(width: 130)
+                    DashboardSegmentedPicker(selection: $analyticsPeriod, items: AnalyticsPeriod.allCases) { $0.title }
                 }
 
                 let categories = finance.expensesByCategory(period: analyticsPeriod)
+                let totalExpenses = categories.reduce(0) { $0 + $1.value }
                 if categories.isEmpty {
                     EmptyState(title: "No expenses for this period", systemImage: "chart.pie")
                         .frame(maxWidth: .infinity, minHeight: 244)
@@ -351,8 +374,64 @@ struct MacCashFlowView: View {
                             )
                             .foregroundStyle(by: .value("Category", item.name))
                             .cornerRadius(5)
+                            .opacity(hoveredExpenseCategory == nil || hoveredExpenseCategory?.id == item.id ? 1.0 : 0.3)
                         }
                         .chartLegend(.hidden)
+                        .chartBackground { proxy in
+                            GeometryReader { geometry in
+                                if let plotFrame = proxy.plotFrame {
+                                    let frame = geometry[plotFrame]
+                                    VStack(spacing: 3) {
+                                        if let hoveredExpenseCategory {
+                                            Text(hoveredExpenseCategory.name.uppercased())
+                                                .font(.caption2.weight(.bold))
+                                                .tracking(1.3)
+                                                .foregroundStyle(.white.opacity(0.8))
+                                            Text(settings.privateCurrency(hoveredExpenseCategory.value))
+                                                .font(.headline.monospacedDigit().weight(.bold))
+                                                .foregroundStyle(.white)
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.7)
+                                            Text("\(hoveredExpenseCategory.percentage.formatted(.number.precision(.fractionLength(1))))%")
+                                                .font(.caption2.monospacedDigit())
+                                                .foregroundStyle(.white.opacity(0.6))
+                                        } else {
+                                            Text("EXPENSES")
+                                                .font(.caption2.weight(.bold))
+                                                .tracking(1.3)
+                                                .foregroundStyle(.white.opacity(0.45))
+                                            Text(settings.privateCurrency(totalExpenses))
+                                                .font(.headline.monospacedDigit().weight(.bold))
+                                                .foregroundStyle(.white)
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.7)
+                                        }
+                                    }
+                                    .position(x: frame.midX, y: frame.midY)
+                                }
+                            }
+                        }
+                        .chartOverlay { proxy in
+                            GeometryReader { geometry in
+                                if let plotFrame = proxy.plotFrame {
+                                    let frame = geometry[plotFrame]
+                                    Rectangle().fill(.clear).contentShape(Rectangle())
+                                        .onContinuousHover { phase in
+                                            switch phase {
+                                            case .active(let location):
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    hoveredExpenseCategory = categorySlice(at: location, in: frame, total: totalExpenses, categories: categories)
+                                                }
+                                            case .ended:
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    hoveredExpenseCategory = nil
+                                                }
+                                            }
+                                        }
+                                }
+                            }
+                        }
+                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: categories.map(\.value))
                     }
                     .frame(height: 200)
 
@@ -828,6 +907,34 @@ struct MacCashFlowView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
+    }
+
+    private func categorySlice(at location: CGPoint, in rect: CGRect, total: Double, categories: [CategoryTotal]) -> CategoryTotal? {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let dx = location.x - center.x
+        let dy = location.y - center.y
+        
+        let distance = sqrt(dx*dx + dy*dy)
+        let radius = min(rect.width, rect.height) / 2
+        let innerRadius = radius * 0.62
+        if distance < innerRadius || distance > radius {
+            return nil
+        }
+        
+        var angle = atan2(dy, dx) + .pi / 2
+        if angle < 0 { angle += 2 * .pi }
+        
+        let fraction = angle / (2 * .pi)
+        let selectedValue = fraction * total
+        
+        var cumulative = 0.0
+        for category in categories {
+            cumulative += category.value
+            if selectedValue <= cumulative {
+                return category
+            }
+        }
+        return nil
     }
 }
 

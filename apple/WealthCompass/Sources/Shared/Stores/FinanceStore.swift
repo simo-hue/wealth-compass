@@ -633,10 +633,13 @@ final class FinanceStore: ObservableObject {
                     partial + settings.convert(investment.currentValue, from: investment.currency)
                 }
             }
-        return grouped.enumerated().map { index, item in
-            AllocationSlice(name: item.key, value: item.value, color: ColorPalette.chart[index % ColorPalette.chart.count])
-        }
-        .sorted { $0.value > $1.value }
+        return grouped
+            .map { (name: $0.key, value: $0.value) }
+            .sorted { $0.value > $1.value }
+            .enumerated()
+            .map { index, item in
+                AllocationSlice(name: item.name, value: item.value, color: ColorPalette.chart[index % ColorPalette.chart.count])
+            }
     }
 
     func investmentTypeAllocation(settings: AppSettings) -> [AllocationSlice] {
@@ -646,10 +649,13 @@ final class FinanceStore: ObservableObject {
                     partial + settings.convert(investment.currentValue, from: investment.currency)
                 }
             }
-        return grouped.enumerated().map { index, item in
-            AllocationSlice(name: item.key, value: item.value, color: ColorPalette.chart[index % ColorPalette.chart.count])
-        }
-        .sorted { $0.value > $1.value }
+        return grouped
+            .map { (name: $0.key, value: $0.value) }
+            .sorted { $0.value > $1.value }
+            .enumerated()
+            .map { index, item in
+                AllocationSlice(name: item.name, value: item.value, color: ColorPalette.chartType[index % ColorPalette.chartType.count])
+            }
     }
 
     func investmentGeographyAllocation(settings: AppSettings) -> [AllocationSlice] {
@@ -659,10 +665,13 @@ final class FinanceStore: ObservableObject {
                     partial + settings.convert(investment.currentValue, from: investment.currency)
                 }
             }
-        return grouped.enumerated().map { index, item in
-            AllocationSlice(name: item.key, value: item.value, color: ColorPalette.chart[index % ColorPalette.chart.count])
-        }
-        .sorted { $0.value > $1.value }
+        return grouped
+            .map { (name: $0.key, value: $0.value) }
+            .sorted { $0.value > $1.value }
+            .enumerated()
+            .map { index, item in
+                AllocationSlice(name: item.name, value: item.value, color: ColorPalette.chartGeography[index % ColorPalette.chartGeography.count])
+            }
     }
 
     func cryptoAllocation(settings: AppSettings) -> [AllocationSlice] {

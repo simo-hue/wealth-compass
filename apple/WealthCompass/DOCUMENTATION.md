@@ -145,3 +145,19 @@
 - [2026-06-10 19:27]: Top Holdings UI Consistency Update
   - *Details*: Redesigned the 'Top Holdings' section in the Crypto Overview tab to match the exact same UI as the main 'Holdings' view. Removed the side-by-side layout in favor of a full-width adaptive `LazyVGrid` layout that scales beautifully.
   - *Tech Notes*: Extracted `topHoldingsSection` from the `HStack`, replaced `VStack` with `LazyVGrid(columns: [GridItem(.adaptive(minimum: 360))])`, aligned the section heading to `.title2`, and increased the display prefix limit to 6 holdings.
+
+- [2026-06-10 19:30]: Crypto Overview No-Scroll Adaptive Layout
+  - *Details*: Redesigned the Crypto Overview layout to aggressively fit content on screen without forcing a scrollbar on larger windows. Grouped the 'Crypto Allocation' chart and 'Performance Section' side-by-side to save an entire vertical row of space, allowing all main elements to render above the fold.
+  - *Tech Notes*: Wrapped the layout in `ViewThatFits(in: .vertical)` with a fallback `ScrollView`. Extracted content to an `overviewContent` view. Switched `performanceSection` from an `HStack` to a `VStack` to sit elegantly next to the `AllocationChart`.
+
+- [2026-06-10 19:31]: Investment Allocation Distinct Chart Colors
+  - *Details*: Modified the Investment Overview charts so that 'Allocation by Sector', 'Allocation by Type', and 'Allocation by Geography' each use distinct color palettes, making them visually unique and easier to distinguish at a glance.
+  - *Tech Notes*: Added `chartType` and `chartGeography` arrays to `ColorPalette` in `DesignSystem.swift`. Updated `investmentTypeAllocation` and `investmentGeographyAllocation` in `FinanceStore.swift` to use the new palettes. Also ensured deterministic color mapping by explicitly sorting slices before assigning colors.
+
+- [2026-06-10 19:34]: Interactive Asset Allocation Dashboard Chart
+  - *Details*: Replicated the interactive hover behavior from the Crypto Allocation chart into the Asset Allocation chart on the Mac Dashboard. Hovering over a slice now highlights it, dims the others, and displays the slice's specific name, value, and percentage in the center of the donut chart.
+  - *Tech Notes*: Added `@State private var hoveredAssetSlice` to `MacDashboardView.swift`. Applied `.opacity` modifier to `SectorMark` bound to the hovered slice state. Added `.chartOverlay` with `.onContinuousHover` to perform hit-testing using a custom geometric `slice(at:in:total:slices:)` function, and updated `.chartBackground` to dynamically display the hovered slice's details or fallback to total assets.
+
+- [2026-06-10 19:37]: Cash Flow Interactive Charts & Unified UI
+  - *Details*: Replaced the dropdown menu on the Expense Categories card with a segmented picker to match the layout of the Cash Flow Trend card. Implemented interactive hover effects on both the Expense Categories donut chart and the Cash Flow Trend bar chart.
+  - *Tech Notes*: In `MacCashFlowView.swift`, replaced `Picker` with `.pickerStyle(.menu)` with `DashboardSegmentedPicker`. Added `@State` tracking variables for hovered month and category. Added geometric slicing logic `categorySlice(at:in:total:categories:)` for the pie chart hover mapping, and simple coordinate mapping using `proxy.value(atX:)` for the bar chart hover. The Legend text dynamically updates to reflect hovered element properties.

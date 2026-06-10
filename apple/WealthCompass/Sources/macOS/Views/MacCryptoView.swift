@@ -34,23 +34,11 @@ struct MacCryptoView: View {
             .padding(.vertical, 16)
 
             if selectedTab == .overview {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        summaryCards
-                        
-                        performanceSection
-                        
-                        AllocationChart(
-                            title: "Crypto Allocation",
-                            slices: finance.cryptoAllocation(settings: settings),
-                            settings: settings,
-                            showLegend: false
-                        )
-                        
-                        topHoldingsSection
+                ViewThatFits(in: .vertical) {
+                    overviewContent
+                    ScrollView {
+                        overviewContent
                     }
-                    .padding(24)
-                    .frame(maxWidth: 1440, alignment: .leading)
                 }
             } else {
                 cryptoTable
@@ -138,6 +126,28 @@ struct MacCryptoView: View {
         }
     }
 
+    private var overviewContent: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            summaryCards
+            
+            HStack(spacing: 24) {
+                AllocationChart(
+                    title: "Crypto Allocation",
+                    slices: finance.cryptoAllocation(settings: settings),
+                    settings: settings,
+                    showLegend: false
+                )
+                .frame(maxWidth: .infinity)
+                
+                performanceSection
+            }
+            
+            topHoldingsSection
+        }
+        .padding(24)
+        .frame(maxWidth: 1440, alignment: .leading)
+    }
+
     @ViewBuilder
     private var performanceSection: some View {
         let cryptos = finance.data.crypto
@@ -148,7 +158,7 @@ struct MacCryptoView: View {
         let hasWorst = worst != nil && worst!.gainLossPercent < 0
         
         if hasBest || hasWorst {
-            HStack(spacing: 24) {
+            VStack(spacing: 24) {
                 if let best, best.gainLossPercent > 0 {
                     performanceCard(title: "Top Performer", holding: best)
                 }
@@ -157,11 +167,12 @@ struct MacCryptoView: View {
                 }
                 
                 if hasBest && !hasWorst {
-                    Spacer().frame(maxWidth: .infinity)
+                    Spacer().frame(maxHeight: .infinity)
                 } else if !hasBest && hasWorst {
-                    Spacer().frame(maxWidth: .infinity)
+                    Spacer().frame(maxHeight: .infinity)
                 }
             }
+            .frame(width: 400)
         }
     }
 

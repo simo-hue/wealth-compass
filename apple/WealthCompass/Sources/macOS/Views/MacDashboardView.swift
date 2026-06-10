@@ -10,6 +10,7 @@ struct MacDashboardView: View {
     @State private var expensePeriod: AnalyticsPeriod = .thirtyDays
     @State private var selectedNetWorthDate: Date?
     @State private var cashFlowRange: CashFlowTimeframe = .sixMonths
+    @State private var hoveredAssetSlice: AllocationSlice?
     @Namespace private var animationNamespace
 
     private var totals: FinanceTotals {
@@ -372,6 +373,7 @@ struct MacDashboardView: View {
                                 )
                                 .foregroundStyle(slice.color.gradient)
                                 .cornerRadius(5)
+                                .opacity(hoveredAssetSlice == nil || hoveredAssetSlice?.id == slice.id ? 1.0 : 0.3)
                             }
                             .chartLegend(.hidden)
                             .chartBackground { proxy in
@@ -379,17 +381,52 @@ struct MacDashboardView: View {
                                     if let plotFrame = proxy.plotFrame {
                                         let frame = geometry[plotFrame]
                                         VStack(spacing: 3) {
-                                            Text("ASSETS")
-                                                .font(.caption2.weight(.bold))
-                                                .tracking(1.3)
-                                                .foregroundStyle(.white.opacity(0.45))
-                                            Text(settings.privateCurrency(allocationTotal))
-                                                .font(.headline.monospacedDigit().weight(.bold))
-                                                .foregroundStyle(.white)
-                                                .lineLimit(1)
-                                                .minimumScaleFactor(0.7)
+                                            if let hoveredAssetSlice {
+                                                Text(hoveredAssetSlice.name.uppercased())
+                                                    .font(.caption2.weight(.bold))
+                                                    .tracking(1.3)
+                                                    .foregroundStyle(hoveredAssetSlice.color)
+                                                Text(settings.privateCurrency(hoveredAssetSlice.value))
+                                                    .font(.headline.monospacedDigit().weight(.bold))
+                                                    .foregroundStyle(.white)
+                                                    .lineLimit(1)
+                                                    .minimumScaleFactor(0.7)
+                                                Text(privatePercent(allocationTotal > 0 ? hoveredAssetSlice.value / allocationTotal * 100 : 0))
+                                                    .font(.caption2.monospacedDigit())
+                                                    .foregroundStyle(.white.opacity(0.6))
+                                            } else {
+                                                Text("ASSETS")
+                                                    .font(.caption2.weight(.bold))
+                                                    .tracking(1.3)
+                                                    .foregroundStyle(.white.opacity(0.45))
+                                                Text(settings.privateCurrency(allocationTotal))
+                                                    .font(.headline.monospacedDigit().weight(.bold))
+                                                    .foregroundStyle(.white)
+                                                    .lineLimit(1)
+                                                    .minimumScaleFactor(0.7)
+                                            }
                                         }
                                         .position(x: frame.midX, y: frame.midY)
+                                    }
+                                }
+                            }
+                            .chartOverlay { proxy in
+                                GeometryReader { geometry in
+                                    if let plotFrame = proxy.plotFrame {
+                                        let frame = geometry[plotFrame]
+                                        Rectangle().fill(.clear).contentShape(Rectangle())
+                                            .onContinuousHover { phase in
+                                                switch phase {
+                                                case .active(let location):
+                                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                                        hoveredAssetSlice = slice(at: location, in: frame, total: allocationTotal, slices: slices)
+                                                    }
+                                                case .ended:
+                                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                                        hoveredAssetSlice = nil
+                                                    }
+                                                }
+                                            }
                                     }
                                 }
                             }
@@ -742,6 +779,34 @@ struct MacDashboardView: View {
             return WCColor.warning
         }
         return .white.opacity(0.35)
+    }
+
+    private func slice(at location: CGPoint, in rect: CGRect, total: Double, slices: [AllocationSlice]) -> AllocationSlice? {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let dx = location.x - center.x
+        let dy = location.y - center.y
+        
+        let distance = sqrt(dx*dx + dy*dy)
+        let radius = min(rect.width, rect.height) / 2
+        let innerRadius = radius * 0.72
+        if distance < innerRadius || distance > radius {
+            return nil
+        }
+        
+        var angle = atan2(dy, dx) + .pi / 2
+        if angle < 0 { angle += 2 * .pi }
+        
+        let fraction = angle / (2 * .pi)
+        let selectedValue = fraction * total
+        
+        var cumulative = 0.0
+        for slice in slices {
+            cumulative += slice.value
+            if selectedValue <= cumulative {
+                return slice
+            }
+        }
+        return nil
     }
 }
 

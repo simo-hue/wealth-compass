@@ -23,6 +23,26 @@ enum ColorPalette {
         .pink,
         WCColor.accent
     ]
+    
+    static let chartType: [Color] = [
+        .blue,
+        .indigo,
+        .cyan,
+        .purple,
+        .mint,
+        .teal,
+        WCColor.accent
+    ]
+    
+    static let chartGeography: [Color] = [
+        WCColor.warning,
+        .orange,
+        WCColor.destructive,
+        .pink,
+        .red,
+        .yellow,
+        .brown
+    ]
 }
 
 struct ScreenBackground: View {
