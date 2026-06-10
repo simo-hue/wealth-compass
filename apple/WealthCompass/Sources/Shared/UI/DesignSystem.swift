@@ -322,6 +322,21 @@ struct AllocationChart: View {
                                             }
                                         }
                                     }
+#if os(iOS)
+                                    .gesture(
+                                        DragGesture(minimumDistance: 0)
+                                            .onChanged { value in
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    hoveredSlice = slice(at: value.location, in: frame, total: total)
+                                                }
+                                            }
+                                            .onEnded { _ in
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    hoveredSlice = nil
+                                                }
+                                            }
+                                    )
+#endif
                             }
                         }
                     }

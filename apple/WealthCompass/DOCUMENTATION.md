@@ -183,3 +183,6 @@
 - [2026-06-10 20:00]: Dashboard Cash Flow Hover Effect
   - *Details*: Added an interactive hover effect to the Cash Flow graph on the macOS Dashboard.
   - *Tech Notes*: Added `@State private var hoveredCashFlowMonth` to `MacDashboardView.swift`. Added `.opacity` modifier to the bar charts and a `.chartOverlay` with hit-testing logic identical to `MacCashFlowView`. The legend dynamically updates to show income, expense, and net values of the hovered month.
+- [2026-06-10 18:07]: iOS Interactive Charts Parity
+  - *Details*: Updated the iOS pie/donut charts to support interactive touch to match the hover interaction available in the macOS app. Users can now tap and drag across the circular charts to view specific slice data directly in the center of the chart.
+  - *Tech Notes*: Replaced macOS-only `onContinuousHover` modifier in `AllocationChart` inside `DesignSystem.swift` with a `DragGesture(minimumDistance: 0)` bounded by `#if os(iOS)`. Transferred the interactive `.chartBackground`, `.chartOverlay`, and `categorySlice` implementation into `iOS/Views/CashFlowView.swift` to upgrade the static Expense Categories pie chart to a fully interactive donut chart.
