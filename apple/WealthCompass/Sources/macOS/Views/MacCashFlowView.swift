@@ -356,7 +356,14 @@ struct MacCashFlowView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    DashboardSegmentedPicker(selection: $analyticsPeriod, items: AnalyticsPeriod.allCases) { $0.title }
+                    Picker("Expense period", selection: $analyticsPeriod) {
+                        ForEach(AnalyticsPeriod.allCases) { period in
+                            Text(period.title).tag(period)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .frame(width: 142)
                 }
 
                 let categories = finance.expensesByCategory(period: analyticsPeriod)
@@ -433,26 +440,7 @@ struct MacCashFlowView: View {
                         }
                         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: categories.map(\.value))
                     }
-                    .frame(height: 200)
-
-                    VStack(spacing: 10) {
-                        ForEach(Array(categories.prefix(8).enumerated()), id: \.element.id) { index, item in
-                            HStack(spacing: 10) {
-                                Circle()
-                                    .fill(ColorPalette.chart[index % ColorPalette.chart.count])
-                                    .frame(width: 8, height: 8)
-                                Text(item.name)
-                                    .lineLimit(1)
-                                Spacer()
-                                Text(settings.privateCurrency(item.value))
-                                    .font(.subheadline.monospacedDigit().weight(.semibold))
-                                Text("\(item.percentage.formatted(.number.precision(.fractionLength(1))))%")
-                                    .font(.caption.monospacedDigit())
-                                    .foregroundStyle(.secondary)
-                                    .frame(width: 52, alignment: .trailing)
-                            }
-                        }
-                    }
+                    .frame(minHeight: 250, maxHeight: .infinity)
                 }
             }
             .frame(maxHeight: .infinity, alignment: .top)
