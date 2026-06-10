@@ -59,7 +59,7 @@ private enum MacCashFlowAlert: Identifiable {
     }
 }
 
-private enum MacCashFlowTab: Hashable, CaseIterable {
+private enum MacCashFlowTab: MacSelectorTab {
     case overview
     case transactions
 
@@ -91,7 +91,7 @@ struct MacCashFlowView: View {
         VStack(spacing: 0) {
             HStack {
                 Spacer()
-                CashFlowSelectorIsland(selection: $selectedTab)
+                MacSelectorIsland(selection: $selectedTab)
                 Spacer()
             }
             .padding(.vertical, 16)
@@ -751,53 +751,4 @@ private struct MacCashFlowTransactionEditor: View {
         onSave(type, parsedAmount, selectedCategory, note, date)
         dismiss()
     }
-}
-
-private struct CashFlowSelectorIsland: View {
-    @Binding var selection: MacCashFlowTab
-
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach(Array(MacCashFlowTab.allCases.enumerated()), id: \.element) { index, tab in
-                Button {
-                    selection = tab
-                } label: {
-                    Text(tab.title)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(selection == tab ? .white : .white.opacity(0.8))
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 6)
-                        .background {
-                            if selection == tab {
-                                Capsule()
-                                    .fill(Color.white.opacity(0.18))
-                                    .matchedGeometryEffect(id: "selector_background", in: namespace)
-                            }
-                        }
-                        .contentShape(Capsule())
-                }
-                .buttonStyle(.plain)
-
-                if index < MacCashFlowTab.allCases.count - 1 {
-                    Divider()
-                        .frame(height: 14)
-                        .background(Color.white.opacity(0.2))
-                        .padding(.horizontal, 6)
-                }
-            }
-        }
-        .padding(4)
-        .background(
-            Capsule()
-                .fill(Color(white: 0.12))
-                .overlay(
-                    Capsule()
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
-        .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selection)
-    }
-
-    @Namespace private var namespace
 }
