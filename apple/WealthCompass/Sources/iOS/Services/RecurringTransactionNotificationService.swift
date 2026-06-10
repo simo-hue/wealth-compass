@@ -86,14 +86,14 @@ actor RecurringTransactionNotificationService {
 
         for schedule in upcoming {
             let content = UNMutableNotificationContent()
-            content.title = "Recurring \(schedule.type.title.lowercased()) due"
+            content.title = String(localized: "Recurring \(schedule.type.title) due")
             if showAmounts {
                 let amount = schedule.amount.formatted(
                     FloatingPointFormatStyle<Double>.Currency(code: currencyCode)
                 )
-                content.body = "\(schedule.category): \(amount). Wealth Compass records it automatically when the app is active."
+                content.body = String(localized: "\(schedule.category): \(amount). Wealth Compass records it automatically when the app is active.")
             } else {
-                content.body = "\(schedule.category) is scheduled. Open Wealth Compass to review it."
+                content.body = String(localized: "\(schedule.category) is scheduled. Open Wealth Compass to review it.")
             }
             content.sound = .default
             content.userInfo = ["recurringTransactionID": schedule.id.uuidString]

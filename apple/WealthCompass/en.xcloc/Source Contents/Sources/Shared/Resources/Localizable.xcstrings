@@ -1,0 +1,1040 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "· %@" : {
+
+    },
+    "%@\n\n%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@\n\n%2$@"
+          }
+        }
+      }
+    },
+    "%@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "%@ (%@%%)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (%2$@%%)"
+          }
+        }
+      }
+    },
+    "%@ / unit" : {
+
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@ • %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ • %2$@"
+          }
+        }
+      }
+    },
+    "%@ App Lock" : {
+
+    },
+    "%@ Cached or fallback rates remain active." : {
+
+    },
+    "%@ is scheduled. Open Wealth Compass to review it." : {
+
+    },
+    "%@ units" : {
+
+    },
+    "%@: %@. Wealth Compass records it automatically when the app is active." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@. Wealth Compass records it automatically when the app is active."
+          }
+        }
+      }
+    },
+    "%@: %@. Wealth Compass records it while the app is active." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@. Wealth Compass records it while the app is active."
+          }
+        }
+      }
+    },
+    "%@. Fetched %@ and cached locally." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@. Fetched %2$@ and cached locally."
+          }
+        }
+      }
+    },
+    "%@%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@%2$@"
+          }
+        }
+      }
+    },
+    "%@%%" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld due transaction%@ added to Cash Flow." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld due transaction%2$@ added to Cash Flow."
+          }
+        }
+      }
+    },
+    "%lld more transactions hidden by this view." : {
+
+    },
+    "•" : {
+
+    },
+    "1 %@" : {
+
+    },
+    "6M NET" : {
+
+    },
+    "A clear view of what you own, owe, earn, and spend." : {
+
+    },
+    "Add" : {
+
+    },
+    "Add a holding to track its value and performance." : {
+
+    },
+    "Add a holding to track its value." : {
+
+    },
+    "Add another snapshot to see movement" : {
+
+    },
+    "Add another snapshot to see movement over time" : {
+
+    },
+    "Add Crypto" : {
+
+    },
+    "Add Investment" : {
+
+    },
+    "Add stocks, ETFs, bonds, or other positions." : {
+
+    },
+    "Add Transaction" : {
+
+    },
+    "Add your first transaction" : {
+
+    },
+    "All Time" : {
+
+    },
+    "Allocation by Geography" : {
+
+    },
+    "Allocation by Sector" : {
+
+    },
+    "Allocation by Type" : {
+
+    },
+    "Amount" : {
+
+    },
+    "Amount (%@)" : {
+
+    },
+    "API keys are verified against a live quote before they are stored in the macOS Keychain." : {
+
+    },
+    "ASSETS" : {
+
+    },
+    "Average Buy Price" : {
+
+    },
+    "Base Currency" : {
+
+    },
+    "Biometric authentication is not available on this device." : {
+
+    },
+    "Biometric authentication is not available on this Mac." : {
+
+    },
+    "Biometrics" : {
+
+    },
+    "Bond" : {
+
+    },
+    "Breakdown of recorded spending" : {
+
+    },
+    "British Pound" : {
+
+    },
+    "Build your first financial view" : {
+
+    },
+    "Calculated Fee" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Cash Flow" : {
+
+    },
+    "Category" : {
+
+    },
+    "Checking the iCloud account and preparing CloudKit." : {
+
+    },
+    "Classification" : {
+
+    },
+    "CoinGecko API Key (Crypto)" : {
+
+    },
+    "CoinGecko ID" : {
+
+    },
+    "Commodity" : {
+
+    },
+    "Completed" : {
+
+    },
+    "Configured" : {
+
+    },
+    "Connect Market Data" : {
+
+    },
+    "Connecting" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Cost Basis" : {
+
+    },
+    "Crypto" : {
+
+    },
+    "Currency" : {
+
+    },
+    "Current Price" : {
+
+    },
+    "Custom Categories" : {
+
+    },
+    "Custom category name" : {
+
+    },
+    "Custom Category Name" : {
+
+    },
+    "Custom..." : {
+
+    },
+    "Daily" : {
+
+    },
+    "Dashboard" : {
+
+    },
+    "Data" : {
+
+    },
+    "Date" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Delete %@" : {
+
+    },
+    "Delete All Data" : {
+
+    },
+    "Delete All Local Data..." : {
+
+    },
+    "Delete Crypto Holding?" : {
+
+    },
+    "Delete Holding" : {
+
+    },
+    "Delete Investment" : {
+
+    },
+    "Delete Investment?" : {
+
+    },
+    "Delete Recurring Transaction?" : {
+
+    },
+    "Delete schedule" : {
+
+    },
+    "Delete Transaction" : {
+
+    },
+    "Delete Transaction?" : {
+
+    },
+    "Description" : {
+
+    },
+    "Details" : {
+
+    },
+    "Dividends" : {
+
+    },
+    "Due schedules are recorded automatically while the app is active and caught up the next time it opens." : {
+
+    },
+    "Due schedules catch up on open" : {
+
+    },
+    "ECB" : {
+
+    },
+    "ECB reference rates are refreshed automatically and cached locally for offline use." : {
+
+    },
+    "Edit" : {
+
+    },
+    "Edit Crypto" : {
+
+    },
+    "Edit Crypto Holding" : {
+
+    },
+    "Edit Holding" : {
+
+    },
+    "Edit Investment" : {
+
+    },
+    "Edit Recurring Transaction" : {
+
+    },
+    "Edit schedule" : {
+
+    },
+    "Enable biometric protection for Wealth Compass." : {
+
+    },
+    "End Date" : {
+
+    },
+    "Ends" : {
+
+    },
+    "Ends %@" : {
+
+    },
+    "Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis." : {
+
+    },
+    "Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date." : {
+
+    },
+    "Entertainment" : {
+
+    },
+    "ETF" : {
+
+    },
+    "Euro" : {
+
+    },
+    "Exchange Rates" : {
+
+    },
+    "Expense" : {
+
+    },
+    "Expense Categories" : {
+
+    },
+    "Expense period" : {
+
+    },
+    "EXPENSES" : {
+
+    },
+    "Export JSON..." : {
+
+    },
+    "Face ID" : {
+
+    },
+    "Fee Amount" : {
+
+    },
+    "Fee Percentage" : {
+
+    },
+    "Fee Type" : {
+
+    },
+    "Finish" : {
+
+    },
+    "Finish Recurring Transaction?" : {
+
+    },
+    "Finish schedule" : {
+
+    },
+    "Finnhub API Key (Stocks)" : {
+
+    },
+    "First Occurrence" : {
+
+    },
+    "Fixed" : {
+
+    },
+    "Food" : {
+
+    },
+    "for %@" : {
+
+    },
+    "Force Sync iCloud" : {
+
+    },
+    "Freelance" : {
+
+    },
+    "Fuel" : {
+
+    },
+    "Generated from a recurring schedule" : {
+
+    },
+    "Geography" : {
+
+    },
+    "Get Started" : {
+
+    },
+    "Health" : {
+
+    },
+    "Housing" : {
+
+    },
+    "iCloud Sync" : {
+
+    },
+    "iCloud sync is not running." : {
+
+    },
+    "iCloud Unavailable" : {
+
+    },
+    "Identity" : {
+
+    },
+    "Import JSON Backup" : {
+
+    },
+    "Import JSON..." : {
+
+    },
+    "Income" : {
+
+    },
+    "Income and expenses by month" : {
+
+    },
+    "Investment Fee" : {
+
+    },
+    "Investment Transaction Fee" : {
+
+    },
+    "Investment Transaction Fee %" : {
+
+    },
+    "Investments" : {
+
+    },
+    "ISIN / ID" : {
+
+    },
+    "Language" : {
+
+    },
+    "Last 3 Months" : {
+
+    },
+    "Last 7 Days" : {
+
+    },
+    "Last 30 Days" : {
+
+    },
+    "Last synced %@." : {
+
+    },
+    "Last Updated" : {
+
+    },
+    "Latest snapshot %@" : {
+
+    },
+    "Liabilities" : {
+
+    },
+    "Local data is ready to sync." : {
+
+    },
+    "Local Only" : {
+
+    },
+    "Market Data" : {
+
+    },
+    "Merge adds new records and updates matching IDs. Replace clears current local finance data before importing." : {
+
+    },
+    "Merge With Existing Data" : {
+
+    },
+    "Merge with local data" : {
+
+    },
+    "Mode" : {
+
+    },
+    "Month" : {
+
+    },
+    "Monthly" : {
+
+    },
+    "Name" : {
+
+    },
+    "Navigate" : {
+
+    },
+    "Net Worth" : {
+
+    },
+    "NET WORTH" : {
+
+    },
+    "Net worth range" : {
+
+    },
+    "Never" : {
+
+    },
+    "New Crypto Holding" : {
+
+    },
+    "New Holding" : {
+
+    },
+    "New Investment" : {
+
+    },
+    "New Recurring Transaction" : {
+
+    },
+    "New Transaction" : {
+
+    },
+    "Next %@" : {
+
+    },
+    "Next: %@" : {
+
+    },
+    "No Crypto Holdings" : {
+
+    },
+    "No custom %@ categories yet." : {
+
+    },
+    "No end date" : {
+
+    },
+    "No Investments" : {
+
+    },
+    "No snapshots" : {
+
+    },
+    "No snapshots yet" : {
+
+    },
+    "Not Set" : {
+
+    },
+    "Notifications" : {
+
+    },
+    "Notifications disabled" : {
+
+    },
+    "Notifications enabled" : {
+
+    },
+    "Notifications off" : {
+
+    },
+    "Notifications on" : {
+
+    },
+    "Notify When Due" : {
+
+    },
+    "Off" : {
+
+    },
+    "Offline fallback" : {
+
+    },
+    "OK" : {
+
+    },
+    "One-Time" : {
+
+    },
+    "One-Time Transaction" : {
+
+    },
+    "Optic ID" : {
+
+    },
+    "Optional Coin ID" : {
+
+    },
+    "Other" : {
+
+    },
+    "Overview" : {
+
+    },
+    "Paste CoinGecko key..." : {
+
+    },
+    "Paste Finnhub key..." : {
+
+    },
+    "Pause schedule" : {
+
+    },
+    "Paused" : {
+
+    },
+    "Percent" : {
+
+    },
+    "Performance" : {
+
+    },
+    "Period" : {
+
+    },
+    "Portfolio Value" : {
+
+    },
+    "Position" : {
+
+    },
+    "Positions" : {
+
+    },
+    "Prepare Backup" : {
+
+    },
+    "Privacy" : {
+
+    },
+    "Privacy Mode" : {
+
+    },
+    "Privacy on" : {
+
+    },
+    "Privacy, sync, currency, and market data" : {
+
+    },
+    "Profit / Loss" : {
+
+    },
+    "Quantity" : {
+
+    },
+    "Range floor" : {
+
+    },
+    "Real Estate" : {
+
+    },
+    "Recent Activity" : {
+
+    },
+    "Recent Transactions" : {
+
+    },
+    "Record cash flow or add a position to bring this dashboard to life." : {
+
+    },
+    "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically." : {
+
+    },
+    "Recurring" : {
+
+    },
+    "Recurring %@ due" : {
+
+    },
+    "Recurring Transaction" : {
+
+    },
+    "Recurring Transactions" : {
+
+    },
+    "Recurring Transactions Added" : {
+
+    },
+    "Refresh Data" : {
+
+    },
+    "Refresh Exchange Rates" : {
+
+    },
+    "Refresh Market Data" : {
+
+    },
+    "Refreshing Exchange Rates" : {
+
+    },
+    "Refreshing Market Data" : {
+
+    },
+    "Region & Language" : {
+
+    },
+    "Remove %@" : {
+
+    },
+    "Remove %@?" : {
+
+    },
+    "Remove Key" : {
+
+    },
+    "Repeats" : {
+
+    },
+    "Replace Existing Data" : {
+
+    },
+    "Replace local data" : {
+
+    },
+    "Resume schedule" : {
+
+    },
+    "Retrieving %@ price..." : {
+
+    },
+    "Salary" : {
+
+    },
+    "Save" : {
+
+    },
+    "Schedule" : {
+
+    },
+    "Schedule completed" : {
+
+    },
+    "Search" : {
+
+    },
+    "Sector" : {
+
+    },
+    "Security" : {
+
+    },
+    "Selected date" : {
+
+    },
+    "Selected Date" : {
+
+    },
+    "Selected net worth" : {
+
+    },
+    "Sending local changes and fetching updates from iCloud." : {
+
+    },
+    "Settings" : {
+
+    },
+    "Share Backup" : {
+
+    },
+    "Shopping" : {
+
+    },
+    "Showing %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Showing %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Skip for now" : {
+
+    },
+    "Snapshots" : {
+
+    },
+    "Source" : {
+
+    },
+    "Status" : {
+
+    },
+    "Status • %@ Sectors" : {
+
+    },
+    "Stock" : {
+
+    },
+    "Storage" : {
+
+    },
+    "Swiss Franc" : {
+
+    },
+    "Symbol" : {
+
+    },
+    "Sync Data with iCloud" : {
+
+    },
+    "Sync Error" : {
+
+    },
+    "Syncing" : {
+
+    },
+    "System" : {
+
+    },
+    "The broker or platform fee is added to the position cost basis." : {
+
+    },
+    "The category will be saved for future %@ transactions." : {
+
+    },
+    "The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account." : {
+
+    },
+    "The key is saved only after %@ returns a live USD price." : {
+
+    },
+    "The stored credential will be deleted from the macOS Keychain." : {
+
+    },
+    "This permanently removes %@ from your crypto portfolio." : {
+
+    },
+    "This permanently removes %@ from your investment portfolio." : {
+
+    },
+    "Top Holdings" : {
+
+    },
+    "TOTAL" : {
+
+    },
+    "Touch ID" : {
+
+    },
+    "Transaction" : {
+
+    },
+    "Transaction Fee" : {
+
+    },
+    "Transaction Period" : {
+
+    },
+    "Transaction Type" : {
+
+    },
+    "Transactions" : {
+
+    },
+    "Transport" : {
+
+    },
+    "Type" : {
+
+    },
+    "Unlock" : {
+
+    },
+    "Unlock with %@" : {
+
+    },
+    "Unlock your local Wealth Compass data." : {
+
+    },
+    "Up to Date" : {
+
+    },
+    "Updated %@" : {
+
+    },
+    "US Dollar" : {
+
+    },
+    "Utilities" : {
+
+    },
+    "Validating..." : {
+
+    },
+    "Validation Failed" : {
+
+    },
+    "Value" : {
+
+    },
+    "Verify & Save" : {
+
+    },
+    "View All" : {
+
+    },
+    "View Cash Flow" : {
+
+    },
+    "We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers." : {
+
+    },
+    "Wealth Compass" : {
+
+    },
+    "Weekly" : {
+
+    },
+    "Welcome to WealthCompass" : {
+
+    },
+    "When enabled, Wealth Compass locks whenever the app leaves the foreground." : {
+
+    },
+    "Year to Date" : {
+
+    },
+    "Yearly" : {
+
+    },
+    "Yes" : {
+
+    },
+    "Your data remains on this device." : {
+
+    },
+    "Your Data, Your Privacy" : {
+
+    },
+    "Your financial data stays available locally and syncs across your devices through your private CloudKit database." : {
+
+    },
+    "Your financial horizon" : {
+
+    },
+    "Your financial view is protected" : {
+
+    },
+    "Your latest cash flow" : {
+
+    },
+    "Your personal compass for tracking cash flow, investments, and expenses all in one beautifully designed dashboard." : {
+
+    },
+    "Your preferences" : {
+
+    }
+  },
+  "version" : "1.0"
+}

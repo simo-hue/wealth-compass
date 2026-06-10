@@ -11,10 +11,10 @@ enum Currency: String, CaseIterable, Codable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .eur: "Euro"
-        case .usd: "US Dollar"
-        case .gbp: "British Pound"
-        case .chf: "Swiss Franc"
+        case .eur: String(localized: "Euro")
+        case .usd: String(localized: "US Dollar")
+        case .gbp: String(localized: "British Pound")
+        case .chf: String(localized: "Swiss Franc")
         }
     }
 
@@ -42,7 +42,12 @@ enum TransactionType: String, CaseIterable, Codable, Identifiable {
     case expense
 
     var id: String { rawValue }
-    var title: String { rawValue.capitalized }
+    var title: String {
+        switch self {
+        case .income: String(localized: "Income")
+        case .expense: String(localized: "Expense")
+        }
+    }
 }
 
 enum InvestmentType: String, CaseIterable, Codable, Identifiable {
@@ -57,12 +62,12 @@ enum InvestmentType: String, CaseIterable, Codable, Identifiable {
 
     var title: String {
         switch self {
-        case .stock: "Stock"
-        case .etf: "ETF"
-        case .bond: "Bond"
-        case .realEstate: "Real Estate"
-        case .commodity: "Commodity"
-        case .other: "Other"
+        case .stock: String(localized: "Stock")
+        case .etf: String(localized: "ETF")
+        case .bond: String(localized: "Bond")
+        case .realEstate: String(localized: "Real Estate")
+        case .commodity: String(localized: "Commodity")
+        case .other: String(localized: "Other")
         }
     }
 }
@@ -88,11 +93,11 @@ enum AnalyticsPeriod: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .sevenDays: "Last 7 Days"
-        case .thirtyDays: "Last 30 Days"
-        case .threeMonths: "Last 3 Months"
-        case .yearToDate: "Year to Date"
-        case .all: "All Time"
+        case .sevenDays: String(localized: "Last 7 Days")
+        case .thirtyDays: String(localized: "Last 30 Days")
+        case .threeMonths: String(localized: "Last 3 Months")
+        case .yearToDate: String(localized: "Year to Date")
+        case .all: String(localized: "All Time")
         }
     }
 }
@@ -102,7 +107,7 @@ enum FeeMode: String, CaseIterable, Identifiable {
     case percent
 
     var id: String { rawValue }
-    var title: String { self == .fixed ? "Fixed" : "Percent" }
+    var title: String { self == .fixed ? String(localized: "Fixed") : String(localized: "Percent") }
 }
 
 struct Transaction: Identifiable, Codable, Equatable {
@@ -128,10 +133,10 @@ enum RecurringTransactionFrequency: String, CaseIterable, Codable, Identifiable 
 
     var title: String {
         switch self {
-        case .daily: "Daily"
-        case .weekly: "Weekly"
-        case .monthly: "Monthly"
-        case .yearly: "Yearly"
+        case .daily: String(localized: "Daily")
+        case .weekly: String(localized: "Weekly")
+        case .monthly: String(localized: "Monthly")
+        case .yearly: String(localized: "Yearly")
         }
     }
 

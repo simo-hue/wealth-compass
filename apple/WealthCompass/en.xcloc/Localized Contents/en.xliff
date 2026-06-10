@@ -1,0 +1,1648 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+  <file original="Resources/iOS/InfoPlist.xcstrings" source-language="en" target-language="en" datatype="plaintext">
+    <header>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="26.5" build-num="17F42"/>
+    </header>
+    <body>
+      <trans-unit id="CFBundleDisplayName" xml:space="preserve">
+        <source>Wealth Compass Tracker</source>
+        <target state="new">Wealth Compass Tracker</target>
+        <note>Bundle display name</note>
+      </trans-unit>
+      <trans-unit id="CFBundleName" xml:space="preserve">
+        <source>WealthCompassMobile</source>
+        <target state="new">WealthCompassMobile</target>
+        <note>Bundle name</note>
+      </trans-unit>
+      <trans-unit id="NSFaceIDUsageDescription" xml:space="preserve">
+        <source>Use Face ID to unlock your local Wealth Compass data.</source>
+        <target state="new">Use Face ID to unlock your local Wealth Compass data.</target>
+        <note>Privacy - Face ID Usage Description</note>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="Resources/macOS/WealthCompassMac-InfoPlist.xcstrings" source-language="en" target-language="en" datatype="plaintext">
+    <header>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="26.5" build-num="17F42"/>
+    </header>
+    <body>
+      <trans-unit id="CFBundleDisplayName" xml:space="preserve">
+        <source>Wealth Compass</source>
+        <target state="new">Wealth Compass</target>
+        <note>Bundle display name</note>
+      </trans-unit>
+      <trans-unit id="CFBundleName" xml:space="preserve">
+        <source>Wealth Compass</source>
+        <target state="new">Wealth Compass</target>
+        <note>Bundle name</note>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="Sources/Shared/Resources/Localizable.xcstrings" source-language="en" target-language="en" datatype="plaintext">
+    <header>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="26.5" build-num="17F42"/>
+    </header>
+    <body>
+      <trans-unit id="" xml:space="preserve">
+        <source/>
+        <target state="new"/>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@&#10;&#10;%@" xml:space="preserve">
+        <source>%1$@
+
+%2$@</source>
+        <target state="new">%1$@
+
+%2$@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@ %@" xml:space="preserve">
+        <source>%1$@ %2$@</source>
+        <target state="new">%1$@ %2$@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@ (%@%%)" xml:space="preserve">
+        <source>%1$@ (%2$@%%)</source>
+        <target state="new">%1$@ (%2$@%%)</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@ (%@)" xml:space="preserve">
+        <source>%1$@ (%2$@)</source>
+        <target state="new">%1$@ (%2$@)</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@ / unit" xml:space="preserve">
+        <source>%@ / unit</source>
+        <target state="new">%@ / unit</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@ App Lock" xml:space="preserve">
+        <source>%@ App Lock</source>
+        <target state="new">%@ App Lock</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@ Cached or fallback rates remain active." xml:space="preserve">
+        <source>%@ Cached or fallback rates remain active.</source>
+        <target state="new">%@ Cached or fallback rates remain active.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@ is scheduled. Open Wealth Compass to review it." xml:space="preserve">
+        <source>%@ is scheduled. Open Wealth Compass to review it.</source>
+        <target state="new">%@ is scheduled. Open Wealth Compass to review it.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@ units" xml:space="preserve">
+        <source>%@ units</source>
+        <target state="new">%@ units</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@ • %@" xml:space="preserve">
+        <source>%1$@ • %2$@</source>
+        <target state="new">%1$@ • %2$@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@%%" xml:space="preserve">
+        <source>%@%%</source>
+        <target state="new">%@%%</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@%@" xml:space="preserve">
+        <source>%1$@%2$@</source>
+        <target state="new">%1$@%2$@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@. Fetched %@ and cached locally." xml:space="preserve">
+        <source>%1$@. Fetched %2$@ and cached locally.</source>
+        <target state="new">%1$@. Fetched %2$@ and cached locally.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@: %@. Wealth Compass records it automatically when the app is active." xml:space="preserve">
+        <source>%1$@: %2$@. Wealth Compass records it automatically when the app is active.</source>
+        <target state="new">%1$@: %2$@. Wealth Compass records it automatically when the app is active.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%@: %@. Wealth Compass records it while the app is active." xml:space="preserve">
+        <source>%1$@: %2$@. Wealth Compass records it while the app is active.</source>
+        <target state="new">%1$@: %2$@. Wealth Compass records it while the app is active.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%lld" xml:space="preserve">
+        <source>%lld</source>
+        <target state="new">%lld</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%lld due transaction%@ added to Cash Flow." xml:space="preserve">
+        <source>%1$lld due transaction%2$@ added to Cash Flow.</source>
+        <target state="new">%1$lld due transaction%2$@ added to Cash Flow.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="%lld more transactions hidden by this view." xml:space="preserve">
+        <source>%lld more transactions hidden by this view.</source>
+        <target state="new">%lld more transactions hidden by this view.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="1 %@" xml:space="preserve">
+        <source>1 %@</source>
+        <target state="new">1 %@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="6M NET" xml:space="preserve">
+        <source>6M NET</source>
+        <target state="new">6M NET</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="A clear view of what you own, owe, earn, and spend." xml:space="preserve">
+        <source>A clear view of what you own, owe, earn, and spend.</source>
+        <target state="new">A clear view of what you own, owe, earn, and spend.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="API keys are verified against a live quote before they are stored in the macOS Keychain." xml:space="preserve">
+        <source>API keys are verified against a live quote before they are stored in the macOS Keychain.</source>
+        <target state="new">API keys are verified against a live quote before they are stored in the macOS Keychain.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="ASSETS" xml:space="preserve">
+        <source>ASSETS</source>
+        <target state="new">ASSETS</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Add" xml:space="preserve">
+        <source>Add</source>
+        <target state="new">Add</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Add Crypto" xml:space="preserve">
+        <source>Add Crypto</source>
+        <target state="new">Add Crypto</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Add Investment" xml:space="preserve">
+        <source>Add Investment</source>
+        <target state="new">Add Investment</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Add Transaction" xml:space="preserve">
+        <source>Add Transaction</source>
+        <target state="new">Add Transaction</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Add a holding to track its value and performance." xml:space="preserve">
+        <source>Add a holding to track its value and performance.</source>
+        <target state="new">Add a holding to track its value and performance.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Add a holding to track its value." xml:space="preserve">
+        <source>Add a holding to track its value.</source>
+        <target state="new">Add a holding to track its value.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Add another snapshot to see movement" xml:space="preserve">
+        <source>Add another snapshot to see movement</source>
+        <target state="new">Add another snapshot to see movement</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Add another snapshot to see movement over time" xml:space="preserve">
+        <source>Add another snapshot to see movement over time</source>
+        <target state="new">Add another snapshot to see movement over time</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Add stocks, ETFs, bonds, or other positions." xml:space="preserve">
+        <source>Add stocks, ETFs, bonds, or other positions.</source>
+        <target state="new">Add stocks, ETFs, bonds, or other positions.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Add your first transaction" xml:space="preserve">
+        <source>Add your first transaction</source>
+        <target state="new">Add your first transaction</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="All Time" xml:space="preserve">
+        <source>All Time</source>
+        <target state="new">All Time</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Allocation by Geography" xml:space="preserve">
+        <source>Allocation by Geography</source>
+        <target state="new">Allocation by Geography</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Allocation by Sector" xml:space="preserve">
+        <source>Allocation by Sector</source>
+        <target state="new">Allocation by Sector</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Allocation by Type" xml:space="preserve">
+        <source>Allocation by Type</source>
+        <target state="new">Allocation by Type</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Amount" xml:space="preserve">
+        <source>Amount</source>
+        <target state="new">Amount</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Amount (%@)" xml:space="preserve">
+        <source>Amount (%@)</source>
+        <target state="new">Amount (%@)</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Average Buy Price" xml:space="preserve">
+        <source>Average Buy Price</source>
+        <target state="new">Average Buy Price</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Base Currency" xml:space="preserve">
+        <source>Base Currency</source>
+        <target state="new">Base Currency</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Biometric authentication is not available on this Mac." xml:space="preserve">
+        <source>Biometric authentication is not available on this Mac.</source>
+        <target state="new">Biometric authentication is not available on this Mac.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Biometric authentication is not available on this device." xml:space="preserve">
+        <source>Biometric authentication is not available on this device.</source>
+        <target state="new">Biometric authentication is not available on this device.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Biometrics" xml:space="preserve">
+        <source>Biometrics</source>
+        <target state="new">Biometrics</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Bond" xml:space="preserve">
+        <source>Bond</source>
+        <target state="new">Bond</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Breakdown of recorded spending" xml:space="preserve">
+        <source>Breakdown of recorded spending</source>
+        <target state="new">Breakdown of recorded spending</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="British Pound" xml:space="preserve">
+        <source>British Pound</source>
+        <target state="new">British Pound</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Build your first financial view" xml:space="preserve">
+        <source>Build your first financial view</source>
+        <target state="new">Build your first financial view</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Calculated Fee" xml:space="preserve">
+        <source>Calculated Fee</source>
+        <target state="new">Calculated Fee</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Cancel" xml:space="preserve">
+        <source>Cancel</source>
+        <target state="new">Cancel</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Cash Flow" xml:space="preserve">
+        <source>Cash Flow</source>
+        <target state="new">Cash Flow</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Category" xml:space="preserve">
+        <source>Category</source>
+        <target state="new">Category</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Checking the iCloud account and preparing CloudKit." xml:space="preserve">
+        <source>Checking the iCloud account and preparing CloudKit.</source>
+        <target state="new">Checking the iCloud account and preparing CloudKit.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Classification" xml:space="preserve">
+        <source>Classification</source>
+        <target state="new">Classification</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="CoinGecko API Key (Crypto)" xml:space="preserve">
+        <source>CoinGecko API Key (Crypto)</source>
+        <target state="new">CoinGecko API Key (Crypto)</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="CoinGecko ID" xml:space="preserve">
+        <source>CoinGecko ID</source>
+        <target state="new">CoinGecko ID</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Commodity" xml:space="preserve">
+        <source>Commodity</source>
+        <target state="new">Commodity</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Completed" xml:space="preserve">
+        <source>Completed</source>
+        <target state="new">Completed</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Configured" xml:space="preserve">
+        <source>Configured</source>
+        <target state="new">Configured</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Connect Market Data" xml:space="preserve">
+        <source>Connect Market Data</source>
+        <target state="new">Connect Market Data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Connecting" xml:space="preserve">
+        <source>Connecting</source>
+        <target state="new">Connecting</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Continue" xml:space="preserve">
+        <source>Continue</source>
+        <target state="new">Continue</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Cost Basis" xml:space="preserve">
+        <source>Cost Basis</source>
+        <target state="new">Cost Basis</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Crypto" xml:space="preserve">
+        <source>Crypto</source>
+        <target state="new">Crypto</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Currency" xml:space="preserve">
+        <source>Currency</source>
+        <target state="new">Currency</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Current Price" xml:space="preserve">
+        <source>Current Price</source>
+        <target state="new">Current Price</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Custom Categories" xml:space="preserve">
+        <source>Custom Categories</source>
+        <target state="new">Custom Categories</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Custom Category Name" xml:space="preserve">
+        <source>Custom Category Name</source>
+        <target state="new">Custom Category Name</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Custom category name" xml:space="preserve">
+        <source>Custom category name</source>
+        <target state="new">Custom category name</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Custom..." xml:space="preserve">
+        <source>Custom...</source>
+        <target state="new">Custom...</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Daily" xml:space="preserve">
+        <source>Daily</source>
+        <target state="new">Daily</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Dashboard" xml:space="preserve">
+        <source>Dashboard</source>
+        <target state="new">Dashboard</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Data" xml:space="preserve">
+        <source>Data</source>
+        <target state="new">Data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Date" xml:space="preserve">
+        <source>Date</source>
+        <target state="new">Date</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete" xml:space="preserve">
+        <source>Delete</source>
+        <target state="new">Delete</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete %@" xml:space="preserve">
+        <source>Delete %@</source>
+        <target state="new">Delete %@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete All Data" xml:space="preserve">
+        <source>Delete All Data</source>
+        <target state="new">Delete All Data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete All Local Data..." xml:space="preserve">
+        <source>Delete All Local Data...</source>
+        <target state="new">Delete All Local Data...</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete Crypto Holding?" xml:space="preserve">
+        <source>Delete Crypto Holding?</source>
+        <target state="new">Delete Crypto Holding?</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete Holding" xml:space="preserve">
+        <source>Delete Holding</source>
+        <target state="new">Delete Holding</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete Investment" xml:space="preserve">
+        <source>Delete Investment</source>
+        <target state="new">Delete Investment</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete Investment?" xml:space="preserve">
+        <source>Delete Investment?</source>
+        <target state="new">Delete Investment?</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete Recurring Transaction?" xml:space="preserve">
+        <source>Delete Recurring Transaction?</source>
+        <target state="new">Delete Recurring Transaction?</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete Transaction" xml:space="preserve">
+        <source>Delete Transaction</source>
+        <target state="new">Delete Transaction</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete Transaction?" xml:space="preserve">
+        <source>Delete Transaction?</source>
+        <target state="new">Delete Transaction?</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Delete schedule" xml:space="preserve">
+        <source>Delete schedule</source>
+        <target state="new">Delete schedule</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Description" xml:space="preserve">
+        <source>Description</source>
+        <target state="new">Description</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Details" xml:space="preserve">
+        <source>Details</source>
+        <target state="new">Details</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Dividends" xml:space="preserve">
+        <source>Dividends</source>
+        <target state="new">Dividends</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Due schedules are recorded automatically while the app is active and caught up the next time it opens." xml:space="preserve">
+        <source>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</source>
+        <target state="new">Due schedules are recorded automatically while the app is active and caught up the next time it opens.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Due schedules catch up on open" xml:space="preserve">
+        <source>Due schedules catch up on open</source>
+        <target state="new">Due schedules catch up on open</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="ECB" xml:space="preserve">
+        <source>ECB</source>
+        <target state="new">ECB</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="ECB reference rates are refreshed automatically and cached locally for offline use." xml:space="preserve">
+        <source>ECB reference rates are refreshed automatically and cached locally for offline use.</source>
+        <target state="new">ECB reference rates are refreshed automatically and cached locally for offline use.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="ETF" xml:space="preserve">
+        <source>ETF</source>
+        <target state="new">ETF</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="EXPENSES" xml:space="preserve">
+        <source>EXPENSES</source>
+        <target state="new">EXPENSES</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Edit" xml:space="preserve">
+        <source>Edit</source>
+        <target state="new">Edit</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Edit Crypto" xml:space="preserve">
+        <source>Edit Crypto</source>
+        <target state="new">Edit Crypto</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Edit Crypto Holding" xml:space="preserve">
+        <source>Edit Crypto Holding</source>
+        <target state="new">Edit Crypto Holding</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Edit Holding" xml:space="preserve">
+        <source>Edit Holding</source>
+        <target state="new">Edit Holding</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Edit Investment" xml:space="preserve">
+        <source>Edit Investment</source>
+        <target state="new">Edit Investment</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Edit Recurring Transaction" xml:space="preserve">
+        <source>Edit Recurring Transaction</source>
+        <target state="new">Edit Recurring Transaction</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Edit schedule" xml:space="preserve">
+        <source>Edit schedule</source>
+        <target state="new">Edit schedule</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Enable biometric protection for Wealth Compass." xml:space="preserve">
+        <source>Enable biometric protection for Wealth Compass.</source>
+        <target state="new">Enable biometric protection for Wealth Compass.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="End Date" xml:space="preserve">
+        <source>End Date</source>
+        <target state="new">End Date</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Ends" xml:space="preserve">
+        <source>Ends</source>
+        <target state="new">Ends</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Ends %@" xml:space="preserve">
+        <source>Ends %@</source>
+        <target state="new">Ends %@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis." xml:space="preserve">
+        <source>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</source>
+        <target state="new">Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date." xml:space="preserve">
+        <source>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</source>
+        <target state="new">Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Entertainment" xml:space="preserve">
+        <source>Entertainment</source>
+        <target state="new">Entertainment</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Euro" xml:space="preserve">
+        <source>Euro</source>
+        <target state="new">Euro</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Exchange Rates" xml:space="preserve">
+        <source>Exchange Rates</source>
+        <target state="new">Exchange Rates</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Expense" xml:space="preserve">
+        <source>Expense</source>
+        <target state="new">Expense</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Expense Categories" xml:space="preserve">
+        <source>Expense Categories</source>
+        <target state="new">Expense Categories</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Expense period" xml:space="preserve">
+        <source>Expense period</source>
+        <target state="new">Expense period</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Export JSON..." xml:space="preserve">
+        <source>Export JSON...</source>
+        <target state="new">Export JSON...</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Face ID" xml:space="preserve">
+        <source>Face ID</source>
+        <target state="new">Face ID</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Fee Amount" xml:space="preserve">
+        <source>Fee Amount</source>
+        <target state="new">Fee Amount</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Fee Percentage" xml:space="preserve">
+        <source>Fee Percentage</source>
+        <target state="new">Fee Percentage</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Fee Type" xml:space="preserve">
+        <source>Fee Type</source>
+        <target state="new">Fee Type</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Finish" xml:space="preserve">
+        <source>Finish</source>
+        <target state="new">Finish</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Finish Recurring Transaction?" xml:space="preserve">
+        <source>Finish Recurring Transaction?</source>
+        <target state="new">Finish Recurring Transaction?</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Finish schedule" xml:space="preserve">
+        <source>Finish schedule</source>
+        <target state="new">Finish schedule</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Finnhub API Key (Stocks)" xml:space="preserve">
+        <source>Finnhub API Key (Stocks)</source>
+        <target state="new">Finnhub API Key (Stocks)</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="First Occurrence" xml:space="preserve">
+        <source>First Occurrence</source>
+        <target state="new">First Occurrence</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Fixed" xml:space="preserve">
+        <source>Fixed</source>
+        <target state="new">Fixed</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Food" xml:space="preserve">
+        <source>Food</source>
+        <target state="new">Food</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Force Sync iCloud" xml:space="preserve">
+        <source>Force Sync iCloud</source>
+        <target state="new">Force Sync iCloud</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Freelance" xml:space="preserve">
+        <source>Freelance</source>
+        <target state="new">Freelance</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Fuel" xml:space="preserve">
+        <source>Fuel</source>
+        <target state="new">Fuel</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Generated from a recurring schedule" xml:space="preserve">
+        <source>Generated from a recurring schedule</source>
+        <target state="new">Generated from a recurring schedule</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Geography" xml:space="preserve">
+        <source>Geography</source>
+        <target state="new">Geography</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Get Started" xml:space="preserve">
+        <source>Get Started</source>
+        <target state="new">Get Started</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Health" xml:space="preserve">
+        <source>Health</source>
+        <target state="new">Health</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Housing" xml:space="preserve">
+        <source>Housing</source>
+        <target state="new">Housing</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="ISIN / ID" xml:space="preserve">
+        <source>ISIN / ID</source>
+        <target state="new">ISIN / ID</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Identity" xml:space="preserve">
+        <source>Identity</source>
+        <target state="new">Identity</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Import JSON Backup" xml:space="preserve">
+        <source>Import JSON Backup</source>
+        <target state="new">Import JSON Backup</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Import JSON..." xml:space="preserve">
+        <source>Import JSON...</source>
+        <target state="new">Import JSON...</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Income" xml:space="preserve">
+        <source>Income</source>
+        <target state="new">Income</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Income and expenses by month" xml:space="preserve">
+        <source>Income and expenses by month</source>
+        <target state="new">Income and expenses by month</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Investment Fee" xml:space="preserve">
+        <source>Investment Fee</source>
+        <target state="new">Investment Fee</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Investment Transaction Fee" xml:space="preserve">
+        <source>Investment Transaction Fee</source>
+        <target state="new">Investment Transaction Fee</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Investment Transaction Fee %" xml:space="preserve">
+        <source>Investment Transaction Fee %</source>
+        <target state="new">Investment Transaction Fee %</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Investments" xml:space="preserve">
+        <source>Investments</source>
+        <target state="new">Investments</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Language" xml:space="preserve">
+        <source>Language</source>
+        <target state="new">Language</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Last 3 Months" xml:space="preserve">
+        <source>Last 3 Months</source>
+        <target state="new">Last 3 Months</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Last 7 Days" xml:space="preserve">
+        <source>Last 7 Days</source>
+        <target state="new">Last 7 Days</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Last 30 Days" xml:space="preserve">
+        <source>Last 30 Days</source>
+        <target state="new">Last 30 Days</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Last Updated" xml:space="preserve">
+        <source>Last Updated</source>
+        <target state="new">Last Updated</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Last synced %@." xml:space="preserve">
+        <source>Last synced %@.</source>
+        <target state="new">Last synced %@.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Latest snapshot %@" xml:space="preserve">
+        <source>Latest snapshot %@</source>
+        <target state="new">Latest snapshot %@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Liabilities" xml:space="preserve">
+        <source>Liabilities</source>
+        <target state="new">Liabilities</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Local Only" xml:space="preserve">
+        <source>Local Only</source>
+        <target state="new">Local Only</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Local data is ready to sync." xml:space="preserve">
+        <source>Local data is ready to sync.</source>
+        <target state="new">Local data is ready to sync.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Market Data" xml:space="preserve">
+        <source>Market Data</source>
+        <target state="new">Market Data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Merge With Existing Data" xml:space="preserve">
+        <source>Merge With Existing Data</source>
+        <target state="new">Merge With Existing Data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Merge adds new records and updates matching IDs. Replace clears current local finance data before importing." xml:space="preserve">
+        <source>Merge adds new records and updates matching IDs. Replace clears current local finance data before importing.</source>
+        <target state="new">Merge adds new records and updates matching IDs. Replace clears current local finance data before importing.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Merge with local data" xml:space="preserve">
+        <source>Merge with local data</source>
+        <target state="new">Merge with local data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Mode" xml:space="preserve">
+        <source>Mode</source>
+        <target state="new">Mode</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Month" xml:space="preserve">
+        <source>Month</source>
+        <target state="new">Month</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Monthly" xml:space="preserve">
+        <source>Monthly</source>
+        <target state="new">Monthly</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="NET WORTH" xml:space="preserve">
+        <source>NET WORTH</source>
+        <target state="new">NET WORTH</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Name" xml:space="preserve">
+        <source>Name</source>
+        <target state="new">Name</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Navigate" xml:space="preserve">
+        <source>Navigate</source>
+        <target state="new">Navigate</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Net Worth" xml:space="preserve">
+        <source>Net Worth</source>
+        <target state="new">Net Worth</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Net worth range" xml:space="preserve">
+        <source>Net worth range</source>
+        <target state="new">Net worth range</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Never" xml:space="preserve">
+        <source>Never</source>
+        <target state="new">Never</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="New Crypto Holding" xml:space="preserve">
+        <source>New Crypto Holding</source>
+        <target state="new">New Crypto Holding</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="New Holding" xml:space="preserve">
+        <source>New Holding</source>
+        <target state="new">New Holding</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="New Investment" xml:space="preserve">
+        <source>New Investment</source>
+        <target state="new">New Investment</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="New Recurring Transaction" xml:space="preserve">
+        <source>New Recurring Transaction</source>
+        <target state="new">New Recurring Transaction</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="New Transaction" xml:space="preserve">
+        <source>New Transaction</source>
+        <target state="new">New Transaction</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Next %@" xml:space="preserve">
+        <source>Next %@</source>
+        <target state="new">Next %@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Next: %@" xml:space="preserve">
+        <source>Next: %@</source>
+        <target state="new">Next: %@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="No Crypto Holdings" xml:space="preserve">
+        <source>No Crypto Holdings</source>
+        <target state="new">No Crypto Holdings</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="No Investments" xml:space="preserve">
+        <source>No Investments</source>
+        <target state="new">No Investments</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="No custom %@ categories yet." xml:space="preserve">
+        <source>No custom %@ categories yet.</source>
+        <target state="new">No custom %@ categories yet.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="No end date" xml:space="preserve">
+        <source>No end date</source>
+        <target state="new">No end date</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="No snapshots" xml:space="preserve">
+        <source>No snapshots</source>
+        <target state="new">No snapshots</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="No snapshots yet" xml:space="preserve">
+        <source>No snapshots yet</source>
+        <target state="new">No snapshots yet</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Not Set" xml:space="preserve">
+        <source>Not Set</source>
+        <target state="new">Not Set</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Notifications" xml:space="preserve">
+        <source>Notifications</source>
+        <target state="new">Notifications</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Notifications disabled" xml:space="preserve">
+        <source>Notifications disabled</source>
+        <target state="new">Notifications disabled</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Notifications enabled" xml:space="preserve">
+        <source>Notifications enabled</source>
+        <target state="new">Notifications enabled</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Notifications off" xml:space="preserve">
+        <source>Notifications off</source>
+        <target state="new">Notifications off</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Notifications on" xml:space="preserve">
+        <source>Notifications on</source>
+        <target state="new">Notifications on</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Notify When Due" xml:space="preserve">
+        <source>Notify When Due</source>
+        <target state="new">Notify When Due</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="OK" xml:space="preserve">
+        <source>OK</source>
+        <target state="new">OK</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Off" xml:space="preserve">
+        <source>Off</source>
+        <target state="new">Off</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Offline fallback" xml:space="preserve">
+        <source>Offline fallback</source>
+        <target state="new">Offline fallback</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="One-Time" xml:space="preserve">
+        <source>One-Time</source>
+        <target state="new">One-Time</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="One-Time Transaction" xml:space="preserve">
+        <source>One-Time Transaction</source>
+        <target state="new">One-Time Transaction</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Optic ID" xml:space="preserve">
+        <source>Optic ID</source>
+        <target state="new">Optic ID</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Optional Coin ID" xml:space="preserve">
+        <source>Optional Coin ID</source>
+        <target state="new">Optional Coin ID</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Other" xml:space="preserve">
+        <source>Other</source>
+        <target state="new">Other</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Overview" xml:space="preserve">
+        <source>Overview</source>
+        <target state="new">Overview</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Paste CoinGecko key..." xml:space="preserve">
+        <source>Paste CoinGecko key...</source>
+        <target state="new">Paste CoinGecko key...</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Paste Finnhub key..." xml:space="preserve">
+        <source>Paste Finnhub key...</source>
+        <target state="new">Paste Finnhub key...</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Pause schedule" xml:space="preserve">
+        <source>Pause schedule</source>
+        <target state="new">Pause schedule</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Paused" xml:space="preserve">
+        <source>Paused</source>
+        <target state="new">Paused</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Percent" xml:space="preserve">
+        <source>Percent</source>
+        <target state="new">Percent</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Performance" xml:space="preserve">
+        <source>Performance</source>
+        <target state="new">Performance</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Period" xml:space="preserve">
+        <source>Period</source>
+        <target state="new">Period</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Portfolio Value" xml:space="preserve">
+        <source>Portfolio Value</source>
+        <target state="new">Portfolio Value</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Position" xml:space="preserve">
+        <source>Position</source>
+        <target state="new">Position</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Positions" xml:space="preserve">
+        <source>Positions</source>
+        <target state="new">Positions</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Prepare Backup" xml:space="preserve">
+        <source>Prepare Backup</source>
+        <target state="new">Prepare Backup</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Privacy" xml:space="preserve">
+        <source>Privacy</source>
+        <target state="new">Privacy</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Privacy Mode" xml:space="preserve">
+        <source>Privacy Mode</source>
+        <target state="new">Privacy Mode</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Privacy on" xml:space="preserve">
+        <source>Privacy on</source>
+        <target state="new">Privacy on</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Privacy, sync, currency, and market data" xml:space="preserve">
+        <source>Privacy, sync, currency, and market data</source>
+        <target state="new">Privacy, sync, currency, and market data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Profit / Loss" xml:space="preserve">
+        <source>Profit / Loss</source>
+        <target state="new">Profit / Loss</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Quantity" xml:space="preserve">
+        <source>Quantity</source>
+        <target state="new">Quantity</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Range floor" xml:space="preserve">
+        <source>Range floor</source>
+        <target state="new">Range floor</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Real Estate" xml:space="preserve">
+        <source>Real Estate</source>
+        <target state="new">Real Estate</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Recent Activity" xml:space="preserve">
+        <source>Recent Activity</source>
+        <target state="new">Recent Activity</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Recent Transactions" xml:space="preserve">
+        <source>Recent Transactions</source>
+        <target state="new">Recent Transactions</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Record cash flow or add a position to bring this dashboard to life." xml:space="preserve">
+        <source>Record cash flow or add a position to bring this dashboard to life.</source>
+        <target state="new">Record cash flow or add a position to bring this dashboard to life.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically." xml:space="preserve">
+        <source>Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically.</source>
+        <target state="new">Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Recurring" xml:space="preserve">
+        <source>Recurring</source>
+        <target state="new">Recurring</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Recurring %@ due" xml:space="preserve">
+        <source>Recurring %@ due</source>
+        <target state="new">Recurring %@ due</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Recurring Transaction" xml:space="preserve">
+        <source>Recurring Transaction</source>
+        <target state="new">Recurring Transaction</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Recurring Transactions" xml:space="preserve">
+        <source>Recurring Transactions</source>
+        <target state="new">Recurring Transactions</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Recurring Transactions Added" xml:space="preserve">
+        <source>Recurring Transactions Added</source>
+        <target state="new">Recurring Transactions Added</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Refresh Data" xml:space="preserve">
+        <source>Refresh Data</source>
+        <target state="new">Refresh Data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Refresh Exchange Rates" xml:space="preserve">
+        <source>Refresh Exchange Rates</source>
+        <target state="new">Refresh Exchange Rates</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Refresh Market Data" xml:space="preserve">
+        <source>Refresh Market Data</source>
+        <target state="new">Refresh Market Data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Refreshing Exchange Rates" xml:space="preserve">
+        <source>Refreshing Exchange Rates</source>
+        <target state="new">Refreshing Exchange Rates</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Refreshing Market Data" xml:space="preserve">
+        <source>Refreshing Market Data</source>
+        <target state="new">Refreshing Market Data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Region &amp; Language" xml:space="preserve">
+        <source>Region &amp; Language</source>
+        <target state="new">Region &amp; Language</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Remove %@" xml:space="preserve">
+        <source>Remove %@</source>
+        <target state="new">Remove %@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Remove %@?" xml:space="preserve">
+        <source>Remove %@?</source>
+        <target state="new">Remove %@?</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Remove Key" xml:space="preserve">
+        <source>Remove Key</source>
+        <target state="new">Remove Key</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Repeats" xml:space="preserve">
+        <source>Repeats</source>
+        <target state="new">Repeats</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Replace Existing Data" xml:space="preserve">
+        <source>Replace Existing Data</source>
+        <target state="new">Replace Existing Data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Replace local data" xml:space="preserve">
+        <source>Replace local data</source>
+        <target state="new">Replace local data</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Resume schedule" xml:space="preserve">
+        <source>Resume schedule</source>
+        <target state="new">Resume schedule</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Retrieving %@ price..." xml:space="preserve">
+        <source>Retrieving %@ price...</source>
+        <target state="new">Retrieving %@ price...</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Salary" xml:space="preserve">
+        <source>Salary</source>
+        <target state="new">Salary</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Save" xml:space="preserve">
+        <source>Save</source>
+        <target state="new">Save</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Schedule" xml:space="preserve">
+        <source>Schedule</source>
+        <target state="new">Schedule</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Schedule completed" xml:space="preserve">
+        <source>Schedule completed</source>
+        <target state="new">Schedule completed</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Search" xml:space="preserve">
+        <source>Search</source>
+        <target state="new">Search</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Sector" xml:space="preserve">
+        <source>Sector</source>
+        <target state="new">Sector</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Security" xml:space="preserve">
+        <source>Security</source>
+        <target state="new">Security</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Selected Date" xml:space="preserve">
+        <source>Selected Date</source>
+        <target state="new">Selected Date</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Selected date" xml:space="preserve">
+        <source>Selected date</source>
+        <target state="new">Selected date</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Selected net worth" xml:space="preserve">
+        <source>Selected net worth</source>
+        <target state="new">Selected net worth</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Sending local changes and fetching updates from iCloud." xml:space="preserve">
+        <source>Sending local changes and fetching updates from iCloud.</source>
+        <target state="new">Sending local changes and fetching updates from iCloud.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Settings" xml:space="preserve">
+        <source>Settings</source>
+        <target state="new">Settings</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Share Backup" xml:space="preserve">
+        <source>Share Backup</source>
+        <target state="new">Share Backup</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Shopping" xml:space="preserve">
+        <source>Shopping</source>
+        <target state="new">Shopping</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Showing %lld of %lld" xml:space="preserve">
+        <source>Showing %1$lld of %2$lld</source>
+        <target state="new">Showing %1$lld of %2$lld</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Skip for now" xml:space="preserve">
+        <source>Skip for now</source>
+        <target state="new">Skip for now</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Snapshots" xml:space="preserve">
+        <source>Snapshots</source>
+        <target state="new">Snapshots</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Source" xml:space="preserve">
+        <source>Source</source>
+        <target state="new">Source</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Status" xml:space="preserve">
+        <source>Status</source>
+        <target state="new">Status</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Status • %@ Sectors" xml:space="preserve">
+        <source>Status • %@ Sectors</source>
+        <target state="new">Status • %@ Sectors</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Stock" xml:space="preserve">
+        <source>Stock</source>
+        <target state="new">Stock</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Storage" xml:space="preserve">
+        <source>Storage</source>
+        <target state="new">Storage</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Swiss Franc" xml:space="preserve">
+        <source>Swiss Franc</source>
+        <target state="new">Swiss Franc</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Symbol" xml:space="preserve">
+        <source>Symbol</source>
+        <target state="new">Symbol</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Sync Data with iCloud" xml:space="preserve">
+        <source>Sync Data with iCloud</source>
+        <target state="new">Sync Data with iCloud</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Sync Error" xml:space="preserve">
+        <source>Sync Error</source>
+        <target state="new">Sync Error</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Syncing" xml:space="preserve">
+        <source>Syncing</source>
+        <target state="new">Syncing</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="System" xml:space="preserve">
+        <source>System</source>
+        <target state="new">System</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="TOTAL" xml:space="preserve">
+        <source>TOTAL</source>
+        <target state="new">TOTAL</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="The broker or platform fee is added to the position cost basis." xml:space="preserve">
+        <source>The broker or platform fee is added to the position cost basis.</source>
+        <target state="new">The broker or platform fee is added to the position cost basis.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="The category will be saved for future %@ transactions." xml:space="preserve">
+        <source>The category will be saved for future %@ transactions.</source>
+        <target state="new">The category will be saved for future %@ transactions.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account." xml:space="preserve">
+        <source>The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.</source>
+        <target state="new">The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="The key is saved only after %@ returns a live USD price." xml:space="preserve">
+        <source>The key is saved only after %@ returns a live USD price.</source>
+        <target state="new">The key is saved only after %@ returns a live USD price.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="The stored credential will be deleted from the macOS Keychain." xml:space="preserve">
+        <source>The stored credential will be deleted from the macOS Keychain.</source>
+        <target state="new">The stored credential will be deleted from the macOS Keychain.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="This permanently removes %@ from your crypto portfolio." xml:space="preserve">
+        <source>This permanently removes %@ from your crypto portfolio.</source>
+        <target state="new">This permanently removes %@ from your crypto portfolio.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="This permanently removes %@ from your investment portfolio." xml:space="preserve">
+        <source>This permanently removes %@ from your investment portfolio.</source>
+        <target state="new">This permanently removes %@ from your investment portfolio.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Top Holdings" xml:space="preserve">
+        <source>Top Holdings</source>
+        <target state="new">Top Holdings</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Touch ID" xml:space="preserve">
+        <source>Touch ID</source>
+        <target state="new">Touch ID</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Transaction" xml:space="preserve">
+        <source>Transaction</source>
+        <target state="new">Transaction</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Transaction Fee" xml:space="preserve">
+        <source>Transaction Fee</source>
+        <target state="new">Transaction Fee</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Transaction Period" xml:space="preserve">
+        <source>Transaction Period</source>
+        <target state="new">Transaction Period</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Transaction Type" xml:space="preserve">
+        <source>Transaction Type</source>
+        <target state="new">Transaction Type</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Transactions" xml:space="preserve">
+        <source>Transactions</source>
+        <target state="new">Transactions</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Transport" xml:space="preserve">
+        <source>Transport</source>
+        <target state="new">Transport</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Type" xml:space="preserve">
+        <source>Type</source>
+        <target state="new">Type</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="US Dollar" xml:space="preserve">
+        <source>US Dollar</source>
+        <target state="new">US Dollar</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Unlock" xml:space="preserve">
+        <source>Unlock</source>
+        <target state="new">Unlock</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Unlock with %@" xml:space="preserve">
+        <source>Unlock with %@</source>
+        <target state="new">Unlock with %@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Unlock your local Wealth Compass data." xml:space="preserve">
+        <source>Unlock your local Wealth Compass data.</source>
+        <target state="new">Unlock your local Wealth Compass data.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Up to Date" xml:space="preserve">
+        <source>Up to Date</source>
+        <target state="new">Up to Date</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Updated %@" xml:space="preserve">
+        <source>Updated %@</source>
+        <target state="new">Updated %@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Utilities" xml:space="preserve">
+        <source>Utilities</source>
+        <target state="new">Utilities</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Validating..." xml:space="preserve">
+        <source>Validating...</source>
+        <target state="new">Validating...</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Validation Failed" xml:space="preserve">
+        <source>Validation Failed</source>
+        <target state="new">Validation Failed</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Value" xml:space="preserve">
+        <source>Value</source>
+        <target state="new">Value</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Verify &amp; Save" xml:space="preserve">
+        <source>Verify &amp; Save</source>
+        <target state="new">Verify &amp; Save</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="View All" xml:space="preserve">
+        <source>View All</source>
+        <target state="new">View All</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="View Cash Flow" xml:space="preserve">
+        <source>View Cash Flow</source>
+        <target state="new">View Cash Flow</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers." xml:space="preserve">
+        <source>We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</source>
+        <target state="new">We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Wealth Compass" xml:space="preserve">
+        <source>Wealth Compass</source>
+        <target state="new">Wealth Compass</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Weekly" xml:space="preserve">
+        <source>Weekly</source>
+        <target state="new">Weekly</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Welcome to WealthCompass" xml:space="preserve">
+        <source>Welcome to WealthCompass</source>
+        <target state="new">Welcome to WealthCompass</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="When enabled, Wealth Compass locks whenever the app leaves the foreground." xml:space="preserve">
+        <source>When enabled, Wealth Compass locks whenever the app leaves the foreground.</source>
+        <target state="new">When enabled, Wealth Compass locks whenever the app leaves the foreground.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Year to Date" xml:space="preserve">
+        <source>Year to Date</source>
+        <target state="new">Year to Date</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Yearly" xml:space="preserve">
+        <source>Yearly</source>
+        <target state="new">Yearly</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Yes" xml:space="preserve">
+        <source>Yes</source>
+        <target state="new">Yes</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Your Data, Your Privacy" xml:space="preserve">
+        <source>Your Data, Your Privacy</source>
+        <target state="new">Your Data, Your Privacy</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Your data remains on this device." xml:space="preserve">
+        <source>Your data remains on this device.</source>
+        <target state="new">Your data remains on this device.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Your financial data stays available locally and syncs across your devices through your private CloudKit database." xml:space="preserve">
+        <source>Your financial data stays available locally and syncs across your devices through your private CloudKit database.</source>
+        <target state="new">Your financial data stays available locally and syncs across your devices through your private CloudKit database.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Your financial horizon" xml:space="preserve">
+        <source>Your financial horizon</source>
+        <target state="new">Your financial horizon</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Your financial view is protected" xml:space="preserve">
+        <source>Your financial view is protected</source>
+        <target state="new">Your financial view is protected</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Your latest cash flow" xml:space="preserve">
+        <source>Your latest cash flow</source>
+        <target state="new">Your latest cash flow</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Your personal compass for tracking cash flow, investments, and expenses all in one beautifully designed dashboard." xml:space="preserve">
+        <source>Your personal compass for tracking cash flow, investments, and expenses all in one beautifully designed dashboard.</source>
+        <target state="new">Your personal compass for tracking cash flow, investments, and expenses all in one beautifully designed dashboard.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="Your preferences" xml:space="preserve">
+        <source>Your preferences</source>
+        <target state="new">Your preferences</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="for %@" xml:space="preserve">
+        <source>for %@</source>
+        <target state="new">for %@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="iCloud Sync" xml:space="preserve">
+        <source>iCloud Sync</source>
+        <target state="new">iCloud Sync</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="iCloud Unavailable" xml:space="preserve">
+        <source>iCloud Unavailable</source>
+        <target state="new">iCloud Unavailable</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="iCloud sync is not running." xml:space="preserve">
+        <source>iCloud sync is not running.</source>
+        <target state="new">iCloud sync is not running.</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="· %@" xml:space="preserve">
+        <source>· %@</source>
+        <target state="new">· %@</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="•" xml:space="preserve">
+        <source>•</source>
+        <target state="new">•</target>
+        <note/>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

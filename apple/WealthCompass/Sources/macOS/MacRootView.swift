@@ -16,6 +16,9 @@ struct MacRootView: View {
             if appLock.isLockEnabled && !appLock.isUnlocked {
                 MacLockView()
                     .frame(minWidth: 520, minHeight: 400)
+            } else if !settings.hasSeenOnboarding {
+                MacOnboardingView()
+                    .frame(minWidth: 700, minHeight: 500)
             } else {
                 NavigationSplitView {
                     List(MacDestination.allCases, selection: $appModel.selection) { destination in
@@ -128,7 +131,7 @@ struct MacRootView: View {
         let marketResult = await refreshMarketPrices()
         alert = MacRootAlert(
             title: marketResult.title,
-            message: "\(exchangeResult.message)\n\n\(marketResult.message)"
+            message: String(localized: "\(exchangeResult.message)\n\n\(marketResult.message)")
         )
     }
 
@@ -148,8 +151,8 @@ struct MacRootView: View {
 
         guard insertedCount > 0 else { return }
         alert = MacRootAlert(
-            title: "Recurring Transactions Added",
-            message: "\(insertedCount) due transaction\(insertedCount == 1 ? " was" : "s were") added to Cash Flow."
+            title: String(localized: "Recurring Transactions Added"),
+            message: String(localized: "\(insertedCount) due transaction\(insertedCount == 1 ? " was" : "s were") added to Cash Flow.")
         )
     }
 

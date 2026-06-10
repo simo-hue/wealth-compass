@@ -22,6 +22,7 @@ struct WealthCompassMacApp: App {
                 .environmentObject(appModel)
                 .environmentObject(appLock)
                 .preferredColorScheme(.dark)
+                .environment(\.locale, settings.appLanguage.map { Locale(identifier: $0) } ?? .current)
         }
         .defaultSize(width: 1240, height: 780)
         .windowResizability(.contentMinSize)
@@ -80,6 +81,7 @@ struct WealthCompassMacApp: App {
                 .environmentObject(settings)
                 .environmentObject(appLock)
                 .preferredColorScheme(.dark)
+                .environment(\.locale, settings.appLanguage.map { Locale(identifier: $0) } ?? .current)
         }
     }
 }

@@ -84,14 +84,14 @@ actor MacRecurringTransactionNotificationService {
 
         for schedule in upcoming {
             let content = UNMutableNotificationContent()
-            content.title = "Recurring \(schedule.type.title.lowercased()) due"
+            content.title = String(localized: "Recurring \(schedule.type.title) due")
             if showAmounts {
                 let amount = schedule.amount.formatted(
                     FloatingPointFormatStyle<Double>.Currency(code: currencyCode)
                 )
-                content.body = "\(schedule.category): \(amount). Wealth Compass records it while the app is active."
+                content.body = String(localized: "\(schedule.category): \(amount). Wealth Compass records it while the app is active.")
             } else {
-                content.body = "\(schedule.category) is scheduled. Open Wealth Compass to review it."
+                content.body = String(localized: "\(schedule.category) is scheduled. Open Wealth Compass to review it.")
             }
             content.sound = .default
             content.userInfo = ["recurringTransactionID": schedule.id.uuidString]
@@ -150,18 +150,18 @@ final class MacAppLockStore: ObservableObject {
         _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
         switch context.biometryType {
         case .touchID:
-            return "Touch ID"
+            return String(localized: "Touch ID")
         case .faceID:
-            return "Face ID"
+            return String(localized: "Face ID")
         case .opticID:
-            return "Optic ID"
+            return String(localized: "Optic ID")
         default:
-            return "Biometrics"
+            return String(localized: "Biometrics")
         }
     }
 
     func enableLock() async -> Bool {
-        let success = await authenticate(reason: "Enable biometric protection for Wealth Compass.")
+        let success = await authenticate(reason: String(localized: "Enable biometric protection for Wealth Compass."))
         if success {
             isLockEnabled = true
             isUnlocked = true
@@ -184,7 +184,7 @@ final class MacAppLockStore: ObservableObject {
     }
 
     func unlock() async {
-        if await authenticate(reason: "Unlock your local Wealth Compass data.") {
+        if await authenticate(reason: String(localized: "Unlock your local Wealth Compass data.")) {
             isUnlocked = true
             lastError = nil
         }
@@ -196,7 +196,7 @@ final class MacAppLockStore: ObservableObject {
 
         var error: NSError?
         guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
-            lastError = error?.localizedDescription ?? "Biometric authentication is not available on this Mac."
+            lastError = error?.localizedDescription ?? String(localized: "Biometric authentication is not available on this Mac.")
             return false
         }
 

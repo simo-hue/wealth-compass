@@ -29,7 +29,14 @@ struct SettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 .listRowBackground(Color.clear)
 
-                Section("Currency") {
+                Section("Region & Language") {
+                    Picker("Language", selection: $settings.appLanguage) {
+                        Text("System").tag(String?.none)
+                        ForEach(settings.availableLanguages, id: \.self) { code in
+                            Text(settings.languageName(for: code)).tag(String?.some(code))
+                        }
+                    }
+                    
                     Picker("Base Currency", selection: $settings.currency) {
                         ForEach(Currency.allCases) { currency in
                             Text("\(currency.displayName) (\(currency.rawValue))").tag(currency)

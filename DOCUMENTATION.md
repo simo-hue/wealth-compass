@@ -369,3 +369,27 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-06-10T20:20:00+02:00]: Fix: App Store Connect Upload Error (BGTaskSchedulerPermittedIdentifiers)
   - *Details*: Resolved the ITMS-90771 upload error regarding missing Info.plist values for background processing.
   - *Tech Notes*: Added the `BGTaskSchedulerPermittedIdentifiers` key to the iOS app's `Info.plist` with a list of identifiers (`$(PRODUCT_BUNDLE_IDENTIFIER).refresh`, `$(PRODUCT_BUNDLE_IDENTIFIER).processing`), which is required by App Store Connect when `UIBackgroundModes` contains `processing`.
+
+- [6/10/2026, 9:46:43 PM]: Internationalization (i18n) via String Catalogs
+  - *Details*: Implemented a scalable localization strategy for macOS and iOS apps using Xcode's String Catalogs (.xcstrings). The app now automatically detects the device language and gracefully falls back to English if the language is unsupported.
+  - *Tech Notes*:
+    - Created `apple/WealthCompass/Sources/Shared/Resources/Localizable.xcstrings`.
+    - Updated `WealthCompass.xcodeproj` to enable Base Internationalization.
+    - Added language regions: `it`, `de`, `es`, `zh-Hans`, `ar`.
+    - Extracted and automatically translated all strings.
+
+- [2026-06-10]: Model & Settings Localization Fix
+  - *Details*: Performed an extensive audit to guarantee 100% string mapping across the codebase. Found and fixed several model enumerations and static default settings (like Categories, CloudKit Sync States, Currency names) that were returning unlocalized string literals. Wrapped them in `String(localized: "")` and extracted them to `Localizable.xcstrings`.
+  - *Tech Notes*: Modified `FinanceModels.swift`, `AppSettings.swift`, and `CloudKitSyncService.swift`.
+
+- [2026-06-10]: iOS Specific Services Localization Fix
+  - *Details*: Checked iOS-specific implementations (Notifications and AppLock) and wrapped remaining hardcoded string literals with `String(localized:)` for full translation coverage.
+  - *Tech Notes*: Modified `RecurringTransactionNotificationService.swift` and `AppLockStore.swift`.
+
+- [2026-06-10]: Manual Language Selection Settings
+  - *Details*: Added a dynamic language picker in the settings view for both iOS and macOS applications. This allows users to manually override the system language and choose any supported language from within the app.
+  - *Tech Notes*: Modified `AppSettings.swift` to introduce an `appLanguage` property backed by `UserDefaults`. Injected `.environment(\.locale)` into the root views in `WealthCompassMobileApp.swift` and `WealthCompassMacApp.swift` to force SwiftUI to re-render in the chosen language instantly. Exported and translated the new settings UI strings.
+
+- [2026-06-10]: Comprehensive String Audit and macOS Localization
+  - *Details*: Audited all `.swift` files across the codebase to identify unlocalized strings missing `String(localized:)` wrapping. Identified multiple missing localizations primarily in the macOS platform layer (`MacRootView`, `MacAppModel`, `MacPlatformServices`, `MacInvestmentsView`).
+  - *Tech Notes*: Replaced bare string literals with `String(localized:)` for notification titles/bodies, Biometric Touch ID/Face ID prompts, app navigation model titles, dashboard alert messages, and chart component titles (`AllocationChart`, `MetricCard`). Re-ran the Xcode localization extraction script to include these strings in `Localizable.xcstrings` and fully translated them across all supported languages.
