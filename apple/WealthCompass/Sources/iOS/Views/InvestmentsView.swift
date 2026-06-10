@@ -74,16 +74,14 @@ struct InvestmentsView: View {
                     VStack(spacing: 12) {
                         ForEach(finance.data.investments.sorted { $0.currentValue > $1.currentValue }) { investment in
                             investmentRow(investment)
-                                .swipeActions(edge: .leading) {
+                                .contextMenu {
                                     Button {
                                         editingInvestment = investment
                                         showingForm = true
                                     } label: {
                                         Label("Edit", systemImage: "pencil")
                                     }
-                                    .tint(.blue)
-                                }
-                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    
                                     Button(role: .destructive) {
                                         investmentPendingDeletion = investment
                                     } label: {
@@ -111,39 +109,48 @@ struct InvestmentsView: View {
                         Text(investment.symbol)
                             .font(.headline.monospaced())
                             .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                         Text(investment.type.title.uppercased())
                             .font(.caption2.weight(.bold))
                             .foregroundStyle(WCColor.primary)
                             .padding(.horizontal, 7)
                             .padding(.vertical, 3)
                             .background(WCColor.primary.opacity(0.11), in: Capsule())
+                            .fixedSize(horizontal: true, vertical: false)
                     }
                     Text(investment.name)
                         .font(.subheadline)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)
-                    HStack(spacing: 10) {
-                        Text(settings.privateNumber(investment.quantity, fractionDigits: 6))
-                        Text(investment.sector)
-                    }
-                    .font(.caption)
-                    .foregroundStyle(WCColor.textSecondary)
+                        .truncationMode(.tail)
+                    Text("\(settings.privateNumber(investment.quantity, fractionDigits: 4)) • \(investment.sector)")
+                        .font(.caption)
+                        .foregroundStyle(WCColor.textSecondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                 }
 
-                Spacer()
+                Spacer(minLength: 8)
 
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(settings.privateCurrency(investment.currentValue, sourceCurrency: investment.currency))
                         .font(.subheadline.monospacedDigit().weight(.bold))
                         .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     ValueDelta(
                         value: investment.gainLoss,
                         formattedValue: settings.privateCurrency(investment.gainLoss, sourceCurrency: investment.currency),
                         percent: investment.gainLossPercent
                     )
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                     Text("Updated \(investment.updatedAt.formatted(date: .abbreviated, time: .omitted))")
                         .font(.caption2)
                         .foregroundStyle(WCColor.textSecondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
         }

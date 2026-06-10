@@ -53,7 +53,7 @@ export function NetWorthChart({ data, onRangeChange, currentRange }: NetWorthCha
         ) : (
           <div className="relative h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
+              <AreaChart data={data} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
                 <defs>
                   <linearGradient id="colorNetWorth" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
@@ -101,7 +101,7 @@ export function NetWorthChart({ data, onRangeChange, currentRange }: NetWorthCha
                   }}
                 />
                 <Area
-                  type="monotone"
+                  type="linear"
                   dataKey="value"
                   stroke="#10b981"
                   strokeWidth={2}

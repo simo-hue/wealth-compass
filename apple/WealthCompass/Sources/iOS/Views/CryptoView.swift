@@ -74,16 +74,14 @@ struct CryptoView: View {
                     VStack(spacing: 12) {
                         ForEach(finance.data.crypto.sorted { $0.currentValue > $1.currentValue }) { holding in
                             holdingRow(holding)
-                                .swipeActions(edge: .leading) {
+                                .contextMenu {
                                     Button {
                                         editingHolding = holding
                                         showingForm = true
                                     } label: {
                                         Label("Edit", systemImage: "pencil")
                                     }
-                                    .tint(.blue)
-                                }
-                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    
                                     Button(role: .destructive) {
                                         holdingPendingDeletion = holding
                                     } label: {
@@ -100,44 +98,53 @@ struct CryptoView: View {
     private func holdingRow(_ holding: CryptoHolding) -> some View {
         InsetFinanceRow {
             HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "bitcoinsign")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(WCColor.warning)
-                    .frame(width: 38, height: 38)
-                    .background(WCColor.warning.opacity(0.11), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                CryptoIconView(symbol: holding.symbol)
 
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 8) {
                         Text(holding.symbol)
                             .font(.headline.monospaced())
                             .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                         Text(holding.name)
                             .font(.caption)
                             .foregroundStyle(WCColor.textSecondary)
                             .lineLimit(1)
+                            .truncationMode(.tail)
                     }
-                    Text("\(settings.privateNumber(holding.quantity, fractionDigits: 8)) units")
+                    Text("\(settings.privateNumber(holding.quantity, fractionDigits: 6)) units")
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                     Text("\(settings.privateCurrency(holding.currentPrice, sourceCurrency: holding.currency)) / unit")
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
 
-                Spacer()
+                Spacer(minLength: 8)
 
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(settings.privateCurrency(holding.currentValue, sourceCurrency: holding.currency))
                         .font(.subheadline.monospacedDigit().weight(.bold))
                         .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     ValueDelta(
                         value: holding.gainLoss,
                         formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
                         percent: holding.gainLossPercent
                     )
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                     Text("Updated \(holding.updatedAt.formatted(date: .abbreviated, time: .omitted))")
                         .font(.caption2)
                         .foregroundStyle(WCColor.textSecondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
         }

@@ -175,7 +175,7 @@ struct CashFlowView: View {
                     VStack(spacing: 12) {
                         ForEach(finance.recurringTransactions) { schedule in
                             recurringTransactionRow(schedule)
-                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                .contextMenu {
                                     Button(role: .destructive) {
                                         activeAlert = .deleteRecurringTransaction(schedule)
                                     } label: {
@@ -290,7 +290,7 @@ struct CashFlowView: View {
                     VStack(spacing: 12) {
                         ForEach(visibleTransactions) { transaction in
                             transactionRow(transaction)
-                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                .contextMenu {
                                     Button(role: .destructive) {
                                         activeAlert = .deleteTransaction(transaction)
                                     } label: {

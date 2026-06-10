@@ -481,6 +481,46 @@ final class FinanceStore: ObservableObject {
     }
 
     private func appendSnapshot(settings: AppSettings) {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        
+        // Backfill missing days using the carry-forward strategy
+        if let lastSnapshot = data.snapshots.max(by: { $0.date < $1.date }) {
+            let lastSnapshotDate = calendar.startOfDay(for: lastSnapshot.date)
+            
+            // If the last snapshot is strictly before today
+            if lastSnapshotDate < today {
+                let components = calendar.dateComponents([.day], from: lastSnapshotDate, to: today)
+                if let daysMissing = components.day, daysMissing > 0 {
+                    let backfillDays = min(daysMissing, 60) // Cap at 60 days to prevent performance issues
+                    
+                    for dayOffset in 1...backfillDays {
+                        if let backfillDate = calendar.date(byAdding: .day, value: dayOffset, to: lastSnapshotDate),
+                           backfillDate < today { // Only backfill up to yesterday
+                            
+                            // Set the backfill time to end of day to represent closing balance
+                            var components = calendar.dateComponents([.year, .month, .day], from: backfillDate)
+                            components.hour = 23
+                            components.minute = 59
+                            components.second = 59
+                            let finalBackfillDate = calendar.date(from: components) ?? backfillDate
+                            
+                            let missingSnapshot = NetWorthSnapshot(
+                                date: finalBackfillDate,
+                                totalAssets: lastSnapshot.totalAssets,
+                                totalLiabilities: lastSnapshot.totalLiabilities,
+                                netWorth: lastSnapshot.netWorth,
+                                liquidity: lastSnapshot.liquidity,
+                                investments: lastSnapshot.investments,
+                                crypto: lastSnapshot.crypto
+                            )
+                            data.snapshots.append(missingSnapshot)
+                        }
+                    }
+                }
+            }
+        }
+
         let totals = calculateTotals(settings: settings)
         let snapshot = NetWorthSnapshot(
             date: Date(),

@@ -54,3 +54,11 @@
 5. In CloudKit Dashboard, verify the generated fields (`schemaVersion`, `payload`, `createdAt`, `updatedAt`, `clientModifiedAt`, `revision`, `isDeleted`, and `deletedAt`) and deploy the development schema to Production before TestFlight or App Store distribution.
 6. In the existing iOS app record in App Store Connect, choose **Add Platform > macOS**. Do not create a separate macOS app record.
 7. Validate on two physical devices using the same Apple Account, including offline edits, concurrent edits, deletes, account sign-out, app relaunch, and manual force sync.
+
+- [2026-06-10 17:47]: Daily Snapshot Backfill Mechanism
+  - *Details*: Implemented a carry-forward backfill strategy to automatically generate snapshots for any days the app is not opened.
+  - *Tech Notes*: Modified `appendSnapshot` in `FinanceStore.swift` to detect missing days between the last snapshot and the current date. It appends up to 60 backfill snapshots at `23:59:59` carrying forward the exact last known values to guarantee mathematical honesty and a continuous daily graph.
+
+- [2026-06-10 17:48]: Dynamic Crypto Icons
+  - *Details*: Replaced hardcoded Bitcoin icon with a dynamic CDN-fetched image for all crypto holdings, matching the specific token automatically.
+  - *Tech Notes*: Created `CryptoIconView` in `DesignSystem.swift` using `AsyncImage` with `assets.coincap.io` CDN. Implemented a deterministic hash-based fallback with the token's first letter and background color for when an image is unavailable. Updated both `CryptoView.swift` (iOS) and `MacCryptoView.swift` (macOS) to use the new dynamic icons.

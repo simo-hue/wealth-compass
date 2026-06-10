@@ -306,3 +306,19 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-06-10T15:24:00+02:00]: Fix: SwiftUI Charts Symbol Error
   - *Details*: Fixed a build error regarding `ChartSymbolShape` conformity.
   - *Tech Notes*: Replaced `.symbol(Circle().strokeBorder(...))` with `.symbol(Circle())` in `DashboardView.swift` and `MacDashboardView.swift` because `LineMark.symbol` requires basic shapes, not stroked view modifiers. Verified with successful `xcodebuild`.
+
+- [2026-06-10T15:35:00+02:00]: SwiftUI UI Enhancements Phase 2
+  - *Details*: Added dynamic "odometer" rolling numeric text animations, ambient "breathing" gradient background animation, context menus for native swipe-like interaction on lists, and hierarchical colored empty states.
+  - *Tech Notes*: 
+    - Updated `MetricCard` and `ValueDelta` in `DesignSystem.swift` to use `.contentTransition(.numericText())`.
+    - Added infinite scale/rotation animation loop to `ScreenBackground` in `DesignSystem.swift`.
+    - Replaced non-functional `.swipeActions` in `ScrollView` with `.contextMenu` across `InvestmentsView.swift`, `CryptoView.swift`, and `CashFlowView.swift`.
+    - Updated `EmptyState` symbol rendering to `.hierarchical`.
+
+- [2026-06-10T15:40:00+02:00]: Fix: UI Overflow in Data Rows
+  - *Details*: Fixed layout squishing and text wrapping in Investment and Crypto rows.
+  - *Tech Notes*: Added `lineLimit(1)`, `minimumScaleFactor(0.8)`, and `fixedSize()` to text elements to prevent badge truncation and multi-line wrapping in `InvestmentsView.swift` and `CryptoView.swift`. Used `Spacer(minLength: 8)` to ensure proper spacing between columns.
+
+- [2026-06-10T17:53:00+02:00]: Fix: Web App Chart Edge Clipping & Interpolation Artifacts
+  - *Details*: Fixed a graphical artifact in the Net Worth chart where the line was abruptly cut off at the very edges and `curveMonotoneX` produced overshoots at the start/end points causing the line to dip below or extend past the visible data markers.
+  - *Tech Notes*: Updated `NetWorthChart.tsx`. Increased horizontal `margin` (left: 20, right: 20) on the `AreaChart` to prevent point clipping and replaced `type="monotone"` with `type="linear"` to strictly connect data points without Bezier curve overshoots.
