@@ -40,18 +40,14 @@ struct MacCryptoView: View {
                         
                         performanceSection
                         
-                        HStack(alignment: .top, spacing: 24) {
-                            AllocationChart(
-                                title: "Crypto Allocation",
-                                slices: finance.cryptoAllocation(settings: settings),
-                                settings: settings,
-                                showLegend: false
-                            )
-                            .frame(maxWidth: .infinity)
-                            
-                            topHoldingsSection
-                                .frame(maxWidth: .infinity)
-                        }
+                        AllocationChart(
+                            title: "Crypto Allocation",
+                            slices: finance.cryptoAllocation(settings: settings),
+                            settings: settings,
+                            showLegend: false
+                        )
+                        
+                        topHoldingsSection
                     }
                     .padding(24)
                     .frame(maxWidth: 1440, alignment: .leading)
@@ -206,13 +202,12 @@ struct MacCryptoView: View {
     private var topHoldingsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Top Holdings")
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.white)
+                .font(.title2.weight(.semibold))
                 .padding(.bottom, 2)
             
             let topHoldings = finance.data.crypto
                 .sorted { $0.currentValue > $1.currentValue }
-                .prefix(4)
+                .prefix(6)
             
             if topHoldings.isEmpty {
                 ContentUnavailableView(
@@ -222,7 +217,7 @@ struct MacCryptoView: View {
                 )
                 .padding(.top, 40)
             } else {
-                VStack(spacing: 12) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
                     ForEach(topHoldings) { holding in
                         holdingCard(for: holding)
                     }

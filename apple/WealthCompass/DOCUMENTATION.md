@@ -141,3 +141,7 @@
 - [2026-06-10 19:26]: Interactive Donut Chart Hover & Hidden Legend
   - *Details*: Updated the AllocationChart component to support an interactive hover state on macOS. When hovering over a slice, it lights up while the others dim, and the center text dynamically updates to display the slice's specific details. Hid the chart legend in the Crypto view to make the circular chart the exclusive focus of its box.
   - *Tech Notes*: Used `.onContinuousHover` combined with a custom `slice(at:in:total:)` geometric math calculation to accurately detect hovered sectors without relying on newer iOS 17 `chartAngleSelection` limits. Updated `AllocationChart` to accept an optional `showLegend` boolean.
+
+- [2026-06-10 19:27]: Top Holdings UI Consistency Update
+  - *Details*: Redesigned the 'Top Holdings' section in the Crypto Overview tab to match the exact same UI as the main 'Holdings' view. Removed the side-by-side layout in favor of a full-width adaptive `LazyVGrid` layout that scales beautifully.
+  - *Tech Notes*: Extracted `topHoldingsSection` from the `HStack`, replaced `VStack` with `LazyVGrid(columns: [GridItem(.adaptive(minimum: 360))])`, aligned the section heading to `.title2`, and increased the display prefix limit to 6 holdings.
