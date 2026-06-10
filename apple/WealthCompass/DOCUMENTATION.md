@@ -186,3 +186,9 @@
 - [2026-06-10 18:07]: iOS Interactive Charts Parity
   - *Details*: Updated the iOS pie/donut charts to support interactive touch to match the hover interaction available in the macOS app. Users can now tap and drag across the circular charts to view specific slice data directly in the center of the chart.
   - *Tech Notes*: Replaced macOS-only `onContinuousHover` modifier in `AllocationChart` inside `DesignSystem.swift` with a `DragGesture(minimumDistance: 0)` bounded by `#if os(iOS)`. Transferred the interactive `.chartBackground`, `.chartOverlay`, and `categorySlice` implementation into `iOS/Views/CashFlowView.swift` to upgrade the static Expense Categories pie chart to a fully interactive donut chart.
+- [2026-06-10 20:10]: iOS Net Worth Chart X-Axis Fix
+  - *Details*: Fixed an issue where the x-axis on the iOS Dashboard's Net Worth chart statically displayed months regardless of the selected timeframe (e.g., 1W or ALL).
+  - *Tech Notes*: Removed the hardcoded `format: .dateTime.month(.abbreviated)` argument from `AxisValueLabel` in `DashboardView.swift`. Calling `AxisValueLabel()` without a format leverages SwiftUI Charts' native automatic scale formatting, seamlessly adapting labels to the appropriate date granularity based on the chart's time domain.
+- [2026-06-10 20:11]: Minimal iOS Net Worth Chart
+  - *Details*: Completely removed the X-axis from the iOS Dashboard's Net Worth chart to achieve a cleaner, more minimal design. Since tapping/dragging the chart reveals the exact date in the center hover view, the static axis labels and gridlines were redundant.
+  - *Tech Notes*: Replaced `.chartXAxis { ... }` with `.chartXAxis(.hidden)` in `iOS/Views/DashboardView.swift`.

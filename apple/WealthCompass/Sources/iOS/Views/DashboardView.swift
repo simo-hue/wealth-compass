@@ -225,14 +225,7 @@ struct DashboardView: View {
                         }
                         .chartYScale(domain: chartDomain(for: points))
                         .chartXSelection(value: $selectedNetWorthDate)
-                        .chartXAxis {
-                            AxisMarks(values: .automatic(desiredCount: 4)) { _ in
-                                AxisGridLine()
-                                    .foregroundStyle(.white.opacity(0.055))
-                                AxisValueLabel(format: .dateTime.month(.abbreviated))
-                                    .foregroundStyle(.white.opacity(0.4))
-                            }
-                        }
+                        .chartXAxis(.hidden)
                         .chartYAxis(.hidden)
                         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: points)
                         .frame(height: 205)
