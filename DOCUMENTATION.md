@@ -365,3 +365,7 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-06-10T19:41:00+02:00]: macOS Crypto View Refactoring (continued)
   - *Details*: Centered the Top Performer and Biggest Loser vertically inside their combined `FinanceCard` container.
   - *Tech Notes*: Removed `alignment: .top` from the `VStack`'s frame modifiers inside `MacCryptoView.swift` to allow natural vertical centering.
+
+- [2026-06-10T20:20:00+02:00]: Fix: App Store Connect Upload Error (BGTaskSchedulerPermittedIdentifiers)
+  - *Details*: Resolved the ITMS-90771 upload error regarding missing Info.plist values for background processing.
+  - *Tech Notes*: Added the `BGTaskSchedulerPermittedIdentifiers` key to the iOS app's `Info.plist` with a list of identifiers (`$(PRODUCT_BUNDLE_IDENTIFIER).refresh`, `$(PRODUCT_BUNDLE_IDENTIFIER).processing`), which is required by App Store Connect when `UIBackgroundModes` contains `processing`.
