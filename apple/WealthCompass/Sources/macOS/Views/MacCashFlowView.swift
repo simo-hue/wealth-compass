@@ -82,6 +82,7 @@ struct MacCashFlowView: View {
     @State private var editor: MacCashFlowEditor?
     @State private var activeAlert: MacCashFlowAlert?
     @State private var selectedTab: MacCashFlowTab = .overview
+    @State private var cashFlowRange: CashFlowTimeframe = .sixMonths
 
     private let summaryColumns = [
         GridItem(.adaptive(minimum: 190, maximum: 320), spacing: 16)
@@ -240,7 +241,7 @@ struct MacCashFlowView: View {
     }
 
     private var cashFlowTrendCard: some View {
-        let trend = finance.cashFlowTrend(months: 6)
+        let trend = finance.cashFlowTrend(months: cashFlowRange.rawValue)
         let hasCashFlow = trend.contains { $0.income != 0 || $0.expense != 0 }
         let totalIncome = trend.reduce(0) { $0 + $1.income }
         let totalExpense = trend.reduce(0) { $0 + $1.expense }
@@ -249,13 +250,14 @@ struct MacCashFlowView: View {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Six-Month Cash Flow")
+                        Text("Cash Flow")
                             .font(.headline)
                         Text("Income and expenses by month")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    Spacer()
+                    Spacer(minLength: 16)
+                    DashboardSegmentedPicker(selection: $cashFlowRange, items: CashFlowTimeframe.allCases) { $0.label }
                 }
 
                 if !hasCashFlow {
@@ -300,7 +302,7 @@ struct MacCashFlowView: View {
                     )
                     Spacer(minLength: 0)
                     VStack(alignment: .trailing, spacing: 3) {
-                        Text("6M NET")
+                        Text("\(cashFlowRange.label) NET")
                             .font(.caption2.weight(.bold))
                             .tracking(1)
                             .foregroundStyle(.secondary)

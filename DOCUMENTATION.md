@@ -350,3 +350,9 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
   - *Tech Notes*: 
     - Refactored timeframe selector logic in `MacDashboardView.swift` to be reusable.
     - Added `CashFlowTimeframe` enum to support 3M, 6M, and 12M cash flow trend ranges.
+
+- [2026-06-10T19:26:00+02:00]: Cash Flow View Timeframe Selector
+  - *Details*: Reused the generic `DashboardSegmentedPicker` for the macOS Cash Flow view (Overview Tab) to match the dynamic 3M/6M/12M ranges introduced on the Dashboard.
+  - *Tech Notes*: 
+    - Made `CashFlowTimeframe` and `DashboardSegmentedPicker` internal in `MacDashboardView.swift` so they can be consumed by `MacCashFlowView.swift`.
+    - Updated the cash flow trend card to adapt to `cashFlowRange` dynamically.

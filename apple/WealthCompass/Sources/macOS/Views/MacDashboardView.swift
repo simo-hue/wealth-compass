@@ -985,7 +985,7 @@ private struct MacDashboardBackdrop: View {
     }
 }
 
-private enum CashFlowTimeframe: Int, CaseIterable, Identifiable {
+enum CashFlowTimeframe: Int, CaseIterable, Identifiable {
     case threeMonths = 3
     case sixMonths = 6
     case twelveMonths = 12
@@ -1000,7 +1000,7 @@ private enum CashFlowTimeframe: Int, CaseIterable, Identifiable {
     }
 }
 
-private struct DashboardSegmentedPicker<SelectionValue: Hashable & Identifiable>: View {
+struct DashboardSegmentedPicker<SelectionValue: Hashable & Identifiable>: View {
     @Binding var selection: SelectionValue
     let items: [SelectionValue]
     let labelProvider: (SelectionValue) -> String
