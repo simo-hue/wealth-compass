@@ -192,3 +192,8 @@
 - [2026-06-10 20:11]: Minimal iOS Net Worth Chart
   - *Details*: Completely removed the X-axis from the iOS Dashboard's Net Worth chart to achieve a cleaner, more minimal design. Since tapping/dragging the chart reveals the exact date in the center hover view, the static axis labels and gridlines were redundant.
   - *Tech Notes*: Replaced `.chartXAxis { ... }` with `.chartXAxis(.hidden)` in `iOS/Views/DashboardView.swift`.
+
+
+- [2026-06-10 20:15]: Bump App Version
+  - *Details*: Increased MARKETING_VERSION to 1.0.2 and CURRENT_PROJECT_VERSION to 3 across macOS and iOS targets for App Store Connect submission.
+  - *Tech Notes*: Updated in WealthCompass.xcodeproj/project.pbxproj.
