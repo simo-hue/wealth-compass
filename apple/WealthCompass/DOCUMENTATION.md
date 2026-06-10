@@ -161,3 +161,11 @@
 - [2026-06-10 19:37]: Cash Flow Interactive Charts & Unified UI
   - *Details*: Replaced the dropdown menu on the Expense Categories card with a segmented picker to match the layout of the Cash Flow Trend card. Implemented interactive hover effects on both the Expense Categories donut chart and the Cash Flow Trend bar chart.
   - *Tech Notes*: In `MacCashFlowView.swift`, replaced `Picker` with `.pickerStyle(.menu)` with `DashboardSegmentedPicker`. Added `@State` tracking variables for hovered month and category. Added geometric slicing logic `categorySlice(at:in:total:categories:)` for the pie chart hover mapping, and simple coordinate mapping using `proxy.value(atX:)` for the bar chart hover. The Legend text dynamically updates to reflect hovered element properties.
+
+- [2026-06-10 19:46]: Cash Flow Expense Categories Simplification
+  - *Details*: Removed the redundant list of categories below the Expense Categories pie chart to maximize the pie chart size and visual impact. Hovering over a slice now serves as the primary way to view exact category amounts.
+  - *Tech Notes*: Removed the `VStack` list of items in `MacCashFlowView.swift` and updated the `ZStack` containing the chart to `.frame(minHeight: 250, maxHeight: .infinity)` to fill available vertical space.
+
+- [2026-06-10 19:48]: Layout Optimization for Expense Categories
+  - *Details*: Fixed a layout issue where the title was wrapping awkwardly due to the segmented picker taking up too much horizontal space.
+  - *Tech Notes*: Reverted the `DashboardSegmentedPicker` on the Expense Categories card in `MacCashFlowView.swift` back to a native `Picker` with `.pickerStyle(.menu)` and a constrained frame of `142pt` to ensure enough width remains for the section title.
