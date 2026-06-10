@@ -76,4 +76,4 @@
 
 - [2026-06-10 18:29]: Cash Flow Redesign — Tab Selector Island
   - *Details*: Redesigned the Cash Flow view to include a native macOS selector island at the top, splitting the view into "Overview" and "Transactions" tabs.
-  - *Tech Notes*: Replaced the top-level `VStack` in `MacCashFlowView.swift` with a `TabView` and added a `MacCashFlowTab` enum. Assigned `.tag` and `.tabItem` elements so the segmented control renders the split view. Removed arbitrary `.frame(maxHeight: 520)` constraint.
+  - *Tech Notes*: Replaced the top-level `VStack` in `MacCashFlowView.swift` with a custom `CashFlowSelectorIsland` component that mimics the settings pill UI. Removed arbitrary `.frame(maxHeight: 520)` constraint.
