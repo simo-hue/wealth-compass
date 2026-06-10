@@ -12,22 +12,39 @@ struct MacInvestmentsView: View {
     ]
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header
-                summaryCards
-                AllocationChart(
-                    title: "Allocation by Sector",
-                    slices: finance.investmentAllocation(settings: settings),
-                    settings: settings
-                )
-                investmentsSection
+        VStack(spacing: 0) {
+            // Scrollable summary area (cards + chart)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    summaryCards
+                    AllocationChart(
+                        title: "Allocation by Sector",
+                        slices: finance.investmentAllocation(settings: settings),
+                        settings: settings
+                    )
+                }
+                .padding(24)
+                .frame(maxWidth: 1440, alignment: .leading)
             }
-            .padding(24)
-            .frame(maxWidth: 1440, alignment: .leading)
+            .frame(maxHeight: 420)
+
+            Divider()
+
+            // Native Table — outside ScrollView for proper NSTableView behavior
+            investmentTable
+                .layoutPriority(1)
         }
         .background(ScreenBackground())
         .navigationTitle("Investments")
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    appModel.editor = .investment(nil)
+                } label: {
+                    Label("New Investment", systemImage: "plus")
+                }
+            }
+        }
         .confirmationDialog(
             "Delete Investment?",
             isPresented: isShowingDeleteConfirmation,
@@ -44,18 +61,6 @@ struct MacInvestmentsView: View {
             }
         } message: { investment in
             Text("This permanently removes \(investment.symbol) from your investment portfolio.")
-        }
-    }
-
-    private var header: some View {
-        PageHeader(title: "Investments", subtitle: "\(privateCount(finance.data.investments.count)) tracked positions") {
-            Button {
-                appModel.editor = .investment(nil)
-            } label: {
-                Label("New Investment", systemImage: "plus")
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(WCColor.primary)
         }
     }
 
@@ -110,35 +115,6 @@ struct MacInvestmentsView: View {
         }
     }
 
-
-    private var investmentsSection: some View {
-        FinanceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text("Investments")
-                        .font(.headline)
-                    Spacer()
-                    Button("Edit", systemImage: "pencil") {
-                        guard let investment = selectedInvestment else { return }
-                        appModel.editor = .investment(investment)
-                    }
-                    .disabled(selectedInvestment == nil)
-
-                    Button(role: .destructive) {
-                        guard let investment = selectedInvestment else { return }
-                        investmentPendingDeletion = investment
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                    .disabled(selectedInvestment == nil)
-                }
-
-                investmentTable
-                    .frame(minHeight: 360)
-            }
-        }
-    }
-
     private var investmentTable: some View {
         Table(finance.data.investments, selection: $selection) {
             TableColumn("Symbol", value: \.symbol)
@@ -169,6 +145,34 @@ struct MacInvestmentsView: View {
                     .foregroundStyle(.secondary)
             }
             .width(min: 120, ideal: 150)
+        }
+        .contextMenu(forSelectionType: Investment.ID.self) { selectedIDs in
+            if let id = selectedIDs.first,
+               let investment = finance.data.investments.first(where: { $0.id == id }) {
+                Button {
+                    appModel.editor = .investment(investment)
+                } label: {
+                    Label("Edit Investment", systemImage: "pencil")
+                }
+
+                Divider()
+
+                Button(role: .destructive) {
+                    investmentPendingDeletion = investment
+                } label: {
+                    Label("Delete Investment", systemImage: "trash")
+                }
+            }
+        } primaryAction: { selectedIDs in
+            // Double-click to edit
+            if let id = selectedIDs.first,
+               let investment = finance.data.investments.first(where: { $0.id == id }) {
+                appModel.editor = .investment(investment)
+            }
+        }
+        .onDeleteCommand {
+            guard let investment = selectedInvestment else { return }
+            investmentPendingDeletion = investment
         }
         .overlay {
             if finance.data.investments.isEmpty {

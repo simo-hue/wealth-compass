@@ -62,3 +62,15 @@
 - [2026-06-10 17:48]: Dynamic Crypto Icons
   - *Details*: Replaced hardcoded Bitcoin icon with a dynamic CDN-fetched image for all crypto holdings, matching the specific token automatically.
   - *Tech Notes*: Created `CryptoIconView` in `DesignSystem.swift` using `AsyncImage` with `assets.coincap.io` CDN. Implemented a deterministic hash-based fallback with the token's first letter and background color for when an image is unavailable. Updated both `CryptoView.swift` (iOS) and `MacCryptoView.swift` (macOS) to use the new dynamic icons.
+
+- [2026-06-10 18:17]: macOS UX Overhaul — All 7 Analysis Issues Fixed
+  - *Details*: Implemented every fix from `macOS_UX_Analysis.md` to bring the macOS app in line with native HIG conventions. This is a comprehensive production-quality UX pass across the entire macOS target.
+  - *Tech Notes*:
+    - **Issue 1 (Table Architecture):** Pulled `Table` components out of outer `ScrollView` wrappers in `MacInvestmentsView`, `MacCryptoView`, and `MacCashFlowView`. Tables now sit outside the scroll context with `.layoutPriority(1)`, enabling native `NSTableView` scrolling with pinned column headers and row virtualization.
+    - **Issue 2 (Context Menus):** Added `.contextMenu(forSelectionType:)` with Edit/Delete actions, `primaryAction:` for double-click editing, and `.onDeleteCommand` for keyboard Delete key on all data tables. Removed floating Edit/Delete button HStacks.
+    - **Issue 3 (Toolbar & Search):** Replaced `TextField` search in `MacCashFlowView` with `.searchable(text:prompt:)` modifier (auto-binds `Cmd+F` and places in toolbar). Moved Add Transaction menu to native `ToolbarItemGroup`.
+    - **Issue 4 (Window Sizing):** Reduced minimum frame constraints from 760×560 to 520×400 in `MacRootView` to allow compact column layout.
+    - **Issue 5 (Editor Sheets):** Refactored all 5 editor views (`MacTransactionEditor`, `MacInvestmentEditor`, `MacCryptoEditor`, `MacRecurringTransactionEditor`, `MacCashFlowTransactionEditor`) to use `NavigationStack` with `.navigationTitle()` and `.toolbar` with `.cancellationAction`/`.confirmationAction` placements. Replaced hardcoded frame sizes with flexible min/ideal constraints. Added `Cmd+S` shortcut to all Save buttons.
+    - **Issue 6 (Keyboard Shortcuts):** Added "Navigate" menu with `Cmd+1` through `Cmd+5` for instant sidebar navigation. Added `Cmd+R` for Refresh Data.
+    - **Issue 7 (Dashboard Padding):** Replaced manual `proxy.size.width < 900 ? 20 : 28` padding with `.padding(.horizontal, 24)` + `.scenePadding(.minimum, edges: .horizontal)`.
+

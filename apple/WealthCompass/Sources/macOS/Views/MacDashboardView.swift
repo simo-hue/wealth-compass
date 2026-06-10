@@ -63,7 +63,8 @@ struct MacDashboardView: View {
                         }
                     }
                 }
-                .padding(.horizontal, proxy.size.width < 900 ? 20 : 28)
+                .padding(.horizontal, 24)
+                .scenePadding(.minimum, edges: .horizontal)
                 .padding(.top, 24)
                 .padding(.bottom, 36)
                 .frame(maxWidth: 1_520, alignment: .leading)

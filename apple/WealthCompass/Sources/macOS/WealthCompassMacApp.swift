@@ -43,6 +43,34 @@ struct WealthCompassMacApp: App {
                 .keyboardShortcut("k", modifiers: [.command, .shift])
             }
 
+            // Sidebar navigation shortcuts (Cmd+1 through Cmd+5)
+            CommandMenu("Navigate") {
+                Button("Dashboard") {
+                    appModel.selection = .dashboard
+                }
+                .keyboardShortcut("1", modifiers: .command)
+
+                Button("Cash Flow") {
+                    appModel.selection = .cashFlow
+                }
+                .keyboardShortcut("2", modifiers: .command)
+
+                Button("Investments") {
+                    appModel.selection = .investments
+                }
+                .keyboardShortcut("3", modifiers: .command)
+
+                Button("Crypto") {
+                    appModel.selection = .crypto
+                }
+                .keyboardShortcut("4", modifiers: .command)
+
+                Button("Settings") {
+                    appModel.selection = .settings
+                }
+                .keyboardShortcut("5", modifiers: .command)
+            }
+
             SidebarCommands()
         }
 

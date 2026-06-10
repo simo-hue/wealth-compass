@@ -15,7 +15,7 @@ struct MacRootView: View {
         Group {
             if appLock.isLockEnabled && !appLock.isUnlocked {
                 MacLockView()
-                    .frame(minWidth: 760, minHeight: 560)
+                    .frame(minWidth: 520, minHeight: 400)
             } else {
                 NavigationSplitView {
                     List(MacDestination.allCases, selection: $appModel.selection) { destination in
@@ -26,7 +26,7 @@ struct MacRootView: View {
                     .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 280)
                 } detail: {
                     detail
-                        .frame(minWidth: 760, minHeight: 560)
+                        .frame(minWidth: 520, minHeight: 400)
                         .toolbar {
                             ToolbarItemGroup(placement: .primaryAction) {
                                 Button {
@@ -35,6 +35,7 @@ struct MacRootView: View {
                                     Label("Refresh Data", systemImage: "arrow.clockwise")
                                 }
                                 .disabled(isRefreshing)
+                                .keyboardShortcut("r", modifiers: .command)
 
                                 Menu {
                                     Button("Transaction") { appModel.editor = .transaction }

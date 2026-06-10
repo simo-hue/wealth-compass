@@ -92,16 +92,7 @@ struct MacRecurringTransactionEditor: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text(existingSchedule == nil ? "New Recurring Transaction" : "Edit Recurring Transaction")
-                    .font(.title2.bold())
-                Spacer()
-            }
-            .padding(20)
-
-            Divider()
-
+        NavigationStack {
             Form {
                 Section("Transaction") {
                     Picker("Type", selection: $type) {
@@ -190,23 +181,21 @@ struct MacRecurringTransactionEditor: View {
                 }
             }
             .formStyle(.grouped)
-
-            Divider()
-
-            HStack {
-                Spacer()
-                Button("Cancel") {
-                    dismiss()
+            .navigationTitle(existingSchedule == nil ? "New Recurring Transaction" : "Edit Recurring Transaction")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
                 }
-                .keyboardShortcut(.cancelAction)
-
-                Button("Save", action: saveSchedule)
-                    .keyboardShortcut(.defaultAction)
-                    .disabled(isSaveDisabled)
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save", action: saveSchedule)
+                        .disabled(isSaveDisabled)
+                        .keyboardShortcut("s", modifiers: .command)
+                }
             }
-            .padding(16)
         }
-        .frame(width: 600, height: 660)
+        .frame(minWidth: 500, idealWidth: 600, minHeight: 540, idealHeight: 660)
     }
 
     private func saveSchedule() {
