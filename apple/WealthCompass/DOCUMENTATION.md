@@ -74,3 +74,6 @@
     - **Issue 6 (Keyboard Shortcuts):** Added "Navigate" menu with `Cmd+1` through `Cmd+5` for instant sidebar navigation. Added `Cmd+R` for Refresh Data.
     - **Issue 7 (Dashboard Padding):** Replaced manual `proxy.size.width < 900 ? 20 : 28` padding with `.padding(.horizontal, 24)` + `.scenePadding(.minimum, edges: .horizontal)`.
 
+- [2026-06-10 18:29]: Cash Flow Redesign — Tab Selector Island
+  - *Details*: Redesigned the Cash Flow view to include a native macOS selector island at the top, splitting the view into "Overview" and "Transactions" tabs.
+  - *Tech Notes*: Replaced the top-level `VStack` in `MacCashFlowView.swift` with a `TabView` and added a `MacCashFlowTab` enum. Assigned `.tag` and `.tabItem` elements so the segmented control renders the split view. Removed arbitrary `.frame(maxHeight: 520)` constraint.

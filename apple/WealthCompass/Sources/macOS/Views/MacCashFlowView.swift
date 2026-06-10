@@ -59,6 +59,11 @@ private enum MacCashFlowAlert: Identifiable {
     }
 }
 
+private enum MacCashFlowTab: Hashable {
+    case overview
+    case transactions
+}
+
 struct MacCashFlowView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
@@ -69,14 +74,15 @@ struct MacCashFlowView: View {
     @State private var transactionTypeFilter: MacTransactionTypeFilter = .all
     @State private var editor: MacCashFlowEditor?
     @State private var activeAlert: MacCashFlowAlert?
+    @State private var selectedTab: MacCashFlowTab = .overview
 
     private let summaryColumns = [
         GridItem(.adaptive(minimum: 190, maximum: 320), spacing: 16)
     ]
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Scrollable upper section: summary cards, analytics, recurring transactions
+        TabView(selection: $selectedTab) {
+            // Overview tab: summary cards, analytics, recurring transactions
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     summaryCards
@@ -86,11 +92,10 @@ struct MacCashFlowView: View {
                 .padding(24)
                 .frame(maxWidth: 1440, alignment: .leading)
             }
-            .frame(maxHeight: 520)
+            .tabItem { Label("Overview", systemImage: "chart.bar.xaxis.ascending") }
+            .tag(MacCashFlowTab.overview)
 
-            Divider()
-
-            // Transaction table section — outside ScrollView for native NSTableView behavior
+            // Transactions tab: filter bar and transaction table
             VStack(alignment: .leading, spacing: 10) {
                 transactionFilters
                     .padding(.horizontal, 24)
@@ -99,6 +104,8 @@ struct MacCashFlowView: View {
                 transactionTable
                     .layoutPriority(1)
             }
+            .tabItem { Label("Transactions", systemImage: "list.bullet.rectangle") }
+            .tag(MacCashFlowTab.transactions)
         }
         .background(ScreenBackground())
         .navigationTitle("Cash Flow")
