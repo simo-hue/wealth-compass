@@ -10,15 +10,15 @@ struct CryptoView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                PageHeader(title: "Crypto assets", subtitle: "Track holdings, allocation, and performance.") {
-                    PrimaryActionButton(systemImage: "plus", accessibilityLabel: "Add Crypto Holding") {
+                PageHeader(title: LocalizedStringKey( "Crypto assets"), subtitle: LocalizedStringKey( "Track holdings, allocation, and performance.")) {
+                    PrimaryActionButton(systemImage: "plus", accessibilityLabel: String(localized: "Add Crypto Holding")) {
                         editingHolding = nil
                         showingForm = true
                     }
                 }
 
                 summary
-                AllocationChart(title: "Crypto Allocation", slices: finance.cryptoAllocation(settings: settings), settings: settings)
+                AllocationChart(title: LocalizedStringKey( "Crypto Allocation"), slices: finance.cryptoAllocation(settings: settings), settings: settings)
                 holdingsList
             }
             .padding(16)
@@ -50,15 +50,15 @@ struct CryptoView: View {
         let percent = costBasis > 0 ? (gain / costBasis) * 100 : 0
 
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            MetricCard(title: "Crypto Value", value: settings.privateCurrency(total), systemImage: "bitcoinsign.circle.fill", accent: WCColor.warning, detail: "Current market value")
-            MetricCard(title: "Holdings", value: settings.isPrivacyMode ? "****" : "\(finance.data.crypto.count)", systemImage: "square.stack.3d.up.fill", detail: "Tracked assets")
-            MetricCard(title: "Cost Basis", value: settings.privateCurrency(costBasis), systemImage: "banknote.fill", detail: "Capital invested")
+            MetricCard(title: LocalizedStringKey( "Crypto Value"), value: settings.privateCurrency(total), systemImage: "bitcoinsign.circle.fill", accent: WCColor.warning, detail: LocalizedStringKey( "Current market value"))
+            MetricCard(title: LocalizedStringKey( "Holdings"), value: settings.isPrivacyMode ? "****" : "\(finance.data.crypto.count)", systemImage: "square.stack.3d.up.fill", detail: LocalizedStringKey( "Tracked assets"))
+            MetricCard(title: LocalizedStringKey( "Cost Basis"), value: settings.privateCurrency(costBasis), systemImage: "banknote.fill", detail: LocalizedStringKey( "Capital invested"))
             MetricCard(
-                title: "Profit / Loss",
+                title: LocalizedStringKey( "Profit / Loss"),
                 value: settings.privateCurrency(gain),
                 systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
                 accent: gain >= 0 ? WCColor.primary : WCColor.destructive,
-                detail: settings.isPrivacyMode ? "Performance hidden" : "\(percent.formatted(.number.precision(.fractionLength(1))))% performance"
+                detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(percent.formatted(.number.precision(.fractionLength(1))))% performance")
             )
         }
     }
@@ -66,10 +66,10 @@ struct CryptoView: View {
     private var holdingsList: some View {
         FinanceCard {
             VStack(alignment: .leading, spacing: 14) {
-                SectionHeading("Crypto holdings", subtitle: "Tap a holding to edit its details")
+                SectionHeading(LocalizedStringKey( "Crypto holdings"), subtitle: LocalizedStringKey( "Tap a holding to edit its details"))
 
                 if finance.data.crypto.isEmpty {
-                    EmptyState(title: "No crypto holdings yet", systemImage: "bitcoinsign.circle")
+                    EmptyState(title: LocalizedStringKey( "No crypto holdings yet"), systemImage: "bitcoinsign.circle")
                 } else {
                     VStack(spacing: 12) {
                         ForEach(finance.data.crypto.sorted { $0.currentValue > $1.currentValue }) { holding in
@@ -140,7 +140,7 @@ struct CryptoView: View {
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    Text("Updated \(holding.updatedAt.formatted(date: .abbreviated, time: .omitted))")
+                    Text(String(localized: "Updated \(holding.updatedAt.formatted(date: .abbreviated, time: .omitted))"))
                         .font(.caption2)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)

@@ -35,30 +35,26 @@ struct ExchangeRateRefreshResult: Equatable {
 
     var title: String {
         if wasAlreadyRunning {
-            return "Refresh Already Running"
+            return String(localized: "Refresh Already Running")
         }
-        return succeeded ? "Exchange Rates Updated" : "Exchange Rate Refresh Failed"
+        return succeeded ? String(localized: "Exchange Rates Updated") : String(localized: "Exchange Rate Refresh Failed")
     }
 
     var message: String {
         if wasAlreadyRunning {
-            return "An exchange-rate refresh is already in progress."
+            return String(localized: "An exchange-rate refresh is already in progress.")
         }
 
         if let errorMessage {
-            let activeRates = snapshot == nil ? "the built-in offline fallback rates" : "the last cached rates"
-            return "\(errorMessage)\n\nWealth Compass will continue using \(activeRates)."
+            let activeRates = snapshot == nil ? String(localized: "the built-in offline fallback rates") : String(localized: "the last cached rates")
+            return String(localized: "\(errorMessage)\n\nWealth Compass will continue using \(activeRates).")
         }
 
         if let snapshot {
-            return """
-            Latest ECB reference rates are effective \(snapshot.effectiveDate.formatted(date: .long, time: .omitted)).
-
-            The rates are cached locally for offline use.
-            """
+            return String(localized: "Latest ECB reference rates are effective \(snapshot.effectiveDate.formatted(date: .long, time: .omitted)).\n\nThe rates are cached locally for offline use.")
         }
 
-        return errorMessage ?? "The exchange-rate provider did not return a usable response."
+        return errorMessage ?? String(localized: "The exchange-rate provider did not return a usable response.")
     }
 }
 
@@ -72,15 +68,15 @@ enum ExchangeRateError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidURL:
-            return "The exchange-rate request could not be created."
+            return String(localized: "The exchange-rate request could not be created.")
         case .invalidResponse:
-            return "The exchange-rate provider returned an invalid response."
+            return String(localized: "The exchange-rate provider returned an invalid response.")
         case .providerError(let statusCode):
-            return "The exchange-rate provider returned HTTP \(statusCode)."
+            return String(localized: "The exchange-rate provider returned HTTP \(statusCode).")
         case .invalidPayload:
-            return "The exchange-rate provider returned malformed data."
+            return String(localized: "The exchange-rate provider returned malformed data.")
         case .incompleteRates:
-            return "The exchange-rate provider did not return all supported currencies."
+            return String(localized: "The exchange-rate provider did not return all supported currencies.")
         }
     }
 }

@@ -7,7 +7,7 @@ private enum MacSettingsTab: MacSelectorTab {
     case data
     case icloud
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
         case .general: return "General"
         case .data: return "Data"
@@ -154,8 +154,8 @@ struct MacSettingsView: View {
 
     private var generalSettings: some View {
         DynamicMasonryLayout(minColumnWidth: 380, spacing: 32) {
-            SettingsSection(title: "Region & Language") {
-                SettingsRow(title: "Language") {
+            SettingsSection(title: String(localized:  "Region & Language")) {
+                SettingsRow(title: String(localized:  "Language")) {
                     Picker("", selection: $settings.appLanguage) {
                         Text("System").tag(String?.none)
                         ForEach(settings.availableLanguages, id: \.self) { code in
@@ -168,7 +168,7 @@ struct MacSettingsView: View {
 
                 Divider().background(WCColor.border)
 
-                SettingsRow(title: "Base Currency") {
+                SettingsRow(title: String(localized:  "Base Currency")) {
                     Picker("", selection: $settings.currency) {
                         ForEach(Currency.allCases) { currency in
                             Text("\(currency.displayName) (\(currency.rawValue))").tag(currency)
@@ -181,8 +181,8 @@ struct MacSettingsView: View {
 
             exchangeRatesSection
 
-            SettingsSection(title: "Privacy & Security") {
-                SettingsRow(title: "Privacy Mode", subtitle: "Hide financial values throughout Wealth Compass.") {
+            SettingsSection(title: String(localized:  "Privacy & Security")) {
+                SettingsRow(title: String(localized: "Privacy Mode"), subtitle: String(localized: "Hide financial values throughout Wealth Compass.")) {
                     Toggle("", isOn: $settings.isPrivacyMode)
                         .toggleStyle(.switch)
                         .labelsHidden()
@@ -191,8 +191,8 @@ struct MacSettingsView: View {
                 Divider().background(WCColor.border)
 
                 SettingsRow(
-                    title: "\(appLock.biometryName) App Lock", 
-                    subtitle: appLock.lastError ?? "When enabled, Wealth Compass locks when the app is no longer active."
+                    title: String(localized: "\(appLock.biometryName) App Lock"),
+                    subtitle: appLock.lastError ?? String(localized: "When enabled, Wealth Compass locks when the app is no longer active.")
                 ) {
                     Toggle("", isOn: biometricLockBinding)
                         .toggleStyle(.switch)
@@ -200,9 +200,9 @@ struct MacSettingsView: View {
                 }
             }
 
-            SettingsSection(title: "Custom Categories") {
+            SettingsSection(title: String(localized:  "Custom Categories")) {
                 categoryGroup(
-                    title: "Income",
+                    title: String(localized: "Income"),
                     type: .income,
                     categories: settings.customIncomeCategories
                 )
@@ -210,7 +210,7 @@ struct MacSettingsView: View {
                 Divider().background(WCColor.border)
                 
                 categoryGroup(
-                    title: "Expense",
+                    title: String(localized: "Expense"),
                     type: .expense,
                     categories: settings.customExpenseCategories
                 )
@@ -221,8 +221,8 @@ struct MacSettingsView: View {
     }
 
     private var exchangeRatesSection: some View {
-        SettingsSection(title: "Exchange Rates") {
-            SettingsRow(title: "Source") {
+        SettingsSection(title: String(localized:  "Exchange Rates")) {
+            SettingsRow(title: String(localized:  "Source")) {
                 if let snapshot = settings.exchangeRateSnapshot {
                     VStack(alignment: .trailing) {
                         Text("ECB")
@@ -240,7 +240,7 @@ struct MacSettingsView: View {
 
             ForEach(Currency.allCases.filter { $0 != settings.currency }) { quoteCurrency in
                 let converted = settings.convert(1, from: settings.currency, to: quoteCurrency)
-                SettingsRow(title: "1 \(settings.currency.rawValue)") {
+                SettingsRow(title: String(localized:  "1 \(settings.currency.rawValue)")) {
                     Text("\(converted.formatted(.number.precision(.fractionLength(2...4)))) \(quoteCurrency.rawValue)")
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
@@ -253,7 +253,7 @@ struct MacSettingsView: View {
                     Task { await refreshExchangeRates() }
                 } label: {
                     Label(
-                        settings.isRefreshingExchangeRates ? "Refreshing Exchange Rates" : "Refresh Exchange Rates",
+                        String(localized: settings.isRefreshingExchangeRates ? "Refreshing Exchange Rates" : "Refresh Exchange Rates"),
                         systemImage: "arrow.triangle.2.circlepath"
                     )
                 }
@@ -283,12 +283,12 @@ struct MacSettingsView: View {
     }
 
     private var marketDataSection: some View {
-        SettingsSection(title: "Market Data") {
+        SettingsSection(title: String(localized:  "Market Data")) {
             Button {
                 openCredentialEditor(.finnhub)
             } label: {
                 credentialRow(
-                    title: "Finnhub API Key",
+                    title: String(localized:  "Finnhub API Key"),
                     systemImage: "chart.line.uptrend.xyaxis",
                     isConfigured: hasFinnhubAPIKey
                 )
@@ -301,7 +301,7 @@ struct MacSettingsView: View {
                 openCredentialEditor(.coingecko)
             } label: {
                 credentialRow(
-                    title: "CoinGecko API Key",
+                    title: String(localized:  "CoinGecko API Key"),
                     systemImage: "bitcoinsign.circle",
                     isConfigured: hasCoinGeckoAPIKey
                 )
@@ -315,7 +315,7 @@ struct MacSettingsView: View {
                     Task { await refreshMarketPrices() }
                 } label: {
                     Label(
-                        isRefreshingPrices ? "Refreshing Market Data" : "Refresh Market Data",
+                        String(localized: isRefreshingPrices ? "Refreshing Market Data" : "Refresh Market Data"),
                         systemImage: "arrow.triangle.2.circlepath"
                     )
                 }
@@ -339,8 +339,8 @@ struct MacSettingsView: View {
 
     private var dataSettings: some View {
         DynamicMasonryLayout(minColumnWidth: 380, spacing: 32) {
-            SettingsSection(title: "Import and Export") {
-                SettingsRow(title: "Import Behavior") {
+            SettingsSection(title: String(localized:  "Import and Export")) {
+                SettingsRow(title: String(localized:  "Import Behavior")) {
                     Picker("", selection: $importMode) {
                         Text("Merge with local data").tag(FinanceImportMode.merge)
                         Text("Replace local data").tag(FinanceImportMode.replace)
@@ -358,20 +358,20 @@ struct MacSettingsView: View {
                 .padding(.top, 8)
             }
 
-            SettingsSection(title: "Local Storage") {
-                SettingsRow(title: "Mode") { Text("Local Only").foregroundStyle(.secondary) }
+            SettingsSection(title: String(localized:  "Local Storage")) {
+                SettingsRow(title: String(localized:  "Mode")) { Text("Local Only").foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Transactions") { Text("\(finance.data.transactions.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: String(localized:  "Transactions")) { Text("\(finance.data.transactions.count)").foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Recurring Schedules") { Text("\(finance.data.recurringTransactions.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: String(localized:  "Recurring Schedules")) { Text("\(finance.data.recurringTransactions.count)").foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Investments") { Text("\(finance.data.investments.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: String(localized:  "Investments")) { Text("\(finance.data.investments.count)").foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Crypto Holdings") { Text("\(finance.data.crypto.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: String(localized:  "Crypto Holdings")) { Text("\(finance.data.crypto.count)").foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Liabilities") { Text("\(finance.data.liabilities.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: String(localized:  "Liabilities")) { Text("\(finance.data.liabilities.count)").foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Snapshots") { Text("\(finance.data.snapshots.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: String(localized:  "Snapshots")) { Text("\(finance.data.snapshots.count)").foregroundStyle(.secondary) }
 
                 Divider().background(WCColor.border)
 
@@ -382,7 +382,7 @@ struct MacSettingsView: View {
                     .padding(.top, 8)
             }
 
-            SettingsSection(title: "Danger Zone") {
+            SettingsSection(title: String(localized:  "Danger Zone")) {
                 Button("Delete All Local Data...", role: .destructive) {
                     pendingDestructiveAction = .deleteAllData
                 }
@@ -392,10 +392,10 @@ struct MacSettingsView: View {
 
     private var syncSettings: some View {
         DynamicMasonryLayout(minColumnWidth: 380, spacing: 32) {
-            SettingsSection(title: "iCloud Sync") {
+            SettingsSection(title: String(localized:  "iCloud Sync")) {
                 SettingsRow(
-                    title: "Sync Data with iCloud",
-                    subtitle: "Your financial data stays available locally and syncs across your devices through your private CloudKit database."
+                    title: String(localized: "Sync Data with iCloud"),
+                    subtitle: String(localized: "Your financial data stays available locally and syncs across your devices through your private CloudKit database.")
                 ) {
                     Toggle("", isOn: $settings.isICloudSyncEnabled)
                         .toggleStyle(.switch)
@@ -409,7 +409,7 @@ struct MacSettingsView: View {
 
                 Divider().background(WCColor.border)
 
-                SettingsRow(title: "Status") {
+                SettingsRow(title: String(localized:  "Status")) {
                     Text(finance.cloudSyncStatus.title)
                         .foregroundStyle(finance.iCloudSyncError == nil ? .secondary : WCColor.destructive)
                 }
@@ -422,14 +422,14 @@ struct MacSettingsView: View {
             }
             
             if settings.isICloudSyncEnabled {
-                SettingsSection(title: "Manual Actions") {
+                SettingsSection(title: String(localized:  "Manual Actions")) {
                     Button {
                         Task {
                             do {
                                 try await finance.forceICloudSync()
                             } catch {
                                 settingsAlert = MacSettingsAlert(
-                                    title: "Sync Failed",
+                                    title: String(localized: "Sync Failed"),
                                     message: error.localizedDescription
                                 )
                             }
@@ -560,12 +560,12 @@ struct MacSettingsView: View {
             activeCredentialEditor = nil
             refreshMarketDataKeyStatus()
             settingsAlert = MacSettingsAlert(
-                title: "\(credential.title) Saved",
-                message: "\(message)\n\nThe API key was saved securely in Keychain."
+                title: String(localized: "\(credential.title) Saved"),
+                message: String(localized: "\(message)\n\nThe API key was saved securely in Keychain.")
             )
         } catch {
             credentialEditorAlert = MacSettingsAlert(
-                title: "\(credential.title) Failed",
+                title: String(localized: "\(credential.title) Failed"),
                 message: Self.errorMessage(error)
             )
         }
@@ -578,10 +578,10 @@ struct MacSettingsView: View {
         switch credential {
         case .finnhub:
             let quote = try await FinnhubQuoteClient(apiKey: apiKey).testConnection()
-            return "Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue)))."
+            return String(localized: "Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
         case .coingecko:
             let quote = try await CoinGeckoPriceClient(apiKey: apiKey).testConnection()
-            return "CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue)))."
+            return String(localized: "CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
         }
     }
 
@@ -591,12 +591,12 @@ struct MacSettingsView: View {
             closeCredentialEditor()
             refreshMarketDataKeyStatus()
             settingsAlert = MacSettingsAlert(
-                title: "\(credential.title) Removed",
-                message: "The API key was removed from the macOS Keychain."
+                title: String(localized: "\(credential.title) Removed"),
+                message: String(localized: "The API key was removed from the macOS Keychain.")
             )
         } catch {
             credentialEditorAlert = MacSettingsAlert(
-                title: "Unable to Remove \(credential.title)",
+                title: String(localized: "Unable to Remove \(credential.title)"),
                 message: Self.errorMessage(error)
             )
         }
@@ -624,7 +624,7 @@ struct MacSettingsView: View {
         } catch {
             refreshMarketDataKeyStatus()
             settingsAlert = MacSettingsAlert(
-                title: "Unable to Refresh Market Data",
+                title: String(localized: "Unable to Refresh Market Data"),
                 message: Self.errorMessage(error)
             )
         }
@@ -655,14 +655,17 @@ struct MacSettingsView: View {
 
                 var message = result.message
                 if insertedCount > 0 {
-                    let transactionWord = insertedCount == 1 ? "transaction was" : "transactions were"
-                    message += "\n\n\(insertedCount) due recurring \(transactionWord) added to Cash Flow."
+                    if insertedCount == 1 {
+                        message += String(localized: "\n\n1 due recurring transaction was added to Cash Flow.")
+                    } else {
+                        message += String(localized: "\n\n\(insertedCount) due recurring transactions were added to Cash Flow.")
+                    }
                 }
-                settingsAlert = MacSettingsAlert(title: "Import Complete", message: message)
+                settingsAlert = MacSettingsAlert(title: String(localized: "Import Complete"), message: message)
             }
         } catch {
             settingsAlert = MacSettingsAlert(
-                title: "Import Failed",
+                title: String(localized: "Import Failed"),
                 message: Self.errorMessage(error)
             )
         }
@@ -678,12 +681,12 @@ struct MacSettingsView: View {
             guard panel.runModal() == .OK, let destination = panel.url else { return }
             try Data(contentsOf: temporaryURL).write(to: destination, options: .atomic)
             settingsAlert = MacSettingsAlert(
-                title: "Backup Exported",
+                title: String(localized: "Backup Exported"),
                 message: destination.path
             )
         } catch {
             settingsAlert = MacSettingsAlert(
-                title: "Export Failed",
+                title: String(localized: "Export Failed"),
                 message: Self.errorMessage(error)
             )
         }
@@ -730,18 +733,18 @@ private enum MacMarketDataCredentialKind: String, Identifiable {
     var title: String {
         switch self {
         case .finnhub:
-            "Finnhub API Key"
+            return String(localized: "Finnhub API Key")
         case .coingecko:
-            "CoinGecko API Key"
+            return String(localized: "CoinGecko API Key")
         }
     }
 
     var placeholder: String {
         switch self {
         case .finnhub:
-            "Paste Finnhub API key"
+            return String(localized: "Paste Finnhub API key")
         case .coingecko:
-            "Paste CoinGecko API key"
+            return String(localized: "Paste CoinGecko API key")
         }
     }
 
@@ -757,9 +760,9 @@ private enum MacMarketDataCredentialKind: String, Identifiable {
     var testAssetName: String {
         switch self {
         case .finnhub:
-            "Apple (AAPL)"
+            return String(localized: "Apple (AAPL)")
         case .coingecko:
-            "Bitcoin"
+            return String(localized: "Bitcoin")
         }
     }
 }
@@ -771,27 +774,27 @@ private enum MacSettingsDestructiveAction {
     var title: String {
         switch self {
         case .deleteAllData:
-            "Delete all local finance data?"
+            return String(localized: "Delete all local finance data?")
         case .deleteCustomCategory:
-            "Remove custom category?"
+            return String(localized: "Remove custom category?")
         }
     }
 
     var message: String {
         switch self {
         case .deleteAllData:
-            "This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone."
+            return String(localized: "This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone.")
         case .deleteCustomCategory(let category, _):
-            "Existing transactions using \(category) will keep their current category label."
+            return String(localized: "Existing transactions using \(category) will keep their current category label.")
         }
     }
 
     var confirmButtonTitle: String {
         switch self {
         case .deleteAllData:
-            "Delete All Data"
+            return String(localized: "Delete All Data")
         case .deleteCustomCategory(let category, _):
-            "Remove \(category)"
+            return String(localized: "Remove \(category)")
         }
     }
 }

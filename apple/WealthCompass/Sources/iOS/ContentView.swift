@@ -106,9 +106,11 @@ struct ContentView: View {
         await syncRecurringNotifications()
 
         guard insertedCount > 0 else { return }
-        let transactionWord = insertedCount == 1 ? "transaction was" : "transactions were"
+        let message = insertedCount == 1
+            ? String(localized: "1 scheduled transaction was automatically added to Cash Flow.")
+            : String(localized: "\(insertedCount) scheduled transactions were automatically added to Cash Flow.")
         recurringInsertionAlert = RecurringInsertionAlert(
-            message: "\(insertedCount) scheduled \(transactionWord) automatically added to Cash Flow."
+            message: message
         )
     }
 

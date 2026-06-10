@@ -136,9 +136,9 @@ struct MacDashboardView: View {
                 Spacer(minLength: 8)
 
                 HStack(spacing: 10) {
-                    onboardingButton("Cash Flow", systemImage: "arrow.left.arrow.right", destination: .cashFlow)
-                    onboardingButton("Investment", systemImage: "chart.line.uptrend.xyaxis", destination: .investments)
-                    onboardingButton("Crypto", systemImage: "bitcoinsign.circle", destination: .crypto)
+                    onboardingButton(String(localized: "Cash Flow"), systemImage: "arrow.left.arrow.right", destination: .cashFlow)
+                    onboardingButton(String(localized: "Investment"), systemImage: "chart.line.uptrend.xyaxis", destination: .investments)
+                    onboardingButton(String(localized: "Crypto"), systemImage: "bitcoinsign.circle", destination: .crypto)
                 }
             }
             .padding(22)
@@ -218,18 +218,18 @@ struct MacDashboardView: View {
 
                     if points.isEmpty {
                         DashboardEmptyState(
-                            title: "Your net-worth trail starts here",
-                            message: "Adding a transaction or position records a snapshot for this chart.",
+                            title: String(localized: "Your net-worth trail starts here"),
+                            message: String(localized: "Adding a transaction or position records a snapshot for this chart."),
                             systemImage: "chart.line.uptrend.xyaxis",
-                            actionTitle: "Add Transaction"
+                            actionTitle: String(localized: "Add Transaction")
                         ) {
                             appModel.presentNewItem(for: .cashFlow)
                         }
                         .frame(height: 238)
                     } else if settings.isPrivacyMode {
                         PrivacyChartCover(
-                            title: "Net-worth history concealed",
-                            message: "Turn off Privacy Mode to reveal values and movement."
+                            title: String(localized: "Net-worth history concealed"),
+                            message: String(localized: "Turn off Privacy Mode to reveal values and movement.")
                         )
                         .frame(height: 238)
                     } else {
@@ -346,14 +346,14 @@ struct MacDashboardView: View {
 
         return DashboardGlassCard {
             VStack(alignment: .leading, spacing: 18) {
-                sectionHeading("Asset Allocation", subtitle: "How investable assets are distributed")
+                sectionHeading(String(localized: "Asset Allocation"), subtitle: String(localized: "How investable assets are distributed"))
 
                 if slices.isEmpty {
                     DashboardEmptyState(
-                        title: "No assets to allocate",
-                        message: "Add recorded cash, an investment, or a crypto holding.",
+                        title: String(localized: "No assets to allocate"),
+                        message: String(localized: "Add recorded cash, an investment, or a crypto holding."),
                         systemImage: "chart.pie",
-                        actionTitle: "Add Investment"
+                        actionTitle: String(localized: "Add Investment")
                     ) {
                         appModel.presentNewItem(for: .investments)
                     }
@@ -362,8 +362,8 @@ struct MacDashboardView: View {
                     ZStack {
                         if settings.isPrivacyMode {
                             PrivacyChartCover(
-                                title: "Allocation concealed",
-                                message: "Values and proportions are hidden."
+                                title: String(localized: "Allocation concealed"),
+                                message: String(localized: "Values and proportions are hidden.")
                             )
                         } else {
                             Chart(slices) { slice in
@@ -383,7 +383,8 @@ struct MacDashboardView: View {
                                         let frame = geometry[plotFrame]
                                         VStack(spacing: 3) {
                                             if let hoveredAssetSlice {
-                                                Text(hoveredAssetSlice.name.uppercased())
+                                                Text(hoveredAssetSlice.name)
+                                                    .textCase(.uppercase)
                                                     .font(.caption2.weight(.bold))
                                                     .tracking(1.3)
                                                     .foregroundStyle(hoveredAssetSlice.color)
@@ -472,7 +473,7 @@ struct MacDashboardView: View {
         return DashboardGlassCard {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(alignment: .top) {
-                    sectionHeading("Cash Flow", subtitle: "Income and expenses by month")
+                    sectionHeading(String(localized: "Cash Flow"), subtitle: String(localized: "Income and expenses by month"))
                     Spacer(minLength: 16)
                     HStack(spacing: 12) {
                         DashboardSegmentedPicker(selection: $cashFlowRange, items: CashFlowTimeframe.allCases) { $0.label }
@@ -488,18 +489,18 @@ struct MacDashboardView: View {
 
                 if !hasCashFlow {
                     DashboardEmptyState(
-                        title: "No recent cash flow",
-                        message: "Record income or an expense to reveal the monthly pattern.",
+                        title: String(localized: "No recent cash flow"),
+                        message: String(localized: "Record income or an expense to reveal the monthly pattern."),
                         systemImage: "chart.bar.xaxis",
-                        actionTitle: "Add Transaction"
+                        actionTitle: String(localized: "Add Transaction")
                     ) {
                         appModel.presentNewItem(for: .cashFlow)
                     }
                     .frame(height: 244)
                 } else if settings.isPrivacyMode {
                     PrivacyChartCover(
-                        title: "Cash-flow chart concealed",
-                        message: "Monthly amounts and proportions are hidden."
+                        title: String(localized: "Cash-flow chart concealed"),
+                        message: String(localized: "Monthly amounts and proportions are hidden.")
                     )
                     .frame(height: 244)
                 } else {
@@ -559,18 +560,19 @@ struct MacDashboardView: View {
 
                 HStack(spacing: 20) {
                     CashFlowLegendItem(
-                        title: "Income",
+                        title: String(localized: "Income"),
                         value: settings.privateCurrency(hoveredCashFlowMonth?.income ?? totalIncome),
                         color: WCColor.primary
                     )
                     CashFlowLegendItem(
-                        title: "Expenses",
+                        title: String(localized: "Expenses"),
                         value: settings.privateCurrency(hoveredCashFlowMonth?.expense ?? totalExpense),
                         color: WCColor.destructive
                     )
                     Spacer(minLength: 0)
                     VStack(alignment: .trailing, spacing: 3) {
-                        Text(hoveredCashFlowMonth != nil ? hoveredCashFlowMonth!.monthLabel.uppercased() : "\(cashFlowRange.label) NET")
+                        Text(hoveredCashFlowMonth != nil ? hoveredCashFlowMonth!.monthLabel : String(localized: "\(cashFlowRange.label) NET"))
+                            .textCase(.uppercase)
                             .font(.caption2.weight(.bold))
                             .tracking(1)
                             .foregroundStyle(.white.opacity(0.4))
@@ -591,7 +593,7 @@ struct MacDashboardView: View {
         return DashboardGlassCard {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(alignment: .top, spacing: 16) {
-                    sectionHeading("Top Expense Categories", subtitle: "Where recorded spending is concentrated")
+                    sectionHeading(String(localized: "Top Expense Categories"), subtitle: String(localized: "Where recorded spending is concentrated"))
                     Spacer()
                     Picker("Expense period", selection: $expensePeriod) {
                         ForEach(AnalyticsPeriod.allCases) { period in
@@ -605,10 +607,10 @@ struct MacDashboardView: View {
 
                 if expenses.isEmpty {
                     DashboardEmptyState(
-                        title: "No expenses for this period",
-                        message: "Choose another period or record an expense.",
+                        title: String(localized: "No expenses for this period"),
+                        message: String(localized: "Choose another period or record an expense."),
                         systemImage: "list.bullet.rectangle.portrait",
-                        actionTitle: "Add Transaction"
+                        actionTitle: String(localized: "Add Transaction")
                     ) {
                         appModel.presentNewItem(for: .cashFlow)
                     }
@@ -675,7 +677,7 @@ struct MacDashboardView: View {
         return DashboardGlassCard {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(alignment: .top) {
-                    sectionHeading("Recent Activity", subtitle: "Your latest recorded cash movements")
+                    sectionHeading(String(localized: "Recent Activity"), subtitle: String(localized: "Your latest recorded cash movements"))
                     Spacer()
                     Button("View All") {
                         appModel.selection = .cashFlow
@@ -687,10 +689,10 @@ struct MacDashboardView: View {
 
                 if transactions.isEmpty {
                     DashboardEmptyState(
-                        title: "No activity yet",
-                        message: "Your latest income and expenses will appear here.",
+                        title: String(localized: "No activity yet"),
+                        message: String(localized: "Your latest income and expenses will appear here."),
                         systemImage: "clock.arrow.circlepath",
-                        actionTitle: "Add Transaction"
+                        actionTitle: String(localized: "Add Transaction")
                     ) {
                         appModel.presentNewItem(for: .cashFlow)
                     }
@@ -785,13 +787,13 @@ struct MacDashboardView: View {
         let interval = max(0, Date().timeIntervalSince(date))
         switch interval {
         case 0..<60:
-            return "just now"
+            return String(localized: "just now")
         case 60..<(60 * 60):
-            return "\(Int(interval / 60))m ago"
+            return String(localized: "\(Int(interval / 60))m ago")
         case (60 * 60)..<(24 * 60 * 60):
-            return "\(Int(interval / (60 * 60)))h ago"
+            return String(localized: "\(Int(interval / (60 * 60)))h ago")
         case (24 * 60 * 60)..<(7 * 24 * 60 * 60):
-            return "\(Int(interval / (24 * 60 * 60)))d ago"
+            return String(localized: "\(Int(interval / (24 * 60 * 60)))d ago")
         default:
             return date.formatted(date: .abbreviated, time: .omitted)
         }
@@ -1085,9 +1087,9 @@ enum CashFlowTimeframe: Int, CaseIterable, Identifiable {
     var id: Int { rawValue }
     var label: String {
         switch self {
-        case .threeMonths: return "3M"
-        case .sixMonths: return "6M"
-        case .twelveMonths: return "12M"
+        case .threeMonths: return String(localized: "3M")
+        case .sixMonths: return String(localized: "6M")
+        case .twelveMonths: return String(localized: "12M")
         }
     }
 }

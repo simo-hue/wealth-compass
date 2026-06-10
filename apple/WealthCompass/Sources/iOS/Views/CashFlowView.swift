@@ -10,9 +10,9 @@ private enum TransactionListTypeFilter: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .all: "All"
-        case .income: "Income"
-        case .expense: "Expense"
+        case .all: String(localized: "All")
+        case .income: String(localized: "Income")
+        case .expense: String(localized: "Expense")
         }
     }
 
@@ -318,7 +318,7 @@ struct CashFlowView: View {
                             } label: {
                                 Image(systemName: schedule.isActive ? "pause.fill" : "play.fill")
                             }
-                            .accessibilityLabel(schedule.isActive ? "Pause schedule" : "Resume schedule")
+                            .accessibilityLabel(schedule.isActive ? String(localized: "Pause schedule") : String(localized: "Resume schedule"))
                         } else {
                             Image(systemName: "checkmark.circle.fill")
                                 .accessibilityLabel("Schedule completed")
@@ -503,8 +503,8 @@ struct CashFlowView: View {
                 if !authorized {
                     finance.setRecurringNotificationsEnabled(id: schedule.id, isEnabled: false)
                     activeAlert = .message(
-                        title: "Notifications Disabled",
-                        message: "The schedule was saved, but notifications are not authorized. You can enable them in iOS Settings and then edit this schedule."
+                        title: String(localized: "Notifications Disabled"),
+                        message: String(localized: "The schedule was saved, but notifications are not authorized. You can enable them in iOS Settings and then edit this schedule.")
                     )
                 }
             }
@@ -537,10 +537,7 @@ struct CashFlowView: View {
         case .deleteTransaction(let transaction):
             return Alert(
                 title: Text("Delete Transaction?"),
-                message: Text(
-                    "This permanently removes the \(transaction.category) transaction from "
-                        + "\(transaction.date.formatted(date: .abbreviated, time: .omitted))."
-                ),
+                message: Text(String(localized: "This permanently removes the \(transaction.category) transaction from \(transaction.date.formatted(date: .abbreviated, time: .omitted)).")),
                 primaryButton: .destructive(Text("Delete")) {
                     finance.deleteTransaction(transaction, settings: settings)
                 },
@@ -550,10 +547,7 @@ struct CashFlowView: View {
         case .deleteRecurringTransaction(let schedule):
             return Alert(
                 title: Text("Delete Recurring Transaction?"),
-                message: Text(
-                    "Future \(schedule.frequency.title.lowercased()) occurrences for "
-                        + "\(schedule.category) will no longer be created."
-                ),
+                message: Text(String(localized: "Future \(schedule.frequency.title) occurrences for \(schedule.category) will no longer be created.")),
                 primaryButton: .destructive(Text("Delete")) {
                     finance.deleteRecurringTransaction(schedule)
                     Task {
@@ -566,10 +560,7 @@ struct CashFlowView: View {
         case .finishRecurringTransaction(let schedule):
             return Alert(
                 title: Text("Finish Recurring Transaction?"),
-                message: Text(
-                    "\(schedule.category) will disappear from Recurring Transactions and "
-                        + "no future occurrences will be inserted automatically."
-                ),
+                message: Text(String(localized: "\(schedule.category) will disappear from Recurring Transactions and no future occurrences will be inserted automatically.")),
                 primaryButton: .default(Text("Yes")) {
                     completeRecurringTransaction(schedule)
                 },

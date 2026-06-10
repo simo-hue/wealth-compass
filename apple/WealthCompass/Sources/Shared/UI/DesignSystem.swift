@@ -123,11 +123,11 @@ struct FinanceCard<Content: View>: View {
 }
 
 struct PageHeader<Trailing: View>: View {
-    let title: String
-    let subtitle: String
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey
     let trailing: Trailing
 
-    init(title: String, subtitle: String, @ViewBuilder trailing: () -> Trailing) {
+    init(title: LocalizedStringKey, subtitle: LocalizedStringKey, @ViewBuilder trailing: () -> Trailing) {
         self.title = title
         self.subtitle = subtitle
         self.trailing = trailing()
@@ -160,11 +160,11 @@ struct PageHeader<Trailing: View>: View {
 }
 
 struct MetricCard: View {
-    let title: String
+    let title: LocalizedStringKey
     let value: String
     let systemImage: String
     var accent: Color = WCColor.primary
-    var detail: String? = nil
+    var detail: LocalizedStringKey? = nil
 
     var body: some View {
         FinanceCard {
@@ -207,7 +207,7 @@ struct MetricCard: View {
 }
 
 struct EmptyState: View {
-    let title: String
+    let title: LocalizedStringKey
     let systemImage: String
 
     var body: some View {
@@ -243,7 +243,7 @@ struct ValueDelta: View {
 }
 
 struct AllocationChart: View {
-    let title: String
+    let title: LocalizedStringKey
     let slices: [AllocationSlice]
     let settings: AppSettings
     var showLegend: Bool = true
@@ -407,10 +407,10 @@ struct AllocationChart: View {
 }
 
 struct SectionHeading: View {
-    let title: String
-    let subtitle: String?
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey?
 
-    init(_ title: String, subtitle: String? = nil) {
+    init(_ title: LocalizedStringKey, subtitle: LocalizedStringKey? = nil) {
         self.title = title
         self.subtitle = subtitle
     }
@@ -481,8 +481,8 @@ struct InsetFinanceRow<Content: View>: View {
 }
 
 struct MobilePrivacyChartCover: View {
-    let title: String
-    let message: String
+    let title: LocalizedStringKey
+    let message: LocalizedStringKey
 
     var body: some View {
         ZStack {
@@ -583,7 +583,7 @@ struct CryptoIconView: View {
 }
 
 protocol MacSelectorTab: Hashable, CaseIterable, Equatable where AllCases: RandomAccessCollection, AllCases.Index == Int, AllCases.Element == Self {
-    var title: String { get }
+    var title: LocalizedStringKey { get }
 }
 
 struct MacSelectorIsland<Tab: MacSelectorTab>: View {

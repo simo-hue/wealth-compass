@@ -393,3 +393,7 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-06-10]: Comprehensive String Audit and macOS Localization
   - *Details*: Audited all `.swift` files across the codebase to identify unlocalized strings missing `String(localized:)` wrapping. Identified multiple missing localizations primarily in the macOS platform layer (`MacRootView`, `MacAppModel`, `MacPlatformServices`, `MacInvestmentsView`).
   - *Tech Notes*: Replaced bare string literals with `String(localized:)` for notification titles/bodies, Biometric Touch ID/Face ID prompts, app navigation model titles, dashboard alert messages, and chart component titles (`AllocationChart`, `MetricCard`). Re-ran the Xcode localization extraction script to include these strings in `Localizable.xcstrings` and fully translated them across all supported languages.
+
+- [2026-06-10]: App Store Connect Localized Metadata Scaffolding
+  - *Details*: Generated the Fastlane metadata folder structure for all 39 App Store Connect supported languages to automate App Store Optimization (ASO). Configured `Deliverfile` to strictly ignore screenshots to prevent overwriting existing custom designs.
+  - *Tech Notes*: Created `fastlane/metadata/` with subfolders for each region (e.g., `en-US`, `zh-Hans`, `es-ES`). Each contains text files for `name`, `subtitle`, `description`, `promotional_text`, and `keywords`. Created `fastlane/Deliverfile` with `skip_screenshots(true)` and `overwrite_screenshots(false)`.

@@ -224,3 +224,26 @@
   - *Tech Notes*:
     - Added regions including `fr`, `ja`, `ko`, `pt-BR`, `hi`, `ru`, `tr`, `nl`, `sv`, `da`, `fi`, `no`, `el`, `he`, `id`, `ms`, `th`, `vi`, etc.
     - Updated `Localizable.xcstrings` with placeholder entries marked as `needs_review` for all new languages.
+  - *Details*: Audited `MacEditorSheet.swift` for hardcoded strings. Replaced string interpolation and ternaries passed to UI components with `String(localized:)` and `LocalizedStringKey` to ensure proper tracking in the strings catalog. Extracted over 50 distinct strings from the UI elements.
+  - *Tech Notes*: Addressed issues where `TextField` and `Picker` components were implicitly mapping strings to variables rather than LocalizedStringKeys. Identified standard dictionary strings, default states, array mappings, and `customCategoryHint` strings for extraction.
+
+- [6/10/2026, 10:22:36 PM]: macOS Localization String Extraction (Multi-Agent)
+  - *Details*: Spawned 12 autonomous sub-agents to concurrently audit all Swift files in the macOS app implementation (`Sources/macOS/`). The agents identified and extracted over 120 unmapped hardcoded strings, while ensuring they are wrapped in `String(localized:)` where needed.
+  - *Tech Notes*:
+    - All extracted strings were aggregated and added to `Sources/Shared/Resources/Localizable.xcstrings`.
+    - Executed `update_catalog_all.cjs` to ensure the newly added strings received the `needs_review` state across all 40 supported Apple language regions.
+
+- [2026-06-10 22:26]: Localization Fixes for iOS Core Views
+  - *Details*: Fixed unlocalized strings bypassing SwiftUI's automatic localization based on the unlocalized strings report.
+  - *Tech Notes*: 
+    - Pluralization ternaries wrapped cleanly in `String(localized:)` (ContentView).
+    - `Text(_ ?? "Fallback")` nil-coalescing split into proper Optional binding (`if let`).
+    - Custom components (e.g. `MetricCard`, `AllocationChart`) given localized strings explicitly via `String(localized:)`.
+    - Removed `.uppercased()` from localized texts, replaced with SwiftUI modifier `.textCase(.uppercase)`.
+## [2026-06-10 22:28:36] Localization Refactoring for macOS Views
+*Details*: Fixed unlocalized strings, ternaries, and missing `LocalizedStringKey` mappings in `MacCryptoView`, `MacInvestmentsView`, `MacEditorSheet`, `MacSettingsView`, `MacCashFlowView`, and `MacDashboardView`.
+*Tech Notes*: Replaced `.uppercased()` with `.textCase(.uppercase)` to ensure compatibility with SwiftUI's localization framework. Extracted concatenated strings into independent  constructs to allow for stringsdict pluralization rules. Wrapped raw strings passed to custom components (e.g., `MetricCard`) in `String(localized:)`.
+
+- [2026-06-10 22:38]: 100% Full UI Localization Pass
+  - *Details*: Ensured that every single user-facing string across the entire iOS and macOS application is fully localized and correctly typed as either `LocalizedStringKey` or `String(localized:)`.
+  - *Tech Notes*: Resolved all type mismatch compiler errors resulting from the global localization audit. Differentiated strictly between custom design system components (e.g. `MetricCard`, `PageHeader`, `SectionHeading`) requiring `LocalizedStringKey`, and data structures or native SwiftUI components (e.g. `SettingsRow`, `SettingsSection`, `Alert` titles) requiring `String(localized:)`. Validated the complete build success on both `WealthCompassMac` and `WealthCompassMobile` targets.
