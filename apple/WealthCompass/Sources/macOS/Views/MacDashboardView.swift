@@ -9,6 +9,7 @@ struct MacDashboardView: View {
     @State private var timeRange: TimeRange = .oneYear
     @State private var expensePeriod: AnalyticsPeriod = .thirtyDays
     @State private var selectedNetWorthDate: Date?
+    @State private var cashFlowRange: CashFlowTimeframe = .sixMonths
     @Namespace private var animationNamespace
 
     private var totals: FinanceTotals {
@@ -206,7 +207,7 @@ struct MacDashboardView: View {
                         Spacer(minLength: 16)
 
                         VStack(alignment: .trailing, spacing: 12) {
-                            timeframeSelector
+                            DashboardSegmentedPicker(selection: $timeRange, items: TimeRange.allCases) { $0.rawValue }
                                 .padding(.bottom, 2)
 
                             snapshotFreshness
@@ -310,42 +311,6 @@ struct MacDashboardView: View {
                 }
                 .padding(24)
             }
-        }
-    }
-
-    private var timeframeSelector: some View {
-        HStack(spacing: 0) {
-            ForEach(TimeRange.allCases) { range in
-                let isSelected = timeRange == range
-                Text(range.rawValue)
-                    .font(.caption.weight(isSelected ? .bold : .medium))
-                    .foregroundStyle(isSelected ? Color.white : Color.white.opacity(0.6))
-                    .frame(minWidth: 44)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background {
-                        if isSelected {
-                            Capsule()
-                                .fill(Color.white.opacity(0.15))
-                                .matchedGeometryEffect(id: "timeRangeSelection", in: animationNamespace)
-                        }
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            timeRange = range
-                        }
-                    }
-            }
-        }
-        .padding(4)
-        .background {
-            Capsule()
-                .fill(.black.opacity(0.2))
-                .overlay {
-                    Capsule()
-                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
-                }
         }
     }
 
@@ -461,7 +426,7 @@ struct MacDashboardView: View {
     }
 
     private var cashFlowCard: some View {
-        let trend = finance.cashFlowTrend(months: 6)
+        let trend = finance.cashFlowTrend(months: cashFlowRange.rawValue)
         let hasCashFlow = trend.contains { $0.income != 0 || $0.expense != 0 }
         let totalIncome = trend.reduce(0) { $0 + $1.income }
         let totalExpense = trend.reduce(0) { $0 + $1.expense }
@@ -469,14 +434,18 @@ struct MacDashboardView: View {
         return DashboardGlassCard {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(alignment: .top) {
-                    sectionHeading("Six-Month Cash Flow", subtitle: "Income and expenses by month")
-                    Spacer()
-                    Button("View Cash Flow") {
-                        appModel.selection = .cashFlow
+                    sectionHeading("Cash Flow", subtitle: "Income and expenses by month")
+                    Spacer(minLength: 16)
+                    HStack(spacing: 12) {
+                        DashboardSegmentedPicker(selection: $cashFlowRange, items: CashFlowTimeframe.allCases) { $0.label }
+                        
+                        Button("View Cash Flow") {
+                            appModel.selection = .cashFlow
+                        }
+                        .buttonStyle(.plain)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(WCColor.primary)
                     }
-                    .buttonStyle(.plain)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(WCColor.primary)
                 }
 
                 if !hasCashFlow {
@@ -538,7 +507,7 @@ struct MacDashboardView: View {
                     )
                     Spacer(minLength: 0)
                     VStack(alignment: .trailing, spacing: 3) {
-                        Text("6M NET")
+                        Text("\(cashFlowRange.label) NET")
                             .font(.caption2.weight(.bold))
                             .tracking(1)
                             .foregroundStyle(.white.opacity(0.4))
@@ -1013,5 +982,63 @@ private struct MacDashboardBackdrop: View {
                 .offset(x: 420, y: -330)
         }
         .ignoresSafeArea()
+    }
+}
+
+private enum CashFlowTimeframe: Int, CaseIterable, Identifiable {
+    case threeMonths = 3
+    case sixMonths = 6
+    case twelveMonths = 12
+    
+    var id: Int { rawValue }
+    var label: String {
+        switch self {
+        case .threeMonths: return "3M"
+        case .sixMonths: return "6M"
+        case .twelveMonths: return "12M"
+        }
+    }
+}
+
+private struct DashboardSegmentedPicker<SelectionValue: Hashable & Identifiable>: View {
+    @Binding var selection: SelectionValue
+    let items: [SelectionValue]
+    let labelProvider: (SelectionValue) -> String
+    @Namespace private var namespace
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(items) { item in
+                let isSelected = selection == item
+                Text(labelProvider(item))
+                    .font(.caption.weight(isSelected ? .bold : .medium))
+                    .foregroundStyle(isSelected ? Color.white : Color.white.opacity(0.6))
+                    .frame(minWidth: 44)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background {
+                        if isSelected {
+                            Capsule()
+                                .fill(Color.white.opacity(0.15))
+                                .matchedGeometryEffect(id: "selection", in: namespace)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            selection = item
+                        }
+                    }
+            }
+        }
+        .padding(4)
+        .background {
+            Capsule()
+                .fill(.black.opacity(0.2))
+                .overlay {
+                    Capsule()
+                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                }
+        }
     }
 }

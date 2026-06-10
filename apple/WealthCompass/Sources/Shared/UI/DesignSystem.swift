@@ -226,6 +226,9 @@ struct AllocationChart: View {
     let title: String
     let slices: [AllocationSlice]
     let settings: AppSettings
+    var showLegend: Bool = true
+
+    @State private var hoveredSlice: AllocationSlice?
 
     var body: some View {
         FinanceCard {
@@ -245,6 +248,7 @@ struct AllocationChart: View {
                         )
                         .foregroundStyle(slice.color.gradient)
                         .cornerRadius(5)
+                        .opacity(hoveredSlice == nil || hoveredSlice?.id == slice.id ? 1.0 : 0.3)
                     }
                     .chartLegend(.hidden)
                     .chartBackground { proxy in
@@ -252,40 +256,77 @@ struct AllocationChart: View {
                             if let plotFrame = proxy.plotFrame {
                                 let frame = geometry[plotFrame]
                                 VStack(spacing: 3) {
-                                    Text("TOTAL")
-                                        .font(.caption2.weight(.bold))
-                                        .tracking(1.3)
-                                        .foregroundStyle(.white.opacity(0.4))
-                                    Text(settings.privateCurrency(total))
-                                        .font(.headline.monospacedDigit().weight(.bold))
-                                        .foregroundStyle(.white)
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.68)
+                                    if let hoveredSlice {
+                                        Text(hoveredSlice.name.uppercased())
+                                            .font(.caption2.weight(.bold))
+                                            .tracking(1.3)
+                                            .foregroundStyle(hoveredSlice.color)
+                                        Text(settings.privateCurrency(hoveredSlice.value))
+                                            .font(.headline.monospacedDigit().weight(.bold))
+                                            .foregroundStyle(.white)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.68)
+                                        Text(percentage(hoveredSlice.value, total: total))
+                                            .font(.caption2.monospacedDigit())
+                                            .foregroundStyle(.white.opacity(0.6))
+                                    } else {
+                                        Text("TOTAL")
+                                            .font(.caption2.weight(.bold))
+                                            .tracking(1.3)
+                                            .foregroundStyle(.white.opacity(0.4))
+                                        Text(settings.privateCurrency(total))
+                                            .font(.headline.monospacedDigit().weight(.bold))
+                                            .foregroundStyle(.white)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.68)
+                                    }
                                 }
                                 .position(x: frame.midX, y: frame.midY)
+                            }
+                        }
+                    }
+                    .chartOverlay { proxy in
+                        GeometryReader { geometry in
+                            if let plotFrame = proxy.plotFrame {
+                                let frame = geometry[plotFrame]
+                                Rectangle().fill(.clear).contentShape(Rectangle())
+                                    .onContinuousHover { phase in
+                                        switch phase {
+                                        case .active(let location):
+                                            withAnimation(.easeInOut(duration: 0.15)) {
+                                                hoveredSlice = slice(at: location, in: frame, total: total)
+                                            }
+                                        case .ended:
+                                            withAnimation(.easeInOut(duration: 0.15)) {
+                                                hoveredSlice = nil
+                                            }
+                                        }
+                                    }
                             }
                         }
                     }
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: slices.map(\.value))
                     .frame(height: 200)
 
-                    VStack(spacing: 12) {
-                        ForEach(slices) { slice in
-                            HStack(spacing: 10) {
-                                RoundedRectangle(cornerRadius: 3)
-                                    .fill(slice.color.gradient)
-                                    .frame(width: 10, height: 10)
-                                Text(slice.name)
-                                    .font(.subheadline.weight(.medium))
-                                    .foregroundStyle(.white.opacity(0.76))
-                                Spacer()
-                                VStack(alignment: .trailing, spacing: 2) {
-                                    Text(settings.privateCurrency(slice.value))
-                                        .font(.subheadline.monospacedDigit().weight(.semibold))
-                                        .foregroundStyle(.white)
-                                    Text(settings.isPrivacyMode ? "••••" : percentage(slice.value, total: total))
-                                        .font(.caption2.monospacedDigit())
-                                        .foregroundStyle(.white.opacity(0.4))
+                    if showLegend {
+                        VStack(spacing: 12) {
+                            ForEach(slices) { slice in
+                                HStack(spacing: 10) {
+                                    RoundedRectangle(cornerRadius: 3)
+                                        .fill(slice.color.gradient)
+                                        .frame(width: 10, height: 10)
+                                    Text(slice.name)
+                                        .font(.subheadline.weight(.medium))
+                                        .foregroundStyle(.white.opacity(0.76))
+                                    Spacer()
+                                    VStack(alignment: .trailing, spacing: 2) {
+                                        Text(settings.privateCurrency(slice.value))
+                                            .font(.subheadline.monospacedDigit().weight(.semibold))
+                                            .foregroundStyle(.white)
+                                        Text(settings.isPrivacyMode ? "••••" : percentage(slice.value, total: total))
+                                            .font(.caption2.monospacedDigit())
+                                            .foregroundStyle(.white.opacity(0.4))
+                                    }
                                 }
                             }
                         }
@@ -294,6 +335,34 @@ struct AllocationChart: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
+    }
+
+    private func slice(at location: CGPoint, in rect: CGRect, total: Double) -> AllocationSlice? {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let dx = location.x - center.x
+        let dy = location.y - center.y
+        
+        let distance = sqrt(dx*dx + dy*dy)
+        let radius = min(rect.width, rect.height) / 2
+        let innerRadius = radius * 0.72
+        if distance < innerRadius || distance > radius {
+            return nil
+        }
+        
+        var angle = atan2(dy, dx) + .pi / 2
+        if angle < 0 { angle += 2 * .pi }
+        
+        let fraction = angle / (2 * .pi)
+        let selectedValue = fraction * total
+        
+        var cumulative = 0.0
+        for slice in slices {
+            cumulative += slice.value
+            if selectedValue <= cumulative {
+                return slice
+            }
+        }
+        return nil
     }
 
     private func percentage(_ value: Double, total: Double) -> String {

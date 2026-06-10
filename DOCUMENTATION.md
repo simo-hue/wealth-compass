@@ -344,3 +344,9 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
   - *Tech Notes*: 
     - Implemented `timeframeSelector` in `MacDashboardView.swift`.
     - Used `matchedGeometryEffect` for smooth capsule selection animation.
+
+- [2026-06-10T19:22:00+02:00]: Cash Flow Timeframe Selector
+  - *Details*: Abstracted the glassmorphism pill selector into a generic `DashboardSegmentedPicker` and applied it to the Cash Flow card.
+  - *Tech Notes*: 
+    - Refactored timeframe selector logic in `MacDashboardView.swift` to be reusable.
+    - Added `CashFlowTimeframe` enum to support 3M, 6M, and 12M cash flow trend ranges.
