@@ -93,3 +93,11 @@
 - [2026-06-10 18:44]: Crypto Holdings Responsive Grid
   - *Details*: Converted the vertical list of crypto holdings into a responsive grid that automatically places multiple holdings side-by-side on larger screens.
   - *Tech Notes*: Replaced `LazyVStack` with `LazyVGrid` using `GridItem(.adaptive(minimum: 360))` in `MacCryptoView`'s holdings view. Expanded the `ScrollView` `maxWidth` to `1440` to allow the grid to flow horizontally.
+
+- [2026-06-10 18:46]: Investment Positions Custom Card Grid
+  - *Details*: Applied the exact same responsive `FinanceCard` grid redesign to the Investments page's "Positions" tab, replacing the native `NSTableView`.
+  - *Tech Notes*: Replaced `Table` with `ScrollView` and `LazyVGrid` in `MacInvestmentsView.swift`. Created `investmentCard(for:)` preserving context menus, double-tap editing, and all primary data fields.
+
+- [2026-06-10 18:47]: Cash Flow Transactions Custom Card Grid
+  - *Details*: Replaced the native `NSTableView` in the Cash Flow "Transactions" tab with a fully responsive `FinanceCard` grid layout.
+  - *Tech Notes*: Replaced `Table` with `ScrollView` and `LazyVGrid` in `MacCashFlowView.swift`. Designed `transactionCard(for:)` to handle income/expense styling dynamically, support recurring schedule badges, and maintain delete context menus.
