@@ -356,3 +356,12 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
   - *Tech Notes*: 
     - Made `CashFlowTimeframe` and `DashboardSegmentedPicker` internal in `MacDashboardView.swift` so they can be consumed by `MacCashFlowView.swift`.
     - Updated the cash flow trend card to adapt to `cashFlowRange` dynamically.
+- [2026-06-10T19:39:00+02:00]: macOS Crypto View Refactoring
+  - *Details*: Grouped Top Performer and Biggest Loser into a single FinanceCard for a cleaner design to match the Crypto Allocation layout height.
+  - *Tech Notes*:
+    - Updated `MacCryptoView.swift` to wrap the `performanceSection` `VStack` in a single `FinanceCard`.
+    - Added a `Divider()` between the Top Performer and Biggest Loser cards.
+    - Adjusted paddings to ensure identical box sizing.
+- [2026-06-10T19:41:00+02:00]: macOS Crypto View Refactoring (continued)
+  - *Details*: Centered the Top Performer and Biggest Loser vertically inside their combined `FinanceCard` container.
+  - *Tech Notes*: Removed `alignment: .top` from the `VStack`'s frame modifiers inside `MacCryptoView.swift` to allow natural vertical centering.

@@ -158,56 +158,56 @@ struct MacCryptoView: View {
         let hasWorst = worst != nil && worst!.gainLossPercent < 0
         
         if hasBest || hasWorst {
-            VStack(spacing: 24) {
-                if let best, best.gainLossPercent > 0 {
-                    performanceCard(title: "Top Performer", holding: best)
+            FinanceCard {
+                VStack(spacing: 24) {
+                    if let best, best.gainLossPercent > 0 {
+                        performanceCard(title: "Top Performer", holding: best)
+                    }
+                    
+                    if hasBest && hasWorst {
+                        Divider().background(WCColor.border)
+                    }
+                    
+                    if let worst, worst.gainLossPercent < 0 {
+                        performanceCard(title: "Biggest Loser", holding: worst)
+                    }
                 }
-                if let worst, worst.gainLossPercent < 0 {
-                    performanceCard(title: "Biggest Loser", holding: worst)
-                }
-                
-                if hasBest && !hasWorst {
-                    Spacer().frame(maxHeight: .infinity)
-                } else if !hasBest && hasWorst {
-                    Spacer().frame(maxHeight: .infinity)
-                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .frame(width: 400)
         }
     }
 
     private func performanceCard(title: String, holding: CryptoHolding) -> some View {
-        FinanceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(title)
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.white)
-                
-                HStack(spacing: 12) {
-                    CryptoIconView(symbol: holding.symbol, size: 40, cornerRadius: 10)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(holding.name)
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.white)
-                        Text(holding.symbol)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text(settings.privateCurrency(holding.currentValue, sourceCurrency: holding.currency))
-                            .font(.subheadline.monospacedDigit().weight(.semibold))
-                            .foregroundStyle(.white)
-                        ValueDelta(
-                            value: holding.gainLoss,
-                            formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
-                            percent: holding.gainLossPercent
-                        )
-                    }
+        VStack(alignment: .leading, spacing: 16) {
+            Text(title)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.white)
+            
+            HStack(spacing: 12) {
+                CryptoIconView(symbol: holding.symbol, size: 40, cornerRadius: 10)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(holding.name)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.white)
+                    Text(holding.symbol)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text(settings.privateCurrency(holding.currentValue, sourceCurrency: holding.currency))
+                        .font(.subheadline.monospacedDigit().weight(.semibold))
+                        .foregroundStyle(.white)
+                    ValueDelta(
+                        value: holding.gainLoss,
+                        formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
+                        percent: holding.gainLossPercent
+                    )
                 }
             }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var topHoldingsSection: some View {
