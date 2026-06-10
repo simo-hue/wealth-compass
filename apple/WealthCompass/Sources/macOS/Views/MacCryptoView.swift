@@ -44,7 +44,8 @@ struct MacCryptoView: View {
                             AllocationChart(
                                 title: "Crypto Allocation",
                                 slices: finance.cryptoAllocation(settings: settings),
-                                settings: settings
+                                settings: settings,
+                                showLegend: false
                             )
                             .frame(maxWidth: .infinity)
                             

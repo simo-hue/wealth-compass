@@ -137,3 +137,7 @@
 - [2026-06-10 19:20]: Improved Mac Crypto Overview Dashboard
   - *Details*: Redesigned the overview tab in MacCryptoView to display top gainers/losers side-by-side at the top, and placed the Crypto Allocation chart horizontally next to a new 'Top Holdings' list, making the interface professional and informative.
   - *Tech Notes*: Added `performanceSection` and `topHoldingsSection` as native SwiftUI components inside `MacCryptoView.swift`, reusing existing `CryptoIconView` and `FinanceCard` designs.
+
+- [2026-06-10 19:26]: Interactive Donut Chart Hover & Hidden Legend
+  - *Details*: Updated the AllocationChart component to support an interactive hover state on macOS. When hovering over a slice, it lights up while the others dim, and the center text dynamically updates to display the slice's specific details. Hid the chart legend in the Crypto view to make the circular chart the exclusive focus of its box.
+  - *Tech Notes*: Used `.onContinuousHover` combined with a custom `slice(at:in:total:)` geometric math calculation to accurately detect hovered sectors without relying on newer iOS 17 `chartAngleSelection` limits. Updated `AllocationChart` to accept an optional `showLegend` boolean.
