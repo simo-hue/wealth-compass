@@ -26,6 +26,8 @@ enum ColorPalette {
 }
 
 struct ScreenBackground: View {
+    @State private var isAnimating = false
+
     var body: some View {
         GeometryReader { proxy in
             ZStack {
@@ -46,15 +48,24 @@ struct ScreenBackground: View {
                     .frame(width: min(proxy.size.width * 0.95, 420))
                     .blur(radius: 80)
                     .offset(x: proxy.size.width * 0.4, y: -proxy.size.height * 0.38)
+                    .scaleEffect(isAnimating ? 1.05 : 0.95)
+                    .rotationEffect(.degrees(isAnimating ? 5 : -5))
 
                 Circle()
                     .fill(WCColor.accent.opacity(0.045))
                     .frame(width: min(proxy.size.width * 0.75, 320))
                     .blur(radius: 72)
                     .offset(x: -proxy.size.width * 0.42, y: proxy.size.height * 0.34)
+                    .scaleEffect(isAnimating ? 0.95 : 1.05)
+                    .rotationEffect(.degrees(isAnimating ? -5 : 5))
             }
         }
         .ignoresSafeArea()
+        .onAppear {
+            withAnimation(.easeInOut(duration: 5.0).repeatForever(autoreverses: true)) {
+                isAnimating = true
+            }
+        }
     }
 }
 
@@ -159,6 +170,8 @@ struct MetricCard: View {
                         .foregroundStyle(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.62)
+                        .contentTransition(.numericText())
+                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: value)
 
                     if let detail {
                         Text(detail)
@@ -180,6 +193,7 @@ struct EmptyState: View {
     var body: some View {
         VStack(spacing: 10) {
             Image(systemName: systemImage)
+                .symbolRenderingMode(.hierarchical)
                 .font(.system(size: 22, weight: .medium))
                 .foregroundStyle(WCColor.primary.opacity(0.78))
                 .frame(width: 46, height: 46)
@@ -203,6 +217,8 @@ struct ValueDelta: View {
         Text("\(formattedValue) (\(percent.formatted(.number.precision(.fractionLength(1))))%)")
             .foregroundStyle(value >= 0 ? WCColor.primary : WCColor.destructive)
             .font(.subheadline.monospacedDigit().weight(.semibold))
+            .contentTransition(.numericText())
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: value)
     }
 }
 
@@ -404,5 +420,59 @@ private struct PageChromeModifier: ViewModifier {
             .padding(.top, topCollisionBuffer)
             .background(ScreenBackground())
             .preferredColorScheme(.dark)
+    }
+}
+
+struct CryptoIconView: View {
+    let symbol: String
+    var size: CGFloat = 38
+    var cornerRadius: CGFloat = 11
+
+    var body: some View {
+        let url = URL(string: "https://assets.coincap.io/assets/icons/\\(symbol.lowercased())@2x.png")
+        
+        AsyncImage(url: url) { phase in
+            switch phase {
+            case .empty:
+                ProgressView()
+                    .frame(width: size, height: size)
+                    .background(WCColor.cardElevated, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            case .success(let image):
+                image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: size, height: size)
+                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            case .failure:
+                fallbackView
+            @unknown default:
+                fallbackView
+            }
+        }
+    }
+    
+    private var fallbackView: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(colorForSymbol(symbol).opacity(0.15))
+            
+            Text(String(symbol.prefix(1).uppercased()))
+                .font(.system(size: size * 0.45, weight: .bold))
+                .foregroundStyle(colorForSymbol(symbol))
+        }
+        .frame(width: size, height: size)
+    }
+    
+    private func colorForSymbol(_ symbol: String) -> Color {
+        let colors: [Color] = [
+            .red, .blue, .green, .orange, .purple, .pink, .teal, .indigo, .yellow, .mint
+        ]
+        
+        var hash = 0
+        for char in symbol.utf8 {
+            hash = (hash &* 31) &+ Int(char)
+        }
+        
+        return colors[abs(hash) % colors.count]
     }
 }

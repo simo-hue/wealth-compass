@@ -141,7 +141,12 @@ struct MacCryptoView: View {
 
     private var cryptoTable: some View {
         Table(finance.data.crypto, selection: $selection) {
-            TableColumn("Symbol", value: \.symbol)
+            TableColumn("Symbol") { holding in
+                HStack(spacing: 8) {
+                    CryptoIconView(symbol: holding.symbol, size: 24, cornerRadius: 6)
+                    Text(holding.symbol)
+                }
+            }
                 .width(min: 70, ideal: 90)
             TableColumn("Asset", value: \.name)
             TableColumn("Quantity") {

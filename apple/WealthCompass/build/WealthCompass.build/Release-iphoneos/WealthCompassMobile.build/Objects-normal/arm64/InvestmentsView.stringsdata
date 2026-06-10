@@ -39,7 +39,15 @@
         "key": "Delete",
         "location": {
           "startingColumn": 47,
-          "startingLine": 90
+          "startingLine": 88
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ • %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 127
         }
       },
       {
@@ -47,7 +55,7 @@
         "key": "Updated %@",
         "location": {
           "startingColumn": 26,
-          "startingLine": 144
+          "startingLine": 149
         }
       }
     ]
