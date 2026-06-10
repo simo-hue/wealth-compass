@@ -255,9 +255,11 @@ struct MacDashboardView: View {
                                     x: .value("Date", point.date),
                                     y: .value("Net Worth", point.value)
                                 )
-                                .foregroundStyle(.white.opacity(0.9))
-                                .lineStyle(StrokeStyle(lineWidth: 2.3, lineCap: .round, lineJoin: .round))
+                                .foregroundStyle(WCColor.primary)
+                                .lineStyle(StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
                                 .interpolationMethod(.monotone)
+                                .symbol(Circle())
+                                .symbolSize(22)
                             }
 
                             if let selectedPoint {
@@ -282,19 +284,9 @@ struct MacDashboardView: View {
                                     .foregroundStyle(.white.opacity(0.45))
                             }
                         }
-                        .chartYAxis {
-                            AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { value in
-                                AxisGridLine()
-                                    .foregroundStyle(.white.opacity(0.08))
-                                AxisValueLabel {
-                                    if let amount = value.as(Double.self) {
-                                        Text(compactCurrency(amount))
-                                            .foregroundStyle(.white.opacity(0.45))
-                                    }
-                                }
-                            }
-                        }
+                        .chartYAxis(.hidden)
                         .chartXSelection(value: $selectedNetWorthDate)
+                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: points)
                         .frame(height: 238)
 
                         if let selectedPoint {
@@ -430,25 +422,33 @@ struct MacDashboardView: View {
                             Chart(slices) { slice in
                                 SectorMark(
                                     angle: .value("Value", slice.value),
-                                    innerRadius: .ratio(0.67),
+                                    innerRadius: .ratio(0.72),
                                     angularInset: 2.5
                                 )
                                 .foregroundStyle(slice.color.gradient)
                                 .cornerRadius(5)
                             }
                             .chartLegend(.hidden)
-
-                            VStack(spacing: 3) {
-                                Text("ASSETS")
-                                    .font(.caption2.weight(.bold))
-                                    .tracking(1.3)
-                                    .foregroundStyle(.white.opacity(0.45))
-                                Text(settings.privateCurrency(allocationTotal))
-                                    .font(.headline.monospacedDigit().weight(.bold))
-                                    .foregroundStyle(.white)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.7)
+                            .chartBackground { proxy in
+                                GeometryReader { geometry in
+                                    if let plotFrame = proxy.plotFrame {
+                                        let frame = geometry[plotFrame]
+                                        VStack(spacing: 3) {
+                                            Text("ASSETS")
+                                                .font(.caption2.weight(.bold))
+                                                .tracking(1.3)
+                                                .foregroundStyle(.white.opacity(0.45))
+                                            Text(settings.privateCurrency(allocationTotal))
+                                                .font(.headline.monospacedDigit().weight(.bold))
+                                                .foregroundStyle(.white)
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.7)
+                                        }
+                                        .position(x: frame.midX, y: frame.midY)
+                                    }
+                                }
                             }
+                            .animation(.spring(response: 0.5, dampingFraction: 0.8), value: slices.map(\.value))
                         }
                     }
                     .frame(height: 210)
@@ -523,7 +523,7 @@ struct MacDashboardView: View {
                         )
                         .foregroundStyle(WCColor.primary.gradient)
                         .position(by: .value("Type", "Income"))
-                        .cornerRadius(4)
+                        .cornerRadius(6)
 
                         BarMark(
                             x: .value("Month", month.monthLabel),
@@ -531,7 +531,7 @@ struct MacDashboardView: View {
                         )
                         .foregroundStyle(WCColor.destructive.opacity(0.78).gradient)
                         .position(by: .value("Type", "Expenses"))
-                        .cornerRadius(4)
+                        .cornerRadius(6)
                     }
                     .chartLegend(.hidden)
                     .chartXAxis {
@@ -540,18 +540,8 @@ struct MacDashboardView: View {
                                 .foregroundStyle(.white.opacity(0.48))
                         }
                     }
-                    .chartYAxis {
-                        AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { value in
-                            AxisGridLine()
-                                .foregroundStyle(.white.opacity(0.07))
-                            AxisValueLabel {
-                                if let amount = value.as(Double.self) {
-                                    Text(compactCurrency(amount))
-                                        .foregroundStyle(.white.opacity(0.45))
-                                }
-                            }
-                        }
-                    }
+                    .chartYAxis(.hidden)
+                    .animation(.spring(response: 0.5, dampingFraction: 0.8), value: trend)
                     .frame(height: 244)
                 }
 

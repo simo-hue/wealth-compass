@@ -6,6 +6,7 @@ struct DashboardView: View {
     @EnvironmentObject private var settings: AppSettings
     @State private var timeRange: TimeRange = .oneYear
     @State private var showingAddTransaction = false
+    @State private var selectedNetWorthDate: Date?
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -175,6 +176,27 @@ struct DashboardView: View {
                         .frame(height: 205)
                     } else {
                         Chart {
+                            if let selectedNetWorthDate,
+                               let selectedPoint = points.min(by: { abs($0.date.timeIntervalSince(selectedNetWorthDate)) < abs($1.date.timeIntervalSince(selectedNetWorthDate)) }) {
+                                RuleMark(x: .value("Selected Date", selectedPoint.date))
+                                    .foregroundStyle(WCColor.primary.opacity(0.6))
+                                    .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [5, 5]))
+                                    .annotation(position: .top) {
+                                        VStack(spacing: 4) {
+                                            Text(selectedPoint.date.formatted(date: .abbreviated, time: .omitted))
+                                                .font(.caption2)
+                                                .foregroundStyle(.white.opacity(0.7))
+                                            Text(settings.privateCurrency(selectedPoint.value))
+                                                .font(.caption.monospacedDigit().weight(.bold))
+                                                .foregroundStyle(.white)
+                                        }
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                        .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(WCColor.border, lineWidth: 1))
+                                    }
+                            }
+
                             ForEach(points) { point in
                                 AreaMark(
                                     x: .value("Date", point.date),
@@ -194,12 +216,15 @@ struct DashboardView: View {
                                     x: .value("Date", point.date),
                                     y: .value("Net Worth", point.value)
                                 )
-                                .foregroundStyle(.white.opacity(0.92))
-                                .lineStyle(StrokeStyle(lineWidth: 2.3, lineCap: .round, lineJoin: .round))
+                                .foregroundStyle(WCColor.primary)
+                                .lineStyle(StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
                                 .interpolationMethod(.monotone)
+                                .symbol(Circle())
+                                .symbolSize(22)
                             }
                         }
                         .chartYScale(domain: chartDomain(for: points))
+                        .chartXSelection(value: $selectedNetWorthDate)
                         .chartXAxis {
                             AxisMarks(values: .automatic(desiredCount: 4)) { _ in
                                 AxisGridLine()
@@ -208,18 +233,8 @@ struct DashboardView: View {
                                     .foregroundStyle(.white.opacity(0.4))
                             }
                         }
-                        .chartYAxis {
-                            AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
-                                AxisGridLine()
-                                    .foregroundStyle(.white.opacity(0.07))
-                                AxisValueLabel {
-                                    if let amount = value.as(Double.self) {
-                                        Text(compactCurrency(amount))
-                                            .foregroundStyle(.white.opacity(0.4))
-                                    }
-                                }
-                            }
-                        }
+                        .chartYAxis(.hidden)
+                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: points)
                         .frame(height: 205)
                     }
                 }
@@ -331,7 +346,7 @@ struct DashboardView: View {
                         )
                         .foregroundStyle(WCColor.primary.gradient)
                         .position(by: .value("Type", "Income"))
-                        .cornerRadius(4)
+                        .cornerRadius(6)
 
                         BarMark(
                             x: .value("Month", month.monthLabel),
@@ -339,7 +354,7 @@ struct DashboardView: View {
                         )
                         .foregroundStyle(WCColor.destructive.opacity(0.8).gradient)
                         .position(by: .value("Type", "Expenses"))
-                        .cornerRadius(4)
+                        .cornerRadius(6)
                     }
                     .chartLegend(.hidden)
                     .chartXAxis {
@@ -348,18 +363,8 @@ struct DashboardView: View {
                                 .foregroundStyle(.white.opacity(0.42))
                         }
                     }
-                    .chartYAxis {
-                        AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
-                            AxisGridLine()
-                                .foregroundStyle(.white.opacity(0.07))
-                            AxisValueLabel {
-                                if let amount = value.as(Double.self) {
-                                    Text(compactCurrency(amount))
-                                        .foregroundStyle(.white.opacity(0.4))
-                                }
-                            }
-                        }
-                    }
+                    .chartYAxis(.hidden)
+                    .animation(.spring(response: 0.5, dampingFraction: 0.8), value: trend)
                     .frame(height: 210)
                 }
 
