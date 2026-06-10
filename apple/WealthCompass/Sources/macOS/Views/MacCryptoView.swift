@@ -12,22 +12,39 @@ struct MacCryptoView: View {
     ]
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header
-                summaryCards
-                AllocationChart(
-                    title: "Crypto Allocation",
-                    slices: finance.cryptoAllocation(settings: settings),
-                    settings: settings
-                )
-                cryptoSection
+        VStack(spacing: 0) {
+            // Scrollable summary area (cards + chart)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    summaryCards
+                    AllocationChart(
+                        title: "Crypto Allocation",
+                        slices: finance.cryptoAllocation(settings: settings),
+                        settings: settings
+                    )
+                }
+                .padding(24)
+                .frame(maxWidth: 1440, alignment: .leading)
             }
-            .padding(24)
-            .frame(maxWidth: 1440, alignment: .leading)
+            .frame(maxHeight: 420)
+
+            Divider()
+
+            // Native Table — outside ScrollView for proper NSTableView behavior
+            cryptoTable
+                .layoutPriority(1)
         }
         .background(ScreenBackground())
         .navigationTitle("Crypto")
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    appModel.editor = .crypto(nil)
+                } label: {
+                    Label("New Holding", systemImage: "plus")
+                }
+            }
+        }
         .confirmationDialog(
             "Delete Crypto Holding?",
             isPresented: isShowingDeleteConfirmation,
@@ -44,18 +61,6 @@ struct MacCryptoView: View {
             }
         } message: { holding in
             Text("This permanently removes \(holding.symbol) from your crypto portfolio.")
-        }
-    }
-
-    private var header: some View {
-        PageHeader(title: "Crypto", subtitle: "\(privateCount(finance.data.crypto.count)) tracked holdings") {
-            Button {
-                appModel.editor = .crypto(nil)
-            } label: {
-                Label("New Holding", systemImage: "plus")
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(WCColor.primary)
         }
     }
 
@@ -110,35 +115,6 @@ struct MacCryptoView: View {
         }
     }
 
-
-    private var cryptoSection: some View {
-        FinanceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text("Holdings")
-                        .font(.headline)
-                    Spacer()
-                    Button("Edit", systemImage: "pencil") {
-                        guard let holding = selectedHolding else { return }
-                        appModel.editor = .crypto(holding)
-                    }
-                    .disabled(selectedHolding == nil)
-
-                    Button(role: .destructive) {
-                        guard let holding = selectedHolding else { return }
-                        holdingPendingDeletion = holding
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                    .disabled(selectedHolding == nil)
-                }
-
-                cryptoTable
-                    .frame(minHeight: 360)
-            }
-        }
-    }
-
     private var cryptoTable: some View {
         Table(finance.data.crypto, selection: $selection) {
             TableColumn("Symbol") { holding in
@@ -177,6 +153,34 @@ struct MacCryptoView: View {
                     .foregroundStyle(.secondary)
             }
             .width(min: 120, ideal: 150)
+        }
+        .contextMenu(forSelectionType: CryptoHolding.ID.self) { selectedIDs in
+            if let id = selectedIDs.first,
+               let holding = finance.data.crypto.first(where: { $0.id == id }) {
+                Button {
+                    appModel.editor = .crypto(holding)
+                } label: {
+                    Label("Edit Holding", systemImage: "pencil")
+                }
+
+                Divider()
+
+                Button(role: .destructive) {
+                    holdingPendingDeletion = holding
+                } label: {
+                    Label("Delete Holding", systemImage: "trash")
+                }
+            }
+        } primaryAction: { selectedIDs in
+            // Double-click to edit
+            if let id = selectedIDs.first,
+               let holding = finance.data.crypto.first(where: { $0.id == id }) {
+                appModel.editor = .crypto(holding)
+            }
+        }
+        .onDeleteCommand {
+            guard let holding = selectedHolding else { return }
+            holdingPendingDeletion = holding
         }
         .overlay {
             if finance.data.crypto.isEmpty {

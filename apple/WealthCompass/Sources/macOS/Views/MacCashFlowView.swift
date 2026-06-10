@@ -75,19 +75,53 @@ struct MacCashFlowView: View {
     ]
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header
-                summaryCards
-                analytics
-                recurringTransactions
-                transactions
+        VStack(spacing: 0) {
+            // Scrollable upper section: summary cards, analytics, recurring transactions
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    summaryCards
+                    analytics
+                    recurringTransactions
+                }
+                .padding(24)
+                .frame(maxWidth: 1440, alignment: .leading)
             }
-            .padding(24)
-            .frame(maxWidth: 1440, alignment: .leading)
+            .frame(maxHeight: 520)
+
+            Divider()
+
+            // Transaction table section — outside ScrollView for native NSTableView behavior
+            VStack(alignment: .leading, spacing: 10) {
+                transactionFilters
+                    .padding(.horizontal, 24)
+                    .padding(.top, 14)
+
+                transactionTable
+                    .layoutPriority(1)
+            }
         }
         .background(ScreenBackground())
         .navigationTitle("Cash Flow")
+        .searchable(text: $searchText, prompt: "Search transactions")
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                Menu {
+                    Button {
+                        editor = .transaction
+                    } label: {
+                        Label("One-Time Transaction", systemImage: "plus.circle")
+                    }
+
+                    Button {
+                        editor = .recurring(nil)
+                    } label: {
+                        Label("Recurring Transaction", systemImage: "repeat.circle")
+                    }
+                } label: {
+                    Label("Add Transaction", systemImage: "plus")
+                }
+            }
+        }
         .sheet(item: $editor) { editor in
             switch editor {
             case .transaction:
@@ -110,29 +144,6 @@ struct MacCashFlowView: View {
             }
         }
         .alert(item: $activeAlert, content: alert(for:))
-    }
-
-    private var header: some View {
-        PageHeader(title: "Cash Flow", subtitle: "Track your income and expenses") {
-            Menu {
-                Button {
-                    editor = .transaction
-                } label: {
-                    Label("One-Time Transaction", systemImage: "plus.circle")
-                }
-
-                Button {
-                    editor = .recurring(nil)
-                } label: {
-                    Label("Recurring Transaction", systemImage: "repeat.circle")
-                }
-            } label: {
-                Label("Add Transaction", systemImage: "plus")
-            }
-            .menuStyle(.borderlessButton)
-            .buttonStyle(.borderedProminent)
-            .tint(WCColor.primary)
-        }
     }
 
     private var summaryCards: some View {
@@ -361,83 +372,6 @@ struct MacCashFlowView: View {
         .background(WCColor.cardElevated, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
-    private var transactions: some View {
-        FinanceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                transactionHeader
-                transactionFilters
-
-                Table(filteredTransactions, selection: $selection) {
-                    TableColumn("Date") { transaction in
-                        Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
-                    }
-                    .width(min: 90, ideal: 110)
-
-                    TableColumn("Type") { transaction in
-                        Label(
-                            transaction.type.title,
-                            systemImage: transaction.type == .income ? "arrow.down.left" : "arrow.up.right"
-                        )
-                        .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
-                    }
-                    .width(min: 90, ideal: 110)
-
-                    TableColumn("Category") { transaction in
-                        HStack(spacing: 6) {
-                            Text(transaction.category)
-                            if transaction.recurringTransactionID != nil {
-                                Image(systemName: "repeat")
-                                    .font(.caption)
-                                    .foregroundStyle(WCColor.primary)
-                                    .help("Generated from a recurring schedule")
-                            }
-                        }
-                    }
-                    .width(min: 110, ideal: 160)
-
-                    TableColumn("Description", value: \.description)
-
-                    TableColumn("Amount") { transaction in
-                        let prefix = transaction.type == .income ? "+" : "-"
-                        Text("\(prefix)\(settings.privateCurrency(transaction.amount))")
-                            .monospacedDigit()
-                            .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    }
-                    .width(min: 120, ideal: 150)
-                }
-                .frame(minHeight: 360)
-                .overlay {
-                    if filteredTransactions.isEmpty {
-                        ContentUnavailableView(
-                            transactionEmptyTitle,
-                            systemImage: transactionEmptySystemImage,
-                            description: Text(transactionEmptyDescription)
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    private var transactionHeader: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text("Transactions")
-                .font(.headline)
-            Spacer()
-            Text("Showing \(filteredTransactions.count) of \(finance.transactions.count)")
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
-            Button(role: .destructive) {
-                guard let selectedTransaction else { return }
-                activeAlert = .deleteTransaction(selectedTransaction)
-            } label: {
-                Label("Delete", systemImage: "trash")
-            }
-            .disabled(selectedTransaction == nil)
-        }
-    }
-
     private var transactionFilters: some View {
         HStack(spacing: 14) {
             Picker("Type", selection: $transactionTypeFilter) {
@@ -455,8 +389,76 @@ struct MacCashFlowView: View {
             }
             .frame(width: 180)
 
-            TextField("Search category or description", text: $searchText)
-                .textFieldStyle(.roundedBorder)
+            Spacer()
+
+            Text("Showing \(filteredTransactions.count) of \(finance.transactions.count)")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var transactionTable: some View {
+        Table(filteredTransactions, selection: $selection) {
+            TableColumn("Date") { transaction in
+                Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
+            }
+            .width(min: 90, ideal: 110)
+
+            TableColumn("Type") { transaction in
+                Label(
+                    transaction.type.title,
+                    systemImage: transaction.type == .income ? "arrow.down.left" : "arrow.up.right"
+                )
+                .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
+            }
+            .width(min: 90, ideal: 110)
+
+            TableColumn("Category") { transaction in
+                HStack(spacing: 6) {
+                    Text(transaction.category)
+                    if transaction.recurringTransactionID != nil {
+                        Image(systemName: "repeat")
+                            .font(.caption)
+                            .foregroundStyle(WCColor.primary)
+                            .help("Generated from a recurring schedule")
+                    }
+                }
+            }
+            .width(min: 110, ideal: 160)
+
+            TableColumn("Description", value: \.description)
+
+            TableColumn("Amount") { transaction in
+                let prefix = transaction.type == .income ? "+" : "-"
+                Text("\(prefix)\(settings.privateCurrency(transaction.amount))")
+                    .monospacedDigit()
+                    .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .width(min: 120, ideal: 150)
+        }
+        .contextMenu(forSelectionType: Transaction.ID.self) { selectedIDs in
+            if let id = selectedIDs.first,
+               let transaction = filteredTransactions.first(where: { $0.id == id }) {
+                Button(role: .destructive) {
+                    activeAlert = .deleteTransaction(transaction)
+                } label: {
+                    Label("Delete Transaction", systemImage: "trash")
+                }
+            }
+        }
+        .onDeleteCommand {
+            guard let selectedTransaction else { return }
+            activeAlert = .deleteTransaction(selectedTransaction)
+        }
+        .overlay {
+            if filteredTransactions.isEmpty {
+                ContentUnavailableView(
+                    transactionEmptyTitle,
+                    systemImage: transactionEmptySystemImage,
+                    description: Text(transactionEmptyDescription)
+                )
+            }
         }
     }
 
@@ -648,16 +650,7 @@ private struct MacCashFlowTransactionEditor: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text("New Transaction")
-                    .font(.title2.bold())
-                Spacer()
-            }
-            .padding(20)
-
-            Divider()
-
+        NavigationStack {
             Form {
                 Section("Transaction") {
                     Picker("Type", selection: $type) {
@@ -706,23 +699,21 @@ private struct MacCashFlowTransactionEditor: View {
                 }
             }
             .formStyle(.grouped)
-
-            Divider()
-
-            HStack {
-                Spacer()
-                Button("Cancel") {
-                    dismiss()
+            .navigationTitle("New Transaction")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
                 }
-                .keyboardShortcut(.cancelAction)
-
-                Button("Save", action: saveTransaction)
-                    .keyboardShortcut(.defaultAction)
-                    .disabled(isSaveDisabled)
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save", action: saveTransaction)
+                        .disabled(isSaveDisabled)
+                        .keyboardShortcut("s", modifiers: .command)
+                }
             }
-            .padding(16)
         }
-        .frame(width: 560, height: 520)
+        .frame(minWidth: 480, idealWidth: 540, minHeight: 400, idealHeight: 480)
     }
 
     private func saveTransaction() {

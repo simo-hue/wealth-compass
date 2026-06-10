@@ -50,108 +50,92 @@ private struct MacTransactionEditor: View {
         Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
     }
 
-    var body: some View {
-        editorContainer(
-            title: "New Transaction",
-            saveDisabled: parsedAmount <= 0 || selectedCategoryName.isEmpty
-        ) {
-            Picker("Type", selection: $type) {
-                ForEach(TransactionType.allCases) {
-                    Text($0.title).tag($0)
-                }
-            }
-            .pickerStyle(.segmented)
-            .onChange(of: type) { _, newType in
-                category = settings.transactionCategories(for: newType).first ?? ""
-                customCategory = ""
-                isCustomCategoryFocused = false
-            }
-
-            TextField("Amount", text: $amount)
-            Picker("Category", selection: $category) {
-                ForEach(categories, id: \.self) {
-                    Text($0).tag($0)
-                }
-                Text("Custom...").tag(Self.customCategoryTag)
-            }
-            .onChange(of: category) { _, newCategory in
-                if newCategory == Self.customCategoryTag {
-                    Task { @MainActor in
-                        isCustomCategoryFocused = true
-                    }
-                } else {
-                    customCategory = ""
-                    isCustomCategoryFocused = false
-                }
-            }
-
-            if isCustomCategorySelected {
-                TextField("Custom Category Name", text: $customCategory)
-                    .focused($isCustomCategoryFocused)
-
-                Text(customCategoryHint)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            DatePicker("Date", selection: $date, displayedComponents: .date)
-            TextField("Description", text: $note)
-        } onSave: {
-            let categoryToSave: String
-            if isCustomCategorySelected {
-                guard let savedCategory = settings.addCustomTransactionCategory(trimmedCustomCategory, for: type) else {
-                    return
-                }
-                categoryToSave = savedCategory
-            } else {
-                categoryToSave = category
-            }
-
-            finance.addTransaction(
-                type: type,
-                amount: parsedAmount,
-                category: categoryToSave,
-                description: note,
-                date: date,
-                settings: settings
-            )
-            dismiss()
-        }
+    private var isSaveDisabled: Bool {
+        parsedAmount <= 0 || selectedCategoryName.isEmpty
     }
 
-    private func editorContainer<Content: View>(
-        title: String,
-        saveDisabled: Bool,
-        @ViewBuilder content: () -> Content,
-        onSave: @escaping () -> Void
-    ) -> some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text(title)
-                    .font(.title2.bold())
-                Spacer()
-            }
-            .padding(20)
-
-            Divider()
-
+    var body: some View {
+        NavigationStack {
             Form {
-                content()
+                Section("Transaction") {
+                    Picker("Type", selection: $type) {
+                        ForEach(TransactionType.allCases) {
+                            Text($0.title).tag($0)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: type) { _, newType in
+                        category = settings.transactionCategories(for: newType).first ?? ""
+                        customCategory = ""
+                        isCustomCategoryFocused = false
+                    }
+
+                    TextField("Amount", text: $amount)
+                    Picker("Category", selection: $category) {
+                        ForEach(categories, id: \.self) {
+                            Text($0).tag($0)
+                        }
+                        Text("Custom...").tag(Self.customCategoryTag)
+                    }
+                    .onChange(of: category) { _, newCategory in
+                        if newCategory == Self.customCategoryTag {
+                            Task { @MainActor in
+                                isCustomCategoryFocused = true
+                            }
+                        } else {
+                            customCategory = ""
+                            isCustomCategoryFocused = false
+                        }
+                    }
+
+                    if isCustomCategorySelected {
+                        TextField("Custom Category Name", text: $customCategory)
+                            .focused($isCustomCategoryFocused)
+
+                        Text(customCategoryHint)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    DatePicker("Date", selection: $date, displayedComponents: .date)
+                    TextField("Description", text: $note)
+                }
             }
             .formStyle(.grouped)
-
-            Divider()
-
-            HStack {
-                Spacer()
-                Button("Cancel") { dismiss() }
-                    .keyboardShortcut(.cancelAction)
-                Button("Save", action: onSave)
-                    .keyboardShortcut(.defaultAction)
-                    .disabled(saveDisabled)
+            .navigationTitle("New Transaction")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save", action: save)
+                        .disabled(isSaveDisabled)
+                        .keyboardShortcut("s", modifiers: .command)
+                }
             }
-            .padding(16)
         }
-        .frame(width: 520, height: 500)
+        .frame(minWidth: 460, idealWidth: 520, minHeight: 380, idealHeight: 460)
+    }
+
+    private func save() {
+        let categoryToSave: String
+        if isCustomCategorySelected {
+            guard let savedCategory = settings.addCustomTransactionCategory(trimmedCustomCategory, for: type) else {
+                return
+            }
+            categoryToSave = savedCategory
+        } else {
+            categoryToSave = category
+        }
+
+        finance.addTransaction(
+            type: type,
+            amount: parsedAmount,
+            category: categoryToSave,
+            description: note,
+            date: date,
+            settings: settings
+        )
+        dismiss()
     }
 
     private var customCategoryHint: String {
@@ -223,10 +207,12 @@ private struct MacInvestmentEditor: View {
             : (parsedQuantity * parsedAveragePrice) * (parsedFeeValue / 100)
     }
 
+    private var isSaveDisabled: Bool {
+        symbol.trimmed.isEmpty || name.trimmed.isEmpty || parsedQuantity <= 0
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            editorTitle(investment == nil ? "New Investment" : "Edit Investment")
-            Divider()
+        NavigationStack {
             Form {
                 Section("Identity") {
                     TextField("Symbol", text: $symbol)
@@ -285,12 +271,19 @@ private struct MacInvestmentEditor: View {
                 }
             }
             .formStyle(.grouped)
-            Divider()
-            editorButtons(saveDisabled: symbol.trimmed.isEmpty || name.trimmed.isEmpty || parsedQuantity <= 0) {
-                save()
+            .navigationTitle(investment == nil ? "New Investment" : "Edit Investment")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save", action: save)
+                        .disabled(isSaveDisabled)
+                        .keyboardShortcut("s", modifiers: .command)
+                }
             }
         }
-        .frame(width: 580, height: 700)
+        .frame(minWidth: 500, idealWidth: 580, minHeight: 580, idealHeight: 700)
     }
 
     private func save() {
@@ -324,26 +317,6 @@ private struct MacInvestmentEditor: View {
         value.updatedAt = Date()
         finance.upsertInvestment(value, settings: settings)
         dismiss()
-    }
-
-    private func editorTitle(_ title: String) -> some View {
-        HStack {
-            Text(title).font(.title2.bold())
-            Spacer()
-        }
-        .padding(20)
-    }
-
-    private func editorButtons(saveDisabled: Bool, onSave: @escaping () -> Void) -> some View {
-        HStack {
-            Spacer()
-            Button("Cancel") { dismiss() }
-                .keyboardShortcut(.cancelAction)
-            Button("Save", action: onSave)
-                .keyboardShortcut(.defaultAction)
-                .disabled(saveDisabled)
-        }
-        .padding(16)
     }
 
     private func parse(_ value: String) -> Double {
@@ -392,17 +365,12 @@ private struct MacCryptoEditor: View {
             : (parsedQuantity * parsedAveragePrice) * (parsedFeeValue / 100)
     }
 
+    private var isSaveDisabled: Bool {
+        symbol.trimmed.isEmpty || name.trimmed.isEmpty || parsedQuantity <= 0
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text(holding == nil ? "New Crypto Holding" : "Edit Crypto Holding")
-                    .font(.title2.bold())
-                Spacer()
-            }
-            .padding(20)
-
-            Divider()
-
+        NavigationStack {
             Form {
                 Section("Identity") {
                     TextField("Symbol", text: $symbol)
@@ -436,20 +404,19 @@ private struct MacCryptoEditor: View {
                 }
             }
             .formStyle(.grouped)
-
-            Divider()
-
-            HStack {
-                Spacer()
-                Button("Cancel") { dismiss() }
-                    .keyboardShortcut(.cancelAction)
-                Button("Save", action: save)
-                    .keyboardShortcut(.defaultAction)
-                    .disabled(symbol.trimmed.isEmpty || name.trimmed.isEmpty || parsedQuantity <= 0)
+            .navigationTitle(holding == nil ? "New Crypto Holding" : "Edit Crypto Holding")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save", action: save)
+                        .disabled(isSaveDisabled)
+                        .keyboardShortcut("s", modifiers: .command)
+                }
             }
-            .padding(16)
         }
-        .frame(width: 560, height: 600)
+        .frame(minWidth: 480, idealWidth: 560, minHeight: 440, idealHeight: 560)
     }
 
     private func save() {
