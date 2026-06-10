@@ -133,79 +133,104 @@ struct MacCryptoView: View {
     }
 
     private var cryptoTable: some View {
-        Table(finance.data.crypto, selection: $selection) {
-            TableColumn("Symbol") { holding in
-                HStack(spacing: 8) {
-                    CryptoIconView(symbol: holding.symbol, size: 24, cornerRadius: 6)
-                    Text(holding.symbol)
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
+                if finance.data.crypto.isEmpty {
+                    ContentUnavailableView(
+                        "No Crypto Holdings",
+                        systemImage: "bitcoinsign.circle",
+                        description: Text("Add a holding to track its value and performance.")
+                    )
+                    .padding(.top, 40)
+                } else {
+                    ForEach(finance.data.crypto) { holding in
+                        holdingCard(for: holding)
+                    }
                 }
             }
-                .width(min: 70, ideal: 90)
-            TableColumn("Asset", value: \.name)
-            TableColumn("Quantity") {
-                Text(settings.privateNumber($0.quantity, fractionDigits: 8))
-                    .monospacedDigit()
-            }
-            .width(min: 100, ideal: 130)
-            TableColumn("Price") {
-                Text(settings.privateCurrency($0.currentPrice, sourceCurrency: $0.currency))
-                    .monospacedDigit()
-            }
-            .width(min: 100, ideal: 130)
-            TableColumn("Value") {
-                Text(settings.privateCurrency($0.currentValue, sourceCurrency: $0.currency))
-                    .monospacedDigit()
-            }
-            .width(min: 110, ideal: 140)
-            TableColumn("Gain / Loss") {
-                ValueDelta(
-                    value: $0.gainLoss,
-                    formattedValue: settings.privateCurrency($0.gainLoss, sourceCurrency: $0.currency),
-                    percent: $0.gainLossPercent
-                )
-            }
-            .width(min: 150, ideal: 180)
-            TableColumn("Updated") {
-                Text(formattedUpdate($0.updatedAt))
-                    .foregroundStyle(.secondary)
-            }
-            .width(min: 120, ideal: 150)
+            .padding(32)
+            .frame(maxWidth: 1440, alignment: .leading)
+            .frame(maxWidth: .infinity)
         }
-        .contextMenu(forSelectionType: CryptoHolding.ID.self) { selectedIDs in
-            if let id = selectedIDs.first,
-               let holding = finance.data.crypto.first(where: { $0.id == id }) {
-                Button {
-                    appModel.editor = .crypto(holding)
-                } label: {
-                    Label("Edit Holding", systemImage: "pencil")
+    }
+
+    private func holdingCard(for holding: CryptoHolding) -> some View {
+        FinanceCard {
+            VStack(spacing: 16) {
+                HStack(alignment: .center, spacing: 12) {
+                    CryptoIconView(symbol: holding.symbol, size: 36, cornerRadius: 8)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(holding.name)
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                        Text(holding.symbol)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text(settings.privateCurrency(holding.currentValue, sourceCurrency: holding.currency))
+                            .font(.headline.monospacedDigit())
+                            .foregroundStyle(.white)
+                        ValueDelta(
+                            value: holding.gainLoss,
+                            formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
+                            percent: holding.gainLossPercent
+                        )
+                    }
                 }
-
-                Divider()
-
-                Button(role: .destructive) {
-                    holdingPendingDeletion = holding
-                } label: {
-                    Label("Delete Holding", systemImage: "trash")
+                
+                Divider().background(WCColor.border)
+                
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Quantity")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(settings.privateNumber(holding.quantity, fractionDigits: 8))
+                            .font(.subheadline.monospacedDigit())
+                            .foregroundStyle(.white)
+                    }
+                    Spacer()
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Current Price")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(settings.privateCurrency(holding.currentPrice, sourceCurrency: holding.currency))
+                            .font(.subheadline.monospacedDigit())
+                            .foregroundStyle(.white)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("Last Updated")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(formattedUpdate(holding.updatedAt))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
-        } primaryAction: { selectedIDs in
-            // Double-click to edit
-            if let id = selectedIDs.first,
-               let holding = finance.data.crypto.first(where: { $0.id == id }) {
+        }
+        .contentShape(Rectangle())
+        .onTapGesture(count: 2) {
+            appModel.editor = .crypto(holding)
+        }
+        .contextMenu {
+            Button {
                 appModel.editor = .crypto(holding)
+            } label: {
+                Label("Edit Holding", systemImage: "pencil")
             }
-        }
-        .onDeleteCommand {
-            guard let holding = selectedHolding else { return }
-            holdingPendingDeletion = holding
-        }
-        .overlay {
-            if finance.data.crypto.isEmpty {
-                ContentUnavailableView(
-                    "No Crypto Holdings",
-                    systemImage: "bitcoinsign.circle",
-                    description: Text("Add a holding to track its value and performance.")
-                )
+            
+            Divider()
+            
+            Button(role: .destructive) {
+                holdingPendingDeletion = holding
+            } label: {
+                Label("Delete Holding", systemImage: "trash")
             }
         }
     }

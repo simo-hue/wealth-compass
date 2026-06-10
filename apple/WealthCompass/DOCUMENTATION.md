@@ -85,3 +85,11 @@
 - [2026-06-10 18:41]: Settings Redesign — Custom Island UI
   - *Details*: Redesigned the macOS Settings view to match the custom dark glassmorphism aesthetic of the rest of the app, completely removing the native `Form` and `TabView` layout.
   - *Tech Notes*: Refactored `MacSettingsView` to use `MacSelectorIsland`, `FinanceCard`, and `ScreenBackground`. Created `SettingsSection` and `SettingsRow` helper components to ensure uniform padding, layouts, and typography across all settings options.
+
+- [2026-06-10 18:42]: Crypto Holdings Custom Card Redesign
+  - *Details*: Replaced the raw native `NSTableView` in the Crypto page's "Holdings" tab with a custom scrollable list of beautifully styled `FinanceCard` elements to ensure UI consistency.
+  - *Tech Notes*: Replaced the `Table` implementation in `MacCryptoView` with a `ScrollView` and `LazyVStack` containing iterating `FinanceCard` rows. Retained context menus and double-tap gestures for editing and deleting holdings.
+
+- [2026-06-10 18:44]: Crypto Holdings Responsive Grid
+  - *Details*: Converted the vertical list of crypto holdings into a responsive grid that automatically places multiple holdings side-by-side on larger screens.
+  - *Tech Notes*: Replaced `LazyVStack` with `LazyVGrid` using `GridItem(.adaptive(minimum: 360))` in `MacCryptoView`'s holdings view. Expanded the `ScrollView` `maxWidth` to `1440` to allow the grid to flow horizontally.
