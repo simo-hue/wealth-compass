@@ -9,6 +9,7 @@ struct MacDashboardView: View {
     @State private var timeRange: TimeRange = .oneYear
     @State private var expensePeriod: AnalyticsPeriod = .thirtyDays
     @State private var selectedNetWorthDate: Date?
+    @Namespace private var animationNamespace
 
     private var totals: FinanceTotals {
         finance.calculateTotals(settings: settings)
@@ -205,14 +206,8 @@ struct MacDashboardView: View {
                         Spacer(minLength: 16)
 
                         VStack(alignment: .trailing, spacing: 12) {
-                            Picker("Net worth range", selection: $timeRange) {
-                                ForEach(TimeRange.allCases) { range in
-                                    Text(range.rawValue).tag(range)
-                                }
-                            }
-                            .labelsHidden()
-                            .pickerStyle(.segmented)
-                            .frame(width: 286)
+                            timeframeSelector
+                                .padding(.bottom, 2)
 
                             snapshotFreshness
                         }
@@ -315,6 +310,42 @@ struct MacDashboardView: View {
                 }
                 .padding(24)
             }
+        }
+    }
+
+    private var timeframeSelector: some View {
+        HStack(spacing: 0) {
+            ForEach(TimeRange.allCases) { range in
+                let isSelected = timeRange == range
+                Text(range.rawValue)
+                    .font(.caption.weight(isSelected ? .bold : .medium))
+                    .foregroundStyle(isSelected ? Color.white : Color.white.opacity(0.6))
+                    .frame(minWidth: 44)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background {
+                        if isSelected {
+                            Capsule()
+                                .fill(Color.white.opacity(0.15))
+                                .matchedGeometryEffect(id: "timeRangeSelection", in: animationNamespace)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            timeRange = range
+                        }
+                    }
+            }
+        }
+        .padding(4)
+        .background {
+            Capsule()
+                .fill(.black.opacity(0.2))
+                .overlay {
+                    Capsule()
+                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                }
         }
     }
 

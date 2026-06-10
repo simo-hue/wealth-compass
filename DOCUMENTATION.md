@@ -330,3 +330,17 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
     - Wrapped `StatCard.tsx` stat text with `<AnimatedNumber />`.
     - Integrated `framer-motion`'s `motion.div` with `whileInView` into `Dashboard.tsx` to add staggered scroll reveals.
     - Added an `.ambient-bg` CSS animation in `index.css` and injected it into `Dashboard.tsx` for a rotating gradient blur backdrop in dark mode.
+
+- [2026-06-10T19:15:00+02:00]: macOS Settings Responsive Layout Enhancement
+  - *Details*: Upgraded the macOS app settings page with a custom responsive masonry layout, moving from a single long vertical list to a dynamic multi-column grid that optimizes screen space usage on wide desktop screens.
+  - *Tech Notes*:
+    - Created `DynamicMasonryLayout.swift` adopting the `Layout` protocol to dynamically handle columns and heights.
+    - Added `DynamicMasonryLayout.swift` to Xcode targets (`WealthCompassMac`, `WealthCompassMobile`).
+    - Updated `MacSettingsView.swift` tabs to use `DynamicMasonryLayout` with a minimum column width of 380pt.
+    - Adjusted max frame width constraints in `MacSettingsView.swift` to allow the grid layout to expand.
+
+- [2026-06-10T19:19:00+02:00]: Net Worth Timeframe Selector UI Enhancement
+  - *Details*: Replaced the native segmented picker on the macOS Dashboard's net worth chart with a sleek, custom-built glassmorphism pill selector.
+  - *Tech Notes*: 
+    - Implemented `timeframeSelector` in `MacDashboardView.swift`.
+    - Used `matchedGeometryEffect` for smooth capsule selection animation.

@@ -35,13 +35,22 @@ struct MacCryptoView: View {
 
             if selectedTab == .overview {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 24) {
                         summaryCards
-                        AllocationChart(
-                            title: "Crypto Allocation",
-                            slices: finance.cryptoAllocation(settings: settings),
-                            settings: settings
-                        )
+                        
+                        performanceSection
+                        
+                        HStack(alignment: .top, spacing: 24) {
+                            AllocationChart(
+                                title: "Crypto Allocation",
+                                slices: finance.cryptoAllocation(settings: settings),
+                                settings: settings
+                            )
+                            .frame(maxWidth: .infinity)
+                            
+                            topHoldingsSection
+                                .frame(maxWidth: .infinity)
+                        }
                     }
                     .padding(24)
                     .frame(maxWidth: 1440, alignment: .leading)
@@ -129,6 +138,95 @@ struct MacCryptoView: View {
                 value: latestUpdate.map(formattedUpdate) ?? "Never",
                 systemImage: "checkmark.circle"
             )
+        }
+    }
+
+    @ViewBuilder
+    private var performanceSection: some View {
+        let cryptos = finance.data.crypto
+        let best = cryptos.max(by: { $0.gainLossPercent < $1.gainLossPercent })
+        let worst = cryptos.min(by: { $0.gainLossPercent < $1.gainLossPercent })
+        
+        let hasBest = best != nil && best!.gainLossPercent > 0
+        let hasWorst = worst != nil && worst!.gainLossPercent < 0
+        
+        if hasBest || hasWorst {
+            HStack(spacing: 24) {
+                if let best, best.gainLossPercent > 0 {
+                    performanceCard(title: "Top Performer", holding: best)
+                }
+                if let worst, worst.gainLossPercent < 0 {
+                    performanceCard(title: "Biggest Loser", holding: worst)
+                }
+                
+                if hasBest && !hasWorst {
+                    Spacer().frame(maxWidth: .infinity)
+                } else if !hasBest && hasWorst {
+                    Spacer().frame(maxWidth: .infinity)
+                }
+            }
+        }
+    }
+
+    private func performanceCard(title: String, holding: CryptoHolding) -> some View {
+        FinanceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                Text(title)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.white)
+                
+                HStack(spacing: 12) {
+                    CryptoIconView(symbol: holding.symbol, size: 40, cornerRadius: 10)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(holding.name)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.white)
+                        Text(holding.symbol)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text(settings.privateCurrency(holding.currentValue, sourceCurrency: holding.currency))
+                            .font(.subheadline.monospacedDigit().weight(.semibold))
+                            .foregroundStyle(.white)
+                        ValueDelta(
+                            value: holding.gainLoss,
+                            formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
+                            percent: holding.gainLossPercent
+                        )
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var topHoldingsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Top Holdings")
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.white)
+                .padding(.bottom, 2)
+            
+            let topHoldings = finance.data.crypto
+                .sorted { $0.currentValue > $1.currentValue }
+                .prefix(4)
+            
+            if topHoldings.isEmpty {
+                ContentUnavailableView(
+                    "No Crypto Holdings",
+                    systemImage: "bitcoinsign.circle",
+                    description: Text("Add a holding to track its value.")
+                )
+                .padding(.top, 40)
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(topHoldings) { holding in
+                        holdingCard(for: holding)
+                    }
+                }
+            }
         }
     }
 
