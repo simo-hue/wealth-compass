@@ -109,7 +109,7 @@ struct MacSettingsView: View {
                     }
                 }
                 .padding(32)
-                .frame(maxWidth: 800, alignment: .leading)
+                .frame(maxWidth: 1200, alignment: .center)
                 .frame(maxWidth: .infinity)
             }
         }
@@ -153,7 +153,7 @@ struct MacSettingsView: View {
     }
 
     private var generalSettings: some View {
-        VStack(alignment: .leading, spacing: 32) {
+        DynamicMasonryLayout(minColumnWidth: 380, spacing: 32) {
             SettingsSection(title: "Currency") {
                 SettingsRow(title: "Base Currency") {
                     Picker("", selection: $settings.currency) {
@@ -325,7 +325,7 @@ struct MacSettingsView: View {
     }
 
     private var dataSettings: some View {
-        VStack(alignment: .leading, spacing: 32) {
+        DynamicMasonryLayout(minColumnWidth: 380, spacing: 32) {
             SettingsSection(title: "Import and Export") {
                 SettingsRow(title: "Import Behavior") {
                     Picker("", selection: $importMode) {
@@ -378,7 +378,7 @@ struct MacSettingsView: View {
     }
 
     private var syncSettings: some View {
-        VStack(alignment: .leading, spacing: 32) {
+        DynamicMasonryLayout(minColumnWidth: 380, spacing: 32) {
             SettingsSection(title: "iCloud Sync") {
                 SettingsRow(
                     title: "Sync Data with iCloud",

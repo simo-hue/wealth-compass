@@ -132,4 +132,8 @@
 
 - [2026-06-10 19:14]: Cash Flow Cards Uniform Height Fix
   - *Details*: Coordinated the sizes of the "Recent Activity" and "Recurring Transactions" boxes in the Cash Flow Overview to dynamically match heights, maintaining a professional and aligned grid. Also applied this to the trend and category charts.
-  - *Tech Notes*: Added `.frame(maxHeight: .infinity, alignment: .top)` to the inner `VStack` inside `recentActivityCard`, `recurringTransactionsCard`, `cashFlowTrendCard`, and `expenseCategoriesCard` in `MacCashFlowView.swift` to allow them to stretch to the `HStack`'s proposed height.
+  - *Tech Notes*: Added `.frame(maxHeight: .infinity, alignment: .top)` to the inner `VStack` inside `recentActivityCard`, `recurringTransactionsCard`, `cashFlowTrendCard`, and `expenseCategoriesCard` in `MacCashFlowView.swift` to allow them to stretch to the `HStack`'s proposed height. Added `.fixedSize(horizontal: false, vertical: true)` to the parent `HStack`s to ensure the vertical height proposal correctly propagates down through the `ScrollView`. Also fixed an Xcode project compilation issue by linking `DynamicMasonryLayout.swift`.
+
+- [2026-06-10 19:20]: Improved Mac Crypto Overview Dashboard
+  - *Details*: Redesigned the overview tab in MacCryptoView to display top gainers/losers side-by-side at the top, and placed the Crypto Allocation chart horizontally next to a new 'Top Holdings' list, making the interface professional and informative.
+  - *Tech Notes*: Added `performanceSection` and `topHoldingsSection` as native SwiftUI components inside `MacCryptoView.swift`, reusing existing `CryptoIconView` and `FinanceCard` designs.

@@ -109,6 +109,7 @@ struct MacCashFlowView: View {
                                         .frame(width: max(340, proxy.size.width * 0.55))
                                     expenseCategoriesCard
                                 }
+                                .fixedSize(horizontal: false, vertical: true)
                             } else {
                                 VStack(spacing: 20) {
                                     cashFlowTrendCard
@@ -122,6 +123,7 @@ struct MacCashFlowView: View {
                                         .frame(width: max(340, proxy.size.width * 0.45))
                                     recurringTransactionsCard
                                 }
+                                .fixedSize(horizontal: false, vertical: true)
                             } else {
                                 VStack(spacing: 20) {
                                     recentActivityCard
