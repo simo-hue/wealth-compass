@@ -2,11 +2,82 @@ import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
+private enum MacSettingsTab: MacSelectorTab {
+    case general
+    case data
+    case icloud
+
+    var title: String {
+        switch self {
+        case .general: return "General"
+        case .data: return "Data"
+        case .icloud: return "iCloud"
+        }
+    }
+}
+
+private struct SettingsSection<Content: View>: View {
+    let title: String
+    let content: Content
+
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(title)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(.white)
+            
+            FinanceCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    content
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+}
+
+private struct SettingsRow<Content: View>: View {
+    let title: String
+    let subtitle: String?
+    let content: Content
+
+    init(title: String, subtitle: String? = nil, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.subtitle = subtitle
+        self.content = content()
+    }
+
+    var body: some View {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.body)
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            Spacer(minLength: 20)
+            content
+        }
+        .padding(.vertical, 4)
+    }
+}
+
 struct MacSettingsView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appLock: MacAppLockStore
     @State private var importMode: FinanceImportMode = .merge
+    @State private var selectedTab: MacSettingsTab = .general
+    
     @State private var settingsAlert: MacSettingsAlert?
     @State private var credentialEditorAlert: MacSettingsAlert?
     @State private var activeCredentialEditor: MacMarketDataCredentialKind?
@@ -18,17 +89,32 @@ struct MacSettingsView: View {
     @State private var pendingDestructiveAction: MacSettingsDestructiveAction?
 
     var body: some View {
-        TabView {
-            generalSettings
-                .tabItem { Label("General", systemImage: "gearshape") }
+        VStack(spacing: 0) {
+            HStack {
+                Spacer()
+                MacSelectorIsland(selection: $selectedTab)
+                Spacer()
+            }
+            .padding(.vertical, 16)
 
-            dataSettings
-                .tabItem { Label("Data", systemImage: "internaldrive") }
-
-            syncSettings
-                .tabItem { Label("iCloud", systemImage: "icloud") }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 32) {
+                    switch selectedTab {
+                    case .general:
+                        generalSettings
+                    case .data:
+                        dataSettings
+                    case .icloud:
+                        syncSettings
+                    }
+                }
+                .padding(32)
+                .frame(maxWidth: 800, alignment: .leading)
+                .frame(maxWidth: .infinity)
+            }
         }
-        .frame(width: 780, height: 700)
+        .background(ScreenBackground())
+        .navigationTitle("Settings")
         .onAppear(perform: refreshMarketDataKeyStatus)
         .sheet(item: $activeCredentialEditor) { credential in
             MacMarketDataCredentialEditor(
@@ -67,45 +153,49 @@ struct MacSettingsView: View {
     }
 
     private var generalSettings: some View {
-        Form {
-            Section("Currency") {
-                Picker("Base Currency", selection: $settings.currency) {
-                    ForEach(Currency.allCases) { currency in
-                        Text("\(currency.displayName) (\(currency.rawValue))").tag(currency)
+        VStack(alignment: .leading, spacing: 32) {
+            SettingsSection(title: "Currency") {
+                SettingsRow(title: "Base Currency") {
+                    Picker("", selection: $settings.currency) {
+                        ForEach(Currency.allCases) { currency in
+                            Text("\(currency.displayName) (\(currency.rawValue))").tag(currency)
+                        }
                     }
+                    .labelsHidden()
+                    .frame(width: 200)
                 }
             }
 
             exchangeRatesSection
 
-            Section("Privacy") {
-                Toggle("Privacy Mode", isOn: $settings.isPrivacyMode)
+            SettingsSection(title: "Privacy & Security") {
+                SettingsRow(title: "Privacy Mode", subtitle: "Hide financial values throughout Wealth Compass.") {
+                    Toggle("", isOn: $settings.isPrivacyMode)
+                        .toggleStyle(.switch)
+                        .labelsHidden()
+                }
 
-                Text("Hide financial values throughout Wealth Compass.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
+                Divider().background(WCColor.border)
 
-            Section("Security") {
-                Toggle("\(appLock.biometryName) App Lock", isOn: biometricLockBinding)
-
-                if let error = appLock.lastError {
-                    Text(error)
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                } else {
-                    Text("When enabled, Wealth Compass locks when the app is no longer active.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                SettingsRow(
+                    title: "\(appLock.biometryName) App Lock", 
+                    subtitle: appLock.lastError ?? "When enabled, Wealth Compass locks when the app is no longer active."
+                ) {
+                    Toggle("", isOn: biometricLockBinding)
+                        .toggleStyle(.switch)
+                        .labelsHidden()
                 }
             }
 
-            Section("Custom Categories") {
+            SettingsSection(title: "Custom Categories") {
                 categoryGroup(
                     title: "Income",
                     type: .income,
                     categories: settings.customIncomeCategories
                 )
+                
+                Divider().background(WCColor.border)
+                
                 categoryGroup(
                     title: "Expense",
                     type: .expense,
@@ -115,30 +205,34 @@ struct MacSettingsView: View {
 
             marketDataSection
         }
-        .formStyle(.grouped)
-        .padding()
     }
 
     private var exchangeRatesSection: some View {
-        Section("Exchange Rates") {
-            LabeledContent("Source") {
+        SettingsSection(title: "Exchange Rates") {
+            SettingsRow(title: "Source") {
                 if let snapshot = settings.exchangeRateSnapshot {
-                    Text("ECB")
-                    Text("· \(snapshot.effectiveDate.formatted(date: .abbreviated, time: .omitted))")
-                        .foregroundStyle(.secondary)
+                    VStack(alignment: .trailing) {
+                        Text("ECB")
+                            .foregroundStyle(.primary)
+                        Text(snapshot.effectiveDate.formatted(date: .abbreviated, time: .omitted))
+                            .foregroundStyle(.secondary)
+                    }
                 } else {
                     Text("Offline fallback")
                         .foregroundStyle(.orange)
                 }
             }
 
+            Divider().background(WCColor.border)
+
             ForEach(Currency.allCases.filter { $0 != settings.currency }) { quoteCurrency in
                 let converted = settings.convert(1, from: settings.currency, to: quoteCurrency)
-                LabeledContent("1 \(settings.currency.rawValue)") {
+                SettingsRow(title: "1 \(settings.currency.rawValue)") {
                     Text("\(converted.formatted(.number.precision(.fractionLength(2...4)))) \(quoteCurrency.rawValue)")
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
                 }
+                Divider().background(WCColor.border)
             }
 
             HStack {
@@ -157,6 +251,7 @@ struct MacSettingsView: View {
                         .controlSize(.small)
                 }
             }
+            .padding(.top, 8)
 
             if let error = settings.exchangeRateError {
                 Text("\(error) Cached or fallback rates remain active.")
@@ -175,7 +270,7 @@ struct MacSettingsView: View {
     }
 
     private var marketDataSection: some View {
-        Section("Market Data") {
+        SettingsSection(title: "Market Data") {
             Button {
                 openCredentialEditor(.finnhub)
             } label: {
@@ -187,6 +282,8 @@ struct MacSettingsView: View {
             }
             .buttonStyle(.plain)
 
+            Divider().background(WCColor.border)
+
             Button {
                 openCredentialEditor(.coingecko)
             } label: {
@@ -197,6 +294,8 @@ struct MacSettingsView: View {
                 )
             }
             .buttonStyle(.plain)
+
+            Divider().background(WCColor.border)
 
             HStack {
                 Button {
@@ -217,6 +316,7 @@ struct MacSettingsView: View {
                         .controlSize(.small)
                 }
             }
+            .padding(.top, 8)
 
             Text("API keys are verified against a live quote before they are stored in the macOS Keychain.")
                 .font(.caption)
@@ -225,68 +325,91 @@ struct MacSettingsView: View {
     }
 
     private var dataSettings: some View {
-        Form {
-            Section("Import and Export") {
-                Picker("Import Behavior", selection: $importMode) {
-                    Text("Merge with local data").tag(FinanceImportMode.merge)
-                    Text("Replace local data").tag(FinanceImportMode.replace)
+        VStack(alignment: .leading, spacing: 32) {
+            SettingsSection(title: "Import and Export") {
+                SettingsRow(title: "Import Behavior") {
+                    Picker("", selection: $importMode) {
+                        Text("Merge with local data").tag(FinanceImportMode.merge)
+                        Text("Replace local data").tag(FinanceImportMode.replace)
+                    }
+                    .labelsHidden()
+                    .frame(width: 200)
                 }
 
-                HStack {
+                Divider().background(WCColor.border)
+
+                HStack(spacing: 16) {
                     Button("Import JSON...", action: importBackup)
                     Button("Export JSON...", action: exportBackup)
                 }
+                .padding(.top, 8)
             }
 
-            Section("Local Storage") {
-                LabeledContent("Mode", value: "Local Only")
-                LabeledContent("Transactions", value: "\(finance.data.transactions.count)")
-                LabeledContent("Recurring Schedules", value: "\(finance.data.recurringTransactions.count)")
-                LabeledContent("Investments", value: "\(finance.data.investments.count)")
-                LabeledContent("Crypto Holdings", value: "\(finance.data.crypto.count)")
-                LabeledContent("Liabilities", value: "\(finance.data.liabilities.count)")
-                LabeledContent("Snapshots", value: "\(finance.data.snapshots.count)")
+            SettingsSection(title: "Local Storage") {
+                SettingsRow(title: "Mode") { Text("Local Only").foregroundStyle(.secondary) }
+                Divider().background(WCColor.border)
+                SettingsRow(title: "Transactions") { Text("\(finance.data.transactions.count)").foregroundStyle(.secondary) }
+                Divider().background(WCColor.border)
+                SettingsRow(title: "Recurring Schedules") { Text("\(finance.data.recurringTransactions.count)").foregroundStyle(.secondary) }
+                Divider().background(WCColor.border)
+                SettingsRow(title: "Investments") { Text("\(finance.data.investments.count)").foregroundStyle(.secondary) }
+                Divider().background(WCColor.border)
+                SettingsRow(title: "Crypto Holdings") { Text("\(finance.data.crypto.count)").foregroundStyle(.secondary) }
+                Divider().background(WCColor.border)
+                SettingsRow(title: "Liabilities") { Text("\(finance.data.liabilities.count)").foregroundStyle(.secondary) }
+                Divider().background(WCColor.border)
+                SettingsRow(title: "Snapshots") { Text("\(finance.data.snapshots.count)").foregroundStyle(.secondary) }
+
+                Divider().background(WCColor.border)
 
                 Text(finance.storageLocationDescription)
                     .font(.caption.monospaced())
                     .foregroundStyle(.secondary)
                     .textSelection(.enabled)
+                    .padding(.top, 8)
             }
 
-            Section {
+            SettingsSection(title: "Danger Zone") {
                 Button("Delete All Local Data...", role: .destructive) {
                     pendingDestructiveAction = .deleteAllData
                 }
             }
         }
-        .formStyle(.grouped)
-        .padding()
     }
 
     private var syncSettings: some View {
-        Form {
-            Section("iCloud") {
-                Toggle("Sync Data with iCloud", isOn: $settings.isICloudSyncEnabled)
-                    .onChange(of: settings.isICloudSyncEnabled) { _, isEnabled in
-                        Task {
-                            await finance.setICloudSyncEnabled(isEnabled)
+        VStack(alignment: .leading, spacing: 32) {
+            SettingsSection(title: "iCloud Sync") {
+                SettingsRow(
+                    title: "Sync Data with iCloud",
+                    subtitle: "Your financial data stays available locally and syncs across your devices through your private CloudKit database."
+                ) {
+                    Toggle("", isOn: $settings.isICloudSyncEnabled)
+                        .toggleStyle(.switch)
+                        .labelsHidden()
+                        .onChange(of: settings.isICloudSyncEnabled) { _, isEnabled in
+                            Task {
+                                await finance.setICloudSyncEnabled(isEnabled)
+                            }
                         }
-                    }
-                
-                Text("Your financial data stays available locally and syncs across your devices through your private CloudKit database.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                }
 
-                LabeledContent("Status", value: finance.cloudSyncStatus.title)
+                Divider().background(WCColor.border)
+
+                SettingsRow(title: "Status") {
+                    Text(finance.cloudSyncStatus.title)
+                        .foregroundStyle(finance.iCloudSyncError == nil ? .secondary : WCColor.destructive)
+                }
+
                 if let detail = finance.cloudSyncStatus.detail {
                     Text(detail)
                         .font(.caption)
-                        .foregroundStyle(finance.iCloudSyncError == nil ? Color.secondary : Color.red)
+                        .foregroundStyle(finance.iCloudSyncError == nil ? .secondary : WCColor.destructive)
                 }
             }
             
             if settings.isICloudSyncEnabled {
-                Section {
+                SettingsSection(title: "Manual Actions") {
                     Button {
                         Task {
                             do {
@@ -305,8 +428,6 @@ struct MacSettingsView: View {
                 }
             }
         }
-        .formStyle(.grouped)
-        .padding()
     }
 
     private var biometricLockBinding: Binding<Bool> {
