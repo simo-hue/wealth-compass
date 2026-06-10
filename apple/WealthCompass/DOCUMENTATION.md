@@ -109,3 +109,11 @@
 - [2026-06-10 18:51]: Centered Cash Flow Filters
   - *Details*: Centered the transaction filter pill horizontally on the Cash Flow page.
   - *Tech Notes*: Removed internal `Spacer()` and applied `.frame(maxWidth: .infinity, alignment: .center)` to the `transactionFilters` component in `MacCashFlowView.swift`.
+
+- [2026-06-10 18:54]: Removed Repetitive Position Section
+  - *Details*: Removed the Position section cards from the macOS dashboard entirely because it presented repetitive net-worth and position information.
+  - *Tech Notes*: Deleted `positionSection` and the `PositionMetricCard` struct from `MacDashboardView.swift`.
+
+- [2026-06-10 18:57]: Net Worth Chart Hover UX Improvement
+  - *Details*: Replaced the awkward bottom bar that appeared when hovering the net worth chart with a sleek, floating Chart annotation directly attached to the selected rule mark. This guarantees a much more professional and seamless UX, keeping the user's focus on the data point itself without shifting layout below.
+  - *Tech Notes*: Updated MacDashboardView.swift by adding an '.annotation(position: .top, overflowResolution: ...)' to the existing RuleMark and removing the separate HStack that conditionally appeared below the chart.

@@ -36,7 +36,6 @@ struct MacDashboardView: View {
                     }
 
                     netWorthHero
-                    positionSection
 
                     if proxy.size.width >= 1_090 {
                         HStack(alignment: .top, spacing: 20) {
@@ -267,6 +266,28 @@ struct MacDashboardView: View {
                                 RuleMark(x: .value("Selected date", selectedPoint.date))
                                     .foregroundStyle(.white.opacity(0.34))
                                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                                    .annotation(
+                                        position: .top,
+                                        spacing: 0,
+                                        overflowResolution: .init(x: .fit(to: .chart), y: .disabled)
+                                    ) {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(selectedPoint.date.formatted(date: .abbreviated, time: .shortened))
+                                                .font(.caption2.weight(.medium))
+                                                .foregroundStyle(.white.opacity(0.62))
+                                            Text(settings.privateCurrency(selectedPoint.value))
+                                                .font(.callout.monospacedDigit().weight(.bold))
+                                                .foregroundStyle(.white)
+                                        }
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 8)
+                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                        .overlay {
+                                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                                .stroke(.white.opacity(0.1), lineWidth: 1)
+                                        }
+                                        .padding(.bottom, 6)
+                                    }
 
                                 PointMark(
                                     x: .value("Selected date", selectedPoint.date),
@@ -290,21 +311,6 @@ struct MacDashboardView: View {
                         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: points)
                         .frame(height: 238)
 
-                        if let selectedPoint {
-                            HStack(spacing: 10) {
-                                Image(systemName: "scope")
-                                    .foregroundStyle(WCColor.primary)
-                                Text(selectedPoint.date.formatted(date: .long, time: .shortened))
-                                    .foregroundStyle(.white.opacity(0.62))
-                                Spacer()
-                                Text(settings.privateCurrency(selectedPoint.value))
-                                    .font(.subheadline.monospacedDigit().weight(.bold))
-                                    .foregroundStyle(.white)
-                            }
-                            .padding(.horizontal, 13)
-                            .padding(.vertical, 10)
-                            .background(.black.opacity(0.16), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        }
                     }
                 }
                 .padding(24)
@@ -333,64 +339,6 @@ struct MacDashboardView: View {
             Label("No snapshots yet", systemImage: "camera.metering.center.weighted")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.white.opacity(0.52))
-        }
-    }
-
-    private var positionSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeading(
-                "Position",
-                subtitle: "Balances derived from your recorded activity and holdings"
-            )
-
-            LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: 178, maximum: 290), spacing: 14)],
-                alignment: .leading,
-                spacing: 14
-            ) {
-                PositionMetricCard(
-                    title: "Recorded Cash",
-                    value: settings.privateCurrency(totals.totalLiquidity),
-                    detail: finance.data.transactions.isEmpty ? "No cash activity yet" : "Income less expenses",
-                    systemImage: "banknote.fill",
-                    tint: WCColor.primary
-                )
-                PositionMetricCard(
-                    title: "Investments",
-                    value: settings.privateCurrency(totals.totalInvestments),
-                    detail: countLabel(finance.data.investments.count, singular: "position"),
-                    systemImage: "chart.line.uptrend.xyaxis",
-                    tint: .cyan
-                )
-                PositionMetricCard(
-                    title: "Crypto",
-                    value: settings.privateCurrency(totals.totalCrypto),
-                    detail: countLabel(finance.data.crypto.count, singular: "holding"),
-                    systemImage: "bitcoinsign.circle.fill",
-                    tint: WCColor.warning
-                )
-                PositionMetricCard(
-                    title: "Total Assets",
-                    value: settings.privateCurrency(totals.totalAssets),
-                    detail: "Liquidity, investments & crypto",
-                    systemImage: "building.columns.fill",
-                    tint: .indigo
-                )
-                PositionMetricCard(
-                    title: "Liabilities",
-                    value: settings.privateCurrency(totals.totalLiabilities),
-                    detail: countLabel(finance.data.liabilities.count, singular: "liability"),
-                    systemImage: "creditcard.trianglebadge.exclamationmark",
-                    tint: WCColor.destructive
-                )
-                PositionMetricCard(
-                    title: "Net Savings",
-                    value: settings.privateCurrency(currentMonthCashFlow.netSavings),
-                    detail: Date().formatted(.dateTime.month(.wide)),
-                    systemImage: currentMonthCashFlow.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
-                    tint: currentMonthCashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive
-                )
-            }
         }
     }
 
@@ -829,48 +777,6 @@ private struct DashboardGlassCard<Content: View>: View {
                     .stroke(.white.opacity(0.08), lineWidth: 1)
             }
             .shadow(color: .black.opacity(0.18), radius: 18, y: 10)
-    }
-}
-
-private struct PositionMetricCard: View {
-    let title: String
-    let value: String
-    let detail: String
-    let systemImage: String
-    let tint: Color
-
-    var body: some View {
-        DashboardGlassCard(padding: 16) {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Image(systemName: systemImage)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(tint)
-                        .frame(width: 32, height: 32)
-                        .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
-                    Spacer()
-                    Circle()
-                        .fill(tint.opacity(0.7))
-                        .frame(width: 5, height: 5)
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(.white.opacity(0.48))
-                    Text(value)
-                        .font(.title3.monospacedDigit().weight(.bold))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.66)
-                    Text(detail)
-                        .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.36))
-                        .lineLimit(1)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
     }
 }
 
