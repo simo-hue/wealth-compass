@@ -639,6 +639,32 @@ final class FinanceStore: ObservableObject {
         .sorted { $0.value > $1.value }
     }
 
+    func investmentTypeAllocation(settings: AppSettings) -> [AllocationSlice] {
+        let grouped = Dictionary(grouping: data.investments, by: { $0.type.title })
+            .mapValues { items in
+                items.reduce(0) { partial, investment in
+                    partial + settings.convert(investment.currentValue, from: investment.currency)
+                }
+            }
+        return grouped.enumerated().map { index, item in
+            AllocationSlice(name: item.key, value: item.value, color: ColorPalette.chart[index % ColorPalette.chart.count])
+        }
+        .sorted { $0.value > $1.value }
+    }
+
+    func investmentGeographyAllocation(settings: AppSettings) -> [AllocationSlice] {
+        let grouped = Dictionary(grouping: data.investments, by: \.geography)
+            .mapValues { items in
+                items.reduce(0) { partial, investment in
+                    partial + settings.convert(investment.currentValue, from: investment.currency)
+                }
+            }
+        return grouped.enumerated().map { index, item in
+            AllocationSlice(name: item.key, value: item.value, color: ColorPalette.chart[index % ColorPalette.chart.count])
+        }
+        .sorted { $0.value > $1.value }
+    }
+
     func cryptoAllocation(settings: AppSettings) -> [AllocationSlice] {
         data.crypto.enumerated().map { index, holding in
             AllocationSlice(

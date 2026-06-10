@@ -117,3 +117,19 @@
 - [2026-06-10 18:57]: Net Worth Chart Hover UX Improvement
   - *Details*: Replaced the awkward bottom bar that appeared when hovering the net worth chart with a sleek, floating Chart annotation directly attached to the selected rule mark. This guarantees a much more professional and seamless UX, keeping the user's focus on the data point itself without shifting layout below.
   - *Tech Notes*: Updated MacDashboardView.swift by adding an '.annotation(position: .top, overflowResolution: ...)' to the existing RuleMark and removing the separate HStack that conditionally appeared below the chart.
+
+- [2026-06-10 19:03]: Cash Flow Overview Redesign
+  - *Details*: Completely redesigned the Cash Flow Overview page to use a responsive dashboard layout, adding a "Six-Month Cash Flow" trend chart and a "Recent Activity" list while packing "Expense Categories" and "Recurring Transactions" into compact side-by-side cards.
+  - *Tech Notes*: Modified `MacCashFlowView.swift` to use `GeometryReader` with a grid layout mirroring the dashboard. Extracted `ActivityRow`, `DashboardEmptyState`, `CashFlowLegendItem`, and `PrivacyChartCover` from `MacDashboardView.swift` by making them `internal` to enable clean code reuse. Added `signedAmount(for:)` helper to `MacCashFlowView`.
+
+- [2026-06-10 19:04]: Improved Mac Investments Overview Dashboard
+  - *Details*: Redesigned the overview tab in `MacInvestmentsView.swift` to show three donut charts side-by-side (Allocation by Sector, Allocation by Type, Allocation by Geography). Also added a "Top Holdings" section to display the top 5 largest investments in the portfolio for better UX.
+  - *Tech Notes*: Added `investmentTypeAllocation` and `investmentGeographyAllocation` to `FinanceStore.swift` to provide data slices for the new charts.
+
+- [2026-06-10 19:11]: AllocationChart Uniform Height Fix
+  - *Details*: Ensured that multiple `AllocationChart` views placed in an `HStack` expand to match the height of the tallest chart in the row, preventing unprofessional staggered box sizes.
+  - *Tech Notes*: Added `.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)` to the inner `VStack` of `AllocationChart` in `DesignSystem.swift`.
+
+- [2026-06-10 19:14]: Cash Flow Cards Uniform Height Fix
+  - *Details*: Coordinated the sizes of the "Recent Activity" and "Recurring Transactions" boxes in the Cash Flow Overview to dynamically match heights, maintaining a professional and aligned grid. Also applied this to the trend and category charts.
+  - *Tech Notes*: Added `.frame(maxHeight: .infinity, alignment: .top)` to the inner `VStack` inside `recentActivityCard`, `recurringTransactionsCard`, `cashFlowTrendCard`, and `expenseCategoriesCard` in `MacCashFlowView.swift` to allow them to stretch to the `HStack`'s proposed height.
