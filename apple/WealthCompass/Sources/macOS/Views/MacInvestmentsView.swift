@@ -133,71 +133,108 @@ struct MacInvestmentsView: View {
     }
 
     private var investmentTable: some View {
-        Table(finance.data.investments, selection: $selection) {
-            TableColumn("Symbol", value: \.symbol)
-                .width(min: 70, ideal: 90)
-            TableColumn("Name", value: \.name)
-            TableColumn("Type") { Text($0.type.title) }
-                .width(min: 80, ideal: 100)
-            TableColumn("Quantity") {
-                Text(settings.privateNumber($0.quantity, fractionDigits: 6))
-                    .monospacedDigit()
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
+                if finance.data.investments.isEmpty {
+                    ContentUnavailableView(
+                        "No Investments",
+                        systemImage: "chart.line.uptrend.xyaxis",
+                        description: Text("Add stocks, ETFs, bonds, or other positions.")
+                    )
+                    .padding(.top, 40)
+                } else {
+                    ForEach(finance.data.investments) { investment in
+                        investmentCard(for: investment)
+                    }
+                }
             }
-            .width(min: 90, ideal: 110)
-            TableColumn("Value") {
-                Text(settings.privateCurrency($0.currentValue, sourceCurrency: $0.currency))
-                    .monospacedDigit()
-            }
-            .width(min: 110, ideal: 140)
-            TableColumn("Gain / Loss") {
-                ValueDelta(
-                    value: $0.gainLoss,
-                    formattedValue: settings.privateCurrency($0.gainLoss, sourceCurrency: $0.currency),
-                    percent: $0.gainLossPercent
-                )
-            }
-            .width(min: 150, ideal: 180)
-            TableColumn("Updated") {
-                Text(formattedUpdate($0.updatedAt))
-                    .foregroundStyle(.secondary)
-            }
-            .width(min: 120, ideal: 150)
+            .padding(32)
+            .frame(maxWidth: 1440, alignment: .leading)
+            .frame(maxWidth: .infinity)
         }
-        .contextMenu(forSelectionType: Investment.ID.self) { selectedIDs in
-            if let id = selectedIDs.first,
-               let investment = finance.data.investments.first(where: { $0.id == id }) {
-                Button {
-                    appModel.editor = .investment(investment)
-                } label: {
-                    Label("Edit Investment", systemImage: "pencil")
+    }
+
+    private func investmentCard(for investment: Investment) -> some View {
+        FinanceCard {
+            VStack(spacing: 16) {
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(investment.name)
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                        HStack(spacing: 6) {
+                            Text(investment.symbol)
+                                .font(.subheadline.weight(.semibold))
+                            Text("•")
+                                .foregroundStyle(.secondary)
+                            Text(investment.type.title)
+                                .font(.subheadline)
+                        }
+                        .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text(settings.privateCurrency(investment.currentValue, sourceCurrency: investment.currency))
+                            .font(.headline.monospacedDigit())
+                            .foregroundStyle(.white)
+                        ValueDelta(
+                            value: investment.gainLoss,
+                            formattedValue: settings.privateCurrency(investment.gainLoss, sourceCurrency: investment.currency),
+                            percent: investment.gainLossPercent
+                        )
+                    }
                 }
-
-                Divider()
-
-                Button(role: .destructive) {
-                    investmentPendingDeletion = investment
-                } label: {
-                    Label("Delete Investment", systemImage: "trash")
+                
+                Divider().background(WCColor.border)
+                
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Quantity")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(settings.privateNumber(investment.quantity, fractionDigits: 6))
+                            .font(.subheadline.monospacedDigit())
+                            .foregroundStyle(.white)
+                    }
+                    Spacer()
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Current Price")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(settings.privateCurrency(investment.currentPrice, sourceCurrency: investment.currency))
+                            .font(.subheadline.monospacedDigit())
+                            .foregroundStyle(.white)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("Last Updated")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(formattedUpdate(investment.updatedAt))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
-        } primaryAction: { selectedIDs in
-            // Double-click to edit
-            if let id = selectedIDs.first,
-               let investment = finance.data.investments.first(where: { $0.id == id }) {
+        }
+        .contentShape(Rectangle())
+        .onTapGesture(count: 2) {
+            appModel.editor = .investment(investment)
+        }
+        .contextMenu {
+            Button {
                 appModel.editor = .investment(investment)
+            } label: {
+                Label("Edit Investment", systemImage: "pencil")
             }
-        }
-        .onDeleteCommand {
-            guard let investment = selectedInvestment else { return }
-            investmentPendingDeletion = investment
-        }
-        .overlay {
-            if finance.data.investments.isEmpty {
-                ContentUnavailableView(
-                    "No Investments",
-                    systemImage: "chart.line.uptrend.xyaxis",
-                    description: Text("Add stocks, ETFs, bonds, or other positions.")
-                )
+            
+            Divider()
+            
+            Button(role: .destructive) {
+                investmentPendingDeletion = investment
+            } label: {
+                Label("Delete Investment", systemImage: "trash")
             }
         }
     }

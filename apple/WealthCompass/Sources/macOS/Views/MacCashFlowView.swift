@@ -417,66 +417,90 @@ struct MacCashFlowView: View {
     }
 
     private var transactionTable: some View {
-        Table(filteredTransactions, selection: $selection) {
-            TableColumn("Date") { transaction in
-                Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
-            }
-            .width(min: 90, ideal: 110)
-
-            TableColumn("Type") { transaction in
-                Label(
-                    transaction.type.title,
-                    systemImage: transaction.type == .income ? "arrow.down.left" : "arrow.up.right"
-                )
-                .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
-            }
-            .width(min: 90, ideal: 110)
-
-            TableColumn("Category") { transaction in
-                HStack(spacing: 6) {
-                    Text(transaction.category)
-                    if transaction.recurringTransactionID != nil {
-                        Image(systemName: "repeat")
-                            .font(.caption)
-                            .foregroundStyle(WCColor.primary)
-                            .help("Generated from a recurring schedule")
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
+                if filteredTransactions.isEmpty {
+                    ContentUnavailableView(
+                        transactionEmptyTitle,
+                        systemImage: transactionEmptySystemImage,
+                        description: Text(transactionEmptyDescription)
+                    )
+                    .padding(.top, 40)
+                } else {
+                    ForEach(filteredTransactions) { transaction in
+                        transactionCard(for: transaction)
                     }
                 }
             }
-            .width(min: 110, ideal: 160)
-
-            TableColumn("Description", value: \.description)
-
-            TableColumn("Amount") { transaction in
-                let prefix = transaction.type == .income ? "+" : "-"
-                Text("\(prefix)\(settings.privateCurrency(transaction.amount))")
-                    .monospacedDigit()
-                    .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .width(min: 120, ideal: 150)
+            .padding(24)
+            .frame(maxWidth: 1440, alignment: .leading)
+            .frame(maxWidth: .infinity)
         }
-        .contextMenu(forSelectionType: Transaction.ID.self) { selectedIDs in
-            if let id = selectedIDs.first,
-               let transaction = filteredTransactions.first(where: { $0.id == id }) {
-                Button(role: .destructive) {
-                    activeAlert = .deleteTransaction(transaction)
-                } label: {
-                    Label("Delete Transaction", systemImage: "trash")
+    }
+
+    private func transactionCard(for transaction: Transaction) -> some View {
+        FinanceCard {
+            VStack(spacing: 16) {
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 6) {
+                            Text(transaction.category)
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                            if transaction.recurringTransactionID != nil {
+                                Image(systemName: "repeat")
+                                    .font(.caption)
+                                    .foregroundStyle(WCColor.primary)
+                                    .help("Generated from a recurring schedule")
+                            }
+                        }
+                        
+                        HStack(spacing: 6) {
+                            Label(
+                                transaction.type.title,
+                                systemImage: transaction.type == .income ? "arrow.down.left" : "arrow.up.right"
+                            )
+                            .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
+                            .font(.subheadline.weight(.semibold))
+                        }
+                    }
+                    Spacer()
+                    
+                    let prefix = transaction.type == .income ? "+" : "-"
+                    Text("\(prefix)\(settings.privateCurrency(transaction.amount))")
+                        .font(.headline.monospacedDigit())
+                        .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
+                }
+                
+                if !transaction.description.isEmpty {
+                    Divider().background(WCColor.border)
+                    Text(transaction.description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                Divider().background(WCColor.border)
+                
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Date")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
+                    }
+                    Spacer()
                 }
             }
         }
-        .onDeleteCommand {
-            guard let selectedTransaction else { return }
-            activeAlert = .deleteTransaction(selectedTransaction)
-        }
-        .overlay {
-            if filteredTransactions.isEmpty {
-                ContentUnavailableView(
-                    transactionEmptyTitle,
-                    systemImage: transactionEmptySystemImage,
-                    description: Text(transactionEmptyDescription)
-                )
+        .contentShape(Rectangle())
+        .contextMenu {
+            Button(role: .destructive) {
+                activeAlert = .deleteTransaction(transaction)
+            } label: {
+                Label("Delete Transaction", systemImage: "trash")
             }
         }
     }
