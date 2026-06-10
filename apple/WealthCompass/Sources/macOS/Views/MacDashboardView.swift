@@ -11,6 +11,7 @@ struct MacDashboardView: View {
     @State private var selectedNetWorthDate: Date?
     @State private var cashFlowRange: CashFlowTimeframe = .sixMonths
     @State private var hoveredAssetSlice: AllocationSlice?
+    @State private var hoveredCashFlowMonth: CashFlowMonth?
     @Namespace private var animationNamespace
 
     private var totals: FinanceTotals {
@@ -510,6 +511,7 @@ struct MacDashboardView: View {
                         .foregroundStyle(WCColor.primary.gradient)
                         .position(by: .value("Type", "Income"))
                         .cornerRadius(6)
+                        .opacity(hoveredCashFlowMonth == nil || hoveredCashFlowMonth?.id == month.id ? 1.0 : 0.3)
 
                         BarMark(
                             x: .value("Month", month.monthLabel),
@@ -518,8 +520,32 @@ struct MacDashboardView: View {
                         .foregroundStyle(WCColor.destructive.opacity(0.78).gradient)
                         .position(by: .value("Type", "Expenses"))
                         .cornerRadius(6)
+                        .opacity(hoveredCashFlowMonth == nil || hoveredCashFlowMonth?.id == month.id ? 1.0 : 0.3)
                     }
                     .chartLegend(.hidden)
+                    .chartOverlay { proxy in
+                        GeometryReader { geometry in
+                            Rectangle().fill(.clear).contentShape(Rectangle())
+                                .onContinuousHover { phase in
+                                    switch phase {
+                                    case .active(let location):
+                                        if let plotFrame = proxy.plotFrame {
+                                            let frame = geometry[plotFrame]
+                                            let x = location.x - frame.origin.x
+                                            if let monthLabel: String = proxy.value(atX: x) {
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    hoveredCashFlowMonth = trend.first { $0.monthLabel == monthLabel }
+                                                }
+                                            }
+                                        }
+                                    case .ended:
+                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                            hoveredCashFlowMonth = nil
+                                        }
+                                    }
+                                }
+                        }
+                    }
                     .chartXAxis {
                         AxisMarks { _ in
                             AxisValueLabel()
@@ -534,23 +560,24 @@ struct MacDashboardView: View {
                 HStack(spacing: 20) {
                     CashFlowLegendItem(
                         title: "Income",
-                        value: settings.privateCurrency(totalIncome),
+                        value: settings.privateCurrency(hoveredCashFlowMonth?.income ?? totalIncome),
                         color: WCColor.primary
                     )
                     CashFlowLegendItem(
                         title: "Expenses",
-                        value: settings.privateCurrency(totalExpense),
+                        value: settings.privateCurrency(hoveredCashFlowMonth?.expense ?? totalExpense),
                         color: WCColor.destructive
                     )
                     Spacer(minLength: 0)
                     VStack(alignment: .trailing, spacing: 3) {
-                        Text("\(cashFlowRange.label) NET")
+                        Text(hoveredCashFlowMonth != nil ? hoveredCashFlowMonth!.monthLabel.uppercased() : "\(cashFlowRange.label) NET")
                             .font(.caption2.weight(.bold))
                             .tracking(1)
                             .foregroundStyle(.white.opacity(0.4))
-                        Text(settings.privateCurrency(totalIncome - totalExpense))
+                        let net = hoveredCashFlowMonth != nil ? (hoveredCashFlowMonth!.income - hoveredCashFlowMonth!.expense) : (totalIncome - totalExpense)
+                        Text(settings.privateCurrency(net))
                             .font(.subheadline.monospacedDigit().weight(.bold))
-                            .foregroundStyle(totalIncome - totalExpense >= 0 ? WCColor.primary : WCColor.destructive)
+                            .foregroundStyle(net >= 0 ? WCColor.primary : WCColor.destructive)
                     }
                 }
             }
