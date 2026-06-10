@@ -169,3 +169,13 @@
 - [2026-06-10 19:48]: Layout Optimization for Expense Categories
   - *Details*: Fixed a layout issue where the title was wrapping awkwardly due to the segmented picker taking up too much horizontal space.
   - *Tech Notes*: Reverted the `DashboardSegmentedPicker` on the Expense Categories card in `MacCashFlowView.swift` back to a native `Picker` with `.pickerStyle(.menu)` and a constrained frame of `142pt` to ensure enough width remains for the section title.
+- [2026-06-10 19:53]: macOS Toolbar Layout Fix
+  - *Details*: Removed the global 'Add' menu from MacRootView's toolbar to rely on context-specific toolbars defined by each sub-view.
+  - *Tech Notes*: The `detail` view toolbar in `MacRootView.swift` was stripped of its `Menu` for adding new transactions, investments, or crypto holdings. Now it only keeps the global 'Refresh Data' button. Child views like Cash Flow, Investments, and Crypto provide their own addition functionality without duplicating buttons in the window toolbar.
+- [2026-06-10 19:56]: Cash Flow Search Bar Moved
+  - *Details*: Removed the macOS toolbar '.searchable' modifier in MacCashFlowView and instead added a custom TextField inline with the existing Type and Period filter selectors.
+  - *Tech Notes*: This unifies the filtering and searching UX into the single centered control box.
+- [2026-06-10 19:58]: Search Bar Position Tweak
+  - *Details*: Reordered the filters in MacCashFlowView so the search bar sits directly between the 'Type' and 'Period' selectors.
+- [2026-06-10 19:58]: Search Bar Clear Button
+  - *Details*: Added an 'X' button inside the Cash Flow search field that appears when text is entered, allowing quick clearing of the search query.

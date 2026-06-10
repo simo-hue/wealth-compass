@@ -37,14 +37,6 @@ struct MacRootView: View {
                                 .disabled(isRefreshing)
                                 .keyboardShortcut("r", modifiers: .command)
 
-                                Menu {
-                                    Button("Transaction") { appModel.editor = .transaction }
-                                        .keyboardShortcut("n", modifiers: .command)
-                                    Button("Investment") { appModel.editor = .investment(nil) }
-                                    Button("Crypto Holding") { appModel.editor = .crypto(nil) }
-                                } label: {
-                                    Label("Add", systemImage: "plus")
-                                }
                             }
                         }
                 }

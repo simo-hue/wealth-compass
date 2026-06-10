@@ -153,7 +153,6 @@ struct MacCashFlowView: View {
         }
         .background(ScreenBackground())
         .navigationTitle("Cash Flow")
-        .searchable(text: $searchText, prompt: "Search transactions")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Menu {
@@ -622,6 +621,31 @@ struct MacCashFlowView: View {
                 .labelsHidden()
                 .frame(width: 220)
             }
+
+            HStack(spacing: 10) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Search", text: $searchText)
+                    .textFieldStyle(.plain)
+                
+                if !searchText.isEmpty {
+                    Button {
+                        searchText = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Color(nsColor: .controlBackgroundColor).opacity(0.5))
+            }
+            .frame(width: 200)
 
             HStack(spacing: 10) {
                 Text("Period")
