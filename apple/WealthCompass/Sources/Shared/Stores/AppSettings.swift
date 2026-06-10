@@ -2,8 +2,8 @@ import Foundation
 
 @MainActor
 final class AppSettings: ObservableObject {
-    let defaultIncomeCategories = ["Salary", "Freelance", "Dividends", "Other"]
-    let defaultExpenseCategories = ["Housing", "Food", "Transport", "Utilities", "Fuel", "Entertainment", "Shopping", "Health", "Other"]
+    let defaultIncomeCategories = [String(localized: "Salary"), String(localized: "Freelance"), String(localized: "Dividends"), String(localized: "Other")]
+    let defaultExpenseCategories = [String(localized: "Housing"), String(localized: "Food"), String(localized: "Transport"), String(localized: "Utilities"), String(localized: "Fuel"), String(localized: "Entertainment"), String(localized: "Shopping"), String(localized: "Health"), String(localized: "Other")]
 
     @Published var currency: Currency {
         didSet { userDefaults.set(currency.rawValue, forKey: Keys.currency) }
@@ -15,6 +15,20 @@ final class AppSettings: ObservableObject {
 
     @Published var isICloudSyncEnabled: Bool {
         didSet { userDefaults.set(isICloudSyncEnabled, forKey: Keys.iCloudSyncEnabled) }
+    }
+
+    @Published var hasSeenOnboarding: Bool {
+        didSet { userDefaults.set(hasSeenOnboarding, forKey: Keys.hasSeenOnboarding) }
+    }
+
+    @Published var appLanguage: String? {
+        didSet {
+            if let lang = appLanguage {
+                userDefaults.set(lang, forKey: Keys.appLanguage)
+            } else {
+                userDefaults.removeObject(forKey: Keys.appLanguage)
+            }
+        }
     }
 
     @Published private(set) var customIncomeCategories: [String] = [] {
@@ -39,6 +53,8 @@ final class AppSettings: ObservableObject {
         static let customExpenseCategories = "wc_mobile_custom_expense_categories"
         static let exchangeRateSnapshot = "wc_mobile_exchange_rate_snapshot"
         static let iCloudSyncEnabled = "wc_mobile_icloud_sync_enabled"
+        static let hasSeenOnboarding = "wc_mobile_has_seen_onboarding"
+        static let appLanguage = "wc_mobile_app_language"
     }
 
     init(userDefaults: UserDefaults = .standard) {
@@ -49,6 +65,8 @@ final class AppSettings: ObservableObject {
         currency = storedCurrency
         isPrivacyMode = userDefaults.bool(forKey: Keys.privacyMode)
         isICloudSyncEnabled = userDefaults.bool(forKey: Keys.iCloudSyncEnabled)
+        hasSeenOnboarding = userDefaults.bool(forKey: Keys.hasSeenOnboarding)
+        appLanguage = userDefaults.string(forKey: Keys.appLanguage)
         customIncomeCategories = Self.loadStringArray(key: Keys.customIncomeCategories, userDefaults: userDefaults)
         customExpenseCategories = Self.loadStringArray(key: Keys.customExpenseCategories, userDefaults: userDefaults)
 
@@ -61,6 +79,14 @@ final class AppSettings: ObservableObject {
         } else {
             exchangeRateSnapshot = nil
         }
+    }
+
+    var availableLanguages: [String] {
+        Bundle.main.localizations.filter { $0 != "Base" }.sorted()
+    }
+
+    func languageName(for code: String) -> String {
+        Locale.current.localizedString(forIdentifier: code)?.capitalized ?? code
     }
 
     func transactionCategories(for type: TransactionType) -> [String] {

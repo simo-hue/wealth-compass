@@ -7,46 +7,49 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AD0000000000000000000001 /* Models/FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000001 /* Models/FinanceModels.swift */; };
-		AD0000000000000000000002 /* Persistence/FinancePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000002 /* Persistence/FinancePersistence.swift */; };
-		AD0000000000000000000003 /* Stores/AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000003 /* Stores/AppSettings.swift */; };
-		AD0000000000000000000004 /* Stores/FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000004 /* Stores/FinanceStore.swift */; };
-		AD0000000000000000000005 /* Services/ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000005 /* Services/ExchangeRateService.swift */; };
-		AD0000000000000000000006 /* Services/MarketDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000006 /* Services/MarketDataService.swift */; };
-		AD0000000000000000000007 /* UI/DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000007 /* UI/DesignSystem.swift */; };
-		AD0000000000000000000008 /* Persistence/FinanceJSONCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000008 /* Persistence/FinanceJSONCoding.swift */; };
-		AD0000000000000000000009 /* Services/CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000009 /* Services/CloudKitSyncService.swift */; };
-		AD0000000000000000000011 /* Models/FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000001 /* Models/FinanceModels.swift */; };
-		AD0000000000000000000012 /* Persistence/FinancePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000002 /* Persistence/FinancePersistence.swift */; };
-		AD0000000000000000000013 /* Stores/AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000003 /* Stores/AppSettings.swift */; };
-		AD0000000000000000000014 /* Stores/FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000004 /* Stores/FinanceStore.swift */; };
-		AD0000000000000000000015 /* Services/ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000005 /* Services/ExchangeRateService.swift */; };
-		AD0000000000000000000016 /* Services/MarketDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000006 /* Services/MarketDataService.swift */; };
-		AD0000000000000000000017 /* UI/DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000007 /* UI/DesignSystem.swift */; };
-		AD0000000000000000000018 /* Persistence/FinanceJSONCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000008 /* Persistence/FinanceJSONCoding.swift */; };
-		AD0000000000000000000019 /* Services/CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000009 /* Services/CloudKitSyncService.swift */; };
+		079720BCD2175270C1EFBBB4 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8172F5C756C4F1253BA6A0F9 /* Localizable.xcstrings */; };
+		1E6833B0C43E0B035AE4B46B /* MacOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CED77C7238F3CB0FAFA197 /* MacOnboardingView.swift */; };
+		82F547D94464A8236318876C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8172F5C756C4F1253BA6A0F9 /* Localizable.xcstrings */; };
+		AD0000000000000000000001 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000001 /* FinanceModels.swift */; };
+		AD0000000000000000000002 /* FinancePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000002 /* FinancePersistence.swift */; };
+		AD0000000000000000000003 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000003 /* AppSettings.swift */; };
+		AD0000000000000000000004 /* FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000004 /* FinanceStore.swift */; };
+		AD0000000000000000000005 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000005 /* ExchangeRateService.swift */; };
+		AD0000000000000000000006 /* MarketDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000006 /* MarketDataService.swift */; };
+		AD0000000000000000000007 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000007 /* DesignSystem.swift */; };
+		AD0000000000000000000008 /* FinanceJSONCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000008 /* FinanceJSONCoding.swift */; };
+		AD0000000000000000000009 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000009 /* CloudKitSyncService.swift */; };
+		AD0000000000000000000011 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000001 /* FinanceModels.swift */; };
+		AD0000000000000000000012 /* FinancePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000002 /* FinancePersistence.swift */; };
+		AD0000000000000000000013 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000003 /* AppSettings.swift */; };
+		AD0000000000000000000014 /* FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000004 /* FinanceStore.swift */; };
+		AD0000000000000000000015 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000005 /* ExchangeRateService.swift */; };
+		AD0000000000000000000016 /* MarketDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000006 /* MarketDataService.swift */; };
+		AD0000000000000000000017 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000007 /* DesignSystem.swift */; };
+		AD0000000000000000000018 /* FinanceJSONCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000008 /* FinanceJSONCoding.swift */; };
+		AD0000000000000000000019 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000009 /* CloudKitSyncService.swift */; };
 		AD0000000000000000000020 /* WealthCompassMobileApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000010 /* WealthCompassMobileApp.swift */; };
 		AD0000000000000000000021 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000011 /* ContentView.swift */; };
-		AD0000000000000000000022 /* Services/AppLockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000012 /* Services/AppLockStore.swift */; };
-		AD0000000000000000000023 /* Services/RecurringTransactionNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000013 /* Services/RecurringTransactionNotificationService.swift */; };
-		AD0000000000000000000024 /* Views/DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000014 /* Views/DashboardView.swift */; };
-		AD0000000000000000000025 /* Views/CashFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000015 /* Views/CashFlowView.swift */; };
-		AD0000000000000000000026 /* Views/InvestmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000016 /* Views/InvestmentsView.swift */; };
-		AD0000000000000000000027 /* Views/CryptoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000017 /* Views/CryptoView.swift */; };
-		AD0000000000000000000028 /* Views/SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000018 /* Views/SettingsView.swift */; };
-		AD0000000000000000000029 /* Views/Forms.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000019 /* Views/Forms.swift */; };
-		AD000000000000000000002A /* Views/LockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC000000000000000000001A /* Views/LockView.swift */; };
+		AD0000000000000000000022 /* AppLockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000012 /* AppLockStore.swift */; };
+		AD0000000000000000000023 /* RecurringTransactionNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000013 /* RecurringTransactionNotificationService.swift */; };
+		AD0000000000000000000024 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000014 /* DashboardView.swift */; };
+		AD0000000000000000000025 /* CashFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000015 /* CashFlowView.swift */; };
+		AD0000000000000000000026 /* InvestmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000016 /* InvestmentsView.swift */; };
+		AD0000000000000000000027 /* CryptoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000017 /* CryptoView.swift */; };
+		AD0000000000000000000028 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000018 /* SettingsView.swift */; };
+		AD0000000000000000000029 /* Forms.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000019 /* Forms.swift */; };
+		AD000000000000000000002A /* LockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC000000000000000000001A /* LockView.swift */; };
 		AD0000000000000000000030 /* WealthCompassMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000020 /* WealthCompassMacApp.swift */; };
 		AD0000000000000000000031 /* MacAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000021 /* MacAppModel.swift */; };
 		AD0000000000000000000032 /* MacRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000022 /* MacRootView.swift */; };
-		AD0000000000000000000033 /* Views/MacDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000023 /* Views/MacDashboardView.swift */; };
-		AD0000000000000000000034 /* Views/MacCashFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000024 /* Views/MacCashFlowView.swift */; };
-		AD0000000000000000000035 /* Views/MacInvestmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000025 /* Views/MacInvestmentsView.swift */; };
-		AD0000000000000000000036 /* Views/MacCryptoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000026 /* Views/MacCryptoView.swift */; };
-		AD0000000000000000000037 /* Views/MacEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000027 /* Views/MacEditorSheet.swift */; };
-		AD0000000000000000000038 /* Views/MacSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000028 /* Views/MacSettingsView.swift */; };
+		AD0000000000000000000033 /* MacDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000023 /* MacDashboardView.swift */; };
+		AD0000000000000000000034 /* MacCashFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000024 /* MacCashFlowView.swift */; };
+		AD0000000000000000000035 /* MacInvestmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000025 /* MacInvestmentsView.swift */; };
+		AD0000000000000000000036 /* MacCryptoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000026 /* MacCryptoView.swift */; };
+		AD0000000000000000000037 /* MacEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000027 /* MacEditorSheet.swift */; };
+		AD0000000000000000000038 /* MacSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000028 /* MacSettingsView.swift */; };
 		AD0000000000000000000039 /* MacPlatformServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000029 /* MacPlatformServices.swift */; };
-		AD000000000000000000003A /* Views/MacRecurringTransactionEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC000000000000000000002A /* Views/MacRecurringTransactionEditor.swift */; };
+		AD000000000000000000003A /* MacRecurringTransactionEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC000000000000000000002A /* MacRecurringTransactionEditor.swift */; };
 		AD0000000000000000000040 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000030 /* Assets.xcassets */; };
 		AD0000000000000000000041 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000031 /* PrivacyInfo.xcprivacy */; };
 		AD0000000000000000000042 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000032 /* Assets.xcassets */; };
@@ -56,6 +59,7 @@
 		C16E71416991E8C87B178C96 /* DynamicMasonryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1614C7598D89322EDC6DD1C /* DynamicMasonryLayout.swift */; };
 		E14ADF289E9B4D9DE196ACBF /* DynamicMasonryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3B18E883C3808CEB9592CB /* DynamicMasonryLayout.swift */; };
 		E4A507349567FDF9A3CA4F11 /* DynamicMasonryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1614C7598D89322EDC6DD1C /* DynamicMasonryLayout.swift */; };
+		E9814262C71865036098CABF /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93DFB98D4B9C2FF8406A9F2A /* OnboardingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,38 +73,41 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		05CED77C7238F3CB0FAFA197 /* MacOnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MacOnboardingView.swift; path = Sources/macOS/Views/MacOnboardingView.swift; sourceTree = SOURCE_ROOT; };
 		2402C7172FD4569C0010EA16 /* WealthCompassMobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WealthCompassMobile.entitlements; sourceTree = "<group>"; };
-		AC0000000000000000000001 /* Models/FinanceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/FinanceModels.swift; sourceTree = "<group>"; };
-		AC0000000000000000000002 /* Persistence/FinancePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/FinancePersistence.swift; sourceTree = "<group>"; };
-		AC0000000000000000000003 /* Stores/AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/AppSettings.swift; sourceTree = "<group>"; };
-		AC0000000000000000000004 /* Stores/FinanceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/FinanceStore.swift; sourceTree = "<group>"; };
-		AC0000000000000000000005 /* Services/ExchangeRateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExchangeRateService.swift; sourceTree = "<group>"; };
-		AC0000000000000000000006 /* Services/MarketDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/MarketDataService.swift; sourceTree = "<group>"; };
-		AC0000000000000000000007 /* UI/DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/DesignSystem.swift; sourceTree = "<group>"; };
-		AC0000000000000000000008 /* Persistence/FinanceJSONCoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/FinanceJSONCoding.swift; sourceTree = "<group>"; };
-		AC0000000000000000000009 /* Services/CloudKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/CloudKitSyncService.swift; sourceTree = "<group>"; };
+		8172F5C756C4F1253BA6A0F9 /* Localizable.xcstrings */ = {isa = PBXFileReference; includeInIndex = 1; name = Localizable.xcstrings; path = Sources/Shared/Resources/Localizable.xcstrings; sourceTree = "<group>"; };
+		93DFB98D4B9C2FF8406A9F2A /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = Sources/iOS/Views/OnboardingView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000001 /* FinanceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/FinanceModels.swift; sourceTree = "<group>"; };
+		AC0000000000000000000002 /* FinancePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/FinancePersistence.swift; sourceTree = "<group>"; };
+		AC0000000000000000000003 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/AppSettings.swift; sourceTree = "<group>"; };
+		AC0000000000000000000004 /* FinanceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/FinanceStore.swift; sourceTree = "<group>"; };
+		AC0000000000000000000005 /* ExchangeRateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExchangeRateService.swift; sourceTree = "<group>"; };
+		AC0000000000000000000006 /* MarketDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/MarketDataService.swift; sourceTree = "<group>"; };
+		AC0000000000000000000007 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/DesignSystem.swift; sourceTree = "<group>"; };
+		AC0000000000000000000008 /* FinanceJSONCoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/FinanceJSONCoding.swift; sourceTree = "<group>"; };
+		AC0000000000000000000009 /* CloudKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/CloudKitSyncService.swift; sourceTree = "<group>"; };
 		AC0000000000000000000010 /* WealthCompassMobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WealthCompassMobileApp.swift; sourceTree = "<group>"; };
 		AC0000000000000000000011 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		AC0000000000000000000012 /* Services/AppLockStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AppLockStore.swift; sourceTree = "<group>"; };
-		AC0000000000000000000013 /* Services/RecurringTransactionNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/RecurringTransactionNotificationService.swift; sourceTree = "<group>"; };
-		AC0000000000000000000014 /* Views/DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DashboardView.swift; sourceTree = "<group>"; };
-		AC0000000000000000000015 /* Views/CashFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CashFlowView.swift; sourceTree = "<group>"; };
-		AC0000000000000000000016 /* Views/InvestmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/InvestmentsView.swift; sourceTree = "<group>"; };
-		AC0000000000000000000017 /* Views/CryptoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CryptoView.swift; sourceTree = "<group>"; };
-		AC0000000000000000000018 /* Views/SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SettingsView.swift; sourceTree = "<group>"; };
-		AC0000000000000000000019 /* Views/Forms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Forms.swift; sourceTree = "<group>"; };
-		AC000000000000000000001A /* Views/LockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/LockView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000012 /* AppLockStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AppLockStore.swift; sourceTree = "<group>"; };
+		AC0000000000000000000013 /* RecurringTransactionNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/RecurringTransactionNotificationService.swift; sourceTree = "<group>"; };
+		AC0000000000000000000014 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DashboardView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000015 /* CashFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CashFlowView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000016 /* InvestmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/InvestmentsView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000017 /* CryptoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CryptoView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SettingsView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000019 /* Forms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Forms.swift; sourceTree = "<group>"; };
+		AC000000000000000000001A /* LockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/LockView.swift; sourceTree = "<group>"; };
 		AC0000000000000000000020 /* WealthCompassMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WealthCompassMacApp.swift; sourceTree = "<group>"; };
 		AC0000000000000000000021 /* MacAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAppModel.swift; sourceTree = "<group>"; };
 		AC0000000000000000000022 /* MacRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacRootView.swift; sourceTree = "<group>"; };
-		AC0000000000000000000023 /* Views/MacDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacDashboardView.swift; sourceTree = "<group>"; };
-		AC0000000000000000000024 /* Views/MacCashFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacCashFlowView.swift; sourceTree = "<group>"; };
-		AC0000000000000000000025 /* Views/MacInvestmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacInvestmentsView.swift; sourceTree = "<group>"; };
-		AC0000000000000000000026 /* Views/MacCryptoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacCryptoView.swift; sourceTree = "<group>"; };
-		AC0000000000000000000027 /* Views/MacEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacEditorSheet.swift; sourceTree = "<group>"; };
-		AC0000000000000000000028 /* Views/MacSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacSettingsView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000023 /* MacDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacDashboardView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000024 /* MacCashFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacCashFlowView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000025 /* MacInvestmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacInvestmentsView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000026 /* MacCryptoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacCryptoView.swift; sourceTree = "<group>"; };
+		AC0000000000000000000027 /* MacEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacEditorSheet.swift; sourceTree = "<group>"; };
+		AC0000000000000000000028 /* MacSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacSettingsView.swift; sourceTree = "<group>"; };
 		AC0000000000000000000029 /* MacPlatformServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPlatformServices.swift; sourceTree = "<group>"; };
-		AC000000000000000000002A /* Views/MacRecurringTransactionEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacRecurringTransactionEditor.swift; sourceTree = "<group>"; };
+		AC000000000000000000002A /* MacRecurringTransactionEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacRecurringTransactionEditor.swift; sourceTree = "<group>"; };
 		AC0000000000000000000030 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AC0000000000000000000031 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AC0000000000000000000032 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -140,12 +147,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0846A081640A6F68A49662BE /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8172F5C756C4F1253BA6A0F9 /* Localizable.xcstrings */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		17E2A2565A09C5C19BA0033F /* WealthCompass */ = {
 			isa = PBXGroup;
 			children = (
 				5A3D7665CEF1A72A312F3A7E /* Sources */,
 			);
 			name = WealthCompass;
+			sourceTree = "<group>";
+		};
+		22216D9668E88DBA43E9F42D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				93DFB98D4B9C2FF8406A9F2A /* OnboardingView.swift */,
+			);
+			name = Views;
 			sourceTree = "<group>";
 		};
 		2FDD42E97E1E4066D345861D /* UI */ = {
@@ -165,10 +188,19 @@
 			path = Sources/Shared/UI;
 			sourceTree = "<group>";
 		};
+		58190B4719430A647C4C459E /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				22216D9668E88DBA43E9F42D /* Views */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
 		5A3D7665CEF1A72A312F3A7E /* Sources */ = {
 			isa = PBXGroup;
 			children = (
 				72B44DF902FA95BCB3288EF2 /* Shared */,
+				58190B4719430A647C4C459E /* iOS */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -177,6 +209,7 @@
 			isa = PBXGroup;
 			children = (
 				2FDD42E97E1E4066D345861D /* UI */,
+				0846A081640A6F68A49662BE /* Resources */,
 			);
 			name = Shared;
 			sourceTree = "<group>";
@@ -206,15 +239,15 @@
 		AB0000000000000000000003 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				AC0000000000000000000001 /* Models/FinanceModels.swift */,
-				AC0000000000000000000002 /* Persistence/FinancePersistence.swift */,
-				AC0000000000000000000003 /* Stores/AppSettings.swift */,
-				AC0000000000000000000004 /* Stores/FinanceStore.swift */,
-				AC0000000000000000000005 /* Services/ExchangeRateService.swift */,
-				AC0000000000000000000006 /* Services/MarketDataService.swift */,
-				AC0000000000000000000007 /* UI/DesignSystem.swift */,
-				AC0000000000000000000008 /* Persistence/FinanceJSONCoding.swift */,
-				AC0000000000000000000009 /* Services/CloudKitSyncService.swift */,
+				AC0000000000000000000001 /* FinanceModels.swift */,
+				AC0000000000000000000002 /* FinancePersistence.swift */,
+				AC0000000000000000000003 /* AppSettings.swift */,
+				AC0000000000000000000004 /* FinanceStore.swift */,
+				AC0000000000000000000005 /* ExchangeRateService.swift */,
+				AC0000000000000000000006 /* MarketDataService.swift */,
+				AC0000000000000000000007 /* DesignSystem.swift */,
+				AC0000000000000000000008 /* FinanceJSONCoding.swift */,
+				AC0000000000000000000009 /* CloudKitSyncService.swift */,
 				520A8B945E3C6A6E2657845A /* UI */,
 			);
 			path = Shared;
@@ -225,15 +258,15 @@
 			children = (
 				AC0000000000000000000010 /* WealthCompassMobileApp.swift */,
 				AC0000000000000000000011 /* ContentView.swift */,
-				AC0000000000000000000012 /* Services/AppLockStore.swift */,
-				AC0000000000000000000013 /* Services/RecurringTransactionNotificationService.swift */,
-				AC0000000000000000000014 /* Views/DashboardView.swift */,
-				AC0000000000000000000015 /* Views/CashFlowView.swift */,
-				AC0000000000000000000016 /* Views/InvestmentsView.swift */,
-				AC0000000000000000000017 /* Views/CryptoView.swift */,
-				AC0000000000000000000018 /* Views/SettingsView.swift */,
-				AC0000000000000000000019 /* Views/Forms.swift */,
-				AC000000000000000000001A /* Views/LockView.swift */,
+				AC0000000000000000000012 /* AppLockStore.swift */,
+				AC0000000000000000000013 /* RecurringTransactionNotificationService.swift */,
+				AC0000000000000000000014 /* DashboardView.swift */,
+				AC0000000000000000000015 /* CashFlowView.swift */,
+				AC0000000000000000000016 /* InvestmentsView.swift */,
+				AC0000000000000000000017 /* CryptoView.swift */,
+				AC0000000000000000000018 /* SettingsView.swift */,
+				AC0000000000000000000019 /* Forms.swift */,
+				AC000000000000000000001A /* LockView.swift */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -245,13 +278,14 @@
 				AC0000000000000000000021 /* MacAppModel.swift */,
 				AC0000000000000000000022 /* MacRootView.swift */,
 				AC0000000000000000000029 /* MacPlatformServices.swift */,
-				AC0000000000000000000023 /* Views/MacDashboardView.swift */,
-				AC0000000000000000000024 /* Views/MacCashFlowView.swift */,
-				AC0000000000000000000025 /* Views/MacInvestmentsView.swift */,
-				AC0000000000000000000026 /* Views/MacCryptoView.swift */,
-				AC0000000000000000000027 /* Views/MacEditorSheet.swift */,
-				AC000000000000000000002A /* Views/MacRecurringTransactionEditor.swift */,
-				AC0000000000000000000028 /* Views/MacSettingsView.swift */,
+				AC0000000000000000000023 /* MacDashboardView.swift */,
+				AC0000000000000000000024 /* MacCashFlowView.swift */,
+				AC0000000000000000000025 /* MacInvestmentsView.swift */,
+				AC0000000000000000000026 /* MacCryptoView.swift */,
+				AC0000000000000000000027 /* MacEditorSheet.swift */,
+				AC000000000000000000002A /* MacRecurringTransactionEditor.swift */,
+				AC0000000000000000000028 /* MacSettingsView.swift */,
+				AB0DA0815EB7A305BFFBD0C3 /* Views */,
 			);
 			path = macOS;
 			sourceTree = "<group>";
@@ -301,6 +335,14 @@
 				AC0000000000000000000050 /* CloudSyncCoreTests.swift */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		AB0DA0815EB7A305BFFBD0C3 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				05CED77C7238F3CB0FAFA197 /* MacOnboardingView.swift */,
+			);
+			name = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -406,6 +448,40 @@
 			knownRegions = (
 				en,
 				Base,
+				it,
+				de,
+				es,
+				"zh-Hans",
+				ar,
+				fr,
+				ja,
+				ko,
+				"pt-BR",
+				"pt-PT",
+				ru,
+				"es-419",
+				tr,
+				ca,
+				hr,
+				cs,
+				da,
+				nl,
+				fi,
+				el,
+				he,
+				hi,
+				hu,
+				id,
+				ms,
+				no,
+				pl,
+				ro,
+				sk,
+				sv,
+				th,
+				uk,
+				vi,
+				"zh-Hant",
 			);
 			mainGroup = AB0000000000000000000001;
 			productRefGroup = AB0000000000000000000009 /* Products */;
@@ -426,6 +502,7 @@
 			files = (
 				AD0000000000000000000040 /* Assets.xcassets in Resources */,
 				AD0000000000000000000041 /* PrivacyInfo.xcprivacy in Resources */,
+				82F547D94464A8236318876C /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,6 +512,7 @@
 			files = (
 				AD0000000000000000000042 /* Assets.xcassets in Resources */,
 				AD0000000000000000000043 /* PrivacyInfo.xcprivacy in Resources */,
+				079720BCD2175270C1EFBBB4 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,28 +530,29 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AD0000000000000000000001 /* Models/FinanceModels.swift in Sources */,
-				AD0000000000000000000002 /* Persistence/FinancePersistence.swift in Sources */,
-				AD0000000000000000000003 /* Stores/AppSettings.swift in Sources */,
-				AD0000000000000000000004 /* Stores/FinanceStore.swift in Sources */,
-				AD0000000000000000000005 /* Services/ExchangeRateService.swift in Sources */,
-				AD0000000000000000000006 /* Services/MarketDataService.swift in Sources */,
-				AD0000000000000000000007 /* UI/DesignSystem.swift in Sources */,
-				AD0000000000000000000008 /* Persistence/FinanceJSONCoding.swift in Sources */,
-				AD0000000000000000000009 /* Services/CloudKitSyncService.swift in Sources */,
+				AD0000000000000000000001 /* FinanceModels.swift in Sources */,
+				AD0000000000000000000002 /* FinancePersistence.swift in Sources */,
+				AD0000000000000000000003 /* AppSettings.swift in Sources */,
+				AD0000000000000000000004 /* FinanceStore.swift in Sources */,
+				AD0000000000000000000005 /* ExchangeRateService.swift in Sources */,
+				AD0000000000000000000006 /* MarketDataService.swift in Sources */,
+				AD0000000000000000000007 /* DesignSystem.swift in Sources */,
+				AD0000000000000000000008 /* FinanceJSONCoding.swift in Sources */,
+				AD0000000000000000000009 /* CloudKitSyncService.swift in Sources */,
 				AD0000000000000000000020 /* WealthCompassMobileApp.swift in Sources */,
 				AD0000000000000000000021 /* ContentView.swift in Sources */,
-				AD0000000000000000000022 /* Services/AppLockStore.swift in Sources */,
-				AD0000000000000000000023 /* Services/RecurringTransactionNotificationService.swift in Sources */,
-				AD0000000000000000000024 /* Views/DashboardView.swift in Sources */,
-				AD0000000000000000000025 /* Views/CashFlowView.swift in Sources */,
-				AD0000000000000000000026 /* Views/InvestmentsView.swift in Sources */,
-				AD0000000000000000000027 /* Views/CryptoView.swift in Sources */,
-				AD0000000000000000000028 /* Views/SettingsView.swift in Sources */,
-				AD0000000000000000000029 /* Views/Forms.swift in Sources */,
-				AD000000000000000000002A /* Views/LockView.swift in Sources */,
+				AD0000000000000000000022 /* AppLockStore.swift in Sources */,
+				AD0000000000000000000023 /* RecurringTransactionNotificationService.swift in Sources */,
+				AD0000000000000000000024 /* DashboardView.swift in Sources */,
+				AD0000000000000000000025 /* CashFlowView.swift in Sources */,
+				AD0000000000000000000026 /* InvestmentsView.swift in Sources */,
+				AD0000000000000000000027 /* CryptoView.swift in Sources */,
+				AD0000000000000000000028 /* SettingsView.swift in Sources */,
+				AD0000000000000000000029 /* Forms.swift in Sources */,
+				AD000000000000000000002A /* LockView.swift in Sources */,
 				E14ADF289E9B4D9DE196ACBF /* DynamicMasonryLayout.swift in Sources */,
 				E4A507349567FDF9A3CA4F11 /* DynamicMasonryLayout.swift in Sources */,
+				E9814262C71865036098CABF /* OnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -481,28 +560,29 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AD0000000000000000000011 /* Models/FinanceModels.swift in Sources */,
-				AD0000000000000000000012 /* Persistence/FinancePersistence.swift in Sources */,
-				AD0000000000000000000013 /* Stores/AppSettings.swift in Sources */,
-				AD0000000000000000000014 /* Stores/FinanceStore.swift in Sources */,
-				AD0000000000000000000015 /* Services/ExchangeRateService.swift in Sources */,
-				AD0000000000000000000016 /* Services/MarketDataService.swift in Sources */,
-				AD0000000000000000000017 /* UI/DesignSystem.swift in Sources */,
-				AD0000000000000000000018 /* Persistence/FinanceJSONCoding.swift in Sources */,
-				AD0000000000000000000019 /* Services/CloudKitSyncService.swift in Sources */,
+				AD0000000000000000000011 /* FinanceModels.swift in Sources */,
+				AD0000000000000000000012 /* FinancePersistence.swift in Sources */,
+				AD0000000000000000000013 /* AppSettings.swift in Sources */,
+				AD0000000000000000000014 /* FinanceStore.swift in Sources */,
+				AD0000000000000000000015 /* ExchangeRateService.swift in Sources */,
+				AD0000000000000000000016 /* MarketDataService.swift in Sources */,
+				AD0000000000000000000017 /* DesignSystem.swift in Sources */,
+				AD0000000000000000000018 /* FinanceJSONCoding.swift in Sources */,
+				AD0000000000000000000019 /* CloudKitSyncService.swift in Sources */,
 				AD0000000000000000000030 /* WealthCompassMacApp.swift in Sources */,
 				AD0000000000000000000031 /* MacAppModel.swift in Sources */,
 				AD0000000000000000000032 /* MacRootView.swift in Sources */,
 				AD0000000000000000000039 /* MacPlatformServices.swift in Sources */,
-				AD0000000000000000000033 /* Views/MacDashboardView.swift in Sources */,
-				AD0000000000000000000034 /* Views/MacCashFlowView.swift in Sources */,
-				AD0000000000000000000035 /* Views/MacInvestmentsView.swift in Sources */,
-				AD0000000000000000000036 /* Views/MacCryptoView.swift in Sources */,
-				AD0000000000000000000037 /* Views/MacEditorSheet.swift in Sources */,
-				AD000000000000000000003A /* Views/MacRecurringTransactionEditor.swift in Sources */,
-				AD0000000000000000000038 /* Views/MacSettingsView.swift in Sources */,
+				AD0000000000000000000033 /* MacDashboardView.swift in Sources */,
+				AD0000000000000000000034 /* MacCashFlowView.swift in Sources */,
+				AD0000000000000000000035 /* MacInvestmentsView.swift in Sources */,
+				AD0000000000000000000036 /* MacCryptoView.swift in Sources */,
+				AD0000000000000000000037 /* MacEditorSheet.swift in Sources */,
+				AD000000000000000000003A /* MacRecurringTransactionEditor.swift in Sources */,
+				AD0000000000000000000038 /* MacSettingsView.swift in Sources */,
 				AFA8D2C0B984E687F87C05EA /* DynamicMasonryLayout.swift in Sources */,
 				C16E71416991E8C87B178C96 /* DynamicMasonryLayout.swift in Sources */,
+				1E6833B0C43E0B035AE4B46B /* MacOnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

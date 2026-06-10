@@ -6,8 +6,8 @@ private enum MacInvestmentsTab: MacSelectorTab {
 
     var title: String {
         switch self {
-        case .overview: return "Overview"
-        case .positions: return "Positions"
+        case .overview: return String(localized: "Overview")
+        case .positions: return String(localized: "Positions")
         }
     }
 }
@@ -40,17 +40,17 @@ struct MacInvestmentsView: View {
                         
                         HStack(spacing: 24) {
                             AllocationChart(
-                                title: "Allocation by Sector",
+                                title: String(localized: "Allocation by Sector"),
                                 slices: finance.investmentAllocation(settings: settings),
                                 settings: settings
                             )
                             AllocationChart(
-                                title: "Allocation by Type",
+                                title: String(localized: "Allocation by Type"),
                                 slices: finance.investmentTypeAllocation(settings: settings),
                                 settings: settings
                             )
                             AllocationChart(
-                                title: "Allocation by Geography",
+                                title: String(localized: "Allocation by Geography"),
                                 slices: finance.investmentGeographyAllocation(settings: settings),
                                 settings: settings
                             )
@@ -106,23 +106,23 @@ struct MacInvestmentsView: View {
 
         return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
             MetricCard(
-                title: "Portfolio Value",
+                title: String(localized: "Portfolio Value"),
                 value: settings.privateCurrency(total),
                 systemImage: "chart.line.uptrend.xyaxis",
                 accent: .blue
             )
             MetricCard(
-                title: "Positions",
+                title: String(localized: "Positions"),
                 value: privateCount(finance.data.investments.count),
                 systemImage: "number"
             )
             MetricCard(
-                title: "Cost Basis",
+                title: String(localized: "Cost Basis"),
                 value: settings.privateCurrency(costBasis),
                 systemImage: "banknote"
             )
             MetricCard(
-                title: "Profit / Loss",
+                title: String(localized: "Profit / Loss"),
                 value: settings.privateCurrency(gain),
                 systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
                 accent: gain >= 0 ? WCColor.primary : WCColor.destructive
@@ -130,7 +130,7 @@ struct MacInvestmentsView: View {
             
             if !settings.isPrivacyMode {
                 MetricCard(
-                    title: "Performance",
+                    title: String(localized: "Performance"),
                     value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
                     systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
                     accent: percent >= 0 ? WCColor.primary : WCColor.destructive
@@ -140,8 +140,8 @@ struct MacInvestmentsView: View {
             let latestUpdate = finance.data.investments.map(\.updatedAt).max()
             let sectorCount = Set(finance.data.investments.map(\.sector).filter(isNonEmpty)).count
             MetricCard(
-                title: "Status • \(privateCount(sectorCount)) Sectors",
-                value: latestUpdate.map(formattedUpdate) ?? "Never",
+                title: String(localized: "Status • \(privateCount(sectorCount)) Sectors"),
+                value: latestUpdate.map(formattedUpdate) ?? String(localized: "Never"),
                 systemImage: "checkmark.circle"
             )
         }

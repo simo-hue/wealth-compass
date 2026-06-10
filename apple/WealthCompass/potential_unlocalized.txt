@@ -1,0 +1,840 @@
+Sources/macOS/MacRootView.swift:38:                                .keyboardShortcut("r", modifiers: .command)
+Sources/macOS/MacRootView.swift:131:            message: "\(exchangeResult.message)\n\n\(marketResult.message)"
+Sources/macOS/MacRootView.swift:151:            title: "Recurring Transactions Added",
+Sources/macOS/MacRootView.swift:152:            message: "\(insertedCount) due transaction\(insertedCount == 1 ? " was" : "s were") added to Cash Flow."
+Sources/macOS/MacAppModel.swift:14:        case .dashboard: "Dashboard"
+Sources/macOS/MacAppModel.swift:15:        case .cashFlow: "Cash Flow"
+Sources/macOS/MacAppModel.swift:16:        case .investments: "Investments"
+Sources/macOS/MacAppModel.swift:17:        case .crypto: "Crypto"
+Sources/macOS/MacAppModel.swift:18:        case .settings: "Settings"
+Sources/macOS/MacAppModel.swift:24:        case .dashboard: "gauge.with.dots.needle.67percent"
+Sources/macOS/MacAppModel.swift:25:        case .cashFlow: "arrow.left.arrow.right"
+Sources/macOS/MacAppModel.swift:26:        case .investments: "chart.line.uptrend.xyaxis"
+Sources/macOS/MacAppModel.swift:27:        case .crypto: "bitcoinsign.circle"
+Sources/macOS/MacAppModel.swift:28:        case .settings: "gear"
+Sources/macOS/MacAppModel.swift:41:            "transaction"
+Sources/macOS/MacAppModel.swift:43:            "investment-\(investment?.id.uuidString ?? "new")"
+Sources/macOS/MacAppModel.swift:45:            "crypto-\(holding?.id.uuidString ?? "new")"
+Sources/macOS/WealthCompassMacApp.swift:34:                .keyboardShortcut("n", modifiers: .command)
+Sources/macOS/WealthCompassMacApp.swift:39:                .keyboardShortcut("i", modifiers: [.command, .shift])
+Sources/macOS/WealthCompassMacApp.swift:44:                .keyboardShortcut("k", modifiers: [.command, .shift])
+Sources/macOS/WealthCompassMacApp.swift:48:            CommandMenu("Navigate") {
+Sources/macOS/WealthCompassMacApp.swift:52:                .keyboardShortcut("1", modifiers: .command)
+Sources/macOS/WealthCompassMacApp.swift:57:                .keyboardShortcut("2", modifiers: .command)
+Sources/macOS/WealthCompassMacApp.swift:62:                .keyboardShortcut("3", modifiers: .command)
+Sources/macOS/WealthCompassMacApp.swift:67:                .keyboardShortcut("4", modifiers: .command)
+Sources/macOS/WealthCompassMacApp.swift:72:                .keyboardShortcut("5", modifiers: .command)
+Sources/macOS/MacPlatformServices.swift:9:        "wealthCompass.mac.recurringTransactionNotificationReceived"
+Sources/macOS/MacPlatformServices.swift:41:    private let identifierPrefix = "wealth-compass-mac-recurring-"
+Sources/macOS/MacPlatformServices.swift:87:            content.title = "Recurring \(schedule.type.title.lowercased()) due"
+Sources/macOS/MacPlatformServices.swift:92:                content.body = "\(schedule.category): \(amount). Wealth Compass records it while the app is active."
+Sources/macOS/MacPlatformServices.swift:94:                content.body = "\(schedule.category) is scheduled. Open Wealth Compass to review it."
+Sources/macOS/MacPlatformServices.swift:97:            content.userInfo = ["recurringTransactionID": schedule.id.uuidString]
+Sources/macOS/MacPlatformServices.swift:128:        "\(identifierPrefix)\(scheduleID.uuidString)"
+Sources/macOS/MacPlatformServices.swift:139:        static let biometricLockEnabled = "wc_mac_biometric_lock_enabled"
+Sources/macOS/MacPlatformServices.swift:153:            return "Touch ID"
+Sources/macOS/MacPlatformServices.swift:155:            return "Face ID"
+Sources/macOS/MacPlatformServices.swift:157:            return "Optic ID"
+Sources/macOS/MacPlatformServices.swift:159:            return "Biometrics"
+Sources/macOS/MacPlatformServices.swift:164:        let success = await authenticate(reason: "Enable biometric protection for Wealth Compass.")
+Sources/macOS/MacPlatformServices.swift:187:        if await authenticate(reason: "Unlock your local Wealth Compass data.") {
+Sources/macOS/MacPlatformServices.swift:195:        context.localizedFallbackTitle = ""
+Sources/macOS/MacPlatformServices.swift:199:            lastError = error?.localizedDescription ?? "Biometric authentication is not available on this Mac."
+Sources/macOS/Views/MacInvestmentsView.swift:9:        case .overview: return "Overview"
+Sources/macOS/Views/MacInvestmentsView.swift:10:        case .positions: return "Positions"
+Sources/macOS/Views/MacInvestmentsView.swift:43:                                title: "Allocation by Sector",
+Sources/macOS/Views/MacInvestmentsView.swift:48:                                title: "Allocation by Type",
+Sources/macOS/Views/MacInvestmentsView.swift:53:                                title: "Allocation by Geography",
+Sources/macOS/Views/MacInvestmentsView.swift:81:            "Delete Investment?",
+Sources/macOS/Views/MacInvestmentsView.swift:109:                title: "Portfolio Value",
+Sources/macOS/Views/MacInvestmentsView.swift:115:                title: "Positions",
+Sources/macOS/Views/MacInvestmentsView.swift:120:                title: "Cost Basis",
+Sources/macOS/Views/MacInvestmentsView.swift:125:                title: "Profit / Loss",
+Sources/macOS/Views/MacInvestmentsView.swift:127:                systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
+Sources/macOS/Views/MacInvestmentsView.swift:133:                    title: "Performance",
+Sources/macOS/Views/MacInvestmentsView.swift:134:                    value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
+Sources/macOS/Views/MacInvestmentsView.swift:135:                    systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
+Sources/macOS/Views/MacInvestmentsView.swift:143:                title: "Status • \(privateCount(sectorCount)) Sectors",
+Sources/macOS/Views/MacInvestmentsView.swift:144:                value: latestUpdate.map(formattedUpdate) ?? "Never",
+Sources/macOS/Views/MacInvestmentsView.swift:161:                    "No Investments",
+Sources/macOS/Views/MacInvestmentsView.swift:182:                        "No Investments",
+Sources/macOS/Views/MacInvestmentsView.swift:301:        settings.isPrivacyMode ? "****" : "\(count)"
+Sources/macOS/Views/MacCryptoView.swift:9:        case .overview: return "Overview"
+Sources/macOS/Views/MacCryptoView.swift:10:        case .holdings: return "Holdings"
+Sources/macOS/Views/MacCryptoView.swift:60:            "Delete Crypto Holding?",
+Sources/macOS/Views/MacCryptoView.swift:88:                title: "Crypto Value",
+Sources/macOS/Views/MacCryptoView.swift:94:                title: "Holdings",
+Sources/macOS/Views/MacCryptoView.swift:99:                title: "Cost Basis",
+Sources/macOS/Views/MacCryptoView.swift:104:                title: "Profit / Loss",
+Sources/macOS/Views/MacCryptoView.swift:106:                systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
+Sources/macOS/Views/MacCryptoView.swift:112:                    title: "Performance",
+Sources/macOS/Views/MacCryptoView.swift:113:                    value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
+Sources/macOS/Views/MacCryptoView.swift:114:                    systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
+Sources/macOS/Views/MacCryptoView.swift:122:                title: "Status • \(privateCount(uniqueCryptoCount)) Coins",
+Sources/macOS/Views/MacCryptoView.swift:123:                value: latestUpdate.map(formattedUpdate) ?? "Never",
+Sources/macOS/Views/MacCryptoView.swift:135:                    title: "Crypto Allocation",
+Sources/macOS/Views/MacCryptoView.swift:164:                        performanceCard(title: "Top Performer", holding: best)
+Sources/macOS/Views/MacCryptoView.swift:172:                        performanceCard(title: "Biggest Loser", holding: worst)
+Sources/macOS/Views/MacCryptoView.swift:225:                    "No Crypto Holdings",
+Sources/macOS/Views/MacCryptoView.swift:245:                        "No Crypto Holdings",
+Sources/macOS/Views/MacCryptoView.swift:360:        settings.isPrivacyMode ? "****" : "\(count)"
+Sources/macOS/Views/MacEditorSheet.swift:23:    private static let customCategoryTag = "__wealth_compass_custom_category__"
+Sources/macOS/Views/MacEditorSheet.swift:26:    @State private var amount = ""
+Sources/macOS/Views/MacEditorSheet.swift:27:    @State private var category = "Food"
+Sources/macOS/Views/MacEditorSheet.swift:28:    @State private var note = ""
+Sources/macOS/Views/MacEditorSheet.swift:30:    @State private var customCategory = ""
+Sources/macOS/Views/MacEditorSheet.swift:50:        Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+Sources/macOS/Views/MacEditorSheet.swift:68:                        category = settings.transactionCategories(for: newType).first ?? ""
+Sources/macOS/Views/MacEditorSheet.swift:69:                        customCategory = ""
+Sources/macOS/Views/MacEditorSheet.swift:73:                    TextField("Amount", text: $amount)
+Sources/macOS/Views/MacEditorSheet.swift:86:                            customCategory = ""
+Sources/macOS/Views/MacEditorSheet.swift:92:                        TextField("Custom Category Name", text: $customCategory)
+Sources/macOS/Views/MacEditorSheet.swift:100:                    TextField("Description", text: $note)
+Sources/macOS/Views/MacEditorSheet.swift:112:                        .keyboardShortcut("s", modifiers: .command)
+Sources/macOS/Views/MacEditorSheet.swift:143:            return "Enter a category name. It will be saved for future \(type.title.lowercased()) transactions."
+Sources/macOS/Views/MacEditorSheet.swift:149:            return "\(existing) already exists and will be selected."
+Sources/macOS/Views/MacEditorSheet.swift:152:        return "This category will be added to your \(type.title.lowercased()) categories."
+Sources/macOS/Views/MacEditorSheet.swift:176:        "Technology", "Finance", "Real Estate", "Healthcare",
+Sources/macOS/Views/MacEditorSheet.swift:177:        "Energy", "Consumer", "All World", "Other"
+Sources/macOS/Views/MacEditorSheet.swift:180:        "US", "Europe", "UK", "Switzerland",
+Sources/macOS/Views/MacEditorSheet.swift:181:        "Global", "Emerging Markets", "Other"
+Sources/macOS/Views/MacEditorSheet.swift:186:        _symbol = State(initialValue: investment?.symbol ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:187:        _name = State(initialValue: investment?.name ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:188:        _isin = State(initialValue: investment?.isin ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:191:        _sector = State(initialValue: investment?.sector ?? "Technology")
+Sources/macOS/Views/MacEditorSheet.swift:192:        _geography = State(initialValue: investment?.geography ?? "US")
+Sources/macOS/Views/MacEditorSheet.swift:193:        _quantity = State(initialValue: investment.map { Self.input($0.quantity) } ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:195:        _averagePrice = State(initialValue: investment.map { _ in Self.input(average) } ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:196:        _currentPrice = State(initialValue: investment.map { Self.input($0.currentPrice) } ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:197:        _feeValue = State(initialValue: investment.map { Self.input($0.fees) } ?? "0")
+Sources/macOS/Views/MacEditorSheet.swift:218:                    TextField("Symbol", text: $symbol)
+Sources/macOS/Views/MacEditorSheet.swift:219:                    TextField("Name", text: $name)
+Sources/macOS/Views/MacEditorSheet.swift:220:                    TextField("ISIN / ID", text: $isin)
+Sources/macOS/Views/MacEditorSheet.swift:245:                    TextField("Quantity", text: $quantity)
+Sources/macOS/Views/MacEditorSheet.swift:246:                    TextField("Average Buy Price", text: $averagePrice)
+Sources/macOS/Views/MacEditorSheet.swift:247:                    TextField("Current Price", text: $currentPrice)
+Sources/macOS/Views/MacEditorSheet.swift:259:                        feeMode == .fixed ? "Investment Transaction Fee" : "Investment Transaction Fee %",
+Sources/macOS/Views/MacEditorSheet.swift:263:                    LabeledContent("Investment Fee") {
+Sources/macOS/Views/MacEditorSheet.swift:274:            .navigationTitle(investment == nil ? "New Investment" : "Edit Investment")
+Sources/macOS/Views/MacEditorSheet.swift:282:                        .keyboardShortcut("s", modifiers: .command)
+Sources/macOS/Views/MacEditorSheet.swift:323:        Double(value.replacingOccurrences(of: ",", with: ".")) ?? 0
+Sources/macOS/Views/MacEditorSheet.swift:327:        value == 0 ? "0" : String(format: "%.8g", value)
+Sources/macOS/Views/MacEditorSheet.swift:348:        _symbol = State(initialValue: holding?.symbol ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:349:        _name = State(initialValue: holding?.name ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:350:        _coinID = State(initialValue: holding?.coinId ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:351:        _quantity = State(initialValue: holding.map { Self.input($0.quantity) } ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:353:        _averagePrice = State(initialValue: holding.map { _ in Self.input(average) } ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:354:        _currentPrice = State(initialValue: holding.map { Self.input($0.currentPrice) } ?? "")
+Sources/macOS/Views/MacEditorSheet.swift:355:        _feeValue = State(initialValue: holding.map { Self.input($0.fees) } ?? "0")
+Sources/macOS/Views/MacEditorSheet.swift:376:                    TextField("Symbol", text: $symbol)
+Sources/macOS/Views/MacEditorSheet.swift:377:                    TextField("Name", text: $name)
+Sources/macOS/Views/MacEditorSheet.swift:378:                    TextField("CoinGecko ID", text: $coinID)
+Sources/macOS/Views/MacEditorSheet.swift:382:                    TextField("Quantity", text: $quantity)
+Sources/macOS/Views/MacEditorSheet.swift:383:                    TextField("Average Buy Price", text: $averagePrice)
+Sources/macOS/Views/MacEditorSheet.swift:384:                    TextField("Current Price", text: $currentPrice)
+Sources/macOS/Views/MacEditorSheet.swift:396:                        feeMode == .fixed ? "Fee Amount" : "Fee Percentage",
+Sources/macOS/Views/MacEditorSheet.swift:400:                    LabeledContent("Calculated Fee") {
+Sources/macOS/Views/MacEditorSheet.swift:407:            .navigationTitle(holding == nil ? "New Crypto Holding" : "Edit Crypto Holding")
+Sources/macOS/Views/MacEditorSheet.swift:415:                        .keyboardShortcut("s", modifiers: .command)
+Sources/macOS/Views/MacEditorSheet.swift:447:        Double(value.replacingOccurrences(of: ",", with: ".")) ?? 0
+Sources/macOS/Views/MacEditorSheet.swift:451:        value == 0 ? "0" : String(format: "%.8g", value)
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:10:    private static let customCategoryTag = "__wealth_compass_mac_recurring_custom_category__"
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:21:    @State private var customCategory = ""
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:36:        _amount = State(initialValue: schedule.map { String($0.amount) } ?? "")
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:37:        _category = State(initialValue: schedule?.category ?? "Food")
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:38:        _note = State(initialValue: schedule?.description ?? "")
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:63:        Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:80:            return "Enter an amount greater than zero."
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:83:            return "Enter a custom category name."
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:86:            return "The first occurrence must be in the future."
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:89:            return "The end date cannot be before the first occurrence."
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:105:                        category = settings.transactionCategories(for: newType).first ?? ""
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:106:                        customCategory = ""
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:110:                    TextField("Amount (\(settings.currency.rawValue))", text: $amount)
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:111:                    TextField("Description", text: $note)
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:127:                            customCategory = ""
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:133:                        TextField("Custom category name", text: $customCategory)
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:150:                        "First Occurrence",
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:155:                    Toggle("End Date", isOn: $hasEndDate)
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:164:                    Toggle("Notify When Due", isOn: $notificationsEnabled)
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:168:                        "Wealth Compass records due occurrences while the app is active. "
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:169:                            + "If the app was closed, missed occurrences are added automatically the next time it opens."
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:184:            .navigationTitle(existingSchedule == nil ? "New Recurring Transaction" : "Edit Recurring Transaction")
+Sources/macOS/Views/MacRecurringTransactionEditor.swift:194:                        .keyboardShortcut("s", modifiers: .command)
+Sources/macOS/Views/MacSettingsView.swift:12:        case .general: return "General"
+Sources/macOS/Views/MacSettingsView.swift:13:        case .data: return "Data"
+Sources/macOS/Views/MacSettingsView.swift:14:        case .icloud: return "iCloud"
+Sources/macOS/Views/MacSettingsView.swift:84:    @State private var credentialDraft = ""
+Sources/macOS/Views/MacSettingsView.swift:143:            pendingDestructiveAction?.title ?? "",
+Sources/macOS/Views/MacSettingsView.swift:157:            SettingsSection(title: "Region & Language") {
+Sources/macOS/Views/MacSettingsView.swift:158:                SettingsRow(title: "Language") {
+Sources/macOS/Views/MacSettingsView.swift:171:                SettingsRow(title: "Base Currency") {
+Sources/macOS/Views/MacSettingsView.swift:184:            SettingsSection(title: "Privacy & Security") {
+Sources/macOS/Views/MacSettingsView.swift:185:                SettingsRow(title: "Privacy Mode", subtitle: "Hide financial values throughout Wealth Compass.") {
+Sources/macOS/Views/MacSettingsView.swift:186:                    Toggle("", isOn: $settings.isPrivacyMode)
+Sources/macOS/Views/MacSettingsView.swift:194:                    title: "\(appLock.biometryName) App Lock", 
+Sources/macOS/Views/MacSettingsView.swift:195:                    subtitle: appLock.lastError ?? "When enabled, Wealth Compass locks when the app is no longer active."
+Sources/macOS/Views/MacSettingsView.swift:197:                    Toggle("", isOn: biometricLockBinding)
+Sources/macOS/Views/MacSettingsView.swift:203:            SettingsSection(title: "Custom Categories") {
+Sources/macOS/Views/MacSettingsView.swift:205:                    title: "Income",
+Sources/macOS/Views/MacSettingsView.swift:213:                    title: "Expense",
+Sources/macOS/Views/MacSettingsView.swift:224:        SettingsSection(title: "Exchange Rates") {
+Sources/macOS/Views/MacSettingsView.swift:225:            SettingsRow(title: "Source") {
+Sources/macOS/Views/MacSettingsView.swift:243:                SettingsRow(title: "1 \(settings.currency.rawValue)") {
+Sources/macOS/Views/MacSettingsView.swift:256:                        settings.isRefreshingExchangeRates ? "Refreshing Exchange Rates" : "Refresh Exchange Rates",
+Sources/macOS/Views/MacSettingsView.swift:286:        SettingsSection(title: "Market Data") {
+Sources/macOS/Views/MacSettingsView.swift:291:                    title: "Finnhub API Key",
+Sources/macOS/Views/MacSettingsView.swift:304:                    title: "CoinGecko API Key",
+Sources/macOS/Views/MacSettingsView.swift:318:                        isRefreshingPrices ? "Refreshing Market Data" : "Refresh Market Data",
+Sources/macOS/Views/MacSettingsView.swift:342:            SettingsSection(title: "Import and Export") {
+Sources/macOS/Views/MacSettingsView.swift:343:                SettingsRow(title: "Import Behavior") {
+Sources/macOS/Views/MacSettingsView.swift:361:            SettingsSection(title: "Local Storage") {
+Sources/macOS/Views/MacSettingsView.swift:385:            SettingsSection(title: "Danger Zone") {
+Sources/macOS/Views/MacSettingsView.swift:395:            SettingsSection(title: "iCloud Sync") {
+Sources/macOS/Views/MacSettingsView.swift:397:                    title: "Sync Data with iCloud",
+Sources/macOS/Views/MacSettingsView.swift:398:                    subtitle: "Your financial data stays available locally and syncs across your devices through your private CloudKit database."
+Sources/macOS/Views/MacSettingsView.swift:400:                    Toggle("", isOn: $settings.isICloudSyncEnabled)
+Sources/macOS/Views/MacSettingsView.swift:412:                SettingsRow(title: "Status") {
+Sources/macOS/Views/MacSettingsView.swift:425:                SettingsSection(title: "Manual Actions") {
+Sources/macOS/Views/MacSettingsView.swift:432:                                    title: "Sync Failed",
+Sources/macOS/Views/MacSettingsView.swift:496:                        .help("Remove \(category)")
+Sources/macOS/Views/MacSettingsView.swift:512:            Text(isConfigured ? "Configured" : "Not Set")
+Sources/macOS/Views/MacSettingsView.swift:536:        credentialDraft = ""
+Sources/macOS/Views/MacSettingsView.swift:542:        credentialDraft = ""
+Sources/macOS/Views/MacSettingsView.swift:559:            credentialDraft = ""
+Sources/macOS/Views/MacSettingsView.swift:563:                title: "\(credential.title) Saved",
+Sources/macOS/Views/MacSettingsView.swift:564:                message: "\(message)\n\nThe API key was saved securely in Keychain."
+Sources/macOS/Views/MacSettingsView.swift:568:                title: "\(credential.title) Failed",
+Sources/macOS/Views/MacSettingsView.swift:581:            return "Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue)))."
+Sources/macOS/Views/MacSettingsView.swift:584:            return "CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue)))."
+Sources/macOS/Views/MacSettingsView.swift:594:                title: "\(credential.title) Removed",
+Sources/macOS/Views/MacSettingsView.swift:595:                message: "The API key was removed from the macOS Keychain."
+Sources/macOS/Views/MacSettingsView.swift:599:                title: "Unable to Remove \(credential.title)",
+Sources/macOS/Views/MacSettingsView.swift:627:                title: "Unable to Refresh Market Data",
+Sources/macOS/Views/MacSettingsView.swift:658:                    let transactionWord = insertedCount == 1 ? "transaction was" : "transactions were"
+Sources/macOS/Views/MacSettingsView.swift:659:                    message += "\n\n\(insertedCount) due recurring \(transactionWord) added to Cash Flow."
+Sources/macOS/Views/MacSettingsView.swift:661:                settingsAlert = MacSettingsAlert(title: "Import Complete", message: message)
+Sources/macOS/Views/MacSettingsView.swift:665:                title: "Import Failed",
+Sources/macOS/Views/MacSettingsView.swift:681:                title: "Backup Exported",
+Sources/macOS/Views/MacSettingsView.swift:686:                title: "Export Failed",
+Sources/macOS/Views/MacSettingsView.swift:733:            "Finnhub API Key"
+Sources/macOS/Views/MacSettingsView.swift:735:            "CoinGecko API Key"
+Sources/macOS/Views/MacSettingsView.swift:742:            "Paste Finnhub API key"
+Sources/macOS/Views/MacSettingsView.swift:744:            "Paste CoinGecko API key"
+Sources/macOS/Views/MacSettingsView.swift:760:            "Apple (AAPL)"
+Sources/macOS/Views/MacSettingsView.swift:762:            "Bitcoin"
+Sources/macOS/Views/MacSettingsView.swift:774:            "Delete all local finance data?"
+Sources/macOS/Views/MacSettingsView.swift:776:            "Remove custom category?"
+Sources/macOS/Views/MacSettingsView.swift:783:            "This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone."
+Sources/macOS/Views/MacSettingsView.swift:785:            "Existing transactions using \(category) will keep their current category label."
+Sources/macOS/Views/MacSettingsView.swift:792:            "Delete All Data"
+Sources/macOS/Views/MacSettingsView.swift:794:            "Remove \(category)"
+Sources/macOS/Views/MacSettingsView.swift:867:            "Remove \(credential.title)?",
+Sources/macOS/Views/MacCashFlowView.swift:13:        case .all: "All"
+Sources/macOS/Views/MacCashFlowView.swift:14:        case .income: "Income"
+Sources/macOS/Views/MacCashFlowView.swift:15:        case .expense: "Expense"
+Sources/macOS/Views/MacCashFlowView.swift:35:            "transaction"
+Sources/macOS/Views/MacCashFlowView.swift:37:            "recurring-\(schedule?.id.uuidString ?? "new")"
+Sources/macOS/Views/MacCashFlowView.swift:51:            "delete-transaction-\(transaction.id)"
+Sources/macOS/Views/MacCashFlowView.swift:53:            "delete-recurring-\(schedule.id)"
+Sources/macOS/Views/MacCashFlowView.swift:55:            "finish-recurring-\(schedule.id)"
+Sources/macOS/Views/MacCashFlowView.swift:57:            "message-\(title)-\(message)"
+Sources/macOS/Views/MacCashFlowView.swift:68:        case .overview: return "Overview"
+Sources/macOS/Views/MacCashFlowView.swift:69:        case .transactions: return "Transactions"
+Sources/macOS/Views/MacCashFlowView.swift:78:    @State private var searchText = ""
+Sources/macOS/Views/MacCashFlowView.swift:206:                title: "Monthly Income",
+Sources/macOS/Views/MacCashFlowView.swift:212:                title: "Monthly Expenses",
+Sources/macOS/Views/MacCashFlowView.swift:218:                title: "Net Savings",
+Sources/macOS/Views/MacCashFlowView.swift:224:                title: "Savings Rate",
+Sources/macOS/Views/MacCashFlowView.swift:226:                    ? "****"
+Sources/macOS/Views/MacCashFlowView.swift:227:                    : "\(cashFlow.savingsRate.formatted(.number.precision(.fractionLength(1))))%",
+Sources/macOS/Views/MacCashFlowView.swift:231:                title: "Transactions",
+Sources/macOS/Views/MacCashFlowView.swift:232:                value: settings.isPrivacyMode ? "****" : "\(monthlyTransactionsCount)",
+Sources/macOS/Views/MacCashFlowView.swift:236:                title: "Total Cash",
+Sources/macOS/Views/MacCashFlowView.swift:273:                            x: .value("Month", month.monthLabel),
+Sources/macOS/Views/MacCashFlowView.swift:274:                            y: .value("Amount", month.income)
+Sources/macOS/Views/MacCashFlowView.swift:277:                        .position(by: .value("Type", "Income"))
+Sources/macOS/Views/MacCashFlowView.swift:282:                            x: .value("Month", month.monthLabel),
+Sources/macOS/Views/MacCashFlowView.swift:283:                            y: .value("Amount", month.expense)
+Sources/macOS/Views/MacCashFlowView.swift:286:                        .position(by: .value("Type", "Expenses"))
+Sources/macOS/Views/MacCashFlowView.swift:320:                        title: "Income",
+Sources/macOS/Views/MacCashFlowView.swift:325:                        title: "Expenses",
+Sources/macOS/Views/MacCashFlowView.swift:331:                        Text(hoveredCashFlowMonth != nil ? hoveredCashFlowMonth!.monthLabel.uppercased() : "\(cashFlowRange.label) NET")
+Sources/macOS/Views/MacCashFlowView.swift:377:                                angle: .value("Expense", item.value),
+Sources/macOS/Views/MacCashFlowView.swift:381:                            .foregroundStyle(by: .value("Category", item.name))
+Sources/macOS/Views/MacCashFlowView.swift:522:            Image(systemName: schedule.type == .income ? "arrow.up.right.circle.fill" : "arrow.down.right.circle.fill")
+Sources/macOS/Views/MacCashFlowView.swift:531:                        schedule.notificationsEnabled ? "Notifications on" : "Notifications off",
+Sources/macOS/Views/MacCashFlowView.swift:532:                        systemImage: schedule.notificationsEnabled ? "bell.fill" : "bell.slash"
+Sources/macOS/Views/MacCashFlowView.swift:537:                    .help(schedule.notificationsEnabled ? "Notifications enabled" : "Notifications disabled")
+Sources/macOS/Views/MacCashFlowView.swift:567:            let prefix = schedule.type == .income ? "+" : "-"
+Sources/macOS/Views/MacCashFlowView.swift:577:                    Image(systemName: schedule.isActive ? "pause.fill" : "play.fill")
+Sources/macOS/Views/MacCashFlowView.swift:579:                .help(schedule.isActive ? "Pause schedule" : "Resume schedule")
+Sources/macOS/Views/MacCashFlowView.swift:586:                .help("Finish schedule")
+Sources/macOS/Views/MacCashFlowView.swift:593:                .help("Edit schedule")
+Sources/macOS/Views/MacCashFlowView.swift:600:                .help("Delete schedule")
+Sources/macOS/Views/MacCashFlowView.swift:628:                TextField("Search", text: $searchText)
+Sources/macOS/Views/MacCashFlowView.swift:633:                        searchText = ""
+Sources/macOS/Views/MacCashFlowView.swift:715:                                    .help("Generated from a recurring schedule")
+Sources/macOS/Views/MacCashFlowView.swift:722:                                systemImage: transaction.type == .income ? "arrow.down.left" : "arrow.up.right"
+Sources/macOS/Views/MacCashFlowView.swift:730:                    let prefix = transaction.type == .income ? "+" : "-"
+Sources/macOS/Views/MacCashFlowView.swift:810:            return "No Transactions"
+Sources/macOS/Views/MacCashFlowView.swift:812:        return "No Matching Transactions"
+Sources/macOS/Views/MacCashFlowView.swift:816:        finance.transactions.isEmpty ? "arrow.left.arrow.right" : "line.3.horizontal.decrease.circle"
+Sources/macOS/Views/MacCashFlowView.swift:821:            return "Add your first income or expense."
+Sources/macOS/Views/MacCashFlowView.swift:823:        return "Change the search, type, or period filters."
+Sources/macOS/Views/MacCashFlowView.swift:827:        guard !settings.isPrivacyMode else { return "****" }
+Sources/macOS/Views/MacCashFlowView.swift:828:        let prefix = transaction.type == .income ? "+" : "-"
+Sources/macOS/Views/MacCashFlowView.swift:841:                        title: "Notifications Disabled",
+Sources/macOS/Views/MacCashFlowView.swift:842:                        message: "The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule."
+Sources/macOS/Views/MacCashFlowView.swift:876:                    "This permanently removes the \(transaction.category) transaction from "
+Sources/macOS/Views/MacCashFlowView.swift:877:                        + "\(transaction.date.formatted(date: .abbreviated, time: .omitted))."
+Sources/macOS/Views/MacCashFlowView.swift:890:                    "Future \(schedule.frequency.title.lowercased()) occurrences for "
+Sources/macOS/Views/MacCashFlowView.swift:891:                        + "\(schedule.category) will no longer be created."
+Sources/macOS/Views/MacCashFlowView.swift:906:                    "\(schedule.category) will disappear from Recurring Transactions and "
+Sources/macOS/Views/MacCashFlowView.swift:907:                        + "no future occurrences will be inserted automatically."
+Sources/macOS/Views/MacCashFlowView.swift:959:    private static let customCategoryTag = "__wealth_compass_mac_custom_category__"
+Sources/macOS/Views/MacCashFlowView.swift:962:    @State private var amount = ""
+Sources/macOS/Views/MacCashFlowView.swift:963:    @State private var category = "Food"
+Sources/macOS/Views/MacCashFlowView.swift:964:    @State private var note = ""
+Sources/macOS/Views/MacCashFlowView.swift:966:    @State private var customCategory = ""
+Sources/macOS/Views/MacCashFlowView.swift:986:        Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+Sources/macOS/Views/MacCashFlowView.swift:1004:                        category = settings.transactionCategories(for: newType).first ?? ""
+Sources/macOS/Views/MacCashFlowView.swift:1005:                        customCategory = ""
+Sources/macOS/Views/MacCashFlowView.swift:1009:                    TextField("Amount (\(settings.currency.rawValue))", text: $amount)
+Sources/macOS/Views/MacCashFlowView.swift:1011:                    TextField("Description", text: $note)
+Sources/macOS/Views/MacCashFlowView.swift:1027:                            customCategory = ""
+Sources/macOS/Views/MacCashFlowView.swift:1033:                        TextField("Custom category name", text: $customCategory)
+Sources/macOS/Views/MacCashFlowView.swift:1053:                        .keyboardShortcut("s", modifiers: .command)
+Sources/macOS/Views/MacDashboardView.swift:194:                                    Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
+Sources/macOS/Views/MacDashboardView.swift:221:                            title: "Your net-worth trail starts here",
+Sources/macOS/Views/MacDashboardView.swift:222:                            message: "Adding a transaction or position records a snapshot for this chart.",
+Sources/macOS/Views/MacDashboardView.swift:224:                            actionTitle: "Add Transaction"
+Sources/macOS/Views/MacDashboardView.swift:231:                            title: "Net-worth history concealed",
+Sources/macOS/Views/MacDashboardView.swift:232:                            message: "Turn off Privacy Mode to reveal values and movement."
+Sources/macOS/Views/MacDashboardView.swift:239:                                    x: .value("Date", point.date),
+Sources/macOS/Views/MacDashboardView.swift:240:                                    yStart: .value("Range floor", chartDomain(for: points).lowerBound),
+Sources/macOS/Views/MacDashboardView.swift:241:                                    yEnd: .value("Net Worth", point.value)
+Sources/macOS/Views/MacDashboardView.swift:253:                                    x: .value("Date", point.date),
+Sources/macOS/Views/MacDashboardView.swift:254:                                    y: .value("Net Worth", point.value)
+Sources/macOS/Views/MacDashboardView.swift:264:                                RuleMark(x: .value("Selected date", selectedPoint.date))
+Sources/macOS/Views/MacDashboardView.swift:291:                                    x: .value("Selected date", selectedPoint.date),
+Sources/macOS/Views/MacDashboardView.swift:292:                                    y: .value("Selected net worth", selectedPoint.value)
+Sources/macOS/Views/MacDashboardView.swift:349:                sectionHeading("Asset Allocation", subtitle: "How investable assets are distributed")
+Sources/macOS/Views/MacDashboardView.swift:353:                        title: "No assets to allocate",
+Sources/macOS/Views/MacDashboardView.swift:354:                        message: "Add recorded cash, an investment, or a crypto holding.",
+Sources/macOS/Views/MacDashboardView.swift:356:                        actionTitle: "Add Investment"
+Sources/macOS/Views/MacDashboardView.swift:365:                                title: "Allocation concealed",
+Sources/macOS/Views/MacDashboardView.swift:366:                                message: "Values and proportions are hidden."
+Sources/macOS/Views/MacDashboardView.swift:371:                                    angle: .value("Value", slice.value),
+Sources/macOS/Views/MacDashboardView.swift:475:                    sectionHeading("Cash Flow", subtitle: "Income and expenses by month")
+Sources/macOS/Views/MacDashboardView.swift:491:                        title: "No recent cash flow",
+Sources/macOS/Views/MacDashboardView.swift:492:                        message: "Record income or an expense to reveal the monthly pattern.",
+Sources/macOS/Views/MacDashboardView.swift:494:                        actionTitle: "Add Transaction"
+Sources/macOS/Views/MacDashboardView.swift:501:                        title: "Cash-flow chart concealed",
+Sources/macOS/Views/MacDashboardView.swift:502:                        message: "Monthly amounts and proportions are hidden."
+Sources/macOS/Views/MacDashboardView.swift:508:                            x: .value("Month", month.monthLabel),
+Sources/macOS/Views/MacDashboardView.swift:509:                            y: .value("Amount", month.income)
+Sources/macOS/Views/MacDashboardView.swift:512:                        .position(by: .value("Type", "Income"))
+Sources/macOS/Views/MacDashboardView.swift:517:                            x: .value("Month", month.monthLabel),
+Sources/macOS/Views/MacDashboardView.swift:518:                            y: .value("Amount", month.expense)
+Sources/macOS/Views/MacDashboardView.swift:521:                        .position(by: .value("Type", "Expenses"))
+Sources/macOS/Views/MacDashboardView.swift:562:                        title: "Income",
+Sources/macOS/Views/MacDashboardView.swift:567:                        title: "Expenses",
+Sources/macOS/Views/MacDashboardView.swift:573:                        Text(hoveredCashFlowMonth != nil ? hoveredCashFlowMonth!.monthLabel.uppercased() : "\(cashFlowRange.label) NET")
+Sources/macOS/Views/MacDashboardView.swift:594:                    sectionHeading("Top Expense Categories", subtitle: "Where recorded spending is concentrated")
+Sources/macOS/Views/MacDashboardView.swift:608:                        title: "No expenses for this period",
+Sources/macOS/Views/MacDashboardView.swift:609:                        message: "Choose another period or record an expense.",
+Sources/macOS/Views/MacDashboardView.swift:611:                        actionTitle: "Add Transaction"
+Sources/macOS/Views/MacDashboardView.swift:678:                    sectionHeading("Recent Activity", subtitle: "Your latest recorded cash movements")
+Sources/macOS/Views/MacDashboardView.swift:690:                        title: "No activity yet",
+Sources/macOS/Views/MacDashboardView.swift:691:                        message: "Your latest income and expenses will appear here.",
+Sources/macOS/Views/MacDashboardView.swift:693:                        actionTitle: "Add Transaction"
+Sources/macOS/Views/MacDashboardView.swift:761:            ? "••••"
+Sources/macOS/Views/MacDashboardView.swift:762:            : "\(value.formatted(.number.precision(.fractionLength(1))))%"
+Sources/macOS/Views/MacDashboardView.swift:771:        return "\(settings.currency.symbol)\(compactValue)"
+Sources/macOS/Views/MacDashboardView.swift:775:        guard !settings.isPrivacyMode else { return "••••" }
+Sources/macOS/Views/MacDashboardView.swift:776:        let prefix = transaction.type == .income ? "+" : "−"
+Sources/macOS/Views/MacDashboardView.swift:781:        "\(count) \(count == 1 ? singular : singular + "s")"
+Sources/macOS/Views/MacDashboardView.swift:788:            return "just now"
+Sources/macOS/Views/MacDashboardView.swift:790:            return "\(Int(interval / 60))m ago"
+Sources/macOS/Views/MacDashboardView.swift:792:            return "\(Int(interval / (60 * 60)))h ago"
+Sources/macOS/Views/MacDashboardView.swift:794:            return "\(Int(interval / (24 * 60 * 60)))d ago"
+Sources/macOS/Views/MacDashboardView.swift:903:            Image(systemName: transaction.type == .income ? "arrow.down.left" : "arrow.up.right")
+Sources/macOS/Views/MacDashboardView.swift:1088:        case .threeMonths: return "3M"
+Sources/macOS/Views/MacDashboardView.swift:1089:        case .sixMonths: return "6M"
+Sources/macOS/Views/MacDashboardView.swift:1090:        case .twelveMonths: return "12M"
+Sources/macOS/Views/MacDashboardView.swift:1115:                                .matchedGeometryEffect(id: "selection", in: namespace)
+Sources/Shared/UI/DesignSystem.swift:256:                SectionHeading(title, subtitle: "How the portfolio is distributed")
+Sources/Shared/UI/DesignSystem.swift:265:                            angle: .value("Value", slice.value),
+Sources/Shared/UI/DesignSystem.swift:361:                                        Text(settings.isPrivacyMode ? "••••" : percentage(slice.value, total: total))
+Sources/Shared/UI/DesignSystem.swift:405:        return "\(percentage.formatted(.number.precision(.fractionLength(1))))%"
+Sources/Shared/UI/DesignSystem.swift:537:        let url = URL(string: "https://assets.coincap.io/assets/icons/\\(symbol.lowercased())@2x.png")
+Sources/Shared/UI/DesignSystem.swift:609:                                    .matchedGeometryEffect(id: "selector_background", in: namespace)
+Sources/Shared/Stores/AppSettings.swift:85:        Bundle.main.localizations.filter { $0 != "Base" }.sorted()
+Sources/Shared/Stores/AppSettings.swift:205:        isPrivacyMode ? "****" : formatCurrency(value, sourceCurrency: sourceCurrency)
+Sources/Shared/Stores/AppSettings.swift:209:        guard !isPrivacyMode else { return "****" }
+Sources/Shared/Stores/FinanceStore.swift:12:        case .merge: "Merge"
+Sources/Shared/Stores/FinanceStore.swift:13:        case .replace: "Replace"
+Sources/Shared/Stores/FinanceStore.swift:37:            "\(mode.title) import completed for \(sourceFileName).",
+Sources/Shared/Stores/FinanceStore.swift:38:            "\(transactions) transactions, \(recurringTransactions) recurring schedules, \(investments) investments, \(crypto) crypto holdings, \(liabilities) liabilities, and \(snapshots) snapshots were imported."
+Sources/Shared/Stores/FinanceStore.swift:42:            lines.append("\(generatedSnapshots) current snapshot was generated after import.")
+Sources/Shared/Stores/FinanceStore.swift:46:            lines.append("\(categoriesAdded) custom cash-flow categories were added.")
+Sources/Shared/Stores/FinanceStore.swift:50:            lines.append("\(skippedRecords) malformed or incomplete records were skipped.")
+Sources/Shared/Stores/FinanceStore.swift:53:        return lines.joined(separator: "\n\n")
+Sources/Shared/Stores/FinanceStore.swift:65:            "The selected file is empty."
+Sources/Shared/Stores/FinanceStore.swift:67:            "The selected file is not a valid Wealth Compass JSON backup. \(details)"
+Sources/Shared/Stores/FinanceStore.swift:69:            "No supported finance records were found in the selected JSON file."
+Sources/Shared/Stores/FinanceStore.swift:371:                    result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error))")
+Sources/Shared/Stores/FinanceStore.swift:375:            result.skippedInvestments = data.investments.map { "\($0.symbol): Finnhub key missing" }
+Sources/Shared/Stores/FinanceStore.swift:379:            result.skippedCrypto = data.crypto.map { "\($0.symbol): CoinGecko key missing" }
+Sources/Shared/Stores/FinanceStore.swift:391:                .map { "\($0.symbol): CoinGecko ID missing" }
+Sources/Shared/Stores/FinanceStore.swift:402:                        result.failedCrypto.append("\(holding.symbol): no CoinGecko price for \(coinID)")
+Sources/Shared/Stores/FinanceStore.swift:410:                    .map { "\($0.symbol): \(Self.errorMessage(error))" }
+Sources/Shared/Stores/FinanceStore.swift:577:        monthFormatter.dateFormat = "yyyy-MM"
+Sources/Shared/Stores/FinanceStore.swift:579:        labelFormatter.dateFormat = "MMM"
+Sources/Shared/Stores/FinanceStore.swift:611:        formatter.dateFormat = "MMM dd"
+Sources/Shared/Stores/FinanceStore.swift:623:            AllocationSlice(name: "Investments", value: totals.totalInvestments, color: .blue),
+Sources/Shared/Stores/FinanceStore.swift:624:            AllocationSlice(name: "Crypto", value: totals.totalCrypto, color: .orange),
+Sources/Shared/Stores/FinanceStore.swift:625:            AllocationSlice(name: "Cash", value: totals.totalLiquidity, color: .green)
+Sources/Shared/Stores/FinanceStore.swift:696:        formatter.dateFormat = "yyyy-MM-dd"
+Sources/Shared/Stores/FinanceStore.swift:697:        let fileName = "wealth-compass-backup-\(formatter.string(from: Date())).json"
+Sources/Shared/Stores/FinanceStore.swift:793:                iCloudSyncError = "Local data loaded, but iCloud sync metadata could not be prepared. \(error.localizedDescription)"
+Sources/Shared/Stores/FinanceStore.swift:801:                    "The local database could not be loaded. The original file was left untouched. \(error.localizedDescription)"
+Sources/Shared/Stores/FinanceStore.swift:809:            iCloudSyncError = "Changes cannot be saved until the local database load error is resolved."
+Sources/Shared/Stores/FinanceStore.swift:828:            assertionFailure("Failed to save local finance data: \(error)")
+Sources/Shared/Stores/FinanceStore.swift:869:            throw localPersistenceError ?? CloudSyncError.invalidRecord("The local database is unavailable.")
+Sources/Shared/Stores/FinanceStore.swift:1053:            category: category ?? "Other",
+Sources/Shared/Stores/FinanceStore.swift:1055:            description: description ?? "",
+Sources/Shared/Stores/FinanceStore.swift:1135:            category: category ?? "Other",
+Sources/Shared/Stores/FinanceStore.swift:1137:            description: description ?? "",
+Sources/Shared/Stores/FinanceStore.swift:1191:            description: description ?? "",
+Sources/Shared/Stores/FinanceStore.swift:1199:        case "salary": "Salary"
+Sources/Shared/Stores/FinanceStore.swift:1200:        case "dividends": "Dividends"
+Sources/Shared/Stores/FinanceStore.swift:1201:        case "freelance": "Freelance"
+Sources/Shared/Stores/FinanceStore.swift:1202:        case "other": "Other"
+Sources/Shared/Stores/FinanceStore.swift:1204:        case .none: "Other"
+Sources/Shared/Stores/FinanceStore.swift:1247:            category: category ?? "Other",
+Sources/Shared/Stores/FinanceStore.swift:1249:            description: description ?? "",
+Sources/Shared/Stores/FinanceStore.swift:1294:        let accountName = name ?? type?.importTitleCased ?? "Liquidity Account"
+Sources/Shared/Stores/FinanceStore.swift:1301:            category: "Liquidity",
+Sources/Shared/Stores/FinanceStore.swift:1303:            description: "Imported liquidity account: \(accountName)",
+Sources/Shared/Stores/FinanceStore.swift:1385:            type: InvestmentType(rawValue: type?.lowercased() ?? "") ?? .other,
+Sources/Shared/Stores/FinanceStore.swift:1393:            geography: geography ?? "Other",
+Sources/Shared/Stores/FinanceStore.swift:1394:            sector: sector ?? "Other",
+Sources/Shared/Stores/FinanceStore.swift:1395:            isin: isin?.uppercased() ?? "",
+Sources/Shared/Stores/FinanceStore.swift:1468:            coinId: coinId?.lowercased() ?? "",
+Sources/Shared/Stores/FinanceStore.swift:1517:            name: name ?? type?.importTitleCased ?? "Liability",
+Sources/Shared/Stores/FinanceStore.swift:1654:        throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unsupported JSON value"))
+Sources/Shared/Stores/FinanceStore.swift:1675:        formatter.dateFormat = "yyyy-MM-dd"
+Sources/Shared/Stores/FinanceStore.swift:1730:                .replacingOccurrences(of: ",", with: ".")
+Sources/Shared/Stores/FinanceStore.swift:1750:        case "true", "1", "yes":
+Sources/Shared/Stores/FinanceStore.swift:1752:        case "false", "0", "no":
+Sources/Shared/Stores/FinanceStore.swift:1822:        replacingOccurrences(of: "_", with: " ")
+Sources/Shared/Stores/FinanceStore.swift:1823:            .replacingOccurrences(of: "-", with: " ")
+Sources/Shared/Stores/FinanceStore.swift:1824:            .split(separator: " ")
+Sources/Shared/Stores/FinanceStore.swift:1829:            .joined(separator: " ")
+Sources/Shared/Models/FinanceModels.swift:5:    case eur = "EUR"
+Sources/Shared/Models/FinanceModels.swift:6:    case usd = "USD"
+Sources/Shared/Models/FinanceModels.swift:7:    case gbp = "GBP"
+Sources/Shared/Models/FinanceModels.swift:8:    case chf = "CHF"
+Sources/Shared/Models/FinanceModels.swift:23:        case .eur: "€"
+Sources/Shared/Models/FinanceModels.swift:24:        case .usd: "$"
+Sources/Shared/Models/FinanceModels.swift:25:        case .gbp: "£"
+Sources/Shared/Models/FinanceModels.swift:26:        case .chf: "Fr"
+Sources/Shared/Models/FinanceModels.swift:57:    case realEstate = "real_estate"
+Sources/Shared/Models/FinanceModels.swift:76:    case oneWeek = "1W"
+Sources/Shared/Models/FinanceModels.swift:77:    case oneMonth = "1M"
+Sources/Shared/Models/FinanceModels.swift:78:    case sixMonths = "6M"
+Sources/Shared/Models/FinanceModels.swift:79:    case oneYear = "1Y"
+Sources/Shared/Models/FinanceModels.swift:80:    case all = "ALL"
+Sources/Shared/Models/FinanceModels.swift:86:    case sevenDays = "7d"
+Sources/Shared/Models/FinanceModels.swift:87:    case thirtyDays = "30d"
+Sources/Shared/Models/FinanceModels.swift:88:    case threeMonths = "3m"
+Sources/Shared/Models/FinanceModels.swift:89:    case yearToDate = "ytd"
+Sources/Shared/Models/FinanceModels.swift:90:    case all = "all"
+Sources/Shared/Persistence/FinancePersistence.swift:23:        directoryName: String = "Wealth Compass",
+Sources/Shared/Persistence/FinancePersistence.swift:24:        fileName: String = "wealth-compass-local-data.json"
+Sources/Shared/Persistence/FinancePersistence.swift:82:        let backupURL = storageURL.appendingPathExtension("pre-cloudkit-backup")
+Sources/Shared/Persistence/FinanceJSONCoding.swift:26:                debugDescription: "Expected an ISO-8601 date string or Unix timestamp."
+Sources/Shared/Persistence/FinanceJSONCoding.swift:72:        changed = addUpdatedAt(to: "transactions", fallbacks: ["createdAt", "date"], in: &root) || changed
+Sources/Shared/Persistence/FinanceJSONCoding.swift:73:        changed = addUpdatedAt(to: "recurringTransactions", fallbacks: ["createdAt", "startDate"], in: &root) || changed
+Sources/Shared/Persistence/FinanceJSONCoding.swift:74:        changed = addUpdatedAt(to: "investments", fallbacks: ["createdAt"], in: &root) || changed
+Sources/Shared/Persistence/FinanceJSONCoding.swift:75:        changed = addUpdatedAt(to: "crypto", fallbacks: ["createdAt"], in: &root) || changed
+Sources/Shared/Persistence/FinanceJSONCoding.swift:76:        changed = addUpdatedAt(to: "liabilities", fallbacks: ["createdAt"], in: &root) || changed
+Sources/Shared/Persistence/FinanceJSONCoding.swift:77:        changed = addUpdatedAt(to: "snapshots", fallbacks: ["createdAt", "date"], in: &root) || changed
+Sources/Shared/Persistence/FinanceJSONCoding.swift:91:        for index in records.indices where records[index]["updatedAt"] == nil {
+Sources/Shared/Persistence/FinanceJSONCoding.swift:95:            records[index]["updatedAt"] = fallbackValue
+Sources/Shared/Services/ExchangeRateService.swift:38:            return "Refresh Already Running"
+Sources/Shared/Services/ExchangeRateService.swift:40:        return succeeded ? "Exchange Rates Updated" : "Exchange Rate Refresh Failed"
+Sources/Shared/Services/ExchangeRateService.swift:45:            return "An exchange-rate refresh is already in progress."
+Sources/Shared/Services/ExchangeRateService.swift:49:            let activeRates = snapshot == nil ? "the built-in offline fallback rates" : "the last cached rates"
+Sources/Shared/Services/ExchangeRateService.swift:50:            return "\(errorMessage)\n\nWealth Compass will continue using \(activeRates)."
+Sources/Shared/Services/ExchangeRateService.swift:54:            return """
+Sources/Shared/Services/ExchangeRateService.swift:58:            """
+Sources/Shared/Services/ExchangeRateService.swift:61:        return errorMessage ?? "The exchange-rate provider did not return a usable response."
+Sources/Shared/Services/ExchangeRateService.swift:75:            return "The exchange-rate request could not be created."
+Sources/Shared/Services/ExchangeRateService.swift:77:            return "The exchange-rate provider returned an invalid response."
+Sources/Shared/Services/ExchangeRateService.swift:79:            return "The exchange-rate provider returned HTTP \(statusCode)."
+Sources/Shared/Services/ExchangeRateService.swift:81:            return "The exchange-rate provider returned malformed data."
+Sources/Shared/Services/ExchangeRateService.swift:83:            return "The exchange-rate provider did not return all supported currencies."
+Sources/Shared/Services/ExchangeRateService.swift:98:        components.scheme = "https"
+Sources/Shared/Services/ExchangeRateService.swift:99:        components.host = "api.frankfurter.dev"
+Sources/Shared/Services/ExchangeRateService.swift:100:        components.path = "/v2/rates"
+Sources/Shared/Services/ExchangeRateService.swift:102:            URLQueryItem(name: "base", value: Currency.eur.rawValue),
+Sources/Shared/Services/ExchangeRateService.swift:103:            URLQueryItem(name: "quotes", value: quoteCurrencies.joined(separator: ",")),
+Sources/Shared/Services/ExchangeRateService.swift:104:            URLQueryItem(name: "providers", value: "ECB")
+Sources/Shared/Services/ExchangeRateService.swift:112:        request.setValue("application/json", forHTTPHeaderField: "Accept")
+Sources/Shared/Services/ExchangeRateService.swift:151:            provider: "European Central Bank via Frankfurter"
+Sources/Shared/Services/ExchangeRateService.swift:156:        let components = value.split(separator: "-").compactMap { Int($0) }
+Sources/Shared/Services/CloudKitSyncService.swift:54:    case transaction = "WCTransaction"
+Sources/Shared/Services/CloudKitSyncService.swift:55:    case recurringTransaction = "WCRecurringTransaction"
+Sources/Shared/Services/CloudKitSyncService.swift:56:    case investment = "WCInvestment"
+Sources/Shared/Services/CloudKitSyncService.swift:57:    case crypto = "WCCryptoHolding"
+Sources/Shared/Services/CloudKitSyncService.swift:58:    case liability = "WCLiability"
+Sources/Shared/Services/CloudKitSyncService.swift:59:    case snapshot = "WCNetWorthSnapshot"
+Sources/Shared/Services/CloudKitSyncService.swift:63:        case .transaction: "transaction"
+Sources/Shared/Services/CloudKitSyncService.swift:64:        case .recurringTransaction: "recurring"
+Sources/Shared/Services/CloudKitSyncService.swift:65:        case .investment: "investment"
+Sources/Shared/Services/CloudKitSyncService.swift:66:        case .crypto: "crypto"
+Sources/Shared/Services/CloudKitSyncService.swift:67:        case .liability: "liability"
+Sources/Shared/Services/CloudKitSyncService.swift:68:        case .snapshot: "snapshot"
+Sources/Shared/Services/CloudKitSyncService.swift:78:        "\(type.recordNamePrefix):\(id.uuidString.lowercased())"
+Sources/Shared/Services/CloudKitSyncService.swift:91:        let parts = recordName.split(separator: ":", maxSplits: 1).map(String.init)
+Sources/Shared/Services/CloudKitSyncService.swift:110:        SHA256.hash(data: payload).map { String(format: "%02x", $0) }.joined()
+Sources/Shared/Services/CloudKitSyncService.swift:246:            throw CloudSyncError.invalidRecord("Record ID and payload ID do not match.")
+Sources/Shared/Services/CloudKitSyncService.swift:300:        directoryName: String = "Wealth Compass",
+Sources/Shared/Services/CloudKitSyncService.swift:301:        fileName: String = "wealth-compass-cloud-sync.json"
+Sources/Shared/Services/CloudKitSyncService.swift:451:    private static let containerIdentifier = "iCloud.com.wealthcompasstracker"
+Sources/Shared/Services/CloudKitSyncService.swift:452:    private static let zoneName = "WealthCompassZone"
+Sources/Shared/Services/CloudKitSyncService.swift:453:    private static let subscriptionID = "WealthCompassSyncSubscription"
+Sources/Shared/Services/CloudKitSyncService.swift:496:                    "Sign in to iCloud and allow iCloud access for this app before turning on sync."
+Sources/Shared/Services/CloudKitSyncService.swift:616:                Self.logger.info("Ignoring an unknown CKSyncEngine event.")
+Sources/Shared/Services/CloudKitSyncService.swift:619:            Self.logger.error("CloudKit event handling failed: \(error.localizedDescription, privacy: .public)")
+Sources/Shared/Services/CloudKitSyncService.swift:649:        record["schemaVersion"] = Self.schemaVersion as NSNumber
+Sources/Shared/Services/CloudKitSyncService.swift:653:            record["isDeleted"] = true as NSNumber
+Sources/Shared/Services/CloudKitSyncService.swift:654:            record["deletedAt"] = deletedAt as NSDate
+Sources/Shared/Services/CloudKitSyncService.swift:655:            record["clientModifiedAt"] = deletedAt as NSDate
+Sources/Shared/Services/CloudKitSyncService.swift:656:            record["revision"] = revision.uuidString as NSString
+Sources/Shared/Services/CloudKitSyncService.swift:657:            record["payload"] = nil
+Sources/Shared/Services/CloudKitSyncService.swift:658:            record["createdAt"] = nil
+Sources/Shared/Services/CloudKitSyncService.swift:659:            record["updatedAt"] = nil
+Sources/Shared/Services/CloudKitSyncService.swift:667:            record["isDeleted"] = false as NSNumber
+Sources/Shared/Services/CloudKitSyncService.swift:668:            record["payload"] = snapshot.payload as NSData
+Sources/Shared/Services/CloudKitSyncService.swift:669:            record["createdAt"] = snapshot.createdAt as NSDate
+Sources/Shared/Services/CloudKitSyncService.swift:670:            record["updatedAt"] = snapshot.updatedAt as NSDate
+Sources/Shared/Services/CloudKitSyncService.swift:671:            record["clientModifiedAt"] = modifiedAt as NSDate
+Sources/Shared/Services/CloudKitSyncService.swift:672:            record["revision"] = revision.uuidString as NSString
+Sources/Shared/Services/CloudKitSyncService.swift:673:            record["deletedAt"] = nil
+Sources/Shared/Services/CloudKitSyncService.swift:729:            let remoteIsDeleted = (record["isDeleted"] as? NSNumber)?.boolValue ?? false
+Sources/Shared/Services/CloudKitSyncService.swift:746:                    state.deletedAt = record["deletedAt"] as? Date ?? record.modificationDate ?? Date()
+Sources/Shared/Services/CloudKitSyncService.swift:760:            guard let payload = record["payload"] as? Data else {
+Sources/Shared/Services/CloudKitSyncService.swift:761:                throw CloudSyncError.invalidRecord("CloudKit record \(record.recordID.recordName) has no payload.")
+Sources/Shared/Services/CloudKitSyncService.swift:766:                createdAt: record["createdAt"] as? Date ?? Date.distantPast,
+Sources/Shared/Services/CloudKitSyncService.swift:767:                updatedAt: record["updatedAt"] as? Date ?? record.modificationDate ?? Date.distantPast
+Sources/Shared/Services/CloudKitSyncService.swift:901:                    state.isTombstone = (record["isDeleted"] as? NSNumber)?.boolValue ?? false
+Sources/Shared/Services/CloudKitSyncService.swift:902:                    state.deletedAt = record["deletedAt"] as? Date
+Sources/Shared/Services/CloudKitSyncService.swift:904:                    state.isTombstone = (record["isDeleted"] as? NSNumber)?.boolValue ?? false
+Sources/Shared/Services/CloudKitSyncService.swift:905:                    state.deletedAt = record["deletedAt"] as? Date
+Sources/Shared/Services/CloudKitSyncService.swift:948:        let serverIsDeleted = (serverRecord["isDeleted"] as? NSNumber)?.boolValue ?? false
+Sources/Shared/Services/CloudKitSyncService.swift:951:        let serverDeletedAt = serverRecord["deletedAt"] as? Date
+Sources/Shared/Services/CloudKitSyncService.swift:1125:            return CKRecord(recordType: key?.type.rawValue ?? "WCUnknown", recordID: fallbackID)
+Sources/Shared/Services/CloudKitSyncService.swift:1131:                recordType: CloudSyncRecordKey(recordName: fallbackID.recordName)?.type.rawValue ?? "WCUnknown",
+Sources/Shared/Services/CloudKitSyncService.swift:1144:        guard let value = record["revision"] as? String else { return nil }
+Sources/Shared/Services/CloudKitSyncService.swift:1178:        Self.logger.error("CloudKit sync error: \(error.localizedDescription, privacy: .public)")
+Sources/Shared/Services/CloudKitSyncService.swift:1182:                await statusHandler(.accountUnavailable("Sign in to iCloud to continue syncing."))
+Sources/Shared/Services/CloudKitSyncService.swift:1184:                await statusHandler(.error("The network is unavailable. Local changes are saved and will retry automatically."))
+Sources/Shared/Services/CloudKitSyncService.swift:1186:                await statusHandler(.error("The iCloud account does not have enough available storage."))
+Sources/Shared/Services/MarketDataService.swift:27:            return "Refresh Already Running"
+Sources/Shared/Services/MarketDataService.swift:29:        return updatedRecordCount > 0 ? "Prices Updated" : "No Prices Updated"
+Sources/Shared/Services/MarketDataService.swift:34:            return "A market price refresh is already in progress."
+Sources/Shared/Services/MarketDataService.swift:39:            lines.append("Updated \(updatedInvestments) investments and \(updatedCrypto) crypto holdings.")
+Sources/Shared/Services/MarketDataService.swift:40:            lines.append("Last refresh: \(refreshedAt.formatted(date: .abbreviated, time: .shortened)).")
+Sources/Shared/Services/MarketDataService.swift:42:            lines.append("No holdings were updated.")
+Sources/Shared/Services/MarketDataService.swift:46:            lines.append("Investments skipped: \(Self.compactList(skippedInvestments)).")
+Sources/Shared/Services/MarketDataService.swift:50:            lines.append("Crypto skipped: \(Self.compactList(skippedCrypto)).")
+Sources/Shared/Services/MarketDataService.swift:54:            lines.append("Investment failures: \(Self.compactList(failedInvestments)).")
+Sources/Shared/Services/MarketDataService.swift:58:            lines.append("Crypto failures: \(Self.compactList(failedCrypto)).")
+Sources/Shared/Services/MarketDataService.swift:61:        return lines.joined(separator: "\n\n")
+Sources/Shared/Services/MarketDataService.swift:65:        let visible = values.prefix(6).joined(separator: ", ")
+Sources/Shared/Services/MarketDataService.swift:67:        return "\(visible), +\(values.count - 6) more"
+Sources/Shared/Services/MarketDataService.swift:83:            return "A Finnhub API key is required to update investment prices."
+Sources/Shared/Services/MarketDataService.swift:85:            return "The market data request could not be created."
+Sources/Shared/Services/MarketDataService.swift:87:            return "\(provider) rejected the API key."
+Sources/Shared/Services/MarketDataService.swift:89:            return "\(provider) rate limit reached. Try again later."
+Sources/Shared/Services/MarketDataService.swift:91:            return "\(provider) returned HTTP \(statusCode)."
+Sources/Shared/Services/MarketDataService.swift:93:            return "\(provider) returned an invalid response."
+Sources/Shared/Services/MarketDataService.swift:95:            return "\(provider) did not return a usable quote for \(symbol)."
+Sources/Shared/Services/MarketDataService.swift:101:    case finnhubAPIKey = "finnhub_api_key"
+Sources/Shared/Services/MarketDataService.swift:102:    case coingeckoAPIKey = "coingecko_api_key"
+Sources/Shared/Services/MarketDataService.swift:112:            return "Keychain operation failed with status \(status)."
+Sources/Shared/Services/MarketDataService.swift:114:            return "The stored Keychain value could not be read."
+Sources/Shared/Services/MarketDataService.swift:122:    private let service = "com.wealthcompass.mobile.marketdata"
+Sources/Shared/Services/MarketDataService.swift:210:        try await quote(for: "AAPL", validationNonce: UUID().uuidString)
+Sources/Shared/Services/MarketDataService.swift:220:            throw MarketDataError.noQuote(provider: "Finnhub", symbol: symbol)
+Sources/Shared/Services/MarketDataService.swift:224:        components.scheme = "https"
+Sources/Shared/Services/MarketDataService.swift:225:        components.host = "finnhub.io"
+Sources/Shared/Services/MarketDataService.swift:226:        components.path = "/api/v1/quote"
+Sources/Shared/Services/MarketDataService.swift:228:            URLQueryItem(name: "symbol", value: normalizedSymbol)
+Sources/Shared/Services/MarketDataService.swift:231:            components.queryItems?.append(URLQueryItem(name: "_validation_nonce", value: validationNonce))
+Sources/Shared/Services/MarketDataService.swift:243:        request.setValue(apiKey, forHTTPHeaderField: "X-Finnhub-Token")
+Sources/Shared/Services/MarketDataService.swift:245:            request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+Sources/Shared/Services/MarketDataService.swift:249:        try Self.validate(response: response, provider: "Finnhub")
+Sources/Shared/Services/MarketDataService.swift:253:            throw MarketDataError.noQuote(provider: "Finnhub", symbol: normalizedSymbol)
+Sources/Shared/Services/MarketDataService.swift:263:        return MarketPriceQuote(price: price, currency: .usd, asOf: asOf, provider: "Finnhub")
+Sources/Shared/Services/MarketDataService.swift:289:        let quotes = try await pricesForChunk(["bitcoin"], validationNonce: UUID().uuidString)
+Sources/Shared/Services/MarketDataService.swift:290:        guard let quote = quotes["bitcoin"] else {
+Sources/Shared/Services/MarketDataService.swift:291:            throw MarketDataError.noQuote(provider: "CoinGecko", symbol: "bitcoin")
+Sources/Shared/Services/MarketDataService.swift:312:        components.scheme = "https"
+Sources/Shared/Services/MarketDataService.swift:313:        components.host = "api.coingecko.com"
+Sources/Shared/Services/MarketDataService.swift:314:        components.path = "/api/v3/simple/price"
+Sources/Shared/Services/MarketDataService.swift:316:            URLQueryItem(name: "ids", value: coinIDs.joined(separator: ",")),
+Sources/Shared/Services/MarketDataService.swift:317:            URLQueryItem(name: "vs_currencies", value: "usd"),
+Sources/Shared/Services/MarketDataService.swift:318:            URLQueryItem(name: "include_last_updated_at", value: "true")
+Sources/Shared/Services/MarketDataService.swift:321:            components.queryItems?.append(URLQueryItem(name: "_validation_nonce", value: validationNonce))
+Sources/Shared/Services/MarketDataService.swift:335:            request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+Sources/Shared/Services/MarketDataService.swift:339:        try Self.validate(response: response, provider: "CoinGecko")
+Sources/Shared/Services/MarketDataService.swift:345:            return MarketPriceQuote(price: price, currency: .usd, asOf: asOf, provider: "CoinGecko")
+Sources/Shared/Services/MarketDataService.swift:370:        request.setValue(key, forHTTPHeaderField: "x-cg-demo-api-key")
+Sources/Shared/Services/MarketDataService.swift:379:        case currentPrice = "c"
+Sources/Shared/Services/MarketDataService.swift:380:        case timestamp = "t"
+Sources/Shared/Services/MarketDataService.swift:390:        case lastUpdatedAt = "last_updated_at"
+Sources/Shared/Services/MarketDataService.swift:412:        "BTC": "bitcoin",
+Sources/Shared/Services/MarketDataService.swift:413:        "ETH": "ethereum",
+Sources/Shared/Services/MarketDataService.swift:414:        "SOL": "solana",
+Sources/Shared/Services/MarketDataService.swift:415:        "BNB": "binancecoin",
+Sources/Shared/Services/MarketDataService.swift:416:        "XRP": "ripple",
+Sources/Shared/Services/MarketDataService.swift:417:        "ADA": "cardano",
+Sources/Shared/Services/MarketDataService.swift:418:        "DOGE": "dogecoin",
+Sources/Shared/Services/MarketDataService.swift:419:        "DOT": "polkadot",
+Sources/Shared/Services/MarketDataService.swift:420:        "AVAX": "avalanche-2",
+Sources/Shared/Services/MarketDataService.swift:421:        "MATIC": "matic-network",
+Sources/Shared/Services/MarketDataService.swift:422:        "POL": "polygon-ecosystem-token",
+Sources/Shared/Services/MarketDataService.swift:423:        "LINK": "chainlink",
+Sources/Shared/Services/MarketDataService.swift:424:        "LTC": "litecoin",
+Sources/Shared/Services/MarketDataService.swift:425:        "BCH": "bitcoin-cash",
+Sources/Shared/Services/MarketDataService.swift:426:        "UNI": "uniswap",
+Sources/Shared/Services/MarketDataService.swift:427:        "ATOM": "cosmos",
+Sources/Shared/Services/MarketDataService.swift:428:        "CRO": "crypto-com-chain",
+Sources/Shared/Services/MarketDataService.swift:429:        "USDT": "tether",
+Sources/Shared/Services/MarketDataService.swift:430:        "USDC": "usd-coin",
+Sources/Shared/Services/MarketDataService.swift:431:        "DAI": "dai"
+Sources/iOS/Views/DashboardView.swift:44:                    title: "Asset Allocation",
+Sources/iOS/Views/DashboardView.swift:71:            title: "Financial horizon",
+Sources/iOS/Views/DashboardView.swift:72:            subtitle: "Everything you own, owe, earn, and spend."
+Sources/iOS/Views/DashboardView.swift:138:                                    Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
+Sources/iOS/Views/DashboardView.swift:167:                            title: "Your net-worth trail starts here",
+Sources/iOS/Views/DashboardView.swift:173:                            title: "Net-worth history concealed",
+Sources/iOS/Views/DashboardView.swift:174:                            message: "Turn off Privacy Mode to reveal values and movement."
+Sources/iOS/Views/DashboardView.swift:181:                                RuleMark(x: .value("Selected Date", selectedPoint.date))
+Sources/iOS/Views/DashboardView.swift:202:                                    x: .value("Date", point.date),
+Sources/iOS/Views/DashboardView.swift:203:                                    yStart: .value("Range floor", chartDomain(for: points).lowerBound),
+Sources/iOS/Views/DashboardView.swift:204:                                    yEnd: .value("Net Worth", point.value)
+Sources/iOS/Views/DashboardView.swift:216:                                    x: .value("Date", point.date),
+Sources/iOS/Views/DashboardView.swift:217:                                    y: .value("Net Worth", point.value)
+Sources/iOS/Views/DashboardView.swift:265:                "Position",
+Sources/iOS/Views/DashboardView.swift:266:                subtitle: "Balances derived from your activity and holdings"
+Sources/iOS/Views/DashboardView.swift:271:                    title: "Recorded Cash",
+Sources/iOS/Views/DashboardView.swift:274:                    detail: finance.data.transactions.isEmpty ? "No activity yet" : "Income less expenses"
+Sources/iOS/Views/DashboardView.swift:277:                    title: "Investments",
+Sources/iOS/Views/DashboardView.swift:281:                    detail: countLabel(finance.data.investments.count, singular: "position")
+Sources/iOS/Views/DashboardView.swift:284:                    title: "Crypto",
+Sources/iOS/Views/DashboardView.swift:288:                    detail: countLabel(finance.data.crypto.count, singular: "holding")
+Sources/iOS/Views/DashboardView.swift:291:                    title: "Total Assets",
+Sources/iOS/Views/DashboardView.swift:295:                    detail: "Across every asset"
+Sources/iOS/Views/DashboardView.swift:298:                    title: "Liabilities",
+Sources/iOS/Views/DashboardView.swift:302:                    detail: countLabel(finance.data.liabilities.count, singular: "liability")
+Sources/iOS/Views/DashboardView.swift:305:                    title: "Net Savings",
+Sources/iOS/Views/DashboardView.swift:307:                    systemImage: currentMonthCashFlow.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
+Sources/iOS/Views/DashboardView.swift:323:                SectionHeading("Six-Month Cash Flow", subtitle: "Income and expenses by month")
+Sources/iOS/Views/DashboardView.swift:330:                        title: "Cash-flow chart concealed",
+Sources/iOS/Views/DashboardView.swift:331:                        message: "Monthly amounts and proportions are hidden."
+Sources/iOS/Views/DashboardView.swift:337:                            x: .value("Month", month.monthLabel),
+Sources/iOS/Views/DashboardView.swift:338:                            y: .value("Amount", month.income)
+Sources/iOS/Views/DashboardView.swift:341:                        .position(by: .value("Type", "Income"))
+Sources/iOS/Views/DashboardView.swift:345:                            x: .value("Month", month.monthLabel),
+Sources/iOS/Views/DashboardView.swift:346:                            y: .value("Amount", month.expense)
+Sources/iOS/Views/DashboardView.swift:349:                        .position(by: .value("Type", "Expenses"))
+Sources/iOS/Views/DashboardView.swift:365:                    cashFlowLegend(title: "Income", value: totalIncome, color: WCColor.primary)
+Sources/iOS/Views/DashboardView.swift:366:                    cashFlowLegend(title: "Expenses", value: totalExpense, color: WCColor.destructive)
+Sources/iOS/Views/DashboardView.swift:404:                    "Top Expense Categories",
+Sources/iOS/Views/DashboardView.swift:405:                    subtitle: "Where spending was concentrated in the last 30 days"
+Sources/iOS/Views/DashboardView.swift:458:                SectionHeading("Recent Activity", subtitle: "Your latest recorded cash movements")
+Sources/iOS/Views/DashboardView.swift:467:                                    Image(systemName: transaction.type == .income ? "arrow.down.left" : "arrow.up.right")
+Sources/iOS/Views/DashboardView.swift:524:        return "\(settings.currency.symbol)\(compactValue)"
+Sources/iOS/Views/DashboardView.swift:529:            ? "••••"
+Sources/iOS/Views/DashboardView.swift:530:            : "\(value.formatted(.number.precision(.fractionLength(1))))%"
+Sources/iOS/Views/DashboardView.swift:534:        guard !settings.isPrivacyMode else { return "••••" }
+Sources/iOS/Views/DashboardView.swift:535:        let prefix = transaction.type == .income ? "+" : "−"
+Sources/iOS/Views/DashboardView.swift:540:        "\(count) \(count == 1 ? singular : singular + "s")"
+Sources/iOS/Views/DashboardView.swift:547:            return "Just now"
+Sources/iOS/Views/DashboardView.swift:549:            return "\(Int(interval / 60))m ago"
+Sources/iOS/Views/DashboardView.swift:551:            return "\(Int(interval / (60 * 60)))h ago"
+Sources/iOS/Views/DashboardView.swift:553:            return "\(Int(interval / (24 * 60 * 60)))d ago"
+Sources/iOS/Views/SettingsView.swift:16:    @State private var credentialDraft = ""
+Sources/iOS/Views/SettingsView.swift:74:                    categoryGroup(title: "Income", type: .income, categories: settings.customIncomeCategories)
+Sources/iOS/Views/SettingsView.swift:75:                    categoryGroup(title: "Expense", type: .expense, categories: settings.customExpenseCategories)
+Sources/iOS/Views/SettingsView.swift:95:                    LabeledContent("Status", value: finance.cloudSyncStatus.title)
+Sources/iOS/Views/SettingsView.swift:111:                                        title: "Sync Failed",
+Sources/iOS/Views/SettingsView.swift:218:            .alert("Import JSON Backup", isPresented: $showingImportOptions) {
+Sources/iOS/Views/SettingsView.swift:243:                        credentialDraft = ""
+Sources/iOS/Views/SettingsView.swift:299:                        settings.isPrivacyMode ? "Private" : "Visible",
+Sources/iOS/Views/SettingsView.swift:300:                        systemImage: settings.isPrivacyMode ? "eye.slash.fill" : "eye.fill",
+Sources/iOS/Views/SettingsView.swift:304:                        settings.isICloudSyncEnabled ? "iCloud" : "Local",
+Sources/iOS/Views/SettingsView.swift:305:                        systemImage: settings.isICloudSyncEnabled ? "icloud.fill" : "internaldrive.fill",
+Sources/iOS/Views/SettingsView.swift:355:                    settings.isRefreshingExchangeRates ? "Refreshing Exchange Rates" : "Refresh Exchange Rates",
+Sources/iOS/Views/SettingsView.swift:387:                    title: "Finnhub API Key",
+Sources/iOS/Views/SettingsView.swift:398:                    title: "CoinGecko API Key",
+Sources/iOS/Views/SettingsView.swift:419:            Text(isConfigured ? "Configured" : "Not Set")
+Sources/iOS/Views/SettingsView.swift:489:                settingsAlert = SettingsAlertState(title: "Import Complete", message: result.message)
+Sources/iOS/Views/SettingsView.swift:492:                    title: "Import Failed",
+Sources/iOS/Views/SettingsView.swift:497:            settingsAlert = SettingsAlertState(title: "Import Failed", message: error.localizedDescription)
+Sources/iOS/Views/SettingsView.swift:507:        credentialDraft = ""
+Sources/iOS/Views/SettingsView.swift:514:            return (try KeychainCredentialStore.shared.string(for: credential) ?? "")
+Sources/iOS/Views/SettingsView.swift:517:            return ""
+Sources/iOS/Views/SettingsView.swift:531:            credentialDraft = ""
+Sources/iOS/Views/SettingsView.swift:535:                title: "\(credential.title) Saved",
+Sources/iOS/Views/SettingsView.swift:536:                message: "\(message)\n\nThe API key was saved securely in Keychain."
+Sources/iOS/Views/SettingsView.swift:540:                title: "\(credential.title) Failed",
+Sources/iOS/Views/SettingsView.swift:550:            return "Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue)))."
+Sources/iOS/Views/SettingsView.swift:553:            return "CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue)))."
+Sources/iOS/Views/SettingsView.swift:602:            "Finnhub API Key"
+Sources/iOS/Views/SettingsView.swift:604:            "CoinGecko API Key"
+Sources/iOS/Views/SettingsView.swift:611:            "Paste Finnhub API key"
+Sources/iOS/Views/SettingsView.swift:613:            "Paste CoinGecko API key"
+Sources/iOS/Views/SettingsView.swift:629:            "Apple (AAPL)"
+Sources/iOS/Views/SettingsView.swift:631:            "Bitcoin"
+Sources/iOS/Views/SettingsView.swift:704:            "delete-all-data"
+Sources/iOS/Views/SettingsView.swift:706:            "delete-category-\(type.rawValue)-\(category.lowercased())"
+Sources/iOS/Views/SettingsView.swift:713:            "Delete All Data?"
+Sources/iOS/Views/SettingsView.swift:715:            "Delete Custom Category?"
+Sources/iOS/Views/SettingsView.swift:722:            "This permanently removes all local Wealth Compass data from this device."
+Sources/iOS/Views/SettingsView.swift:724:            "This removes \(category) from your custom \(type.title.lowercased()) categories. Existing transactions using this category will keep their current label."
+Sources/iOS/Views/SettingsView.swift:731:            "Delete"
+Sources/iOS/Views/SettingsView.swift:733:            "Delete Category"
+Sources/iOS/Views/Forms.swift:8:    private static let customCategoryTag = "__wealth_compass_custom_category__"
+Sources/iOS/Views/Forms.swift:11:    @State private var amount = ""
+Sources/iOS/Views/Forms.swift:12:    @State private var category = "Food"
+Sources/iOS/Views/Forms.swift:13:    @State private var note = ""
+Sources/iOS/Views/Forms.swift:15:    @State private var customCategory = ""
+Sources/iOS/Views/Forms.swift:40:            return "Enter a category name. It will be saved for future \(type.title.lowercased()) transactions."
+Sources/iOS/Views/Forms.swift:44:            return "\(existing) already exists and will be selected."
+Sources/iOS/Views/Forms.swift:47:        return "This category will be added to your \(type.title.lowercased()) categories."
+Sources/iOS/Views/Forms.swift:51:        Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+Sources/iOS/Views/Forms.swift:64:                    category = settings.transactionCategories(for: newValue).first ?? ""
+Sources/iOS/Views/Forms.swift:65:                    customCategory = ""
+Sources/iOS/Views/Forms.swift:70:                    TextField("Amount", text: $amount)
+Sources/iOS/Views/Forms.swift:73:                    TextField("Description", text: $note)
+Sources/iOS/Views/Forms.swift:90:                            customCategory = ""
+Sources/iOS/Views/Forms.swift:96:                        TextField("Custom category name", text: $customCategory)
+Sources/iOS/Views/Forms.swift:148:    private static let customCategoryTag = "__wealth_compass_recurring_custom_category__"
+Sources/iOS/Views/Forms.swift:159:    @State private var customCategory = ""
+Sources/iOS/Views/Forms.swift:174:        _amount = State(initialValue: schedule.map { String($0.amount) } ?? "")
+Sources/iOS/Views/Forms.swift:175:        _category = State(initialValue: schedule?.category ?? "Food")
+Sources/iOS/Views/Forms.swift:176:        _note = State(initialValue: schedule?.description ?? "")
+Sources/iOS/Views/Forms.swift:201:        Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+Sources/iOS/Views/Forms.swift:226:                    category = settings.transactionCategories(for: newValue).first ?? ""
+Sources/iOS/Views/Forms.swift:227:                    customCategory = ""
+Sources/iOS/Views/Forms.swift:232:                    TextField("Amount (\(settings.currency.rawValue))", text: $amount)
+Sources/iOS/Views/Forms.swift:234:                    TextField("Description", text: $note)
+Sources/iOS/Views/Forms.swift:251:                            customCategory = ""
+Sources/iOS/Views/Forms.swift:257:                        TextField("Custom category name", text: $customCategory)
+Sources/iOS/Views/Forms.swift:276:                        "First Occurrence",
+Sources/iOS/Views/Forms.swift:281:                    Toggle("End Date", isOn: $hasEndDate)
+Sources/iOS/Views/Forms.swift:290:                    Toggle("Notify When Due", isOn: $notificationsEnabled)
+Sources/iOS/Views/Forms.swift:294:                        "Wealth Compass records due occurrences while the app is active. "
+Sources/iOS/Views/Forms.swift:295:                            + "If the app was closed, missed occurrences are added automatically the next time it opens."
+Sources/iOS/Views/Forms.swift:301:            .navigationTitle(existingSchedule == nil ? "New Recurring Transaction" : "Edit Recurring Transaction")
+Sources/iOS/Views/Forms.swift:388:    private let sectors = ["Technology", "Finance", "Real Estate", "Healthcare", "Energy", "Consumer", "All World", "Other"]
+Sources/iOS/Views/Forms.swift:389:    private let geographies = ["US", "Europe", "UK", "Switzerland", "Global", "Emerging Markets", "Other"]
+Sources/iOS/Views/Forms.swift:394:        _symbol = State(initialValue: investment?.symbol ?? "")
+Sources/iOS/Views/Forms.swift:395:        _name = State(initialValue: investment?.name ?? "")
+Sources/iOS/Views/Forms.swift:396:        _isin = State(initialValue: investment?.isin ?? "")
+Sources/iOS/Views/Forms.swift:398:        _sector = State(initialValue: investment?.sector ?? "Technology")
+Sources/iOS/Views/Forms.swift:399:        _geography = State(initialValue: investment?.geography ?? "US")
+Sources/iOS/Views/Forms.swift:401:        _quantity = State(initialValue: investment.map { Self.formatInput($0.quantity) } ?? "")
+Sources/iOS/Views/Forms.swift:403:        _avgBuyPrice = State(initialValue: investment == nil ? "" : Self.formatInput(rawAverage))
+Sources/iOS/Views/Forms.swift:404:        _currentPrice = State(initialValue: investment.map { Self.formatInput($0.currentPrice) } ?? "")
+Sources/iOS/Views/Forms.swift:405:        _feeValue = State(initialValue: investment.map { Self.formatInput($0.fees) } ?? "0")
+Sources/iOS/Views/Forms.swift:420:                    TextField("Symbol", text: $symbol)
+Sources/iOS/Views/Forms.swift:422:                    TextField("Name", text: $name)
+Sources/iOS/Views/Forms.swift:423:                    TextField("ISIN / ID", text: $isin)
+Sources/iOS/Views/Forms.swift:446:                    TextField("Quantity", text: $quantity)
+Sources/iOS/Views/Forms.swift:448:                    TextField("Average Buy Price", text: $avgBuyPrice)
+Sources/iOS/Views/Forms.swift:450:                    TextField("Current Price", text: $currentPrice)
+Sources/iOS/Views/Forms.swift:461:                    TextField(feeMode == .fixed ? "Investment Transaction Fee" : "Investment Transaction Fee %", text: $feeValue)
+Sources/iOS/Views/Forms.swift:475:            .navigationTitle(investment == nil ? "Add Investment" : "Edit Investment")
+Sources/iOS/Views/Forms.swift:526:        Double(value.replacingOccurrences(of: ",", with: ".")) ?? 0
+Sources/iOS/Views/Forms.swift:530:        value == 0 ? "0" : String(format: "%.8g", value)
+Sources/iOS/Views/Forms.swift:551:        _symbol = State(initialValue: holding?.symbol ?? "")
+Sources/iOS/Views/Forms.swift:552:        _name = State(initialValue: holding?.name ?? "")
+Sources/iOS/Views/Forms.swift:553:        _coinId = State(initialValue: holding?.coinId ?? "")
+Sources/iOS/Views/Forms.swift:554:        _quantity = State(initialValue: holding.map { Self.formatInput($0.quantity) } ?? "")
+Sources/iOS/Views/Forms.swift:556:        _avgBuyPrice = State(initialValue: holding == nil ? "" : Self.formatInput(rawAverage))
+Sources/iOS/Views/Forms.swift:557:        _currentPrice = State(initialValue: holding.map { Self.formatInput($0.currentPrice) } ?? "")
+Sources/iOS/Views/Forms.swift:558:        _feeValue = State(initialValue: holding.map { Self.formatInput($0.fees) } ?? "0")
+Sources/iOS/Views/Forms.swift:573:                    TextField("Symbol", text: $symbol)
+Sources/iOS/Views/Forms.swift:575:                    TextField("Name", text: $name)
+Sources/iOS/Views/Forms.swift:576:                    TextField("Optional Coin ID", text: $coinId)
+Sources/iOS/Views/Forms.swift:580:                    TextField("Quantity", text: $quantity)
+Sources/iOS/Views/Forms.swift:582:                    TextField("Average Buy Price", text: $avgBuyPrice)
+Sources/iOS/Views/Forms.swift:584:                    TextField("Current Price", text: $currentPrice)
+Sources/iOS/Views/Forms.swift:595:                    TextField(feeMode == .fixed ? "Fee Amount" : "Fee Percentage", text: $feeValue)
+Sources/iOS/Views/Forms.swift:605:            .navigationTitle(holding == nil ? "Add Crypto" : "Edit Crypto")
+Sources/iOS/Views/Forms.swift:646:        Double(value.replacingOccurrences(of: ",", with: ".")) ?? 0
+Sources/iOS/Views/Forms.swift:650:        value == 0 ? "0" : String(format: "%.8g", value)
+Sources/iOS/Views/CashFlowView.swift:13:        case .all: "All"
+Sources/iOS/Views/CashFlowView.swift:14:        case .income: "Income"
+Sources/iOS/Views/CashFlowView.swift:15:        case .expense: "Expense"
+Sources/iOS/Views/CashFlowView.swift:44:                PageHeader(title: "Cash flow", subtitle: "Understand what comes in and where it goes.") {
+Sources/iOS/Views/CashFlowView.swift:110:                    SectionHeading("Spending analytics", subtitle: "Expenses grouped by category")
+Sources/iOS/Views/CashFlowView.swift:129:                                angle: .value("Expense", item.value),
+Sources/iOS/Views/CashFlowView.swift:133:                            .foregroundStyle(by: .value("Category", item.name))
+Sources/iOS/Views/CashFlowView.swift:222:                    SectionHeading("Recurring Transactions", subtitle: "Automatic income and expenses")
+Sources/iOS/Views/CashFlowView.swift:261:                Image(systemName: schedule.type == .income ? "arrow.down.left" : "arrow.up.right")
+Sources/iOS/Views/CashFlowView.swift:275:                        Image(systemName: schedule.notificationsEnabled ? "bell.fill" : "bell.slash")
+Sources/iOS/Views/CashFlowView.swift:302:                    let prefix = schedule.type == .income ? "+" : "-"
+Sources/iOS/Views/CashFlowView.swift:319:                                Image(systemName: schedule.isActive ? "pause.fill" : "play.fill")
+Sources/iOS/Views/CashFlowView.swift:321:                            .accessibilityLabel(schedule.isActive ? "Pause schedule" : "Resume schedule")
+Sources/iOS/Views/CashFlowView.swift:457:                Image(systemName: transaction.type == .income ? "arrow.down.left" : "arrow.up.right")
+Sources/iOS/Views/CashFlowView.swift:489:                let prefix = transaction.type == .income ? "+" : "-"
+Sources/iOS/Views/CashFlowView.swift:506:                        title: "Notifications Disabled",
+Sources/iOS/Views/CashFlowView.swift:507:                        message: "The schedule was saved, but notifications are not authorized. You can enable them in iOS Settings and then edit this schedule."
+Sources/iOS/Views/CashFlowView.swift:541:                    "This permanently removes the \(transaction.category) transaction from "
+Sources/iOS/Views/CashFlowView.swift:542:                        + "\(transaction.date.formatted(date: .abbreviated, time: .omitted))."
+Sources/iOS/Views/CashFlowView.swift:554:                    "Future \(schedule.frequency.title.lowercased()) occurrences for "
+Sources/iOS/Views/CashFlowView.swift:555:                        + "\(schedule.category) will no longer be created."
+Sources/iOS/Views/CashFlowView.swift:570:                    "\(schedule.category) will disappear from Recurring Transactions and "
+Sources/iOS/Views/CashFlowView.swift:571:                        + "no future occurrences will be inserted automatically."
+Sources/iOS/Views/CashFlowView.swift:631:            return "delete-transaction-\(transaction.id)"
+Sources/iOS/Views/CashFlowView.swift:633:            return "delete-recurring-\(schedule.id)"
+Sources/iOS/Views/CashFlowView.swift:635:            return "finish-recurring-\(schedule.id)"
+Sources/iOS/Views/CashFlowView.swift:637:            return "message-\(title)-\(message)"
+Sources/iOS/Views/CryptoView.swift:13:                PageHeader(title: "Crypto assets", subtitle: "Track holdings, allocation, and performance.") {
+Sources/iOS/Views/CryptoView.swift:21:                AllocationChart(title: "Crypto Allocation", slices: finance.cryptoAllocation(settings: settings), settings: settings)
+Sources/iOS/Views/CryptoView.swift:57:                title: "Profit / Loss",
+Sources/iOS/Views/CryptoView.swift:59:                systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
+Sources/iOS/Views/CryptoView.swift:61:                detail: settings.isPrivacyMode ? "Performance hidden" : "\(percent.formatted(.number.precision(.fractionLength(1))))% performance"
+Sources/iOS/Views/CryptoView.swift:69:                SectionHeading("Crypto holdings", subtitle: "Tap a holding to edit its details")
+Sources/iOS/Views/InvestmentsView.swift:13:                PageHeader(title: "Investments", subtitle: "Follow positions, allocation, and performance.") {
+Sources/iOS/Views/InvestmentsView.swift:21:                AllocationChart(title: "Allocation by Sector", slices: finance.investmentAllocation(settings: settings), settings: settings)
+Sources/iOS/Views/InvestmentsView.swift:57:                title: "Profit / Loss",
+Sources/iOS/Views/InvestmentsView.swift:59:                systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
+Sources/iOS/Views/InvestmentsView.swift:61:                detail: settings.isPrivacyMode ? "Performance hidden" : "\(percent.formatted(.number.precision(.fractionLength(1))))% performance"
+Sources/iOS/Views/InvestmentsView.swift:69:                SectionHeading("Positions", subtitle: "Tap a position to edit its details")
+Sources/iOS/Views/OnboardingView.swift:6:    @State private var finnhubKey = ""
+Sources/iOS/Views/OnboardingView.swift:7:    @State private var coinGeckoKey = ""
+Sources/iOS/Views/OnboardingView.swift:31:            finnhubKey = (try? KeychainCredentialStore.shared.string(for: .finnhubAPIKey)) ?? ""
+Sources/iOS/Views/OnboardingView.swift:32:            coinGeckoKey = (try? KeychainCredentialStore.shared.string(for: .coingeckoAPIKey)) ?? ""
+Sources/iOS/Views/OnboardingView.swift:34:        .alert("Validation Failed", isPresented: $showingErrorAlert) {
+Sources/iOS/Views/OnboardingView.swift:37:            Text(validationError ?? "Invalid API Key")
+Sources/iOS/Views/OnboardingView.swift:165:                        SecureField("Paste Finnhub key...", text: $finnhubKey)
+Sources/iOS/Views/OnboardingView.swift:177:                        SecureField("Paste CoinGecko key...", text: $coinGeckoKey)
+Sources/iOS/Views/OnboardingView.swift:199:                        Text(isValidating ? "Validating..." : "Get Started")
+Sources/iOS/Views/OnboardingView.swift:226:            validationError = "Please insert at least one API key, or tap 'Skip for now' if you wish to proceed without them."
+Sources/iOS/ContentView.swift:109:        let transactionWord = insertedCount == 1 ? "transaction was" : "transactions were"
+Sources/iOS/ContentView.swift:111:            message: "\(insertedCount) scheduled \(transactionWord) automatically added to Cash Flow."
+Sources/iOS/Services/AppLockStore.swift:63:        context.localizedFallbackTitle = ""
+Sources/iOS/Services/RecurringTransactionNotificationService.swift:7:        "wealthCompass.recurringTransactionNotificationReceived"
+Sources/iOS/Services/RecurringTransactionNotificationService.swift:43:    private let identifierPrefix = "wealth-compass-recurring-"
+Sources/iOS/Services/RecurringTransactionNotificationService.swift:99:            content.userInfo = ["recurringTransactionID": schedule.id.uuidString]
+Sources/iOS/Services/RecurringTransactionNotificationService.swift:131:        "\(identifierPrefix)\(scheduleID.uuidString)"

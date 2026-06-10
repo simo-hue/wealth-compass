@@ -14,32 +14,32 @@ enum CloudSyncStatus: Equatable, Sendable {
     var title: String {
         switch self {
         case .disabled:
-            "Off"
+            String(localized: "Off")
         case .starting:
-            "Connecting"
+            String(localized: "Connecting")
         case .syncing:
-            "Syncing"
+            String(localized: "Syncing")
         case .upToDate:
-            "Up to Date"
+            String(localized: "Up to Date")
         case .accountUnavailable:
-            "iCloud Unavailable"
+            String(localized: "iCloud Unavailable")
         case .error:
-            "Sync Error"
+            String(localized: "Sync Error")
         }
     }
 
     var detail: String? {
         switch self {
         case .disabled:
-            "Your data remains on this device."
+            String(localized: "Your data remains on this device.")
         case .starting:
-            "Checking the iCloud account and preparing CloudKit."
+            String(localized: "Checking the iCloud account and preparing CloudKit.")
         case .syncing:
-            "Sending local changes and fetching updates from iCloud."
+            String(localized: "Sending local changes and fetching updates from iCloud.")
         case .upToDate(let date):
             date.map {
-                "Last synced \($0.formatted(date: .abbreviated, time: .shortened))."
-            } ?? "Local data is ready to sync."
+                String(localized: "Last synced \($0.formatted(date: .abbreviated, time: .shortened)).")
+            } ?? String(localized: "Local data is ready to sync.")
         case .accountUnavailable(let message), .error(let message):
             message
         }
@@ -435,9 +435,9 @@ enum CloudSyncError: LocalizedError {
         case .accountUnavailable(let message), .invalidRecord(let message):
             message
         case .accountChanged:
-            "The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account."
+            String(localized: "The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.")
         case .notRunning:
-            "iCloud sync is not running."
+            String(localized: "iCloud sync is not running.")
         }
     }
 }

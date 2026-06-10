@@ -154,7 +154,20 @@ struct MacSettingsView: View {
 
     private var generalSettings: some View {
         DynamicMasonryLayout(minColumnWidth: 380, spacing: 32) {
-            SettingsSection(title: "Currency") {
+            SettingsSection(title: "Region & Language") {
+                SettingsRow(title: "Language") {
+                    Picker("", selection: $settings.appLanguage) {
+                        Text("System").tag(String?.none)
+                        ForEach(settings.availableLanguages, id: \.self) { code in
+                            Text(settings.languageName(for: code)).tag(String?.some(code))
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 200)
+                }
+
+                Divider().background(WCColor.border)
+
                 SettingsRow(title: "Base Currency") {
                     Picker("", selection: $settings.currency) {
                         ForEach(Currency.allCases) { currency in

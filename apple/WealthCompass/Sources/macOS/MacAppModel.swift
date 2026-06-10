@@ -11,11 +11,11 @@ enum MacDestination: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .dashboard: "Dashboard"
-        case .cashFlow: "Cash Flow"
-        case .investments: "Investments"
-        case .crypto: "Crypto"
-        case .settings: "Settings"
+        case .dashboard: String(localized: "Dashboard")
+        case .cashFlow: String(localized: "Cash Flow")
+        case .investments: String(localized: "Investments")
+        case .crypto: String(localized: "Crypto")
+        case .settings: String(localized: "Settings")
         }
     }
 

@@ -197,3 +197,30 @@
 - [2026-06-10 20:15]: Bump App Version
   - *Details*: Increased MARKETING_VERSION to 1.0.2 and CURRENT_PROJECT_VERSION to 3 across macOS and iOS targets for App Store Connect submission.
   - *Tech Notes*: Updated in WealthCompass.xcodeproj/project.pbxproj.
+
+- [2026-06-10 21:50]: iOS Onboarding Flow
+  - *Details*: Added a multi-page onboarding tutorial on the first launch of the iOS app to explain features, privacy, and highly recommend API key inputs.
+  - *Tech Notes*: Added `hasSeenOnboarding` boolean to `AppSettings` backed by `UserDefaults`. Created `OnboardingView` using `TabView` with `.tabViewStyle(.page)` and `ScreenBackground`. Integrated `OnboardingView` into `ContentView` to show conditionally before the main tabs. Updated Xcode project via ruby script.
+
+- [2026-06-10 21:56]: Onboarding API Validation
+  - *Details*: Added live validation for the API keys inserted during the onboarding flow. If the keys are invalid, or if the user taps 'Get Started' without providing any keys, graphical feedback is provided and the user is prevented from proceeding automatically. The 'Skip for now' button remains the only way to proceed without keys.
+  - *Tech Notes*: Updated `OnboardingView.swift` to use `FinnhubQuoteClient` and `CoinGeckoPriceClient` `.testConnection()` methods asynchronously. Added logic to show an error alert if both fields are empty when 'Get Started' is tapped.
+
+- [2026-06-10 22:08]: macOS Onboarding Flow Port
+  - *Details*: Ported the iOS onboarding experience (including API validation and UI design) to the macOS app. Given macOS does not natively support swiping tab views, the layout was rebuilt to use a click-through transition.
+  - *Tech Notes*: Created `MacOnboardingView.swift` using `ZStack` and `AnyTransition.asymmetric` to build a robust slide-over pagination. Updated `MacRootView.swift` to conditionally show the onboarding view if `hasSeenOnboarding` is false. Ensured responsiveness via `GeometryReader` and `frame` minimums. Added to `WealthCompassMac` target.
+
+- [6/10/2026, 9:46:29 PM]: Internationalization (i18n) via String Catalogs
+  - *Details*: Implemented a scalable localization strategy for macOS and iOS apps using Xcode's String Catalogs (.xcstrings). The app now automatically detects the device language and gracefully falls back to English if the language is unsupported.
+  - *Tech Notes*:
+    - Created `Sources/Shared/Resources/Localizable.xcstrings`.
+    - Updated `WealthCompass.xcodeproj` to enable Base Internationalization.
+    - Added language regions: `it` (Italian), `de` (German), `es` (Spanish), `zh-Hans` (Simplified Chinese), `ar` (Arabic).
+    - Extracted all English strings automatically via Xcode build system (`builtin-BuildStringCatalog`).
+    - Bulk translated all keys for the 5 target languages and populated the JSON catalog.
+
+- [6/10/2026, 9:50:33 PM]: Internationalization (i18n) Expanded Worldwide
+  - *Details*: Registered all ~40 core Apple-supported localization regions to the Xcode project and populated the `Localizable.xcstrings` catalog.
+  - *Tech Notes*:
+    - Added regions including `fr`, `ja`, `ko`, `pt-BR`, `hi`, `ru`, `tr`, `nl`, `sv`, `da`, `fi`, `no`, `el`, `he`, `id`, `ms`, `th`, `vi`, etc.
+    - Updated `Localizable.xcstrings` with placeholder entries marked as `needs_review` for all new languages.

@@ -32,6 +32,9 @@ struct ContentView: View {
         Group {
             if appLock.isLockEnabled && !appLock.isUnlocked {
                 LockView()
+            } else if !settings.hasSeenOnboarding {
+                OnboardingView()
+                    .transition(.opacity)
             } else {
                 tabs
             }

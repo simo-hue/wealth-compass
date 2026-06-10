@@ -20,6 +20,7 @@ struct WealthCompassMobileApp: App {
                 .environmentObject(settings)
                 .environmentObject(appLock)
                 .preferredColorScheme(.dark)
+                .environment(\.locale, settings.appLanguage.map { Locale(identifier: $0) } ?? .current)
         }
     }
 }

@@ -21,15 +21,15 @@ final class AppLockStore: ObservableObject {
         let context = LAContext()
         _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
         switch context.biometryType {
-        case .faceID: return "Face ID"
-        case .touchID: return "Touch ID"
-        case .opticID: return "Optic ID"
-        default: return "Biometrics"
+        case .faceID: return String(localized: "Face ID")
+        case .touchID: return String(localized: "Touch ID")
+        case .opticID: return String(localized: "Optic ID")
+        default: return String(localized: "Biometrics")
         }
     }
 
     func enableLock() async -> Bool {
-        let success = await authenticate(reason: "Enable biometric protection for Wealth Compass.")
+        let success = await authenticate(reason: String(localized: "Enable biometric protection for Wealth Compass."))
         if success {
             isLockEnabled = true
             isUnlocked = true
@@ -52,7 +52,7 @@ final class AppLockStore: ObservableObject {
     }
 
     func unlock() async {
-        if await authenticate(reason: "Unlock your local Wealth Compass data.") {
+        if await authenticate(reason: String(localized: "Unlock your local Wealth Compass data.")) {
             isUnlocked = true
             lastError = nil
         }
@@ -64,7 +64,7 @@ final class AppLockStore: ObservableObject {
 
         var error: NSError?
         guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
-            lastError = error?.localizedDescription ?? "Biometric authentication is not available on this device."
+            lastError = error?.localizedDescription ?? String(localized: "Biometric authentication is not available on this device.")
             return false
         }
 
