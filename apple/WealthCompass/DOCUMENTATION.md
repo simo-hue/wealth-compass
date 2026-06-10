@@ -179,3 +179,7 @@
   - *Details*: Reordered the filters in MacCashFlowView so the search bar sits directly between the 'Type' and 'Period' selectors.
 - [2026-06-10 19:58]: Search Bar Clear Button
   - *Details*: Added an 'X' button inside the Cash Flow search field that appears when text is entered, allowing quick clearing of the search query.
+
+- [2026-06-10 20:00]: Dashboard Cash Flow Hover Effect
+  - *Details*: Added an interactive hover effect to the Cash Flow graph on the macOS Dashboard.
+  - *Tech Notes*: Added `@State private var hoveredCashFlowMonth` to `MacDashboardView.swift`. Added `.opacity` modifier to the bar charts and a `.chartOverlay` with hit-testing logic identical to `MacCashFlowView`. The legend dynamically updates to show income, expense, and net values of the hovered month.
