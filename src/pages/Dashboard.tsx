@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Wallet, TrendingUp, Bitcoin, Camera, RefreshCw, Loader2, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useFinance } from '@/contexts/FinanceContext';
@@ -98,11 +99,30 @@ const Dashboard = () => {
     }
   };
 
+  const fadeUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background dark">
-      <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
+    <div className="min-h-screen bg-background dark relative overflow-hidden">
+      <div className="ambient-bg" />
+      <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-8 relative z-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <motion.div 
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+        >
           <div>
             <h1 className="text-3xl font-bold text-gradient">Dashboard</h1>
             <div className="flex items-center gap-2">
@@ -124,58 +144,89 @@ const Dashboard = () => {
               <Camera className="h-4 w-4 mr-2" /> Snapshot
             </Button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="Net Worth"
-            value={totals.netWorth}
-            icon={TrendingUp}
-            helpText="Total Assets - Total Liabilities"
-          />
-          <StatCard
-            title="Cash Balance"
-            value={totals.totalLiquidity}
-            icon={Wallet}
-            helpText="Liquid Cash (Income - Expenses)"
-          />
-          <StatCard
-            title="Investments"
-            value={totals.totalInvestments}
-            icon={TrendingUp}
-            helpText="Stocks & ETF Holdings"
-          />
-          <StatCard
-            title="Crypto"
-            value={totals.totalCrypto}
-            icon={Bitcoin}
-            helpText="Cryptocurrency Holdings"
-          />
-        </div>
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+        >
+          <motion.div variants={fadeUp}>
+            <StatCard
+              title="Net Worth"
+              value={totals.netWorth}
+              icon={TrendingUp}
+              helpText="Total Assets - Total Liabilities"
+            />
+          </motion.div>
+          <motion.div variants={fadeUp}>
+            <StatCard
+              title="Cash Balance"
+              value={totals.totalLiquidity}
+              icon={Wallet}
+              helpText="Liquid Cash (Income - Expenses)"
+            />
+          </motion.div>
+          <motion.div variants={fadeUp}>
+            <StatCard
+              title="Investments"
+              value={totals.totalInvestments}
+              icon={TrendingUp}
+              helpText="Stocks & ETF Holdings"
+            />
+          </motion.div>
+          <motion.div variants={fadeUp}>
+            <StatCard
+              title="Crypto"
+              value={totals.totalCrypto}
+              icon={Bitcoin}
+              helpText="Cryptocurrency Holdings"
+            />
+          </motion.div>
+        </motion.div>
 
         {/* Charts & Activity Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Column */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* 1. Net Worth History */}
-            <NetWorthChart data={chartData} currentRange={timeRange} onRangeChange={setTimeRange} />
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={staggerContainer}
+            className="lg:col-span-2 space-y-6"
+          >
+            <motion.div variants={fadeUp}>
+              <NetWorthChart data={chartData} currentRange={timeRange} onRangeChange={setTimeRange} />
+            </motion.div>
 
-            {/* 2. Cash Flow Trend (New) */}
-            <CashFlowTrendChart />
+            <motion.div variants={fadeUp}>
+              <CashFlowTrendChart />
+            </motion.div>
 
-            {/* 3. Top Expenses (New) */}
-            <ExpensesBreakdownChart />
-          </div>
+            <motion.div variants={fadeUp}>
+              <ExpensesBreakdownChart />
+            </motion.div>
+          </motion.div>
 
           {/* Side Column */}
-          <div className="flex flex-col gap-6 h-full">
-            {/* 3. Recent Activity */}
-            <RecentActivity />
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={staggerContainer}
+            className="flex flex-col gap-6 h-full"
+          >
+            <motion.div variants={fadeUp}>
+              <RecentActivity />
+            </motion.div>
 
-            {/* 4. Asset Allocation (Updated) */}
-            <AssetAllocationChart />
-          </div>
+            <motion.div variants={fadeUp}>
+              <AssetAllocationChart />
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </div>

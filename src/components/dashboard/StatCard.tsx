@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, Minus, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSettings } from '@/contexts/SettingsContext';
 import { HelpTooltip } from '@/components/ui/tooltip-helper';
+import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 
 interface StatCardProps {
   title: string;
@@ -17,10 +18,9 @@ interface StatCardProps {
 export function StatCard({ title, value, icon: Icon, trend, format = 'currency', className, helpText }: StatCardProps) {
   const { formatCurrency, isPrivacyMode } = useSettings();
 
-  const formattedValue =
-    format === 'currency'
-      ? isPrivacyMode ? '****' : formatCurrency(value)
-      : `${value.toFixed(1)}%`;
+  const formatter = format === 'currency' 
+    ? (v: number) => formatCurrency(v)
+    : (v: number) => `${v.toFixed(1)}%`;
 
   const TrendIcon = trend && trend > 0 ? TrendingUp : trend && trend < 0 ? TrendingDown : Minus;
   const trendColor = trend && trend > 0 ? 'text-success' : trend && trend < 0 ? 'text-destructive' : 'text-muted-foreground';
@@ -36,7 +36,7 @@ export function StatCard({ title, value, icon: Icon, trend, format = 'currency',
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold tracking-tight">
-          {formattedValue}
+          {isPrivacyMode ? '****' : <AnimatedNumber value={value} format={formatter} />}
         </div>
         {trend !== undefined && (
           <div className={cn('flex items-center gap-1 text-xs mt-1', trendColor)}>

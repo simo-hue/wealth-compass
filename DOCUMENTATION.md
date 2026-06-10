@@ -322,3 +322,11 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-06-10T17:53:00+02:00]: Fix: Web App Chart Edge Clipping & Interpolation Artifacts
   - *Details*: Fixed a graphical artifact in the Net Worth chart where the line was abruptly cut off at the very edges and `curveMonotoneX` produced overshoots at the start/end points causing the line to dip below or extend past the visible data markers.
   - *Tech Notes*: Updated `NetWorthChart.tsx`. Increased horizontal `margin` (left: 20, right: 20) on the `AreaChart` to prevent point clipping and replaced `type="monotone"` with `type="linear"` to strictly connect data points without Bezier curve overshoots.
+
+- [2026-06-10T15:58:00+02:00]: Web App UI Enhancements Phase 3
+  - *Details*: Migrated the premium feel of the iOS app over to the React Web application by adding rolling animated number counters, scroll-driven reveal animations, and an ambient breathing background.
+  - *Tech Notes*: 
+    - Created an `AnimatedNumber.tsx` component using `framer-motion`'s `useSpring` and `useTransform` to achieve smooth odometer effects.
+    - Wrapped `StatCard.tsx` stat text with `<AnimatedNumber />`.
+    - Integrated `framer-motion`'s `motion.div` with `whileInView` into `Dashboard.tsx` to add staggered scroll reveals.
+    - Added an `.ambient-bg` CSS animation in `index.css` and injected it into `Dashboard.tsx` for a rotating gradient blur backdrop in dark mode.
