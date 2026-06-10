@@ -98,14 +98,41 @@ struct MacCashFlowView: View {
 
             if selectedTab == .overview {
                 // Overview tab: summary cards, analytics, recurring transactions
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        summaryCards
-                        analytics
-                        recurringTransactions
+                GeometryReader { proxy in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 20) {
+                            summaryCards
+                            
+                            if proxy.size.width >= 1_090 {
+                                HStack(alignment: .top, spacing: 20) {
+                                    cashFlowTrendCard
+                                        .frame(width: max(340, proxy.size.width * 0.55))
+                                    expenseCategoriesCard
+                                }
+                            } else {
+                                VStack(spacing: 20) {
+                                    cashFlowTrendCard
+                                    expenseCategoriesCard
+                                }
+                            }
+
+                            if proxy.size.width >= 1_090 {
+                                HStack(alignment: .top, spacing: 20) {
+                                    recentActivityCard
+                                        .frame(width: max(340, proxy.size.width * 0.45))
+                                    recurringTransactionsCard
+                                }
+                            } else {
+                                VStack(spacing: 20) {
+                                    recentActivityCard
+                                    recurringTransactionsCard
+                                }
+                            }
+                        }
+                        .padding(24)
+                        .frame(maxWidth: 1440, alignment: .leading)
+                        .frame(maxWidth: .infinity)
                     }
-                    .padding(24)
-                    .frame(maxWidth: 1440, alignment: .leading)
                 }
             } else {
                 // Transactions tab: filter bar and transaction table
@@ -210,28 +237,108 @@ struct MacCashFlowView: View {
         }
     }
 
-    private var analytics: some View {
+    private var cashFlowTrendCard: some View {
+        let trend = finance.cashFlowTrend(months: 6)
+        let hasCashFlow = trend.contains { $0.income != 0 || $0.expense != 0 }
+        let totalIncome = trend.reduce(0) { $0 + $1.income }
+        let totalExpense = trend.reduce(0) { $0 + $1.expense }
+
+        return FinanceCard {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Six-Month Cash Flow")
+                            .font(.headline)
+                        Text("Income and expenses by month")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+
+                if !hasCashFlow {
+                    EmptyState(title: "No recent cash flow", systemImage: "chart.bar.xaxis")
+                        .frame(maxWidth: .infinity, minHeight: 244)
+                } else if settings.isPrivacyMode {
+                    EmptyState(title: "Cash-flow chart concealed", systemImage: "eye.slash")
+                        .frame(maxWidth: .infinity, minHeight: 244)
+                } else {
+                    Chart(trend) { month in
+                        BarMark(
+                            x: .value("Month", month.monthLabel),
+                            y: .value("Amount", month.income)
+                        )
+                        .foregroundStyle(WCColor.primary.gradient)
+                        .position(by: .value("Type", "Income"))
+                        .cornerRadius(6)
+
+                        BarMark(
+                            x: .value("Month", month.monthLabel),
+                            y: .value("Amount", month.expense)
+                        )
+                        .foregroundStyle(WCColor.destructive.opacity(0.78).gradient)
+                        .position(by: .value("Type", "Expenses"))
+                        .cornerRadius(6)
+                    }
+                    .chartLegend(.hidden)
+                    .animation(.spring(response: 0.5, dampingFraction: 0.8), value: trend)
+                    .frame(height: 244)
+                }
+
+                HStack(spacing: 20) {
+                    CashFlowLegendItem(
+                        title: "Income",
+                        value: settings.privateCurrency(totalIncome),
+                        color: WCColor.primary
+                    )
+                    CashFlowLegendItem(
+                        title: "Expenses",
+                        value: settings.privateCurrency(totalExpense),
+                        color: WCColor.destructive
+                    )
+                    Spacer(minLength: 0)
+                    VStack(alignment: .trailing, spacing: 3) {
+                        Text("6M NET")
+                            .font(.caption2.weight(.bold))
+                            .tracking(1)
+                            .foregroundStyle(.secondary)
+                        Text(settings.privateCurrency(totalIncome - totalExpense))
+                            .font(.subheadline.monospacedDigit().weight(.bold))
+                            .foregroundStyle(totalIncome - totalExpense >= 0 ? WCColor.primary : WCColor.destructive)
+                    }
+                }
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+        }
+    }
+
+    private var expenseCategoriesCard: some View {
         FinanceCard {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
-                    Text("Expense Categories")
-                        .font(.headline)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Expense Categories")
+                            .font(.headline)
+                        Text("Breakdown of recorded spending")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    Picker("Analytics Period", selection: $analyticsPeriod) {
+                    Picker("", selection: $analyticsPeriod) {
                         ForEach(AnalyticsPeriod.allCases) { period in
                             Text(period.title).tag(period)
                         }
                     }
                     .labelsHidden()
-                    .frame(width: 150)
+                    .frame(width: 130)
                 }
 
                 let categories = finance.expensesByCategory(period: analyticsPeriod)
                 if categories.isEmpty {
                     EmptyState(title: "No expenses for this period", systemImage: "chart.pie")
-                        .frame(maxWidth: .infinity, minHeight: 180)
+                        .frame(maxWidth: .infinity, minHeight: 244)
                 } else {
-                    HStack(alignment: .center, spacing: 28) {
+                    ZStack {
                         Chart(categories) { item in
                             SectorMark(
                                 angle: .value("Expense", item.value),
@@ -242,43 +349,80 @@ struct MacCashFlowView: View {
                             .cornerRadius(5)
                         }
                         .chartLegend(.hidden)
-                        .frame(width: 250, height: 220)
+                    }
+                    .frame(height: 200)
 
-                        VStack(spacing: 10) {
-                            ForEach(Array(categories.prefix(8).enumerated()), id: \.element.id) { index, item in
-                                HStack(spacing: 10) {
-                                    Circle()
-                                        .fill(ColorPalette.chart[index % ColorPalette.chart.count])
-                                        .frame(width: 8, height: 8)
-                                    Text(item.name)
-                                        .lineLimit(1)
-                                    Spacer()
-                                    Text(settings.privateCurrency(item.value))
-                                        .font(.subheadline.monospacedDigit().weight(.semibold))
-                                    Text("\(item.percentage.formatted(.number.precision(.fractionLength(1))))%")
-                                        .font(.caption.monospacedDigit())
-                                        .foregroundStyle(.secondary)
-                                        .frame(width: 52, alignment: .trailing)
-                                }
+                    VStack(spacing: 10) {
+                        ForEach(Array(categories.prefix(8).enumerated()), id: \.element.id) { index, item in
+                            HStack(spacing: 10) {
+                                Circle()
+                                    .fill(ColorPalette.chart[index % ColorPalette.chart.count])
+                                    .frame(width: 8, height: 8)
+                                Text(item.name)
+                                    .lineLimit(1)
+                                Spacer()
+                                Text(settings.privateCurrency(item.value))
+                                    .font(.subheadline.monospacedDigit().weight(.semibold))
+                                Text("\(item.percentage.formatted(.number.precision(.fractionLength(1))))%")
+                                    .font(.caption.monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                                    .frame(width: 52, alignment: .trailing)
                             }
                         }
-                        .frame(maxWidth: 560)
-
-                        Spacer(minLength: 0)
                     }
                 }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
     }
 
-    private var recurringTransactions: some View {
+    private var recentActivityCard: some View {
+        let transactions = Array(finance.transactions.prefix(6))
+
+        return FinanceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Recent Activity")
+                            .font(.headline)
+                        Text("Your latest cash flow")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+
+                if transactions.isEmpty {
+                    EmptyState(title: "No activity yet", systemImage: "clock.arrow.circlepath")
+                        .frame(maxWidth: .infinity, minHeight: 200)
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(Array(transactions.enumerated()), id: \.element.id) { index, transaction in
+                            ActivityRow(
+                                transaction: transaction,
+                                formattedAmount: signedAmount(for: transaction)
+                            )
+
+                            if index < transactions.count - 1 {
+                                Divider()
+                                    .padding(.leading, 44)
+                            }
+                        }
+                    }
+                }
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+        }
+    }
+
+    private var recurringTransactionsCard: some View {
         FinanceCard {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Recurring Transactions")
                             .font(.headline)
-                        Text("Due schedules are recorded while the app is active and caught up the next time it opens.")
+                        Text("Due schedules catch up on open")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -286,19 +430,20 @@ struct MacCashFlowView: View {
                     Button {
                         editor = .recurring(nil)
                     } label: {
-                        Label("Add Schedule", systemImage: "plus")
+                        Label("Add", systemImage: "plus")
                     }
                 }
 
                 if finance.recurringTransactions.isEmpty {
                     EmptyState(title: "No recurring transactions", systemImage: "repeat")
-                        .frame(maxWidth: .infinity, minHeight: 120)
+                        .frame(maxWidth: .infinity, minHeight: 200)
                 } else {
                     ForEach(finance.recurringTransactions) { schedule in
                         recurringTransactionRow(schedule)
                     }
                 }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
     }
 
@@ -581,6 +726,12 @@ struct MacCashFlowView: View {
             return "Add your first income or expense."
         }
         return "Change the search, type, or period filters."
+    }
+
+    private func signedAmount(for transaction: Transaction) -> String {
+        guard !settings.isPrivacyMode else { return "****" }
+        let prefix = transaction.type == .income ? "+" : "-"
+        return prefix + settings.privateCurrency(transaction.amount)
     }
 
     private func saveRecurringTransaction(_ schedule: RecurringTransaction) {

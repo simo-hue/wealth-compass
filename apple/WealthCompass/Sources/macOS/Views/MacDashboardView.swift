@@ -745,7 +745,7 @@ struct MacDashboardView: View {
     }
 }
 
-private struct DashboardGlassCard<Content: View>: View {
+struct DashboardGlassCard<Content: View>: View {
     var padding: CGFloat = 20
     @ViewBuilder let content: Content
 
@@ -780,7 +780,7 @@ private struct DashboardGlassCard<Content: View>: View {
     }
 }
 
-private struct CashFlowLegendItem: View {
+struct CashFlowLegendItem: View {
     let title: String
     let value: String
     let color: Color
@@ -802,7 +802,7 @@ private struct CashFlowLegendItem: View {
     }
 }
 
-private struct ActivityRow: View {
+struct ActivityRow: View {
     let transaction: Transaction
     let formattedAmount: String
 
@@ -843,7 +843,7 @@ private struct ActivityRow: View {
     }
 }
 
-private struct DashboardEmptyState: View {
+struct DashboardEmptyState: View {
     let title: String
     let message: String
     let systemImage: String
@@ -893,7 +893,7 @@ private struct DashboardEmptyState: View {
     }
 }
 
-private struct PrivacyChartCover: View {
+struct PrivacyChartCover: View {
     let title: String
     let message: String
 

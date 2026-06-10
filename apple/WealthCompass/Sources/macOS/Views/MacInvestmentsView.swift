@@ -35,13 +35,28 @@ struct MacInvestmentsView: View {
 
             if selectedTab == .overview {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 24) {
                         summaryCards
-                        AllocationChart(
-                            title: "Allocation by Sector",
-                            slices: finance.investmentAllocation(settings: settings),
-                            settings: settings
-                        )
+                        
+                        HStack(spacing: 24) {
+                            AllocationChart(
+                                title: "Allocation by Sector",
+                                slices: finance.investmentAllocation(settings: settings),
+                                settings: settings
+                            )
+                            AllocationChart(
+                                title: "Allocation by Type",
+                                slices: finance.investmentTypeAllocation(settings: settings),
+                                settings: settings
+                            )
+                            AllocationChart(
+                                title: "Allocation by Geography",
+                                slices: finance.investmentGeographyAllocation(settings: settings),
+                                settings: settings
+                            )
+                        }
+                        
+                        topHoldingsSection
                     }
                     .padding(24)
                     .frame(maxWidth: 1440, alignment: .leading)
@@ -130,6 +145,33 @@ struct MacInvestmentsView: View {
                 systemImage: "checkmark.circle"
             )
         }
+    }
+
+    private var topHoldingsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Top Holdings")
+                .font(.title2.weight(.semibold))
+            
+            let topHoldings = finance.data.investments
+                .sorted { $0.currentValue > $1.currentValue }
+                .prefix(5)
+            
+            if topHoldings.isEmpty {
+                ContentUnavailableView(
+                    "No Investments",
+                    systemImage: "chart.line.uptrend.xyaxis",
+                    description: Text("Add stocks, ETFs, bonds, or other positions.")
+                )
+                .padding(.top, 40)
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
+                    ForEach(topHoldings) { investment in
+                        investmentCard(for: investment)
+                    }
+                }
+            }
+        }
+        .padding(.top, 16)
     }
 
     private var investmentTable: some View {
