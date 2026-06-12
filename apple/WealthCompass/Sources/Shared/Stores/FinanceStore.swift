@@ -366,7 +366,7 @@ final class FinanceStore: ObservableObject {
             for investment in data.investments {
                 do {
                     investmentQuotes[investment.id] = try await client.quote(for: investment.symbol)
-                    try await Task.sleep(nanoseconds: 150_000_000)
+                    try await Task.sleep(nanoseconds: 1_000_000_000)
                 } catch {
                     result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error))")
                 }
@@ -395,7 +395,7 @@ final class FinanceStore: ObservableObject {
 
         if let trimmedCoinGeckoKey, hasCoinGeckoKey, !cryptoLookups.isEmpty {
             do {
-                let prices = try await CoinGeckoPriceClient(apiKey: trimmedCoinGeckoKey).prices(for: Array(cryptoLookups.values))
+                let prices = try await CoinGeckoPriceClient(apiKey: trimmedCoinGeckoKey, preferredCurrency: settings.currency).prices(for: Array(cryptoLookups.values))
                 for holding in data.crypto {
                     guard let coinID = cryptoLookups[holding.id] else { continue }
                     guard let quote = prices[coinID] else {
@@ -440,14 +440,12 @@ final class FinanceStore: ObservableObject {
     }
 
     func calculateTotals(settings: AppSettings) -> FinanceTotals {
-        let income = data.transactions
-            .filter { $0.type == .income }
-            .reduce(0) { $0 + $1.amount }
-        let expenses = data.transactions
-            .filter { $0.type == .expense }
-            .reduce(0) { $0 + $1.amount }
-
-        let totalLiquidity = income - expenses
+        let totalLiquidity = data.transactions.reduce(into: 0.0) { result, transaction in
+            switch transaction.type {
+            case .income:  result += transaction.amount
+            case .expense: result -= transaction.amount
+            }
+        }
         let totalInvestments = data.investments.reduce(0) {
             $0 + settings.convert($1.currentValue, from: $1.currency)
         }
@@ -482,10 +480,11 @@ final class FinanceStore: ObservableObject {
 
     private func appendSnapshot(settings: AppSettings) {
         let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
         
         // Backfill missing days using the carry-forward strategy
-        if let lastSnapshot = data.snapshots.max(by: { $0.date < $1.date }) {
+        if let lastSnapshot = data.snapshots.last {
             let lastSnapshotDate = calendar.startOfDay(for: lastSnapshot.date)
             
             // If the last snapshot is strictly before today
@@ -523,7 +522,7 @@ final class FinanceStore: ObservableObject {
 
         let totals = calculateTotals(settings: settings)
         let snapshot = NetWorthSnapshot(
-            date: Date(),
+            date: now,
             totalAssets: totals.totalAssets,
             totalLiabilities: totals.totalLiabilities,
             netWorth: totals.netWorth,
@@ -531,7 +530,12 @@ final class FinanceStore: ObservableObject {
             investments: totals.totalInvestments,
             crypto: totals.totalCrypto
         )
-        data.snapshots.append(snapshot)
+        
+        if let lastIndex = data.snapshots.indices.last, calendar.isDate(data.snapshots[lastIndex].date, inSameDayAs: now) {
+            data.snapshots[lastIndex] = snapshot
+        } else {
+            data.snapshots.append(snapshot)
+        }
         data.snapshots.sort { $0.date < $1.date }
     }
 
