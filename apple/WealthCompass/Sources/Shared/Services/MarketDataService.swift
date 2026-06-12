@@ -220,10 +220,8 @@ struct FinnhubQuoteClient {
             throw MarketDataError.noQuote(provider: "Finnhub", symbol: symbol)
         }
 
-        var components = URLComponents()
-        components.scheme = "https"
-        components.host = "finnhub.io"
-        components.path = "/api/v1/quote"
+        var components = URLComponents(string: APIConfiguration.proxyBaseURL)!
+        components.path = "/api/quote"
         components.queryItems = [
             URLQueryItem(name: "symbol", value: normalizedSymbol)
         ]
@@ -309,10 +307,8 @@ struct CoinGeckoPriceClient {
     }
 
     private func pricesForChunk(_ coinIDs: [String], validationNonce: String?) async throws -> [String: MarketPriceQuote] {
-        var components = URLComponents()
-        components.scheme = "https"
-        components.host = "api.coingecko.com"
-        components.path = "/api/v3/simple/price"
+        var components = URLComponents(string: APIConfiguration.proxyBaseURL)!
+        components.path = "/api/price"
         var vsCurrencies = [preferredCurrency.rawValue.lowercased()]
         if preferredCurrency != .eur {
             vsCurrencies.append("eur")

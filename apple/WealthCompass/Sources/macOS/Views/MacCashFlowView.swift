@@ -76,7 +76,7 @@ struct MacCashFlowView: View {
     @EnvironmentObject private var settings: AppSettings
     @State private var selection: Transaction.ID?
     @State private var searchText = ""
-    @State private var analyticsPeriod: AnalyticsPeriod = .thirtyDays
+    @State private var analyticsPeriod: AnalyticsPeriod = .all
     @State private var transactionPeriod: AnalyticsPeriod = .thirtyDays
     @State private var transactionTypeFilter: MacTransactionTypeFilter = .all
     @State private var editor: MacCashFlowEditor?

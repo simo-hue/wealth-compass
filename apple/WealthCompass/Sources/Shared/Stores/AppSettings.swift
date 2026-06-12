@@ -44,21 +44,28 @@ final class AppSettings: ObservableObject {
     @Published private(set) var exchangeRateError: String?
 
     private let userDefaults: UserDefaults
+    private let exchangeRatePersistence: ExchangeRatePersistence
     private var lastExchangeRateRefreshAttemptAt: Date?
+    private var consecutiveExchangeRateFailures: Int
 
     private enum Keys {
         static let currency = "wc_mobile_currency"
         static let privacyMode = "wc_mobile_privacy_mode"
         static let customIncomeCategories = "wc_mobile_custom_income_categories"
         static let customExpenseCategories = "wc_mobile_custom_expense_categories"
-        static let exchangeRateSnapshot = "wc_mobile_exchange_rate_snapshot"
         static let iCloudSyncEnabled = "wc_mobile_icloud_sync_enabled"
         static let hasSeenOnboarding = "wc_mobile_has_seen_onboarding"
         static let appLanguage = "wc_mobile_app_language"
+        static let lastExchangeRateRefreshAttempt = "wc_mobile_last_exchange_rate_refresh_attempt"
+        static let consecutiveExchangeRateFailures = "wc_mobile_consecutive_exchange_rate_failures"
     }
 
-    init(userDefaults: UserDefaults = .standard) {
+    init(
+        userDefaults: UserDefaults = .standard,
+        exchangeRatePersistence: ExchangeRatePersistence = LocalExchangeRatePersistence()
+    ) {
         self.userDefaults = userDefaults
+        self.exchangeRatePersistence = exchangeRatePersistence
 
         let storedCurrency = userDefaults.string(forKey: Keys.currency)
             .flatMap(Currency.init(rawValue:)) ?? .eur
@@ -70,14 +77,13 @@ final class AppSettings: ObservableObject {
         customIncomeCategories = Self.loadStringArray(key: Keys.customIncomeCategories, userDefaults: userDefaults)
         customExpenseCategories = Self.loadStringArray(key: Keys.customExpenseCategories, userDefaults: userDefaults)
 
-        if
-            let data = userDefaults.data(forKey: Keys.exchangeRateSnapshot),
-            let snapshot = try? JSONDecoder().decode(ExchangeRateSnapshot.self, from: data),
-            snapshot.isValid
-        {
-            exchangeRateSnapshot = snapshot
-        } else {
-            exchangeRateSnapshot = nil
+        // Load exchange rate snapshot from file-based persistence (with auto-migration from UserDefaults)
+        exchangeRateSnapshot = exchangeRatePersistence.load()
+
+        // Restore persisted retry state
+        consecutiveExchangeRateFailures = userDefaults.integer(forKey: Keys.consecutiveExchangeRateFailures)
+        if let timestamp = userDefaults.object(forKey: Keys.lastExchangeRateRefreshAttempt) as? Date {
+            lastExchangeRateRefreshAttemptAt = timestamp
         }
     }
 
@@ -141,9 +147,13 @@ final class AppSettings: ObservableObject {
 
     func shouldAutoRefreshExchangeRates(
         staleAfter: TimeInterval = 12 * 60 * 60,
-        retryAfter: TimeInterval = 15 * 60,
+        baseRetryAfter: TimeInterval = 15 * 60,
         now: Date = Date()
     ) -> Bool {
+        // Exponential backoff: 15min × 2^min(failures, 4) → caps at ~4 hours
+        let backoffMultiplier = pow(2.0, Double(min(consecutiveExchangeRateFailures, 4)))
+        let retryAfter = baseRetryAfter * backoffMultiplier
+
         if let lastExchangeRateRefreshAttemptAt,
            now.timeIntervalSince(lastExchangeRateRefreshAttemptAt) < retryAfter {
             return false
@@ -165,6 +175,7 @@ final class AppSettings: ObservableObject {
 
         isRefreshingExchangeRates = true
         lastExchangeRateRefreshAttemptAt = Date()
+        userDefaults.set(lastExchangeRateRefreshAttemptAt, forKey: Keys.lastExchangeRateRefreshAttempt)
         defer { isRefreshingExchangeRates = false }
 
         do {
@@ -172,7 +183,11 @@ final class AppSettings: ObservableObject {
             let snapshot = try await client.latestRates()
             exchangeRateSnapshot = snapshot
             exchangeRateError = nil
-            saveExchangeRateSnapshot(snapshot)
+            exchangeRatePersistence.save(snapshot)
+
+            // Reset backoff on success
+            consecutiveExchangeRateFailures = 0
+            userDefaults.set(0, forKey: Keys.consecutiveExchangeRateFailures)
 
             return ExchangeRateRefreshResult(
                 snapshot: snapshot,
@@ -183,6 +198,11 @@ final class AppSettings: ObservableObject {
         } catch {
             let message = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
             exchangeRateError = message
+
+            // Increment backoff counter on failure
+            consecutiveExchangeRateFailures += 1
+            userDefaults.set(consecutiveExchangeRateFailures, forKey: Keys.consecutiveExchangeRateFailures)
+
             return ExchangeRateRefreshResult(
                 snapshot: exchangeRateSnapshot,
                 errorMessage: message,
@@ -190,6 +210,21 @@ final class AppSettings: ObservableObject {
                 wasAlreadyRunning: false
             )
         }
+    }
+
+    /// Shared helper that refreshes exchange rates and recalculates net worth if rates changed.
+    /// Consolidates the duplicated "refresh → check didChangeRates → takeSnapshot" pattern
+    /// used across iOS ContentView, macOS MacRootView, and both platform SettingsViews.
+    func refreshExchangeRatesAndRecalculate(
+        finance: FinanceStore,
+        client: ExchangeRateClient = ExchangeRateClient(),
+        showResult: ((ExchangeRateRefreshResult) -> Void)? = nil
+    ) async {
+        let result = await refreshExchangeRates(client: client)
+        if result.didChangeRates, finance.hasForeignCurrencyExposure(relativeTo: currency) {
+            finance.takeSnapshot(settings: self)
+        }
+        showResult?(result)
     }
 
     func formatCurrency(_ value: Double, sourceCurrency: Currency? = nil) -> String {
@@ -217,11 +252,6 @@ final class AppSettings: ObservableObject {
 
     private func unitsPerEuro(for currency: Currency) -> Double {
         exchangeRateSnapshot?.unitsPerBaseCurrency(for: currency) ?? currency.fallbackUnitsPerEuro
-    }
-
-    private func saveExchangeRateSnapshot(_ snapshot: ExchangeRateSnapshot) {
-        guard let data = try? JSONEncoder().encode(snapshot) else { return }
-        userDefaults.set(data, forKey: Keys.exchangeRateSnapshot)
     }
 
     private static func loadStringArray(key: String, userDefaults: UserDefaults) -> [String] {

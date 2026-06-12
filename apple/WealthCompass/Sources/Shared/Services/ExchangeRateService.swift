@@ -90,10 +90,10 @@ struct ExchangeRateClient {
             .map(\.rawValue)
             .sorted()
 
-        var components = URLComponents()
-        components.scheme = "https"
-        components.host = "api.frankfurter.dev"
-        components.path = "/v2/rates"
+        guard var components = URLComponents(string: APIConfiguration.proxyBaseURL) else {
+            throw ExchangeRateError.invalidURL
+        }
+        components.path = "/api/rates"
         components.queryItems = [
             URLQueryItem(name: "base", value: Currency.eur.rawValue),
             URLQueryItem(name: "quotes", value: quoteCurrencies.joined(separator: ",")),

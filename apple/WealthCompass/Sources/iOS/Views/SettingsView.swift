@@ -572,11 +572,9 @@ struct SettingsView: View {
     }
 
     private func refreshExchangeRates() async {
-        let result = await settings.refreshExchangeRates()
-        if result.didChangeRates, finance.hasForeignCurrencyExposure(relativeTo: settings.currency) {
-            finance.takeSnapshot(settings: settings)
+        await settings.refreshExchangeRatesAndRecalculate(finance: finance) { result in
+            settingsAlert = SettingsAlertState(title: result.title, message: result.message)
         }
-        settingsAlert = SettingsAlertState(title: result.title, message: result.message)
     }
 
     private static func errorMessage(_ error: Error) -> String {
