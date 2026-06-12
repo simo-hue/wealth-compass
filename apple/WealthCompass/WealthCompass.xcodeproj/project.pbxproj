@@ -9,9 +9,11 @@
 /* Begin PBXBuildFile section */
 		079720BCD2175270C1EFBBB4 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8172F5C756C4F1253BA6A0F9 /* Localizable.xcstrings */; };
 		1E6833B0C43E0B035AE4B46B /* MacOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CED77C7238F3CB0FAFA197 /* MacOnboardingView.swift */; };
+		7A36196A7E5604A1813530BB /* APIConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03F2CE5F27A45BA11A85D0D /* APIConfiguration.swift */; };
 		82F547D94464A8236318876C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8172F5C756C4F1253BA6A0F9 /* Localizable.xcstrings */; };
 		AD0000000000000000000001 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000001 /* FinanceModels.swift */; };
 		AD0000000000000000000002 /* FinancePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000002 /* FinancePersistence.swift */; };
+		AD00000000000000000000E1 /* ExchangeRatePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000E1 /* ExchangeRatePersistence.swift */; };
 		AD0000000000000000000003 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000003 /* AppSettings.swift */; };
 		AD0000000000000000000004 /* FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000004 /* FinanceStore.swift */; };
 		AD0000000000000000000005 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000005 /* ExchangeRateService.swift */; };
@@ -21,6 +23,7 @@
 		AD0000000000000000000009 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000009 /* CloudKitSyncService.swift */; };
 		AD0000000000000000000011 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000001 /* FinanceModels.swift */; };
 		AD0000000000000000000012 /* FinancePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000002 /* FinancePersistence.swift */; };
+		AD00000000000000000000E2 /* ExchangeRatePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000E1 /* ExchangeRatePersistence.swift */; };
 		AD0000000000000000000013 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000003 /* AppSettings.swift */; };
 		AD0000000000000000000014 /* FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000004 /* FinanceStore.swift */; };
 		AD0000000000000000000015 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000005 /* ExchangeRateService.swift */; };
@@ -60,6 +63,7 @@
 		E14ADF289E9B4D9DE196ACBF /* DynamicMasonryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3B18E883C3808CEB9592CB /* DynamicMasonryLayout.swift */; };
 		E4A507349567FDF9A3CA4F11 /* DynamicMasonryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1614C7598D89322EDC6DD1C /* DynamicMasonryLayout.swift */; };
 		E9814262C71865036098CABF /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93DFB98D4B9C2FF8406A9F2A /* OnboardingView.swift */; };
+		FF92F90F0B92CE85C5C5801B /* APIConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03F2CE5F27A45BA11A85D0D /* APIConfiguration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +83,7 @@
 		93DFB98D4B9C2FF8406A9F2A /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = Sources/iOS/Views/OnboardingView.swift; sourceTree = "<group>"; };
 		AC0000000000000000000001 /* FinanceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/FinanceModels.swift; sourceTree = "<group>"; };
 		AC0000000000000000000002 /* FinancePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/FinancePersistence.swift; sourceTree = "<group>"; };
+		AC00000000000000000000E1 /* ExchangeRatePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/ExchangeRatePersistence.swift; sourceTree = "<group>"; };
 		AC0000000000000000000003 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/AppSettings.swift; sourceTree = "<group>"; };
 		AC0000000000000000000004 /* FinanceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/FinanceStore.swift; sourceTree = "<group>"; };
 		AC0000000000000000000005 /* ExchangeRateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExchangeRateService.swift; sourceTree = "<group>"; };
@@ -120,6 +125,7 @@
 		AC0000000000000000000051 /* WealthCompassTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WealthCompassTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1614C7598D89322EDC6DD1C /* DynamicMasonryLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DynamicMasonryLayout.swift; path = Sources/Shared/UI/DynamicMasonryLayout.swift; sourceTree = "<group>"; };
 		DB3B18E883C3808CEB9592CB /* DynamicMasonryLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DynamicMasonryLayout.swift; path = ../../../UI/DynamicMasonryLayout.swift; sourceTree = "<group>"; };
+		E03F2CE5F27A45BA11A85D0D /* APIConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = APIConfiguration.swift; path = Sources/Shared/Services/APIConfiguration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -210,6 +216,7 @@
 			children = (
 				2FDD42E97E1E4066D345861D /* UI */,
 				0846A081640A6F68A49662BE /* Resources */,
+				CAB0407E776DC4FE364BAC38 /* Services */,
 			);
 			name = Shared;
 			sourceTree = "<group>";
@@ -241,6 +248,7 @@
 			children = (
 				AC0000000000000000000001 /* FinanceModels.swift */,
 				AC0000000000000000000002 /* FinancePersistence.swift */,
+				AC00000000000000000000E1 /* ExchangeRatePersistence.swift */,
 				AC0000000000000000000003 /* AppSettings.swift */,
 				AC0000000000000000000004 /* FinanceStore.swift */,
 				AC0000000000000000000005 /* ExchangeRateService.swift */,
@@ -343,6 +351,14 @@
 				05CED77C7238F3CB0FAFA197 /* MacOnboardingView.swift */,
 			);
 			name = Views;
+			sourceTree = "<group>";
+		};
+		CAB0407E776DC4FE364BAC38 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				E03F2CE5F27A45BA11A85D0D /* APIConfiguration.swift */,
+			);
+			name = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -532,6 +548,7 @@
 			files = (
 				AD0000000000000000000001 /* FinanceModels.swift in Sources */,
 				AD0000000000000000000002 /* FinancePersistence.swift in Sources */,
+				AD00000000000000000000E1 /* ExchangeRatePersistence.swift in Sources */,
 				AD0000000000000000000003 /* AppSettings.swift in Sources */,
 				AD0000000000000000000004 /* FinanceStore.swift in Sources */,
 				AD0000000000000000000005 /* ExchangeRateService.swift in Sources */,
@@ -553,6 +570,7 @@
 				E14ADF289E9B4D9DE196ACBF /* DynamicMasonryLayout.swift in Sources */,
 				E4A507349567FDF9A3CA4F11 /* DynamicMasonryLayout.swift in Sources */,
 				E9814262C71865036098CABF /* OnboardingView.swift in Sources */,
+				FF92F90F0B92CE85C5C5801B /* APIConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -562,6 +580,7 @@
 			files = (
 				AD0000000000000000000011 /* FinanceModels.swift in Sources */,
 				AD0000000000000000000012 /* FinancePersistence.swift in Sources */,
+				AD00000000000000000000E2 /* ExchangeRatePersistence.swift in Sources */,
 				AD0000000000000000000013 /* AppSettings.swift in Sources */,
 				AD0000000000000000000014 /* FinanceStore.swift in Sources */,
 				AD0000000000000000000015 /* ExchangeRateService.swift in Sources */,
@@ -583,6 +602,7 @@
 				AFA8D2C0B984E687F87C05EA /* DynamicMasonryLayout.swift in Sources */,
 				C16E71416991E8C87B178C96 /* DynamicMasonryLayout.swift in Sources */,
 				1E6833B0C43E0B035AE4B46B /* MacOnboardingView.swift in Sources */,
+				7A36196A7E5604A1813530BB /* APIConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

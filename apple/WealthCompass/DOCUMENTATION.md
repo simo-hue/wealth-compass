@@ -264,3 +264,7 @@
     - Expanded `CoinGeckoSimplePriceResponse` to decode all four supported currency fields (`eur`, `usd`, `gbp`, `chf`).
     - Added `preferredPrice(for:)` method that resolves the best available price with EUR fallback.
     - `FinanceStore.refreshMarketPrices` now passes `settings.currency` when constructing the client.
+
+- [6/12/2026, 8:12:56 AM]: App Version Update
+  - *Details*: Incremented marketing version from 1.0.2 to 1.0.3 and build number from 3 to 4 to publish an update.
+  - *Tech Notes*: Updated MARKETING_VERSION and CURRENT_PROJECT_VERSION in project.pbxproj.

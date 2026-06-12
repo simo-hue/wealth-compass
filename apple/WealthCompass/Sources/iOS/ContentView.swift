@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var recurringInsertionAlert: RecurringInsertionAlert?
 
     private let recurringCheckTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
+    private let exchangeRateRefreshTimer = Timer.publish(every: 5 * 60 * 60, on: .main, in: .common).autoconnect()
 
     init() {
         let appearance = UITabBarAppearance()
@@ -52,6 +53,10 @@ struct ContentView: View {
         .onReceive(recurringCheckTimer) { _ in
             guard scenePhase == .active else { return }
             Task { await processRecurringTransactions() }
+        }
+        .onReceive(exchangeRateRefreshTimer) { _ in
+            guard scenePhase == .active else { return }
+            Task { await refreshExchangeRatesIfNeeded() }
         }
         .onReceive(NotificationCenter.default.publisher(for: .recurringTransactionNotificationReceived)) { _ in
             Task { await processRecurringTransactions() }
@@ -124,10 +129,7 @@ struct ContentView: View {
 
     private func refreshExchangeRatesIfNeeded() async {
         guard settings.shouldAutoRefreshExchangeRates() else { return }
-        let result = await settings.refreshExchangeRates()
-        if result.didChangeRates, finance.hasForeignCurrencyExposure(relativeTo: settings.currency) {
-            finance.takeSnapshot(settings: settings)
-        }
+        await settings.refreshExchangeRatesAndRecalculate(finance: finance)
     }
 
     private func refreshMarketPricesIfNeeded() async {

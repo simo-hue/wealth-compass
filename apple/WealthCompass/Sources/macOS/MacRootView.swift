@@ -10,6 +10,7 @@ struct MacRootView: View {
     @State private var alert: MacRootAlert?
 
     private let recurringCheckTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
+    private let exchangeRateRefreshTimer = Timer.publish(every: 5 * 60 * 60, on: .main, in: .common).autoconnect()
 
     var body: some View {
         Group {
@@ -65,6 +66,10 @@ struct MacRootView: View {
             guard scenePhase == .active, appLock.isUnlocked else { return }
             Task { await processRecurringTransactions() }
         }
+        .onReceive(exchangeRateRefreshTimer) { _ in
+            guard scenePhase == .active, appLock.isUnlocked else { return }
+            Task { await refreshExchangeRatesIfNeeded() }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .macRecurringTransactionNotificationReceived)) { _ in
             Task { await processRecurringTransactions() }
         }
@@ -107,10 +112,7 @@ struct MacRootView: View {
         await processRecurringTransactions()
 
         if settings.shouldAutoRefreshExchangeRates() {
-            let result = await settings.refreshExchangeRates()
-            if result.didChangeRates, finance.hasForeignCurrencyExposure(relativeTo: settings.currency) {
-                finance.takeSnapshot(settings: settings)
-            }
+            await settings.refreshExchangeRatesAndRecalculate(finance: finance)
         }
 
         if finance.shouldAutoRefreshMarketPrices() {
@@ -123,16 +125,22 @@ struct MacRootView: View {
         isRefreshing = true
         defer { isRefreshing = false }
 
-        let exchangeResult = await settings.refreshExchangeRates()
-        if exchangeResult.didChangeRates, finance.hasForeignCurrencyExposure(relativeTo: settings.currency) {
-            finance.takeSnapshot(settings: settings)
+        var exchangeResultForAlert: ExchangeRateRefreshResult?
+        await settings.refreshExchangeRatesAndRecalculate(finance: finance) { result in
+            exchangeResultForAlert = result
         }
 
         let marketResult = await refreshMarketPrices()
+        let exchangeMessage = exchangeResultForAlert?.message ?? ""
         alert = MacRootAlert(
             title: marketResult.title,
-            message: String(localized: "\(exchangeResult.message)\n\n\(marketResult.message)")
+            message: String(localized: "\(exchangeMessage)\n\n\(marketResult.message)")
         )
+    }
+
+    private func refreshExchangeRatesIfNeeded() async {
+        guard settings.shouldAutoRefreshExchangeRates() else { return }
+        await settings.refreshExchangeRatesAndRecalculate(finance: finance)
     }
 
     private func refreshMarketPrices() async -> MarketPriceRefreshResult {

@@ -631,12 +631,9 @@ struct MacSettingsView: View {
     }
 
     private func refreshExchangeRates() async {
-        let result = await settings.refreshExchangeRates()
-        if result.didChangeRates,
-           finance.hasForeignCurrencyExposure(relativeTo: settings.currency) {
-            finance.takeSnapshot(settings: settings)
+        await settings.refreshExchangeRatesAndRecalculate(finance: finance) { result in
+            settingsAlert = MacSettingsAlert(title: result.title, message: result.message)
         }
-        settingsAlert = MacSettingsAlert(title: result.title, message: result.message)
     }
 
     private func importBackup() {
