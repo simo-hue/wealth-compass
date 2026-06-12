@@ -283,6 +283,7 @@ struct FinnhubQuoteClient {
 
 struct CoinGeckoPriceClient {
     var apiKey: String?
+    var preferredCurrency: Currency = .eur
     var session: URLSession = .shared
 
     func testConnection() async throws -> MarketPriceQuote {
@@ -312,9 +313,13 @@ struct CoinGeckoPriceClient {
         components.scheme = "https"
         components.host = "api.coingecko.com"
         components.path = "/api/v3/simple/price"
+        var vsCurrencies = [preferredCurrency.rawValue.lowercased()]
+        if preferredCurrency != .eur {
+            vsCurrencies.append("eur")
+        }
         components.queryItems = [
             URLQueryItem(name: "ids", value: coinIDs.joined(separator: ",")),
-            URLQueryItem(name: "vs_currencies", value: "usd"),
+            URLQueryItem(name: "vs_currencies", value: vsCurrencies.joined(separator: ",")),
             URLQueryItem(name: "include_last_updated_at", value: "true")
         ]
         if let validationNonce {
@@ -340,9 +345,9 @@ struct CoinGeckoPriceClient {
 
         let payload = try JSONDecoder().decode([String: CoinGeckoSimplePriceResponse].self, from: data)
         return payload.compactMapValues { value in
-            guard let price = value.usd, price > 0, price.isFinite else { return nil }
+            guard let (price, resolvedCurrency) = value.preferredPrice(for: preferredCurrency) else { return nil }
             let asOf = value.lastUpdatedAt.map(Date.init(timeIntervalSince1970:)) ?? Date()
-            return MarketPriceQuote(price: price, currency: .usd, asOf: asOf, provider: "CoinGecko")
+            return MarketPriceQuote(price: price, currency: resolvedCurrency, asOf: asOf, provider: "CoinGecko")
         }
     }
 
@@ -382,12 +387,34 @@ private struct FinnhubQuoteResponse: Decodable {
 }
 
 private struct CoinGeckoSimplePriceResponse: Decodable {
+    let eur: Double?
     let usd: Double?
+    let gbp: Double?
+    let chf: Double?
     let lastUpdatedAt: TimeInterval?
 
     private enum CodingKeys: String, CodingKey {
-        case usd
+        case eur, usd, gbp, chf
         case lastUpdatedAt = "last_updated_at"
+    }
+
+    func preferredPrice(for currency: Currency) -> (Double, Currency)? {
+        if let price = price(for: currency), price > 0, price.isFinite {
+            return (price, currency)
+        }
+        if currency != .eur, let eurPrice = eur, eurPrice > 0, eurPrice.isFinite {
+            return (eurPrice, .eur)
+        }
+        return nil
+    }
+
+    private func price(for currency: Currency) -> Double? {
+        switch currency {
+        case .eur: eur
+        case .usd: usd
+        case .gbp: gbp
+        case .chf: chf
+        }
     }
 }
 

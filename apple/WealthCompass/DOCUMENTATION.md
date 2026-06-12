@@ -247,3 +247,20 @@
 - [2026-06-10 22:38]: 100% Full UI Localization Pass
   - *Details*: Ensured that every single user-facing string across the entire iOS and macOS application is fully localized and correctly typed as either `LocalizedStringKey` or `String(localized:)`.
   - *Tech Notes*: Resolved all type mismatch compiler errors resulting from the global localization audit. Differentiated strictly between custom design system components (e.g. `MetricCard`, `PageHeader`, `SectionHeading`) requiring `LocalizedStringKey`, and data structures or native SwiftUI components (e.g. `SettingsRow`, `SettingsSection`, `Alert` titles) requiring `String(localized:)`. Validated the complete build success on both `WealthCompassMac` and `WealthCompassMobile` targets.
+
+- [2026-06-12 07:56]: FinanceStore Snapshot Optimization
+  - *Details*: Fixed a data bloat issue where refreshing market prices multiple times a day would append redundant intraday net worth snapshots to the JSON file. Also improved performance of locating the last snapshot.
+  - *Tech Notes*: Modified `appendSnapshot` in `FinanceStore.swift` to check if the last snapshot in the array corresponds to today. If it does, it replaces it instead of appending a new one. Optimized `data.snapshots.max` with `data.snapshots.last` taking advantage of the pre-sorted array structure.
+
+- [2026-06-12 07:57]: calculateTotals Single-Pass Optimization
+  - *Details*: Replaced the double-iteration over all transactions (one `filter+reduce` for income, another for expenses) with a single-pass `reduce(into:)` using a `switch` statement. Cuts CPU work in half for liquidity calculation.
+  - *Tech Notes*: Modified `calculateTotals(settings:)` in `FinanceStore.swift`. The previous code allocated two intermediate filtered arrays and iterated the full transactions list twice. The new code walks it once, adding for income and subtracting for expenses.
+
+- [2026-06-12 08:03]: CoinGecko Fetch in User's Preferred Currency
+  - *Details*: Crypto prices are now fetched from CoinGecko directly in the user's selected display currency (EUR, USD, GBP, or CHF), eliminating an unnecessary exchange-rate conversion layer. EUR is used as a fallback if CoinGecko does not return a price in the requested currency.
+  - *Tech Notes*:
+    - Added `preferredCurrency: Currency` property to `CoinGeckoPriceClient` (defaults to `.eur`).
+    - `pricesForChunk` now builds the `vs_currencies` query parameter dynamically: `[preferredCurrency, eur]` (deduplicated when preferred is already EUR).
+    - Expanded `CoinGeckoSimplePriceResponse` to decode all four supported currency fields (`eur`, `usd`, `gbp`, `chf`).
+    - Added `preferredPrice(for:)` method that resolves the best available price with EUR fallback.
+    - `FinanceStore.refreshMarketPrices` now passes `settings.currency` when constructing the client.
