@@ -1,3 +1,4 @@
+import CloudKit
 import XCTest
 @testable import WealthCompassMobile
 
@@ -102,6 +103,52 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(decoded.data.transactions.first?.updatedAt, fixedDate)
     }
 
+    @MainActor
+    func testStopDuringPendingCloudSyncStartPreventsLateEngineCreation() async {
+        let accountStatusGate = AccountStatusGate()
+        let engineFactoryCalled = ThreadSafeFlag()
+        var statuses: [CloudSyncStatus] = []
+        let metadataStore = CloudSyncMetadataStore(
+            directoryName: "WealthCompassTests-\(UUID().uuidString)"
+        )
+        let service = CloudKitSyncService(
+            metadataStore: metadataStore,
+            snapshotProvider: { [:] },
+            remoteMutationHandler: { _ in [] },
+            statusHandler: { status in
+                statuses.append(status)
+            },
+            disableHandler: {},
+            accountStatusProvider: {
+                await accountStatusGate.waitForStatus()
+            },
+            userRecordIDProvider: {
+                XCTFail("A stopped sync start should not continue to the user record lookup.")
+                return CKRecord.ID(recordName: "test-user")
+            },
+            engineFactory: { _ in
+                engineFactoryCalled.setTrue()
+                throw TestCloudSyncLifecycleError.engineShouldNotStart
+            }
+        )
+
+        let startTask = Task {
+            await service.start(allowAccountReplacement: true)
+        }
+        await accountStatusGate.waitUntilBlocked()
+
+        await service.stop()
+        await accountStatusGate.resume(returning: .available)
+        await startTask.value
+
+        XCTAssertFalse(engineFactoryCalled.isSet)
+        XCTAssertEqual(statuses.last, .disabled)
+        XCTAssertFalse(statuses.contains { status in
+            if case .error = status { return true }
+            return false
+        })
+    }
+
     private func makeTransaction(id: UUID, amount: Double) -> Transaction {
         Transaction(
             id: id,
@@ -113,5 +160,51 @@ final class CloudSyncCoreTests: XCTestCase {
             createdAt: fixedDate,
             updatedAt: fixedDate
         )
+    }
+}
+
+private enum TestCloudSyncLifecycleError: Error {
+    case engineShouldNotStart
+}
+
+private actor AccountStatusGate {
+    private var statusContinuation: CheckedContinuation<CKAccountStatus, Never>?
+    private var blockedContinuations: [CheckedContinuation<Void, Never>] = []
+
+    func waitForStatus() async -> CKAccountStatus {
+        blockedContinuations.forEach { $0.resume() }
+        blockedContinuations.removeAll()
+        return await withCheckedContinuation { continuation in
+            statusContinuation = continuation
+        }
+    }
+
+    func waitUntilBlocked() async {
+        if statusContinuation != nil { return }
+        await withCheckedContinuation { continuation in
+            blockedContinuations.append(continuation)
+        }
+    }
+
+    func resume(returning status: CKAccountStatus) {
+        statusContinuation?.resume(returning: status)
+        statusContinuation = nil
+    }
+}
+
+private final class ThreadSafeFlag {
+    private let lock = NSLock()
+    private var value = false
+
+    var isSet: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return value
+    }
+
+    func setTrue() {
+        lock.lock()
+        value = true
+        lock.unlock()
     }
 }

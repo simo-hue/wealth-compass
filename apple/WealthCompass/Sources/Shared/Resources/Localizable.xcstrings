@@ -9024,6 +9024,9 @@
         }
       }
     },
+    "Add a new key in Developer Dashboard." : {
+
+    },
     "Add another snapshot to see movement" : {
       "localizations" : {
         "ar" : {
@@ -18090,6 +18093,9 @@
         }
       }
     },
+    "Choose the free Demo API tier." : {
+
+    },
     "Classification" : {
       "localizations" : {
         "ar" : {
@@ -18299,6 +18305,9 @@
       }
     },
     "CloudKit record %@ has no payload." : {
+
+    },
+    "CoinGecko" : {
 
     },
     "CoinGecko API Key" : {
@@ -19774,6 +19783,9 @@
         }
       }
     },
+    "Confirm your email and sign in." : {
+
+    },
     "Connect Market Data" : {
       "localizations" : {
         "ar" : {
@@ -20613,6 +20625,9 @@
         }
       }
     },
+    "Copy your API key and paste it below." : {
+
+    },
     "Cost Basis" : {
       "localizations" : {
         "ar" : {
@@ -20820,6 +20835,12 @@
           }
         }
       }
+    },
+    "Create a free Finnhub account." : {
+
+    },
+    "Create or sign in to your account." : {
+
     },
     "Crypto" : {
       "localizations" : {
@@ -21254,6 +21275,9 @@
 
     },
     "Crypto Holdings" : {
+
+    },
+    "Crypto market prices" : {
 
     },
     "Crypto skipped: %@." : {
@@ -36363,6 +36387,9 @@
         }
       }
     },
+    "Finnhub" : {
+
+    },
     "Finnhub API Key" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -41021,6 +41048,9 @@
     "How the portfolio is distributed" : {
 
     },
+    "How to get your API keys" : {
+
+    },
     "iCloud" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -45461,6 +45491,9 @@
 
     },
     "Keychain operation failed with status %d." : {
+
+    },
+    "Keys are stored securely in Keychain and only used to refresh market prices from this %@." : {
 
     },
     "Language" : {
@@ -59369,6 +59402,15 @@
           }
         }
       }
+    },
+    "Open CoinGecko" : {
+
+    },
+    "Open Finnhub" : {
+
+    },
+    "Open the dashboard API section." : {
+
     },
     "Optic ID" : {
       "localizations" : {
@@ -75716,6 +75758,9 @@
         }
       }
     },
+    "Stock and ETF prices" : {
+
+    },
     "Stocks, ETFs, and more" : {
 
     },
@@ -86584,6 +86629,9 @@
           }
         }
       }
+    },
+    "Use the free tiers, create a key, then paste it below." : {
+
     },
     "Utilities" : {
       "localizations" : {

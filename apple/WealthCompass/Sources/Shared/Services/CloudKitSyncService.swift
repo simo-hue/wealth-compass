@@ -447,6 +447,9 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     typealias RemoteMutationHandler = @MainActor @Sendable ([CloudSyncRemoteMutation]) throws -> Set<CloudSyncRecordKey>
     typealias StatusHandler = @MainActor @Sendable (CloudSyncStatus) -> Void
     typealias DisableHandler = @MainActor @Sendable () -> Void
+    typealias AccountStatusProvider = @Sendable () async throws -> CKAccountStatus
+    typealias UserRecordIDProvider = @Sendable () async throws -> CKRecord.ID
+    typealias EngineFactory = (CKSyncEngine.Configuration) throws -> CKSyncEngine
 
     private static let containerIdentifier = "iCloud.com.wealthcompasstracker"
     private static let zoneName = "WealthCompassZone"
@@ -461,17 +464,27 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     private let remoteMutationHandler: RemoteMutationHandler
     private let statusHandler: StatusHandler
     private let disableHandler: DisableHandler
+    private let accountStatusProvider: AccountStatusProvider
+    private let userRecordIDProvider: UserRecordIDProvider
+    private let engineFactory: EngineFactory
     private let zoneID = CKRecordZone.ID(zoneName: zoneName, ownerName: CKCurrentUserDefaultName)
 
     private var engine: CKSyncEngine?
     private var isSynchronizing = false
+    private var isStarting = false
+    // CloudKit awaits and CKSyncEngine callbacks can resume after a user toggles sync.
+    private var syncRequested = false
+    private var lifecycleGeneration = 0
 
     init(
         metadataStore: CloudSyncMetadataStore,
         snapshotProvider: @escaping SnapshotProvider,
         remoteMutationHandler: @escaping RemoteMutationHandler,
         statusHandler: @escaping StatusHandler,
-        disableHandler: @escaping DisableHandler
+        disableHandler: @escaping DisableHandler,
+        accountStatusProvider: AccountStatusProvider? = nil,
+        userRecordIDProvider: UserRecordIDProvider? = nil,
+        engineFactory: @escaping EngineFactory = { CKSyncEngine($0) }
     ) {
         let container = CKContainer(identifier: Self.containerIdentifier)
         self.container = container
@@ -481,23 +494,51 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         self.remoteMutationHandler = remoteMutationHandler
         self.statusHandler = statusHandler
         self.disableHandler = disableHandler
+        self.accountStatusProvider = accountStatusProvider ?? {
+            try await container.accountStatus()
+        }
+        self.userRecordIDProvider = userRecordIDProvider ?? {
+            try await container.userRecordID()
+        }
+        self.engineFactory = engineFactory
     }
 
     func start(allowAccountReplacement: Bool) async {
-        guard engine == nil else {
-            await synchronize()
+        syncRequested = true
+        if let engine {
+            await synchronize(generation: lifecycleGeneration, using: engine)
+            return
+        }
+        guard !isStarting else {
             return
         }
 
+        lifecycleGeneration += 1
+        let generation = lifecycleGeneration
+        isStarting = true
         await statusHandler(.starting)
+        guard isCurrent(generation) else {
+            finishStarting(generation: generation)
+            return
+        }
+
         do {
-            guard try await container.accountStatus() == .available else {
+            guard try await accountStatusProvider() == .available else {
                 throw CloudSyncError.accountUnavailable(
                     String(localized: "Sign in to iCloud and allow iCloud access for this app before turning on sync.")
                 )
             }
+            guard isCurrent(generation) else {
+                finishStarting(generation: generation)
+                return
+            }
 
-            let userRecordID = try await container.userRecordID()
+            let userRecordID = try await userRecordIDProvider()
+            guard isCurrent(generation) else {
+                finishStarting(generation: generation)
+                return
+            }
+
             let metadata = metadataStore.read()
             if
                 let previousAccount = metadata.accountRecordName,
@@ -507,11 +548,15 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 throw CloudSyncError.accountChanged
             }
 
+            let currentRecords = try await snapshotProvider()
+            guard isCurrent(generation) else {
+                finishStarting(generation: generation)
+                return
+            }
+
             if metadata.accountRecordName != userRecordID.recordName {
                 try resetMetadata(for: userRecordID.recordName)
             }
-
-            let currentRecords = try await snapshotProvider()
             try metadataStore.reconcileLocalInventory(currentRecords)
             let preparedMetadata = metadataStore.read()
             let stateSerialization = preparedMetadata.engineState.flatMap {
@@ -525,61 +570,104 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             configuration.automaticallySync = true
             configuration.subscriptionID = Self.subscriptionID
 
-            let engine = CKSyncEngine(configuration)
+            let engine = try engineFactory(configuration)
+            guard isCurrent(generation) else {
+                await engine.cancelOperations()
+                finishStarting(generation: generation)
+                return
+            }
+
             self.engine = engine
             reconcileEngineState(engine)
-            await synchronize()
+            finishStarting(generation: generation)
+            await synchronize(generation: generation, using: engine)
         } catch {
-            await handleStartFailure(error)
+            if isCurrent(generation) {
+                finishStarting(generation: generation)
+                await handleStartFailure(error)
+            }
         }
     }
 
     func stop() async {
+        syncRequested = false
+        isStarting = false
+        lifecycleGeneration += 1
+        let generation = lifecycleGeneration
         let existingEngine = engine
         engine = nil
+        isSynchronizing = false
         if let existingEngine {
             await existingEngine.cancelOperations()
         }
-        isSynchronizing = false
+        guard lifecycleGeneration == generation, !syncRequested else { return }
         await statusHandler(.disabled)
     }
 
     func localChangesRecorded() async {
-        guard let engine else { return }
+        guard syncRequested, let engine else { return }
         guard metadataStore.read().bootstrapCompleted else { return }
         enqueuePendingRecordChanges(on: engine)
     }
 
     func synchronize() async {
-        guard let engine, !isSynchronizing else { return }
+        guard syncRequested, let engine else { return }
+        await synchronize(generation: lifecycleGeneration, using: engine)
+    }
+
+    private func synchronize(generation: Int, using engine: CKSyncEngine) async {
+        guard isCurrent(generation, engine: engine), !isSynchronizing else { return }
         isSynchronizing = true
         await statusHandler(.syncing)
-        defer { isSynchronizing = false }
+        defer { finishSynchronizing(generation: generation, engine: engine) }
+        guard isCurrent(generation, engine: engine) else { return }
 
         do {
             let metadata = metadataStore.read()
             if !metadata.zoneReady {
                 ensureZonePending(on: engine)
                 try await engine.sendChanges()
+                guard isCurrent(generation, engine: engine) else { return }
             }
 
             try await engine.fetchChanges(.init(scope: .zoneIDs([zoneID])))
+            guard isCurrent(generation, engine: engine) else { return }
 
             if metadataStore.read().bootstrapCompleted {
                 enqueuePendingRecordChanges(on: engine)
                 try await engine.sendChanges(.init(scope: .zoneIDs([zoneID])))
+                guard isCurrent(generation, engine: engine) else { return }
             }
 
             let date = Date()
             try metadataStore.update { $0.lastSyncAt = date }
             await statusHandler(.upToDate(date))
         } catch {
+            guard isCurrent(generation, engine: engine) else { return }
             await report(error)
         }
     }
 
+    private func isCurrent(_ generation: Int, engine expectedEngine: CKSyncEngine? = nil) -> Bool {
+        guard syncRequested, lifecycleGeneration == generation else { return false }
+        if let expectedEngine {
+            return engine === expectedEngine
+        }
+        return true
+    }
+
+    private func finishStarting(generation: Int) {
+        guard lifecycleGeneration == generation else { return }
+        isStarting = false
+    }
+
+    private func finishSynchronizing(generation: Int, engine expectedEngine: CKSyncEngine) {
+        guard lifecycleGeneration == generation, engine === expectedEngine else { return }
+        isSynchronizing = false
+    }
+
     func handleEvent(_ event: CKSyncEngine.Event, syncEngine: CKSyncEngine) async {
-        guard engine === syncEngine else { return }
+        guard syncRequested, engine === syncEngine else { return }
 
         do {
             switch event {
@@ -616,6 +704,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 Self.logger.info("Ignoring an unknown CKSyncEngine event.")
             }
         } catch {
+            guard syncRequested, engine === syncEngine else { return }
             Self.logger.error("CloudKit event handling failed: \(error.localizedDescription, privacy: .public)")
             await stopAfterFatalError(error)
         }
@@ -625,17 +714,18 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         _ context: CKSyncEngine.SendChangesContext,
         syncEngine: CKSyncEngine
     ) async -> CKSyncEngine.RecordZoneChangeBatch? {
-        guard engine === syncEngine else { return nil }
+        guard syncRequested, engine === syncEngine else { return nil }
         let pending = syncEngine.state.pendingRecordZoneChanges.filter {
             context.options.scope.contains($0)
         }
         return await CKSyncEngine.RecordZoneChangeBatch(pendingChanges: pending) { [weak self] recordID in
             guard let self else { return nil }
-            return await self.makeRecord(for: recordID)
+            return await self.makeRecord(for: recordID, syncEngine: syncEngine)
         }
     }
 
-    private func makeRecord(for recordID: CKRecord.ID) async -> CKRecord? {
+    private func makeRecord(for recordID: CKRecord.ID, syncEngine: CKSyncEngine) async -> CKRecord? {
+        guard syncRequested, engine === syncEngine else { return nil }
         guard recordID.zoneID == zoneID, let key = CloudSyncRecordKey(recordName: recordID.recordName) else {
             return nil
         }
@@ -1163,14 +1253,20 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     }
 
     private func stopAfterFatalError(_ error: Error) async {
+        syncRequested = false
+        isStarting = false
+        lifecycleGeneration += 1
+        let generation = lifecycleGeneration
         let existingEngine = engine
         engine = nil
-        if let existingEngine {
-            await existingEngine.cancelOperations()
-        }
         if case CloudSyncError.accountChanged = error {
             await disableHandler()
         }
+        isSynchronizing = false
+        if let existingEngine {
+            await existingEngine.cancelOperations()
+        }
+        guard lifecycleGeneration == generation, !syncRequested else { return }
         await report(error)
     }
 
