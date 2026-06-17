@@ -140,91 +140,101 @@ struct MacOnboardingView: View {
     }
     
     private var apiSetupPage: some View {
-        VStack(spacing: 20) {
-            Spacer()
-            
-            Image(systemName: "network")
-                .font(.system(size: 80, weight: .light))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [WCColor.primary, .green],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .shadow(color: WCColor.primary.opacity(0.3), radius: 25, y: 15)
-            
-            VStack(spacing: 10) {
-                Text("Connect Market Data")
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                
-                Text("Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.")
-                    .font(.body)
-                    .foregroundStyle(WCColor.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-            }
-            
-            VStack(spacing: 15) {
-                InsetFinanceRow {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Finnhub API Key (Stocks)")
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(WCColor.textSecondary)
-                        SecureField("Paste Finnhub key...", text: $finnhubKey)
-                            .textFieldStyle(.plain)
+        GeometryReader { proxy in
+            ScrollView {
+                VStack(spacing: 18) {
+                    Image(systemName: "network")
+                        .font(.system(size: 64, weight: .light))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [WCColor.primary, .green],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .shadow(color: WCColor.primary.opacity(0.3), radius: 20, y: 10)
+                    
+                    VStack(spacing: 9) {
+                        Text("Connect Market Data")
+                            .font(.system(size: 34, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
-                    }
-                }
-                
-                InsetFinanceRow {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("CoinGecko API Key (Crypto)")
-                            .font(.caption.weight(.medium))
+                            .multilineTextAlignment(.center)
+                        
+                        Text("Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.")
+                            .font(.body)
                             .foregroundStyle(WCColor.textSecondary)
-                        SecureField("Paste CoinGecko key...", text: $coinGeckoKey)
-                            .textFieldStyle(.plain)
-                            .foregroundStyle(.white)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 40)
                     }
-                }
-            }
-            .frame(maxWidth: 420)
-            .padding(.top, 10)
-            
-            Spacer()
-            
-            VStack(spacing: 16) {
-                Button {
-                    Task { await finishOnboarding() }
-                } label: {
-                    HStack {
-                        if isValidating {
-                            ProgressView()
-                                .controlSize(.small)
-                                .padding(.trailing, 5)
+
+                    MarketDataAPIKeyGuide()
+                        .frame(maxWidth: 760)
+                        .padding(.top, 2)
+                    
+                    VStack(spacing: 12) {
+                        InsetFinanceRow {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Finnhub API Key (Stocks)")
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(WCColor.textSecondary)
+                                SecureField("Paste Finnhub key...", text: $finnhubKey)
+                                    .textFieldStyle(.plain)
+                                    .foregroundStyle(.white)
+                            }
                         }
-                        Text(isValidating ? String(localized: "Validating...") : String(localized: "Get Started"))
+                        
+                        InsetFinanceRow {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("CoinGecko API Key (Crypto)")
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(WCColor.textSecondary)
+                                SecureField("Paste CoinGecko key...", text: $coinGeckoKey)
+                                    .textFieldStyle(.plain)
+                                    .foregroundStyle(.white)
+                            }
+                        }
+
+                        MarketDataAPIKeySecurityNote(deviceName: "Mac")
                     }
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.black)
-                    .frame(maxWidth: 320)
-                    .padding(.vertical, 14)
-                    .background(WCColor.primary.gradient, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .frame(maxWidth: 520)
+                    
+                    VStack(spacing: 14) {
+                        Button {
+                            Task { await finishOnboarding() }
+                        } label: {
+                            HStack {
+                                if isValidating {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                        .padding(.trailing, 5)
+                                }
+                                Text(isValidating ? String(localized: "Validating...") : String(localized: "Get Started"))
+                            }
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(.black)
+                            .frame(maxWidth: 320)
+                            .padding(.vertical, 14)
+                            .background(WCColor.primary.gradient, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isValidating)
+                        
+                        Button(action: skipOnboarding) {
+                            Text("Skip for now")
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(WCColor.textSecondary)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isValidating)
+                    }
                 }
-                .buttonStyle(.plain)
-                .disabled(isValidating)
-                
-                Button(action: skipOnboarding) {
-                    Text("Skip for now")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(WCColor.textSecondary)
-                }
-                .buttonStyle(.plain)
-                .disabled(isValidating)
+                .frame(maxWidth: 840)
+                .frame(minHeight: max(proxy.size.height - 40, 620))
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 36)
+                .padding(.vertical, 24)
             }
-            .padding(.bottom, 40)
+            .scrollIndicators(.hidden)
         }
     }
     

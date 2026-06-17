@@ -19,3 +19,7 @@
     - **Safe URL**: Force-unwrap `URLComponents(string:)!` replaced with `guard let` throwing `ExchangeRateError.invalidURL`.
     - **Shared helper**: `AppSettings.refreshExchangeRatesAndRecalculate(finance:showResult:)` consolidates the "refresh → didChangeRates → takeSnapshot" pattern previously duplicated in 4 views.
     - **Xcode project**: `ExchangeRatePersistence.swift` registered in both `WealthCompassMobile` and `WealthCompassMac` targets.
+
+- [2026-06-17 08:49:00]: Version Bump
+  - *Details*: Aggiornata la versione dell'app per iOS e macOS.
+  - *Tech Notes*: Modificato `project.pbxproj` per impostare `MARKETING_VERSION = 1.0.4` e `CURRENT_PROJECT_VERSION = 5`.

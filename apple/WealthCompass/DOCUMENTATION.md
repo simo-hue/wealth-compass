@@ -268,3 +268,7 @@
 - [6/12/2026, 8:12:56 AM]: App Version Update
   - *Details*: Incremented marketing version from 1.0.2 to 1.0.3 and build number from 3 to 4 to publish an update.
   - *Tech Notes*: Updated MARKETING_VERSION and CURRENT_PROJECT_VERSION in project.pbxproj.
+
+- [2026-06-17 08:43]: iCloud Sync Toggle Crash Fix
+  - *Details*: Hardened the CloudKit sync lifecycle so activating or deactivating iCloud sync cannot leave stale asynchronous CloudKit work running after the user toggles sync off. The sync actor now gates start, stop, synchronize, engine delegate events, and record batch creation behind a lifecycle generation and requested-sync flag.
+  - *Tech Notes*: Updated `CloudKitSyncService` with injectable CloudKit account/engine seams for regression coverage, stale `CKSyncEngine` callback guards, and generation checks after every suspending CloudKit operation. Added a `CloudSyncCoreTests` regression test that simulates stopping sync while account-status startup is still pending.
