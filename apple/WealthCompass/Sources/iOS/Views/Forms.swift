@@ -5,6 +5,7 @@ struct TransactionFormView: View {
     @EnvironmentObject private var settings: AppSettings
     let transaction: Transaction?
     let onSave: (Transaction?, TransactionType, Double, String, String, Date) -> Void
+    let onDelete: (() -> Void)?
 
     private static let customCategoryTag = "__wealth_compass_custom_category__"
 
@@ -18,10 +19,12 @@ struct TransactionFormView: View {
 
     init(
         transaction: Transaction? = nil,
-        onSave: @escaping (Transaction?, TransactionType, Double, String, String, Date) -> Void
+        onSave: @escaping (Transaction?, TransactionType, Double, String, String, Date) -> Void,
+        onDelete: (() -> Void)? = nil
     ) {
         self.transaction = transaction
         self.onSave = onSave
+        self.onDelete = onDelete
         _type = State(initialValue: transaction?.type ?? .expense)
         _amount = State(initialValue: transaction.map { String($0.amount) } ?? "")
         _category = State(initialValue: transaction?.category ?? String(localized: "Food"))
@@ -118,6 +121,21 @@ struct TransactionFormView: View {
                         Text(customCategoryHint)
                             .font(.caption)
                             .foregroundStyle(WCColor.textSecondary)
+                    }
+                }
+                
+                if transaction != nil, let onDelete {
+                    Section {
+                        Button(role: .destructive) {
+                            onDelete()
+                            dismiss()
+                        } label: {
+                            HStack {
+                                Spacer()
+                                Text("Delete Transaction")
+                                Spacer()
+                            }
+                        }
                     }
                 }
             }
