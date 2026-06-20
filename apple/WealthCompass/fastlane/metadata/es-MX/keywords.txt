@@ -1,1 +1,1 @@
-patrimonio neto,presupuesto,gastos,ingresos,flujo de caja,cartera,inversión,cripto,finanzas,riqueza
+valor neto,presupuesto,gasto,ingreso,flujo de efectivo,cartera,inversión,cripto,finanzas,riqueza

@@ -1,6 +1,6 @@
 Wealth Compass é um painel de finanças pessoais privado, com foco local, que ajuda você a entender seu patrimônio líquido, fluxo de caixa, investimentos, ativos de criptomoeda e passivos em um único lugar.
 
-Construa um panorama claro das suas finanças:
+Construa um panorama claro de suas finanças:
 
 - Veja patrimônio líquido, saldo em dinheiro, investimentos e criptomoedas de relance
 - Acompanhe receitas e despesas com categorias e tendências visuais

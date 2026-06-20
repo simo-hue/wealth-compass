@@ -1,1 +1,1 @@
-nettoformue, budsjett, utgift, inntekt, kontantstrøm, portefølje, investering, kryptovaluta
+net worth,budget,expense,income,cash flow,portfolio,investment,crypto,finance,wealth

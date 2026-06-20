@@ -12,7 +12,7 @@ Vytvorte si jasný obraz o svojich financiách:
 - Prevádzanie hodnôt pomocou uložených referenčných výmenných kurzov ECB
 - Okamžité skrytie citlivých čiastok pomocou Režimu súkromia
 - Ochrana aplikácie pomocou Face ID alebo Touch ID
-- Export, import a vymazanie vašich lokálnych údajov kedykoľvek si vyberiete
+- Export, import a vymazanie vašich lokálnych údajov kedykoľvek si zvolíte
 
 Vaše finančné záznamy zostávajú na vašom zariadení. Wealth Compass nevyžaduje účet a neukladá vaše portfólio ani históriu transakcií na serveroch prevádzkovaných vývojárom.
 

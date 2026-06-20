@@ -2,20 +2,20 @@ Wealth Compass adalah papan pemuka kewangan peribadi tempatan yang membantu anda
 
 Bina gambaran jelas tentang kewangan anda:
 
-- Lihat nilai bersih, baki tunai, pelaburan, dan kripto sekilas
-- Jejak pendapatan dan perbelanjaan dengan kategori dan trend visual
+- Lihat nilai bersih, baki tunai, pelaburan, dan kripto sekilas pandang
+- Jejaki pendapatan dan perbelanjaan dengan kategori dan tren visual
 - Jadualkan transaksi berulang dan terima peringatan tempatan pilihan
-- Pantau pegangan saham, ETF, dan cryptocurrency
-- Semak asas kos, untung dan rugi, dan pengagihan portfolio
-- Jejak liabiliti bersama-sama aset anda
-- Ikuti sejarah nilai bersih dengan rakaman tempatan automatik
-- Tukar nilai menggunakan kadar pertukaran rujukan ECB yang disimpan dalam cache
-- Sembunyikan jumlah sensitif dengan segera menggunakan Mod Privasi
+- Pantau pegangan saham, ETF, dan mata wang kripto
+- Semak asas kos, untung dan rugi, serta peruntukan portfolio
+- Jejaki liabiliti bersama aset anda
+- Ikuti sejarah nilai bersih dengan tangkapan skrin tempatan automatik
+- Tukar nilai menggunakan kadar pertukaran ECB yang di-cache
+- Sembunyikan jumlah sensitif serta-merta dengan Mod Privasi
 - Lindungi aplikasi dengan Face ID atau Touch ID
 - Eksport, import, dan padam data tempatan anda bila-bila masa anda mahu
 
-Rekod kewangan anda kekal di peranti anda. Wealth Compass tidak memerlukan akaun dan tidak menyimpan portfolio atau sejarah transaksi anda di pelayan yang dikendalikan oleh pembangun.
+Rekod kewangan anda disimpan pada peranti anda. Wealth Compass tidak memerlukan akaun dan tidak menyimpan portfolio atau sejarah transaksi anda pada pelayan yang dikendalikan oleh pembangun.
 
-Kemas kini harga pasaran pilihan menggunakan kelayakan API yang anda berikan. Kelayakan disimpan dengan selamat dalam iOS Keychain.
+Kemaskini harga pasaran pilihan menggunakan kredensial API yang anda berikan. Kredensial disimpan dengan selamat dalam iOS Keychain.
 
-Wealth Compass adalah alat untuk menjejak maklumat sahaja. Ia tidak bersambung ke institusi kewangan, melaksanakan perdagangan, memberi nasihat kewangan, atau menjamin ketepatan data pasaran pihak ketiga.
+Wealth Compass adalah alat pemantauan maklumat. Ia tidak disambungkan kepada institusi kewangan, melaksanakan dagangan, memberikan nasihat kewangan, atau menjamin ketepatan data pasaran pihak ketiga.

@@ -1,21 +1,21 @@
-Wealth Compass é um painel de finanças pessoais privado, com enfoque local, que ajuda a compreender o seu património líquido, fluxo de caixa, investimentos, ativos em criptomoedas e passivos num único lugar.
+Wealth Compass é um painel de finanças pessoais privado, com enfoque local, que ajuda a compreender o seu património líquido, fluxo de caixa, investimentos, ativos em criptomoeda e passivos num único lugar.
 
 Construa uma visão clara das suas finanças:
 
 - Veja rapidamente o património líquido, saldo de caixa, investimentos e criptomoedas
 - Acompanhe rendimentos e despesas com categorias e tendências visuais
 - Agende transações recorrentes e receba lembretes locais opcionais
-- Monitorize ações, ETFs e participações em criptomoedas
-- Revise o custo base, lucro e perda, e a alocação de portfólio
-- Acompanhe os passivos juntamente com os ativos
-- Siga o histórico do património líquido com instantâneos locais automáticos
-- Converta valores utilizando taxas de câmbio de referência do BCE em cache
-- Oculte valores sensíveis instantaneamente com o Modo de Privacidade
-- Proteja a app com Face ID ou Touch ID
+- Monitorize ações, ETFs e criptomoedas
+- Revise o custo base, lucros e perdas e alocação da carteira
+- Acompanhe passivos juntamente com os seus ativos
+- Siga o histórico do património líquido com capturas de ecrã automáticas locais
+- Converta valores usando taxas de câmbio de referência ECB em cache
+- Oculte montantes sensíveis instantaneamente com o Modo Privacidade
+- Proteja a aplicação com Face ID ou Touch ID
 - Exporte, importe e apague os seus dados locais sempre que desejar
 
-Os seus registos financeiros permanecem no seu dispositivo. O Wealth Compass não necessita de conta e não guarda o seu portfólio ou histórico de transações nos servidores geridos pelo desenvolvedor.
+Os seus registos financeiros permanecem no seu dispositivo. O Wealth Compass não requer uma conta e não armazena o seu portfólio ou histórico de transações em servidores operados pelo desenvolvedor.
 
-As atualizações de preço de mercado opcionais utilizam credenciais API fornecidas por si. As credenciais são armazenadas de forma segura no iOS Keychain.
+As atualizações opcionais de preços de mercado usam credenciais de API que você fornece. As credenciais são armazenadas de forma segura no iOS Keychain.
 
-Wealth Compass é uma ferramenta de acompanhamento informativa. Não se liga a instituições financeiras, não executa transações, não fornece aconselhamento financeiro nem garante a precisão de dados de mercado de terceiros.
+O Wealth Compass é uma ferramenta de acompanhamento informativa. Não se conecta a instituições financeiras, não executa transações, não fornece aconselhamento financeiro, nem garante a precisão de dados de mercado de terceiros.

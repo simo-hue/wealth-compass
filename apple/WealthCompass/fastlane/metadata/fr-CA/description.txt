@@ -1,21 +1,21 @@
-Wealth Compass est un tableau de bord privé et local de finances personnelles qui vous aide à comprendre votre valeur nette, votre trésorerie, vos investissements, vos actifs crypto et vos passifs en un seul endroit.
+Wealth Compass est un tableau de bord de finances personnelles privé, conçu en priorité pour un usage local, qui vous aide à comprendre votre patrimoine net, votre flux de trésorerie, vos investissements, vos actifs cryptographiques et vos passifs en un seul endroit.
 
 Construisez une image claire de vos finances :
 
-- Voir la valeur nette, le solde de trésorerie, les investissements et la crypto en un coup d’œil
+- Voir le patrimoine net, le solde de trésorerie, les investissements et les crypto-monnaies en un coup d'œil
 - Suivre les revenus et les dépenses avec des catégories et des tendances visuelles
-- Planifier les transactions récurrentes et recevoir des rappels locaux optionnels
-- Surveiller les détentions en actions, ETF et cryptomonnaies
-- Examiner le coût de base, les profits et pertes, ainsi que l’allocation du portefeuille
+- Programmer des transactions récurrentes et recevoir des rappels locaux optionnels
+- Surveiller les actions, les ETF et les avoirs en cryptomonnaies
+- Examiner le prix de revient, le profit et la perte, et la répartition du portefeuille
 - Suivre les passifs en parallèle de vos actifs
-- Suivre l’historique de la valeur nette avec des instantanés locaux automatiques
+- Suivre l'historique du patrimoine net avec des instantanés locaux automatiques
 - Convertir les valeurs en utilisant les taux de change de référence de la BCE mis en cache
-- Masquer instantanément les montants sensibles avec le mode Confidentialité
-- Protéger l’application avec Face ID ou Touch ID
+- Masquer instantanément les montants sensibles avec le mode confidentialité
+- Protéger l'application avec Face ID ou Touch ID
 - Exporter, importer et supprimer vos données locales quand vous le souhaitez
 
-Vos dossiers financiers restent sur votre appareil. Wealth Compass ne nécessite pas de compte et ne stocke pas votre portefeuille ni votre historique de transactions sur des serveurs gérés par les développeurs.
+Vos dossiers financiers restent sur votre appareil. Wealth Compass ne nécessite pas de compte et ne stocke pas votre portefeuille ni l'historique de vos transactions sur des serveurs exploités par le développeur.
 
-Les mises à jour optionnelles sur le prix du marché utilisent les identifiants API que vous fournissez. Les identifiants sont stockés de manière sécurisée dans le porte-clés iOS.
+Les mises à jour optionnelles des prix du marché utilisent des identifiants API que vous fournissez. Ces identifiants sont stockés en toute sécurité dans le trousseau iOS.
 
-Wealth Compass est un outil de suivi informationnel. Il ne se connecte pas aux institutions financières, n’exécute pas de transactions, ne fournit pas de conseils financiers, ni ne garantit l’exactitude des données de marché tierces.
+Wealth Compass est un outil de suivi informatif. Il ne se connecte pas aux institutions financières, n'exécute pas de transactions, ne fournit pas de conseils financiers et ne garantit pas l'exactitude des données de marché tierces.
