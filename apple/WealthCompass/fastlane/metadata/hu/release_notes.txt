@@ -1,1 +1,1 @@
-teljesen új felhasználói felület
+UI improvements

@@ -1,1 +1,1 @@
-helt ny brugergrænseflade
+UI improvements

@@ -1,1 +1,1 @@
-úplne nové používateľské rozhranie
+UI improvements

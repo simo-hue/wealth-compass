@@ -397,3 +397,7 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-06-10]: App Store Connect Localized Metadata Scaffolding
   - *Details*: Generated the Fastlane metadata folder structure for all 39 App Store Connect supported languages to automate App Store Optimization (ASO). Configured `Deliverfile` to strictly ignore screenshots to prevent overwriting existing custom designs.
   - *Tech Notes*: Created `fastlane/metadata/` with subfolders for each region (e.g., `en-US`, `zh-Hans`, `es-ES`). Each contains text files for `name`, `subtitle`, `description`, `promotional_text`, and `keywords`. Created `fastlane/Deliverfile` with `skip_screenshots(true)` and `overwrite_screenshots(false)`.
+
+- [2026-06-20T14:04:03+02:00]: App Store Connect Release Notes Update
+  - *Details*: Updated the "What's New in This Version" field (`release_notes.txt`) for all languages to "UI improvements" via Fastlane metadata.
+  - *Tech Notes*: Run `fastlane deliver` to publish these to App Store Connect.
