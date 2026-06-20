@@ -272,3 +272,7 @@
 - [2026-06-17 08:43]: iCloud Sync Toggle Crash Fix
   - *Details*: Hardened the CloudKit sync lifecycle so activating or deactivating iCloud sync cannot leave stale asynchronous CloudKit work running after the user toggles sync off. The sync actor now gates start, stop, synchronize, engine delegate events, and record batch creation behind a lifecycle generation and requested-sync flag.
   - *Tech Notes*: Updated `CloudKitSyncService` with injectable CloudKit account/engine seams for regression coverage, stale `CKSyncEngine` callback guards, and generation checks after every suspending CloudKit operation. Added a `CloudSyncCoreTests` regression test that simulates stopping sync while account-status startup is still pending.
+
+- [2026-06-20 18:44]: Apple Version Bump
+  - *Details*: Incremented the marketing version to 1.0.5 and the build number to 6 across macOS and iOS targets for App Store Connect submission.
+  - *Tech Notes*: Updated `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` using `agvtool` in `WealthCompass.xcodeproj/project.pbxproj`.

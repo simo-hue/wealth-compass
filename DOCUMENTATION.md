@@ -411,3 +411,9 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
     - **iOS DashboardView.swift**: Updated `TransactionFormView` call site to match new signature.
     - **macOS MacCashFlowView.swift**: Updated `MacCashFlowEditor` enum to `.transaction(Transaction?)`, added tap gesture and edit/delete buttons to transaction cards, refactored `MacCashFlowTransactionEditor` with `init(transaction:onSave:)` for pre-population, updated sheet handler to route add vs update.
     - Both iOS and macOS builds verified successfully via `xcodebuild`.
+
+- [2026-06-20T18:44:00+02:00]: Historical Net Worth Snapshot Recalculation
+  - *Details*: Fixed a bug where deleting or editing historical cash flow transactions did not retroactively update the Net Worth history graph. The app now recalculates past snapshots dynamically when transactions are modified.
+  - *Tech Notes*:
+    - **FinanceStore.swift**: Introduced `adjustHistoricalSnapshots(from:liquidityDelta:)` which iterates over existing snapshots on or after the transaction's date and applies the exact cash delta to `liquidity`, `totalAssets`, and `netWorth`.
+    - Applied this helper to `addTransaction()`, `deleteTransaction()`, `updateTransaction()`, and `processDueRecurringTransactions()` ensuring the net worth graph is instantly accurate without requiring a full rebuild from scratch.
