@@ -29,6 +29,7 @@ struct CashFlowView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @State private var showingAddTransaction = false
+    @State private var transactionToEdit: Transaction?
     @State private var recurringEditor: RecurringTransactionEditor?
     @State private var period: AnalyticsPeriod = .thirtyDays
     @State private var transactionPeriod: AnalyticsPeriod = .thirtyDays
@@ -74,7 +75,7 @@ struct CashFlowView: View {
         }
         .pageChrome()
         .sheet(isPresented: $showingAddTransaction) {
-            TransactionFormView { type, amount, category, description, date in
+            TransactionFormView { _, type, amount, category, description, date in
                 finance.addTransaction(
                     type: type,
                     amount: amount,
@@ -83,6 +84,21 @@ struct CashFlowView: View {
                     date: date,
                     settings: settings
                 )
+            }
+        }
+        .sheet(item: $transactionToEdit) { transaction in
+            TransactionFormView(transaction: transaction) { original, type, amount, category, description, date in
+                if let original {
+                    finance.updateTransaction(
+                        original,
+                        type: type,
+                        amount: amount,
+                        category: category,
+                        description: description,
+                        date: date,
+                        settings: settings
+                    )
+                }
             }
         }
         .sheet(item: $recurringEditor) { editor in
@@ -352,7 +368,17 @@ struct CashFlowView: View {
                     VStack(spacing: 12) {
                         ForEach(visibleTransactions) { transaction in
                             transactionRow(transaction)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    transactionToEdit = transaction
+                                }
                                 .contextMenu {
+                                    Button {
+                                        transactionToEdit = transaction
+                                    } label: {
+                                        Label("Edit", systemImage: "pencil")
+                                    }
+
                                     Button(role: .destructive) {
                                         activeAlert = .deleteTransaction(transaction)
                                     } label: {
