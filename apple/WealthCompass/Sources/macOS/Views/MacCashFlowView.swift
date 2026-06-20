@@ -26,13 +26,13 @@ private enum MacTransactionTypeFilter: String, CaseIterable, Identifiable {
 }
 
 private enum MacCashFlowEditor: Identifiable {
-    case transaction
+    case transaction(Transaction?)
     case recurring(RecurringTransaction?)
 
     var id: String {
         switch self {
-        case .transaction:
-            "transaction"
+        case .transaction(let transaction):
+            "transaction-\(transaction?.id.uuidString ?? "new")"
         case .recurring(let schedule):
             "recurring-\(schedule?.id.uuidString ?? "new")"
         }
@@ -157,7 +157,7 @@ struct MacCashFlowView: View {
             ToolbarItemGroup(placement: .primaryAction) {
                 Menu {
                     Button {
-                        editor = .transaction
+                        editor = .transaction(nil)
                     } label: {
                         Label("One-Time Transaction", systemImage: "plus.circle")
                     }
@@ -174,16 +174,28 @@ struct MacCashFlowView: View {
         }
         .sheet(item: $editor) { editor in
             switch editor {
-            case .transaction:
-                MacCashFlowTransactionEditor { type, amount, category, description, date in
-                    finance.addTransaction(
-                        type: type,
-                        amount: amount,
-                        category: category,
-                        description: description,
-                        date: date,
-                        settings: settings
-                    )
+            case .transaction(let transaction):
+                MacCashFlowTransactionEditor(transaction: transaction) { original, type, amount, category, description, date in
+                    if let original {
+                        finance.updateTransaction(
+                            original,
+                            type: type,
+                            amount: amount,
+                            category: category,
+                            description: description,
+                            date: date,
+                            settings: settings
+                        )
+                    } else {
+                        finance.addTransaction(
+                            type: type,
+                            amount: amount,
+                            category: category,
+                            description: description,
+                            date: date,
+                            settings: settings
+                        )
+                    }
                 }
                 .environmentObject(settings)
             case .recurring(let schedule):
@@ -692,6 +704,9 @@ struct MacCashFlowView: View {
                 } else {
                     ForEach(filteredTransactions) { transaction in
                         transactionCard(for: transaction)
+                            .onTapGesture {
+                                editor = .transaction(transaction)
+                            }
                     }
                 }
             }
@@ -757,12 +772,36 @@ struct MacCashFlowView: View {
                             .foregroundStyle(.white)
                     }
                     Spacer()
+
+                    HStack(spacing: 4) {
+                        Button {
+                            editor = .transaction(transaction)
+                        } label: {
+                            Image(systemName: "pencil")
+                        }
+                        .help("Edit transaction")
+
+                        Button(role: .destructive) {
+                            activeAlert = .deleteTransaction(transaction)
+                        } label: {
+                            Image(systemName: "trash")
+                        }
+                        .help("Delete transaction")
+                    }
+                    .buttonStyle(.borderless)
+                    .controlSize(.small)
                 }
             }
             .frame(maxHeight: .infinity, alignment: .top)
         }
         .contentShape(Rectangle())
         .contextMenu {
+            Button {
+                editor = .transaction(transaction)
+            } label: {
+                Label("Edit Transaction", systemImage: "pencil")
+            }
+
             Button(role: .destructive) {
                 activeAlert = .deleteTransaction(transaction)
             } label: {
@@ -953,17 +992,31 @@ private struct MacCashFlowTransactionEditor: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var settings: AppSettings
 
-    let onSave: (TransactionType, Double, String, String, Date) -> Void
+    let transaction: Transaction?
+    let onSave: (Transaction?, TransactionType, Double, String, String, Date) -> Void
 
     private static let customCategoryTag = "__wealth_compass_mac_custom_category__"
 
-    @State private var type: TransactionType = .expense
-    @State private var amount = ""
-    @State private var category = String(localized: "Food")
-    @State private var note = ""
-    @State private var date = Date()
+    @State private var type: TransactionType
+    @State private var amount: String
+    @State private var category: String
+    @State private var note: String
+    @State private var date: Date
     @State private var customCategory = ""
     @FocusState private var isCustomCategoryFocused: Bool
+
+    init(
+        transaction: Transaction? = nil,
+        onSave: @escaping (Transaction?, TransactionType, Double, String, String, Date) -> Void
+    ) {
+        self.transaction = transaction
+        self.onSave = onSave
+        _type = State(initialValue: transaction?.type ?? .expense)
+        _amount = State(initialValue: transaction.map { String($0.amount) } ?? "")
+        _category = State(initialValue: transaction?.category ?? String(localized: "Food"))
+        _note = State(initialValue: transaction?.description ?? "")
+        _date = State(initialValue: transaction?.date ?? Date())
+    }
 
     private var categories: [String] {
         settings.transactionCategories(for: type)
@@ -1000,7 +1053,9 @@ private struct MacCashFlowTransactionEditor: View {
                     }
                     .pickerStyle(.segmented)
                     .onChange(of: type) { _, newType in
-                        category = settings.transactionCategories(for: newType).first ?? ""
+                        if !settings.transactionCategories(for: newType).contains(category) && !isCustomCategorySelected {
+                            category = settings.transactionCategories(for: newType).first ?? ""
+                        }
                         customCategory = ""
                         isCustomCategoryFocused = false
                     }
@@ -1039,7 +1094,7 @@ private struct MacCashFlowTransactionEditor: View {
                 }
             }
             .formStyle(.grouped)
-            .navigationTitle("New Transaction")
+            .navigationTitle(transaction == nil ? "New Transaction" : "Edit Transaction")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -1069,7 +1124,7 @@ private struct MacCashFlowTransactionEditor: View {
             selectedCategory = category
         }
 
-        onSave(type, parsedAmount, selectedCategory, note, date)
+        onSave(transaction, type, parsedAmount, selectedCategory, note, date)
         dismiss()
     }
 }

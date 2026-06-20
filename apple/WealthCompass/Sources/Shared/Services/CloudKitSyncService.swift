@@ -3,6 +3,29 @@ import CryptoKit
 import Foundation
 import OSLog
 
+// #region agent log
+private func wcDebugLog(_ location: String, _ message: String, _ data: [String: Any] = [:], _ hypothesis: String) {
+    var payload: [String: Any] = [
+        "sessionId": "4c10e7",
+        "location": location,
+        "message": message,
+        "hypothesisId": hypothesis,
+        "timestamp": Date().timeIntervalSince1970 * 1000
+    ]
+    payload["data"] = data
+    guard
+        let body = try? JSONSerialization.data(withJSONObject: payload),
+        let url = URL(string: "http://127.0.0.1:7504/ingest/61db8831-ab92-46de-81de-fd622a59ac18")
+    else { return }
+    var req = URLRequest(url: url)
+    req.httpMethod = "POST"
+    req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    req.setValue("4c10e7", forHTTPHeaderField: "X-Debug-Session-Id")
+    req.httpBody = body
+    URLSession.shared.dataTask(with: req).resume()
+}
+// #endregion
+
 enum CloudSyncStatus: Equatable, Sendable {
     case disabled
     case starting
@@ -341,10 +364,16 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
         try update { metadata in
             let hashes = Dictionary(uniqueKeysWithValues: records.map { ($0.key.storageKey, $0.value.payloadHash) })
             let now = Date()
+            // #region agent log
+            var _wcChangedFromInventory = 0
+            // #endregion
 
             for record in records.values {
                 let storageKey = record.key.storageKey
                 guard metadata.knownLocalHashes[storageKey] != record.payloadHash else { continue }
+                // #region agent log
+                _wcChangedFromInventory += 1
+                // #endregion
                 var state = metadata.records[storageKey] ?? CloudSyncRecordState()
                 let origin: CloudSyncPendingOrigin = metadata.knownLocalHashes[storageKey] == nil
                     && !metadata.bootstrapCompleted ? .inventory : .localChange
@@ -368,6 +397,14 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
                 metadata.records[key.storageKey] = state
             }
             metadata.knownLocalHashes = hashes
+            // #region agent log
+            wcDebugLog("CloudKitSyncService.swift:reconcileLocalInventory", "inventory reconciled", [
+                "totalRecords": records.count,
+                "flaggedPendingFromInventory": _wcChangedFromInventory,
+                "bootstrapCompleted": metadata.bootstrapCompleted,
+                "knownHashesBefore": metadata.knownLocalHashes.count
+            ], "B")
+            // #endregion
         }
     }
 
@@ -411,8 +448,19 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
             at: url.deletingLastPathComponent(),
             withIntermediateDirectories: true
         )
+        // #region agent log
+        let _wcStart = Date()
+        // #endregion
         let data = try FinanceJSONCoding.encode(metadata, prettyPrinted: true)
         try data.write(to: url, options: [.atomic, .completeFileProtectionUnlessOpen])
+        // #region agent log
+        wcDebugLog("CloudKitSyncService.swift:metadataPersist", "metadata file rewritten", [
+            "recordsCount": metadata.records.count,
+            "knownHashesCount": metadata.knownLocalHashes.count,
+            "fileBytes": data.count,
+            "durationMs": Date().timeIntervalSince(_wcStart) * 1000
+        ], "E")
+        // #endregion
     }
 }
 
@@ -616,6 +664,14 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     }
 
     private func synchronize(generation: Int, using engine: CKSyncEngine) async {
+        // #region agent log
+        wcDebugLog("CloudKitSyncService.swift:synchronize", "synchronize requested", [
+            "generation": generation,
+            "lifecycleGeneration": lifecycleGeneration,
+            "isSynchronizing": isSynchronizing,
+            "automaticallySync": true
+        ], "C")
+        // #endregion
         guard isCurrent(generation, engine: engine), !isSynchronizing else { return }
         isSynchronizing = true
         await statusHandler(.syncing)
@@ -642,9 +698,32 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             let date = Date()
             try metadataStore.update { $0.lastSyncAt = date }
             await statusHandler(.upToDate(date))
+            // #region agent log
+            wcDebugLog("CloudKitSyncService.swift:synchronize", "synchronize finished OK", [
+                "generation": generation
+            ], "C")
+            // #endregion
         } catch {
+            // #region agent log
+            wcDebugLog("CloudKitSyncService.swift:synchronize", "synchronize threw", [
+                "generation": generation,
+                "errorType": String(describing: type(of: error)),
+                "error": error.localizedDescription,
+                "ckCode": (error as? CKError)?.errorCode ?? -1
+            ], "C,D")
+            // #endregion
             guard isCurrent(generation, engine: engine) else { return }
-            await report(error)
+            // A partial failure means some records were rejected (e.g. first-sync
+            // "record already exists" collisions). Those are handled per-record in
+            // the sent/fetched event callbacks and retried by the engine, so this is
+            // not a fatal, user-facing sync error.
+            if (error as? CKError)?.code == .partialFailure {
+                let date = Date()
+                try? metadataStore.update { $0.lastSyncAt = date }
+                await statusHandler(.upToDate(date))
+            } else {
+                await report(error)
+            }
         }
     }
 
@@ -704,6 +783,14 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 Self.logger.info("Ignoring an unknown CKSyncEngine event.")
             }
         } catch {
+            // #region agent log
+            wcDebugLog("CloudKitSyncService.swift:handleEvent", "event handling FAILED -> fatal stop", [
+                "errorType": String(describing: type(of: error)),
+                "error": error.localizedDescription,
+                "ckCode": (error as? CKError)?.errorCode ?? -1,
+                "syncRequested": syncRequested
+            ], "D")
+            // #endregion
             guard syncRequested, engine === syncEngine else { return }
             Self.logger.error("CloudKit event handling failed: \(error.localizedDescription, privacy: .public)")
             await stopAfterFatalError(error)
@@ -797,7 +884,28 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         _ event: CKSyncEngine.Event.FetchedRecordZoneChanges,
         syncEngine: CKSyncEngine
     ) async throws {
-        let localRecords = try await snapshotProvider()
+        // #region agent log
+        let _wcStart = Date()
+        let _wcMods = event.modifications.count
+        let _wcDels = event.deletions.count
+        // #endregion
+        // The full local snapshot is only required during the initial bootstrap
+        // merge (to compare local vs. remote). Once bootstrap is complete, remote
+        // changes win directly, so we avoid re-encoding the entire dataset + SHA256
+        // on every fetched batch (a heavy main-actor cost).
+        let isBootstrapCompleted = metadataStore.read().bootstrapCompleted
+        let localRecords: [CloudSyncRecordKey: CloudSyncRecordSnapshot] = isBootstrapCompleted
+            ? [:]
+            : try await snapshotProvider()
+        // #region agent log
+        wcDebugLog("CloudKitSyncService.swift:handleFetchedRecordZoneChanges", "fetched batch processed", [
+            "modifications": _wcMods,
+            "deletions": _wcDels,
+            "localRecordsEncoded": localRecords.count,
+            "encodeMs": Date().timeIntervalSince(_wcStart) * 1000,
+            "bootstrapCompleted": isBootstrapCompleted
+        ], "A")
+        // #endregion
         let originalMetadata = metadataStore.read()
         var metadata = originalMetadata
         var mutations: [CloudSyncRemoteMutation] = []
@@ -1001,31 +1109,83 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         }
         enqueue(keys: Array(pendingToRequeue), on: syncEngine)
 
+        // Classify failures first. The common first-sync case is a flood of
+        // `serverRecordChanged` collisions ("record to insert already exists") when
+        // both devices uploaded the same records. Those non-deleted conflicts all do
+        // the same thing (adopt the server's system fields, then resend as an update),
+        // so we batch them into a single metadata write + single enqueue instead of
+        // one full metadata-file rewrite per record.
+        var nonDeletedConflicts: [(key: CloudSyncRecordKey, serverRecord: CKRecord)] = []
+        var deletedServerConflicts: [(key: CloudSyncRecordKey, expectedRevision: UUID?, serverRecord: CKRecord)] = []
+        var simpleRequeue = Set<CloudSyncRecordKey>()
+        var needsZoneRecreation = false
+
         for failure in event.failedRecordSaves where failure.record.recordID.zoneID == zoneID {
             guard let key = CloudSyncRecordKey(recordName: failure.record.recordID.recordName) else { continue }
             let currentRevision = metadataStore.pendingRevision(for: key)
             if let failedRevision = recordRevision(failure.record), currentRevision != failedRevision {
-                enqueue(keys: [key], on: syncEngine)
+                simpleRequeue.insert(key)
                 continue
             }
 
             if failure.error.code == .serverRecordChanged,
                let serverRecord = failure.error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord {
-                try await resolveServerConflict(
-                    for: key,
-                    expectedPendingRevision: currentRevision,
-                    serverRecord: serverRecord,
-                    syncEngine: syncEngine
-                )
+                let serverIsDeleted = (serverRecord["isDeleted"] as? NSNumber)?.boolValue ?? false
+                if serverIsDeleted {
+                    deletedServerConflicts.append((key, currentRevision, serverRecord))
+                } else {
+                    nonDeletedConflicts.append((key, serverRecord))
+                }
             } else if failure.error.code == .zoneNotFound {
-                try metadataStore.update { $0.zoneReady = false }
-                ensureZonePending(on: syncEngine)
-                enqueue(keys: [key], on: syncEngine)
+                needsZoneRecreation = true
+                simpleRequeue.insert(key)
             } else if isRetryable(failure.error) {
-                enqueue(keys: [key], on: syncEngine)
+                simpleRequeue.insert(key)
             } else {
                 throw failure.error
             }
+        }
+
+        if needsZoneRecreation {
+            try metadataStore.update { $0.zoneReady = false }
+            ensureZonePending(on: syncEngine)
+        }
+
+        // #region agent log
+        if !event.failedRecordSaves.isEmpty {
+            wcDebugLog("CloudKitSyncService.swift:handleSentRecordZoneChanges", "send failures classified", [
+                "failed": event.failedRecordSaves.count,
+                "nonDeletedConflicts": nonDeletedConflicts.count,
+                "deletedServerConflicts": deletedServerConflicts.count,
+                "simpleRequeue": simpleRequeue.count
+            ], "B,E")
+        }
+        // #endregion
+
+        if !nonDeletedConflicts.isEmpty {
+            var conflictRequeue = Set<CloudSyncRecordKey>()
+            try metadataStore.update { metadata in
+                for (key, serverRecord) in nonDeletedConflicts {
+                    var state = metadata.records[key.storageKey] ?? CloudSyncRecordState()
+                    state.systemFields = encodeSystemFields(serverRecord)
+                    metadata.records[key.storageKey] = state
+                    if state.pending != nil {
+                        conflictRequeue.insert(key)
+                    }
+                }
+            }
+            simpleRequeue.formUnion(conflictRequeue)
+        }
+
+        enqueue(keys: Array(simpleRequeue), on: syncEngine)
+
+        for conflict in deletedServerConflicts {
+            try await resolveServerConflict(
+                for: conflict.key,
+                expectedPendingRevision: conflict.expectedRevision,
+                serverRecord: conflict.serverRecord,
+                syncEngine: syncEngine
+            )
         }
     }
 

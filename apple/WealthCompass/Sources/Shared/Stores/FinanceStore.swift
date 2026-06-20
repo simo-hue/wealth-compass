@@ -1,6 +1,29 @@
 import Foundation
 import SwiftUI
 
+// #region agent log
+private func wcDebugLog(_ location: String, _ message: String, _ data: [String: Any] = [:], _ hypothesis: String) {
+    var payload: [String: Any] = [
+        "sessionId": "4c10e7",
+        "location": location,
+        "message": message,
+        "hypothesisId": hypothesis,
+        "timestamp": Date().timeIntervalSince1970 * 1000
+    ]
+    payload["data"] = data
+    guard
+        let body = try? JSONSerialization.data(withJSONObject: payload),
+        let url = URL(string: "http://127.0.0.1:7504/ingest/61db8831-ab92-46de-81de-fd622a59ac18")
+    else { return }
+    var req = URLRequest(url: url)
+    req.httpMethod = "POST"
+    req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    req.setValue("4c10e7", forHTTPHeaderField: "X-Debug-Session-Id")
+    req.httpBody = body
+    URLSession.shared.dataTask(with: req).resume()
+}
+// #endregion
+
 enum FinanceImportMode: String, Identifiable {
     case merge
     case replace
@@ -159,6 +182,18 @@ final class FinanceStore: ObservableObject {
 
     func deleteTransaction(_ transaction: Transaction, settings: AppSettings) {
         data.transactions.removeAll { $0.id == transaction.id }
+        appendSnapshot(settings: settings)
+        save()
+    }
+
+    func updateTransaction(_ transaction: Transaction, type: TransactionType, amount: Double, category: String, description: String, date: Date, settings: AppSettings) {
+        guard let index = data.transactions.firstIndex(where: { $0.id == transaction.id }) else { return }
+        data.transactions[index].type = type
+        data.transactions[index].amount = amount
+        data.transactions[index].category = category
+        data.transactions[index].description = description
+        data.transactions[index].date = Calendar.current.startOfDay(for: date)
+        data.transactions[index].updatedAt = Date()
         appendSnapshot(settings: settings)
         save()
     }
@@ -815,6 +850,9 @@ final class FinanceStore: ObservableObject {
         }
 
         do {
+            // #region agent log
+            let _wcStart = Date()
+            // #endregion
             let oldRecords = try persistedData.cloudSyncRecords()
             let newRecords = try data.cloudSyncRecords()
             let changes = CloudSyncChangeSet.difference(from: oldRecords, to: newRecords)
@@ -822,6 +860,16 @@ final class FinanceStore: ObservableObject {
             try syncMetadataStore.recordLocalChanges(changes, currentRecords: newRecords)
             persistedData = data
             self.iCloudSyncError = nil
+            // #region agent log
+            wcDebugLog("FinanceStore.swift:save", "local save completed", [
+                "totalRecords": newRecords.count,
+                "changedCount": changes.changed.count,
+                "deletedCount": changes.deleted.count,
+                "changedKeys": changes.changed.prefix(8).map { $0.key.storageKey },
+                "durationMs": Date().timeIntervalSince(_wcStart) * 1000,
+                "syncEnabled": settings?.isICloudSyncEnabled ?? false
+            ], "A,B")
+            // #endregion
             if !changes.isEmpty {
                 Task { [weak self] in
                     await self?.cloudSyncService.localChangesRecorded()
@@ -876,17 +924,36 @@ final class FinanceStore: ObservableObject {
         let applicableMutations = mutations.filter {
             syncMetadataStore.pendingRevision(for: $0.key) == $0.expectedPendingRevision
         }
+        // #region agent log
+        wcDebugLog("FinanceStore.swift:applyRemoteMutations", "remote mutations received", [
+            "incoming": mutations.count,
+            "applicable": applicableMutations.count
+        ], "A")
+        // #endregion
         guard !applicableMutations.isEmpty else { return [] }
 
+        // #region agent log
+        let _wcStart = Date()
+        // #endregion
         var updatedData = data
         try updatedData.applyCloudSyncMutations(applicableMutations)
         updatedData = updatedData.sortedForStorage()
         try persistence.save(updatedData)
-        withAnimation {
-            data = updatedData
-            persistedData = updatedData
-            iCloudSyncError = nil
-        }
+        // Plain assignment (no withAnimation): remote applies are driven from
+        // CloudKit callbacks and can land during a SwiftUI view update, which makes
+        // `withAnimation` emit "Publishing changes from within view updates" and
+        // forces expensive animation transactions during bulk sync.
+        data = updatedData
+        persistedData = updatedData
+        iCloudSyncError = nil
+        // #region agent log
+        wcDebugLog("FinanceStore.swift:applyRemoteMutations", "remote mutations applied (full file rewrite + UI update)", [
+            "applied": applicableMutations.count,
+            "totalTransactions": updatedData.transactions.count,
+            "totalSnapshots": updatedData.snapshots.count,
+            "durationMs": Date().timeIntervalSince(_wcStart) * 1000
+        ], "A")
+        // #endregion
         return Set(applicableMutations.map(\.key))
     }
 

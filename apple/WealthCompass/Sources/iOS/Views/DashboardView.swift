@@ -53,7 +53,7 @@ struct DashboardView: View {
         }
         .pageChrome()
         .sheet(isPresented: $showingAddTransaction) {
-            TransactionFormView { type, amount, category, description, date in
+            TransactionFormView { _, type, amount, category, description, date in
                 finance.addTransaction(
                     type: type,
                     amount: amount,

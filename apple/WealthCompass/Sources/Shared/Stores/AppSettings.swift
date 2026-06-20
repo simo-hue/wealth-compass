@@ -142,7 +142,18 @@ final class AppSettings: ObservableObject {
 
         let sourceUnitsPerEuro = unitsPerEuro(for: sourceCurrency)
         let targetUnitsPerEuro = unitsPerEuro(for: targetCurrency)
-        return value / sourceUnitsPerEuro * targetUnitsPerEuro
+        // Guard against malformed exchange-rate data (a zero or non-finite rate),
+        // which would otherwise yield Inf/NaN and propagate into chart geometry,
+        // triggering "invalid numeric value (NaN) to CoreGraphics" errors.
+        guard
+            value.isFinite,
+            sourceUnitsPerEuro.isFinite, sourceUnitsPerEuro > 0,
+            targetUnitsPerEuro.isFinite, targetUnitsPerEuro > 0
+        else {
+            return value
+        }
+        let result = value / sourceUnitsPerEuro * targetUnitsPerEuro
+        return result.isFinite ? result : value
     }
 
     func shouldAutoRefreshExchangeRates(

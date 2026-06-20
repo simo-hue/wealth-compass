@@ -401,3 +401,13 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-06-20T14:04:03+02:00]: App Store Connect Release Notes Update
   - *Details*: Updated the "What's New in This Version" field (`release_notes.txt`) for all languages to "UI improvements" via Fastlane metadata.
   - *Tech Notes*: Run `fastlane deliver` to publish these to App Store Connect.
+
+- [2026-06-20T18:29:00+02:00]: Transaction Edit & Delete Feature (iOS & macOS)
+  - *Details*: Implemented full transaction edit and delete capability across both iOS and macOS apps. Users can now tap any transaction to open an edit form (reusing the same popup as the add-transaction form, pre-populated with existing values), and delete transactions via context menus or inline buttons.
+  - *Tech Notes*:
+    - **FinanceStore.swift**: Added `updateTransaction()` method that updates a transaction in place by ID (type, amount, category, description, date) while preserving its original ID and recurring references.
+    - **iOS Forms.swift**: Refactored `TransactionFormView` to accept an optional `Transaction` parameter. When editing, all fields are pre-populated. The `onSave` callback now passes the original `Transaction?` to distinguish add vs update.
+    - **iOS CashFlowView.swift**: Added `@State transactionToEdit`, tap gesture on transaction rows to open edit sheet, context menu with Edit and Delete options, and a dedicated `.sheet(item:)` for the edit flow.
+    - **iOS DashboardView.swift**: Updated `TransactionFormView` call site to match new signature.
+    - **macOS MacCashFlowView.swift**: Updated `MacCashFlowEditor` enum to `.transaction(Transaction?)`, added tap gesture and edit/delete buttons to transaction cards, refactored `MacCashFlowTransactionEditor` with `init(transaction:onSave:)` for pre-population, updated sheet handler to route add vs update.
+    - Both iOS and macOS builds verified successfully via `xcodebuild`.

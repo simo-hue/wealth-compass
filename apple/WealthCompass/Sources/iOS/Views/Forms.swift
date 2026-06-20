@@ -3,17 +3,31 @@ import SwiftUI
 struct TransactionFormView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var settings: AppSettings
-    let onSave: (TransactionType, Double, String, String, Date) -> Void
+    let transaction: Transaction?
+    let onSave: (Transaction?, TransactionType, Double, String, String, Date) -> Void
 
     private static let customCategoryTag = "__wealth_compass_custom_category__"
 
-    @State private var type: TransactionType = .expense
-    @State private var amount = ""
-    @State private var category = String(localized: "Food")
-    @State private var note = ""
-    @State private var date = Date()
+    @State private var type: TransactionType
+    @State private var amount: String
+    @State private var category: String
+    @State private var note: String
+    @State private var date: Date
     @State private var customCategory = ""
     @FocusState private var isCustomCategoryFocused: Bool
+
+    init(
+        transaction: Transaction? = nil,
+        onSave: @escaping (Transaction?, TransactionType, Double, String, String, Date) -> Void
+    ) {
+        self.transaction = transaction
+        self.onSave = onSave
+        _type = State(initialValue: transaction?.type ?? .expense)
+        _amount = State(initialValue: transaction.map { String($0.amount) } ?? "")
+        _category = State(initialValue: transaction?.category ?? String(localized: "Food"))
+        _note = State(initialValue: transaction?.description ?? "")
+        _date = State(initialValue: transaction?.date ?? Date())
+    }
 
     private var categories: [String] {
         settings.transactionCategories(for: type)
@@ -61,7 +75,10 @@ struct TransactionFormView: View {
                 }
                 .pickerStyle(.segmented)
                 .onChange(of: type) { _, newValue in
-                    category = settings.transactionCategories(for: newValue).first ?? ""
+                    // Only reset category when changing type if user hasn't selected a valid category for the new type
+                    if !settings.transactionCategories(for: newValue).contains(category) && !isCustomCategorySelected {
+                        category = settings.transactionCategories(for: newValue).first ?? ""
+                    }
                     customCategory = ""
                     isCustomCategoryFocused = false
                 }
@@ -104,7 +121,7 @@ struct TransactionFormView: View {
                     }
                 }
             }
-            .navigationTitle("Add Transaction")
+            .navigationTitle(transaction == nil ? "Add Transaction" : "Edit Transaction")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -133,7 +150,7 @@ struct TransactionFormView: View {
             selectedCategory = category
         }
 
-        onSave(type, parsedAmount, selectedCategory, note, date)
+        onSave(transaction, type, parsedAmount, selectedCategory, note, date)
         dismiss()
     }
 }

@@ -26100,6 +26100,9 @@
         }
       }
     },
+    "Delete transaction" : {
+
+    },
     "Delete Transaction" : {
       "localizations" : {
         "ar" : {
@@ -29427,6 +29430,12 @@
           }
         }
       }
+    },
+    "Edit transaction" : {
+
+    },
+    "Edit Transaction" : {
+
     },
     "Emerging Markets" : {
       "extractionState" : "manual",
