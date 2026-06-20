@@ -6,9 +6,9 @@ Construisez une image claire de vos finances :
 - Suivre les revenus et les dépenses avec des catégories et des tendances visuelles
 - Programmer des transactions récurrentes et recevoir des rappels locaux optionnels
 - Surveiller les actions, les ETF et les avoirs en cryptomonnaies
-- Examiner le prix de revient, le profit et la perte, et la répartition du portefeuille
-- Suivre les passifs en parallèle de vos actifs
-- Suivre l'historique du patrimoine net avec des instantanés locaux automatiques
+- Examiner le prix de revient, les profits et pertes, et la répartition du portefeuille
+- Suivre les passifs aux côtés de vos actifs
+- Suivre l'historique du patrimoine net grâce à des instantanés locaux automatiques
 - Convertir les valeurs en utilisant les taux de change de référence de la BCE mis en cache
 - Masquer instantanément les montants sensibles avec le mode confidentialité
 - Protéger l'application avec Face ID ou Touch ID

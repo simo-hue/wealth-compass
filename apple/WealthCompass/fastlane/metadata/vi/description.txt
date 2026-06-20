@@ -10,7 +10,7 @@ Xây dựng bức tranh rõ ràng về tài chính của bạn:
 - Theo dõi các khoản nợ cùng với tài sản của bạn
 - Theo dõi lịch sử giá trị ròng với các ảnh chụp nhanh tự động tại địa phương
 - Chuyển đổi giá trị bằng cách sử dụng tỷ giá hối đoái tham chiếu ECB đã lưu
-- Ẩn các khoản tiền nhạy cảm ngay lập tức với Chế độ Riêng tư
+- Ẩn các số tiền nhạy cảm ngay lập tức với Chế độ Riêng tư
 - Bảo vệ ứng dụng bằng Face ID hoặc Touch ID
 - Xuất, nhập và xóa dữ liệu cục bộ của bạn bất cứ khi nào bạn muốn
 
@@ -18,4 +18,4 @@ Hồ sơ tài chính của bạn được lưu trên thiết bị của bạn. W
 
 Cập nhật giá thị trường tùy chọn sử dụng thông tin đăng nhập API mà bạn cung cấp. Thông tin đăng nhập được lưu trữ an toàn trong iOS Keychain.
 
-Wealth Compass là công cụ theo dõi thông tin. Nó không kết nối với các tổ chức tài chính, không thực hiện giao dịch, không cung cấp tư vấn tài chính, và không đảm bảo độ chính xác của dữ liệu thị trường từ bên thứ ba.
+Wealth Compass là công cụ theo dõi thông tin. Nó không kết nối với các tổ chức tài chính, thực hiện giao dịch, cung cấp lời khuyên tài chính hoặc đảm bảo độ chính xác của dữ liệu thị trường từ bên thứ ba.

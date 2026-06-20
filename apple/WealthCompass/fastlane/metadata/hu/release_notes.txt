@@ -1,1 +1,1 @@
-UI improvements
+Felhasználói felület fejlesztések
