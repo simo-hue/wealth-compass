@@ -1,1 +1,1 @@
-Interfață de utilizator complet nouă
+UI improvements

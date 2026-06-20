@@ -1,1 +1,1 @@
-całkowicie nowy interfejs użytkownika
+UI improvements
