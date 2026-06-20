@@ -175,12 +175,19 @@ final class FinanceStore: ObservableObject {
             description: description,
             date: Calendar.current.startOfDay(for: date)
         )
+        
+        let delta = type == .income ? amount : -amount
+        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: delta)
+        
         data.transactions.append(transaction)
         appendSnapshot(settings: settings)
         save()
     }
 
     func deleteTransaction(_ transaction: Transaction, settings: AppSettings) {
+        let delta = transaction.type == .income ? -transaction.amount : transaction.amount
+        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: delta)
+        
         data.transactions.removeAll { $0.id == transaction.id }
         appendSnapshot(settings: settings)
         save()
@@ -188,12 +195,21 @@ final class FinanceStore: ObservableObject {
 
     func updateTransaction(_ transaction: Transaction, type: TransactionType, amount: Double, category: String, description: String, date: Date, settings: AppSettings) {
         guard let index = data.transactions.firstIndex(where: { $0.id == transaction.id }) else { return }
+        
+        let oldDelta = transaction.type == .income ? -transaction.amount : transaction.amount
+        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: oldDelta)
+        
+        let newDate = Calendar.current.startOfDay(for: date)
+        let newDelta = type == .income ? amount : -amount
+        adjustHistoricalSnapshots(from: newDate, liquidityDelta: newDelta)
+        
         data.transactions[index].type = type
         data.transactions[index].amount = amount
         data.transactions[index].category = category
         data.transactions[index].description = description
-        data.transactions[index].date = Calendar.current.startOfDay(for: date)
+        data.transactions[index].date = newDate
         data.transactions[index].updatedAt = Date()
+        
         appendSnapshot(settings: settings)
         save()
     }
@@ -282,13 +298,17 @@ final class FinanceStore: ObservableObject {
                 }
 
                 if !alreadyGenerated {
+                    let occurrenceStartOfDay = calendar.startOfDay(for: occurrence)
+                    let delta = schedule.type == .income ? schedule.amount : -schedule.amount
+                    adjustHistoricalSnapshots(from: occurrenceStartOfDay, liquidityDelta: delta)
+                    
                     data.transactions.append(
                         Transaction(
                             type: schedule.type,
                             category: schedule.category,
                             amount: schedule.amount,
                             description: schedule.description,
-                            date: calendar.startOfDay(for: occurrence),
+                            date: occurrenceStartOfDay,
                             recurringTransactionID: schedule.id,
                             recurringOccurrenceDate: occurrence
                         )
@@ -572,6 +592,17 @@ final class FinanceStore: ObservableObject {
             data.snapshots.append(snapshot)
         }
         data.snapshots.sort { $0.date < $1.date }
+    }
+
+    private func adjustHistoricalSnapshots(from date: Date, liquidityDelta: Double) {
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        for i in data.snapshots.indices {
+            if data.snapshots[i].date >= startOfDay {
+                data.snapshots[i].liquidity += liquidityDelta
+                data.snapshots[i].totalAssets += liquidityDelta
+                data.snapshots[i].netWorth += liquidityDelta
+            }
+        }
     }
 
     func monthlyCashFlow(for month: Date) -> MonthlyCashFlow {
