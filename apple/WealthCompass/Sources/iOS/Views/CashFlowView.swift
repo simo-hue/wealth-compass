@@ -99,6 +99,8 @@ struct CashFlowView: View {
                         settings: settings
                     )
                 }
+            } onDelete: {
+                finance.deleteTransaction(transaction, settings: settings)
             }
         }
         .sheet(item: $recurringEditor) { editor in
