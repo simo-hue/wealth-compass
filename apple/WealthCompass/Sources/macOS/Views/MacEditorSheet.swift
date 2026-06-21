@@ -139,17 +139,18 @@ private struct MacTransactionEditor: View {
     }
 
     private var customCategoryHint: String {
+        let typeName = type.localizedTitle(appLanguage: settings.appLanguage).lowercased()
         if trimmedCustomCategory.isEmpty {
-            return String(localized: "Enter a category name. It will be saved for future \(type.title.lowercased()) transactions.")
+            return settings.localized("Enter a category name. It will be saved for future \(typeName) transactions.")
         }
 
         if let existing = categories.first(where: {
             $0.caseInsensitiveCompare(trimmedCustomCategory) == .orderedSame
         }) {
-            return String(localized: "\(existing) already exists and will be selected.")
+            return settings.localized("\(existing) already exists and will be selected.")
         }
 
-        return String(localized: "This category will be added to your \(type.title.lowercased()) categories.")
+        return settings.localized("This category will be added to your \(typeName) categories.")
     }
 }
 
@@ -226,7 +227,7 @@ private struct MacInvestmentEditor: View {
                 Section("Classification") {
                     Picker("Currency", selection: $currency) {
                         ForEach(Currency.allCases) {
-                            Text("\($0.displayName) (\($0.rawValue))").tag($0)
+                            (Text($0.displayName) + Text(" (\($0.rawValue))")).tag($0)
                         }
                     }
                     Picker("Sector", selection: $sector) {
@@ -256,7 +257,9 @@ private struct MacInvestmentEditor: View {
                     .pickerStyle(.segmented)
 
                     TextField(
-                        feeMode == .fixed ? String(localized: "Investment Transaction Fee") : String(localized: "Investment Transaction Fee %"),
+                        feeMode == .fixed
+                            ? settings.localized("Investment Transaction Fee")
+                            : settings.localized("Investment Transaction Fee %"),
                         text: $feeValue
                     )
 
@@ -271,7 +274,7 @@ private struct MacInvestmentEditor: View {
                 }
             }
             .formStyle(.grouped)
-            .navigationTitle(investment == nil ? String(localized: "New Investment") : String(localized: "Edit Investment"))
+            .navigationTitle(investment == nil ? "New Investment" : "Edit Investment")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -393,7 +396,9 @@ private struct MacCryptoEditor: View {
                     .pickerStyle(.segmented)
 
                     TextField(
-                        feeMode == .fixed ? String(localized: "Fee Amount") : String(localized: "Fee Percentage"),
+                        feeMode == .fixed
+                            ? settings.localized("Fee Amount")
+                            : settings.localized("Fee Percentage"),
                         text: $feeValue
                     )
 
@@ -404,7 +409,7 @@ private struct MacCryptoEditor: View {
                 }
             }
             .formStyle(.grouped)
-            .navigationTitle(holding == nil ? String(localized: "New Crypto Holding") : String(localized: "Edit Crypto Holding"))
+            .navigationTitle(holding == nil ? "New Crypto Holding" : "Edit Crypto Holding")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }

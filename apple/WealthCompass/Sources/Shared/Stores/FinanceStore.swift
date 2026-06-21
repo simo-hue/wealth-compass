@@ -30,10 +30,17 @@ enum FinanceImportMode: String, Identifiable {
 
     var id: String { rawValue }
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
-        case .merge: String(localized: "Merge")
-        case .replace: String(localized: "Replace")
+        case .merge: "Merge"
+        case .replace: "Replace"
+        }
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        switch self {
+        case .merge: AppLocalization.string("Merge", appLanguage: appLanguage)
+        case .replace: AppLocalization.string("Replace", appLanguage: appLanguage)
         }
     }
 }
@@ -56,21 +63,25 @@ struct FinanceImportResult {
     }
 
     var message: String {
+        message(appLanguage: nil)
+    }
+
+    func message(appLanguage: String?) -> String {
         var lines = [
-            String(localized: "\(mode.title) import completed for \(sourceFileName)."),
-            String(localized: "\(transactions) transactions, \(recurringTransactions) recurring schedules, \(investments) investments, \(crypto) crypto holdings, \(liabilities) liabilities, and \(snapshots) snapshots were imported.")
+            AppLocalization.string("\(mode.localizedTitle(appLanguage: appLanguage)) import completed for \(sourceFileName).", appLanguage: appLanguage),
+            AppLocalization.string("\(transactions) transactions, \(recurringTransactions) recurring schedules, \(investments) investments, \(crypto) crypto holdings, \(liabilities) liabilities, and \(snapshots) snapshots were imported.", appLanguage: appLanguage)
         ]
 
         if generatedSnapshots > 0 {
-            lines.append(String(localized: "\(generatedSnapshots) current snapshot was generated after import."))
+            lines.append(AppLocalization.string("\(generatedSnapshots) current snapshot was generated after import.", appLanguage: appLanguage))
         }
 
         if categoriesAdded > 0 {
-            lines.append(String(localized: "\(categoriesAdded) custom cash-flow categories were added."))
+            lines.append(AppLocalization.string("\(categoriesAdded) custom cash-flow categories were added.", appLanguage: appLanguage))
         }
 
         if skippedRecords > 0 {
-            lines.append(String(localized: "\(skippedRecords) malformed or incomplete records were skipped."))
+            lines.append(AppLocalization.string("\(skippedRecords) malformed or incomplete records were skipped.", appLanguage: appLanguage))
         }
 
         return lines.joined(separator: "\n\n")
@@ -83,13 +94,17 @@ enum FinanceImportError: LocalizedError {
     case noSupportedRecords
 
     var errorDescription: String? {
+        localizedDescription(appLanguage: nil)
+    }
+
+    func localizedDescription(appLanguage: String?) -> String {
         switch self {
         case .emptyFile:
-            String(localized: "The selected file is empty.")
+            AppLocalization.string("The selected file is empty.", appLanguage: appLanguage)
         case .invalidJSON(let details):
-            String(localized: "The selected file is not a valid Wealth Compass JSON backup. \(details)")
+            AppLocalization.string("The selected file is not a valid Wealth Compass JSON backup. \(details)", appLanguage: appLanguage)
         case .noSupportedRecords:
-            String(localized: "No supported finance records were found in the selected JSON file.")
+            AppLocalization.string("No supported finance records were found in the selected JSON file.", appLanguage: appLanguage)
         }
     }
 }
@@ -690,9 +705,9 @@ final class FinanceStore: ObservableObject {
     func assetAllocation(settings: AppSettings) -> [AllocationSlice] {
         let totals = calculateTotals(settings: settings)
         return [
-            AllocationSlice(name: String(localized: "Investments"), value: totals.totalInvestments, color: .blue),
-            AllocationSlice(name: String(localized: "Crypto"), value: totals.totalCrypto, color: .orange),
-            AllocationSlice(name: String(localized: "Cash"), value: totals.totalLiquidity, color: .green)
+            AllocationSlice(name: settings.localized("Investments"), value: totals.totalInvestments, color: .blue),
+            AllocationSlice(name: settings.localized("Crypto"), value: totals.totalCrypto, color: .orange),
+            AllocationSlice(name: settings.localized("Cash"), value: totals.totalLiquidity, color: .green)
         ].filter { $0.value > 0 }
     }
 
@@ -713,7 +728,7 @@ final class FinanceStore: ObservableObject {
     }
 
     func investmentTypeAllocation(settings: AppSettings) -> [AllocationSlice] {
-        let grouped = Dictionary(grouping: data.investments, by: { $0.type.title })
+        let grouped = Dictionary(grouping: data.investments, by: { $0.type.rawValue })
             .mapValues { items in
                 items.reduce(0) { partial, investment in
                     partial + settings.convert(investment.currentValue, from: investment.currency)
@@ -724,7 +739,12 @@ final class FinanceStore: ObservableObject {
             .sorted { $0.value > $1.value }
             .enumerated()
             .map { index, item in
-                AllocationSlice(name: item.name, value: item.value, color: ColorPalette.chartType[index % ColorPalette.chartType.count])
+                let type = InvestmentType(rawValue: item.name) ?? .other
+                return AllocationSlice(
+                    name: type.localizedTitle(appLanguage: settings.appLanguage),
+                    value: item.value,
+                    color: ColorPalette.chartType[index % ColorPalette.chartType.count]
+                )
             }
     }
 
@@ -860,7 +880,10 @@ final class FinanceStore: ObservableObject {
                 let records = try loadedData.cloudSyncRecords()
                 try syncMetadataStore.reconcileLocalInventory(records)
             } catch {
-                iCloudSyncError = String(localized: "Local data loaded, but iCloud sync metadata could not be prepared. \(error.localizedDescription)")
+                iCloudSyncError = AppLocalization.string(
+                    "Local data loaded, but iCloud sync metadata could not be prepared. \(error.localizedDescription)",
+                    appLanguage: settings?.appLanguage
+                )
                 cloudSyncStatus = .error(iCloudSyncError ?? error.localizedDescription)
             }
         } catch {
@@ -868,7 +891,10 @@ final class FinanceStore: ObservableObject {
                 self.localPersistenceError = error
                 self.iCloudSyncError = error.localizedDescription
                 self.cloudSyncStatus = .error(
-                    String(localized: "The local database could not be loaded. The original file was left untouched. \(error.localizedDescription)")
+                    AppLocalization.string(
+                        "The local database could not be loaded. The original file was left untouched. \(error.localizedDescription)",
+                        appLanguage: settings?.appLanguage
+                    )
                 )
             }
         }
@@ -876,7 +902,10 @@ final class FinanceStore: ObservableObject {
 
     private func save() {
         guard localPersistenceError == nil else {
-            iCloudSyncError = String(localized: "Changes cannot be saved until the local database load error is resolved.")
+            iCloudSyncError = AppLocalization.string(
+                "Changes cannot be saved until the local database load error is resolved.",
+                appLanguage: settings?.appLanguage
+            )
             return
         }
 
@@ -949,7 +978,9 @@ final class FinanceStore: ObservableObject {
         _ mutations: [CloudSyncRemoteMutation]
     ) throws -> Set<CloudSyncRecordKey> {
         guard localPersistenceError == nil else {
-            throw localPersistenceError ?? CloudSyncError.invalidRecord(String(localized: "The local database is unavailable."))
+            throw localPersistenceError ?? CloudSyncError.invalidRecord(
+                AppLocalization.string("The local database is unavailable.", appLanguage: settings?.appLanguage)
+            )
         }
 
         let applicableMutations = mutations.filter {
@@ -1152,7 +1183,7 @@ private struct ImportedTransaction: Decodable {
         return Transaction(
             id: id ?? UUID(),
             type: transactionType,
-            category: category ?? String(localized: "Other"),
+            category: category ?? "Other",
             amount: amount,
             description: description ?? "",
             date: date,
@@ -1234,7 +1265,7 @@ private struct ImportedRecurringTransaction: Decodable {
         return RecurringTransaction(
             id: id ?? UUID(),
             type: transactionType,
-            category: category ?? String(localized: "Other"),
+            category: category ?? "Other",
             amount: amount,
             description: description ?? "",
             startDate: startDate,
@@ -1298,12 +1329,12 @@ private struct ImportedIncomeEntry: Decodable {
 
     private static func categoryName(from rawType: String?) -> String {
         switch rawType?.lowercased() {
-        case "salary": String(localized: "Salary")
-        case "dividends": String(localized: "Dividends")
-        case "freelance": String(localized: "Freelance")
-        case "other": String(localized: "Other")
+        case "salary": "Salary"
+        case "dividends": "Dividends"
+        case "freelance": "Freelance"
+        case "other": "Other"
         case .some(let value): value.importTitleCased
-        case .none: String(localized: "Other")
+        case .none: "Other"
         }
     }
 }
@@ -1346,7 +1377,7 @@ private struct ImportedExpenseEntry: Decodable {
         return Transaction(
             id: id ?? UUID(),
             type: .expense,
-            category: category ?? String(localized: "Other"),
+            category: category ?? "Other",
             amount: amount,
             description: description ?? "",
             date: date,
@@ -1393,16 +1424,16 @@ private struct ImportedLiquidityAccount: Decodable {
         let convertedAmount = settings.convert(abs(balance), from: sourceCurrency)
         guard convertedAmount > 0, convertedAmount.isFinite else { return nil }
 
-        let accountName = name ?? type?.importTitleCased ?? String(localized: "Liquidity Account")
+        let accountName = name ?? type?.importTitleCased ?? "Liquidity Account"
         let importedDate = ImportDateParser.parse(updatedAt) ?? ImportDateParser.parse(createdAt) ?? Date()
         let transactionType: TransactionType = balance >= 0 ? .income : .expense
 
         return Transaction(
             id: id ?? UUID(),
             type: transactionType,
-            category: String(localized: "Liquidity"),
+            category: "Liquidity",
             amount: convertedAmount,
-            description: String(localized: "Imported liquidity account: \(accountName)"),
+            description: "Imported liquidity account: \(accountName)",
             date: Calendar.current.startOfDay(for: importedDate),
             createdAt: ImportDateParser.parse(createdAt) ?? importedDate
         )
@@ -1492,8 +1523,8 @@ private struct ImportedInvestment: Decodable {
             currentValue: currentValue,
             currentPrice: currentPrice,
             currency: Currency.imported(currency, default: .usd),
-            geography: geography ?? String(localized: "Other"),
-            sector: sector ?? String(localized: "Other"),
+            geography: geography ?? "Other",
+            sector: sector ?? "Other",
             isin: isin?.uppercased() ?? "",
             fees: fees?.nonNegativeImportedAmount ?? 0,
             updatedAt: importedUpdatedAt,

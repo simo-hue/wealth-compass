@@ -9,12 +9,21 @@ enum Currency: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
-    var displayName: String {
+    var displayName: LocalizedStringKey {
         switch self {
-        case .eur: String(localized: "Euro")
-        case .usd: String(localized: "US Dollar")
-        case .gbp: String(localized: "British Pound")
-        case .chf: String(localized: "Swiss Franc")
+        case .eur: "Euro"
+        case .usd: "US Dollar"
+        case .gbp: "British Pound"
+        case .chf: "Swiss Franc"
+        }
+    }
+
+    func localizedDisplayName(appLanguage: String?) -> String {
+        switch self {
+        case .eur: AppLocalization.string("Euro", appLanguage: appLanguage)
+        case .usd: AppLocalization.string("US Dollar", appLanguage: appLanguage)
+        case .gbp: AppLocalization.string("British Pound", appLanguage: appLanguage)
+        case .chf: AppLocalization.string("Swiss Franc", appLanguage: appLanguage)
         }
     }
 
@@ -42,10 +51,17 @@ enum TransactionType: String, CaseIterable, Codable, Identifiable {
     case expense
 
     var id: String { rawValue }
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
-        case .income: String(localized: "Income")
-        case .expense: String(localized: "Expense")
+        case .income: "Income"
+        case .expense: "Expense"
+        }
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        switch self {
+        case .income: AppLocalization.string("Income", appLanguage: appLanguage)
+        case .expense: AppLocalization.string("Expense", appLanguage: appLanguage)
         }
     }
 }
@@ -60,14 +76,25 @@ enum InvestmentType: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
-        case .stock: String(localized: "Stock")
-        case .etf: String(localized: "ETF")
-        case .bond: String(localized: "Bond")
-        case .realEstate: String(localized: "Real Estate")
-        case .commodity: String(localized: "Commodity")
-        case .other: String(localized: "Other")
+        case .stock: "Stock"
+        case .etf: "ETF"
+        case .bond: "Bond"
+        case .realEstate: "Real Estate"
+        case .commodity: "Commodity"
+        case .other: "Other"
+        }
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        switch self {
+        case .stock: AppLocalization.string("Stock", appLanguage: appLanguage)
+        case .etf: AppLocalization.string("ETF", appLanguage: appLanguage)
+        case .bond: AppLocalization.string("Bond", appLanguage: appLanguage)
+        case .realEstate: AppLocalization.string("Real Estate", appLanguage: appLanguage)
+        case .commodity: AppLocalization.string("Commodity", appLanguage: appLanguage)
+        case .other: AppLocalization.string("Other", appLanguage: appLanguage)
         }
     }
 }
@@ -91,13 +118,23 @@ enum AnalyticsPeriod: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
-        case .sevenDays: String(localized: "Last 7 Days")
-        case .thirtyDays: String(localized: "Last 30 Days")
-        case .threeMonths: String(localized: "Last 3 Months")
-        case .yearToDate: String(localized: "Year to Date")
-        case .all: String(localized: "All Time")
+        case .sevenDays: "Last 7 Days"
+        case .thirtyDays: "Last 30 Days"
+        case .threeMonths: "Last 3 Months"
+        case .yearToDate: "Year to Date"
+        case .all: "All Time"
+        }
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        switch self {
+        case .sevenDays: AppLocalization.string("Last 7 Days", appLanguage: appLanguage)
+        case .thirtyDays: AppLocalization.string("Last 30 Days", appLanguage: appLanguage)
+        case .threeMonths: AppLocalization.string("Last 3 Months", appLanguage: appLanguage)
+        case .yearToDate: AppLocalization.string("Year to Date", appLanguage: appLanguage)
+        case .all: AppLocalization.string("All Time", appLanguage: appLanguage)
         }
     }
 }
@@ -107,7 +144,11 @@ enum FeeMode: String, CaseIterable, Identifiable {
     case percent
 
     var id: String { rawValue }
-    var title: String { self == .fixed ? String(localized: "Fixed") : String(localized: "Percent") }
+    var title: LocalizedStringKey { self == .fixed ? "Fixed" : "Percent" }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        AppLocalization.string(self == .fixed ? "Fixed" : "Percent", appLanguage: appLanguage)
+    }
 }
 
 struct Transaction: Identifiable, Codable, Equatable {
@@ -131,12 +172,21 @@ enum RecurringTransactionFrequency: String, CaseIterable, Codable, Identifiable 
 
     var id: String { rawValue }
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
-        case .daily: String(localized: "Daily")
-        case .weekly: String(localized: "Weekly")
-        case .monthly: String(localized: "Monthly")
-        case .yearly: String(localized: "Yearly")
+        case .daily: "Daily"
+        case .weekly: "Weekly"
+        case .monthly: "Monthly"
+        case .yearly: "Yearly"
+        }
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        switch self {
+        case .daily: AppLocalization.string("Daily", appLanguage: appLanguage)
+        case .weekly: AppLocalization.string("Weekly", appLanguage: appLanguage)
+        case .monthly: AppLocalization.string("Monthly", appLanguage: appLanguage)
+        case .yearly: AppLocalization.string("Yearly", appLanguage: appLanguage)
         }
     }
 

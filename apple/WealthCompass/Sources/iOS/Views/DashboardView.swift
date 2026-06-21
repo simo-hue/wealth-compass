@@ -334,19 +334,19 @@ struct DashboardView: View {
                 } else {
                     Chart(trend) { month in
                         BarMark(
-                            x: .value(String(localized: "Month"), month.monthLabel),
-                            y: .value(String(localized: "Amount"), month.income)
+                            x: .value(settings.localized("Month"), month.monthLabel),
+                            y: .value(settings.localized("Amount"), month.income)
                         )
                         .foregroundStyle(WCColor.primary.gradient)
-                        .position(by: .value(String(localized: "Type"), String(localized: "Income")))
+                        .position(by: .value(settings.localized("Type"), settings.localized("Income")))
                         .cornerRadius(6)
 
                         BarMark(
-                            x: .value(String(localized: "Month"), month.monthLabel),
-                            y: .value(String(localized: "Amount"), month.expense)
+                            x: .value(settings.localized("Month"), month.monthLabel),
+                            y: .value(settings.localized("Amount"), month.expense)
                         )
                         .foregroundStyle(WCColor.destructive.opacity(0.8).gradient)
-                        .position(by: .value(String(localized: "Type"), String(localized: "Expenses")))
+                        .position(by: .value(settings.localized("Type"), settings.localized("Expenses")))
                         .cornerRadius(6)
                     }
                     .chartLegend(.hidden)
@@ -362,8 +362,8 @@ struct DashboardView: View {
                 }
 
                 HStack(spacing: 18) {
-                    cashFlowLegend(title: String(localized: "Income"), value: totalIncome, color: WCColor.primary)
-                    cashFlowLegend(title: String(localized: "Expenses"), value: totalExpense, color: WCColor.destructive)
+                    cashFlowLegend(title: settings.localized("Income"), value: totalIncome, color: WCColor.primary)
+                    cashFlowLegend(title: settings.localized("Expenses"), value: totalExpense, color: WCColor.destructive)
                     Spacer(minLength: 0)
                     VStack(alignment: .trailing, spacing: 3) {
                         Text("6M NET")
@@ -542,16 +542,16 @@ struct DashboardView: View {
         let interval = max(0, Date().timeIntervalSince(date))
         switch interval {
         case 0..<60:
-            return String(localized: "Just now")
+            return settings.localized("Just now")
         case 60..<(60 * 60):
             let m = Int(interval / 60)
-            return String(localized: "\(m)m ago")
+            return settings.localized("\(m)m ago")
         case (60 * 60)..<(24 * 60 * 60):
             let h = Int(interval / (60 * 60))
-            return String(localized: "\(h)h ago")
+            return settings.localized("\(h)h ago")
         case (24 * 60 * 60)..<(7 * 24 * 60 * 60):
             let d = Int(interval / (24 * 60 * 60))
-            return String(localized: "\(d)d ago")
+            return settings.localized("\(d)d ago")
         default:
             return date.formatted(date: .abbreviated, time: .omitted)
         }

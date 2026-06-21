@@ -1,0 +1,624 @@
+{
+  "source": "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/macOS/Views/MacDashboardView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Dashboard",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 78
+        }
+      },
+      {
+        "comment": "",
+        "key": "Privacy on",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 104
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your financial horizon",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "A clear view of what you own, owe, earn, and spend.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 96
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Transaction",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 115
+        }
+      },
+      {
+        "comment": "",
+        "key": "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 130
+        }
+      },
+      {
+        "comment": "",
+        "key": "Build your first financial view",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 127
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cash Flow",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 139
+        }
+      },
+      {
+        "comment": "",
+        "key": "Investment",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 140
+        }
+      },
+      {
+        "comment": "",
+        "key": "Crypto",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 141
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your net-worth trail starts here",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 221
+        }
+      },
+      {
+        "comment": "",
+        "key": "Adding a transaction or position records a snapshot for this chart.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 222
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Transaction",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 224
+        }
+      },
+      {
+        "comment": "",
+        "key": "Net-worth history concealed",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 231
+        }
+      },
+      {
+        "comment": "",
+        "key": "Turn off Privacy Mode to reveal values and movement.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 232
+        }
+      },
+      {
+        "comment": "",
+        "key": "NET WORTH",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add another snapshot to see movement over time",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 203
+        }
+      },
+      {
+        "comment": "",
+        "key": "for %@",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 197
+        }
+      },
+      {
+        "comment": "",
+        "key": "No snapshots yet",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 337
+        }
+      },
+      {
+        "comment": "",
+        "key": "Selected date",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 264
+        }
+      },
+      {
+        "comment": "",
+        "key": "Selected date",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 291
+        }
+      },
+      {
+        "comment": "",
+        "key": "Selected net worth",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 292
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 239
+        }
+      },
+      {
+        "comment": "",
+        "key": "Range floor",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 240
+        }
+      },
+      {
+        "comment": "",
+        "key": "Net Worth",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 241
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 253
+        }
+      },
+      {
+        "comment": "",
+        "key": "Net Worth",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 254
+        }
+      },
+      {
+        "comment": "",
+        "key": "Latest snapshot %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 328
+        }
+      },
+      {
+        "comment": "",
+        "key": "just now",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 796
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lldm ago",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 798
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lldh ago",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 800
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lldd ago",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 802
+        }
+      },
+      {
+        "comment": "",
+        "key": "Asset Allocation",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 349
+        }
+      },
+      {
+        "comment": "",
+        "key": "How investable assets are distributed",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 349
+        }
+      },
+      {
+        "comment": "",
+        "key": "No assets to allocate",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 353
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add recorded cash, an investment, or a crypto holding.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 354
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Investment",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 356
+        }
+      },
+      {
+        "comment": "",
+        "key": "Allocation concealed",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 365
+        }
+      },
+      {
+        "comment": "",
+        "key": "Values and proportions are hidden.",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 366
+        }
+      },
+      {
+        "comment": "",
+        "key": "Value",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 371
+        }
+      },
+      {
+        "comment": "",
+        "key": "ASSETS",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 400
+        }
+      },
+      {
+        "comment": "",
+        "key": "No recent cash flow",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 492
+        }
+      },
+      {
+        "comment": "",
+        "key": "Record income or an expense to reveal the monthly pattern.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 493
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Transaction",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 495
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cash-flow chart concealed",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 502
+        }
+      },
+      {
+        "comment": "",
+        "key": "Monthly amounts and proportions are hidden.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 503
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cash Flow",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 476
+        }
+      },
+      {
+        "comment": "",
+        "key": "Income and expenses by month",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 476
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Cash Flow",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 481
+        }
+      },
+      {
+        "comment": "",
+        "key": "3M",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1097
+        }
+      },
+      {
+        "comment": "",
+        "key": "6M",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1098
+        }
+      },
+      {
+        "comment": "",
+        "key": "12M",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 1099
+        }
+      },
+      {
+        "comment": "",
+        "key": "Month",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 509
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 510
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 513
+        }
+      },
+      {
+        "comment": "",
+        "key": "Month",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 518
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 519
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 522
+        }
+      },
+      {
+        "comment": "",
+        "key": "Income",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 563
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expenses",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 568
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ NET",
+        "location": {
+          "startingColumn": 57,
+          "startingLine": 578
+        }
+      },
+      {
+        "comment": "",
+        "key": "3M",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 1105
+        }
+      },
+      {
+        "comment": "",
+        "key": "6M",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 1106
+        }
+      },
+      {
+        "comment": "",
+        "key": "12M",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 1107
+        }
+      },
+      {
+        "comment": "",
+        "key": "No expenses for this period",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 616
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose another period or record an expense.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 617
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Transaction",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 619
+        }
+      },
+      {
+        "comment": "",
+        "key": "Top Expense Categories",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 602
+        }
+      },
+      {
+        "comment": "",
+        "key": "Where recorded spending is concentrated",
+        "location": {
+          "startingColumn": 72,
+          "startingLine": 602
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expense period",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 604
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 629
+        }
+      },
+      {
+        "comment": "",
+        "key": "No activity yet",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 698
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your latest income and expenses will appear here.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 699
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Transaction",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 701
+        }
+      },
+      {
+        "comment": "",
+        "key": "Recent Activity",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 686
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your latest recorded cash movements",
+        "location": {
+          "startingColumn": 65,
+          "startingLine": 686
+        }
+      },
+      {
+        "comment": "",
+        "key": "View All",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 688
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -27,7 +27,7 @@ struct TransactionFormView: View {
         self.onDelete = onDelete
         _type = State(initialValue: transaction?.type ?? .expense)
         _amount = State(initialValue: transaction.map { String($0.amount) } ?? "")
-        _category = State(initialValue: transaction?.category ?? String(localized: "Food"))
+        _category = State(initialValue: transaction?.category ?? "Food")
         _note = State(initialValue: transaction?.description ?? "")
         _date = State(initialValue: transaction?.date ?? Date())
     }
@@ -53,15 +53,16 @@ struct TransactionFormView: View {
     }
 
     private var customCategoryHint: String {
+        let typeName = type.localizedTitle(appLanguage: settings.appLanguage)
         if trimmedCustomCategory.isEmpty {
-            return String(localized: "Enter a category name. It will be saved for future \(type.title) transactions.")
+            return settings.localized("Enter a category name. It will be saved for future \(typeName) transactions.")
         }
 
         if let existing = categories.first(where: { $0.caseInsensitiveCompare(trimmedCustomCategory) == .orderedSame }) {
-            return String(localized: "\(existing) already exists and will be selected.")
+            return settings.localized("\(existing) already exists and will be selected.")
         }
 
-        return String(localized: "This category will be added to your \(type.title) categories.")
+        return settings.localized("This category will be added to your \(typeName) categories.")
     }
 
     private var parsedAmount: Double {
@@ -207,7 +208,7 @@ struct RecurringTransactionFormView: View {
 
         _type = State(initialValue: schedule?.type ?? .expense)
         _amount = State(initialValue: schedule.map { String($0.amount) } ?? "")
-        _category = State(initialValue: schedule?.category ?? String(localized: "Food"))
+        _category = State(initialValue: schedule?.category ?? "Food")
         _note = State(initialValue: schedule?.description ?? "")
         _startDate = State(initialValue: initialStartDate)
         _frequency = State(initialValue: schedule?.frequency ?? .monthly)
@@ -294,7 +295,7 @@ struct RecurringTransactionFormView: View {
                             .autocorrectionDisabled()
                             .focused($isCustomCategoryFocused)
 
-                        Text(String(localized: "The category will be saved for future \(type.title) transactions."))
+                        Text(settings.localized("The category will be saved for future \(type.localizedTitle(appLanguage: settings.appLanguage)) transactions."))
                             .font(.caption)
                             .foregroundStyle(WCColor.textSecondary)
                     }
@@ -325,12 +326,12 @@ struct RecurringTransactionFormView: View {
                     Toggle("Notify When Due", isOn: $notificationsEnabled)
                         .tint(WCColor.primary)
 
-                    Text(String(localized: "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."))
+                    Text("Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.")
                     .font(.caption)
                     .foregroundStyle(WCColor.textSecondary)
                 }
             }
-            .navigationTitle(existingSchedule == nil ? String(localized: "New Recurring Transaction") : String(localized: "Edit Recurring Transaction"))
+            .navigationTitle(existingSchedule == nil ? "New Recurring Transaction" : "Edit Recurring Transaction")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -401,6 +402,7 @@ struct RecurringTransactionFormView: View {
 
 struct InvestmentFormView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var settings: AppSettings
     let investment: Investment?
     let onSave: (Investment) -> Void
 
@@ -417,8 +419,8 @@ struct InvestmentFormView: View {
     @State private var feeMode: FeeMode = .fixed
     @State private var feeValue: String
 
-    private let sectors = [String(localized: "Technology"), String(localized: "Finance"), String(localized: "Real Estate"), String(localized: "Healthcare"), String(localized: "Energy"), String(localized: "Consumer"), String(localized: "All World"), String(localized: "Other")]
-    private let geographies = [String(localized: "US"), String(localized: "Europe"), String(localized: "UK"), String(localized: "Switzerland"), String(localized: "Global"), String(localized: "Emerging Markets"), String(localized: "Other")]
+    private let sectors = ["Technology", "Finance", "Real Estate", "Healthcare", "Energy", "Consumer", "All World", "Other"]
+    private let geographies = ["US", "Europe", "UK", "Switzerland", "Global", "Emerging Markets", "Other"]
 
     init(investment: Investment?, onSave: @escaping (Investment) -> Void) {
         self.investment = investment
@@ -427,8 +429,8 @@ struct InvestmentFormView: View {
         _name = State(initialValue: investment?.name ?? "")
         _isin = State(initialValue: investment?.isin ?? "")
         _type = State(initialValue: investment?.type ?? .stock)
-        _sector = State(initialValue: investment?.sector ?? String(localized: "Technology"))
-        _geography = State(initialValue: investment?.geography ?? String(localized: "US"))
+        _sector = State(initialValue: investment?.sector ?? "Technology")
+        _geography = State(initialValue: investment?.geography ?? "US")
         _currency = State(initialValue: investment?.currency ?? .usd)
         _quantity = State(initialValue: investment.map { Self.formatInput($0.quantity) } ?? "")
         let rawAverage = investment.map { $0.quantity > 0 ? max(0, ($0.costBasis - $0.fees) / $0.quantity) : 0 } ?? 0
@@ -463,7 +465,7 @@ struct InvestmentFormView: View {
                     }
                     Picker("Currency", selection: $currency) {
                         ForEach(Currency.allCases) { currency in
-                            Text("\(currency.displayName) (\(currency.rawValue))").tag(currency)
+                            (Text(currency.displayName) + Text(" (\(currency.rawValue))")).tag(currency)
                         }
                     }
                     Picker("Sector", selection: $sector) {
@@ -490,7 +492,12 @@ struct InvestmentFormView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    TextField(feeMode == .fixed ? String(localized: "Investment Transaction Fee") : String(localized: "Investment Transaction Fee %"), text: $feeValue)
+                    TextField(
+                        feeMode == .fixed
+                            ? settings.localized("Investment Transaction Fee")
+                            : settings.localized("Investment Transaction Fee %"),
+                        text: $feeValue
+                    )
                         .keyboardType(.decimalPad)
                     HStack {
                         Text("Investment Fee")
@@ -504,7 +511,7 @@ struct InvestmentFormView: View {
                     Text("Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.")
                 }
             }
-            .navigationTitle(investment == nil ? String(localized: "Add Investment") : String(localized: "Edit Investment"))
+            .navigationTitle(investment == nil ? "Add Investment" : "Edit Investment")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -565,6 +572,7 @@ struct InvestmentFormView: View {
 
 struct CryptoFormView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var settings: AppSettings
     let holding: CryptoHolding?
     let onSave: (CryptoHolding) -> Void
 
@@ -624,7 +632,12 @@ struct CryptoFormView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    TextField(feeMode == .fixed ? String(localized: "Fee Amount") : String(localized: "Fee Percentage"), text: $feeValue)
+                    TextField(
+                        feeMode == .fixed
+                            ? settings.localized("Fee Amount")
+                            : settings.localized("Fee Percentage"),
+                        text: $feeValue
+                    )
                         .keyboardType(.decimalPad)
                     HStack {
                         Text("Calculated Fee")
@@ -634,7 +647,7 @@ struct CryptoFormView: View {
                     }
                 }
             }
-            .navigationTitle(holding == nil ? String(localized: "Add Crypto") : String(localized: "Edit Crypto"))
+            .navigationTitle(holding == nil ? "Add Crypto" : "Edit Crypto")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }

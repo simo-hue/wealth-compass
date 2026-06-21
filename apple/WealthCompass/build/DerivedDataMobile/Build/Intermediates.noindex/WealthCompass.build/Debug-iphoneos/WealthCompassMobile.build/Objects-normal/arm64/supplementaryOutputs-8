@@ -1,0 +1,23 @@
+{
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/Shared/UI/DynamicMasonryLayout.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/DynamicMasonryLayout-6d5c45b173a88dfd702cef8f015ffce9.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/DynamicMasonryLayout-6d5c45b173a88dfd702cef8f015ffce9.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/DynamicMasonryLayout-6d5c45b173a88dfd702cef8f015ffce9.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/DynamicMasonryLayout-6d5c45b173a88dfd702cef8f015ffce9.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/DynamicMasonryLayout-6d5c45b173a88dfd702cef8f015ffce9.swiftdeps"
+  },
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/iOS/Views/Forms.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/Forms.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/Forms.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/Forms.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/Forms.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/Forms.swiftdeps"
+  },
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/iOS/Views/LockView.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/LockView.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/LockView.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/LockView.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/LockView.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphoneos/WealthCompassMobile.build/Objects-normal/arm64/LockView.swiftdeps"
+  }
+}

@@ -1,0 +1,208 @@
+{
+  "source": "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/macOS/Views/MacRecurringTransactionEditor.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Enter an amount greater than zero.",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 80
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enter a custom category name.",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 83
+        }
+      },
+      {
+        "comment": "",
+        "key": "The first occurrence must be in the future.",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 86
+        }
+      },
+      {
+        "comment": "",
+        "key": "The end date cannot be before the first occurrence.",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 89
+        }
+      },
+      {
+        "comment": "",
+        "key": "New Recurring Transaction",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Recurring Transaction",
+        "location": {
+          "startingColumn": 86,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "Transaction",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 97
+        }
+      },
+      {
+        "comment": "",
+        "key": "Category",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 114
+        }
+      },
+      {
+        "comment": "",
+        "key": "Schedule",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 142
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notifications",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 163
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 98
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount (%@)",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "Description",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 111
+        }
+      },
+      {
+        "comment": "",
+        "key": "Category",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 115
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom category name",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 133
+        }
+      },
+      {
+        "comment": "",
+        "key": "The category will be saved for future %@ transactions.",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 136
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom...",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 119
+        }
+      },
+      {
+        "comment": "",
+        "key": "Repeats",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 143
+        }
+      },
+      {
+        "comment": "",
+        "key": "First Occurrence",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 150
+        }
+      },
+      {
+        "comment": "",
+        "key": "End Date",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 155
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ends",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 159
+        }
+      },
+      {
+        "comment": "",
+        "key": "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 167
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notify When Due",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 164
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 184
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 189
+        }
+      }
+    ]
+  },
+  "version": 1
+}

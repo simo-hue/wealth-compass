@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 enum MacDestination: String, CaseIterable, Identifiable {
     case dashboard
@@ -9,13 +10,23 @@ enum MacDestination: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
-        case .dashboard: String(localized: "Dashboard")
-        case .cashFlow: String(localized: "Cash Flow")
-        case .investments: String(localized: "Investments")
-        case .crypto: String(localized: "Crypto")
-        case .settings: String(localized: "Settings")
+        case .dashboard: "Dashboard"
+        case .cashFlow: "Cash Flow"
+        case .investments: "Investments"
+        case .crypto: "Crypto"
+        case .settings: "Settings"
+        }
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        switch self {
+        case .dashboard: AppLocalization.string("Dashboard", appLanguage: appLanguage)
+        case .cashFlow: AppLocalization.string("Cash Flow", appLanguage: appLanguage)
+        case .investments: AppLocalization.string("Investments", appLanguage: appLanguage)
+        case .crypto: AppLocalization.string("Crypto", appLanguage: appLanguage)
+        case .settings: AppLocalization.string("Settings", appLanguage: appLanguage)
         }
     }
 

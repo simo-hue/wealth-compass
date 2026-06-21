@@ -112,8 +112,8 @@ struct ContentView: View {
 
         guard insertedCount > 0 else { return }
         let message = insertedCount == 1
-            ? String(localized: "1 scheduled transaction was automatically added to Cash Flow.")
-            : String(localized: "\(insertedCount) scheduled transactions were automatically added to Cash Flow.")
+            ? settings.localized("1 scheduled transaction was automatically added to Cash Flow.")
+            : settings.localized("\(insertedCount) scheduled transactions were automatically added to Cash Flow.")
         recurringInsertionAlert = RecurringInsertionAlert(
             message: message
         )

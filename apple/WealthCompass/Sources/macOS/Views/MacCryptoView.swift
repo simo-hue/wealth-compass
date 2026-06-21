@@ -110,7 +110,7 @@ struct MacCryptoView: View {
             if !settings.isPrivacyMode {
                 MetricCard(
                     title: LocalizedStringKey( "Performance"),
-                    value: String(localized:  "\(percent.formatted(.number.precision(.fractionLength(1))))%"),
+                    value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
                     systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
                     accent: percent >= 0 ? WCColor.primary : WCColor.destructive
                 )
@@ -120,7 +120,7 @@ struct MacCryptoView: View {
             let uniqueCryptoCount = Set(finance.data.crypto.map(\.symbol).filter(isNonEmpty)).count
             MetricCard(
                 title: LocalizedStringKey( "Status • \(privateCount(uniqueCryptoCount)) Coins"),
-                value: latestUpdate.map(formattedUpdate) ?? String(localized: "Never"),
+                value: latestUpdate.map(formattedUpdate) ?? settings.localized("Never"),
                 systemImage: "checkmark.circle"
             )
         }
@@ -161,7 +161,7 @@ struct MacCryptoView: View {
             FinanceCard {
                 VStack(spacing: 24) {
                     if let best, best.gainLossPercent > 0 {
-                        performanceCard(title: String(localized:  "Top Performer"), holding: best)
+                        performanceCard(title: "Top Performer", holding: best)
                     }
                     
                     if hasBest && hasWorst {
@@ -169,7 +169,7 @@ struct MacCryptoView: View {
                     }
                     
                     if let worst, worst.gainLossPercent < 0 {
-                        performanceCard(title: String(localized:  "Biggest Loser"), holding: worst)
+                        performanceCard(title: "Biggest Loser", holding: worst)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -178,7 +178,7 @@ struct MacCryptoView: View {
         }
     }
 
-    private func performanceCard(title: String, holding: CryptoHolding) -> some View {
+    private func performanceCard(title: LocalizedStringKey, holding: CryptoHolding) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(title)
                 .font(.headline.weight(.semibold))

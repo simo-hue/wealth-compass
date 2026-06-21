@@ -1,0 +1,736 @@
+{
+  "source": "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/macOS/Views/MacSettingsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "General",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 12
+        }
+      },
+      {
+        "comment": "",
+        "key": "Data",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 13
+        }
+      },
+      {
+        "comment": "",
+        "key": "iCloud",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 14
+        }
+      },
+      {
+        "comment": "",
+        "key": "Settings",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 144
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ Saved",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 594
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@\n\nThe API key was saved securely in Keychain.",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 595
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ Failed",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 599
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ Removed",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 625
+        }
+      },
+      {
+        "comment": "",
+        "key": "The API key was removed from the macOS Keychain.",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 626
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unable to Remove %@",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 630
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 166
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete all local finance data?",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 841
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove custom category?",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 843
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete All Data",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 859
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove %@",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 861
+        }
+      },
+      {
+        "comment": "",
+        "key": "This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone.",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 850
+        }
+      },
+      {
+        "comment": "",
+        "key": "Existing transactions using %@ will keep their current category label.",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 852
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 186
+        }
+      },
+      {
+        "comment": "",
+        "key": "System",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 187
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 199
+        }
+      },
+      {
+        "comment": "",
+        "key": " (%@)",
+        "location": {
+          "startingColumn": 64,
+          "startingLine": 201
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ App Lock",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 221
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 213
+        }
+      },
+      {
+        "comment": "",
+        "key": "When enabled, Wealth Compass locks when the app is no longer active.",
+        "location": {
+          "startingColumn": 71,
+          "startingLine": 222
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 224
+        }
+      },
+      {
+        "comment": "",
+        "key": "Income",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 232
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expense",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 240
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ Cached or fallback rates remain active.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 299
+        }
+      },
+      {
+        "comment": "",
+        "key": "ECB reference rates are refreshed automatically and cached locally for offline use.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 307
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@. Fetched %@ and cached locally.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 303
+        }
+      },
+      {
+        "comment": "",
+        "key": "Offline fallback",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 261
+        }
+      },
+      {
+        "comment": "",
+        "key": "ECB",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 255
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 271
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refreshing Exchange Rates",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 284
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refresh Exchange Rates",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 285
+        }
+      },
+      {
+        "comment": "",
+        "key": "API keys are verified against a live quote before they are stored in the macOS Keychain.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 365
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finnhub API Key",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 320
+        }
+      },
+      {
+        "comment": "",
+        "key": "CoinGecko API Key",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 333
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unable to Refresh Market Data",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 661
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refreshing Market Data",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 348
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refresh Market Data",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 349
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 375
+        }
+      },
+      {
+        "comment": "",
+        "key": "Merge with local data",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 376
+        }
+      },
+      {
+        "comment": "",
+        "key": "Replace local data",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 377
+        }
+      },
+      {
+        "comment": "",
+        "key": "Import JSON...",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 386
+        }
+      },
+      {
+        "comment": "",
+        "key": "Export JSON...",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 387
+        }
+      },
+      {
+        "comment": "",
+        "key": "Import Failed",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 705
+        }
+      },
+      {
+        "comment": "",
+        "key": "Backup Exported",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 721
+        }
+      },
+      {
+        "comment": "",
+        "key": "Export Failed",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 726
+        }
+      },
+      {
+        "comment": "",
+        "key": "Local Only",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 393
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 395
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 66,
+          "startingLine": 397
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 58,
+          "startingLine": 399
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 401
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 58,
+          "startingLine": 403
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 405
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete All Local Data...",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 417
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 431
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sync Failed",
+        "location": {
+          "startingColumn": 63,
+          "startingLine": 463
+        }
+      },
+      {
+        "comment": "",
+        "key": "Force Sync iCloud",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 469
+        }
+      },
+      {
+        "comment": "",
+        "key": "No custom %@ categories yet.",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 509
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove %@",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 527
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove %@",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 523
+        }
+      },
+      {
+        "comment": "",
+        "key": "Configured",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 543
+        }
+      },
+      {
+        "comment": "",
+        "key": "Not Set",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 543
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finnhub returned a live AAPL quote at %@.",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 612
+        }
+      },
+      {
+        "comment": "",
+        "key": "CoinGecko returned a live Bitcoin price at %@.",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 615
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finnhub API Key",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 782
+        }
+      },
+      {
+        "comment": "",
+        "key": "CoinGecko API Key",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 784
+        }
+      },
+      {
+        "comment": "",
+        "key": "\n\n1 due recurring transaction was added to Cash Flow.",
+        "location": {
+          "startingColumn": 55,
+          "startingLine": 693
+        }
+      },
+      {
+        "comment": "",
+        "key": "\n\n%lld due recurring transactions were added to Cash Flow.",
+        "location": {
+          "startingColumn": 55,
+          "startingLine": 695
+        }
+      },
+      {
+        "comment": "",
+        "key": "Import Complete",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 699
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finnhub API Key",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 773
+        }
+      },
+      {
+        "comment": "",
+        "key": "CoinGecko API Key",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 775
+        }
+      },
+      {
+        "comment": "",
+        "key": "Paste Finnhub API key",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 791
+        }
+      },
+      {
+        "comment": "",
+        "key": "Paste CoinGecko API key",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 793
+        }
+      },
+      {
+        "comment": "",
+        "key": "Paste Finnhub API key",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 800
+        }
+      },
+      {
+        "comment": "",
+        "key": "Paste CoinGecko API key",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 802
+        }
+      },
+      {
+        "comment": "",
+        "key": "Apple (AAPL)",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 818
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bitcoin",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 820
+        }
+      },
+      {
+        "comment": "",
+        "key": "Apple (AAPL)",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 827
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bitcoin",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 829
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove %@?",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 934
+        }
+      },
+      {
+        "comment": "",
+        "key": "The key is saved only after %@ returns a live USD price.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 889
+        }
+      },
+      {
+        "comment": "",
+        "key": "Retrieving %@ price...",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 897
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove Key",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 908
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 915
+        }
+      },
+      {
+        "comment": "",
+        "key": "Verify & Save",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 919
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 930
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove Key",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 937
+        }
+      },
+      {
+        "comment": "",
+        "key": "The stored credential will be deleted from the macOS Keychain.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 939
+        }
+      }
+    ]
+  },
+  "version": 1
+}

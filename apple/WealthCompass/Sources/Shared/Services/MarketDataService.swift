@@ -1,5 +1,6 @@
 import Foundation
 import Security
+import SwiftUI
 
 struct MarketPriceQuote: Equatable {
     let price: Double
@@ -22,40 +23,53 @@ struct MarketPriceRefreshResult: Equatable {
         updatedInvestments + updatedCrypto
     }
 
-    var title: String {
+    var title: LocalizedStringKey {
         if wasAlreadyRunning {
-            return String(localized: "Refresh Already Running")
+            "Refresh Already Running"
+        } else if updatedRecordCount > 0 {
+            "Prices Updated"
+        } else {
+            "No Prices Updated"
         }
-        return updatedRecordCount > 0 ? String(localized: "Prices Updated") : String(localized: "No Prices Updated")
     }
 
-    var message: String {
+    func localizedTitle(appLanguage: String?) -> String {
         if wasAlreadyRunning {
-            return String(localized: "A market price refresh is already in progress.")
+            AppLocalization.string("Refresh Already Running", appLanguage: appLanguage)
+        } else if updatedRecordCount > 0 {
+            AppLocalization.string("Prices Updated", appLanguage: appLanguage)
+        } else {
+            AppLocalization.string("No Prices Updated", appLanguage: appLanguage)
+        }
+    }
+
+    func localizedMessage(appLanguage: String?) -> String {
+        if wasAlreadyRunning {
+            return AppLocalization.string("A market price refresh is already in progress.", appLanguage: appLanguage)
         }
 
         var lines: [String] = []
         if updatedRecordCount > 0 {
-            lines.append(String(localized: "Updated \(updatedInvestments) investments and \(updatedCrypto) crypto holdings."))
-            lines.append(String(localized: "Last refresh: \(refreshedAt.formatted(date: .abbreviated, time: .shortened))."))
+            lines.append(AppLocalization.string("Updated \(updatedInvestments) investments and \(updatedCrypto) crypto holdings.", appLanguage: appLanguage))
+            lines.append(AppLocalization.string("Last refresh: \(refreshedAt.formatted(date: .abbreviated, time: .shortened)).", appLanguage: appLanguage))
         } else {
-            lines.append(String(localized: "No holdings were updated."))
+            lines.append(AppLocalization.string("No holdings were updated.", appLanguage: appLanguage))
         }
 
         if !skippedInvestments.isEmpty {
-            lines.append(String(localized: "Investments skipped: \(Self.compactList(skippedInvestments))."))
+            lines.append(AppLocalization.string("Investments skipped: \(Self.compactList(skippedInvestments)).", appLanguage: appLanguage))
         }
 
         if !skippedCrypto.isEmpty {
-            lines.append(String(localized: "Crypto skipped: \(Self.compactList(skippedCrypto))."))
+            lines.append(AppLocalization.string("Crypto skipped: \(Self.compactList(skippedCrypto)).", appLanguage: appLanguage))
         }
 
         if !failedInvestments.isEmpty {
-            lines.append(String(localized: "Investment failures: \(Self.compactList(failedInvestments))."))
+            lines.append(AppLocalization.string("Investment failures: \(Self.compactList(failedInvestments)).", appLanguage: appLanguage))
         }
 
         if !failedCrypto.isEmpty {
-            lines.append(String(localized: "Crypto failures: \(Self.compactList(failedCrypto))."))
+            lines.append(AppLocalization.string("Crypto failures: \(Self.compactList(failedCrypto)).", appLanguage: appLanguage))
         }
 
         return lines.joined(separator: "\n\n")
@@ -77,22 +91,34 @@ enum MarketDataError: LocalizedError {
     case invalidResponse(provider: String)
     case noQuote(provider: String, symbol: String)
 
+    var title: LocalizedStringKey {
+        "Market Data Error"
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        AppLocalization.string("Market Data Error", appLanguage: appLanguage)
+    }
+
     var errorDescription: String? {
+        localizedDescription(appLanguage: nil)
+    }
+
+    func localizedDescription(appLanguage: String?) -> String {
         switch self {
         case .missingAPIKey:
-            return String(localized: "A Finnhub API key is required to update investment prices.")
+            AppLocalization.string("A Finnhub API key is required to update investment prices.", appLanguage: appLanguage)
         case .invalidURL:
-            return String(localized: "The market data request could not be created.")
+            AppLocalization.string("The market data request could not be created.", appLanguage: appLanguage)
         case .unauthorized(let provider):
-            return String(localized: "\(provider) rejected the API key.")
+            AppLocalization.string("\(provider) rejected the API key.", appLanguage: appLanguage)
         case .rateLimited(let provider):
-            return String(localized: "\(provider) rate limit reached. Try again later.")
+            AppLocalization.string("\(provider) rate limit reached. Try again later.", appLanguage: appLanguage)
         case .providerError(let provider, let statusCode):
-            return String(localized: "\(provider) returned HTTP \(statusCode).")
+            AppLocalization.string("\(provider) returned HTTP \(statusCode).", appLanguage: appLanguage)
         case .invalidResponse(let provider):
-            return String(localized: "\(provider) returned an invalid response.")
+            AppLocalization.string("\(provider) returned an invalid response.", appLanguage: appLanguage)
         case .noQuote(let provider, let symbol):
-            return String(localized: "\(provider) did not return a usable quote for \(symbol).")
+            AppLocalization.string("\(provider) did not return a usable quote for \(symbol).", appLanguage: appLanguage)
         }
     }
 }
@@ -106,12 +132,24 @@ enum KeychainServiceError: LocalizedError {
     case unexpectedStatus(OSStatus)
     case invalidData
 
+    var title: LocalizedStringKey {
+        "Keychain Error"
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        AppLocalization.string("Keychain Error", appLanguage: appLanguage)
+    }
+
     var errorDescription: String? {
+        localizedDescription(appLanguage: nil)
+    }
+
+    func localizedDescription(appLanguage: String?) -> String {
         switch self {
         case .unexpectedStatus(let status):
-            return String(localized: "Keychain operation failed with status \(status).")
+            AppLocalization.string("Keychain operation failed with status \(status).", appLanguage: appLanguage)
         case .invalidData:
-            return String(localized: "The stored Keychain value could not be read.")
+            AppLocalization.string("The stored Keychain value could not be read.", appLanguage: appLanguage)
         }
     }
 }

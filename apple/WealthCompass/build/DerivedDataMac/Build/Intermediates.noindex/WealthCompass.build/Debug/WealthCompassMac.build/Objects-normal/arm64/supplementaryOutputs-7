@@ -1,0 +1,23 @@
+{
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/macOS/Views/MacCryptoView.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacCryptoView.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacCryptoView.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacCryptoView.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacCryptoView.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacCryptoView.swiftdeps"
+  },
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/macOS/Views/MacEditorSheet.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacEditorSheet.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacEditorSheet.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacEditorSheet.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacEditorSheet.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacEditorSheet.swiftdeps"
+  },
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/macOS/Views/MacInvestmentsView.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacInvestmentsView.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacInvestmentsView.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacInvestmentsView.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacInvestmentsView.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMac/Build/Intermediates.noindex/WealthCompass.build/Debug/WealthCompassMac.build/Objects-normal/arm64/MacInvestmentsView.swiftdeps"
+  }
+}

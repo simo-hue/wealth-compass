@@ -1,0 +1,152 @@
+{
+  "source": "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/Shared/UI/MarketDataAPIKeyGuide.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "How to get your API keys",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 16
+        }
+      },
+      {
+        "comment": "",
+        "key": "Use the free tiers, create a key, then paste it below.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 19
+        }
+      },
+      {
+        "comment": "",
+        "key": "Keys are stored securely in Keychain and only used to refresh market prices from this %@.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 54
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finnhub",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 151
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stock and ETF prices",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 152
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open Finnhub",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 155
+        }
+      },
+      {
+        "comment": "",
+        "key": "Create a free Finnhub account.",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 158
+        }
+      },
+      {
+        "comment": "",
+        "key": "Confirm your email and sign in.",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 159
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open the dashboard API section.",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 160
+        }
+      },
+      {
+        "comment": "",
+        "key": "Copy your API key and paste it below.",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 161
+        }
+      },
+      {
+        "comment": "",
+        "key": "CoinGecko",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 166
+        }
+      },
+      {
+        "comment": "",
+        "key": "Crypto market prices",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 167
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open CoinGecko",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 170
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose the free Demo API tier.",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 173
+        }
+      },
+      {
+        "comment": "",
+        "key": "Create or sign in to your account.",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 174
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add a new key in Developer Dashboard.",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 175
+        }
+      },
+      {
+        "comment": "",
+        "key": "Copy your API key and paste it below.",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 176
+        }
+      }
+    ]
+  },
+  "version": 1
+}

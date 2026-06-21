@@ -84,14 +84,15 @@ actor MacRecurringTransactionNotificationService {
 
         for schedule in upcoming {
             let content = UNMutableNotificationContent()
-            content.title = String(localized: "Recurring \(schedule.type.title) due")
+            let appLanguage = UserDefaults.standard.string(forKey: "wc_mobile_app_language")
+            content.title = AppLocalization.string("Recurring \(schedule.type.localizedTitle(appLanguage: appLanguage)) due", appLanguage: appLanguage)
             if showAmounts {
                 let amount = schedule.amount.formatted(
                     FloatingPointFormatStyle<Double>.Currency(code: currencyCode)
                 )
-                content.body = String(localized: "\(schedule.category): \(amount). Wealth Compass records it while the app is active.")
+                content.body = AppLocalization.string("\(schedule.category): \(amount). Wealth Compass records it while the app is active.", appLanguage: appLanguage)
             } else {
-                content.body = String(localized: "\(schedule.category) is scheduled. Open Wealth Compass to review it.")
+                content.body = AppLocalization.string("\(schedule.category) is scheduled. Open Wealth Compass to review it.", appLanguage: appLanguage)
             }
             content.sound = .default
             content.userInfo = ["recurringTransactionID": schedule.id.uuidString]
@@ -145,23 +146,26 @@ final class MacAppLockStore: ObservableObject {
         isUnlocked = !enabled
     }
 
-    var biometryName: String {
+    func biometryName(appLanguage: String?) -> String {
         let context = LAContext()
         _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
         switch context.biometryType {
         case .touchID:
-            return String(localized: "Touch ID")
+            return AppLocalization.string("Touch ID", appLanguage: appLanguage)
         case .faceID:
-            return String(localized: "Face ID")
+            return AppLocalization.string("Face ID", appLanguage: appLanguage)
         case .opticID:
-            return String(localized: "Optic ID")
+            return AppLocalization.string("Optic ID", appLanguage: appLanguage)
         default:
-            return String(localized: "Biometrics")
+            return AppLocalization.string("Biometrics", appLanguage: appLanguage)
         }
     }
 
-    func enableLock() async -> Bool {
-        let success = await authenticate(reason: String(localized: "Enable biometric protection for Wealth Compass."))
+    func enableLock(appLanguage: String?) async -> Bool {
+        let success = await authenticate(
+            reason: AppLocalization.string("Enable biometric protection for Wealth Compass.", appLanguage: appLanguage),
+            appLanguage: appLanguage
+        )
         if success {
             isLockEnabled = true
             isUnlocked = true
@@ -183,20 +187,24 @@ final class MacAppLockStore: ObservableObject {
         isUnlocked = false
     }
 
-    func unlock() async {
-        if await authenticate(reason: String(localized: "Unlock your local Wealth Compass data.")) {
+    func unlock(appLanguage: String?) async {
+        if await authenticate(
+            reason: AppLocalization.string("Unlock your local Wealth Compass data.", appLanguage: appLanguage),
+            appLanguage: appLanguage
+        ) {
             isUnlocked = true
             lastError = nil
         }
     }
 
-    private func authenticate(reason: String) async -> Bool {
+    private func authenticate(reason: String, appLanguage: String?) async -> Bool {
         let context = LAContext()
         context.localizedFallbackTitle = ""
 
         var error: NSError?
         guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
-            lastError = error?.localizedDescription ?? String(localized: "Biometric authentication is not available on this Mac.")
+            lastError = error?.localizedDescription
+                ?? AppLocalization.string("Biometric authentication is not available on this Mac.", appLanguage: appLanguage)
             return false
         }
 
@@ -218,6 +226,7 @@ final class MacAppLockStore: ObservableObject {
 
 struct MacLockView: View {
     @EnvironmentObject private var appLock: MacAppLockStore
+    @EnvironmentObject private var settings: AppSettings
 
     var body: some View {
         ZStack {
@@ -232,14 +241,14 @@ struct MacLockView: View {
                     VStack(spacing: 6) {
                         Text("Wealth Compass")
                             .font(.largeTitle.bold())
-                        Text("Unlock with \(appLock.biometryName)")
+                        Text(settings.localized("Unlock with \(appLock.biometryName(appLanguage: settings.appLanguage))"))
                             .foregroundStyle(WCColor.textSecondary)
                     }
 
                     Button {
-                        Task { await appLock.unlock() }
+                        Task { await appLock.unlock(appLanguage: settings.appLanguage) }
                     } label: {
-                        Label("Unlock", systemImage: appLock.biometryName == "Touch ID" ? "touchid" : "lock.open")
+                        Label("Unlock", systemImage: "lock.open")
                             .font(.headline)
                             .frame(width: 220)
                     }
@@ -259,7 +268,7 @@ struct MacLockView: View {
             .frame(width: 430)
         }
         .task {
-            await appLock.unlock()
+            await appLock.unlock(appLanguage: settings.appLanguage)
         }
     }
 }

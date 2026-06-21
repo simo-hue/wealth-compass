@@ -22,51 +22,52 @@ struct WealthCompassMacApp: App {
                 .environmentObject(appModel)
                 .environmentObject(appLock)
                 .preferredColorScheme(.dark)
-                .environment(\.locale, settings.appLanguage.map { Locale(identifier: $0) } ?? .current)
+                .appLanguage(settings.appLanguage)
+                .id(settings.appLanguage ?? "system")
         }
         .defaultSize(width: 1240, height: 780)
         .windowResizability(.contentMinSize)
         .commands {
             CommandGroup(replacing: .newItem) {
-                Button("New Transaction") {
+                Button(AppLocalization.string("New Transaction", appLanguage: settings.appLanguage)) {
                     appModel.editor = .transaction
                 }
                 .keyboardShortcut("n", modifiers: .command)
 
-                Button("New Investment") {
+                Button(AppLocalization.string("New Investment", appLanguage: settings.appLanguage)) {
                     appModel.editor = .investment(nil)
                 }
                 .keyboardShortcut("i", modifiers: [.command, .shift])
 
-                Button("New Crypto Holding") {
+                Button(AppLocalization.string("New Crypto Holding", appLanguage: settings.appLanguage)) {
                     appModel.editor = .crypto(nil)
                 }
                 .keyboardShortcut("k", modifiers: [.command, .shift])
             }
 
             // Sidebar navigation shortcuts (Cmd+1 through Cmd+5)
-            CommandMenu("Navigate") {
-                Button("Dashboard") {
+            CommandMenu(AppLocalization.string("Navigate", appLanguage: settings.appLanguage)) {
+                Button(AppLocalization.string("Dashboard", appLanguage: settings.appLanguage)) {
                     appModel.selection = .dashboard
                 }
                 .keyboardShortcut("1", modifiers: .command)
 
-                Button("Cash Flow") {
+                Button(AppLocalization.string("Cash Flow", appLanguage: settings.appLanguage)) {
                     appModel.selection = .cashFlow
                 }
                 .keyboardShortcut("2", modifiers: .command)
 
-                Button("Investments") {
+                Button(AppLocalization.string("Investments", appLanguage: settings.appLanguage)) {
                     appModel.selection = .investments
                 }
                 .keyboardShortcut("3", modifiers: .command)
 
-                Button("Crypto") {
+                Button(AppLocalization.string("Crypto", appLanguage: settings.appLanguage)) {
                     appModel.selection = .crypto
                 }
                 .keyboardShortcut("4", modifiers: .command)
 
-                Button("Settings") {
+                Button(AppLocalization.string("Settings", appLanguage: settings.appLanguage)) {
                     appModel.selection = .settings
                 }
                 .keyboardShortcut("5", modifiers: .command)
@@ -81,7 +82,8 @@ struct WealthCompassMacApp: App {
                 .environmentObject(settings)
                 .environmentObject(appLock)
                 .preferredColorScheme(.dark)
-                .environment(\.locale, settings.appLanguage.map { Locale(identifier: $0) } ?? .current)
+                .appLanguage(settings.appLanguage)
+                .id(settings.appLanguage ?? "system")
         }
     }
 }

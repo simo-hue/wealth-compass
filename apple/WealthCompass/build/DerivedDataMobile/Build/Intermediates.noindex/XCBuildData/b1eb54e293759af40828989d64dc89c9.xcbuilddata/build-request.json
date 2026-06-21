@@ -1,0 +1,73 @@
+{
+  "buildCommand" : {
+    "command" : "build",
+    "skipDependencies" : false,
+    "style" : "buildOnly"
+  },
+  "configuredTargets" : [
+    {
+      "guid" : "b2e725606b0dd03857edc11617f102a5b3d30407b3929e9adc2873f03f4974ea"
+    }
+  ],
+  "containerPath" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/WealthCompass.xcodeproj",
+  "continueBuildingAfterErrors" : false,
+  "dependencyScope" : "workspace",
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "build",
+    "activeArchitecture" : "undefined_arch",
+    "activeRunDestination" : {
+      "disableOnlyActiveArch" : true,
+      "hostTargetedPlatform" : null,
+      "platform" : "iphoneos",
+      "sdk" : "iphoneos26.5",
+      "sdkVariant" : "iphoneos",
+      "supportedArchitectures" : [
+        "armv4t",
+        "armv5",
+        "armv6",
+        "armv7",
+        "armv7f",
+        "armv7s",
+        "armv7k",
+        "arm64",
+        "arm64e"
+      ],
+      "targetArchitecture" : "undefined_arch"
+    },
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex",
+      "buildProductsPath" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Products",
+      "derivedDataPath" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile",
+      "indexDataStoreFolderPath" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Index.noindex/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Index.noindex/PrecompiledHeaders",
+      "pchPath" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/PrecompiledHeaders"
+    },
+    "configurationName" : "Debug",
+    "overrides" : {
+      "commandLine" : {
+        "table" : {
+
+        }
+      },
+      "synthesized" : {
+        "table" : {
+          "ACTION" : "build",
+          "CLANG_COVERAGE_MAPPING" : "YES",
+          "CLANG_PROFILE_DATA_DIRECTORY" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/ProfileData",
+          "ENABLE_PREVIEWS" : "NO",
+          "ENABLE_XOJIT_PREVIEWS" : "YES",
+          "ONLY_ACTIVE_ARCH" : "YES"
+        }
+      }
+    }
+  },
+  "schemeCommand" : "launch",
+  "showNonLoggedProgress" : true,
+  "useDryRun" : false,
+  "useImplicitDependencies" : true,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : true
+}

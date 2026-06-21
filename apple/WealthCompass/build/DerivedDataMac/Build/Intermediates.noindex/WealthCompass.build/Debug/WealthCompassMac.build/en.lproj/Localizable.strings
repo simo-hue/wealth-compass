@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>%@ Failed</key>
+	<string>%@ Failed</string>
+	<key>%@ NET</key>
+	<string>%@ NET</string>
+	<key>%@ Removed</key>
+	<string>%@ Removed</string>
+	<key>%@ Saved</key>
+	<string>%@ Saved</string>
+	<key>%@ already exists and will be selected.</key>
+	<string>%@ already exists and will be selected.</string>
+	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
+	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<key>%@))d ago</key>
+	<string>%@))d ago</string>
+	<key>%@))h ago</key>
+	<string>%@))h ago</string>
+	<key>%@)m ago</key>
+	<string>%@)m ago</string>
+	<key>%@. Fetched %@) and cached locally.</key>
+	<string>%@. Fetched %@) and cached locally.</string>
+	<key>%@\n\nThe API key was saved securely in Keychain.</key>
+	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<key>12M</key>
+	<string>12M</string>
+	<key>3M</key>
+	<string>3M</string>
+	<key>6M</key>
+	<string>6M</string>
+	<key>Add recorded cash, an investment, or a crypto holding.</key>
+	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<key>Add your first income or expense.</key>
+	<string>Add your first income or expense.</string>
+	<key>Adding a transaction or position records a snapshot for this chart.</key>
+	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<key>All</key>
+	<string>All</string>
+	<key>All World</key>
+	<string>All World</string>
+	<key>Allocation concealed</key>
+	<string>Allocation concealed</string>
+	<key>Apple (AAPL)</key>
+	<string>Apple (AAPL)</string>
+	<key>Asset Allocation</key>
+	<string>Asset Allocation</string>
+	<key>Backup Exported</key>
+	<string>Backup Exported</string>
+	<key>Biggest Loser</key>
+	<string>Biggest Loser</string>
+	<key>Bitcoin</key>
+	<string>Bitcoin</string>
+	<key>Cash-flow chart concealed</key>
+	<string>Cash-flow chart concealed</string>
+	<key>Change the search, type, or period filters.</key>
+	<string>Change the search, type, or period filters.</string>
+	<key>Choose another period or record an expense.</key>
+	<string>Choose another period or record an expense.</string>
+	<key>CoinGecko API Key</key>
+	<string>CoinGecko API Key</string>
+	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
+	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<key>Consumer</key>
+	<string>Consumer</string>
+	<key>Crypto Allocation</key>
+	<string>Crypto Allocation</string>
+	<key>Crypto Value</key>
+	<string>Crypto Value</string>
+	<key>Danger Zone</key>
+	<string>Danger Zone</string>
+	<key>Delete all local finance data?</key>
+	<string>Delete all local finance data?</string>
+	<key>Emerging Markets</key>
+	<string>Emerging Markets</string>
+	<key>Ends %@)</key>
+	<string>Ends %@)</string>
+	<key>Energy</key>
+	<string>Energy</string>
+	<key>Enter a category name. It will be saved for future %@) transactions.</key>
+	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<key>Enter a custom category name.</key>
+	<string>Enter a custom category name.</string>
+	<key>Enter an amount greater than zero.</key>
+	<string>Enter an amount greater than zero.</string>
+	<key>Europe</key>
+	<string>Europe</string>
+	<key>Existing transactions using %@ will keep their current category label.</key>
+	<string>Existing transactions using %@ will keep their current category label.</string>
+	<key>Expenses</key>
+	<string>Expenses</string>
+	<key>Export Failed</key>
+	<string>Export Failed</string>
+	<key>Finance</key>
+	<string>Finance</string>
+	<key>Finnhub API Key</key>
+	<string>Finnhub API Key</string>
+	<key>Finnhub returned a live AAPL quote at %@)).</key>
+	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<key>Future %@) occurrences for %@ will no longer be created.</key>
+	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<key>General</key>
+	<string>General</string>
+	<key>Global</key>
+	<string>Global</string>
+	<key>Healthcare</key>
+	<string>Healthcare</string>
+	<key>Hide financial values throughout Wealth Compass.</key>
+	<string>Hide financial values throughout Wealth Compass.</string>
+	<key>Holdings</key>
+	<string>Holdings</string>
+	<key>How investable assets are distributed</key>
+	<string>How investable assets are distributed</string>
+	<key>Import Behavior</key>
+	<string>Import Behavior</string>
+	<key>Import Complete</key>
+	<string>Import Complete</string>
+	<key>Import Failed</key>
+	<string>Import Failed</string>
+	<key>Import and Export</key>
+	<string>Import and Export</string>
+	<key>Invalid API Key</key>
+	<string>Invalid API Key</string>
+	<key>Investment</key>
+	<string>Investment</string>
+	<key>Latest snapshot %@)</key>
+	<string>Latest snapshot %@)</string>
+	<key>Local Storage</key>
+	<string>Local Storage</string>
+	<key>Manual Actions</key>
+	<string>Manual Actions</string>
+	<key>Monthly Expenses</key>
+	<string>Monthly Expenses</string>
+	<key>Monthly Income</key>
+	<string>Monthly Income</string>
+	<key>Monthly amounts and proportions are hidden.</key>
+	<string>Monthly amounts and proportions are hidden.</string>
+	<key>Net Savings</key>
+	<string>Net Savings</string>
+	<key>Net-worth history concealed</key>
+	<string>Net-worth history concealed</string>
+	<key>Next %@)</key>
+	<string>Next %@)</string>
+	<key>No Matching Transactions</key>
+	<string>No Matching Transactions</string>
+	<key>No Transactions</key>
+	<string>No Transactions</string>
+	<key>No activity yet</key>
+	<string>No activity yet</string>
+	<key>No assets to allocate</key>
+	<string>No assets to allocate</string>
+	<key>No custom %@) categories yet.</key>
+	<string>No custom %@) categories yet.</string>
+	<key>No expenses for this period</key>
+	<string>No expenses for this period</string>
+	<key>No recent cash flow</key>
+	<string>No recent cash flow</string>
+	<key>No recurring transactions</key>
+	<string>No recurring transactions</string>
+	<key>Notifications Disabled</key>
+	<string>Notifications Disabled</string>
+	<key>Paste CoinGecko API key</key>
+	<string>Paste CoinGecko API key</string>
+	<key>Paste Finnhub API key</key>
+	<string>Paste Finnhub API key</string>
+	<key>Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them.</key>
+	<string>Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them.</string>
+	<key>Privacy &amp; Security</key>
+	<string>Privacy &amp; Security</string>
+	<key>Record income or an expense to reveal the monthly pattern.</key>
+	<string>Record income or an expense to reveal the monthly pattern.</string>
+	<key>Recurring Schedules</key>
+	<string>Recurring Schedules</string>
+	<key>Remove custom category?</key>
+	<string>Remove custom category?</string>
+	<key>Savings Rate</key>
+	<string>Savings Rate</string>
+	<key>Showing %@ of %@</key>
+	<string>Showing %@ of %@</string>
+	<key>Status • %@) Coins</key>
+	<string>Status • %@) Coins</string>
+	<key>Status • %@) Sectors</key>
+	<string>Status • %@) Sectors</string>
+	<key>Switzerland</key>
+	<string>Switzerland</string>
+	<key>Sync Failed</key>
+	<string>Sync Failed</string>
+	<key>Technology</key>
+	<string>Technology</string>
+	<key>The API key was removed from the macOS Keychain.</key>
+	<string>The API key was removed from the macOS Keychain.</string>
+	<key>The category will be saved for future %@) transactions.</key>
+	<string>The category will be saved for future %@) transactions.</string>
+	<key>The end date cannot be before the first occurrence.</key>
+	<string>The end date cannot be before the first occurrence.</string>
+	<key>The first occurrence must be in the future.</key>
+	<string>The first occurrence must be in the future.</string>
+	<key>The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.</key>
+	<string>The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.</string>
+	<key>This category will be added to your %@) categories.</key>
+	<string>This category will be added to your %@) categories.</string>
+	<key>This permanently removes the %@ transaction from %@).</key>
+	<string>This permanently removes the %@ transaction from %@).</string>
+	<key>This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone.</key>
+	<string>This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone.</string>
+	<key>Top Expense Categories</key>
+	<string>Top Expense Categories</string>
+	<key>Top Performer</key>
+	<string>Top Performer</string>
+	<key>Total Cash</key>
+	<string>Total Cash</string>
+	<key>Turn off Privacy Mode to reveal values and movement.</key>
+	<string>Turn off Privacy Mode to reveal values and movement.</string>
+	<key>UK</key>
+	<string>UK</string>
+	<key>US</key>
+	<string>US</string>
+	<key>Unable to Refresh Market Data</key>
+	<string>Unable to Refresh Market Data</string>
+	<key>Unable to Remove %@</key>
+	<string>Unable to Remove %@</string>
+	<key>Values and proportions are hidden.</key>
+	<string>Values and proportions are hidden.</string>
+	<key>Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.</key>
+	<string>Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.</string>
+	<key>When enabled, Wealth Compass locks when the app is no longer active.</key>
+	<string>When enabled, Wealth Compass locks when the app is no longer active.</string>
+	<key>Where recorded spending is concentrated</key>
+	<string>Where recorded spending is concentrated</string>
+	<key>Your latest income and expenses will appear here.</key>
+	<string>Your latest income and expenses will appear here.</string>
+	<key>Your latest recorded cash movements</key>
+	<string>Your latest recorded cash movements</string>
+	<key>Your net-worth trail starts here</key>
+	<string>Your net-worth trail starts here</string>
+	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
+	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<key>iCloud</key>
+	<string>iCloud</string>
+	<key>just now</key>
+	<string>just now</string>
+	<key>transaction was</key>
+	<string>transaction was</string>
+	<key>transactions were</key>
+	<string>transactions were</string>
+</dict>
+</plist>

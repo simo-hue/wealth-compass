@@ -1,0 +1,160 @@
+{
+  "source": "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/macOS/Views/MacOnboardingView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Validation Failed",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 38
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 39
+        }
+      },
+      {
+        "comment": "",
+        "key": "Invalid API Key",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 41
+        }
+      },
+      {
+        "comment": "",
+        "key": "Welcome to WealthCompass",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 68
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your personal compass for tracking cash flow, investments, and expenses all in one beautifully designed dashboard.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 73
+        }
+      },
+      {
+        "comment": "",
+        "key": "Continue",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 85
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your Data, Your Privacy",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 113
+        }
+      },
+      {
+        "comment": "",
+        "key": "We don't use central servers. All your financial data is stored locally on your Mac or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 118
+        }
+      },
+      {
+        "comment": "",
+        "key": "Continue",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 130
+        }
+      },
+      {
+        "comment": "",
+        "key": "Connect Market Data",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 158
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 163
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finnhub API Key (Stocks)",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 177
+        }
+      },
+      {
+        "comment": "",
+        "key": "Paste Finnhub key...",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 180
+        }
+      },
+      {
+        "comment": "",
+        "key": "CoinGecko API Key (Crypto)",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 188
+        }
+      },
+      {
+        "comment": "",
+        "key": "Paste CoinGecko key...",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 191
+        }
+      },
+      {
+        "comment": "",
+        "key": "Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them.",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 246
+        }
+      },
+      {
+        "comment": "",
+        "key": "Validating...",
+        "location": {
+          "startingColumn": 53,
+          "startingLine": 211
+        }
+      },
+      {
+        "comment": "",
+        "key": "Get Started",
+        "location": {
+          "startingColumn": 71,
+          "startingLine": 211
+        }
+      },
+      {
+        "comment": "",
+        "key": "Skip for now",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 223
+        }
+      }
+    ]
+  },
+  "version": 1
+}

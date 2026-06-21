@@ -2,8 +2,11 @@ import Foundation
 
 @MainActor
 final class AppSettings: ObservableObject {
-    let defaultIncomeCategories = [String(localized: "Salary"), String(localized: "Freelance"), String(localized: "Dividends"), String(localized: "Other")]
-    let defaultExpenseCategories = [String(localized: "Housing"), String(localized: "Food"), String(localized: "Transport"), String(localized: "Utilities"), String(localized: "Fuel"), String(localized: "Entertainment"), String(localized: "Shopping"), String(localized: "Health"), String(localized: "Other")]
+    private static let defaultIncomeCategoryKeys = ["Salary", "Freelance", "Dividends", "Other"]
+    private static let defaultExpenseCategoryKeys = ["Housing", "Food", "Transport", "Utilities", "Fuel", "Entertainment", "Shopping", "Health", "Other"]
+
+    var defaultIncomeCategories: [String] { Self.defaultIncomeCategoryKeys }
+    var defaultExpenseCategories: [String] { Self.defaultExpenseCategoryKeys }
 
     @Published var currency: Currency {
         didSet { userDefaults.set(currency.rawValue, forKey: Keys.currency) }
@@ -28,6 +31,20 @@ final class AppSettings: ObservableObject {
             } else {
                 userDefaults.removeObject(forKey: Keys.appLanguage)
             }
+            AppLocalization.applyLanguagePreference(appLanguage)
+            // #region agent log
+            I18nDebugLog.sampleResolutions(appLanguage: appLanguage)
+            I18nDebugLog.log(
+                location: "AppSettings.swift:appLanguage",
+                message: "app language changed",
+                hypothesisId: "D",
+                data: [
+                    "appLanguage": appLanguage ?? "nil",
+                    "defaultIncomeFirst": defaultIncomeCategories.first ?? "nil",
+                    "transactionTypeIncome": TransactionType.income.localizedTitle(appLanguage: appLanguage)
+                ]
+            )
+            // #endregion
         }
     }
 
@@ -85,6 +102,21 @@ final class AppSettings: ObservableObject {
         if let timestamp = userDefaults.object(forKey: Keys.lastExchangeRateRefreshAttempt) as? Date {
             lastExchangeRateRefreshAttemptAt = timestamp
         }
+
+        // #region agent log
+        I18nDebugLog.sampleResolutions(appLanguage: appLanguage)
+        I18nDebugLog.log(
+            location: "AppSettings.swift:init",
+            message: "settings initialized",
+            hypothesisId: "D",
+            data: [
+                "appLanguage": appLanguage ?? "nil",
+                "defaultIncomeFirst": defaultIncomeCategories.first ?? "nil"
+            ]
+        )
+        // #endregion
+
+        AppLocalization.applyLanguagePreference(appLanguage)
     }
 
     var availableLanguages: [String] {
@@ -93,6 +125,10 @@ final class AppSettings: ObservableObject {
 
     func languageName(for code: String) -> String {
         Locale.current.localizedString(forIdentifier: code)?.capitalized ?? code
+    }
+
+    func localized(_ key: String.LocalizationValue) -> String {
+        AppLocalization.string(key, appLanguage: appLanguage)
     }
 
     func transactionCategories(for type: TransactionType) -> [String] {

@@ -237,7 +237,7 @@ struct OnboardingView: View {
         let coinGecko = coinGeckoKey.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if finnhub.isEmpty && coinGecko.isEmpty {
-            validationError = String(localized: "Please insert at least one API key, or tap 'Skip for now' if you wish to proceed without them.")
+            validationError = settings.localized("Please insert at least one API key, or tap 'Skip for now' if you wish to proceed without them.")
             showingErrorAlert = true
             return
         }

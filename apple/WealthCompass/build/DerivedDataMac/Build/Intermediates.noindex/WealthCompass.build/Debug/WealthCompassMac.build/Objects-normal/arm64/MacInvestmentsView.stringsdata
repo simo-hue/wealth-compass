@@ -1,0 +1,240 @@
+{
+  "source": "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/macOS/Views/MacInvestmentsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Overview",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 9
+        }
+      },
+      {
+        "comment": "",
+        "key": "Positions",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 10
+        }
+      },
+      {
+        "comment": "",
+        "key": "Investments",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 70
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete Investment?",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 81
+        }
+      },
+      {
+        "comment": "",
+        "key": "Allocation by Sector",
+        "location": {
+          "startingColumn": 60,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "Allocation by Type",
+        "location": {
+          "startingColumn": 60,
+          "startingLine": 48
+        }
+      },
+      {
+        "comment": "",
+        "key": "Allocation by Geography",
+        "location": {
+          "startingColumn": 60,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "New Investment",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 76
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete %@",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 86
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "This permanently removes %@ from your investment portfolio.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 95
+        }
+      },
+      {
+        "comment": "",
+        "key": "Portfolio Value",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "Positions",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 115
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cost Basis",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 120
+        }
+      },
+      {
+        "comment": "",
+        "key": "Profit / Loss",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 125
+        }
+      },
+      {
+        "comment": "",
+        "key": "Performance",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 133
+        }
+      },
+      {
+        "comment": "",
+        "key": "Status • %@ Sectors",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 143
+        }
+      },
+      {
+        "comment": "",
+        "key": "Never",
+        "location": {
+          "startingColumn": 80,
+          "startingLine": 144
+        }
+      },
+      {
+        "comment": "",
+        "key": "Top Holdings",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 152
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add stocks, ETFs, bonds, or other positions.",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 163
+        }
+      },
+      {
+        "comment": "",
+        "key": "No Investments",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 161
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add stocks, ETFs, bonds, or other positions.",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 184
+        }
+      },
+      {
+        "comment": "",
+        "key": "No Investments",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 182
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 210
+        }
+      },
+      {
+        "comment": "",
+        "key": "Quantity",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 235
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current Price",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 244
+        }
+      },
+      {
+        "comment": "",
+        "key": "Last Updated",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 253
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Investment",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 271
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete Investment",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 279
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -131,7 +131,7 @@ struct MacInvestmentsView: View {
             if !settings.isPrivacyMode {
                 MetricCard(
                     title: LocalizedStringKey( "Performance"),
-                    value: String(localized:  "\(percent.formatted(.number.precision(.fractionLength(1))))%"),
+                    value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
                     systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
                     accent: percent >= 0 ? WCColor.primary : WCColor.destructive
                 )
@@ -141,7 +141,7 @@ struct MacInvestmentsView: View {
             let sectorCount = Set(finance.data.investments.map(\.sector).filter(isNonEmpty)).count
             MetricCard(
                 title: LocalizedStringKey( "Status • \(privateCount(sectorCount)) Sectors"),
-                value: latestUpdate.map(formattedUpdate) ?? String(localized: "Never"),
+                value: latestUpdate.map(formattedUpdate) ?? settings.localized("Never"),
                 systemImage: "checkmark.circle"
             )
         }
