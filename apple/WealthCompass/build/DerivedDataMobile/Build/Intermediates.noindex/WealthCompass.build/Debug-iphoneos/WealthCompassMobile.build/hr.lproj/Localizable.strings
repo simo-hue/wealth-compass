@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld dospjelih ponavljajućih transakcija dodano je u Cash Flow.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>1 dospjela ponavljajuća transakcija dodana je u novčani tok.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+API ključ je sigurno spremljen u Keychain.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Wealth Compass nastavit će koristiti %@.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,57 +39,101 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@ / jedinica</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ Zaključavanje aplikacije</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ Predmemorirane ili rezervne stope ostaju aktivne.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ Nije uspjelo</string>
 	<key>%@ NET</key>
 	<string>%@ NET</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ Uklonjeno</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ Spremljeno</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ već postoji i bit će odabran.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ nije vratio upotrebljivu ponudu za %@.</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ uvoz dovršen za %@.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ je na rasporedu. Otvorite Wealth Compass da biste ga pregledali.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>Dosegnuto je ograničenje brzine %@. Pokušajte ponovno kasnije.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ odbio je API ključ.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ je vratio HTTP %lld.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ je vratio nevažeći odgovor.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ jedinica</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ će nestati iz Ponavljajućih transakcija i nijedno buduće pojavljivanje neće se automatski umetati.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% učinak</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>prije %@))d</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>prije %@))h</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>prije %@) min</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. Dohvaćeno %@ i lokalno predmemorirano.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. Dohvaćeno %@) i lokalno predmemorirano.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. Wealth Compass ga automatski bilježi kada je aplikacija aktivna.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. Wealth Compass to bilježi dok je aplikacija aktivna.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nAPI ključ je sigurno spremljen u Keychain.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>Trenutačna snimka %lld generirana je nakon uvoza.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>Dodano je %lld prilagođenih kategorija novčanog toka.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld dospjela transakcija%@ dodana u novčani tok.</string>
+	<key>%lld holdings</key>
+	<string>%lld građa</string>
+	<key>%lld liabilities</key>
+	<string>%lld obveze</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld pogrešno oblikovanih ili nepotpunih zapisa je preskočeno.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>Još %lld transakcija skriveno ovim prikazom.</string>
+	<key>%lld positions</key>
+	<string>%lld pozicija</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld zakazanih transakcija automatski je dodano u Cash Flow.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>Uvezeno je %lld transakcija, %lld ponavljajućih rasporeda, %lld ulaganja, %lld kripto posjeda, %lld obveza i %lld snimaka.</string>
+	<key>%lldd ago</key>
+	<string>prije %lldd</string>
+	<key>%lldh ago</key>
+	<string>prije %lldh</string>
+	<key>%lldm ago</key>
+	<string>prije %lldm</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 držanje</string>
+	<key>1 liability</key>
+	<string>1 odgovornost</string>
+	<key>1 position</key>
+	<string>1 položaj</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1 zakazana transakcija automatski je dodana u Cash Flow.</string>
 	<key>12M</key>
 	<string>12M</string>
 	<key>3M</key>
@@ -75,347 +141,443 @@
 	<key>6M</key>
 	<string>6M</string>
 	<key>6M NET</key>
-	<string>6M NET</string>
+	<string>6M MREŽE</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>Finnhub API ključ je potreban za ažuriranje cijena ulaganja.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>Jasan pogled na ono što posjedujete, dugujete, zarađujete i trošite.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>Osvježavanje tržišne cijene već je u tijeku.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>API ključevi provjeravaju se u odnosu na ponudu uživo prije nego što se pohrane u macOS Keychain.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>IMOVINA</string>
+	<key>Across every asset</key>
+	<string>Preko svake imovine</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>Dodati</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>Dodaj Crypto</string>
+	<key>Add Crypto Holding</key>
+	<string>Dodajte Crypto Holding</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>Dodajte investiciju</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>Dodaj transakciju</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>Dodajte holding kako biste pratili njegovu vrijednost i učinak.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>Dodajte holding da biste pratili njegovu vrijednost.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Dodajte novi ključ na nadzornoj ploči razvojnog programera.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>Dodajte još jednu snimku da vidite kretanje</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>Dodajte još jednu snimku da vidite kretanje tijekom vremena</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>Dodajte evidentirani novac, ulaganje ili kripto holding.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>Dodajte dionice, ETF-ove, obveznice ili druge pozicije.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>Dodajte svoj prvi prihod ili rashod.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>Dodajte svoju prvu transakciju</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>Dodavanje transakcije ili pozicije bilježi snimku za ovaj grafikon.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>Sve</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>Sva vremena</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>Cijeli svijet</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>Raspodjela prema zemljopisu</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>Raspodjela po sektorima</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>Raspodjela prema vrsti</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>Dodjela skrivena</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>Iznositi</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>Iznos (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>Osvježavanje tečaja je već u tijeku.</string>
 	<key>Apple (AAPL)</key>
 	<string>Apple (AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>Raspodjela imovine</string>
+	<key>Automatic income and expenses</key>
+	<string>Automatski prihodi i rashodi</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>Prosječna kupovna cijena</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>Sigurnosna kopija izvezena</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Stanja izvedena iz vaše aktivnosti i posjeda</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>Osnovna valuta</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>Najveći gubitnik</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>Biometrijska provjera autentičnosti nije dostupna na ovom Macu.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>Biometrijska provjera autentičnosti nije dostupna na ovom uređaju.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>Biometrija</string>
 	<key>Bitcoin</key>
 	<string>Bitcoin</string>
 	<key>Bond</key>
-	<string>Bond</string>
+	<string>Veza</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>Raščlamba evidentirane potrošnje</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>Britanska funta</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>Izgradite svoj prvi financijski pregled</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>Obračunata naknada</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>Otkazati</string>
+	<key>Capital invested</key>
+	<string>Uloženi kapital</string>
+	<key>Cash</key>
+	<string>Unovčiti</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>Novčani tok</string>
+	<key>Cash flow</key>
+	<string>Novčani tok</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>Grafikon novčanog toka skriven</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>Kategorija</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>Promijenite filtre za pretraživanje, vrstu ili razdoblje.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>Promjene se ne mogu spremiti dok se ne riješi pogreška učitavanja lokalne baze podataka.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>Provjera iCloud računa i pripremanje CloudKita.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>Odaberite drugo razdoblje ili evidentirajte trošak.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Odaberite besplatnu demo API razinu.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>Klasifikacija</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>CloudKit zapis %@ nema korisni teret.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>CoinGecko API ključ</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>CoinGecko API ključ (kripto)</string>
 	<key>CoinGecko ID</key>
 	<string>CoinGecko ID</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko je vratio živu cijenu Bitcoina na %@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko je vratio živu cijenu Bitcoina na %@.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>Roba</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>Završeno</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>Konfigurirano</string>
+	<key>Confirm your email and sign in.</key>
+	<string>Potvrdite svoju e-poštu i prijavite se.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>Povežite tržišne podatke</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>Povezivanje</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>Potrošač</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>Nastaviti</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>Kopirajte svoj API ključ i zalijepite ga ispod.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>Osnova troškova</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Napravite besplatni Finnhub račun.</string>
+	<key>Create or sign in to your account.</key>
+	<string>Izradite ili se prijavite na svoj račun.</string>
 	<key>Crypto</key>
-	<string>Crypto</string>
+	<string>Kripto</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>Kripto dodjela</string>
+	<key>Crypto Holdings</key>
+	<string>Kripto Holdings</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>Kripto vrijednost</string>
+	<key>Crypto assets</key>
+	<string>Kripto sredstva</string>
+	<key>Crypto failures: %@.</key>
+	<string>Kripto greške: %@.</string>
+	<key>Crypto holdings</key>
+	<string>Kripto posjedi</string>
+	<key>Crypto market prices</key>
+	<string>Cijene kripto tržišta</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Kripto preskočeno: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>Valuta</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>Trenutna cijena</string>
+	<key>Current market value</key>
+	<string>Trenutna tržišna vrijednost</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>Prilagođene kategorije</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>Naziv prilagođene kategorije</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>Naziv prilagođene kategorije</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>Običaj...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>Dnevno</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>Opasna zona</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>Nadzorna ploča</string>
 	<key>Data</key>
-	<string>Data</string>
+	<string>Podaci</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>Datum</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>Izbrisati</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>Izbriši %@</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>Izbriši sve podatke</string>
+	<key>Delete All Data?</key>
+	<string>Izbrisati sve podatke?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>Izbriši sve lokalne podatke...</string>
+	<key>Delete Category</key>
+	<string>Izbriši kategoriju</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>Izbrisati Crypto Holding?</string>
+	<key>Delete Custom Category?</key>
+	<string>Izbrisati prilagođenu kategoriju?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>Izbriši držanje</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>Izbriši ulaganje</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>Izbrisati ulaganje?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>Izbrisati ponavljajuću transakciju?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>Izbriši transakciju</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>Izbrisati transakciju?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>Izbrisati sve podatke o lokalnim financijama?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>Izbriši raspored</string>
+	<key>Delete transaction</key>
+	<string>Izbriši transakciju</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>Opis</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>pojedinosti</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>Dividende</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>Rasporedi se automatski bilježe dok je aplikacija aktivna i nadoknađuju se kada se sljedeći put otvori.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>Dospjeli rasporedi nadoknaditi otvorene</string>
 	<key>ECB</key>
 	<string>ECB</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>Referentne stope ECB-a automatski se osvježavaju i pohranjuju lokalno za izvanmrežnu upotrebu.</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>TROŠKOVI</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>Uredi</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>Uredi kripto</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>Uredi Crypto Holding</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>Uredi držanje</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>Uredi investiciju</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>Uredi ponavljajuću transakciju</string>
+	<key>Edit Transaction</key>
+	<string>Uredi transakciju</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>Uredi raspored</string>
+	<key>Edit transaction</key>
+	<string>Uredi transakciju</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>Tržišta u razvoju</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>Omogućite biometrijsku zaštitu za Wealth Compass.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>Datum završetka</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>Završava</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>Završava %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>Završava %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>energija</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Unesite naziv kategorije. Bit će spremljeno za buduće %@ transakcije.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>Unesite naziv kategorije. Bit će spremljeno za buduće %@) transakcije.</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>Unesite prilagođeni naziv kategorije.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>Unesite iznos veći od nule.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>Unesite brokersku ili platformsku naknadu koja se naplaćuje za ovu investicijsku transakciju. Dodaje se osnovici troškova pozicije.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>Unesite svoje besplatne API ključeve da biste dobili cijene dionica i kriptovaluta. Ovo se toplo preporučuje—u protivnom cijene imovine neće biti stvarne ili ažurne.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>Zabava</string>
 	<key>Euro</key>
 	<string>Euro</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>Europi</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Sve što posjedujete, dugujete, zaradite i potrošite.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>Osvježavanje tečaja nije uspjelo</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>Tečajna lista</string>
+	<key>Exchange Rates Updated</key>
+	<string>Tečajna lista ažurirana</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>Postojeće transakcije koje koriste %@ zadržat će oznaku trenutne kategorije.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>Trošak</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>Kategorije troškova</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>Troškovno razdoblje</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>Troškovi</string>
+	<key>Expenses grouped by category</key>
+	<string>Troškovi grupirani po kategorijama</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>Izvoz nije uspio</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>Izvezi JSON...</string>
 	<key>Face ID</key>
-	<string>Face ID</string>
+	<string>ID lica</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>Iznos naknade</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>Postotak naknade</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>Vrsta naknade</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>Financije</string>
+	<key>Financial horizon</key>
+	<string>Financijski horizont</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>Završiti</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>Završiti ponavljajuću transakciju?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>Završi raspored</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>Finnhub API ključ</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Finnhub API ključ (dionice)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub je vratio AAPL ponudu uživo na %@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub je vratio AAPL ponudu uživo u %@.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>Prva pojava</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>Popravljeno</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Pratite pozicije, raspodjelu i učinak.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>Hrana</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>Prisilno sinkroniziraj iCloud</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>Honorarac</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>Gorivo</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>Buduća %@ pojavljivanja za %@ više se neće stvarati.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>Buduća %@) pojavljivanja za %@ više se neće stvarati.</string>
 	<key>General</key>
 	<string>General</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>Generirano iz ponavljajućeg rasporeda</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>Geografija</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>Započnite</string>
 	<key>Global</key>
-	<string>Global</string>
+	<string>Globalno</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>Zdravlje</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>zdravstvo</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>Sakrij financijske vrijednosti kroz Wealth Compass.</string>
 	<key>Holdings</key>
 	<string>Holdings</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>Kućište</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>Kako se raspodjeljuju investicijska sredstva</string>
+	<key>How the portfolio is distributed</key>
+	<string>Kako je portfelj raspoređen</string>
+	<key>How to get your API keys</key>
+	<string>Kako doći do API ključeva</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>Identitet</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>Uvozno ponašanje</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>Uvoz dovršen</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>Uvoz nije uspio</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>Uvoz JSON sigurnosne kopije</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>Uvezi JSON...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>Uvoz i izvoz</string>
+	<key>Imported liquidity account: %@</key>
+	<string>Uvezeni račun likvidnosti: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>Prihod</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>Prihodi i rashodi po mjesecima</string>
+	<key>Income less expenses</key>
+	<string>Prihodi umanjeni za troškove</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>Nevažeći API ključ</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>Ulaganje</string>
 	<key>Investment Fee</key>
-	<string>Investment Fee</string>
+	<string>Naknada za ulaganje</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>Neuspjesi ulaganja: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ dužni periodični %@ dodan u novčani tok.</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>za %@</string>
 	<key>iCloud</key>
 	<string>iCloud</string>
 	<key>iCloud Sync</key>
-	<string>iCloud Sync</string>
+	<string>iCloud sinkronizacija</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud nedostupan</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>iCloud sinkronizacija nije pokrenuta.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

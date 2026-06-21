@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld tranzacțiile recurente scadente au fost adăugate la Fluxul de numerar.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>1 tranzacție recurentă scadentă a fost adăugată la Fluxul de numerar.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+Cheia API a fost salvată în siguranță în Keychain.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Wealth Compass va folosi în continuare %@.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,57 +39,101 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@ / unitate</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ Blocare aplicație</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ Ratele stocate în cache sau de rezervă rămân active.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ A eșuat</string>
 	<key>%@ NET</key>
 	<string>%@ NET</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ Eliminat</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ Salvat</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ există deja și va fi selectat.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ nu a returnat o cotație utilizabilă pentru %@.</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ import finalizat pentru %@.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ este programată. Deschide Wealth Compass pentru a o revizui.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>%@ limita de rată a fost atinsă. Încercați din nou mai târziu.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ a respins cheia API.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ a returnat HTTP %lld.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ a returnat un răspuns nevalid.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ unități</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ va dispărea din Tranzacțiile recurente și nicio apariție viitoare nu va fi inserată automat.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% performanță</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@))d acum</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@))h în urmă</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>%@)m în urmă</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. Preluat %@ și stocat în cache local.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. Preluat %@) și stocat în cache local.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. Wealth Compass îl înregistrează automat când aplicația este activă.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. Wealth Compass îl înregistrează în timp ce aplicația este activă.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nCheia API a fost salvată în siguranță în Keychain.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld instantaneul curent a fost generat după import.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>Au fost adăugate %lld categorii personalizate de fluxuri de numerar.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld tranzacție scadentă%@ adăugată la Fluxul de numerar.</string>
+	<key>%lld holdings</key>
+	<string>%lld exploatații</string>
+	<key>%lld liabilities</key>
+	<string>%lld pasive</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld înregistrările incorecte sau incomplete au fost omise.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld mai multe tranzacții ascunse de această vizualizare.</string>
+	<key>%lld positions</key>
+	<string>%lld poziții</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld tranzacțiile programate au fost adăugate automat la Fluxul de numerar.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>Au fost importate %lld tranzacții, %lld programe recurente, %lld investiții, %lld cripto dețineri, %lld pasive și %lld instantanee.</string>
+	<key>%lldd ago</key>
+	<string>%lldd în urmă</string>
+	<key>%lldh ago</key>
+	<string>acum %lldh</string>
+	<key>%lldm ago</key>
+	<string>%lldmin în urmă</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 exploatare</string>
+	<key>1 liability</key>
+	<string>1 răspundere</string>
+	<key>1 position</key>
+	<string>1 pozitie</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1 tranzacție programată a fost adăugată automat la Fluxul de numerar.</string>
 	<key>12M</key>
 	<string>12M</string>
 	<key>3M</key>
@@ -76,346 +142,442 @@
 	<string>6M</string>
 	<key>6M NET</key>
 	<string>6M NET</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>Este necesară o cheie API Finnhub pentru a actualiza prețurile de investiție.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>O vedere clară a ceea ce dețineți, datorați, câștigați și cheltuiți.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>O reîmprospătare a prețului pieței este deja în curs.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>Cheile API sunt verificate în funcție de o cotație live înainte de a fi stocate în breloul macOS.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>ACTIVE</string>
+	<key>Across every asset</key>
+	<string>Peste fiecare activ</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>Adăuga</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>Adăugați Crypto</string>
+	<key>Add Crypto Holding</key>
+	<string>Adăugați Crypto Holding</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>Adăugați investiții</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>Adăugați tranzacție</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>Adăugați o exploatare pentru a-i urmări valoarea și performanța.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>Adăugați o exploatare pentru a-i urmări valoarea.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Adăugați o cheie nouă în Tabloul de bord pentru dezvoltatori.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>Adăugați un alt instantaneu pentru a vedea mișcarea</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>Adăugați un alt instantaneu pentru a vedea mișcarea în timp</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>Adăugați numerar înregistrat, o investiție sau o exploatare cripto.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>Adăugați acțiuni, ETF-uri, obligațiuni sau alte poziții.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>Adăugați primul venit sau cheltuială.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>Adăugați prima tranzacție</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>Adăugarea unei tranzacții sau a unei poziții înregistrează un instantaneu pentru acest grafic.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>Toate</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>Tot timpul</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>Toată lumea</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>Alocarea după geografie</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>Alocarea pe Sector</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>Alocarea după tip</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>Alocarea ascunsă</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>Cantitate</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>Sumă (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>O reîmprospătare a cursului de schimb este deja în curs.</string>
 	<key>Apple (AAPL)</key>
 	<string>Apple (AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>Alocarea activelor</string>
+	<key>Automatic income and expenses</key>
+	<string>Venituri și cheltuieli automate</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>Prețul mediu de cumpărare</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>Backup exportat</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Solduri derivate din activitatea și deținerile dvs</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>Moneda de bază</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>Cel mai mare ratat</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>Autentificarea biometrică nu este disponibilă pe acest Mac.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>Autentificarea biometrică nu este disponibilă pe acest dispozitiv.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>Biometrie</string>
 	<key>Bitcoin</key>
 	<string>Bitcoin</string>
 	<key>Bond</key>
-	<string>Bond</string>
+	<string>Legătură</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>Defalcarea cheltuielilor înregistrate</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>Lira sterlină</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>Construiți-vă prima viziune financiară</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>Taxa calculată</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>Anula</string>
+	<key>Capital invested</key>
+	<string>Capitalul investit</string>
+	<key>Cash</key>
+	<string>Numerar</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>Fluxul de numerar</string>
+	<key>Cash flow</key>
+	<string>Fluxul de numerar</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>Diagrama fluxului de numerar ascuns</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>Categorie</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>Schimbați filtrele de căutare, tip sau perioadă.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>Modificările nu pot fi salvate până când eroarea de încărcare a bazei de date locală nu este rezolvată.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>Verificarea contului iCloud și pregătirea CloudKit.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>Alegeți o altă perioadă sau înregistrați o cheltuială.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Alegeți nivelul gratuit Demo API.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>Clasificare</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>Înregistrarea CloudKit %@ nu are încărcătură utilă.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>Cheia API CoinGecko</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>Cheie API CoinGecko (Crypto)</string>
 	<key>CoinGecko ID</key>
-	<string>CoinGecko ID</string>
+	<string>ID-ul CoinGecko</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko a returnat un preț Bitcoin live la %@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko a returnat un preț Bitcoin live la %@.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>Marfa</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>Terminat</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>Configurat</string>
+	<key>Confirm your email and sign in.</key>
+	<string>Confirmați-vă adresa de e-mail și conectați-vă.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>Conectați datele pieței</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>Conectare</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>Consumator</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>Continua</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>Copiați cheia API și inserați-o mai jos.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>Baza costurilor</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Creează un cont Finnhub gratuit.</string>
+	<key>Create or sign in to your account.</key>
+	<string>Creați sau conectați-vă la contul dvs.</string>
 	<key>Crypto</key>
-	<string>Crypto</string>
+	<string>Cripto</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>Alocarea criptografică</string>
+	<key>Crypto Holdings</key>
+	<string>Crypto Holdings</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>Valoare cripto</string>
+	<key>Crypto assets</key>
+	<string>Active cripto</string>
+	<key>Crypto failures: %@.</key>
+	<string>Eșecuri criptografice: %@.</string>
+	<key>Crypto holdings</key>
+	<string>Deținerile cripto</string>
+	<key>Crypto market prices</key>
+	<string>Prețurile pieței cripto</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Crypto ignorat: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>Valută</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>Prețul curent</string>
+	<key>Current market value</key>
+	<string>Valoarea curentă de piață</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>Categorii personalizate</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>Nume categorie personalizată</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>Numele categoriei personalizate</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>Personalizat...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>Zilnic</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>Zona de pericol</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>Bord</string>
 	<key>Data</key>
-	<string>Data</string>
-	<key>Date</key>
 	<string>Date</string>
+	<key>Date</key>
+	<string>Data</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>Şterge</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>Ștergeți %@</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>Ștergeți toate datele</string>
+	<key>Delete All Data?</key>
+	<string>Ștergeți toate datele?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>Ștergeți toate datele locale...</string>
+	<key>Delete Category</key>
+	<string>Ștergeți categoria</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>Ștergeți Crypto Holding?</string>
+	<key>Delete Custom Category?</key>
+	<string>Ștergeți categoria personalizată?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>Ștergeți Holding</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>Ștergeți investiția</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>Ștergeți investiția?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>Ștergeți tranzacția recurentă?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>Șterge tranzacția</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>Ștergeți tranzacția?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>Ștergeți toate datele financiare locale?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>Ștergeți programul</string>
+	<key>Delete transaction</key>
+	<string>Șterge tranzacția</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>Descriere</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>Detalii</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>Dividende</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>Programele scadente sunt înregistrate automat în timp ce aplicația este activă și reținută data viitoare când se deschide.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>Programele scadente ajung din urmă la deschidere</string>
 	<key>ECB</key>
-	<string>ECB</string>
+	<string>BCE</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>Ratele de referință ale BCE sunt reîmprospătate automat și stocate în cache local pentru utilizare offline.</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>CHELTUIELI</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>Edita</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>Editați Crypto</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>Editați Crypto Holding</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>Editare Holding</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>Editați investiția</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>Editați tranzacția recurentă</string>
+	<key>Edit Transaction</key>
+	<string>Editați tranzacția</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>Editați programul</string>
+	<key>Edit transaction</key>
+	<string>Editați tranzacția</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>Piețele emergente</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>Activați protecția biometrică pentru Wealth Compass.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>Data de încheiere</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>Se termină</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>Se încheie %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>Se încheie %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>Energie</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Introduceți un nume de categorie. Va fi salvat pentru viitoarele %@ tranzacții.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>Introduceți un nume de categorie. Va fi salvat pentru tranzacțiile viitoare %@).</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>Introduceți un nume de categorie personalizat.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>Introduceți o sumă mai mare decât zero.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>Introduceți comisionul de broker sau platformă perceput pentru această tranzacție de investiție. Se adaugă la baza costului poziției.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>Introduceți cheile API gratuite pentru a obține prețuri în stoc și cripto. Acest lucru este foarte recomandat - în caz contrar, prețurile activelor nu vor fi reale sau actualizate.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>Divertisment</string>
 	<key>Euro</key>
 	<string>Euro</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>Europa</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Tot ceea ce dețineți, datorați, câștigați și cheltuiți.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>Actualizarea cursului de schimb nu a reușit</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>Rate de schimb</string>
+	<key>Exchange Rates Updated</key>
+	<string>Rate de schimb actualizate</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>Tranzacțiile existente care folosesc %@ își vor păstra eticheta de categorie actuală.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>Cheltuiala</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>Categorii de cheltuieli</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>Perioada de cheltuieli</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>Cheltuieli</string>
+	<key>Expenses grouped by category</key>
+	<string>Cheltuieli grupate pe categorii</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>Export eșuat</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>Exportați JSON...</string>
 	<key>Face ID</key>
 	<string>Face ID</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>Suma taxei</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>Procentul taxei</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>Tipul taxei</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>Finanţa</string>
+	<key>Financial horizon</key>
+	<string>Orizontul financiar</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>Termina</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>Terminați tranzacția recurentă?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>Terminați programul</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>Cheia API Finnhub</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Cheie API Finnhub (Stocuri)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub a returnat o cotație AAPL live la %@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub a returnat o cotație AAPL live la %@.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>Prima Apariție</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>Fix</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Urmăriți pozițiile, alocarea și performanța.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>Mâncare</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>Forțați sincronizarea iCloud</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>Independent</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>Combustibil</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>Aparițiile viitoare %@ pentru %@ nu vor mai fi create.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>Aparițiile viitoare %@) pentru %@ nu vor mai fi create.</string>
 	<key>General</key>
 	<string>General</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>Generat dintr-un program recurent</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>Geografie</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>Începeți</string>
 	<key>Global</key>
 	<string>Global</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>Sănătate</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>Sănătate</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>Ascundeți valorile financiare în Wealth Compass.</string>
 	<key>Holdings</key>
 	<string>Holdings</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>Locuințe</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>Cum sunt distribuite activele investibile</string>
+	<key>How the portfolio is distributed</key>
+	<string>Cum este distribuit portofoliul</string>
+	<key>How to get your API keys</key>
+	<string>Cum să obțineți cheile API</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>Identitate</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>Comportamentul de import</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>Import finalizat</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>Import a eșuat</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>Importați backup JSON</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>Importă JSON...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>Import și export</string>
+	<key>Imported liquidity account: %@</key>
+	<string>Cont de lichiditate importat: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>Venituri</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>Venituri și cheltuieli pe lună</string>
+	<key>Income less expenses</key>
+	<string>Venituri minus cheltuieli</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>Cheie API nevalidă</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>Investiție</string>
 	<key>Investment Fee</key>
 	<string>Investment Fee</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>Eșecuri de investiții: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ datorată recurenței %@ adăugate la Fluxul de numerar.</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>pentru %@</string>
 	<key>iCloud</key>
 	<string>iCloud</string>
 	<key>iCloud Sync</key>
 	<string>iCloud Sync</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud indisponibil</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>Sincronizarea iCloud nu rulează.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

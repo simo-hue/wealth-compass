@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld עקב עסקאות חוזרות נוספו לתזרים המזומנים.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>נוספה לתזרים מזומנים עסקה חוזרת אחת בשל עקבות.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+מפתח ה-API נשמר בצורה מאובטחת במחזיק מפתחות.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Wealth Compass ימשיך להשתמש ב-%@.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,57 +39,101 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@ / יחידה</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ נעילת אפליקציה</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ שיעורי מטמון או חילופין נשארים פעילים.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ נכשל</string>
 	<key>%@ NET</key>
 	<string>%@ NET</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ הוסר</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ נשמר</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ כבר קיים ויבחר.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ לא החזיר הצעת מחיר שמישה עבור %@.</string>
+	<key>%@ import completed for %@.</key>
+	<string>ייבוא ​​%@ הושלם עבור %@.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ מתוזמן. פתח את Wealth Compass כדי לסקור אותו.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>הגעת למגבלת התעריף %@. נסה שוב מאוחר יותר.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ דחה את מפתח ה-API.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ החזיר HTTP %lld.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ החזיר תגובה לא חוקית.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ יחידות</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ ייעלם מהעסקאות החוזרות ולא יוכנסו מופעים עתידיים באופן אוטומטי.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% ביצועים</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@)) לפני יום</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@)) לפני שעה</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>לפני %@) מ'</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. הוחזר %@ ונשמר במטמון מקומי.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. הוחזר %@) ונשמר במטמון מקומי.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. Wealth Compass מקליט אותו באופן אוטומטי כאשר האפליקציה פעילה.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
 	<string>%@: %@. Wealth Compass records it while the app is active.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nמפתח ה-API נשמר בצורה מאובטחת במחזיק מפתחות.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld תמונת מצב נוכחית נוצרה לאחר הייבוא.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>נוספו %lld קטגוריות תזרים מזומנים מותאמות אישית.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld עסקה בשל %@ נוספה לתזרים מזומנים.</string>
+	<key>%lld holdings</key>
+	<string>%lld אחזקות</string>
+	<key>%lld liabilities</key>
+	<string>%lld התחייבויות</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld דילגו על רשומות שגויות או לא שלמות.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld עסקאות נוספות מוסתרות בתצוגה זו.</string>
+	<key>%lld positions</key>
+	<string>%lld עמדות</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld עסקאות מתוזמנות נוספו אוטומטית לתזרים מזומנים.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>יובאו עסקאות %lld, %lld לוחות זמנים חוזרים, %lld השקעות, %lld אחזקות קריפטו, %lld התחייבויות ו%lld צילומי מצב.</string>
+	<key>%lldd ago</key>
+	<string>לפני %lldd</string>
+	<key>%lldh ago</key>
+	<string>לפני %lld שעות</string>
+	<key>%lldm ago</key>
+	<string>לפני %lldמ'</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 החזקה</string>
+	<key>1 liability</key>
+	<string>1 אחריות</string>
+	<key>1 position</key>
+	<string>עמדה 1</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>עסקה אחת מתוזמנת נוספה אוטומטית לתזרים מזומנים.</string>
 	<key>12M</key>
 	<string>12M</string>
 	<key>3M</key>
@@ -76,346 +142,440 @@
 	<string>6M</string>
 	<key>6M NET</key>
 	<string>6M NET</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>נדרש מפתח API של Finnhub כדי לעדכן את מחירי ההשקעה.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>תצוגה ברורה של מה שאתה בעל, חייב, מרוויח ומוציא.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>רענון מחירי שוק כבר בעיצומו.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>מפתחות API מאומתים מול הצעת מחיר חיה לפני שהם מאוחסנים במחזיק מפתחות macOS.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>נכסים</string>
+	<key>Across every asset</key>
+	<string>על פני כל נכס</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>לְהוֹסִיף</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>הוסף קריפטו</string>
+	<key>Add Crypto Holding</key>
+	<string>הוסף Crypto Holding</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>הוסף השקעה</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>הוסף עסקה</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>הוסף החזקה כדי לעקוב אחר הערך והביצועים שלה.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>הוסף החזקה כדי לעקוב אחר הערך שלה.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>הוסף מפתח חדש בלוח המחוונים למפתחים.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>הוסף עוד תמונת מצב כדי לראות תנועה</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>הוסף עוד תמונת מצב כדי לראות תנועה לאורך זמן</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>הוסף מזומן רשום, השקעה או אחזקת קריפטו.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>הוסף מניות, תעודות סל, אג"ח או פוזיציות אחרות.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>הוסף את ההכנסה או ההוצאה הראשונה שלך.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>הוסף את העסקה הראשונה שלך</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>הוספת עסקה או מיקום מתעדת תמונת מצב עבור תרשים זה.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>כֹּל</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>כל הזמן</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>כל העולם</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>הקצאה לפי גיאוגרפיה</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>הקצאה לפי מגזר</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>הקצאה לפי סוג</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>ההקצאה נסתרת</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>סְכוּם</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>סכום (%@)</string>
 	<key>Apple (AAPL)</key>
-	<string>Apple (AAPL)</string>
+	<string>אפל (AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>הקצאת נכסים</string>
+	<key>Automatic income and expenses</key>
+	<string>הכנסות והוצאות אוטומטיות</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>מחיר קנייה ממוצע</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>הגיבוי יצא</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>יתרות הנגזרות מהפעילות והאחזקות שלך</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>מטבע הבסיס</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>המפסיד הגדול ביותר</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>אימות ביומטרי אינו זמין ב-Mac זה.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>אימות ביומטרי אינו זמין במכשיר זה.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>ביומטריה</string>
 	<key>Bitcoin</key>
-	<string>Bitcoin</string>
+	<string>ביטקוין</string>
 	<key>Bond</key>
-	<string>Bond</string>
+	<string>קֶשֶׁר</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>פירוט ההוצאה הרשומה</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>פאונד בריטי</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>בנה את התצוגה הפיננסית הראשונה שלך</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>עמלה מחושבת</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>לְבַטֵל</string>
+	<key>Capital invested</key>
+	<string>הון שהושקע</string>
+	<key>Cash</key>
+	<string>מְזוּמָנִים</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>תזרים מזומנים</string>
+	<key>Cash flow</key>
+	<string>תזרים מזומנים</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>תרשים תזרים מזומנים נסתר</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>קָטֵגוֹרִיָה</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>שנה את מסנני החיפוש, הסוג או התקופות.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>לא ניתן לשמור שינויים עד שנפתרה שגיאת הטעינה המקומית של מסד הנתונים.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>בדיקת חשבון iCloud והכנת CloudKit.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>בחר תקופה אחרת או רשום הוצאה.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>בחר בשכבת ה-API של הדגמה בחינם.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>מִיוּן</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>לרשומת CloudKit %@ אין מטען.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>מפתח API של CoinGecko</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>מפתח API של CoinGecko (קריפטו)</string>
 	<key>CoinGecko ID</key>
-	<string>CoinGecko ID</string>
+	<string>מזהה CoinGecko</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko החזיר מחיר ביטקוין חי ב-%@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko החזיר מחיר ביטקוין חי ב-%@.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>סְחוֹרָה</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>הושלם</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>מוגדר</string>
+	<key>Confirm your email and sign in.</key>
+	<string>אשר את האימייל שלך והיכנס.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>חיבור נתוני שוק</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>מְקַשֵׁר</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>צַרכָן</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>לְהַמשִׁיך</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>העתק את מפתח ה-API שלך והדבק אותו למטה.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>בסיס עלות</string>
+	<key>Create a free Finnhub account.</key>
+	<string>צור חשבון Finnhub בחינם.</string>
+	<key>Create or sign in to your account.</key>
+	<string>צור או היכנס לחשבון שלך.</string>
 	<key>Crypto</key>
-	<string>Crypto</string>
+	<string>קריפטו</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>הקצאת קריפטו</string>
+	<key>Crypto Holdings</key>
+	<string>קריפטו אחזקות</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>ערך קריפטו</string>
+	<key>Crypto assets</key>
+	<string>נכסי קריפטו</string>
+	<key>Crypto failures: %@.</key>
+	<string>כשלי קריפטו: %@.</string>
+	<key>Crypto holdings</key>
+	<string>אחזקות קריפטו</string>
+	<key>Crypto market prices</key>
+	<string>מחירי שוק הקריפטו</string>
+	<key>Crypto skipped: %@.</key>
+	<string>קריפטו דילג: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>מַטְבֵּעַ</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>מחיר נוכחי</string>
+	<key>Current market value</key>
+	<string>שווי שוק נוכחי</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>קטגוריות מותאמות אישית</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>שם קטגוריה מותאמת אישית</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>שם קטגוריה מותאמת אישית</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>מִנְהָג...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>יוֹמִי</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>אזור הסכנה</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>לוּחַ מַחווָנִים</string>
 	<key>Data</key>
-	<string>Data</string>
+	<string>נְתוּנִים</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>תַאֲרִיך</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>לִמְחוֹק</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>מחק את %@</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>מחק את כל הנתונים</string>
+	<key>Delete All Data?</key>
+	<string>למחוק את כל הנתונים?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>מחק את כל הנתונים המקומיים...</string>
+	<key>Delete Category</key>
+	<string>מחק קטגוריה</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>למחוק את החזקת קריפטו?</string>
+	<key>Delete Custom Category?</key>
+	<string>למחוק קטגוריה מותאמת אישית?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>מחק החזקה</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>מחק השקעה</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>למחוק את ההשקעה?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>למחוק את העסקה החוזרת?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>מחק את העסקה</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>למחוק את העסקה?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>למחוק את כל נתוני הכספים המקומיים?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>מחק לוח זמנים</string>
+	<key>Delete transaction</key>
+	<string>מחק עסקה</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>תֵאוּר</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>פרטים</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>דיבידנדים</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>לוחות זמנים שנקבעו מתועדים באופן אוטומטי בזמן שהאפליקציה פעילה ומתעדכנים בפעם הבאה שהיא נפתחת.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>לוחות זמנים אמורים להתעדכן בפתיחה</string>
 	<key>ECB</key>
 	<string>ECB</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>שיעורי הייחוס של ה-ECB מתרעננים אוטומטית ומאוחסנים במטמון מקומי לשימוש לא מקוון.</string>
 	<key>ETF</key>
-	<string>ETF</string>
+	<string>תעודת סל</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>הוצאות</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>לַעֲרוֹך</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>ערוך קריפטו</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>עריכת Crypto Holding</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>ערוך החזקה</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>ערוך השקעה</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>ערוך עסקה חוזרת</string>
+	<key>Edit Transaction</key>
+	<string>ערוך עסקה</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>ערוך לוח זמנים</string>
+	<key>Edit transaction</key>
+	<string>ערוך עסקה</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>שווקים מתעוררים</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>אפשר הגנה ביומטרית עבור Wealth Compass.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>תאריך סיום</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>מסתיים</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>מסתיים %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>מסתיים %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>אֵנֶרְגִיָה</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>הזן שם קטגוריה. הוא יישמר עבור עסקאות %@ עתידיות.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>הזן שם קטגוריה. זה יישמר עבור עסקאות %@) עתידיות.</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>הזן שם קטגוריה מותאמת אישית.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>הזן סכום גדול מאפס.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>הזן את עמלת הברוקר או הפלטפורמה שנגבה עבור עסקת השקעה זו. זה מתווסף לבסיס עלות העמדה.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>הזן את מפתחות ה-API החינמיים שלך כדי לקבל מחירי מניות וקריפטו. זה מומלץ מאוד - אחרת, מחירי הנכסים לא יהיו אמיתיים או מעודכנים.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>בידור</string>
 	<key>Euro</key>
-	<string>Euro</string>
+	<string>יוֹרוֹ</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>אֵירוֹפָּה</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>כל מה שאתה מחזיק, חייב, מרוויח ומוציא.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>רענון שער החליפין נכשל</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>שערי חליפין</string>
+	<key>Exchange Rates Updated</key>
+	<string>שערי חליפין עודכנו</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>עסקאות קיימות באמצעות %@ ישמרו על תווית הקטגוריה הנוכחית שלהן.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>הוֹצָאָה</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>קטגוריות הוצאות</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>תקופת הוצאה</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>הוצאות</string>
+	<key>Expenses grouped by category</key>
+	<string>הוצאות מקובצות לפי קטגוריות</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>הייצוא נכשל</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>ייצא JSON...</string>
 	<key>Face ID</key>
-	<string>Face ID</string>
+	<string>מזהה פנים</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>סכום עמלה</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>אחוז עמלות</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>סוג עמלה</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>לְמַמֵן</string>
+	<key>Financial horizon</key>
+	<string>אופק פיננסי</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>סִיוּם</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>לסיים עסקה חוזרת?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>סיים את לוח הזמנים</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>מפתח API של Finnhub</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>מפתח API של Finnhub (מניות)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub החזירה הצעת מחיר חיה של AAPL ב-%@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub החזירה הצעת מחיר חיה של AAPL ב-%@.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>התרחשות ראשונה</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>קָבוּעַ</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>עקוב אחר עמדות, הקצאה וביצועים.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>מָזוֹן</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>כפה סנכרון של iCloud</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>עצמאי</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>דֶלֶק</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>מופעי %@ עתידיים עבור %@ לא ייווצרו עוד.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>מופעי %@) עתידיים עבור %@ לא ייווצרו עוד.</string>
 	<key>General</key>
-	<string>General</string>
+	<string>כְּלָלִי</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>נוצר מלוח זמנים חוזר</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>גֵאוֹגרַפיָה</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>התחל</string>
 	<key>Global</key>
-	<string>Global</string>
+	<string>גלוֹבָּלִי</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>בְּרִיאוּת</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>שירותי בריאות</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>הסתר ערכים פיננסיים ברחבי Wealth Compass.</string>
 	<key>Holdings</key>
-	<string>Holdings</string>
+	<string>אחזקות</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>דִיוּר</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>אופן חלוקת הנכסים הניתנים להשקעה</string>
+	<key>How the portfolio is distributed</key>
+	<string>אופן חלוקת התיק</string>
+	<key>How to get your API keys</key>
+	<string>כיצד להשיג את מפתחות ה-API שלך</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>זֶהוּת</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>התנהגות ייבוא</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>הייבוא ​​הושלם</string>
 	<key>Import Failed</key>
 	<string>Import Failed</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>ייבוא ​​גיבוי JSON</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>ייבוא ​​JSON...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>ייבוא ​​וייצוא</string>
+	<key>Imported liquidity account: %@</key>
+	<string>חשבון נזילות מיובא: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>הַכנָסָה</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>הכנסות והוצאות לפי חודש</string>
+	<key>Income less expenses</key>
+	<string>הכנסה פחות הוצאות</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>מפתח API לא חוקי</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>הַשׁקָעָה</string>
 	<key>Investment Fee</key>
-	<string>Investment Fee</string>
+	<string>עמלת השקעה</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>כשלים בהשקעה: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1027,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ עקב %@ נוספה לתזרים מזומנים.</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>עבור %@</string>
 	<key>iCloud</key>
 	<string>iCloud</string>
 	<key>iCloud Sync</key>
 	<string>iCloud Sync</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud לא זמין</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>סנכרון iCloud אינו פועל.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

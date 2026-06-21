@@ -4,418 +4,580 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>Nakit Akışına %lld vadesi gelen yinelenen işlemler eklendi.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>Nakit Akışına 1 adet vadesi gelen yinelenen işlem eklendi.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+API anahtarı Anahtar Zinciri'ne güvenli bir şekilde kaydedildi.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Zenginlik Pusulası %@ kullanmaya devam edecek.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
-	<string>%@ (%@%%)</string>
+	<string>%@ (%%@)</string>
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@ / birim</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ Uygulama Kilidi</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ Önbelleğe alınmış veya geri dönüş oranları etkin kalır.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ Başarısız</string>
 	<key>%@ NET</key>
 	<string>%@ NET</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ Kaldırıldı</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ Kaydedildi</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ zaten mevcut ve seçilecek.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@, %@ için kullanılabilir bir fiyat teklifi döndürmedi.</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ içe aktarma %@ için tamamlandı.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ planlandı. İncelemek için Zenginlik Pusulası'nı açın.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>%@ hız sınırına ulaşıldı. Daha sonra tekrar deneyin.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ API anahtarını reddetti.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@, HTTP %lld değerini döndürdü.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ geçersiz bir yanıt döndürdü.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ birimleri</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ Tekrarlanan İşlemlerden kaybolacak ve gelecekte hiçbir oluşum otomatik olarak eklenmeyecektir.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% performans</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@))d önce</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@))h önce</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>%@)dk önce</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. %@ getirildi ve yerel olarak önbelleğe alındı.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. %@ getirildi ve yerel olarak önbelleğe alındı.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. Wealth Compass, uygulama aktif olduğunda bunu otomatik olarak kaydeder.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. Wealth Compass, uygulama aktifken bunu kaydeder.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nAPI anahtarı, Anahtar Zinciri'ne güvenli bir şekilde kaydedildi.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld geçerli anlık görüntü, içe aktarmanın ardından oluşturuldu.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>%lld özel nakit akışı kategorileri eklendi.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld vadesi gelen işlem%@ Nakit Akışına eklendi.</string>
+	<key>%lld holdings</key>
+	<string>%lld holdingler</string>
+	<key>%lld liabilities</key>
+	<string>%lld yükümlülükler</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld hatalı biçimlendirilmiş veya eksik kayıtlar atlandı.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld daha fazla işlem bu görünüm tarafından gizlendi.</string>
+	<key>%lld positions</key>
+	<string>%lld konumları</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld planlanmış işlemler Nakit Akışına otomatik olarak eklendi.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>%lld işlemler, %lld yinelenen programlar, %lld yatırımlar, %lld kripto varlıkları, %lld yükümlülükler ve %lld anlık görüntüler içe aktarıldı.</string>
+	<key>%lldd ago</key>
+	<string>%lldd önce</string>
+	<key>%lldh ago</key>
+	<string>%lldsa önce</string>
+	<key>%lldm ago</key>
+	<string>%lld dk önce</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 tutma</string>
+	<key>1 liability</key>
+	<string>1 sorumluluk</string>
+	<key>1 position</key>
+	<string>1 pozisyon</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>Nakit Akışına 1 adet planlı işlem otomatik olarak eklendi.</string>
 	<key>12M</key>
-	<string>12M</string>
+	<string>12 milyon</string>
 	<key>3M</key>
-	<string>3M</string>
+	<string>3 milyon</string>
 	<key>6M</key>
-	<string>6M</string>
+	<string>6 milyon</string>
 	<key>6M NET</key>
 	<string>6M NET</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>Yatırım fiyatlarını güncellemek için bir Finnhub API anahtarı gereklidir.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>Sahip olduğunuz, borçlu olduğunuz, kazandığınız ve harcadığınız şeylerin net bir görünümü.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>Piyasa fiyatı yenilemesi halihazırda devam ediyor.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>API anahtarları, macOS Anahtar Zincirinde saklanmadan önce canlı fiyat teklifiyle doğrulanır.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>VARLIKLAR</string>
+	<key>Across every asset</key>
+	<string>Her varlıkta</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>Eklemek</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>Kripto Ekle</string>
+	<key>Add Crypto Holding</key>
+	<string>Kripto Holding Ekle</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>Yatırım Ekle</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>İşlem Ekle</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>Değerini ve performansını takip etmek için bir holding ekleyin.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>Değerini takip etmek için bir holding ekleyin.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Geliştirici Kontrol Paneline yeni bir anahtar ekleyin.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>Hareketi görmek için başka bir anlık görüntü ekleyin</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>Zaman içindeki hareketi görmek için başka bir anlık görüntü ekleyin</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>Kaydedilmiş nakit, bir yatırım veya bir kripto holdingi ekleyin.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>Hisse senetleri, ETF'ler, tahviller veya diğer pozisyonları ekleyin.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>İlk gelirinizi veya giderinizi ekleyin.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>İlk işleminizi ekleyin</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>Bir işlem veya pozisyon eklemek, bu grafiğin anlık görüntüsünü kaydeder.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>Tüm</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>Tüm Zamanlar</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>Tüm Dünya</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>Coğrafyaya Göre Tahsis</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>Sektöre Göre Tahsis</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>Türe Göre Tahsis</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>Tahsis gizlendi</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>Miktar</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>Tutar (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>Döviz kuru yenilemesi zaten devam ediyor.</string>
 	<key>Apple (AAPL)</key>
-	<string>Apple (AAPL)</string>
+	<string>Elma (AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>Varlık Tahsisi</string>
+	<key>Automatic income and expenses</key>
+	<string>Otomatik gelir ve giderler</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>Ortalama Alış Fiyatı</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>Yedekleme Dışa Aktarıldı</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Faaliyetlerinizden ve varlıklarınızdan elde edilen bakiyeler</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>Baz Para Birimi</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>En Büyük Kaybeden</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>Biyometrik kimlik doğrulama bu Mac'te mevcut değil.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>Bu cihazda biyometrik kimlik doğrulama kullanılamıyor.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>Biyometri</string>
 	<key>Bitcoin</key>
 	<string>Bitcoin</string>
 	<key>Bond</key>
-	<string>Bond</string>
+	<string>Bağlamak</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>Kaydedilen harcamaların dökümü</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>İngiliz Sterlini</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>İlk finansal görünümünüzü oluşturun</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>Hesaplanan Ücret</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>İptal etmek</string>
+	<key>Capital invested</key>
+	<string>Yatırım yapılan sermaye</string>
+	<key>Cash</key>
+	<string>Peşin</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>Nakit akımı</string>
+	<key>Cash flow</key>
+	<string>Nakit akımı</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>Nakit akışı şeması gizlendi</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>Kategori</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>Arama, tür veya dönem filtrelerini değiştirin.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>Yerel veritabanı yükleme hatası çözülene kadar değişiklikler kaydedilemez.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>İCloud hesabını kontrol etme ve CloudKit'i hazırlama.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>Başka bir dönem seçin veya bir gider kaydedin.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Ücretsiz Demo API katmanını seçin.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>sınıflandırma</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>CloudKit kaydı %@ veri yüküne sahip değil.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>CoinGecko API Anahtarı</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>CoinGecko API Anahtarı (Kripto)</string>
 	<key>CoinGecko ID</key>
-	<string>CoinGecko ID</string>
+	<string>CoinGecko Kimliği</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko, %@ seviyesinde canlı bir Bitcoin fiyatı döndürdü)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko %@ seviyesinde canlı bir Bitcoin fiyatı döndürdü.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>Emtia</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>Tamamlanmış</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>Yapılandırılmış</string>
+	<key>Confirm your email and sign in.</key>
+	<string>E-postanızı onaylayın ve oturum açın.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>Piyasa Verilerini Bağlayın</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>Bağlanıyor</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>Tüketici</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>Devam etmek</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>API anahtarınızı kopyalayıp aşağıya yapıştırın.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>Maliyet Esası</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Ücretsiz bir Finnhub hesabı oluşturun.</string>
+	<key>Create or sign in to your account.</key>
+	<string>Hesabınızı oluşturun veya oturum açın.</string>
 	<key>Crypto</key>
-	<string>Crypto</string>
+	<string>Kripto</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>Kripto Tahsisi</string>
+	<key>Crypto Holdings</key>
+	<string>Kripto Varlıkları</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>Kripto Değeri</string>
+	<key>Crypto assets</key>
+	<string>Kripto varlıkları</string>
+	<key>Crypto failures: %@.</key>
+	<string>Kripto hataları: %@.</string>
+	<key>Crypto holdings</key>
+	<string>Kripto varlıkları</string>
+	<key>Crypto market prices</key>
+	<string>Kripto piyasası fiyatları</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Kripto atlandı: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>Para birimi</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>Güncel Fiyat</string>
+	<key>Current market value</key>
+	<string>Güncel piyasa değeri</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>Özel Kategoriler</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>Özel Kategori Adı</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>Özel kategori adı</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>Gelenek...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>Günlük</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>Tehlikeli Bölge</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>Kontrol Paneli</string>
 	<key>Data</key>
-	<string>Data</string>
+	<string>Veri</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>Tarih</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>Silmek</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>%@ öğesini sil</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>Tüm Verileri Sil</string>
+	<key>Delete All Data?</key>
+	<string>Tüm Veriler Silinsin mi?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>Tüm Yerel Verileri Sil...</string>
+	<key>Delete Category</key>
+	<string>Kategoriyi Sil</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>Kripto Holding Silinsin mi?</string>
+	<key>Delete Custom Category?</key>
+	<string>Özel Kategori Silinsin mi?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>Bekletmeyi Sil</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>Yatırımı Sil</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>Yatırım Silinsin mi?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>Yinelenen İşlem Silinsin mi?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>İşlemi Sil</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>İşlem Silinsin mi?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>Tüm yerel finans verileri silinsin mi?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>Programı sil</string>
+	<key>Delete transaction</key>
+	<string>İşlemi sil</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>Tanım</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>Detaylar</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>Temettüler</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>Uygulama etkinken vade programları otomatik olarak kaydedilir ve bir sonraki açılışında yakalanır.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>Vade programları açılışta yetişiyor</string>
 	<key>ECB</key>
 	<string>ECB</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>ECB referans oranları otomatik olarak yenilenir ve çevrimdışı kullanım için yerel olarak önbelleğe alınır.</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>GİDERLER</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>Düzenlemek</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>Kriptoyu Düzenle</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>Kripto Holdingi Düzenle</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>Holdingi Düzenle</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>Yatırımı Düzenle</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>Yinelenen İşlemi Düzenle</string>
+	<key>Edit Transaction</key>
+	<string>İşlemi Düzenle</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>Programı düzenle</string>
+	<key>Edit transaction</key>
+	<string>İşlemi düzenle</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>Gelişmekte Olan Piyasalar</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>Zenginlik Pusulası için biyometrik korumayı etkinleştirin.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>Bitiş Tarihi</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>biter</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>%@ tarihinde sona eriyor</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>%@ ile biter)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>Enerji</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Bir kategori adı girin. Gelecekteki %@ işlemleri için kaydedilecek.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>Bir kategori adı girin. Gelecekteki %@) işlemler için kaydedilecektir.</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>Özel bir kategori adı girin.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>Sıfırdan büyük bir miktar girin.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>Bu yatırım işlemi için alınan komisyoncu veya platform ücretini girin. Pozisyon maliyet esasına eklenir.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>Canlı hisse senedi ve kripto fiyatlarını almak için ücretsiz API anahtarlarınızı girin. Bu şiddetle tavsiye edilir; aksi takdirde varlık fiyatları gerçek veya güncel olmayacaktır.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>Eğlence</string>
 	<key>Euro</key>
 	<string>Euro</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>Avrupa</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Sahip olduğunuz, borçlu olduğunuz, kazandığınız ve harcadığınız her şey.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>Döviz Kuru Yenileme Başarısız</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>Döviz Kurları</string>
+	<key>Exchange Rates Updated</key>
+	<string>Döviz Kurları Güncellendi</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>%@ kullanan mevcut işlemler mevcut kategori etiketlerini koruyacaktır.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>Gider</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>Gider Kategorileri</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>Gider dönemi</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>Giderler</string>
+	<key>Expenses grouped by category</key>
+	<string>Kategoriye göre gruplandırılmış giderler</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>Dışa Aktarma Başarısız</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>JSON'u dışa aktar...</string>
 	<key>Face ID</key>
-	<string>Face ID</string>
+	<string>Yüz Kimliği</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>Ücret Tutarı</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>Ücret Yüzdesi</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>Ücret Türü</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>Finans</string>
+	<key>Financial horizon</key>
+	<string>Finansal ufuk</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>Sona ermek</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>Yinelenen İşlem Bitirilsin mi?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>Programı bitir</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>Finnhub API Anahtarı</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Finnhub API Anahtarı (Hisse Senetleri)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub %@'da canlı bir AAPL teklifi döndürdü)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub %@ adresinde canlı bir AAPL teklifi verdi.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>İlk Oluşum</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>Sabit</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Pozisyonları, tahsisi ve performansı takip edin.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>Yiyecek</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>iCloud'u Senkronize Etmeye Zorla</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>Serbest çalışan</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>Yakıt</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>%@ için gelecekteki %@ oluşumları artık oluşturulmayacak.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>%@ için gelecekteki %@) oluşumları artık oluşturulmayacak.</string>
 	<key>General</key>
-	<string>General</string>
+	<string>Genel</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>Yinelenen bir programdan oluşturuldu</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>Coğrafya</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>Başlayın</string>
 	<key>Global</key>
-	<string>Global</string>
+	<string>Küresel</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>Sağlık</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>Sağlık hizmeti</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>Zenginlik Pusulası boyunca finansal değerleri gizleyin.</string>
 	<key>Holdings</key>
-	<string>Holdings</string>
+	<string>Holdingler</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>Konut</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>Yatırım yapılabilir varlıklar nasıl dağıtılır?</string>
+	<key>How the portfolio is distributed</key>
+	<string>Portföy nasıl dağıtılır</string>
+	<key>How to get your API keys</key>
+	<string>API anahtarlarınızı nasıl alırsınız?</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>Kimlik</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>İçe Aktarma Davranışı</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>İçe Aktarma Tamamlandı</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>İçe Aktarma Başarısız</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>JSON Yedeklemesini İçe Aktar</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>JSON'u içe aktar...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>İthalat ve İhracat</string>
+	<key>Imported liquidity account: %@</key>
+	<string>İçe aktarılan likidite hesabı: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>Gelir</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>Aylara göre gelir ve giderler</string>
+	<key>Income less expenses</key>
+	<string>Gelir daha az gider</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>Geçersiz API Anahtarı</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>Yatırım</string>
 	<key>Investment Fee</key>
 	<string>Investment Fee</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>Yatırım başarısızlıkları: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ vadesi gelen yinelenen %@ Nakit Akışına eklendi.</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>%@ için</string>
 	<key>iCloud</key>
-	<string>iCloud</string>
+	<string>iCloud'da</string>
 	<key>iCloud Sync</key>
-	<string>iCloud Sync</string>
+	<string>iCloud Senkronizasyonu</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud Kullanılamıyor</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>iCloud senkronizasyonu çalışmıyor.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

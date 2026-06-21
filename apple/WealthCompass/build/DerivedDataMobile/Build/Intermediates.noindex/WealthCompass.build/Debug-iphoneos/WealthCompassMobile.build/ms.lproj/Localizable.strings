@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld disebabkan urus niaga berulang telah ditambahkan pada Aliran Tunai.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>1 urus niaga berulang disebabkan telah ditambahkan pada Aliran Tunai.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+Kunci API telah disimpan dengan selamat dalam Rantai Kunci.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Kompas Kekayaan akan terus menggunakan %@.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -19,55 +41,99 @@
 	<key>%@ / unit</key>
 	<string>%@ / unit</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ Kunci Apl</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ Kadar cache atau sandaran kekal aktif.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ Gagal</string>
 	<key>%@ NET</key>
-	<string>%@ NET</string>
+	<string>%@ BERSIH</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ Dialih keluar</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ Disimpan</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ sudah wujud dan akan dipilih.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ tidak mengembalikan sebut harga yang boleh digunakan untuk %@.</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ import selesai untuk %@.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ dijadualkan. Buka Kompas Kekayaan untuk menyemaknya.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>Had kadar %@ dicapai. Cuba lagi nanti.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ menolak kunci API.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ mengembalikan HTTP %lld.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ mengembalikan respons yang tidak sah.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ unit</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ akan hilang daripada Transaksi Berulang dan tiada kejadian akan datang akan disisipkan secara automatik.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% prestasi</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@))d lalu</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@))h lalu</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>%@)m yang lalu</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. Diambil %@ dan dicache secara setempat.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. Diambil %@) dan dicache secara setempat.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. Wealth Compass merekodkannya secara automatik apabila apl aktif.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. Kompas Kekayaan merekodkannya semasa apl aktif.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nKunci API telah disimpan dengan selamat dalam Rantai Kunci.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld petikan semasa telah dijana selepas import.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>%lld kategori aliran tunai tersuai telah ditambahkan.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld urus niaga kena dibayar%@ ditambahkan pada Aliran Tunai.</string>
+	<key>%lld holdings</key>
+	<string>%lld pegangan</string>
+	<key>%lld liabilities</key>
+	<string>%lld liabiliti</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld rekod cacat atau tidak lengkap telah dilangkau.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld lagi transaksi disembunyikan oleh paparan ini.</string>
+	<key>%lld positions</key>
+	<string>%lld jawatan</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld urus niaga berjadual telah ditambahkan secara automatik pada Aliran Tunai.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>%lld urus niaga, %lld jadual berulang, %lld pelaburan, %lld pegangan crypto, liabiliti %lld dan %lld syot kilat telah diimport.</string>
+	<key>%lldd ago</key>
+	<string>%lldd lalu</string>
+	<key>%lldh ago</key>
+	<string>%lldj lalu</string>
+	<key>%lldm ago</key>
+	<string>%lldm yang lalu</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 pegangan</string>
+	<key>1 liability</key>
+	<string>1 liabiliti</string>
+	<key>1 position</key>
+	<string>1 kedudukan</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1 transaksi berjadual telah ditambahkan secara automatik pada Aliran Tunai.</string>
 	<key>12M</key>
 	<string>12M</string>
 	<key>3M</key>
@@ -75,347 +141,443 @@
 	<key>6M</key>
 	<string>6M</string>
 	<key>6M NET</key>
-	<string>6M NET</string>
+	<string>BERSIH 6M</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>Kunci API Finnhub diperlukan untuk mengemas kini harga pelaburan.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>Pandangan yang jelas tentang apa yang anda miliki, berhutang, peroleh dan belanjakan.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>Penyegaran harga pasaran sedang dijalankan.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>Kunci API disahkan terhadap petikan langsung sebelum ia disimpan dalam Rantai Kunci macOS.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>ASET</string>
+	<key>Across every asset</key>
+	<string>Merentasi setiap aset</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>Tambah</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>Tambah Kripto</string>
+	<key>Add Crypto Holding</key>
+	<string>Tambah Crypto Holding</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>Tambah Pelaburan</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>Tambah Transaksi</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>Tambahkan pegangan untuk menjejak nilai dan prestasinya.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>Tambahkan pegangan untuk menjejaki nilainya.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Tambahkan kunci baharu dalam Papan Pemuka Pembangun.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>Tambah gambar lain untuk melihat pergerakan</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>Tambah gambar lain untuk melihat pergerakan dari semasa ke semasa</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>Tambahkan tunai yang direkodkan, pelaburan atau pegangan kripto.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>Tambah saham, ETF, bon atau kedudukan lain.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>Tambah pendapatan atau perbelanjaan pertama anda.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>Tambahkan transaksi pertama anda</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>Menambah transaksi atau kedudukan merekodkan petikan untuk carta ini.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>Semua</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>Sepanjang Masa</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>Seluruh Dunia</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>Peruntukan mengikut Geografi</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>Peruntukan mengikut Sektor</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>Peruntukan mengikut Jenis</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>Peruntukan disembunyikan</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>Jumlah</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>Amaun (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>Muat semula kadar pertukaran sedang dijalankan.</string>
 	<key>Apple (AAPL)</key>
 	<string>Apple (AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>Peruntukan Aset</string>
+	<key>Automatic income and expenses</key>
+	<string>Pendapatan dan perbelanjaan automatik</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>Harga Belian Purata</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>Sandaran Dieksport</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Baki yang diperoleh daripada aktiviti dan pegangan anda</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>Mata Wang Asas</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>Pecundang Terbesar</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>Pengesahan biometrik tidak tersedia pada Mac ini.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>Pengesahan biometrik tidak tersedia pada peranti ini.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>Biometrik</string>
 	<key>Bitcoin</key>
 	<string>Bitcoin</string>
 	<key>Bond</key>
 	<string>Bond</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>Pecahan perbelanjaan yang direkodkan</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>Paun British</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>Bina pandangan kewangan pertama anda</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>Yuran Dikira</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>Batal</string>
+	<key>Capital invested</key>
+	<string>Modal dilaburkan</string>
+	<key>Cash</key>
+	<string>Tunai</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>Aliran Tunai</string>
+	<key>Cash flow</key>
+	<string>Aliran tunai</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>Carta aliran tunai disembunyikan</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>kategori</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>Tukar penapis carian, jenis atau tempoh.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>Perubahan tidak boleh disimpan sehingga ralat memuatkan pangkalan data setempat diselesaikan.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>Menyemak akaun iCloud dan menyediakan CloudKit.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>Pilih tempoh lain atau rekod perbelanjaan.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Pilih peringkat API Demo percuma.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>Pengelasan</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>Rekod CloudKit %@ tidak mempunyai muatan.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>Kunci API CoinGecko</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>Kunci API CoinGecko (Crypto)</string>
 	<key>CoinGecko ID</key>
-	<string>CoinGecko ID</string>
+	<string>ID CoinGecko</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko mengembalikan harga Bitcoin secara langsung pada %@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko mengembalikan harga Bitcoin secara langsung pada %@.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>Komoditi</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>Selesai</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>Dikonfigurasikan</string>
+	<key>Confirm your email and sign in.</key>
+	<string>Sahkan e-mel anda dan log masuk.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>Sambungkan Data Pasaran</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>Menyambung</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>Pengguna</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>Teruskan</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>Salin kunci API anda dan tampalkannya di bawah.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>Asas Kos</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Buat akaun Finnhub percuma.</string>
+	<key>Create or sign in to your account.</key>
+	<string>Buat atau log masuk ke akaun anda.</string>
 	<key>Crypto</key>
-	<string>Crypto</string>
+	<string>Kripto</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>Peruntukan Kripto</string>
+	<key>Crypto Holdings</key>
+	<string>Crypto Holdings</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>Nilai Kripto</string>
+	<key>Crypto assets</key>
+	<string>Aset kripto</string>
+	<key>Crypto failures: %@.</key>
+	<string>Kegagalan kripto: %@.</string>
+	<key>Crypto holdings</key>
+	<string>pegangan kripto</string>
+	<key>Crypto market prices</key>
+	<string>Harga pasaran kripto</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Kripto dilangkau: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>mata wang</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>Harga Semasa</string>
+	<key>Current market value</key>
+	<string>Nilai pasaran semasa</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>Kategori Tersuai</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>Nama Kategori Tersuai</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>Nama kategori tersuai</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>tersuai...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>Setiap hari</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>Zon Bahaya</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>Papan pemuka</string>
 	<key>Data</key>
 	<string>Data</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>tarikh</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>Padam</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>Padamkan %@</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>Padamkan Semua Data</string>
+	<key>Delete All Data?</key>
+	<string>Padamkan Semua Data?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>Padamkan Semua Data Setempat...</string>
+	<key>Delete Category</key>
+	<string>Padamkan Kategori</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>Padamkan Crypto Holding?</string>
+	<key>Delete Custom Category?</key>
+	<string>Padamkan Kategori Tersuai?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>Padamkan Pegangan</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>Padamkan Pelaburan</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>Padamkan Pelaburan?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>Padamkan Transaksi Berulang?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>Padamkan Transaksi</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>Padamkan Transaksi?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>Padamkan semua data kewangan tempatan?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>Padamkan jadual</string>
+	<key>Delete transaction</key>
+	<string>Padamkan transaksi</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>Penerangan</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>Butiran</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>Dividen</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>Jadual yang sepatutnya direkodkan secara automatik semasa apl aktif dan terperangkap pada kali berikutnya ia dibuka.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>Jadual yang sepatutnya diikuti dibuka</string>
 	<key>ECB</key>
 	<string>ECB</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>Kadar rujukan ECB dimuat semula secara automatik dan dicache secara tempatan untuk kegunaan luar talian.</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>PERBELANJAAN</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>Sunting</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>Edit Kripto</string>
 	<key>Edit Crypto Holding</key>
 	<string>Edit Crypto Holding</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>Edit Pegangan</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>Edit Pelaburan</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>Edit Transaksi Berulang</string>
+	<key>Edit Transaction</key>
+	<string>Edit Transaksi</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>Edit jadual</string>
+	<key>Edit transaction</key>
+	<string>Edit transaksi</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>Pasaran Baru Muncul</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>Dayakan perlindungan biometrik untuk Kompas Kekayaan.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>Tarikh Tamat</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>tamat</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>Tamat %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>Tamat %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>Tenaga</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Masukkan nama kategori. Ia akan disimpan untuk transaksi %@ akan datang.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>Masukkan nama kategori. Ia akan disimpan untuk transaksi %@) pada masa hadapan.</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>Masukkan nama kategori tersuai.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>Masukkan jumlah yang lebih besar daripada sifar.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>Masukkan yuran broker atau platform yang dikenakan untuk transaksi pelaburan ini. Ia ditambah kepada asas kos kedudukan.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>Masukkan kunci API percuma anda untuk mendapatkan harga saham langsung dan crypto. Ini amat disyorkan—jika tidak, harga aset tidak akan benar atau terkini.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>Hiburan</string>
 	<key>Euro</key>
 	<string>Euro</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>Eropah</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Semua yang anda miliki, hutang, peroleh dan belanjakan.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>Muat Semula Kadar Pertukaran Gagal</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>Kadar Pertukaran</string>
+	<key>Exchange Rates Updated</key>
+	<string>Kadar Pertukaran Dikemaskini</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>Urus niaga sedia ada menggunakan %@ akan mengekalkan label kategori semasa mereka.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>Perbelanjaan</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>Kategori Perbelanjaan</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>Tempoh perbelanjaan</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>Perbelanjaan</string>
+	<key>Expenses grouped by category</key>
+	<string>Perbelanjaan dikumpulkan mengikut kategori</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>Eksport Gagal</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>Eksport JSON...</string>
 	<key>Face ID</key>
-	<string>Face ID</string>
+	<string>ID Wajah</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>Jumlah Yuran</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>Peratusan Yuran</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>Jenis Yuran</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>Kewangan</string>
+	<key>Financial horizon</key>
+	<string>Cakrawala kewangan</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>Selesai</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>Selesaikan Transaksi Berulang?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>Jadual tamat</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>Kunci API Finnhub</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Kunci API Finnhub (Stok)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub mengembalikan petikan AAPL secara langsung di %@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub mengembalikan petikan AAPL secara langsung di %@.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>Kejadian Pertama</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>tetap</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Ikut jawatan, peruntukan dan prestasi.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>Makanan</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>Paksa Segerakkan iCloud</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>Bebas</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>Bahan api</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>Kejadian %@ masa hadapan untuk %@ tidak akan dibuat lagi.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>Kejadian %@) masa hadapan untuk %@ tidak akan dibuat lagi.</string>
 	<key>General</key>
-	<string>General</string>
+	<string>Umum</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>Dihasilkan daripada jadual berulang</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>Geografi</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>Mulakan</string>
 	<key>Global</key>
 	<string>Global</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>Kesihatan</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>Penjagaan kesihatan</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>Sembunyikan nilai kewangan sepanjang Kompas Kekayaan.</string>
 	<key>Holdings</key>
-	<string>Holdings</string>
+	<string>pegangan</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>Perumahan</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>Bagaimana aset boleh labur diagihkan</string>
+	<key>How the portfolio is distributed</key>
+	<string>Bagaimana portfolio diedarkan</string>
+	<key>How to get your API keys</key>
+	<string>Cara mendapatkan kunci API anda</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>identiti</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>Gelagat Import</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>Import Selesai</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>Import Gagal</string>
 	<key>Import JSON Backup</key>
 	<string>Import JSON Backup</string>
 	<key>Import JSON...</key>
 	<string>Import JSON...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>Import dan Eksport</string>
+	<key>Imported liquidity account: %@</key>
+	<string>Akaun kecairan yang diimport: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>pendapatan</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>Pendapatan dan perbelanjaan mengikut bulan</string>
+	<key>Income less expenses</key>
+	<string>Pendapatan kurang perbelanjaan</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>Kunci API tidak sah</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>Pelaburan</string>
 	<key>Investment Fee</key>
 	<string>Investment Fee</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>Kegagalan pelaburan: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ kerana berulang %@ ditambahkan pada Aliran Tunai.</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>untuk %@</string>
 	<key>iCloud</key>
 	<string>iCloud</string>
 	<key>iCloud Sync</key>
-	<string>iCloud Sync</string>
+	<string>Penyegerakan iCloud</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud Tidak Tersedia</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>Penyegerakan iCloud tidak berjalan.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

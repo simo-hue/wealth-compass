@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld 到期經常性交易已加入現金流量。</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>現金流量中新增了 1 項到期經常性交易。</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+API 金鑰安全地保存在 Keychain 中。</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+財富指南針將繼續使用%@。</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,57 +39,101 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@ / 單位</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ 應用程式鎖定</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ 快取或回退率保持活動狀態。</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ 失敗</string>
 	<key>%@ NET</key>
-	<string>%@ NET</string>
+	<string>%@ 網路</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ 已刪除</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ 已保存</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ 已存在並將被選取。</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ 未傳回 %@ 的可用報價。</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ 的 %@ 導入已完成。</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ 已安排。打開財富指南針進行查看。</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>已達到 %@ 速率限制。稍後再試。</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ 拒絕了 API 金鑰。</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ 傳回 HTTP %lld。</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ 傳回無效回應。</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ 單位</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ 將從定期交易中消失，並且不會自動插入將來發生的事件。</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% 效能</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@))d 前</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@)) 小時前</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>%@)m 前</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@。取得 %@ 並緩存在本機。</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@。取得 %@) 並緩存在本機。</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@：%@。當應用程式處於活動狀態時，財富指南針會自動記錄它。</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@：%@。財富指南針會在應用程式處於活動狀態時記錄它。</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nAPI 金鑰已安全保存在鑰匙圈中。</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld 目前快照是匯入後產生的。</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>新增了 %lld 自訂現金流量類別。</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld 到期交易%@ 加入現金流。</string>
+	<key>%lld holdings</key>
+	<string>%lld 持股</string>
+	<key>%lld liabilities</key>
+	<string>%lld 負債</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld 格式錯誤或不完整的記錄被跳過。</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld 此視圖隱藏了更多交易。</string>
+	<key>%lld positions</key>
+	<string>%lld 職位</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld 預定交易已自動加入現金流量。</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>匯入了 %lld 交易、%lld 經常性計畫、%lld 投資、%lld 加密資產、%lld 負債和 %lld 快照。</string>
+	<key>%lldd ago</key>
+	<string>%lldd 前</string>
+	<key>%lldh ago</key>
+	<string>%lld 小時前</string>
+	<key>%lldm ago</key>
+	<string>%lld分鐘前</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 控股</string>
+	<key>1 liability</key>
+	<string>1 責任</string>
+	<key>1 position</key>
+	<string>1 個職位</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1 項預定交易已自動加入現金流量。</string>
 	<key>12M</key>
 	<string>12M</string>
 	<key>3M</key>
@@ -75,347 +141,443 @@
 	<key>6M</key>
 	<string>6M</string>
 	<key>6M NET</key>
-	<string>6M NET</string>
+	<string>6M網</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>更新投資價格需要 Finnhub API 金鑰。</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>清楚了解您擁有的、欠下的、賺取的和支出的內容。</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>市場價格更新已經在進行中。</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>API 金鑰在儲存到 macOS 鑰匙圈之前會根據即時報價進行驗證。</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>資產</string>
+	<key>Across every asset</key>
+	<string>涵蓋每項資產</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>添加</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>新增加密貨幣</string>
+	<key>Add Crypto Holding</key>
+	<string>新增加密貨幣持有</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>添加投資</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>新增交易</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>添加控股以追蹤其價值和表現。</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>添加控股以跟踪其價值。</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>在開發人員儀表板中新增密鑰。</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>添加另一個快照以查看運動</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>新增另一個快照以查看隨時間的變化</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>新增記錄的現金、投資或加密貨幣持有。</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>新增股票、ETF、債券或其他部位。</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>新增您的第一筆收入或支出。</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>新增您的第一筆交易</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>新增交易或頭寸會記錄此圖表的快照。</string>
 	<key>All</key>
-	<string>All</string>
+	<string>全部</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>所有時間</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>全世界</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>依地域分配</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>按部門分配</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>按類型分配</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>分配隱藏</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>數量</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>金額 (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>匯率刷新正在進行中。</string>
 	<key>Apple (AAPL)</key>
-	<string>Apple (AAPL)</string>
+	<string>蘋果 (AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>資產配置</string>
+	<key>Automatic income and expenses</key>
+	<string>自動收入和支出</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>平均買入價</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>備份匯出</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>來自您的活動和持有量的餘額</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>基礎貨幣</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>最大輸家</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>此 Mac 上不提供生物辨識身份驗證。</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>此設備不支援生物辨識身份驗證。</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>生物辨識技術</string>
 	<key>Bitcoin</key>
-	<string>Bitcoin</string>
+	<string>比特幣</string>
 	<key>Bond</key>
-	<string>Bond</string>
+	<string>紐帶</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>記錄支出明細</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>英鎊</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>建立您的第一個財務視圖</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>計算費用</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>取消</string>
+	<key>Capital invested</key>
+	<string>投入資本</string>
+	<key>Cash</key>
+	<string>現金</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>現金週轉</string>
+	<key>Cash flow</key>
+	<string>現金週轉</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>隱藏的現金流量圖</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>類別</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>變更搜尋、類型或期間篩選器。</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>在解決本地資料庫載入錯誤之前，無法儲存變更。</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>檢查 iCloud 帳戶並準備 CloudKit。</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>選擇另一個期間或記錄費用。</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>選擇免費的演示 API 層。</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>分類</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>CloudKit 記錄 %@ 沒有有效負載。</string>
+	<key>CoinGecko</key>
+	<string>幣壁虎</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>CoinGecko API 金鑰</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>CoinGecko API 金鑰（加密）</string>
 	<key>CoinGecko ID</key>
 	<string>CoinGecko ID</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko 回傳了即時比特幣價格 %@))。</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko 回傳了 %@ 的即時比特幣價格。</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>商品</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>完全的</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>已配置</string>
+	<key>Confirm your email and sign in.</key>
+	<string>確認您的電子郵件並登入。</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>連結市場數據</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>正在連接</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>消費者</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>繼續</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>複製您的 API 金鑰並將其貼到下面。</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>成本基礎</string>
+	<key>Create a free Finnhub account.</key>
+	<string>建立一個免費的 Finnhub 帳戶。</string>
+	<key>Create or sign in to your account.</key>
+	<string>建立或登入您的帳戶。</string>
 	<key>Crypto</key>
-	<string>Crypto</string>
+	<string>加密貨幣</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>加密貨幣分配</string>
+	<key>Crypto Holdings</key>
+	<string>加密控股</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>加密價值</string>
+	<key>Crypto assets</key>
+	<string>加密資產</string>
+	<key>Crypto failures: %@.</key>
+	<string>加密失敗：%@。</string>
+	<key>Crypto holdings</key>
+	<string>加密貨幣持有量</string>
+	<key>Crypto market prices</key>
+	<string>加密貨幣市場價格</string>
+	<key>Crypto skipped: %@.</key>
+	<string>跳過加密：%@。</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>貨幣</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>目前價格</string>
+	<key>Current market value</key>
+	<string>當前市場價值</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>自訂類別</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>自訂類別名稱</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>自訂類別名稱</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>風俗...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>日常的</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>危險區</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>儀表板</string>
 	<key>Data</key>
-	<string>Data</string>
+	<string>數據</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>日期</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>刪除</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>刪除 %@</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>刪除所有數據</string>
+	<key>Delete All Data?</key>
+	<string>刪除所有資料？</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>刪除所有本機資料...</string>
+	<key>Delete Category</key>
+	<string>刪除類別</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>刪除加密貨幣持有？</string>
+	<key>Delete Custom Category?</key>
+	<string>刪除自訂類別？</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>刪除控股</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>刪除投資</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>刪除投資？</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>刪除重複交易？</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>刪除交易</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>刪除交易？</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>刪除所有本地財務資料？</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>刪除行程</string>
+	<key>Delete transaction</key>
+	<string>刪除交易</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>描述</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>細節</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>股利</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>當應用程式處於活動狀態時，會自動記錄到期時間表，並在下次開啟時進行記錄。</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>到期時間表趕上開放時間</string>
 	<key>ECB</key>
-	<string>ECB</string>
+	<string>歐洲央行</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>歐洲央行參考利率會自動刷新並本地緩存以供離線使用。</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>開支</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>編輯</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>編輯加密貨幣</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>編輯加密貨幣持有</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>編輯控股</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>編輯投資</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>編輯經常性交易</string>
+	<key>Edit Transaction</key>
+	<string>編輯交易</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>編輯日程</string>
+	<key>Edit transaction</key>
+	<string>編輯交易</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>新興市場</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>為 Wealth Compass 啟用生物辨識保護。</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>結束日期</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>結束</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>結束 %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>結束 %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>活力</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>輸入類別名稱。它將被保存以供將來的 %@ 交易使用。</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>輸入類別名稱。它將被保存以供將來 %@) 交易使用。</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>輸入自訂類別名稱。</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>輸入大於零的金額。</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>輸入為此投資交易收取的經紀人或平台費用。它被添加到職位成本基礎中。</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>輸入您的免費 API 金鑰以取得即時股票和加密貨幣價格。強烈建議這樣做，否則資產價格將不是真實的或最新的。</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>娛樂</string>
 	<key>Euro</key>
-	<string>Euro</string>
+	<string>歐元</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>歐洲</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>你擁有、欠下、賺和花掉的一切。</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>匯率刷新失敗</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>匯率</string>
+	<key>Exchange Rates Updated</key>
+	<string>匯率更新</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>使用 %@ 的現有交易將保留其目前類別標籤。</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>費用</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>費用類別</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>費用期間</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>開支</string>
+	<key>Expenses grouped by category</key>
+	<string>按類別分組的費用</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>匯出失敗</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>導出 JSON...</string>
 	<key>Face ID</key>
-	<string>Face ID</string>
+	<string>人臉辨識</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>費用金額</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>費用百分比</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>費用類型</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>金融</string>
+	<key>Financial horizon</key>
+	<string>財務視野</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>結束</string>
 	<key>Finish Recurring Transaction?</key>
 	<string>Finish Recurring Transaction?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>完成時間表</string>
+	<key>Finnhub</key>
+	<string>芬蘭中心</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>Finnhub API 金鑰</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Finnhub API 金鑰（股票）</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub 在 %@)) 回傳了 AAPL 即時報價。</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub 在 %@ 回傳了即時 AAPL 報價。</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>第一次出現</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>固定的</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>遵循職位、分配和績效。</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>食物</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>強制同步 iCloud</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>自由工作者</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>燃料</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>將不再建立 %@ 的未來 %@ 事件。</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>將不再建立 %@ 的未來 %@) 事件。</string>
 	<key>General</key>
-	<string>General</string>
+	<string>一般的</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>根據循環計劃生成</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>地理</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>開始使用</string>
 	<key>Global</key>
-	<string>Global</string>
+	<string>全球的</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>健康</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>衛生保健</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>在財富指南針中隱藏財務價值。</string>
 	<key>Holdings</key>
-	<string>Holdings</string>
+	<string>控股</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>住房</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>可投資資產如何分配</string>
+	<key>How the portfolio is distributed</key>
+	<string>投資組合如何分配</string>
+	<key>How to get your API keys</key>
+	<string>如何取得您的 API 金鑰</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>身分</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>導入行為</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>導入完成</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>導入失敗</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>導入 JSON 備份</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>導入 JSON...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>進出口</string>
+	<key>Imported liquidity account: %@</key>
+	<string>導入流動性帳戶：%@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>收入</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>按月劃分的收入和支出</string>
+	<key>Income less expenses</key>
+	<string>收入減去支出</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>API 金鑰無效</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>投資</string>
 	<key>Investment Fee</key>
 	<string>Investment Fee</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>投資失敗：%@。</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ 由於經常性 %@ 加入現金流量。</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>對於 %@</string>
 	<key>iCloud</key>
 	<string>iCloud</string>
 	<key>iCloud Sync</key>
-	<string>iCloud Sync</string>
+	<string>iCloud 同步</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud 不可用</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>iCloud 同步未運作。</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

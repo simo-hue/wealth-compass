@@ -76,23 +76,31 @@ struct ContentView: View {
     private var tabs: some View {
         TabView {
             DashboardView()
-                .tabItem { Label("Dashboard", systemImage: "gauge.with.dots.needle.67percent") }
+                .tabItem { Label(TabBarLabels.dashboard, systemImage: "gauge.with.dots.needle.67percent") }
 
             CashFlowView()
-                .tabItem { Label("Cash Flow", systemImage: "arrow.left.arrow.right") }
+                .tabItem { Label(TabBarLabels.cashFlow, systemImage: "arrow.left.arrow.right") }
 
             InvestmentsView()
-                .tabItem { Label("Investments", systemImage: "chart.line.uptrend.xyaxis") }
+                .tabItem { Label(TabBarLabels.investments, systemImage: "chart.line.uptrend.xyaxis") }
 
             CryptoView()
-                .tabItem { Label("Crypto", systemImage: "bitcoinsign.circle") }
+                .tabItem { Label(TabBarLabels.crypto, systemImage: "bitcoinsign.circle") }
 
             SettingsView()
-                .tabItem { Label("Settings", systemImage: "gearshape") }
+                .tabItem { Label(TabBarLabels.settings, systemImage: "gearshape") }
         }
         .tint(WCColor.primary)
         .toolbarColorScheme(.dark, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
+        // #region agent log
+        .onAppear {
+            I18nDebugLog.auditTabBarLabels(appLanguage: settings.appLanguage, runId: "post-fix")
+        }
+        .onChange(of: settings.appLanguage) { _, _ in
+            I18nDebugLog.auditTabBarLabels(appLanguage: settings.appLanguage, runId: "post-fix")
+        }
+        // #endregion
     }
 
     private func handleAppBecameActive() async {

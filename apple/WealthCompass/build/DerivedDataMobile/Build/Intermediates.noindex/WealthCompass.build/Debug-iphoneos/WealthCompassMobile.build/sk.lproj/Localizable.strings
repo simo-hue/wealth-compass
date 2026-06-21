@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>Do Cash Flow bolo pridaných %lld splatných opakujúcich sa transakcií.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>Do Cash Flow bola pridaná 1 splatná opakujúca sa transakcia.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+Kľúč API bol bezpečne uložený v Keychain.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Wealth Compass bude naďalej používať %@.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,405 +39,545 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@ / jednotka</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ Zámok aplikácie</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ Hodnoty uložené vo vyrovnávacej pamäti alebo záložné hodnoty zostávajú aktívne.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ zlyhalo</string>
 	<key>%@ NET</key>
 	<string>%@ NET</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ Odstránené</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ Uložené</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ už existuje a bude vybratý.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ nevrátil použiteľnú cenovú ponuku pre %@.</string>
+	<key>%@ import completed for %@.</key>
+	<string>Import %@ pre %@ bol dokončený.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ je naplánované. Otvorte kompas bohatstva a skontrolujte ho.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>Bol dosiahnutý limit rýchlosti %@. Skúste to znova neskôr.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ odmietol kľúč API.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ vrátil HTTP %lld.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ vrátilo neplatnú odpoveď.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ jednotiek</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ zmizne z opakujúcich sa transakcií a nebudú sa automaticky vkladať žiadne budúce výskyty.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>Výkon %@%%</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>pred %@))d</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>pred %@))h</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>pred %@) min</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. Načítané %@ a uložené do lokálnej vyrovnávacej pamäte.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. Načítané %@) a uložené do lokálnej vyrovnávacej pamäte.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. Wealth Compass to automaticky zaznamená, keď je aplikácia aktívna.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. Wealth Compass to zaznamenáva, keď je aplikácia aktívna.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nKľúč API bol bezpečne uložený v Keychain.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>Po importe bola vygenerovaná aktuálna snímka %lld.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>Boli pridané %lld vlastné kategórie peňažných tokov.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld splatná transakcia%@ pridaná do peňažného toku.</string>
+	<key>%lld holdings</key>
+	<string>%lld holdingy</string>
+	<key>%lld liabilities</key>
+	<string>%lld záväzkov</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld chybné alebo neúplné záznamy boli preskočené.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld ďalších transakcií skrytých týmto zobrazením.</string>
+	<key>%lld positions</key>
+	<string>%lld pozícií</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld naplánované transakcie boli automaticky pridané do Cash Flow.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>Boli importované %lld transakcie, %lld opakujúce sa plány, %lld investície, %lld držby kryptomien, %lld záväzky a %lld snímky.</string>
+	<key>%lldd ago</key>
+	<string>pred %lldd</string>
+	<key>%lldh ago</key>
+	<string>pred %lldh</string>
+	<key>%lldm ago</key>
+	<string>pred %lldm</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 držanie</string>
+	<key>1 liability</key>
+	<string>1 zodpovednosť</string>
+	<key>1 position</key>
+	<string>1 pozíciu</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1 plánovaná transakcia bola automaticky pridaná do Cash Flow.</string>
 	<key>12M</key>
-	<string>12M</string>
+	<string>12 miliónov</string>
 	<key>3M</key>
 	<string>3M</string>
 	<key>6M</key>
-	<string>6M</string>
+	<string>6 mil</string>
 	<key>6M NET</key>
 	<string>6M NET</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>Na aktualizáciu investičných cien je potrebný kľúč API Finnhub.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>Jasný prehľad o tom, čo vlastníte, čo dlhujete, zarábate a míňate.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>Obnovenie trhovej ceny už prebieha.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>Kľúče API sa pred uložením do kľúča macOS overia podľa aktuálnej cenovej ponuky.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>AKTÍVA</string>
+	<key>Across every asset</key>
+	<string>Naprieč každým aktívom</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>Pridať</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>Pridajte Crypto</string>
+	<key>Add Crypto Holding</key>
+	<string>Pridajte Crypto Holding</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>Pridať investície</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>Pridať transakciu</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>Pridajte holding a sledujte jeho hodnotu a výkonnosť.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>Pridajte holding na sledovanie jeho hodnoty.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Pridajte nový kľúč na paneli Developer Dashboard.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>Pridajte ďalšiu snímku, aby ste videli pohyb</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>Pridajte ďalšiu snímku, aby ste videli pohyb v priebehu času</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>Pridajte zaznamenanú hotovosť, investíciu alebo držbu kryptomien.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>Pridajte akcie, ETF, dlhopisy alebo iné pozície.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>Pridajte svoj prvý príjem alebo výdavok.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>Pridajte svoju prvú transakciu</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>Pridaním transakcie alebo pozície sa zaznamená snímka tohto grafu.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>Všetky</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>Všetky časy</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>Celý svet</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>Pridelenie podľa geografie</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>Pridelenie podľa sektorov</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>Pridelenie podľa typu</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>Pridelenie skryté</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>Suma</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>Suma (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>Obnovenie výmenného kurzu už prebieha.</string>
 	<key>Apple (AAPL)</key>
 	<string>Apple (AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>Alokácia aktív</string>
+	<key>Automatic income and expenses</key>
+	<string>Automatické príjmy a výdavky</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>Priemerná nákupná cena</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>Záloha bola exportovaná</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Zostatky odvodené z vašej činnosti a podielov</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>Základná mena</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>Najväčší Loser</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>Biometrické overenie nie je na tomto Macu dostupné.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>Na tomto zariadení nie je k dispozícii biometrické overenie.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>Biometria</string>
 	<key>Bitcoin</key>
 	<string>Bitcoin</string>
 	<key>Bond</key>
 	<string>Bond</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>Rozdelenie zaznamenaných výdavkov</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>Britská libra</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>Vytvorte si svoj prvý finančný pohľad</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>Vypočítaný poplatok</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>Zrušiť</string>
+	<key>Capital invested</key>
+	<string>Investovaný kapitál</string>
+	<key>Cash</key>
+	<string>Hotovosť</string>
 	<key>Cash Flow</key>
 	<string>Cash Flow</string>
+	<key>Cash flow</key>
+	<string>Peňažný tok</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>Skrytý graf cash-flow</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>Kategória</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>Zmeňte filtre vyhľadávania, typu alebo obdobia.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>Zmeny nie je možné uložiť, kým sa nevyrieši chyba načítania lokálnej databázy.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>Kontrola účtu iCloud a príprava CloudKit.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>Vyberte si iné obdobie alebo zaznamenajte výdavok.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Vyberte si bezplatnú úroveň rozhrania Demo API.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>Klasifikácia</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>Záznam CloudKit %@ nemá žiadne užitočné zaťaženie.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>CoinGecko API kľúč</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>CoinGecko API kľúč (Crypto)</string>
 	<key>CoinGecko ID</key>
-	<string>CoinGecko ID</string>
+	<string>ID CoinGecko</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko vrátilo živú cenu bitcoinu na %@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko vrátilo živú cenu bitcoinu na %@.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>Komodita</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>Dokončené</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>Nakonfigurované</string>
+	<key>Confirm your email and sign in.</key>
+	<string>Potvrďte svoj e-mail a prihláste sa.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>Pripojte údaje o trhu</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>Pripája sa</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>Spotrebiteľ</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>Pokračovať</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>Skopírujte svoj kľúč API a vložte ho nižšie.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>Základ nákladov</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Vytvorte si bezplatný účet Finnhub.</string>
+	<key>Create or sign in to your account.</key>
+	<string>Vytvorte si účet alebo sa doň prihláste.</string>
 	<key>Crypto</key>
 	<string>Crypto</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>Prideľovanie kryptomien</string>
+	<key>Crypto Holdings</key>
+	<string>Crypto Holdings</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>Hodnota kryptomeny</string>
+	<key>Crypto assets</key>
+	<string>Krypto aktíva</string>
+	<key>Crypto failures: %@.</key>
+	<string>Zlyhania šifrovania: %@.</string>
+	<key>Crypto holdings</key>
+	<string>Kryptomeny</string>
+	<key>Crypto market prices</key>
+	<string>Trhové ceny kryptomien</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Preskočené šifrovanie: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>mena</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>Aktuálna cena</string>
+	<key>Current market value</key>
+	<string>Aktuálna trhová hodnota</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>Vlastné kategórie</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>Názov vlastnej kategórie</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>Názov vlastnej kategórie</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>Vlastné...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>Denne</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>Nebezpečná zóna</string>
 	<key>Dashboard</key>
 	<string>Dashboard</string>
 	<key>Data</key>
-	<string>Data</string>
+	<string>Údaje</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>Dátum</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>Odstrániť</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>Odstrániť %@</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>Vymazať všetky údaje</string>
+	<key>Delete All Data?</key>
+	<string>Odstrániť všetky údaje?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>Odstrániť všetky miestne údaje...</string>
+	<key>Delete Category</key>
+	<string>Odstrániť kategóriu</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>Odstrániť kryptomeny?</string>
+	<key>Delete Custom Category?</key>
+	<string>Odstrániť vlastnú kategóriu?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>Odstrániť držanie</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>Odstrániť investíciu</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>Odstrániť investíciu?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>Odstrániť opakujúcu sa transakciu?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>Odstrániť transakciu</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>Chcete odstrániť transakciu?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>Odstrániť všetky miestne finančné údaje?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>Odstrániť plán</string>
+	<key>Delete transaction</key>
+	<string>Odstrániť transakciu</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>Popis</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>Podrobnosti</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>Dividendy</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>Plány termínov sa zaznamenávajú automaticky, keď je aplikácia aktívna, a zachytia sa pri ďalšom otvorení.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>Termíny dobiehajú otvorené</string>
 	<key>ECB</key>
 	<string>ECB</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>Referenčné sadzby ECB sa automaticky obnovujú a lokálne sa ukladajú do vyrovnávacej pamäte na použitie offline.</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>NÁKLADY</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>Upraviť</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>Upraviť kryptomeny</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>Upraviť Crypto Holding</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>Upraviť Holding</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>Upraviť investíciu</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>Upraviť opakujúcu sa transakciu</string>
+	<key>Edit Transaction</key>
+	<string>Upraviť transakciu</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>Upraviť rozvrh</string>
+	<key>Edit transaction</key>
+	<string>Upraviť transakciu</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>rozvíjajúce sa trhy</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>Povoliť biometrickú ochranu pre Wealth Compass.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>Dátum ukončenia</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>Koniec</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>Končí sa %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>Končí %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>Energia</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Zadajte názov kategórie. Uloží sa pre budúce transakcie %@.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>Zadajte názov kategórie. Uloží sa pre budúce %@) transakcie.</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>Zadajte názov vlastnej kategórie.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>Zadajte sumu väčšiu ako nula.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>Zadajte poplatok za sprostredkovateľa alebo platformu účtovaný za túto investičnú transakciu. Pripočítava sa k základu nákladov na pozíciu.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>Zadajte svoje bezplatné kľúče API a získajte ceny akcií a kryptomien. Toto sa dôrazne odporúča – v opačnom prípade nebudú ceny aktív skutočné ani aktuálne.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>Zábava</string>
 	<key>Euro</key>
-	<string>Euro</string>
+	<string>eur</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>Európe</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Všetko, čo vlastníte, dlžíte, zarábate a míňate.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>Obnovenie výmenného kurzu zlyhalo</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>Výmenné kurzy</string>
+	<key>Exchange Rates Updated</key>
+	<string>Výmenné kurzy aktualizované</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>Existujúce transakcie používajúce %@ si zachovajú svoj aktuálny štítok kategórie.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>Výdavok</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>Kategórie výdavkov</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>Nákladové obdobie</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>Výdavky</string>
+	<key>Expenses grouped by category</key>
+	<string>Výdavky zoskupené podľa kategórie</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>Export zlyhal</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>Exportovať JSON...</string>
 	<key>Face ID</key>
-	<string>Face ID</string>
+	<string>ID tváre</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>Výška poplatku</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>Percento poplatku</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>Typ poplatku</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>Financie</string>
+	<key>Financial horizon</key>
+	<string>Finančný horizont</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>Dokončiť</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>Dokončiť opakujúcu sa transakciu?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>Dokončiť rozvrh</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>Kľúč API Finnhub</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Finnhub API kľúč (akcie)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub vrátil aktuálnu cenovú ponuku AAPL na %@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub vrátil aktuálnu cenovú ponuku AAPL na %@.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>Prvý výskyt</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>Opravené</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Sledujte pozície, rozdelenie a výkon.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>Jedlo</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>Vynútiť synchronizáciu iCloud</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>Na voľnej nohe</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>Palivo</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>Budúce výskyty %@ pre %@ sa už nebudú vytvárať.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>Budúce %@) výskyty pre %@ sa už nebudú vytvárať.</string>
 	<key>General</key>
-	<string>General</string>
+	<string>generál</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>Vygenerované z opakujúceho sa plánu</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>Geografia</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>Začíname</string>
 	<key>Global</key>
-	<string>Global</string>
+	<string>globálne</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>Zdravie</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>Zdravotníctvo</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>Skryť finančné hodnoty v rámci Wealth Compass.</string>
 	<key>Holdings</key>
 	<string>Holdings</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>Bývanie</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>Ako sa rozdeľuje investovateľný majetok</string>
+	<key>How the portfolio is distributed</key>
+	<string>Ako je portfólio rozdelené</string>
+	<key>How to get your API keys</key>
+	<string>Ako získať kľúče API</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>Identita</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>Správanie importu</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>Import dokončený</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>Import zlyhal</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>Importujte zálohu JSON</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>Importovať JSON...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>Import a Export</string>
+	<key>Imported liquidity account: %@</key>
+	<string>Importovaný účet likvidity: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>Príjem</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>Príjmy a výdavky podľa mesiaca</string>
+	<key>Income less expenses</key>
+	<string>Príjem mínus výdavky</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>Neplatný kľúč API</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>Investície</string>
 	<key>Investment Fee</key>
 	<string>Investment Fee</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>Neúspechy investícií: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ z dôvodu opakujúcich sa %@ pridaných do peňažného toku.</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>pre %@</string>
 	<key>iCloud</key>
 	<string>iCloud</string>
 	<key>iCloud Sync</key>
 	<string>iCloud Sync</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud nedostupný</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>Synchronizácia iCloud nie je spustená.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

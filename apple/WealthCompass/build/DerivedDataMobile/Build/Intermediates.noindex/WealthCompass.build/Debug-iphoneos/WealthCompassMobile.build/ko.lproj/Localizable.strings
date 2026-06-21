@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld 반복 거래가 현금 흐름에 추가되었습니다.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>1개의 정기 반복 거래가 현금 흐름에 추가되었습니다.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+API 키는 키체인에 안전하게 저장되었습니다.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Wealth Compass는 %@을(를) 계속 사용할 것입니다.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,57 +39,101 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@/단위</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ 앱 잠금</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ 캐시된 비율 또는 대체 비율은 활성 상태로 유지됩니다.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ 실패</string>
 	<key>%@ NET</key>
 	<string>%@ NET</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ 삭제됨</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ 저장됨</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@이(가) 이미 존재하며 선택됩니다.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@이(가) %@에 대해 사용 가능한 견적을 반환하지 않았습니다.</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@에 대한 %@ 가져오기가 완료되었습니다.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@이(가) 예정되어 있습니다. Wealth Compass를 열어서 검토하세요.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>%@ 속도 제한에 도달했습니다. 나중에 다시 시도하세요.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@이(가) API 키를 거부했습니다.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@이(가) HTTP %lld을(를) 반환했습니다.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@이(가) 잘못된 응답을 반환했습니다.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ 단위</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@은(는) 반복 거래에서 사라지며 향후 발생 항목은 자동으로 삽입되지 않습니다.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% 성능</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@))일 전</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@))시간 전</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>%@)분 전</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. %@을 가져와 로컬에 캐시했습니다.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. %@)을 가져와 로컬에 캐시했습니다.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. Wealth Compass는 앱이 활성화되면 자동으로 기록합니다.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. Wealth Compass는 앱이 활성화된 동안 이를 기록합니다.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nAPI 키가 키체인에 안전하게 저장되었습니다.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld 현재 스냅샷은 가져온 후 생성되었습니다.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>%lld 맞춤형 현금 흐름 카테고리가 추가되었습니다.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld 거래 기한%@이 현금 흐름에 추가되었습니다.</string>
+	<key>%lld holdings</key>
+	<string>%lld 보유</string>
+	<key>%lld liabilities</key>
+	<string>%lld 부채</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld 형식이 잘못되었거나 불완전한 레코드를 건너뛰었습니다.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld 더 많은 거래가 이 보기에 의해 숨겨졌습니다.</string>
+	<key>%lld positions</key>
+	<string>%lld 위치</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld 예정된 거래가 현금 흐름에 자동으로 추가되었습니다.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>%lld 거래, %lld 반복 일정, %lld 투자, %lld 암호화폐 보유, %lld 부채 및 %lld 스냅샷을 가져왔습니다.</string>
+	<key>%lldd ago</key>
+	<string>%lldd 전</string>
+	<key>%lldh ago</key>
+	<string>%lld시간 전</string>
+	<key>%lldm ago</key>
+	<string>%lld분 전</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1개 보유</string>
+	<key>1 liability</key>
+	<string>책임 1개</string>
+	<key>1 position</key>
+	<string>1개 위치</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1개의 예정된 거래가 현금 흐름에 자동으로 추가되었습니다.</string>
 	<key>12M</key>
 	<string>12M</string>
 	<key>3M</key>
@@ -76,346 +142,442 @@
 	<string>6M</string>
 	<key>6M NET</key>
 	<string>6M NET</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>투자 가격을 업데이트하려면 Finnhub API 키가 필요합니다.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>귀하가 소유하고, 빚지고, 벌고, 지출하는 것을 명확하게 볼 수 있습니다.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>시장 가격 갱신이 이미 진행 중입니다.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>API 키는 macOS 키체인에 저장되기 전에 실시간 견적을 통해 확인됩니다.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>자산</string>
+	<key>Across every asset</key>
+	<string>모든 자산에 걸쳐</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>추가하다</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>암호화폐 추가</string>
+	<key>Add Crypto Holding</key>
+	<string>암호화폐 보유 추가</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>투자 추가</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>거래 추가</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>가치와 성과를 추적하려면 보유 종목을 추가하세요.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>가치를 추적하려면 보유 종목을 추가하세요.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>개발자 대시보드에 새 키를 추가하세요.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>움직임을 보려면 다른 스냅샷을 추가하세요.</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>시간 경과에 따른 움직임을 보려면 다른 스냅샷을 추가하세요.</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>기록된 현금, 투자 또는 암호화폐 보유를 추가하세요.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>주식, ETF, 채권 또는 기타 포지션을 추가하세요.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>첫 수입이나 지출을 추가하세요.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>첫 번째 거래 추가</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>거래나 포지션을 추가하면 이 차트에 대한 스냅샷이 기록됩니다.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>모두</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>모든 시간</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>모든 세계</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>지역별 할당</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>부문별 할당</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>유형별 할당</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>숨겨진 할당</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>양</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>금액(%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>환율 새로고침이 이미 진행 중입니다.</string>
 	<key>Apple (AAPL)</key>
-	<string>Apple (AAPL)</string>
+	<string>애플(AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>자산배분</string>
+	<key>Automatic income and expenses</key>
+	<string>자동 수입과 지출</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>평균 구매 가격</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>백업을 내보냈습니다.</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>귀하의 활동 및 보유 자산에서 파생된 잔액</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>기본 통화</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>가장 큰 패자</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>이 Mac에서는 생체 인증을 사용할 수 없습니다.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>이 기기에서는 생체 인증을 사용할 수 없습니다.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>생체 인식</string>
 	<key>Bitcoin</key>
-	<string>Bitcoin</string>
+	<string>비트코인</string>
 	<key>Bond</key>
-	<string>Bond</string>
+	<string>노예</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>기록된 지출 분석</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>영국 파운드</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>첫 번째 재무 뷰 구축</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>계산된 수수료</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>취소</string>
+	<key>Capital invested</key>
+	<string>투자된 자본</string>
+	<key>Cash</key>
+	<string>현금</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>현금흐름</string>
+	<key>Cash flow</key>
+	<string>현금흐름</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>숨겨진 현금 흐름 차트</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>범주</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>검색, 유형 또는 기간 필터를 변경합니다.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>로컬 데이터베이스 로드 오류가 해결될 때까지 변경 사항을 저장할 수 없습니다.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>iCloud 계정을 확인하고 CloudKit을 준비 중입니다.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>다른 기간을 선택하거나 비용을 기록하세요.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>무료 데모 API 계층을 선택하세요.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>분류</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>CloudKit 레코드 %@에는 페이로드가 없습니다.</string>
+	<key>CoinGecko</key>
+	<string>코인게코</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>코인게코 API 키</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>CoinGecko API 키(암호화폐)</string>
 	<key>CoinGecko ID</key>
-	<string>CoinGecko ID</string>
+	<string>코인게코 ID</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko는 %@)에 실시간 비트코인 ​​가격을 반환했습니다.</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko는 %@에서 실시간 비트코인 ​​가격을 반환했습니다.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>상품</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>완전한</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>구성됨</string>
+	<key>Confirm your email and sign in.</key>
+	<string>이메일을 확인하고 로그인하세요.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>시장 데이터 연결</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>연결 중</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>소비자</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>계속하다</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>API 키를 복사하여 아래에 붙여넣으세요.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>비용 기준</string>
+	<key>Create a free Finnhub account.</key>
+	<string>무료 Finnhub 계정을 만드세요.</string>
+	<key>Create or sign in to your account.</key>
+	<string>계정을 만들거나 로그인하세요.</string>
 	<key>Crypto</key>
-	<string>Crypto</string>
+	<string>암호화폐</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>암호화폐 할당</string>
+	<key>Crypto Holdings</key>
+	<string>암호화폐 홀딩스</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>암호화폐 가치</string>
+	<key>Crypto assets</key>
+	<string>암호화폐 자산</string>
+	<key>Crypto failures: %@.</key>
+	<string>암호화 실패: %@.</string>
+	<key>Crypto holdings</key>
+	<string>암호화폐 보유</string>
+	<key>Crypto market prices</key>
+	<string>암호화폐 시장 가격</string>
+	<key>Crypto skipped: %@.</key>
+	<string>건너뛴 암호화: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>통화</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>현재 가격</string>
+	<key>Current market value</key>
+	<string>현재 시장 가치</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>맞춤 카테고리</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>맞춤 카테고리 이름</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>맞춤 카테고리 이름</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>관습...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>일일</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>위험지대</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>계기반</string>
 	<key>Data</key>
-	<string>Data</string>
+	<string>데이터</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>날짜</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>삭제</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>%@ 삭제</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>모든 데이터 삭제</string>
+	<key>Delete All Data?</key>
+	<string>모든 데이터를 삭제하시겠습니까?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>모든 로컬 데이터 삭제...</string>
+	<key>Delete Category</key>
+	<string>카테고리 삭제</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>암호화폐 보유를 삭제하시겠습니까?</string>
+	<key>Delete Custom Category?</key>
+	<string>맞춤 카테고리를 삭제하시겠습니까?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>보유 삭제</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>투자 삭제</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>투자를 삭제하시겠습니까?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>반복 거래를 삭제하시겠습니까?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>거래 삭제</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>거래를 삭제하시겠습니까?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>모든 지역 금융 데이터를 삭제하시겠습니까?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>일정 삭제</string>
+	<key>Delete transaction</key>
+	<string>거래 삭제</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>설명</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>세부</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>배당금</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>마감 일정은 앱이 활성화되어 있는 동안 자동으로 기록되며 다음에 앱을 열 때 따라잡습니다.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>기한 일정이 공개 시간을 따라잡습니다.</string>
 	<key>ECB</key>
 	<string>ECB</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>ECB 기준금리는 자동으로 새로 고쳐지고 오프라인 사용을 위해 로컬로 캐시됩니다.</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>경비</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>편집하다</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>암호화폐 편집</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>암호화폐 보유 편집</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>보유 편집</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>투자 편집</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>반복 거래 편집</string>
+	<key>Edit Transaction</key>
+	<string>거래 편집</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>일정 수정</string>
+	<key>Edit transaction</key>
+	<string>거래 수정</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>신흥 시장</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>Wealth Compass에 대한 생체 인식 보호를 활성화합니다.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>종료일</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>종료</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>%@ 종료</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>%@ 종료)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>에너지</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>카테고리 이름을 입력하세요. 향후 %@ 거래를 위해 저장됩니다.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>카테고리 이름을 입력하세요. 향후 %@) 거래를 위해 저장됩니다.</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>맞춤 카테고리 이름을 입력하세요.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>0보다 큰 금액을 입력하세요.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>이 투자 거래에 부과되는 브로커 또는 플랫폼 수수료를 입력하세요. 포지션 비용 기준에 추가됩니다.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>무료 API 키를 입력하여 실시간 주식 및 암호화폐 가격을 확인하세요. 이는 적극 권장됩니다. 그렇지 않으면 자산 가격이 실제 가격이 아니거나 최신 상태가 되지 않습니다.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>오락</string>
 	<key>Euro</key>
-	<string>Euro</string>
+	<string>유로</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>유럽</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>당신이 소유하고, 빚지고, 벌고, 소비하는 모든 것.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>환율 새로고침 실패</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>환율</string>
+	<key>Exchange Rates Updated</key>
+	<string>환율 업데이트됨</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>%@을(를) 사용하는 기존 거래는 현재 카테고리 라벨을 유지합니다.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>비용</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>비용 카테고리</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>비용기간</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>경비</string>
+	<key>Expenses grouped by category</key>
+	<string>카테고리별로 그룹화된 비용</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>내보내기 실패</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>JSON 내보내기...</string>
 	<key>Face ID</key>
-	<string>Face ID</string>
+	<string>페이스 아이디</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>수수료 금액</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>수수료 비율</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>수수료 유형</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>재원</string>
+	<key>Financial horizon</key>
+	<string>재정적 지평선</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>마치다</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>반복 거래를 완료하시겠습니까?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>일정 종료</string>
+	<key>Finnhub</key>
+	<string>핀허브</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>핀허브 API 키</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Finnhub API 키(주식)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub는 %@)에서 실시간 AAPL 견적을 반환했습니다.</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub는 %@에서 실시간 AAPL 견적을 반환했습니다.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>첫 번째 발생</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>결정된</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>위치, 할당 및 성과를 따르십시오.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>음식</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>iCloud 강제 동기화</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>프리랜서</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>연료</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>%@에 대한 향후 %@ 발생은 더 이상 생성되지 않습니다.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>%@에 대한 향후 %@) 발생은 더 이상 생성되지 않습니다.</string>
 	<key>General</key>
-	<string>General</string>
+	<string>일반적인</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>반복 일정에서 생성됨</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>지리학</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>시작하기</string>
 	<key>Global</key>
-	<string>Global</string>
+	<string>글로벌</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>건강</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>헬스케어</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>Wealth Compass 전체에서 재정적 가치를 숨깁니다.</string>
 	<key>Holdings</key>
-	<string>Holdings</string>
+	<string>지주</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>주택</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>투자 가능한 자산이 분배되는 방식</string>
+	<key>How the portfolio is distributed</key>
+	<string>포트폴리오가 배포되는 방식</string>
+	<key>How to get your API keys</key>
+	<string>API 키를 얻는 방법</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>신원</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>가져오기 동작</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>가져오기 완료</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>가져오기 실패</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>JSON 백업 가져오기</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>JSON 가져오기...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>가져오기 및 내보내기</string>
+	<key>Imported liquidity account: %@</key>
+	<string>수입 유동성 계좌: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>소득</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>월별 수입과 지출</string>
+	<key>Income less expenses</key>
+	<string>수입에서 지출을 뺀</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>잘못된 API 키</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>투자</string>
 	<key>Investment Fee</key>
 	<string>Investment Fee</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>투자 실패: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ 반복 %@이(가) 현금 흐름에 추가되었습니다.</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>%@에 대해</string>
 	<key>iCloud</key>
-	<string>iCloud</string>
+	<string>아이클라우드</string>
 	<key>iCloud Sync</key>
-	<string>iCloud Sync</string>
+	<string>아이클라우드 동기화</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud를 사용할 수 없음</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>iCloud 동기화가 실행되고 있지 않습니다.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

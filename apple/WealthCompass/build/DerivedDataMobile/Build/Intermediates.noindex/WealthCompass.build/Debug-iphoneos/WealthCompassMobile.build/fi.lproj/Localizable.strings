@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld erääntyvät toistuvat tapahtumat lisättiin kassavirtaan.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>1 erääntyvä toistuva tapahtuma lisättiin kassavirtaan.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+API-avain tallennettiin turvallisesti Keychainiin.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Wealth Compass jatkaa %@:n käyttöä.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,405 +39,545 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@ / yksikkö</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ Sovelluksen lukitus</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ Välimuistissa olevat tai varanopeudet pysyvät aktiivisina.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ Epäonnistui</string>
 	<key>%@ NET</key>
 	<string>%@ NET</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ Poistettu</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ Tallennettu</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ on jo olemassa ja se valitaan.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ ei palauttanut käyttökelpoista tarjousta kohteelle %@.</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ tuonti suoritettu %@.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ on ajoitettu. Avaa Wealth Compass tarkistaaksesi sen.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>%@ hintaraja saavutettu. Yritä myöhemmin uudelleen.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ hylkäsi API-avaimen.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ palautti HTTP:n %lld.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ palautti virheellisen vastauksen.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ yksikköä</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ katoaa Toistuvista tapahtumista, eikä tulevia tapahtumia lisätä automaattisesti.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% suorituskykyä</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@))p sitten</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@))h sitten</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>%@) min sitten</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. Haettu %@ ja tallennettu välimuistiin paikallisesti.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. Haettu %@) ja tallennettu välimuistiin paikallisesti.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. Wealth Compass tallentaa sen automaattisesti, kun sovellus on aktiivinen.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. Wealth Compass tallentaa sen, kun sovellus on aktiivinen.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nAPI-avain tallennettiin turvallisesti Avainnippuun.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld nykyinen tilannekuva luotiin tuonnin jälkeen.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>%lld mukautettuja kassavirtaluokkia lisättiin.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld erääntyvä tapahtuma%@ lisätty kassavirtaan.</string>
+	<key>%lld holdings</key>
+	<string>%lld tilat</string>
+	<key>%lld liabilities</key>
+	<string>%lld velat</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld väärin muotoiltuja tai epätäydellisiä tietueita ohitettiin.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>Tämä näkymä piilottaa %lld muuta tapahtumaa.</string>
+	<key>%lld positions</key>
+	<string>%lld paikkaa</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld ajoitettua tapahtumaa lisättiin automaattisesti kassavirtaan.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>Tuotiin %lld tapahtumaa, %lld toistuvia aikatauluja, %lld sijoituksia, %lld kryptoomistuksia, %lld velkoja ja %lld tilannekuvaa.</string>
+	<key>%lldd ago</key>
+	<string>%lldd sitten</string>
+	<key>%lldh ago</key>
+	<string>%lldh sitten</string>
+	<key>%lldm ago</key>
+	<string>%lldmin sitten</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 pito</string>
+	<key>1 liability</key>
+	<string>1 vastuu</string>
+	<key>1 position</key>
+	<string>1 asema</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1 ajoitettu tapahtuma lisättiin automaattisesti kassavirtaan.</string>
 	<key>12M</key>
-	<string>12M</string>
+	<string>12 milj</string>
 	<key>3M</key>
 	<string>3M</string>
 	<key>6M</key>
-	<string>6M</string>
+	<string>6 milj</string>
 	<key>6M NET</key>
-	<string>6M NET</string>
+	<string>6M NETTOA</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>Sijoitushintojen päivittämiseen tarvitaan Finnhub API-avain.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>Selkeä näkemys siitä, mitä omistat, velkaa, ansaitset ja kulutat.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>Markkinahinnan päivitys on jo käynnissä.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>API-avaimet tarkistetaan reaaliaikaista lainausta vastaan ​​ennen kuin ne tallennetaan macOS-avainnippuun.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>OMAISUUS</string>
+	<key>Across every asset</key>
+	<string>Jokaisella omaisuudella</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>Lisätä</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>Lisää krypto</string>
+	<key>Add Crypto Holding</key>
+	<string>Lisää Crypto Holding</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>Lisää sijoitus</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>Lisää tapahtuma</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>Lisää osakkuus seurataksesi sen arvoa ja tehokkuutta.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>Lisää osakkuus seurataksesi sen arvoa.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Lisää uusi avain kehittäjien hallintapaneeliin.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>Lisää toinen tilannekuva nähdäksesi liikkeen</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>Lisää toinen tilannekuva nähdäksesi liikkeen ajan mittaan</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>Lisää tallennettua käteistä, sijoitusta tai kryptoomistusta.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>Lisää osakkeita, ETF:itä, joukkovelkakirjoja tai muita positioita.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>Lisää ensimmäiset tulot tai menot.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>Lisää ensimmäinen tapahtumasi</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>Tapahtuman tai aseman lisääminen tallentaa tilannekuvan tästä kaaviosta.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>Kaikki</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>Kaikki aika</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>Koko maailma</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>Jako maantieteen mukaan</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>Jako sektoreittain</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>Jako tyypin mukaan</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>Jako piilotettu</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>Määrä</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>Summa (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>Valuuttakurssin päivitys on jo käynnissä.</string>
 	<key>Apple (AAPL)</key>
 	<string>Apple (AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>Omaisuuden allokointi</string>
+	<key>Automatic income and expenses</key>
+	<string>Automaattiset tulot ja kulut</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>Keskimääräinen ostohinta</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>Varmuuskopio viety</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Aktiviteetistasi ja omistuksistasi saadut saldot</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>Perusvaluutta</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>Suurin häviäjä</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>Biometrinen todennus ei ole käytettävissä tässä Macissa.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>Biometrinen todennus ei ole käytettävissä tällä laitteella.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>Biometriset tiedot</string>
 	<key>Bitcoin</key>
 	<string>Bitcoin</string>
 	<key>Bond</key>
 	<string>Bond</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>Kirjattujen menojen erittely</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>Englannin punta</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>Luo ensimmäinen taloudellinen näkymäsi</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>Laskettu maksu</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>Peruuttaa</string>
+	<key>Capital invested</key>
+	<string>Sijoitettu pääoma</string>
+	<key>Cash</key>
+	<string>käteistä</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>Kassavirta</string>
+	<key>Cash flow</key>
+	<string>Kassavirta</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>Kassavirtakaavio piilossa</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>Luokka</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>Muuta haku-, tyyppi- tai jaksosuodattimia.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>Muutoksia ei voi tallentaa ennen kuin paikallisen tietokannan latausvirhe on korjattu.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>iCloud-tilin tarkistaminen ja CloudKitin valmistelu.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>Valitse toinen ajanjakso tai kirjaa kulu.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Valitse ilmainen Demo API -taso.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>Luokitus</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>CloudKit-tietueella %@ ei ole hyötykuormaa.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>CoinGecko API-avain</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>CoinGecko API-avain (salaus)</string>
 	<key>CoinGecko ID</key>
 	<string>CoinGecko ID</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko palautti reaaliaikaisen Bitcoin-hinnan %@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko palautti reaaliaikaisen Bitcoin-hinnan %@.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>Hyödyke</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>Valmis</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>Määritetty</string>
+	<key>Confirm your email and sign in.</key>
+	<string>Vahvista sähköpostiosoitteesi ja kirjaudu sisään.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>Yhdistä markkinatiedot</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>Yhdistetään</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>Kuluttaja</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>Jatkaa</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>Kopioi API-avain ja liitä se alle.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>Kustannusperuste</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Luo ilmainen Finnhub-tili.</string>
+	<key>Create or sign in to your account.</key>
+	<string>Luo tili tai kirjaudu sisään.</string>
 	<key>Crypto</key>
-	<string>Crypto</string>
+	<string>Krypto</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>Kryptovaraus</string>
+	<key>Crypto Holdings</key>
+	<string>Crypto Holdings</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>Kryptoarvo</string>
+	<key>Crypto assets</key>
+	<string>Kryptovarat</string>
+	<key>Crypto failures: %@.</key>
+	<string>Salausvirheet: %@.</string>
+	<key>Crypto holdings</key>
+	<string>Kryptovarastot</string>
+	<key>Crypto market prices</key>
+	<string>Kryptomarkkinoiden hinnat</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Salaus ohitettu: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>Valuutta</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>Nykyinen hinta</string>
+	<key>Current market value</key>
+	<string>Nykyinen markkina-arvo</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>Mukautetut luokat</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>Mukautetun luokan nimi</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>Mukautetun luokan nimi</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>Mukautettu...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>Päivittäin</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>Vaaravyöhyke</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>Kojelauta</string>
 	<key>Data</key>
 	<string>Data</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>Päivämäärä</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>Poistaa</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>Poista %@</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>Poista kaikki tiedot</string>
+	<key>Delete All Data?</key>
+	<string>Poistetaanko kaikki tiedot?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>Poista kaikki paikalliset tiedot...</string>
+	<key>Delete Category</key>
+	<string>Poista luokka</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>Poistetaanko Crypto Holding?</string>
+	<key>Delete Custom Category?</key>
+	<string>Poistetaanko oma luokka?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>Poista Holding</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>Poista sijoitus</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>Poistetaanko sijoitus?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>Poistetaanko toistuva tapahtuma?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>Poista tapahtuma</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>Poistetaanko tapahtuma?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>Poistetaanko kaikki paikalliset taloustiedot?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>Poista aikataulu</string>
+	<key>Delete transaction</key>
+	<string>Poista tapahtuma</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>Kuvaus</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>Yksityiskohdat</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>Osingot</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>Erääntymisaikataulut tallennetaan automaattisesti, kun sovellus on aktiivinen, ja ne ovat kiinni, kun se avataan seuraavan kerran.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>Sopivat aikataulut ovat auki</string>
 	<key>ECB</key>
-	<string>ECB</string>
+	<string>EKP</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>EKP:n viitekorot päivitetään automaattisesti ja tallennetaan paikallisesti välimuistiin offline-käyttöä varten.</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>KULUT</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>Muokata</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>Muokkaa kryptoa</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>Muokkaa Crypto Holdingia</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>Muokkaa pitoa</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>Muokkaa sijoitusta</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>Muokkaa toistuvaa tapahtumaa</string>
+	<key>Edit Transaction</key>
+	<string>Muokkaa tapahtumaa</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>Muokkaa aikataulua</string>
+	<key>Edit transaction</key>
+	<string>Muokkaa tapahtumaa</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>Kehittyvät markkinat</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>Ota käyttöön Wealth Compassin biometrinen suojaus.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>Päättymispäivämäärä</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>Päättyy</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>Päättyy %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>Päättyy %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>Energiaa</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Anna luokan nimi. Se tallennetaan tulevia %@ tapahtumia varten.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>Anna luokan nimi. Se tallennetaan tulevia %@) tapahtumia varten.</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>Anna mukautetun luokan nimi.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>Anna summa, joka on suurempi kuin nolla.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>Syötä tästä sijoitustapahtumasta veloitettava välittäjä- tai alustapalkkio. Se lisätään asemakustannusperusteeseen.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>Anna ilmaiset API-avaimesi saadaksesi reaaliaikaiset osake- ja kryptohinnat. Tämä on erittäin suositeltavaa – muuten omaisuuden hinnat eivät ole todellisia tai ajan tasalla.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>Viihde</string>
 	<key>Euro</key>
-	<string>Euro</string>
+	<string>euroa</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>Euroopassa</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Kaikki mitä omistat, velkaa, ansaitset ja kulutat.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>Valuuttakurssin päivitys epäonnistui</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>Valuuttakurssit</string>
+	<key>Exchange Rates Updated</key>
+	<string>Valuuttakurssit päivitetty</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>Nykyiset tapahtumat, joissa käytetään %@, säilyttävät nykyisen luokkatunnistuksensa.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>Kustannukset</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>Kulujen luokat</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>Kulutusaika</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>Kulut</string>
+	<key>Expenses grouped by category</key>
+	<string>Kulut ryhmitelty luokittain</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>Vienti epäonnistui</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>Vie JSON...</string>
 	<key>Face ID</key>
-	<string>Face ID</string>
+	<string>Kasvojen tunnus</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>Maksun määrä</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>Maksuprosentti</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>Maksun tyyppi</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>Rahoitus</string>
+	<key>Financial horizon</key>
+	<string>Taloudellinen horisontti</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>Valmis</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>Lopeta toistuva tapahtuma?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>Lopeta aikataulu</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>Finnhub API-avain</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Finnhub API Key (osakkeet)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub palautti live-AAPL-tarjouksen osoitteessa %@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub palautti live-AAPL-tarjouksen osoitteessa %@.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>Ensimmäinen esiintyminen</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>Korjattu</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Seuraa paikkoja, jakamista ja suorituskykyä.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>Ruokaa</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>Pakota synkronointi iCloud</string>
 	<key>Freelance</key>
 	<string>Freelance</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>Polttoaine</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>Tulevia %@ esiintymiä kohteelle %@ ei enää luoda.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>Tulevia %@) esiintymiä kohteelle %@ ei enää luoda.</string>
 	<key>General</key>
-	<string>General</string>
+	<string>Kenraali</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>Luotu toistuvasta aikataulusta</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>Maantiede</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>Aloita</string>
 	<key>Global</key>
-	<string>Global</string>
+	<string>Maailmanlaajuinen</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>Terveys</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>Terveydenhuolto</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>Piilota taloudelliset arvot Wealth Compassissa.</string>
 	<key>Holdings</key>
-	<string>Holdings</string>
+	<string>Omistukset</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>Asuminen</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>Kuinka sijoitettavat varat jaetaan</string>
+	<key>How the portfolio is distributed</key>
+	<string>Kuinka portfolio jakautuu</string>
+	<key>How to get your API keys</key>
+	<string>Kuinka saada API-avaimet</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>Identiteetti</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>Tuontikäyttäytyminen</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>Tuonti valmis</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>Tuonti epäonnistui</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>Tuo JSON-varmuuskopio</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>Tuo JSON...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>Tuonti ja vienti</string>
+	<key>Imported liquidity account: %@</key>
+	<string>Tuotu likviditeettitili: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>Tulot</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>Tulot ja kulut kuukausittain</string>
+	<key>Income less expenses</key>
+	<string>Tulot vähennettynä kuluilla</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>Virheellinen API-avain</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>Investoinnit</string>
 	<key>Investment Fee</key>
-	<string>Investment Fee</string>
+	<string>Sijoituspalkkio</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>Investointien epäonnistumiset: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ erääntyvä toistuva %@ lisätty kassavirtaan.</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>%@</string>
 	<key>iCloud</key>
 	<string>iCloud</string>
 	<key>iCloud Sync</key>
 	<string>iCloud Sync</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud ei saatavilla</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>iCloud-synkronointi ei ole käynnissä.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

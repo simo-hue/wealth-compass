@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld på grunn av gjentakende transaksjoner ble lagt til kontantstrøm.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>1 forfallende gjentakende transaksjon ble lagt til kontantstrøm.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+API-nøkkelen ble lagret sikkert i nøkkelring.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Wealth Compass vil fortsette å bruke %@.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,57 +39,101 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@ / enhet</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ Applås</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ Bufret eller reservefrekvenser forblir aktive.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ Mislyktes</string>
 	<key>%@ NET</key>
-	<string>%@ NET</string>
+	<string>%@ NETT</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ Fjernet</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ Lagret</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ eksisterer allerede og vil bli valgt.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ returnerte ikke et brukbart tilbud for %@.</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ import fullført for %@.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ er planlagt. Åpne Wealth Compass for å se den.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>%@ hastighetsgrense nådd. Prøv igjen senere.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ avviste API-nøkkelen.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ returnerte HTTP %lld.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ returnerte et ugyldig svar.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ enheter</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ vil forsvinne fra gjentakende transaksjoner og ingen fremtidige forekomster vil bli satt inn automatisk.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% ytelse</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@))d siden</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@)) t siden</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>%@) m siden</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. Hentet %@ og bufret lokalt.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. Hentet %@) og bufret lokalt.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. Wealth Compass registrerer det automatisk når appen er aktiv.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. Wealth Compass registrerer det mens appen er aktiv.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nAPI-nøkkelen ble lagret sikkert i nøkkelring.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld gjeldende øyeblikksbilde ble generert etter import.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>%lld egendefinerte kontantstrømkategorier ble lagt til.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld forfallen transaksjon%@ lagt til kontantstrøm.</string>
+	<key>%lld holdings</key>
+	<string>%lld beholdning</string>
+	<key>%lld liabilities</key>
+	<string>%lld forpliktelser</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld misformede eller ufullstendige poster ble hoppet over.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld flere transaksjoner skjult av denne visningen.</string>
+	<key>%lld positions</key>
+	<string>%lld stillinger</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld planlagte transaksjoner ble automatisk lagt til kontantstrøm.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>%lld transaksjoner, %lld gjentakende tidsplaner, %lld investeringer, %lld kryptobeholdning, %lld forpliktelser og %lld øyeblikksbilder ble importert.</string>
+	<key>%lldd ago</key>
+	<string>%lldd siden</string>
+	<key>%lldh ago</key>
+	<string>%lldt siden</string>
+	<key>%lldm ago</key>
+	<string>%lldm siden</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 beholdning</string>
+	<key>1 liability</key>
+	<string>1 ansvar</string>
+	<key>1 position</key>
+	<string>1 stilling</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1 planlagt transaksjon ble automatisk lagt til kontantstrøm.</string>
 	<key>12M</key>
 	<string>12M</string>
 	<key>3M</key>
@@ -75,347 +141,443 @@
 	<key>6M</key>
 	<string>6M</string>
 	<key>6M NET</key>
-	<string>6M NET</string>
+	<string>6M NETT</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>En Finnhub API-nøkkel kreves for å oppdatere investeringsprisene.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>Et klart syn på hva du eier, skylder, tjener og bruker.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>En markedsprisoppdatering er allerede i gang.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>API-nøkler verifiseres mot et direkte tilbud før de lagres i macOS nøkkelring.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>EIENDELER</string>
+	<key>Across every asset</key>
+	<string>På tvers av alle eiendeler</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>Legge til</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>Legg til Crypto</string>
+	<key>Add Crypto Holding</key>
+	<string>Legg til Crypto Holding</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>Legg til investering</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>Legg til transaksjon</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>Legg til en beholdning for å spore verdien og ytelsen.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>Legg til en beholdning for å spore verdien.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Legg til en ny nøkkel i Developer Dashboard.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>Legg til et nytt øyeblikksbilde for å se bevegelse</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>Legg til et nytt øyeblikksbilde for å se bevegelse over tid</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>Legg til registrerte kontanter, en investering eller en kryptobeholdning.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>Legg til aksjer, ETFer, obligasjoner eller andre posisjoner.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>Legg til din første inntekt eller utgift.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>Legg til din første transaksjon</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>Når du legger til en transaksjon eller posisjon, registreres et øyeblikksbilde for dette diagrammet.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>Alle</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>Hele tiden</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>Hele verden</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>Tildeling etter geografi</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>Fordeling etter sektor</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>Tildeling etter type</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>Tildeling skjult</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>Beløp</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>Beløp (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>En valutakursoppdatering pågår allerede.</string>
 	<key>Apple (AAPL)</key>
 	<string>Apple (AAPL)</string>
 	<key>Asset Allocation</key>
 	<string>Asset Allocation</string>
+	<key>Automatic income and expenses</key>
+	<string>Automatiske inntekter og utgifter</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>Gjennomsnittlig kjøpspris</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>Sikkerhetskopiering eksportert</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Saldo avledet fra din aktivitet og beholdning</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>Basisvaluta</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>Største taper</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>Biometrisk autentisering er ikke tilgjengelig på denne Mac-en.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>Biometrisk autentisering er ikke tilgjengelig på denne enheten.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>Biometri</string>
 	<key>Bitcoin</key>
 	<string>Bitcoin</string>
 	<key>Bond</key>
-	<string>Bond</string>
+	<string>Bånd</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>Fordeling av registrerte utgifter</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>britiske pund</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>Bygg ditt første økonomiske syn</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>Beregnet gebyr</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>Kansellere</string>
+	<key>Capital invested</key>
+	<string>Investert kapital</string>
+	<key>Cash</key>
+	<string>Kontanter</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>Kontantstrøm</string>
+	<key>Cash flow</key>
+	<string>Kontantstrøm</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>Kontantstrømdiagram skjult</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>Kategori</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>Endre søke-, type- eller periodefiltre.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>Endringer kan ikke lagres før den lokale databaselastefeilen er løst.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>Sjekker iCloud-kontoen og klargjør CloudKit.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>Velg en annen periode eller registrer en utgift.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Velg det gratis Demo API-nivået.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>Klassifikasjon</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>CloudKit-posten %@ har ingen nyttelast.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>CoinGecko API-nøkkel</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>CoinGecko API-nøkkel (krypto)</string>
 	<key>CoinGecko ID</key>
 	<string>CoinGecko ID</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko returnerte en live Bitcoin-pris til %@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko returnerte en live Bitcoin-pris til %@.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>Vare</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>Fullført</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>Konfigurert</string>
+	<key>Confirm your email and sign in.</key>
+	<string>Bekreft e-posten din og logg på.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>Koble til markedsdata</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>Kobler til</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>Forbruker</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>Fortsette</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>Kopier API-nøkkelen din og lim den inn nedenfor.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>Kostnadsgrunnlag</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Opprett en gratis Finnhub-konto.</string>
+	<key>Create or sign in to your account.</key>
+	<string>Opprett eller logg på kontoen din.</string>
 	<key>Crypto</key>
-	<string>Crypto</string>
+	<string>Krypto</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>Kryptotildeling</string>
+	<key>Crypto Holdings</key>
+	<string>Crypto Holdings</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>Kryptoverdi</string>
+	<key>Crypto assets</key>
+	<string>Krypto eiendeler</string>
+	<key>Crypto failures: %@.</key>
+	<string>Kryptofeil: %@.</string>
+	<key>Crypto holdings</key>
+	<string>Krypto beholdning</string>
+	<key>Crypto market prices</key>
+	<string>Krypto markedspriser</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Krypto hoppet over: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>Valuta</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>Gjeldende pris</string>
+	<key>Current market value</key>
+	<string>Gjeldende markedsverdi</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>Egendefinerte kategorier</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>Egendefinert kategorinavn</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>Egendefinert kategorinavn</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>Skikk...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>Daglig</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>Faresone</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>Dashbord</string>
 	<key>Data</key>
 	<string>Data</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>Dato</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>Slett</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>Slett %@</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>Slett alle data</string>
+	<key>Delete All Data?</key>
+	<string>Vil du slette alle data?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>Slett alle lokale data...</string>
+	<key>Delete Category</key>
+	<string>Slett kategori</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>Vil du slette kryptobeholdning?</string>
+	<key>Delete Custom Category?</key>
+	<string>Vil du slette egendefinert kategori?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>Slett holding</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>Slett investering</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>Vil du slette investeringen?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>Vil du slette gjentakende transaksjon?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>Slett transaksjon</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>Vil du slette transaksjonen?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>Vil du slette alle lokale finansdata?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>Slett tidsplan</string>
+	<key>Delete transaction</key>
+	<string>Slett transaksjonen</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>Beskrivelse</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>Detaljer</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>Utbytte</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>Forfallsplaner registreres automatisk mens appen er aktiv og fanges opp neste gang den åpnes.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>Forefallende tidsplaner innhente åpent</string>
 	<key>ECB</key>
 	<string>ECB</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>ECBs referansekurser oppdateres automatisk og bufres lokalt for offline bruk.</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>UTGIFTER</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>Redigere</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>Rediger krypto</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>Rediger Crypto Holding</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>Rediger holding</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>Rediger investering</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>Rediger gjentakende transaksjon</string>
+	<key>Edit Transaction</key>
+	<string>Rediger transaksjon</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>Rediger tidsplan</string>
+	<key>Edit transaction</key>
+	<string>Rediger transaksjonen</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>Fremvoksende markeder</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>Aktiver biometrisk beskyttelse for Wealth Compass.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>Sluttdato</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>Slutter</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>Slutter %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>Slutter %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>Energi</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Skriv inn et kategorinavn. Den vil bli lagret for fremtidige %@ transaksjoner.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>Skriv inn et kategorinavn. Den vil bli lagret for fremtidige %@) transaksjoner.</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>Skriv inn et egendefinert kategorinavn.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>Angi et beløp større enn null.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>Angi megler- eller plattformgebyret som belastes for denne investeringstransaksjonen. Det legges til stillingskostnadsgrunnlaget.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>Skriv inn dine gratis API-nøkler for å få levende aksjer og kryptopriser. Dette anbefales på det sterkeste – ellers vil ikke aktivaprisene være reelle eller oppdaterte.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>Underholdning</string>
 	<key>Euro</key>
 	<string>Euro</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>Europa</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Alt du eier, skylder, tjener og bruker.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>Valutakursoppdatering mislyktes</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>Valutakurser</string>
+	<key>Exchange Rates Updated</key>
+	<string>Valutakurser oppdatert</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>Eksisterende transaksjoner som bruker %@ vil beholde sin nåværende kategorietikett.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>Kostnader</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>Utgiftskategorier</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>Utgiftsperiode</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>Utgifter</string>
+	<key>Expenses grouped by category</key>
+	<string>Utgifter gruppert etter kategori</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>Eksporten mislyktes</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>Eksporter JSON...</string>
 	<key>Face ID</key>
 	<string>Face ID</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>Gebyrbeløp</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>Avgiftsprosent</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>Avgiftstype</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>Finansiere</string>
+	<key>Financial horizon</key>
+	<string>Finansiell horisont</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>Fullfør</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>Fullføre gjentakende transaksjon?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>Fullfør tidsplanen</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>Finnhub API-nøkkel</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Finnhub API-nøkkel (aksjer)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub returnerte et direkte AAPL-tilbud på %@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub returnerte et direkte AAPL-tilbud på %@.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>Første forekomst</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>Fikset</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Følg posisjoner, tildeling og ytelse.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>Mat</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>Tving synkronisering av iCloud</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>Frilans</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>Brensel</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>Fremtidige %@-forekomster for %@ vil ikke lenger bli opprettet.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>Fremtidige %@)-forekomster for %@ vil ikke lenger bli opprettet.</string>
 	<key>General</key>
 	<string>General</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>Generert fra en tilbakevendende tidsplan</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>Geografi</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>Kom i gang</string>
 	<key>Global</key>
 	<string>Global</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>Helse</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>Helsetjenester</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>Skjul økonomiske verdier gjennom Wealth Compass.</string>
 	<key>Holdings</key>
-	<string>Holdings</string>
+	<string>Beholdning</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>Bolig</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>Hvordan investerbare eiendeler er fordelt</string>
+	<key>How the portfolio is distributed</key>
+	<string>Hvordan porteføljen er fordelt</string>
+	<key>How to get your API keys</key>
+	<string>Slik får du API-nøkler</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>Identitet</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>Importatferd</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>Import fullført</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>Import mislyktes</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>Importer JSON-sikkerhetskopi</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>Importer JSON...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>Import og eksport</string>
+	<key>Imported liquidity account: %@</key>
+	<string>Importert likviditetskonto: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>Inntekt</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>Inntekter og utgifter per måned</string>
+	<key>Income less expenses</key>
+	<string>Inntekter minus utgifter</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>Ugyldig API-nøkkel</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>Investering</string>
 	<key>Investment Fee</key>
 	<string>Investment Fee</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>Investeringsfeil: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ på grunn av gjentakende %@ lagt til kontantstrøm.</string>
 	<key>for %@</key>
 	<string>for %@</string>
 	<key>iCloud</key>
 	<string>iCloud</string>
 	<key>iCloud Sync</key>
-	<string>iCloud Sync</string>
+	<string>iCloud-synkronisering</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud utilgjengelig</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>iCloud-synkronisering kjører ikke.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

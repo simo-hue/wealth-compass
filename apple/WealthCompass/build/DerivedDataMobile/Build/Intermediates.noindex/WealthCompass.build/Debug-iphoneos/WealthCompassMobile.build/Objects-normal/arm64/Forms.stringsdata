@@ -1,0 +1,592 @@
+{
+  "source": "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/iOS/Views/Forms.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Enter a category name. It will be saved for future %@ transactions.",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ already exists and will be selected.",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 62
+        }
+      },
+      {
+        "comment": "",
+        "key": "This category will be added to your %@ categories.",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 65
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Transaction",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 143
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Transaction",
+        "location": {
+          "startingColumn": 71,
+          "startingLine": 143
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 75
+        }
+      },
+      {
+        "comment": "",
+        "key": "Details",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 90
+        }
+      },
+      {
+        "comment": "",
+        "key": "Category",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 97
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 93
+        }
+      },
+      {
+        "comment": "",
+        "key": "Description",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 94
+        }
+      },
+      {
+        "comment": "",
+        "key": "Category",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 98
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom category name",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 117
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom...",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 102
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete Transaction",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 136
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 146
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 149
+        }
+      },
+      {
+        "comment": "",
+        "key": "New Recurring Transaction",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 334
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Recurring Transaction",
+        "location": {
+          "startingColumn": 86,
+          "startingLine": 334
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 255
+        }
+      },
+      {
+        "comment": "",
+        "key": "Transaction",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 267
+        }
+      },
+      {
+        "comment": "",
+        "key": "Category",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 273
+        }
+      },
+      {
+        "comment": "",
+        "key": "Schedule",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 304
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notifications",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 325
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount (%@)",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 268
+        }
+      },
+      {
+        "comment": "",
+        "key": "Description",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 270
+        }
+      },
+      {
+        "comment": "",
+        "key": "Category",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 274
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom category name",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 293
+        }
+      },
+      {
+        "comment": "",
+        "key": "The category will be saved for future %@ transactions.",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 298
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom...",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 278
+        }
+      },
+      {
+        "comment": "",
+        "key": "Repeats",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 305
+        }
+      },
+      {
+        "comment": "",
+        "key": "First Occurrence",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 312
+        }
+      },
+      {
+        "comment": "",
+        "key": "End Date",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 317
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ends",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 321
+        }
+      },
+      {
+        "comment": "",
+        "key": "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 329
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notify When Due",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 326
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 338
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 341
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Investment",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 514
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Investment",
+        "location": {
+          "startingColumn": 69,
+          "startingLine": 514
+        }
+      },
+      {
+        "comment": "",
+        "key": "Symbol",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 454
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 456
+        }
+      },
+      {
+        "comment": "",
+        "key": "ISIN / ID",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 457
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 461
+        }
+      },
+      {
+        "comment": "",
+        "key": "Currency",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 466
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sector",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 471
+        }
+      },
+      {
+        "comment": "",
+        "key": "Geography",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 474
+        }
+      },
+      {
+        "comment": "",
+        "key": " (%@)",
+        "location": {
+          "startingColumn": 64,
+          "startingLine": 468
+        }
+      },
+      {
+        "comment": "",
+        "key": "Quantity",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 480
+        }
+      },
+      {
+        "comment": "",
+        "key": "Average Buy Price",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 482
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current Price",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 484
+        }
+      },
+      {
+        "comment": "",
+        "key": "Fee Type",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 489
+        }
+      },
+      {
+        "comment": "",
+        "key": "Investment Transaction Fee",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 497
+        }
+      },
+      {
+        "comment": "",
+        "key": "Investment Transaction Fee %",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 498
+        }
+      },
+      {
+        "comment": "",
+        "key": "Investment Fee",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 503
+        }
+      },
+      {
+        "comment": "",
+        "key": "Investment Transaction Fee",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 509
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 511
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 517
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 520
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Crypto",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 650
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Crypto",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 650
+        }
+      },
+      {
+        "comment": "",
+        "key": "Symbol",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 613
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 615
+        }
+      },
+      {
+        "comment": "",
+        "key": "Optional Coin ID",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 616
+        }
+      },
+      {
+        "comment": "",
+        "key": "Quantity",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 620
+        }
+      },
+      {
+        "comment": "",
+        "key": "Average Buy Price",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 622
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current Price",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 624
+        }
+      },
+      {
+        "comment": "",
+        "key": "Fee Type",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 629
+        }
+      },
+      {
+        "comment": "",
+        "key": "Fee Amount",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 637
+        }
+      },
+      {
+        "comment": "",
+        "key": "Fee Percentage",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 638
+        }
+      },
+      {
+        "comment": "",
+        "key": "Calculated Fee",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 643
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 653
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 656
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld verschuldigde terugkerende transacties zijn toegevoegd aan de cashflow.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>Er is 1 verschuldigde terugkerende transactie toegevoegd aan de kasstroom.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+De API-sleutel is veilig opgeslagen in Keychain.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Wealth Compass blijft %@ gebruiken.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,57 +39,101 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@ / eenheid</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ App-vergrendeling</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ Gecachte of terugvalpercentages blijven actief.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ Mislukt</string>
 	<key>%@ NET</key>
 	<string>%@ NET</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ Verwijderd</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ Opgeslagen</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ bestaat al en wordt geselecteerd.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ heeft geen bruikbare prijsopgave geretourneerd voor %@.</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ import voltooid voor %@.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ is gepland. Open Wealth Compass om het te bekijken.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>%@ frequentielimiet bereikt. Probeer het later opnieuw.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ heeft de API-sleutel afgewezen.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ heeft HTTP %lld geretourneerd.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ heeft een ongeldig antwoord geretourneerd.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ eenheden</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ verdwijnt uit Terugkerende transacties en er worden geen toekomstige gebeurtenissen automatisch ingevoegd.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% prestatie</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@))d geleden</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@))u geleden</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>%@)m geleden</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. %@ opgehaald en lokaal in de cache opgeslagen.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. %@ opgehaald en lokaal in de cache opgeslagen.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. Wealth Compass registreert het automatisch wanneer de app actief is.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. Wealth Compass registreert het terwijl de app actief is.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nDe API-sleutel is veilig opgeslagen in Keychain.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld huidige momentopname is gegenereerd na het importeren.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>Er zijn %lld aangepaste cashflowcategorieën toegevoegd.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld verschuldigde transactie%@ toegevoegd aan cashflow.</string>
+	<key>%lld holdings</key>
+	<string>%lld bezit</string>
+	<key>%lld liabilities</key>
+	<string>%lld verplichtingen</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld verkeerd opgemaakte of onvolledige records zijn overgeslagen.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld meer transacties verborgen door deze weergave.</string>
+	<key>%lld positions</key>
+	<string>%lld posities</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld geplande transacties zijn automatisch toegevoegd aan de cashflow.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>Er zijn %lld transacties, %lld terugkerende schema's, %lld investeringen, %lld crypto-holdings, %lld passiva en %lld snapshots geïmporteerd.</string>
+	<key>%lldd ago</key>
+	<string>%lldd geleden</string>
+	<key>%lldh ago</key>
+	<string>%lldu geleden</string>
+	<key>%lldm ago</key>
+	<string>%lldm geleden</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 bedrijf</string>
+	<key>1 liability</key>
+	<string>1 aansprakelijkheid</string>
+	<key>1 position</key>
+	<string>1 positie</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>Er is automatisch 1 geplande transactie aan de cashflow toegevoegd.</string>
 	<key>12M</key>
 	<string>12M</string>
 	<key>3M</key>
@@ -75,347 +141,443 @@
 	<key>6M</key>
 	<string>6M</string>
 	<key>6M NET</key>
-	<string>6M NET</string>
+	<string>6M NETTO</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>Een Finnhub API-sleutel is vereist om investeringsprijzen bij te werken.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>Een duidelijk beeld van wat u bezit, verschuldigd bent, verdient en uitgeeft.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>Er is al een vernieuwing van de marktprijzen aan de gang.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>API-sleutels worden geverifieerd aan de hand van een live offerte voordat ze worden opgeslagen in de macOS-sleutelhanger.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>ACTIVA</string>
+	<key>Across every asset</key>
+	<string>Over elk bezit</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>Toevoegen</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>Crypto toevoegen</string>
+	<key>Add Crypto Holding</key>
+	<string>Crypto-holding toevoegen</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>Investering toevoegen</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>Transactie toevoegen</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>Voeg een holding toe om de waarde en prestaties ervan te volgen.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>Voeg een holding toe om de waarde ervan te volgen.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Voeg een nieuwe sleutel toe in het ontwikkelaarsdashboard.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>Voeg nog een momentopname toe om beweging te zien</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>Voeg nog een momentopname toe om de beweging in de loop van de tijd te zien</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>Voeg geregistreerd contant geld, een investering of een crypto-holding toe.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>Voeg aandelen, ETF's, obligaties of andere posities toe.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>Voeg uw eerste inkomsten of uitgaven toe.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>Voeg uw eerste transactie toe</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>Door een transactie of positie toe te voegen, wordt een momentopname voor dit diagram vastgelegd.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>Alle</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>Altijd</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>De hele wereld</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>Toewijzing op basis van geografie</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>Verdeling per sector</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>Toewijzing op soort</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>Toewijzing verborgen</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>Hoeveelheid</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>Bedrag (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>Er is al een wisselkoersvernieuwing aan de gang.</string>
 	<key>Apple (AAPL)</key>
-	<string>Apple (AAPL)</string>
+	<string>Appel (AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>Toewijzing van activa</string>
+	<key>Automatic income and expenses</key>
+	<string>Automatische inkomsten en uitgaven</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>Gemiddelde koopprijs</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>Back-up geëxporteerd</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Saldi afgeleid van uw activiteiten en bezittingen</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>Basisvaluta</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>Grootste verliezer</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>Biometrische authenticatie is niet beschikbaar op deze Mac.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>Biometrische authenticatie is niet beschikbaar op dit apparaat.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>Biometrie</string>
 	<key>Bitcoin</key>
 	<string>Bitcoin</string>
 	<key>Bond</key>
 	<string>Bond</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>Uitsplitsing van de geregistreerde uitgaven</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>Brits pond</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>Creëer uw eerste financiële visie</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>Berekende vergoeding</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>Annuleren</string>
+	<key>Capital invested</key>
+	<string>Geïnvesteerd kapitaal</string>
+	<key>Cash</key>
+	<string>Contant geld</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>Cashstroom</string>
+	<key>Cash flow</key>
+	<string>Cashstroom</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>Cashflowdiagram verborgen</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>Categorie</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>Wijzig de zoek-, type- of periodefilters.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>Wijzigingen kunnen pas worden opgeslagen als de fout bij het laden van de lokale database is opgelost.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>Het iCloud-account controleren en CloudKit voorbereiden.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>Kies een andere periode of leg een uitgave vast.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Kies de gratis Demo API-laag.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>Classificatie</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>CloudKit-record %@ heeft geen payload.</string>
+	<key>CoinGecko</key>
+	<string>Muntgekko</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>CoinGecko API-sleutel</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>CoinGecko API-sleutel (Crypto)</string>
 	<key>CoinGecko ID</key>
-	<string>CoinGecko ID</string>
+	<string>CoinGecko-ID</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko heeft een live Bitcoin-prijs geretourneerd op %@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko heeft een live Bitcoin-prijs geretourneerd op %@.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>Product</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>Voltooid</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>Geconfigureerd</string>
+	<key>Confirm your email and sign in.</key>
+	<string>Bevestig uw e-mailadres en log in.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>Verbind marktgegevens</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>Verbinden</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>Consument</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>Doorgaan</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>Kopieer uw API-sleutel en plak deze hieronder.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>Kostenbasis</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Maak een gratis Finnhub-account aan.</string>
+	<key>Create or sign in to your account.</key>
+	<string>Maak een account aan of log in op uw account.</string>
 	<key>Crypto</key>
 	<string>Crypto</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>Crypto-toewijzing</string>
+	<key>Crypto Holdings</key>
+	<string>Crypto-holdings</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>Crypto-waarde</string>
+	<key>Crypto assets</key>
+	<string>Crypto-activa</string>
+	<key>Crypto failures: %@.</key>
+	<string>Crypto-fouten: %@.</string>
+	<key>Crypto holdings</key>
+	<string>Crypto-bezit</string>
+	<key>Crypto market prices</key>
+	<string>Crypto-marktprijzen</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Crypto overgeslagen: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>Munteenheid</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>Huidige prijs</string>
+	<key>Current market value</key>
+	<string>Huidige marktwaarde</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>Aangepaste categorieën</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>Aangepaste categorienaam</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>Aangepaste categorienaam</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>Aangepast...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>Dagelijks</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>Gevarenzone</string>
 	<key>Dashboard</key>
 	<string>Dashboard</string>
 	<key>Data</key>
-	<string>Data</string>
+	<string>Gegevens</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>Datum</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>Verwijderen</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>Verwijder %@</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>Verwijder alle gegevens</string>
+	<key>Delete All Data?</key>
+	<string>Alle gegevens verwijderen?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>Alle lokale gegevens verwijderen...</string>
+	<key>Delete Category</key>
+	<string>Categorie verwijderen</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>Crypto-holding verwijderen?</string>
+	<key>Delete Custom Category?</key>
+	<string>Aangepaste categorie verwijderen?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>Holding verwijderen</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>Investering verwijderen</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>Investering verwijderen?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>Terugkerende transactie verwijderen?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>Transactie verwijderen</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>Transactie verwijderen?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>Alle lokale financiële gegevens verwijderen?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>Schema verwijderen</string>
+	<key>Delete transaction</key>
+	<string>Transactie verwijderen</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>Beschrijving</string>
 	<key>Details</key>
 	<string>Details</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>Dividenden</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>Inleverschema's worden automatisch geregistreerd terwijl de app actief is en worden ingehaald de volgende keer dat deze wordt geopend.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>De geplande schema's halen de open tijd in</string>
 	<key>ECB</key>
 	<string>ECB</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>ECB-referentietarieven worden automatisch vernieuwd en lokaal in de cache opgeslagen voor offline gebruik.</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>UITGAVEN</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>Bewerking</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>Crypto bewerken</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>Crypto-holding bewerken</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>Holding bewerken</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>Investering bewerken</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>Terugkerende transactie bewerken</string>
+	<key>Edit Transaction</key>
+	<string>Transactie bewerken</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>Schema bewerken</string>
+	<key>Edit transaction</key>
+	<string>Transactie bewerken</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>Opkomende markten</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>Schakel biometrische bescherming in voor Wealth Compass.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>Einddatum</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>Eindigt</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>Eindigt op %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>Eindigt op %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>Energie</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Voer een categorienaam in. Het wordt bewaard voor toekomstige %@-transacties.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>Voer een categorienaam in. Het wordt bewaard voor toekomstige %@) transacties.</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>Voer een aangepaste categorienaam in.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>Voer een bedrag in dat groter is dan nul.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>Voer de makelaars- of platformkosten in die voor deze beleggingstransactie in rekening worden gebracht. Het wordt toegevoegd aan de positiekostenbasis.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>Voer uw gratis API-sleutels in om live aandelen- en cryptoprijzen te krijgen. Dit wordt ten zeerste aanbevolen, anders zijn de activaprijzen niet reëel of actueel.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>Amusement</string>
 	<key>Euro</key>
 	<string>Euro</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>Europa</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Alles wat u bezit, verschuldigd bent, verdient en uitgeeft.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>Vernieuwen van de wisselkoers is mislukt</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>Wisselkoersen</string>
+	<key>Exchange Rates Updated</key>
+	<string>Wisselkoersen bijgewerkt</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>Bestaande transacties met %@ behouden hun huidige categorielabel.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>Kosten</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>Uitgavencategorieën</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>Kostenperiode</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>Uitgaven</string>
+	<key>Expenses grouped by category</key>
+	<string>Kosten gegroepeerd per categorie</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>Exporteren mislukt</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>JSON exporteren...</string>
 	<key>Face ID</key>
-	<string>Face ID</string>
+	<string>Gezichts-ID</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>Vergoedingsbedrag</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>Vergoedingspercentage</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>Type vergoeding</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>Financiën</string>
+	<key>Financial horizon</key>
+	<string>Financiële horizon</string>
 	<key>Finish</key>
 	<string>Finish</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>Terugkerende transactie voltooien?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>Maak het schema af</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>Finnhub API-sleutel</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Finnhub API-sleutel (aandelen)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub heeft een live AAPL-citaat teruggestuurd op %@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub heeft een live AAPL-offerte geretourneerd op %@.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>Eerste gebeurtenis</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>Vast</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Volg posities, toewijzing en prestaties.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>Voedsel</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>Forceer synchronisatie iCloud</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>Freelancer</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>Brandstof</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>Toekomstige %@-instanties voor %@ worden niet langer aangemaakt.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>Toekomstige %@) exemplaren voor %@ worden niet langer aangemaakt.</string>
 	<key>General</key>
-	<string>General</string>
+	<string>Algemeen</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>Gegenereerd op basis van een terugkerend schema</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>Geografie</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>Aan de slag</string>
 	<key>Global</key>
-	<string>Global</string>
+	<string>Globaal</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>Gezondheid</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>Gezondheidszorg</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>Verberg financiële waarden in Wealth Compass.</string>
 	<key>Holdings</key>
-	<string>Holdings</string>
+	<string>Bezit</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>Huisvesting</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>Hoe belegbare activa worden verdeeld</string>
+	<key>How the portfolio is distributed</key>
+	<string>Hoe de portefeuille wordt verdeeld</string>
+	<key>How to get your API keys</key>
+	<string>Hoe u uw API-sleutels kunt verkrijgen</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>Identiteit</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>Gedrag importeren</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>Importeren voltooid</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>Importeren mislukt</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>JSON-back-up importeren</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>JSON importeren...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>Importeren en exporteren</string>
+	<key>Imported liquidity account: %@</key>
+	<string>Geïmporteerde liquiditeitsrekening: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>Inkomen</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>Inkomsten en uitgaven per maand</string>
+	<key>Income less expenses</key>
+	<string>Inkomsten minus uitgaven</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>Ongeldige API-sleutel</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>Investering</string>
 	<key>Investment Fee</key>
 	<string>Investment Fee</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>Mislukte investeringen: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ wegens terugkerende %@ toegevoegd aan cashflow.</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>voor %@</string>
 	<key>iCloud</key>
 	<string>iCloud</string>
 	<key>iCloud Sync</key>
-	<string>iCloud Sync</string>
+	<string>iCloud-synchronisatie</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud niet beschikbaar</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>iCloud-synchronisatie is niet actief.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

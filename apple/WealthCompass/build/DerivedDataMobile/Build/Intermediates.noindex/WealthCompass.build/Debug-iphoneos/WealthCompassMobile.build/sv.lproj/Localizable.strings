@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld på grund av återkommande transaktioner lades till kassaflödet.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>1 på grund av återkommande transaktion lades till kassaflödet.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+API-nyckeln sparades säkert i nyckelring.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Wealth Compass kommer att fortsätta använda %@.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,57 +39,101 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@ / enhet</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ Applås</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ Cachade eller reservfrekvenser förblir aktiva.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ Misslyckades</string>
 	<key>%@ NET</key>
 	<string>%@ NET</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ har tagits bort</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ Sparad</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ finns redan och kommer att väljas.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ returnerade inte en användbar offert för %@.</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ import slutförd för %@.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ är schemalagd. Öppna Wealth Compass för att granska den.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>%@ hastighetsgräns nådd. Försök igen senare.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ avvisade API-nyckeln.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ returnerade HTTP %lld.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ returnerade ett ogiltigt svar.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ enheter</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ kommer att försvinna från återkommande transaktioner och inga framtida händelser kommer att infogas automatiskt.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% prestanda</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@))d sedan</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@))h sedan</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>%@)m sedan</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. Hämtade %@ och cachade lokalt.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. Hämtade %@) och cachade lokalt.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. Wealth Compass registrerar det automatiskt när appen är aktiv.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. Wealth Compass registrerar det medan appen är aktiv.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nAPI-nyckeln sparades säkert i nyckelring.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld aktuell ögonblicksbild genererades efter import.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>%lld anpassade kassaflödeskategorier har lagts till.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld förfallen transaktion%@ har lagts till i kassaflödet.</string>
+	<key>%lld holdings</key>
+	<string>%lld innehav</string>
+	<key>%lld liabilities</key>
+	<string>%lld skulder</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld felaktiga eller ofullständiga poster hoppades över.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld fler transaktioner dolda av den här vyn.</string>
+	<key>%lld positions</key>
+	<string>%lld positioner</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld schemalagda transaktioner lades automatiskt till i kassaflödet.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>%lld transaktioner, %lld återkommande scheman, %lld investeringar, %lld kryptoinnehav, %lld skulder och %lld ögonblicksbilder importerades.</string>
+	<key>%lldd ago</key>
+	<string>%lldd sedan</string>
+	<key>%lldh ago</key>
+	<string>%lldh sedan</string>
+	<key>%lldm ago</key>
+	<string>%lldm sedan</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 innehav</string>
+	<key>1 liability</key>
+	<string>1 ansvar</string>
+	<key>1 position</key>
+	<string>1 position</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1 schemalagd transaktion lades automatiskt till i kassaflödet.</string>
 	<key>12M</key>
 	<string>12M</string>
 	<key>3M</key>
@@ -75,347 +141,439 @@
 	<key>6M</key>
 	<string>6M</string>
 	<key>6M NET</key>
-	<string>6M NET</string>
+	<string>6M NETT</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>En Finnhub API-nyckel krävs för att uppdatera investeringspriser.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>En tydlig bild av vad du äger, är skyldig, tjänar och spenderar.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>En marknadsprisuppdatering pågår redan.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>API-nycklar verifieras mot en live offert innan de lagras i macOS-nyckelringen.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>TILLGÅNGAR</string>
+	<key>Across every asset</key>
+	<string>Över varje tillgång</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>Tillägga</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>Lägg till Crypto</string>
+	<key>Add Crypto Holding</key>
+	<string>Lägg till Crypto Holding</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>Lägg till investeringar</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>Lägg till transaktion</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>Lägg till ett innehav för att spåra dess värde och prestanda.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>Lägg till en innehav för att spåra dess värde.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Lägg till en ny nyckel i Developer Dashboard.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>Lägg till ytterligare en ögonblicksbild för att se rörelse</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>Lägg till ytterligare en ögonblicksbild för att se rörelse över tiden</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>Lägg till registrerade kontanter, en investering eller ett kryptoinnehav.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>Lägg till aktier, ETF:er, obligationer eller andra positioner.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>Lägg till din första inkomst eller utgift.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>Lägg till din första transaktion</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>Genom att lägga till en transaktion eller position registreras en ögonblicksbild för detta diagram.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>Alla</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>Hela tiden</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>Hela världen</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>Fördelning efter geografi</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>Fördelning per sektor</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>Fördelning efter typ</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>Tilldelning dold</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>Belopp</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>Belopp (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>En växelkursuppdatering pågår redan.</string>
 	<key>Apple (AAPL)</key>
 	<string>Apple (AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>Tillgångsfördelning</string>
+	<key>Automatic income and expenses</key>
+	<string>Automatiska intäkter och utgifter</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>Genomsnittligt köppris</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>Säkerhetskopiering exporterad</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Saldon som härrör från dina aktiviteter och innehav</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>Basvaluta</string>
 	<key>Biggest Loser</key>
 	<string>Biggest Loser</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>Biometrisk autentisering är inte tillgänglig på denna Mac.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>Biometrisk autentisering är inte tillgänglig på den här enheten.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>Biometri</string>
 	<key>Bitcoin</key>
 	<string>Bitcoin</string>
 	<key>Bond</key>
-	<string>Bond</string>
+	<string>Obligation</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>Fördelning av bokförda utgifter</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>Brittiska pundet</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>Bygg din första ekonomiska syn</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>Beräknad avgift</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>Avboka</string>
+	<key>Cash</key>
+	<string>Kontanter</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>Kassaflöde</string>
+	<key>Cash flow</key>
+	<string>Kassaflöde</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>Kassaflödesdiagram dold</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>Kategori</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>Ändra sök-, typ- eller periodfiltren.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>Ändringar kan inte sparas förrän det lokala databasladdningsfelet är löst.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>Kontrollerar iCloud-kontot och förbereder CloudKit.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>Välj en annan period eller registrera en kostnad.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Välj den kostnadsfria Demo API-nivån.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>Klassificering</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>CloudKit-posten %@ har ingen nyttolast.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>CoinGecko API-nyckel</string>
 	<key>CoinGecko API Key (Crypto)</key>
 	<string>CoinGecko API Key (Crypto)</string>
 	<key>CoinGecko ID</key>
 	<string>CoinGecko ID</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>CoinGecko returnerade ett live Bitcoin-pris på %@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko returnerade ett live Bitcoin-pris på %@.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>Vara</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>Avslutad</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>Konfigurerad</string>
+	<key>Confirm your email and sign in.</key>
+	<string>Bekräfta din e-post och logga in.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>Anslut marknadsdata</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>Ansluter</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>Konsument</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>Fortsätta</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>Kopiera din API-nyckel och klistra in den nedan.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>Kostnadsgrund</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Skapa ett gratis Finnhub-konto.</string>
 	<key>Crypto</key>
-	<string>Crypto</string>
+	<string>Krypto</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>Kryptoallokering</string>
+	<key>Crypto Holdings</key>
+	<string>Kryptoinnehav</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>Kryptovärde</string>
+	<key>Crypto assets</key>
+	<string>Kryptotillgångar</string>
+	<key>Crypto failures: %@.</key>
+	<string>Kryptofel: %@.</string>
+	<key>Crypto holdings</key>
+	<string>Kryptoinnehav</string>
+	<key>Crypto market prices</key>
+	<string>Kryptomarknadspriser</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Kryptering hoppade över: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>Valuta</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>Aktuellt pris</string>
+	<key>Current market value</key>
+	<string>Aktuellt marknadsvärde</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>Anpassade kategorier</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>Anpassat kategorinamn</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>Anpassat kategorinamn</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>Beställnings...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>Dagligen</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>Riskzon</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>Instrumentbräda</string>
 	<key>Data</key>
 	<string>Data</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>Datum</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>Radera</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>Ta bort %@</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>Ta bort all data</string>
+	<key>Delete All Data?</key>
+	<string>Ta bort all data?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>Ta bort all lokal data...</string>
+	<key>Delete Category</key>
+	<string>Ta bort kategori</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>Ta bort kryptoinnehav?</string>
+	<key>Delete Custom Category?</key>
+	<string>Ta bort anpassad kategori?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>Ta bort Holding</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>Ta bort investering</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>Ta bort investering?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>Ta bort återkommande transaktion?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>Ta bort transaktion</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>Ta bort transaktion?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>Ta bort all lokal ekonomidata?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>Ta bort schema</string>
+	<key>Delete transaction</key>
+	<string>Ta bort transaktion</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>Beskrivning</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>Detaljer</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>Utdelningar</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>Förfalloscheman registreras automatiskt medan appen är aktiv och kommer ikapp nästa gång den öppnas.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>Förfallna scheman kommer ikapp öppet</string>
 	<key>ECB</key>
 	<string>ECB</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>ECB:s referensräntor uppdateras automatiskt och cachelagras lokalt för offlineanvändning.</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>KOSTNADER</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>Redigera</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>Redigera krypto</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>Redigera kryptoinnehav</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>Redigera Holding</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>Redigera investering</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>Redigera återkommande transaktion</string>
+	<key>Edit Transaction</key>
+	<string>Redigera transaktion</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>Redigera schema</string>
+	<key>Edit transaction</key>
+	<string>Redigera transaktion</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>Tillväxtmarknader</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>Aktivera biometriskt skydd för Wealth Compass.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>Slutdatum</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>Slutar</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>Slutar %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>Slutar %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>Energi</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Ange ett kategorinamn. Den kommer att sparas för framtida %@ transaktioner.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>Ange ett kategorinamn. Det kommer att sparas för framtida %@) transaktioner.</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>Ange ett anpassat kategorinamn.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>Ange ett belopp som är större än noll.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>Ange mäklar- eller plattformsavgiften som debiteras för denna investeringstransaktion. Den läggs till positionskostnadsbasen.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>Ange dina gratis API-nycklar för att få levande aktier och kryptopriser. Detta rekommenderas starkt – annars kommer tillgångspriserna inte att vara verkliga eller uppdaterade.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>Underhållning</string>
 	<key>Euro</key>
 	<string>Euro</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>Europa</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Allt du äger, är skyldig, tjänar och spenderar.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>Valutakursuppdatering misslyckades</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>Växelkurser</string>
+	<key>Exchange Rates Updated</key>
+	<string>Växelkurser uppdaterade</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>Befintliga transaktioner som använder %@ kommer att behålla sin nuvarande kategorietikett.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>Bekostnad</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>Utgiftskategorier</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>Kostnadsperiod</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>Utgifter</string>
+	<key>Expenses grouped by category</key>
+	<string>Utgifter grupperade efter kategori</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>Exporten misslyckades</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>Exportera JSON...</string>
 	<key>Face ID</key>
 	<string>Face ID</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>Avgiftsbelopp</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>Avgiftsprocent</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>Typ av avgift</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>Finansiera</string>
+	<key>Financial horizon</key>
+	<string>Finansiell horisont</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>Avsluta</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>Avsluta återkommande transaktion?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>Avsluta schemat</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>Finnhub API-nyckel</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Finnhub API Key (aktier)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>Finnhub returnerade en live AAPL offert på %@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub returnerade en live AAPL offert på %@.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>Första förekomsten</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>Fast</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Följ positioner, tilldelning och prestation.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>Mat</string>
 	<key>Force Sync iCloud</key>
 	<string>Force Sync iCloud</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>Frilans</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>Bränsle</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>Framtida %@-förekomster för %@ kommer inte längre att skapas.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>Framtida %@)-förekomster för %@ kommer inte längre att skapas.</string>
 	<key>General</key>
-	<string>General</string>
+	<string>Allmän</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>Genereras från ett återkommande schema</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>Geografi</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>Kom igång</string>
 	<key>Global</key>
 	<string>Global</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>Hälsa</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>Sjukvård</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>Dölj ekonomiska värden i hela Wealth Compass.</string>
 	<key>Holdings</key>
-	<string>Holdings</string>
+	<string>Innehav</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>Hus</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>Hur placeringsbara tillgångar fördelas</string>
+	<key>How the portfolio is distributed</key>
+	<string>Hur portföljen är fördelad</string>
+	<key>How to get your API keys</key>
+	<string>Hur du får dina API-nycklar</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>Identitet</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>Importbeteende</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>Importen är klar</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>Importen misslyckades</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>Importera JSON-säkerhetskopia</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>Importera JSON...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>Importera och exportera</string>
+	<key>Imported liquidity account: %@</key>
+	<string>Importerat likviditetskonto: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>Inkomst</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>Inkomster och kostnader per månad</string>
+	<key>Income less expenses</key>
+	<string>Inkomst minus utgifter</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>Ogiltig API-nyckel</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>Investering</string>
 	<key>Investment Fee</key>
 	<string>Investment Fee</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>Investeringsfel: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1025,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ på grund av återkommande %@ har lagts till i kassaflödet.</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>för %@</string>
 	<key>iCloud</key>
 	<string>iCloud</string>
 	<key>iCloud Sync</key>
 	<string>iCloud Sync</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>iCloud ej tillgänglig</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>iCloud-synkronisering körs inte.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

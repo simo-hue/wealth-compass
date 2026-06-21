@@ -32,19 +32,6 @@ final class AppSettings: ObservableObject {
                 userDefaults.removeObject(forKey: Keys.appLanguage)
             }
             AppLocalization.applyLanguagePreference(appLanguage)
-            // #region agent log
-            I18nDebugLog.sampleResolutions(appLanguage: appLanguage)
-            I18nDebugLog.log(
-                location: "AppSettings.swift:appLanguage",
-                message: "app language changed",
-                hypothesisId: "D",
-                data: [
-                    "appLanguage": appLanguage ?? "nil",
-                    "defaultIncomeFirst": defaultIncomeCategories.first ?? "nil",
-                    "transactionTypeIncome": TransactionType.income.localizedTitle(appLanguage: appLanguage)
-                ]
-            )
-            // #endregion
         }
     }
 
@@ -102,19 +89,6 @@ final class AppSettings: ObservableObject {
         if let timestamp = userDefaults.object(forKey: Keys.lastExchangeRateRefreshAttempt) as? Date {
             lastExchangeRateRefreshAttemptAt = timestamp
         }
-
-        // #region agent log
-        I18nDebugLog.sampleResolutions(appLanguage: appLanguage)
-        I18nDebugLog.log(
-            location: "AppSettings.swift:init",
-            message: "settings initialized",
-            hypothesisId: "D",
-            data: [
-                "appLanguage": appLanguage ?? "nil",
-                "defaultIncomeFirst": defaultIncomeCategories.first ?? "nil"
-            ]
-        )
-        // #endregion
 
         AppLocalization.applyLanguagePreference(appLanguage)
     }

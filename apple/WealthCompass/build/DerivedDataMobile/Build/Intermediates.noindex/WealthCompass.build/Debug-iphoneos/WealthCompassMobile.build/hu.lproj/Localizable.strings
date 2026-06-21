@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld esedékes ismétlődő tranzakciók hozzáadva a Cash Flow-hoz.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>1 esedékes ismétlődő tranzakció hozzáadásra került a Cash Flow-hoz.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+Az API-kulcs biztonságosan mentve lett a Keychainben.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+A Wealth Compass továbbra is a %@ szolgáltatást fogja használni.</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,57 +39,101 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@ / egység</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ Alkalmazászár</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ A gyorsítótárazott vagy tartalék arányok aktívak maradnak.</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ Sikertelen</string>
 	<key>%@ NET</key>
 	<string>%@ NET</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ Eltávolítva</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ Mentve</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ már létezik, és kiválasztásra kerül.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>A %@ nem adott vissza használható árajánlatot a %@ számára.</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ importálás befejeződött a %@ számára.</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ ütemezve. Nyissa meg a Wealth Compass alkalmazást az áttekintéshez.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>Elérte a %@ díjkorlátot. Próbálja újra később.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ elutasította az API-kulcsot.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ visszaküldte a HTTP-t %lld.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ érvénytelen választ adott vissza.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ egység</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>A %@ eltűnik az Ismétlődő tranzakciók közül, és a jövőbeni előfordulások nem kerülnek be automatikusan.</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% teljesítmény</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@)) napja</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@)) órával ezelőtt</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>%@) perce</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. A %@ lekérve és helyileg gyorsítótárazva.</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. Lekérve a %@) és helyileg gyorsítótárazva.</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. A Wealth Compass automatikusan rögzíti, amikor az alkalmazás aktív.</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. A Wealth Compass rögzíti, amíg az alkalmazás aktív.</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nAz API-kulcsot biztonságosan mentettük a Keychainben.</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld aktuális pillanatkép készült az importálás után.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>%lld egyéni cash-flow kategória hozzáadva.</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld esedékes tranzakció%@ hozzáadva a Cash Flow-hoz.</string>
+	<key>%lld holdings</key>
+	<string>%lld állomány</string>
+	<key>%lld liabilities</key>
+	<string>%lld kötelezettségek</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld rosszul formázott vagy hiányos rekord kimaradt.</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld további tranzakciót rejt ez a nézet.</string>
+	<key>%lld positions</key>
+	<string>%lld pozíciók</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld ütemezett tranzakció automatikusan hozzáadásra került a Cash Flow-hoz.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>%lld tranzakció, %lld ismétlődő ütemezés, %lld befektetés, %lld kriptoállomány, %lld kötelezettség és %lld pillanatkép importálva lett.</string>
+	<key>%lldd ago</key>
+	<string>%lldd ezelőtt</string>
+	<key>%lldh ago</key>
+	<string>%lldórája</string>
+	<key>%lldm ago</key>
+	<string>%lld perce</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 gazdaság</string>
+	<key>1 liability</key>
+	<string>1 felelősség</string>
+	<key>1 position</key>
+	<string>1 pozíció</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1 ütemezett tranzakció automatikusan hozzáadásra került a Cash Flow-hoz.</string>
 	<key>12M</key>
 	<string>12M</string>
 	<key>3M</key>
@@ -76,346 +142,442 @@
 	<string>6M</string>
 	<key>6M NET</key>
 	<string>6M NET</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>A befektetési árak frissítéséhez Finnhub API-kulcs szükséges.</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>Tiszta rálátása arról, hogy mi a tulajdona, tartozása, bevétele és költése.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>A piaci ár frissítése már folyamatban van.</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>Az API-kulcsokat a macOS-kulcstartóban való tárolás előtt egy élő idézet alapján ellenőrzik.</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>ESZKÖZÖK</string>
+	<key>Across every asset</key>
+	<string>Minden eszközön</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>Hozzáadás</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>Adja hozzá a kriptot</string>
+	<key>Add Crypto Holding</key>
+	<string>Adja hozzá a Crypto Holdingot</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>Befektetés hozzáadása</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>Tranzakció hozzáadása</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>Adjon hozzá egy holdingot az értékének és teljesítményének nyomon követéséhez.</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>Adjon hozzá egy holdingot az értékének nyomon követéséhez.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Adjon hozzá új kulcsot a fejlesztői irányítópulton.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>Adjon hozzá egy másik pillanatképet a mozgás megtekintéséhez</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>Adjon hozzá egy másik pillanatképet az időbeli mozgások megtekintéséhez</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>Adjon hozzá rögzített készpénzt, befektetést vagy kriptotartozást.</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>Adjon hozzá részvényeket, ETF-eket, kötvényeket vagy egyéb pozíciókat.</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>Adja hozzá első bevételét vagy kiadását.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>Adja hozzá első tranzakcióját</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>Tranzakció vagy pozíció hozzáadása pillanatképet rögzít ehhez a diagramhoz.</string>
 	<key>All</key>
-	<string>All</string>
+	<string>Minden</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>Minden idők</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>Minden Világ</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>Földrajzi kiosztás</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>Kiosztás szektoronként</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>Kiosztás típus szerint</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>A kiosztás elrejtve</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>Összeg</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>Összeg (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>Az árfolyam frissítése már folyamatban van.</string>
 	<key>Apple (AAPL)</key>
 	<string>Apple (AAPL)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>Eszközallokáció</string>
+	<key>Automatic income and expenses</key>
+	<string>Automatikus bevételek és kiadások</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>Átlagos vételár</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>Biztonsági másolat exportálva</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Az Ön tevékenységéből és birtokaiból származó egyenlegek</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>Alapvaluta</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>Legnagyobb vesztes</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>A biometrikus hitelesítés nem érhető el ezen a Mac-en.</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>A biometrikus hitelesítés nem érhető el ezen az eszközön.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>Biometrikus adatok</string>
 	<key>Bitcoin</key>
 	<string>Bitcoin</string>
 	<key>Bond</key>
-	<string>Bond</string>
+	<string>Kötvény</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>A nyilvántartott kiadások bontása</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>brit font</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>Készítse el első pénzügyi nézetét</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>Számított díj</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>Mégse</string>
+	<key>Capital invested</key>
+	<string>Befektetett tőke</string>
+	<key>Cash</key>
+	<string>Készpénz</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>Pénzforgalom</string>
+	<key>Cash flow</key>
+	<string>Pénzforgalom</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>Cash-flow diagram rejtett</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>Kategória</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>Módosítsa a keresési, típus- vagy időszakszűrőket.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>A változtatások nem menthetők addig, amíg a helyi adatbázis betöltési hibáját meg nem oldják.</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>Az iCloud-fiók ellenőrzése és a CloudKit előkészítése.</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>Válasszon másik időszakot, vagy jegyezzen fel egy kiadást.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Válassza ki az ingyenes Demo API szintet.</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>Osztályozás</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>A %@ CloudKit rekordnak nincs hasznos terhelése.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>CoinGecko API kulcs</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>CoinGecko API kulcs (kriptográfia)</string>
 	<key>CoinGecko ID</key>
-	<string>CoinGecko ID</string>
+	<string>CoinGecko azonosító</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>A CoinGecko élő Bitcoin árat adott vissza %@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>A CoinGecko élő Bitcoin árat adott vissza %@.</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>Árucikk</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>Befejezve</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>Beállítva</string>
+	<key>Confirm your email and sign in.</key>
+	<string>Erősítse meg e-mail-címét, és jelentkezzen be.</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>Csatlakoztassa a piaci adatokat</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>Csatlakozás</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>Fogyasztó</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>Folytatás</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>Másolja ki az API-kulcsot, és illessze be alább.</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>Költségalap</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Hozzon létre egy ingyenes Finnhub fiókot.</string>
+	<key>Create or sign in to your account.</key>
+	<string>Hozzon létre vagy jelentkezzen be fiókjába.</string>
 	<key>Crypto</key>
 	<string>Crypto</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>Kriptokiosztás</string>
+	<key>Crypto Holdings</key>
+	<string>Crypto Holdings</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>Kriptoérték</string>
+	<key>Crypto assets</key>
+	<string>Kriptoeszközök</string>
+	<key>Crypto failures: %@.</key>
+	<string>Kriptohibák: %@.</string>
+	<key>Crypto holdings</key>
+	<string>Kriptoállomány</string>
+	<key>Crypto market prices</key>
+	<string>Kriptopiaci árak</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Kihagyott kriptográfia: %@.</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>Valuta</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>Jelenlegi ár</string>
+	<key>Current market value</key>
+	<string>Jelenlegi piaci érték</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>Egyéni kategóriák</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>Egyéni kategória neve</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>Egyéni kategórianév</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>Szokás...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>Napi</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>Veszélyzóna</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>Műszerfal</string>
 	<key>Data</key>
-	<string>Data</string>
+	<string>Adat</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>Dátum</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>Töröl</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>%@ törlése</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>Minden adat törlése</string>
+	<key>Delete All Data?</key>
+	<string>Törli az összes adatot?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>Minden helyi adat törlése...</string>
+	<key>Delete Category</key>
+	<string>Kategória törlése</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>Törli a Crypto Holdingot?</string>
+	<key>Delete Custom Category?</key>
+	<string>Törli az egyéni kategóriát?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>Holding törlése</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>Befektetés törlése</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>Törli a befektetést?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>Törli az ismétlődő tranzakciót?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>Tranzakció törlése</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>Törli a tranzakciót?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>Törli az összes helyi pénzügyi adatot?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>Ütemezés törlése</string>
+	<key>Delete transaction</key>
+	<string>Tranzakció törlése</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>Leírás</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>Részletek</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>Osztalék</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>Az esedékes ütemezések automatikusan rögzítésre kerülnek, amikor az alkalmazás aktív, és a következő megnyitáskor utolérik.</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>Az esedékes ütemterv nyitva tart</string>
 	<key>ECB</key>
-	<string>ECB</string>
+	<string>EKB</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>Az EKB referencia-kamatlábai automatikusan frissülnek, és helyi gyorsítótárban tárolódnak offline használatra.</string>
 	<key>ETF</key>
 	<string>ETF</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>KÖLTSÉGEK</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>Szerkesztés</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>Kripto szerkesztése</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>A Crypto Holding szerkesztése</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>Holding szerkesztése</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>Befektetés szerkesztése</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>Ismétlődő tranzakció szerkesztése</string>
+	<key>Edit Transaction</key>
+	<string>Tranzakció szerkesztése</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>Ütemezés szerkesztése</string>
+	<key>Edit transaction</key>
+	<string>Tranzakció szerkesztése</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>Feltörekvő piacok</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>Biometrikus védelem engedélyezése a Wealth Compass számára.</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>Befejezés dátuma</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>Véget ér</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>Vége: %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>Vége: %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>Energia</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Adja meg a kategória nevét. A rendszer menti a jövőbeli %@ tranzakciókhoz.</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>Adja meg a kategória nevét. A rendszer elmenti a jövőbeni %@) tranzakciókhoz.</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>Adjon meg egy egyéni kategórianevet.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>Adjon meg egy nullánál nagyobb összeget.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>Adja meg a befektetési tranzakcióért felszámított bróker- vagy platformdíjat. Ez hozzáadódik a pozícióköltség alapjához.</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>Adja meg ingyenes API-kulcsait, hogy élő részvény- és kriptoárakat kapjon. Ez erősen ajánlott – különben az eszközök árai nem lesznek valósak vagy naprakészek.</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>Szórakozás</string>
 	<key>Euro</key>
 	<string>Euro</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>Európa</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Minden, amivel rendelkezel, tartozol, keresel és költesz.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>Az árfolyam frissítése nem sikerült</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>Árfolyamok</string>
+	<key>Exchange Rates Updated</key>
+	<string>Az árfolyamok frissítve</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>A %@ használatával meglévő tranzakciók megtartják jelenlegi kategóriacímkéjüket.</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>Költség</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>Költségkategóriák</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>Költségidőszak</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>Költségek</string>
+	<key>Expenses grouped by category</key>
+	<string>A költségek kategóriák szerint csoportosítva</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>Az exportálás sikertelen</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>JSON exportálása...</string>
 	<key>Face ID</key>
-	<string>Face ID</string>
+	<string>Arcazonosító</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>Díj összege</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>Díj százalék</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>Díjtípus</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>Pénzügy</string>
+	<key>Financial horizon</key>
+	<string>Pénzügyi horizont</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>Befejezés</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>Befejezi az ismétlődő tranzakciót?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>Fejezd be a menetrendet</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>Finnhub API kulcs</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>Finnhub API kulcs (Részvények)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>A Finnhub élő AAPL-ajánlatot adott vissza a következő címen: %@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>A Finnhub élő AAPL-ajánlatot adott vissza a következő címen: %@.</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>Első előfordulás</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>Rögzített</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Kövesse a pozíciókat, az elosztást és a teljesítményt.</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>Élelmiszer</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>Az iCloud kényszerített szinkronizálása</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>Szabadúszó</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>Üzemanyag</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>A %@ jövőbeli %@ előfordulásai többé nem jönnek létre.</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>A %@ jövőbeli %@) előfordulásai többé nem jönnek létre.</string>
 	<key>General</key>
-	<string>General</string>
+	<string>Általános</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>Ismétlődő ütemezésből generálva</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>Földrajz</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>Kezdje el</string>
 	<key>Global</key>
-	<string>Global</string>
+	<string>Globális</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>Egészség</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>Egészségügy</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>Pénzügyi értékek elrejtése a Wealth Compassben.</string>
 	<key>Holdings</key>
-	<string>Holdings</string>
+	<string>Holdingok</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>Ház</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>Hogyan oszlanak meg a befektethető eszközök</string>
+	<key>How the portfolio is distributed</key>
+	<string>Hogyan oszlik el a portfólió</string>
+	<key>How to get your API keys</key>
+	<string>Az API-kulcsok beszerzése</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>Identitás</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>Importálási viselkedés</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>Az importálás befejeződött</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>Az importálás sikertelen</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>Importálja a JSON biztonsági másolatot</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>JSON importálása...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>Import és Export</string>
+	<key>Imported liquidity account: %@</key>
+	<string>Importált likviditási számla: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>Jövedelem</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>Bevételek és kiadások havi bontásban</string>
+	<key>Income less expenses</key>
+	<string>A bevételek mínusz a kiadások</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>Érvénytelen API-kulcs</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>Beruházás</string>
 	<key>Investment Fee</key>
-	<string>Investment Fee</string>
+	<string>Befektetési díj</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>Befektetési hibák: %@.</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ esedékes, ismétlődő %@ hozzáadva a Cash Flow-hoz.</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>%@</string>
 	<key>iCloud</key>
 	<string>iCloud</string>
 	<key>iCloud Sync</key>
 	<string>iCloud Sync</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>Az iCloud nem érhető el</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>Az iCloud szinkronizálás nem fut.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>

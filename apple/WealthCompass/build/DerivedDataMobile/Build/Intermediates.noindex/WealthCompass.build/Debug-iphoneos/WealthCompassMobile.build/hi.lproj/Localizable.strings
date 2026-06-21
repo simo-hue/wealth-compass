@@ -4,12 +4,34 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld देय आवर्ती लेनदेन को कैश फ्लो में जोड़ा गया।</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>1 देय आवर्ती लेनदेन कैश फ्लो में जोड़ा गया था।</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
 	<key>%@
 
 %@</key>
 	<string>%@
 
 %@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+एपीआई कुंजी को किचेन में सुरक्षित रूप से सहेजा गया था।</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+वेल्थ कम्पास %@ का उपयोग जारी रखेगा।</string>
 	<key>%@ %@</key>
 	<string>%@ %@</string>
 	<key>%@ (%@%%)</key>
@@ -17,405 +39,545 @@
 	<key>%@ (%@)</key>
 	<string>%@ (%@)</string>
 	<key>%@ / unit</key>
-	<string>%@ / unit</string>
+	<string>%@/यूनिट</string>
 	<key>%@ App Lock</key>
-	<string>%@ App Lock</string>
+	<string>%@ ऐप लॉक</string>
 	<key>%@ Cached or fallback rates remain active.</key>
-	<string>%@ Cached or fallback rates remain active.</string>
+	<string>%@ कैश्ड या फ़ॉलबैक दरें सक्रिय रहती हैं।</string>
 	<key>%@ Failed</key>
-	<string>%@ Failed</string>
+	<string>%@ विफल</string>
 	<key>%@ NET</key>
-	<string>%@ NET</string>
+	<string>%@ नेट</string>
 	<key>%@ Removed</key>
-	<string>%@ Removed</string>
+	<string>%@ हटा दिया गया</string>
 	<key>%@ Saved</key>
-	<string>%@ Saved</string>
+	<string>%@ सहेजा गया</string>
 	<key>%@ already exists and will be selected.</key>
-	<string>%@ already exists and will be selected.</string>
+	<string>%@ पहले से मौजूद है और उसका चयन किया जाएगा।</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ ने %@ के लिए उपयोगी उद्धरण नहीं लौटाया।</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ आयात %@ के लिए पूरा हुआ।</string>
 	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
-	<string>%@ is scheduled. Open Wealth Compass to review it.</string>
+	<string>%@ निर्धारित है. इसकी समीक्षा करने के लिए वेल्थ कंपास खोलें।</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>%@ दर सीमा पूरी हो गई. बाद में पुन: प्रयास।</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ ने एपीआई कुंजी को अस्वीकार कर दिया।</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ ने HTTP %lld लौटाया।</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ ने अमान्य प्रतिक्रिया दी.</string>
 	<key>%@ units</key>
-	<string>%@ units</string>
+	<string>%@ इकाइयाँ</string>
 	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
-	<string>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</string>
+	<string>%@ आवर्ती लेनदेन से गायब हो जाएगा और भविष्य में कोई भी घटना स्वचालित रूप से नहीं डाली जाएगी।</string>
 	<key>%@ • %@</key>
 	<string>%@ • %@</string>
 	<key>%@%%</key>
 	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% प्रदर्शन</string>
 	<key>%@%@</key>
 	<string>%@%@</string>
 	<key>%@))d ago</key>
-	<string>%@))d ago</string>
+	<string>%@))d पहले</string>
 	<key>%@))h ago</key>
-	<string>%@))h ago</string>
+	<string>%@)) घंटे पहले</string>
 	<key>%@)m ago</key>
-	<string>%@)m ago</string>
+	<string>%@)m पहले</string>
 	<key>%@. Fetched %@ and cached locally.</key>
-	<string>%@. Fetched %@ and cached locally.</string>
+	<string>%@. %@ लाया गया और स्थानीय रूप से कैश किया गया।</string>
 	<key>%@. Fetched %@) and cached locally.</key>
-	<string>%@. Fetched %@) and cached locally.</string>
+	<string>%@. %@ लाया गया) और स्थानीय रूप से कैश किया गया।</string>
 	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
-	<string>%@: %@. Wealth Compass records it automatically when the app is active.</string>
+	<string>%@: %@. ऐप सक्रिय होने पर वेल्थ कंपास इसे स्वचालित रूप से रिकॉर्ड करता है।</string>
 	<key>%@: %@. Wealth Compass records it while the app is active.</key>
-	<string>%@: %@. Wealth Compass records it while the app is active.</string>
+	<string>%@: %@. ऐप सक्रिय होने पर वेल्थ कंपास इसे रिकॉर्ड करता है।</string>
 	<key>%@\n\nThe API key was saved securely in Keychain.</key>
-	<string>%@\n\nThe API key was saved securely in Keychain.</string>
+	<string>%@\n\nएपीआई कुंजी को किचेन में सुरक्षित रूप से सहेजा गया था।</string>
 	<key>%lld</key>
 	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld वर्तमान स्नैपशॉट आयात के बाद उत्पन्न किया गया था।</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>%lld कस्टम नकदी-प्रवाह श्रेणियां जोड़ी गईं।</string>
 	<key>%lld due transaction%@ added to Cash Flow.</key>
-	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<string>%lld देय लेनदेन%@ को नकदी प्रवाह में जोड़ा गया।</string>
+	<key>%lld holdings</key>
+	<string>%lld जोत</string>
+	<key>%lld liabilities</key>
+	<string>%lld देनदारियाँ</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld विकृत या अधूरे रिकॉर्ड छोड़ दिए गए।</string>
 	<key>%lld more transactions hidden by this view.</key>
-	<string>%lld more transactions hidden by this view.</string>
+	<string>%lld इस दृश्य से अधिक लेनदेन छिपे हुए हैं।</string>
+	<key>%lld positions</key>
+	<string>%lld पद</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld निर्धारित लेनदेन स्वचालित रूप से कैश फ्लो में जोड़े गए थे।</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>%lld लेनदेन, %lld आवर्ती कार्यक्रम, %lld निवेश, %lld क्रिप्टो होल्डिंग्स, %lld देनदारियां, और %lld स्नैपशॉट आयात किए गए थे।</string>
+	<key>%lldd ago</key>
+	<string>%lldd पहले</string>
+	<key>%lldh ago</key>
+	<string>%lldh पहले</string>
+	<key>%lldm ago</key>
+	<string>%lldm पहले</string>
 	<key>1 %@</key>
 	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 धारण</string>
+	<key>1 liability</key>
+	<string>1 दायित्व</string>
+	<key>1 position</key>
+	<string>1 पद</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1 अनुसूचित लेनदेन स्वचालित रूप से कैश फ्लो में जोड़ा गया था।</string>
 	<key>12M</key>
-	<string>12M</string>
+	<string>12एम</string>
 	<key>3M</key>
-	<string>3M</string>
+	<string>3एम</string>
 	<key>6M</key>
-	<string>6M</string>
+	<string>6</string>
 	<key>6M NET</key>
-	<string>6M NET</string>
+	<string>6एम नेट</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>निवेश कीमतों को अपडेट करने के लिए फिनहब एपीआई कुंजी की आवश्यकता होती है।</string>
 	<key>A clear view of what you own, owe, earn, and spend.</key>
-	<string>A clear view of what you own, owe, earn, and spend.</string>
+	<string>आपके पास क्या है, क्या देना है, क्या कमाना है और क्या खर्च करना है, इसका स्पष्ट दृष्टिकोण।</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>बाज़ार मूल्य नवीनीकरण पहले से ही प्रगति पर है।</string>
 	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
-	<string>API keys are verified against a live quote before they are stored in the macOS Keychain.</string>
+	<string>एपीआई कुंजियों को macOS किचेन में संग्रहीत करने से पहले लाइव कोटेशन के विरुद्ध सत्यापित किया जाता है।</string>
 	<key>ASSETS</key>
-	<string>ASSETS</string>
+	<string>संपत्ति</string>
+	<key>Across every asset</key>
+	<string>हर संपत्ति के पार</string>
 	<key>Add</key>
-	<string>Add</string>
+	<string>जोड़ना</string>
 	<key>Add Crypto</key>
-	<string>Add Crypto</string>
+	<string>क्रिप्टो जोड़ें</string>
+	<key>Add Crypto Holding</key>
+	<string>क्रिप्टो होल्डिंग जोड़ें</string>
 	<key>Add Investment</key>
-	<string>Add Investment</string>
+	<string>निवेश जोड़ें</string>
 	<key>Add Transaction</key>
-	<string>Add Transaction</string>
+	<string>लेन-देन जोड़ें</string>
 	<key>Add a holding to track its value and performance.</key>
-	<string>Add a holding to track its value and performance.</string>
+	<string>इसके मूल्य और प्रदर्शन को ट्रैक करने के लिए एक होल्डिंग जोड़ें।</string>
 	<key>Add a holding to track its value.</key>
-	<string>Add a holding to track its value.</string>
+	<string>इसके मूल्य को ट्रैक करने के लिए एक होल्डिंग जोड़ें।</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>डेवलपर डैशबोर्ड में एक नई कुंजी जोड़ें.</string>
 	<key>Add another snapshot to see movement</key>
-	<string>Add another snapshot to see movement</string>
+	<string>गतिविधि देखने के लिए एक और स्नैपशॉट जोड़ें</string>
 	<key>Add another snapshot to see movement over time</key>
-	<string>Add another snapshot to see movement over time</string>
+	<string>समय के साथ गतिविधि देखने के लिए एक और स्नैपशॉट जोड़ें</string>
 	<key>Add recorded cash, an investment, or a crypto holding.</key>
-	<string>Add recorded cash, an investment, or a crypto holding.</string>
+	<string>रिकॉर्ड की गई नकदी, एक निवेश, या एक क्रिप्टो होल्डिंग जोड़ें।</string>
 	<key>Add stocks, ETFs, bonds, or other positions.</key>
-	<string>Add stocks, ETFs, bonds, or other positions.</string>
+	<string>स्टॉक, ईटीएफ, बांड, या अन्य स्थितियां जोड़ें।</string>
 	<key>Add your first income or expense.</key>
-	<string>Add your first income or expense.</string>
+	<string>अपनी पहली आय या व्यय जोड़ें.</string>
 	<key>Add your first transaction</key>
-	<string>Add your first transaction</string>
+	<string>अपना पहला लेनदेन जोड़ें</string>
 	<key>Adding a transaction or position records a snapshot for this chart.</key>
-	<string>Adding a transaction or position records a snapshot for this chart.</string>
+	<string>लेन-देन या स्थिति जोड़ने से इस चार्ट के लिए एक स्नैपशॉट रिकॉर्ड होता है।</string>
 	<key>All</key>
-	<string>All</string>
+	<string>सभी</string>
 	<key>All Time</key>
-	<string>All Time</string>
+	<string>पूरे समय</string>
 	<key>All World</key>
-	<string>All World</string>
+	<string>सारी दुनिया</string>
 	<key>Allocation by Geography</key>
-	<string>Allocation by Geography</string>
+	<string>भूगोल द्वारा आवंटन</string>
 	<key>Allocation by Sector</key>
-	<string>Allocation by Sector</string>
+	<string>सेक्टर द्वारा आवंटन</string>
 	<key>Allocation by Type</key>
-	<string>Allocation by Type</string>
+	<string>प्रकार के अनुसार आवंटन</string>
 	<key>Allocation concealed</key>
-	<string>Allocation concealed</string>
+	<string>आवंटन छुपाया गया</string>
 	<key>Amount</key>
-	<string>Amount</string>
+	<string>मात्रा</string>
 	<key>Amount (%@)</key>
-	<string>Amount (%@)</string>
+	<string>राशि (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>विनिमय-दर नवीनीकरण पहले से ही प्रगति पर है।</string>
 	<key>Apple (AAPL)</key>
-	<string>Apple (AAPL)</string>
+	<string>सेब (एएपीएल)</string>
 	<key>Asset Allocation</key>
-	<string>Asset Allocation</string>
+	<string>परिसंपत्ति आवंटन</string>
+	<key>Automatic income and expenses</key>
+	<string>स्वचालित आय और व्यय</string>
 	<key>Average Buy Price</key>
-	<string>Average Buy Price</string>
+	<string>औसत खरीद मूल्य</string>
 	<key>Backup Exported</key>
-	<string>Backup Exported</string>
+	<string>बैकअप निर्यात किया गया</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>आपकी गतिविधि और होल्डिंग्स से प्राप्त शेष राशि</string>
 	<key>Base Currency</key>
-	<string>Base Currency</string>
+	<string>आधार मुद्रा</string>
 	<key>Biggest Loser</key>
-	<string>Biggest Loser</string>
+	<string>सबसे बड़ा हारने वाला</string>
 	<key>Biometric authentication is not available on this Mac.</key>
-	<string>Biometric authentication is not available on this Mac.</string>
+	<string>इस Mac पर बायोमेट्रिक प्रमाणीकरण उपलब्ध नहीं है।</string>
 	<key>Biometric authentication is not available on this device.</key>
-	<string>Biometric authentication is not available on this device.</string>
+	<string>इस डिवाइस पर बायोमेट्रिक प्रमाणीकरण उपलब्ध नहीं है.</string>
 	<key>Biometrics</key>
-	<string>Biometrics</string>
+	<string>बॉयोमेट्रिक्स</string>
 	<key>Bitcoin</key>
 	<string>Bitcoin</string>
 	<key>Bond</key>
-	<string>Bond</string>
+	<string>गहरा संबंध</string>
 	<key>Breakdown of recorded spending</key>
-	<string>Breakdown of recorded spending</string>
+	<string>रिकॉर्ड किए गए खर्च का विवरण</string>
 	<key>British Pound</key>
-	<string>British Pound</string>
+	<string>ब्रिटिश पाउंड</string>
 	<key>Build your first financial view</key>
-	<string>Build your first financial view</string>
+	<string>अपना पहला वित्तीय दृष्टिकोण बनाएं</string>
 	<key>Calculated Fee</key>
-	<string>Calculated Fee</string>
+	<string>परिकलित शुल्क</string>
 	<key>Cancel</key>
-	<string>Cancel</string>
+	<string>रद्द करना</string>
+	<key>Capital invested</key>
+	<string>पूंजी निवेश किया गया</string>
+	<key>Cash</key>
+	<string>नकद</string>
 	<key>Cash Flow</key>
-	<string>Cash Flow</string>
+	<string>नकदी प्रवाह</string>
+	<key>Cash flow</key>
+	<string>नकदी प्रवाह</string>
 	<key>Cash-flow chart concealed</key>
-	<string>Cash-flow chart concealed</string>
+	<string>नकदी-प्रवाह चार्ट छुपाया गया</string>
 	<key>Category</key>
-	<string>Category</string>
+	<string>वर्ग</string>
 	<key>Change the search, type, or period filters.</key>
-	<string>Change the search, type, or period filters.</string>
+	<string>खोज, प्रकार, या अवधि फ़िल्टर बदलें।</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>स्थानीय डेटाबेस लोड त्रुटि का समाधान होने तक परिवर्तन सहेजे नहीं जा सकते।</string>
 	<key>Checking the iCloud account and preparing CloudKit.</key>
-	<string>Checking the iCloud account and preparing CloudKit.</string>
+	<string>iCloud खाते की जाँच करना और CloudKit तैयार करना।</string>
 	<key>Choose another period or record an expense.</key>
-	<string>Choose another period or record an expense.</string>
+	<string>कोई अन्य अवधि चुनें या कोई व्यय रिकॉर्ड करें.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>निःशुल्क डेमो एपीआई स्तर चुनें।</string>
 	<key>Classification</key>
-	<string>Classification</string>
+	<string>वर्गीकरण</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>CloudKit रिकॉर्ड %@ में कोई पेलोड नहीं है।</string>
+	<key>CoinGecko</key>
+	<string>कॉइनगेको</string>
 	<key>CoinGecko API Key</key>
-	<string>CoinGecko API Key</string>
+	<string>कॉइनगेको एपीआई कुंजी</string>
 	<key>CoinGecko API Key (Crypto)</key>
-	<string>CoinGecko API Key (Crypto)</string>
+	<string>कॉइनगेको एपीआई कुंजी (क्रिप्टो)</string>
 	<key>CoinGecko ID</key>
-	<string>CoinGecko ID</string>
+	<string>कॉइनगेको आईडी</string>
 	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
-	<string>CoinGecko returned a live Bitcoin price at %@)).</string>
+	<string>कॉइनगेको ने %@) पर लाइव बिटकॉइन मूल्य लौटाया।</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>कॉइनगेको ने %@ पर लाइव बिटकॉइन मूल्य लौटाया।</string>
 	<key>Commodity</key>
-	<string>Commodity</string>
+	<string>माल</string>
 	<key>Completed</key>
-	<string>Completed</string>
+	<string>पुरा होना।</string>
 	<key>Configured</key>
-	<string>Configured</string>
+	<string>कॉन्फ़िगर किया गया</string>
+	<key>Confirm your email and sign in.</key>
+	<string>अपने ईमेल की पुष्टि करें और साइन इन करें।</string>
 	<key>Connect Market Data</key>
-	<string>Connect Market Data</string>
+	<string>बाज़ार डेटा कनेक्ट करें</string>
 	<key>Connecting</key>
-	<string>Connecting</string>
+	<string>कनेक्ट</string>
 	<key>Consumer</key>
-	<string>Consumer</string>
+	<string>उपभोक्ता</string>
 	<key>Continue</key>
-	<string>Continue</string>
+	<string>जारी रखना</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>अपनी एपीआई कुंजी कॉपी करें और इसे नीचे पेस्ट करें।</string>
 	<key>Cost Basis</key>
-	<string>Cost Basis</string>
+	<string>लागत का आधार</string>
+	<key>Create a free Finnhub account.</key>
+	<string>एक निःशुल्क फिनहब खाता बनाएँ।</string>
+	<key>Create or sign in to your account.</key>
+	<string>अपना खाता बनाएं या उसमें साइन इन करें.</string>
 	<key>Crypto</key>
-	<string>Crypto</string>
+	<string>क्रिप्टो</string>
 	<key>Crypto Allocation</key>
-	<string>Crypto Allocation</string>
+	<string>क्रिप्टो आवंटन</string>
+	<key>Crypto Holdings</key>
+	<string>क्रिप्टो होल्डिंग्स</string>
 	<key>Crypto Value</key>
-	<string>Crypto Value</string>
+	<string>क्रिप्टो मूल्य</string>
+	<key>Crypto assets</key>
+	<string>क्रिप्टो संपत्ति</string>
+	<key>Crypto failures: %@.</key>
+	<string>क्रिप्टो विफलताएँ: %@।</string>
+	<key>Crypto holdings</key>
+	<string>क्रिप्टो होल्डिंग्स</string>
+	<key>Crypto market prices</key>
+	<string>क्रिप्टो बाजार की कीमतें</string>
+	<key>Crypto skipped: %@.</key>
+	<string>क्रिप्टो छोड़ दिया गया: %@।</string>
 	<key>Currency</key>
-	<string>Currency</string>
+	<string>मुद्रा</string>
 	<key>Current Price</key>
-	<string>Current Price</string>
+	<string>वर्तमान कीमत</string>
+	<key>Current market value</key>
+	<string>वर्तमान बाज़ार मूल्य</string>
 	<key>Custom Categories</key>
-	<string>Custom Categories</string>
+	<string>कस्टम श्रेणियाँ</string>
 	<key>Custom Category Name</key>
-	<string>Custom Category Name</string>
+	<string>कस्टम श्रेणी का नाम</string>
 	<key>Custom category name</key>
-	<string>Custom category name</string>
+	<string>कस्टम श्रेणी का नाम</string>
 	<key>Custom...</key>
-	<string>Custom...</string>
+	<string>रिवाज़...</string>
 	<key>Daily</key>
-	<string>Daily</string>
+	<string>दैनिक</string>
 	<key>Danger Zone</key>
-	<string>Danger Zone</string>
+	<string>खतरा क्षेत्र</string>
 	<key>Dashboard</key>
-	<string>Dashboard</string>
+	<string>डैशबोर्ड</string>
 	<key>Data</key>
-	<string>Data</string>
+	<string>डेटा</string>
 	<key>Date</key>
-	<string>Date</string>
+	<string>तारीख</string>
 	<key>Delete</key>
-	<string>Delete</string>
+	<string>मिटाना</string>
 	<key>Delete %@</key>
-	<string>Delete %@</string>
+	<string>%@ हटाएं</string>
 	<key>Delete All Data</key>
-	<string>Delete All Data</string>
+	<string>सभी डेटा हटाएँ</string>
+	<key>Delete All Data?</key>
+	<string>सभी डेटा हटाएँ?</string>
 	<key>Delete All Local Data...</key>
-	<string>Delete All Local Data...</string>
+	<string>सभी स्थानीय डेटा हटाएं...</string>
+	<key>Delete Category</key>
+	<string>श्रेणी हटाएँ</string>
 	<key>Delete Crypto Holding?</key>
-	<string>Delete Crypto Holding?</string>
+	<string>क्रिप्टो होल्डिंग हटाएं?</string>
+	<key>Delete Custom Category?</key>
+	<string>कस्टम श्रेणी हटाएँ?</string>
 	<key>Delete Holding</key>
-	<string>Delete Holding</string>
+	<string>होल्डिंग हटाएँ</string>
 	<key>Delete Investment</key>
-	<string>Delete Investment</string>
+	<string>निवेश हटाएँ</string>
 	<key>Delete Investment?</key>
-	<string>Delete Investment?</string>
+	<string>निवेश हटाएँ?</string>
 	<key>Delete Recurring Transaction?</key>
-	<string>Delete Recurring Transaction?</string>
+	<string>आवर्ती लेनदेन हटाएं?</string>
 	<key>Delete Transaction</key>
-	<string>Delete Transaction</string>
+	<string>लेन-देन हटाएँ</string>
 	<key>Delete Transaction?</key>
-	<string>Delete Transaction?</string>
+	<string>लेन-देन हटाएँ?</string>
 	<key>Delete all local finance data?</key>
-	<string>Delete all local finance data?</string>
+	<string>सभी स्थानीय वित्त डेटा हटाएं?</string>
 	<key>Delete schedule</key>
-	<string>Delete schedule</string>
+	<string>शेड्यूल हटाएं</string>
+	<key>Delete transaction</key>
+	<string>लेन-देन हटाएँ</string>
 	<key>Description</key>
-	<string>Description</string>
+	<string>विवरण</string>
 	<key>Details</key>
-	<string>Details</string>
+	<string>विवरण</string>
 	<key>Dividends</key>
-	<string>Dividends</string>
+	<string>लाभांश</string>
 	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
-	<string>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</string>
+	<string>ऐप सक्रिय होने पर नियत शेड्यूल स्वचालित रूप से रिकॉर्ड किए जाते हैं और अगली बार खुलने पर पकड़ में आ जाते हैं।</string>
 	<key>Due schedules catch up on open</key>
-	<string>Due schedules catch up on open</string>
+	<string>नियत कार्यक्रम खुले में पकड़ में आते हैं</string>
 	<key>ECB</key>
-	<string>ECB</string>
+	<string>ईसीबी</string>
 	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
-	<string>ECB reference rates are refreshed automatically and cached locally for offline use.</string>
+	<string>ईसीबी संदर्भ दरें स्वचालित रूप से ताज़ा की जाती हैं और ऑफ़लाइन उपयोग के लिए स्थानीय रूप से कैश की जाती हैं।</string>
 	<key>ETF</key>
-	<string>ETF</string>
+	<string>ईटीएफ</string>
 	<key>EXPENSES</key>
-	<string>EXPENSES</string>
+	<string>खर्च</string>
 	<key>Edit</key>
-	<string>Edit</string>
+	<string>संपादन करना</string>
 	<key>Edit Crypto</key>
-	<string>Edit Crypto</string>
+	<string>क्रिप्टो संपादित करें</string>
 	<key>Edit Crypto Holding</key>
-	<string>Edit Crypto Holding</string>
+	<string>क्रिप्टो होल्डिंग संपादित करें</string>
 	<key>Edit Holding</key>
-	<string>Edit Holding</string>
+	<string>होल्डिंग संपादित करें</string>
 	<key>Edit Investment</key>
-	<string>Edit Investment</string>
+	<string>निवेश संपादित करें</string>
 	<key>Edit Recurring Transaction</key>
-	<string>Edit Recurring Transaction</string>
+	<string>आवर्ती लेनदेन संपादित करें</string>
+	<key>Edit Transaction</key>
+	<string>लेन-देन संपादित करें</string>
 	<key>Edit schedule</key>
-	<string>Edit schedule</string>
+	<string>शेड्यूल संपादित करें</string>
+	<key>Edit transaction</key>
+	<string>लेन-देन संपादित करें</string>
 	<key>Emerging Markets</key>
-	<string>Emerging Markets</string>
+	<string>उभरते बाजार</string>
 	<key>Enable biometric protection for Wealth Compass.</key>
-	<string>Enable biometric protection for Wealth Compass.</string>
+	<string>वेल्थ कम्पास के लिए बायोमेट्रिक सुरक्षा सक्षम करें।</string>
 	<key>End Date</key>
-	<string>End Date</string>
+	<string>अंतिम तिथि</string>
 	<key>Ends</key>
-	<string>Ends</string>
+	<string>समाप्त होता है</string>
 	<key>Ends %@</key>
-	<string>Ends %@</string>
+	<string>समाप्त होता है %@</string>
 	<key>Ends %@)</key>
-	<string>Ends %@)</string>
+	<string>समाप्त होता है %@)</string>
 	<key>Energy</key>
-	<string>Energy</string>
+	<string>ऊर्जा</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>एक श्रेणी का नाम दर्ज करें. इसे भविष्य के %@ लेनदेन के लिए सहेजा जाएगा।</string>
 	<key>Enter a category name. It will be saved for future %@) transactions.</key>
-	<string>Enter a category name. It will be saved for future %@) transactions.</string>
+	<string>एक श्रेणी का नाम दर्ज करें. इसे भविष्य के %@) लेनदेन के लिए सहेजा जाएगा।</string>
 	<key>Enter a custom category name.</key>
-	<string>Enter a custom category name.</string>
+	<string>एक कस्टम श्रेणी नाम दर्ज करें.</string>
 	<key>Enter an amount greater than zero.</key>
-	<string>Enter an amount greater than zero.</string>
+	<string>शून्य से अधिक राशि दर्ज करें.</string>
 	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
-	<string>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</string>
+	<string>इस निवेश लेनदेन के लिए लिया गया ब्रोकर या प्लेटफ़ॉर्म शुल्क दर्ज करें। इसे पद लागत के आधार पर जोड़ा जाता है।</string>
 	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
-	<string>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</string>
+	<string>लाइव स्टॉक और क्रिप्टो कीमतें प्राप्त करने के लिए अपनी निःशुल्क एपीआई कुंजियाँ दर्ज करें। इसकी अत्यधिक अनुशंसा की जाती है—अन्यथा, परिसंपत्ति की कीमतें वास्तविक या अद्यतन नहीं होंगी।</string>
 	<key>Entertainment</key>
-	<string>Entertainment</string>
+	<string>मनोरंजन</string>
 	<key>Euro</key>
-	<string>Euro</string>
+	<string>यूरो</string>
 	<key>Europe</key>
-	<string>Europe</string>
+	<string>यूरोप</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>वह सब कुछ जो आपके पास है, देना है, कमाना है और खर्च करना है।</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>विनिमय दर ताज़ा विफल रहा</string>
 	<key>Exchange Rates</key>
-	<string>Exchange Rates</string>
+	<string>विनिमय दरें</string>
+	<key>Exchange Rates Updated</key>
+	<string>विनिमय दरें अद्यतन की गईं</string>
 	<key>Existing transactions using %@ will keep their current category label.</key>
-	<string>Existing transactions using %@ will keep their current category label.</string>
+	<string>%@ का उपयोग करने वाले मौजूदा लेनदेन अपना वर्तमान श्रेणी लेबल बनाए रखेंगे।</string>
 	<key>Expense</key>
-	<string>Expense</string>
+	<string>व्यय</string>
 	<key>Expense Categories</key>
-	<string>Expense Categories</string>
+	<string>व्यय श्रेणियाँ</string>
 	<key>Expense period</key>
-	<string>Expense period</string>
+	<string>व्यय अवधि</string>
 	<key>Expenses</key>
-	<string>Expenses</string>
+	<string>खर्च</string>
+	<key>Expenses grouped by category</key>
+	<string>खर्चों को श्रेणी के अनुसार समूहीकृत किया गया</string>
 	<key>Export Failed</key>
-	<string>Export Failed</string>
+	<string>निर्यात विफल</string>
 	<key>Export JSON...</key>
-	<string>Export JSON...</string>
+	<string>JSON निर्यात करें...</string>
 	<key>Face ID</key>
-	<string>Face ID</string>
+	<string>फेस आईडी</string>
 	<key>Fee Amount</key>
-	<string>Fee Amount</string>
+	<string>शुल्क राशि</string>
 	<key>Fee Percentage</key>
-	<string>Fee Percentage</string>
+	<string>शुल्क प्रतिशत</string>
 	<key>Fee Type</key>
-	<string>Fee Type</string>
+	<string>शुल्क प्रकार</string>
 	<key>Finance</key>
-	<string>Finance</string>
+	<string>वित्त</string>
+	<key>Financial horizon</key>
+	<string>वित्तीय क्षितिज</string>
 	<key>Finish</key>
-	<string>Finish</string>
+	<string>खत्म करना</string>
 	<key>Finish Recurring Transaction?</key>
-	<string>Finish Recurring Transaction?</string>
+	<string>आवर्ती लेनदेन समाप्त करें?</string>
 	<key>Finish schedule</key>
-	<string>Finish schedule</string>
+	<string>शेड्यूल ख़त्म करें</string>
+	<key>Finnhub</key>
+	<string>फिनहब</string>
 	<key>Finnhub API Key</key>
-	<string>Finnhub API Key</string>
+	<string>फिनहब एपीआई कुंजी</string>
 	<key>Finnhub API Key (Stocks)</key>
-	<string>Finnhub API Key (Stocks)</string>
+	<string>फिनहब एपीआई कुंजी (स्टॉक)</string>
 	<key>Finnhub returned a live AAPL quote at %@)).</key>
-	<string>Finnhub returned a live AAPL quote at %@)).</string>
+	<string>फ़िनहब ने %@) पर एक लाइव AAPL उद्धरण लौटाया।</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>फिनहब ने %@ पर एक लाइव AAPL कोटेशन लौटाया।</string>
 	<key>First Occurrence</key>
-	<string>First Occurrence</string>
+	<string>पहली घटना</string>
 	<key>Fixed</key>
-	<string>Fixed</string>
+	<string>तय</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>पदों, आवंटन और प्रदर्शन का पालन करें।</string>
 	<key>Food</key>
-	<string>Food</string>
+	<string>खाना</string>
 	<key>Force Sync iCloud</key>
-	<string>Force Sync iCloud</string>
+	<string>आईक्लाउड को जबरदस्ती सिंक करें</string>
 	<key>Freelance</key>
-	<string>Freelance</string>
+	<string>फ्रीलांस</string>
 	<key>Fuel</key>
-	<string>Fuel</string>
+	<string>ईंधन</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>%@ के लिए भविष्य में %@ घटनाएँ अब नहीं बनाई जाएंगी।</string>
 	<key>Future %@) occurrences for %@ will no longer be created.</key>
-	<string>Future %@) occurrences for %@ will no longer be created.</string>
+	<string>%@ के लिए भविष्य में %@) घटनाएँ अब नहीं बनाई जाएंगी।</string>
 	<key>General</key>
-	<string>General</string>
+	<string>सामान्य</string>
 	<key>Generated from a recurring schedule</key>
-	<string>Generated from a recurring schedule</string>
+	<string>आवर्ती शेड्यूल से उत्पन्न</string>
 	<key>Geography</key>
-	<string>Geography</string>
+	<string>भूगोल</string>
 	<key>Get Started</key>
-	<string>Get Started</string>
+	<string>शुरू हो जाओ</string>
 	<key>Global</key>
-	<string>Global</string>
+	<string>वैश्विक</string>
 	<key>Health</key>
-	<string>Health</string>
+	<string>स्वास्थ्य</string>
 	<key>Healthcare</key>
-	<string>Healthcare</string>
+	<string>स्वास्थ्य देखभाल</string>
 	<key>Hide financial values throughout Wealth Compass.</key>
-	<string>Hide financial values throughout Wealth Compass.</string>
+	<string>वेल्थ कम्पास में वित्तीय मूल्यों को छिपाएँ।</string>
 	<key>Holdings</key>
-	<string>Holdings</string>
+	<string>होल्डिंग्स</string>
 	<key>Housing</key>
-	<string>Housing</string>
+	<string>आवास</string>
 	<key>How investable assets are distributed</key>
-	<string>How investable assets are distributed</string>
+	<string>निवेश योग्य परिसंपत्तियों का वितरण कैसे किया जाता है?</string>
+	<key>How the portfolio is distributed</key>
+	<string>पोर्टफोलियो कैसे वितरित किया जाता है</string>
+	<key>How to get your API keys</key>
+	<string>अपनी एपीआई कुंजियाँ कैसे प्राप्त करें</string>
 	<key>ISIN / ID</key>
 	<string>ISIN / ID</string>
 	<key>Identity</key>
-	<string>Identity</string>
+	<string>पहचान</string>
 	<key>Import Behavior</key>
-	<string>Import Behavior</string>
+	<string>व्यवहार आयात करें</string>
 	<key>Import Complete</key>
-	<string>Import Complete</string>
+	<string>आयात पूर्ण</string>
 	<key>Import Failed</key>
-	<string>Import Failed</string>
+	<string>आयात विफल</string>
 	<key>Import JSON Backup</key>
-	<string>Import JSON Backup</string>
+	<string>JSON बैकअप आयात करें</string>
 	<key>Import JSON...</key>
-	<string>Import JSON...</string>
+	<string>JSON आयात करें...</string>
 	<key>Import and Export</key>
-	<string>Import and Export</string>
+	<string>आयात और निर्यात</string>
+	<key>Imported liquidity account: %@</key>
+	<string>आयातित तरलता खाता: %@</string>
 	<key>Income</key>
-	<string>Income</string>
+	<string>आय</string>
 	<key>Income and expenses by month</key>
-	<string>Income and expenses by month</string>
+	<string>महीने के हिसाब से आय और व्यय</string>
+	<key>Income less expenses</key>
+	<string>आमदनी कम खर्चा</string>
 	<key>Invalid API Key</key>
-	<string>Invalid API Key</string>
+	<string>अमान्य एपीआई कुंजी</string>
 	<key>Investment</key>
-	<string>Investment</string>
+	<string>निवेश</string>
 	<key>Investment Fee</key>
-	<string>Investment Fee</string>
+	<string>निवेश शुल्क</string>
 	<key>Investment Transaction Fee</key>
 	<string>Investment Transaction Fee</string>
 	<key>Investment Transaction Fee %</key>
 	<string>Investment Transaction Fee %</string>
+	<key>Investment failures: %@.</key>
+	<string>निवेश विफलताएँ: %@।</string>
 	<key>Investments</key>
 	<string>Investments</string>
 	<key>Language</key>
@@ -867,17 +1029,17 @@
 	<key>Your preferences</key>
 	<string>Your preferences</string>
 	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
-	<string>\n\n%@ due recurring %@ added to Cash Flow.</string>
+	<string>\n\n%@ देय आवर्ती %@ को कैश फ्लो में जोड़ा गया।</string>
 	<key>for %@</key>
-	<string>for %@</string>
+	<string>%@ के लिए</string>
 	<key>iCloud</key>
-	<string>iCloud</string>
+	<string>आईक्लाउड</string>
 	<key>iCloud Sync</key>
-	<string>iCloud Sync</string>
+	<string>आईक्लाउड सिंक</string>
 	<key>iCloud Unavailable</key>
-	<string>iCloud Unavailable</string>
+	<string>आईक्लाउड अनुपलब्ध</string>
 	<key>iCloud sync is not running.</key>
-	<string>iCloud sync is not running.</string>
+	<string>iCloud सिंक नहीं चल रहा है.</string>
 	<key>just now</key>
 	<string>just now</string>
 	<key>transaction was</key>
