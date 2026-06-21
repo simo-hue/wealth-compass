@@ -1,1 +1,1 @@
-ユーザーインターフェースの改善
+UI Improvements

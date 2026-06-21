@@ -426,3 +426,9 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-06-20]: App Store Metadata Translation & Upload
   - *Details*: Translated all App Store Connect metadata from English to 38 supported languages and pushed the updates to App Store Connect.
   - *Tech Notes*: Executed `translate_metadata.cjs` and `translate_bing.cjs` to handle translation and rate limit fallback. Enforced App Store character limits (170 for promotional text, 100 for keywords) using `fix_lengths.cjs`. Used `fastlane deliver --force` with `FASTLANE_ITC_TEAM_NAME` to push the translated metadata fields to the respective App Store Connect locales.
+
+- [2026-06-21]: App Store Connect Release Notes & Submission
+  - *Details*: Updated the "what"s new in this version" (release notes) to "UI Improvements" for all localized languages and successfully submitted version 1.0.5 of the iOS application for review.
+  - *Tech Notes*:
+    - Created/updated `release_notes.txt` in all `fastlane/metadata/*/` locale directories.
+    - Executed `fastlane deliver` with `FASTLANE_ITC_TEAM_ID` set to `128920131` ("Simone Mattioli" group) and `--submit_for_review true` to process the metadata upload and submission.
