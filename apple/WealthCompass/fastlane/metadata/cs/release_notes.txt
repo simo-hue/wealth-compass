@@ -1,1 +1,1 @@
-vylepšení uživatelského rozhraní
+UI Improvements
