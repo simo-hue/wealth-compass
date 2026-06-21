@@ -285,9 +285,10 @@
   - *Details*: Completed a repo-wide localization sweep: removed remaining `String(localized:)` from UI/services (now `settings.localized()` / `LocalizedStringKey`), localized macOS menu commands, settings sections, dashboard empty states, onboarding, sync status messages, and import errors. Filled `Localizable.xcstrings` with ~3,170 translations for es/it/de/fr/zh-Hans/ar via `fill_catalog_translations.cjs`.
   - *Tech Notes*: Added `fill_catalog_translations.cjs` (no npm deps, uses gtx translate endpoint). Spanish coverage ~96% of catalog keys. Rebuild required after catalog changes.
 
-- [2026-06-21 15:41]: High-Priority Localization Pass
-  - *Details*: Replaced `String(localized:)` in settings, dashboard, cash flow, forms, menu commands, alerts, and shared services with `LocalizedStringKey` literals (SwiftUI) or `settings.localized()` / `AppLocalization.string(..., appLanguage:)` for dynamic strings. Exchange-rate and market-data refresh results now expose `localizedTitle(appLanguage:)` and `localizedMessage(appLanguage:)`.
-  - *Tech Notes*: Updated `SettingsSection`/`SettingsRow`, `DashboardEmptyState`, `PrivacyChartCover`, `AppLockStore`/`MacAppLockStore` biometry APIs, and `WealthCompassMacApp` `CommandMenu` labels. `I18nDebugLog` and CloudKit debug instrumentation left untouched. macOS scheme builds successfully.
+
+- [2026-06-21 19:30]: Compact Tab Bar Localization
+  - *Details*: Fixed overcrowded iOS tab bar labels in languages with long word-by-word translations (e.g. Italian "Pannello di controllo"). Tab bar now uses dedicated short labels while page titles and navigation keep full translations.
+  - *Tech Notes*: Added `TabBarLabels.swift`, five `*, Tab Bar` keys in `Localizable.xcstrings` (34 locales), `scripts/add_tab_bar_localizations.py` audit script, and runtime width logging in `I18nDebugLog.auditTabBarLabels`.
 
 - [2026-06-21]: Remaining Localization Cleanup
   - *Details*: Cleared the last `String(localized:)` usages in editor sheets, finance store, CloudKit sync, dashboard, onboarding, investments/crypto views, and iOS content view. Import category mapping now stores English catalog keys. Cloud sync status detail text respects the selected app language.

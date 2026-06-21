@@ -55571,6 +55571,18 @@
             "state": "translated",
             "value": "Як розподіляється портфоліо"
           }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Danh mục đầu tư được phân phối như thế nào"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "投資組合如何分配"
+          }
         }
       }
     },
@@ -55611,6 +55623,174 @@
             "state": "translated",
             "value": "كيفية الحصول على مفاتيح API الخاصة بك"
           }
+        },
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Com obtenir les teves claus API"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jak získat klíče API"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sådan får du dine API-nøgler"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Πώς να αποκτήσετε τα κλειδιά API σας"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cómo obtener sus claves API"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuinka saada API-avaimet"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כיצד להשיג את מפתחות ה-API שלך"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अपनी एपीआई कुंजियाँ कैसे प्राप्त करें"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kako doći do API ključeva"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az API-kulcsok beszerzése"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cara mendapatkan kunci API Anda"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API キーの取得方法"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API 키를 얻는 방법"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cara mendapatkan kunci API anda"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slik får du API-nøkler"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoe u uw API-sleutels kunt verkrijgen"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jak zdobyć klucze API"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como obter suas chaves de API"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como obter as suas chaves API"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cum să obțineți cheile API"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Как получить ключи API"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ako získať kľúče API"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hur du får dina API-nycklar"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "วิธีรับคีย์ API ของคุณ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API anahtarlarınızı nasıl alırsınız?"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Як отримати ключі API"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cách nhận khóa API của bạn"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "如何取得您的 API 金鑰"
+          }
         }
       }
     },
@@ -55620,24 +55800,24 @@
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "iCloud"
+            "value": "آي كلاود"
           }
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
@@ -55649,7 +55829,7 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
@@ -55667,13 +55847,13 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
@@ -55685,31 +55865,31 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud"
+            "state": "translated",
+            "value": "आईक्लाउड"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
@@ -55721,97 +55901,97 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud"
+            "state": "translated",
+            "value": "아이클라우드"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud"
+            "state": "translated",
+            "value": "ไอคลาวด์"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud"
+            "state": "translated",
+            "value": "iCloud'da"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         },
@@ -55823,7 +56003,7 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud"
           }
         }
@@ -55839,20 +56019,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud Sync"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud Sync"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "iCloud-synkronisering"
           }
         },
         "de": {
@@ -55863,7 +56043,7 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud Sync"
           }
         },
@@ -55875,13 +56055,13 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "Sincronización de iCloud"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud Sync"
           }
         },
@@ -55899,26 +56079,26 @@
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "आईक्लाउड सिंक"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "iCloud sinkronizacija"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud Sync"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "Sinkronisasi iCloud"
           }
         },
         "it": {
@@ -55929,98 +56109,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "iCloud同期"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "아이클라우드 동기화"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "Penyegerakan iCloud"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "iCloud-synkronisering"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "iCloud-synchronisatie"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "Synchronizacja iCloud"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "Sincronização do iCloud"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "Sincronização do iCloud"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud Sync"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "Синхронизация с iCloud"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud Sync"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud Sync"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "การซิงค์ iCloud"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "iCloud Senkronizasyonu"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "iCloud Sync"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "Đồng bộ hóa iCloud"
           }
         },
         "zh-Hans": {
@@ -56031,8 +56211,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Sync"
+            "state": "translated",
+            "value": "iCloud 同步"
           }
         }
       }
@@ -56047,20 +56227,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "La sincronització d'iCloud no s'està executant."
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud synchronizace neběží."
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud-synkronisering kører ikke."
           }
         },
         "de": {
@@ -56071,8 +56251,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "Ο συγχρονισμός iCloud δεν εκτελείται."
           }
         },
         "es": {
@@ -56083,14 +56263,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "La sincronización de iCloud no se está ejecutando."
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud-synkronointi ei ole käynnissä."
           }
         },
         "fr": {
@@ -56101,32 +56281,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "סנכרון iCloud אינו פועל."
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud सिंक नहीं चल रहा है."
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud sinkronizacija nije pokrenuta."
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "Az iCloud szinkronizálás nem fut."
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "Sinkronisasi iCloud tidak berjalan."
           }
         },
         "it": {
@@ -56137,98 +56317,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud同期が実行されていません。"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud 동기화가 실행되고 있지 않습니다."
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "Penyegerakan iCloud tidak berjalan."
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud-synkronisering kjører ikke."
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud-synchronisatie is niet actief."
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "Synchronizacja iCloud nie działa."
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "A sincronização do iCloud não está em execução."
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "A sincronização do iCloud não está a ser executada."
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "Sincronizarea iCloud nu rulează."
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "Синхронизация iCloud не работает."
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "Synchronizácia iCloud nie je spustená."
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud-synkronisering körs inte."
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "การซิงค์ iCloud ไม่ทำงาน"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud senkronizasyonu çalışmıyor."
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "Синхронізація iCloud не працює."
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "Đồng bộ hóa iCloud không chạy."
           }
         },
         "zh-Hans": {
@@ -56239,8 +56419,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud sync is not running."
+            "state": "translated",
+            "value": "iCloud 同步未運作。"
           }
         }
       }
@@ -56255,20 +56435,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud no disponible"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud není k dispozici"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud er ikke tilgængelig"
           }
         },
         "de": {
@@ -56279,8 +56459,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "Το iCloud δεν είναι διαθέσιμο"
           }
         },
         "es": {
@@ -56291,14 +56471,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud no disponible"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud ei saatavilla"
           }
         },
         "fr": {
@@ -56309,32 +56489,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud לא זמין"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "आईक्लाउड अनुपलब्ध"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud nedostupan"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "Az iCloud nem érhető el"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud Tidak Tersedia"
           }
         },
         "it": {
@@ -56345,98 +56525,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloudが利用できません"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud를 사용할 수 없음"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud Tidak Tersedia"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud utilgjengelig"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud niet beschikbaar"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud niedostępny"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud indisponível"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud indisponível"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud indisponibil"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud недоступен"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud nedostupný"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud ej tillgänglig"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud ไม่พร้อมใช้งาน"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud Kullanılamıyor"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud недоступний"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud không khả dụng"
           }
         },
         "zh-Hans": {
@@ -56447,8 +56627,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "iCloud Unavailable"
+            "state": "translated",
+            "value": "iCloud 不可用"
           }
         }
       }
@@ -56463,20 +56643,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identitat"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identita"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identitet"
           }
         },
         "de": {
@@ -56487,8 +56667,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Ταυτότητα"
           }
         },
         "es": {
@@ -56499,14 +56679,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identidad"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identiteetti"
           }
         },
         "fr": {
@@ -56517,32 +56697,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "זֶהוּת"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "पहचान"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identitet"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identitás"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identitas"
           }
         },
         "it": {
@@ -56553,98 +56733,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "身元"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "신원"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "identiti"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identitet"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identiteit"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Tożsamość"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identidade"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identidade"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identitate"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Личность"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identita"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Identitet"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "ตัวตน"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Kimlik"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Ідентичність"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "Danh tính"
           }
         },
         "zh-Hans": {
@@ -56655,8 +56835,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Identity"
+            "state": "translated",
+            "value": "身分"
           }
         }
       }
@@ -56672,20 +56852,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Importació i exportació"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Import a Export"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Import og eksport"
           }
         },
         "de": {
@@ -56696,8 +56876,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Εισαγωγές και Εξαγωγές"
           }
         },
         "en": {
@@ -56714,14 +56894,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Importar y Exportar"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Tuonti ja vienti"
           }
         },
         "fr": {
@@ -56732,32 +56912,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "ייבוא ​​וייצוא"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "आयात और निर्यात"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Uvoz i izvoz"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Import és Export"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Impor dan Ekspor"
           }
         },
         "it": {
@@ -56768,98 +56948,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "インポートとエクスポート"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "가져오기 및 내보내기"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Import dan Eksport"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Import og eksport"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Importeren en exporteren"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Import i eksport"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Importar e Exportar"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Importar e Exportar"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Import și export"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Импорт и экспорт"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Import a Export"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Importera och exportera"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "นำเข้าและส่งออก"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "İthalat ve İhracat"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Імпорт та експорт"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "Xuất nhập khẩu"
           }
         },
         "zh-Hans": {
@@ -56870,8 +57050,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import and Export"
+            "state": "translated",
+            "value": "進出口"
           }
         }
       }
@@ -56887,20 +57067,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Comportament d'importació"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Importní chování"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Importadfærd"
           }
         },
         "de": {
@@ -56911,8 +57091,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Εισαγωγική Συμπεριφορά"
           }
         },
         "en": {
@@ -56929,14 +57109,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Comportamiento de importación"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Tuontikäyttäytyminen"
           }
         },
         "fr": {
@@ -56947,32 +57127,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "התנהגות ייבוא"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "व्यवहार आयात करें"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Uvozno ponašanje"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Importálási viselkedés"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Perilaku Impor"
           }
         },
         "it": {
@@ -56983,98 +57163,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "インポート動作"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "가져오기 동작"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Gelagat Import"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Importatferd"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Gedrag importeren"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Importuj zachowanie"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Comportamento de importação"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Comportamento de importação"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Comportamentul de import"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Поведение импорта"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Správanie importu"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Importbeteende"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "พฤติกรรมการนำเข้า"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "İçe Aktarma Davranışı"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Імпорт поведінки"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "Hành vi nhập khẩu"
           }
         },
         "zh-Hans": {
@@ -57085,8 +57265,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Behavior"
+            "state": "translated",
+            "value": "導入行為"
           }
         }
       }
@@ -57102,20 +57282,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Importació completada"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Import dokončen"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Import fuldført"
           }
         },
         "de": {
@@ -57126,8 +57306,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Η εισαγωγή ολοκληρώθηκε"
           }
         },
         "en": {
@@ -57144,14 +57324,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Importación completa"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Tuonti valmis"
           }
         },
         "fr": {
@@ -57162,32 +57342,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "הייבוא ​​הושלם"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "आयात पूर्ण"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Uvoz dovršen"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Az importálás befejeződött"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Impor Selesai"
           }
         },
         "it": {
@@ -57198,98 +57378,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "インポートが完了しました"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "가져오기 완료"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Import Selesai"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Import fullført"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Importeren voltooid"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Import zakończony"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Importação concluída"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Importação concluída"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Import finalizat"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Импорт завершен"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Import dokončený"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Importen är klar"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "นำเข้าเสร็จสมบูรณ์"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "İçe Aktarma Tamamlandı"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Імпорт завершено"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "Nhập hoàn tất"
           }
         },
         "zh-Hans": {
@@ -57300,8 +57480,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Complete"
+            "state": "translated",
+            "value": "導入完成"
           }
         }
       }
@@ -57317,20 +57497,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "La importació ha fallat"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Import se nezdařil"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Import mislykkedes"
           }
         },
         "de": {
@@ -57341,8 +57521,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Η εισαγωγή απέτυχε"
           }
         },
         "en": {
@@ -57359,14 +57539,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Importación fallida"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Tuonti epäonnistui"
           }
         },
         "fr": {
@@ -57383,26 +57563,26 @@
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "आयात विफल"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Uvoz nije uspio"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Az importálás sikertelen"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Impor Gagal"
           }
         },
         "it": {
@@ -57413,98 +57593,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "インポートに失敗しました"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "가져오기 실패"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Import Gagal"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Import mislyktes"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Importeren mislukt"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Import nie powiódł się"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Falha na importação"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Falha na importação"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Import a eșuat"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Импорт не выполнен"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Import zlyhal"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Importen misslyckades"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "การนำเข้าล้มเหลว"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "İçe Aktarma Başarısız"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Помилка імпорту"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "Nhập không thành công"
           }
         },
         "zh-Hans": {
@@ -57515,8 +57695,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import Failed"
+            "state": "translated",
+            "value": "導入失敗"
           }
         }
       }
@@ -57531,20 +57711,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importa la còpia de seguretat JSON"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importujte zálohu JSON"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importer JSON-sikkerhedskopi"
           }
         },
         "de": {
@@ -57555,8 +57735,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Εισαγωγή αντιγράφων ασφαλείας JSON"
           }
         },
         "es": {
@@ -57567,14 +57747,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importar copia de seguridad JSON"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Tuo JSON-varmuuskopio"
           }
         },
         "fr": {
@@ -57585,32 +57765,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "ייבוא ​​גיבוי JSON"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "JSON बैकअप आयात करें"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Uvoz JSON sigurnosne kopije"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importálja a JSON biztonsági másolatot"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Impor Cadangan JSON"
           }
         },
         "it": {
@@ -57621,98 +57801,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "JSONバックアップのインポート"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "JSON 백업 가져오기"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Import JSON Backup"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importer JSON-sikkerhetskopi"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "JSON-back-up importeren"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importuj kopię zapasową JSON"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importar backup JSON"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importar backup JSON"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importați backup JSON"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Импортировать резервную копию JSON"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importujte zálohu JSON"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Importera JSON-säkerhetskopia"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "นำเข้าข้อมูลสำรอง JSON"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "JSON Yedeklemesini İçe Aktar"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Імпорт резервної копії JSON"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "Nhập bản sao lưu JSON"
           }
         },
         "zh-Hans": {
@@ -57723,8 +57903,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON Backup"
+            "state": "translated",
+            "value": "導入 JSON 備份"
           }
         }
       }
@@ -57739,20 +57919,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Importa JSON..."
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Importovat JSON..."
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Importer JSON..."
           }
         },
         "de": {
@@ -57763,8 +57943,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Εισαγωγή JSON..."
           }
         },
         "es": {
@@ -57775,14 +57955,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Importar JSON..."
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Tuo JSON..."
           }
         },
         "fr": {
@@ -57793,32 +57973,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "ייבוא ​​JSON..."
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "JSON आयात करें..."
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Uvezi JSON..."
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "JSON importálása..."
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Impor JSON..."
           }
         },
         "it": {
@@ -57829,98 +58009,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "JSON をインポート..."
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "JSON 가져오기..."
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Import JSON..."
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Importer JSON..."
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "JSON importeren..."
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Importuj JSON..."
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Importar JSON..."
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Importar JSON..."
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Importă JSON..."
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Импортировать JSON..."
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Importovať JSON..."
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Importera JSON..."
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "นำเข้า JSON..."
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "JSON'u içe aktar..."
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Імпорт JSON..."
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "Nhập JSON..."
           }
         },
         "zh-Hans": {
@@ -57931,8 +58111,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Import JSON..."
+            "state": "translated",
+            "value": "導入 JSON..."
           }
         }
       }
@@ -57974,6 +58154,174 @@
             "state": "translated",
             "value": "حساب السيولة المستوردة: %@"
           }
+        },
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compte de liquiditat importat: %@"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importovaný účet likvidity: %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importeret likviditetskonto: %@"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εισαγόμενος λογαριασμός ρευστότητας: %@"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuenta de liquidez importada: %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tuotu likviditeettitili: %@"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חשבון נזילות מיובא: %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आयातित तरलता खाता: %@"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uvezeni račun likvidnosti: %@"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importált likviditási számla: %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rekening likuiditas yang diimpor: %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インポートされた流動性口座: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "수입 유동성 계좌: %@"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akaun kecairan yang diimport: %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importert likviditetskonto: %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geïmporteerde liquiditeitsrekening: %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zaimportowany rachunek płynności: %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conta de liquidez importada: %@"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conta de liquidez importada: %@"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cont de lichiditate importat: %@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импортированный счет ликвидности: %@"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importovaný účet likvidity: %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importerat likviditetskonto: %@"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บัญชีสภาพคล่องที่นำเข้า: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İçe aktarılan likidite hesabı: %@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Імпортований рахунок ліквідності: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tài khoản thanh khoản đã nhập: %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "導入流動性帳戶：%@"
+          }
         }
       }
     },
@@ -57987,20 +58335,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Ingressos"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Příjem"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Indkomst"
           }
         },
         "de": {
@@ -58011,8 +58359,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Εισόδημα"
           }
         },
         "es": {
@@ -58023,14 +58371,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Ingreso"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Tulot"
           }
         },
         "fr": {
@@ -58041,32 +58389,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "הַכנָסָה"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "आय"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Prihod"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Jövedelem"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Penghasilan"
           }
         },
         "it": {
@@ -58077,98 +58425,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "所得"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "소득"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "pendapatan"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Inntekt"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Inkomen"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Dochód"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Renda"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Rendimento"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Venituri"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Доход"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Príjem"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Inkomst"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "รายได้"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Gelir"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Дохід"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "Thu nhập"
           }
         },
         "zh-Hans": {
@@ -58179,8 +58527,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income"
+            "state": "translated",
+            "value": "收入"
           }
         }
       }
@@ -58195,20 +58543,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Ingressos i despeses per mes"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Příjmy a výdaje podle měsíce"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Indtægter og udgifter pr. måned"
           }
         },
         "de": {
@@ -58219,8 +58567,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Έσοδα και έξοδα ανά μήνα"
           }
         },
         "es": {
@@ -58231,14 +58579,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Ingresos y gastos por mes"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Tulot ja kulut kuukausittain"
           }
         },
         "fr": {
@@ -58249,32 +58597,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "הכנסות והוצאות לפי חודש"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "महीने के हिसाब से आय और व्यय"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Prihodi i rashodi po mjesecima"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Bevételek és kiadások havi bontásban"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Pendapatan dan pengeluaran berdasarkan bulan"
           }
         },
         "it": {
@@ -58285,98 +58633,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "月別の収入と支出"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "월별 수입과 지출"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Pendapatan dan perbelanjaan mengikut bulan"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Inntekter og utgifter per måned"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Inkomsten en uitgaven per maand"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Dochody i wydatki według miesiąca"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Receitas e despesas por mês"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Receitas e despesas por mês"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Venituri și cheltuieli pe lună"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Доходы и расходы по месяцам"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Príjmy a výdavky podľa mesiaca"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Inkomster och kostnader per månad"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "รายได้และค่าใช้จ่ายตามเดือน"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Aylara göre gelir ve giderler"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Доходи та витрати по місяцях"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "Thu nhập và chi phí theo tháng"
           }
         },
         "zh-Hans": {
@@ -58387,8 +58735,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Income and expenses by month"
+            "state": "translated",
+            "value": "按月劃分的收入和支出"
           }
         }
       }
@@ -58430,6 +58778,174 @@
             "state": "translated",
             "value": "الدخل أقل النفقات"
           }
+        },
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingressos menys despeses"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Příjem minus výdaje"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indtægter fratrukket udgifter"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Έσοδα μείον έξοδα"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingresos menos gastos"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tulot vähennettynä kuluilla"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הכנסה פחות הוצאות"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आमदनी कम खर्चा"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prihodi umanjeni za troškove"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A bevételek mínusz a kiadások"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendapatan dikurangi pengeluaran"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "収入から支出を差し引いたもの"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "수입에서 지출을 뺀"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendapatan kurang perbelanjaan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inntekter minus utgifter"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inkomsten minus uitgaven"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dochody minus wydatki"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Renda menos despesas"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rendimento menos despesas"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Venituri minus cheltuieli"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доходы минус расходы"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Príjem mínus výdavky"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inkomst minus utgifter"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รายได้หักค่าใช้จ่าย"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gelir daha az gider"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дохід мінус витрати"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thu nhập trừ chi phí"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收入減去支出"
+          }
         }
       }
     },
@@ -58444,20 +58960,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Clau d'API no vàlida"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Neplatný klíč API"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Ugyldig API-nøgle"
           }
         },
         "de": {
@@ -58468,8 +58984,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Μη έγκυρο κλειδί API"
           }
         },
         "en": {
@@ -58486,14 +59002,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Clave API no válida"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Virheellinen API-avain"
           }
         },
         "fr": {
@@ -58504,32 +59020,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "מפתח API לא חוקי"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "अमान्य एपीआई कुंजी"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Nevažeći API ključ"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Érvénytelen API-kulcs"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Kunci API tidak valid"
           }
         },
         "it": {
@@ -58540,98 +59056,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "無効な API キー"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "잘못된 API 키"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Kunci API tidak sah"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Ugyldig API-nøkkel"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Ongeldige API-sleutel"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Nieprawidłowy klucz API"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Chave de API inválida"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Chave API inválida"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Cheie API nevalidă"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Неверный ключ API"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Neplatný kľúč API"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Ogiltig API-nyckel"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "คีย์ API ไม่ถูกต้อง"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Geçersiz API Anahtarı"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Недійсний ключ API"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "Khóa API không hợp lệ"
           }
         },
         "zh-Hans": {
@@ -58642,8 +59158,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Invalid API Key"
+            "state": "translated",
+            "value": "API 金鑰無效"
           }
         }
       }
@@ -58659,20 +59175,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Inversió"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Investice"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Investering"
           }
         },
         "de": {
@@ -58683,8 +59199,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Επένδυση"
           }
         },
         "en": {
@@ -58701,14 +59217,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Inversión"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Investoinnit"
           }
         },
         "fr": {
@@ -58719,32 +59235,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "הַשׁקָעָה"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "निवेश"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Ulaganje"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Beruházás"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Investasi"
           }
         },
         "it": {
@@ -58755,98 +59271,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "投資"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "투자"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Pelaburan"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Investering"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Investering"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Inwestycja"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Investimento"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Investimento"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Investiție"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Инвестиции"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Investície"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Investering"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "การลงทุน"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Yatırım"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Інвестиції"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "Sự đầu tư"
           }
         },
         "zh-Hans": {
@@ -58857,8 +59373,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment"
+            "state": "translated",
+            "value": "投資"
           }
         }
       }
@@ -58900,6 +59416,174 @@
             "state": "translated",
             "value": "فشل الاستثمار: %@."
           }
+        },
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fallades d'inversió: %@."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selhání investic: %@."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Investeringsfejl: %@."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αποτυχίες επένδυσης: %@."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fallos de inversión: %@."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Investointien epäonnistumiset: %@."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כשלים בהשקעה: %@."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "निवेश विफलताएँ: %@।"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neuspjesi ulaganja: %@."
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befektetési hibák: %@."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kegagalan investasi: %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "投資の失敗: %@。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "투자 실패: %@."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kegagalan pelaburan: %@."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Investeringsfeil: %@."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mislukte investeringen: %@."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niepowodzenie inwestycji: %@."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falhas de investimento: %@."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falhas de investimento: %@."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eșecuri de investiții: %@."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Инвестиционные неудачи: %@."
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neúspechy investícií: %@."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Investeringsfel: %@."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ความล้มเหลวในการลงทุน: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yatırım başarısızlıkları: %@."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Невдалі інвестиції: %@."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thất bại trong đầu tư: %@."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "投資失敗：%@。"
+          }
         }
       }
     },
@@ -58913,20 +59597,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Comissió d'inversió"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Investiční poplatek"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Investeringsgebyr"
           }
         },
         "de": {
@@ -58937,8 +59621,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Προμήθεια επένδυσης"
           }
         },
         "es": {
@@ -58949,14 +59633,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Tarifa de inversión"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Sijoituspalkkio"
           }
         },
         "fr": {
@@ -58967,32 +59651,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "עמלת השקעה"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "निवेश शुल्क"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Naknada za ulaganje"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Befektetési díj"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Biaya Investasi"
           }
         },
         "it": {
@@ -59003,98 +59687,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "投資手数料"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "투자 수수료"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Yuran Pelaburan"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Investeringsgebyr"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Investeringsvergoeding"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Opłata inwestycyjna"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Taxa de investimento"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Taxa de investimento"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Comision de investiție"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Инвестиционный сбор"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Investičný poplatok"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Investeringsavgift"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "ค่าธรรมเนียมการลงทุน"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Yatırım Ücreti"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Комісія за інвестиції"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "Phí đầu tư"
           }
         },
         "zh-Hans": {
@@ -59105,8 +59789,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Fee"
+            "state": "translated",
+            "value": "投資費"
           }
         }
       }
@@ -59121,20 +59805,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Comissió de transacció d'inversió"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Poplatek za investiční transakci"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Gebyr for investeringstransaktion"
           }
         },
         "de": {
@@ -59145,8 +59829,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Προμήθεια Επενδυτικής Συναλλαγής"
           }
         },
         "es": {
@@ -59157,14 +59841,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Tarifa de transacción de inversión"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Sijoitustapahtumapalkkio"
           }
         },
         "fr": {
@@ -59175,32 +59859,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "עמלת עסקת השקעה"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "निवेश लेनदेन शुल्क"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Naknada za investicijsku transakciju"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Befektetési tranzakciós díj"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Biaya Transaksi Investasi"
           }
         },
         "it": {
@@ -59211,98 +59895,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "投資取引手数料"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "투자 거래 수수료"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Yuran Transaksi Pelaburan"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Transaksjonsgebyr for investeringer"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Kosten voor beleggingstransacties"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Opłata za transakcję inwestycyjną"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Taxa de transação de investimento"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Taxa de transação de investimento"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Comision de tranzacție de investiții"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Комиссия за инвестиционную транзакцию"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Poplatok za investičnú transakciu"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Investeringstransaktionsavgift"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "ค่าธรรมเนียมการทำธุรกรรมการลงทุน"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Yatırım İşlem Ücreti"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Комісія за інвестиційну операцію"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "Phí giao dịch đầu tư"
           }
         },
         "zh-Hans": {
@@ -59313,8 +59997,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee"
+            "state": "translated",
+            "value": "投資交易費"
           }
         }
       }
@@ -59329,20 +60013,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Comissió de transacció d'inversió"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Poplatek za investiční transakci %"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Investeringstransaktionsgebyr %"
           }
         },
         "de": {
@@ -59353,8 +60037,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Προμήθεια επενδυτικής συναλλαγής %"
           }
         },
         "es": {
@@ -59365,14 +60049,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Tarifa de transacción de inversión %"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Sijoitustapahtumapalkkio %"
           }
         },
         "fr": {
@@ -59383,32 +60067,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "עמלת עסקת השקעה %"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "निवेश लेनदेन शुल्क %"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Naknada za investicijsku transakciju %"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Befektetési tranzakciós díj %"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "% Biaya Transaksi Investasi"
           }
         },
         "it": {
@@ -59419,98 +60103,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "投資取引手数料%"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "투자 거래 수수료 %"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Yuran Transaksi Pelaburan %"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Investeringstransaksjonsgebyr %"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Beleggingstransactiekosten %"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Opłata za transakcję inwestycyjną%"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Taxa de transação de investimento%"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Taxa de transação de investimento%"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Taxa de tranzacție de investiții %"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Комиссия за инвестиционную транзакцию %"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Poplatok za investičnú transakciu %"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Investeringstransaktionsavgift %"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "ค่าธรรมเนียมการทำธุรกรรมการลงทุน %"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Yatırım İşlem Ücreti %"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Комісія за інвестиційні операції %"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "Phí giao dịch đầu tư %"
           }
         },
         "zh-Hans": {
@@ -59521,8 +60205,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investment Transaction Fee %"
+            "state": "translated",
+            "value": "投資交易費%"
           }
         }
       }
@@ -59537,20 +60221,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investments"
+            "state": "translated",
+            "value": "Inversions"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investments"
+            "state": "translated",
+            "value": "Investice"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Investments"
+            "state": "translated",
+            "value": "Investeringer"
           }
         },
         "de": {
