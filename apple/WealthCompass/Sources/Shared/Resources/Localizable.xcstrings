@@ -85229,6 +85229,102 @@
             "state": "translated",
             "value": "プライベート"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사적인"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Persendirian"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privat"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privé"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prywatny"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privado"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privado"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privat"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Частный"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Súkromné"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privat"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ส่วนตัว"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Özel"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Приватний"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riêng tư"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "私人的"
+          }
         }
       }
     },
@@ -85242,20 +85338,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Guany / Pèrdua"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Zisk/ztráta"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Fortjeneste / tab"
           }
         },
         "de": {
@@ -85266,8 +85362,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Κέρδη / Ζημιά"
           }
         },
         "es": {
@@ -85278,14 +85374,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Ganancia / Pérdida"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Voitto/tappio"
           }
         },
         "fr": {
@@ -85296,32 +85392,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "רווח / הפסד"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "लाभ/हानि"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Dobit / Gubitak"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Nyereség/veszteség"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Untung/Rugi"
           }
         },
         "it": {
@@ -85332,98 +85428,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "損益"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "이익 / 손실"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Untung / Rugi"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Fortjeneste / tap"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Winst / verlies"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Zysk / strata"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Lucro / Perda"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Lucro / Perda"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Profit / Pierdere"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Прибыль/Убыток"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Zisk/strata"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Vinst/förlust"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "กำไร/ขาดทุน"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Kar / Zarar"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Прибуток / Збиток"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "Lãi/Lỗ"
           }
         },
         "zh-Hans": {
@@ -85434,8 +85530,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Profit / Loss"
+            "state": "translated",
+            "value": "利潤/虧損"
           }
         }
       }
@@ -85450,20 +85546,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Quantitat"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Množství"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Mængde"
           }
         },
         "de": {
@@ -85474,8 +85570,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Ποσότητα"
           }
         },
         "es": {
@@ -85486,14 +85582,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Cantidad"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Määrä"
           }
         },
         "fr": {
@@ -85504,32 +85600,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "כַּמוּת"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "मात्रा"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Količina"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Mennyiség"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Kuantitas"
           }
         },
         "it": {
@@ -85540,98 +85636,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "量"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "수량"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Kuantiti"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Mengde"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Hoeveelheid"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Ilość"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Quantidade"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Quantidade"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Cantitate"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Количество"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Množstvo"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Kvantitet"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "ปริมาณ"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Miktar"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Кількість"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "Số lượng"
           }
         },
         "zh-Hans": {
@@ -85642,8 +85738,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Quantity"
+            "state": "translated",
+            "value": "數量"
           }
         }
       }
@@ -85658,20 +85754,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Pis de gamma"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Podlaha rozsahu"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Range gulv"
           }
         },
         "de": {
@@ -85682,8 +85778,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Δάπεδο εμβέλειας"
           }
         },
         "es": {
@@ -85694,14 +85790,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "piso de gama"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Range lattia"
           }
         },
         "fr": {
@@ -85712,32 +85808,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "רצפת המטווח"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "रेंज फर्श"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Pod dometa"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Range padló"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Lantai jangkauan"
           }
         },
         "it": {
@@ -85748,98 +85844,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "レンジフロア"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "범위 층"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Lantai julat"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Range gulv"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Bereik vloer"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Podłoga zasięgu"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Piso de intervalo"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Piso de intervalo"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Etajul razei"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Пол диапазона"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Podlaha rozsahu"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Range golv"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "ชั้นช่วง"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Menzil katı"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "Підлога асортименту"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "tầng dãy"
           }
         },
         "zh-Hans": {
@@ -85850,8 +85946,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Range floor"
+            "state": "translated",
+            "value": "範圍樓層"
           }
         }
       }
@@ -85866,20 +85962,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Immobiliària"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Nemovitost"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Fast ejendom"
           }
         },
         "de": {
@@ -85890,8 +85986,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Ακίνητα"
           }
         },
         "es": {
@@ -85902,14 +85998,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Bienes raíces"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Kiinteistöt"
           }
         },
         "fr": {
@@ -85920,32 +86016,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "מְקַרקְעִין"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "रियल एस्टेट"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Nekretnina"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Ingatlan"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Real Estat"
           }
         },
         "it": {
@@ -85956,98 +86052,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "不動産"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "부동산"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Hartanah"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Fast eiendom"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Vastgoed"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Nieruchomość"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Imobiliária"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Imobiliária"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Imobiliare"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Недвижимость"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Nehnuteľnosti"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Fastighet"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "อสังหาริมทรัพย์"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Gayrimenkul"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Нерухомість"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "Bất động sản"
           }
         },
         "zh-Hans": {
@@ -86058,8 +86154,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Real Estate"
+            "state": "translated",
+            "value": "房地產"
           }
         }
       }
@@ -86074,20 +86170,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Activitat recent"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Nedávná aktivita"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Seneste aktivitet"
           }
         },
         "de": {
@@ -86098,8 +86194,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Πρόσφατη Δραστηριότητα"
           }
         },
         "es": {
@@ -86110,14 +86206,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Actividad reciente"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Viimeaikainen toiminta"
           }
         },
         "fr": {
@@ -86128,32 +86224,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "פעילות אחרונה"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "हाल की गतिविधि"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Nedavna aktivnost"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Legutóbbi tevékenység"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Aktivitas Terkini"
           }
         },
         "it": {
@@ -86164,98 +86260,98 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "最近の活動"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "최근 활동"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Aktiviti Terkini"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Nylig aktivitet"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Recente activiteit"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Ostatnia aktywność"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Atividade recente"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Atividade recente"
           }
         },
         "ro": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Activitate recentă"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Недавняя активность"
           }
         },
         "sk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Nedávna aktivita"
           }
         },
         "sv": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Senaste aktivitet"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "กิจกรรมล่าสุด"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Son Etkinlik"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Останні дії"
           }
         },
         "vi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "Hoạt động gần đây"
           }
         },
         "zh-Hans": {
@@ -86266,8 +86362,8 @@
         },
         "zh-Hant": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Activity"
+            "state": "translated",
+            "value": "最近的活動"
           }
         }
       }
@@ -86282,20 +86378,20 @@
         },
         "ca": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Transaccions recents"
           }
         },
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Nedávné transakce"
           }
         },
         "da": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Seneste transaktioner"
           }
         },
         "de": {
@@ -86306,8 +86402,8 @@
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Πρόσφατες Συναλλαγές"
           }
         },
         "es": {
@@ -86318,14 +86414,14 @@
         },
         "es-419": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Transacciones recientes"
           }
         },
         "fi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Viimeaikaiset tapahtumat"
           }
         },
         "fr": {
@@ -86336,32 +86432,32 @@
         },
         "he": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "עסקאות אחרונות"
           }
         },
         "hi": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "हाल के लेनदेन"
           }
         },
         "hr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Nedavne transakcije"
           }
         },
         "hu": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Legutóbbi tranzakciók"
           }
         },
         "id": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Transaksi Terkini"
           }
         },
         "it": {
@@ -86372,50 +86468,50 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "最近の取引"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "최근 거래"
           }
         },
         "ms": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Transaksi Terkini"
           }
         },
         "nb": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Nylige transaksjoner"
           }
         },
         "nl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Recente transacties"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Ostatnie transakcje"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Transações recentes"
           }
         },
         "pt-PT": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Recent Transactions"
+            "state": "translated",
+            "value": "Transações recentes"
           }
         },
         "ro": {
