@@ -8,11 +8,11 @@ private enum MacTransactionTypeFilter: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
-        case .all: String(localized: "All")
-        case .income: String(localized: "Income")
-        case .expense: String(localized: "Expense")
+        case .all: "All"
+        case .income: "Income"
+        case .expense: "Expense"
         }
     }
 
@@ -340,11 +340,17 @@ struct MacCashFlowView: View {
                     )
                     Spacer(minLength: 0)
                     VStack(alignment: .trailing, spacing: 3) {
-                        Text(hoveredCashFlowMonth != nil ? hoveredCashFlowMonth!.monthLabel : String(localized: "\(cashFlowRange.label) NET"))
-                            .textCase(.uppercase)
-                            .font(.caption2.weight(.bold))
-                            .tracking(1)
-                            .foregroundStyle(.secondary)
+                        Group {
+                            if hoveredCashFlowMonth != nil {
+                                Text(hoveredCashFlowMonth!.monthLabel)
+                            } else {
+                                Text(settings.localized("\(cashFlowRange.localizedTitle(appLanguage: settings.appLanguage)) NET"))
+                            }
+                        }
+                        .textCase(.uppercase)
+                        .font(.caption2.weight(.bold))
+                        .tracking(1)
+                        .foregroundStyle(.secondary)
                         let net = hoveredCashFlowMonth != nil ? (hoveredCashFlowMonth!.income - hoveredCashFlowMonth!.expense) : (totalIncome - totalExpense)
                         Text(settings.privateCurrency(net))
                             .font(.subheadline.monospacedDigit().weight(.bold))
@@ -542,13 +548,17 @@ struct MacCashFlowView: View {
                     Text(schedule.category)
                         .font(.headline)
                     Label(
-                        String(localized: schedule.notificationsEnabled ? "Notifications on" : "Notifications off"),
+                        schedule.notificationsEnabled
+                            ? settings.localized("Notifications on")
+                            : settings.localized("Notifications off"),
                         systemImage: schedule.notificationsEnabled ? "bell.fill" : "bell.slash"
                     )
                     .labelStyle(.iconOnly)
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .help(schedule.notificationsEnabled ? String(localized: "Notifications enabled") : String(localized: "Notifications disabled"))
+                    .help(schedule.notificationsEnabled
+                        ? settings.localized("Notifications enabled")
+                        : settings.localized("Notifications disabled"))
                 }
 
                 HStack(spacing: 10) {
@@ -590,7 +600,9 @@ struct MacCashFlowView: View {
                 } label: {
                     Image(systemName: schedule.isActive ? "pause.fill" : "play.fill")
                 }
-                .help(schedule.isActive ? String(localized: "Pause schedule") : String(localized: "Resume schedule"))
+                .help(schedule.isActive
+                    ? settings.localized("Pause schedule")
+                    : settings.localized("Resume schedule"))
 
                 Button {
                     activeAlert = .finishRecurringTransaction(schedule)
@@ -848,9 +860,9 @@ struct MacCashFlowView: View {
 
     private var transactionEmptyTitle: String {
         if finance.transactions.isEmpty {
-            return String(localized: "No Transactions")
+            return settings.localized("No Transactions")
         }
-        return String(localized: "No Matching Transactions")
+        return settings.localized("No Matching Transactions")
     }
 
     private var transactionEmptySystemImage: String {
@@ -859,9 +871,9 @@ struct MacCashFlowView: View {
 
     private var transactionEmptyDescription: String {
         if finance.transactions.isEmpty {
-            return String(localized: "Add your first income or expense.")
+            return settings.localized("Add your first income or expense.")
         }
-        return String(localized: "Change the search, type, or period filters.")
+        return settings.localized("Change the search, type, or period filters.")
     }
 
     private func signedAmount(for transaction: Transaction) -> String {
@@ -879,8 +891,8 @@ struct MacCashFlowView: View {
                 if !authorized {
                     finance.setRecurringNotificationsEnabled(id: schedule.id, isEnabled: false)
                     activeAlert = .message(
-                        title: String(localized: "Notifications Disabled"),
-                        message: String(localized: "The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.")
+                        title: settings.localized("Notifications Disabled"),
+                        message: settings.localized("The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.")
                     )
                 }
             }
@@ -912,11 +924,11 @@ struct MacCashFlowView: View {
         switch alert {
         case .deleteTransaction(let transaction):
             return Alert(
-                title: Text(String(localized: "Delete Transaction?")),
+                title: Text("Delete Transaction?"),
                 message: Text(
-                    "This permanently removes the \(transaction.category) transaction from \(transaction.date.formatted(date: .abbreviated, time: .omitted))."
+                    settings.localized("This permanently removes the \(transaction.category) transaction from \(transaction.date.formatted(date: .abbreviated, time: .omitted)).")
                 ),
-                primaryButton: .destructive(Text(String(localized: "Delete"))) {
+                primaryButton: .destructive(Text("Delete")) {
                     finance.deleteTransaction(transaction, settings: settings)
                     selection = nil
                 },
@@ -925,11 +937,9 @@ struct MacCashFlowView: View {
 
         case .deleteRecurringTransaction(let schedule):
             return Alert(
-                title: Text(String(localized: "Delete Recurring Transaction?")),
-                message: Text(
-                    "Future \(schedule.frequency.title.lowercased()) occurrences for \(schedule.category) will no longer be created."
-                ),
-                primaryButton: .destructive(Text(String(localized: "Delete"))) {
+                title: Text("Delete Recurring Transaction?"),
+                message: Text(settings.localized("Future \(schedule.frequency.localizedTitle(appLanguage: settings.appLanguage).lowercased()) occurrences for \(schedule.category) will no longer be created.")),
+                primaryButton: .destructive(Text("Delete")) {
                     finance.deleteRecurringTransaction(schedule)
                     Task {
                         await MacRecurringTransactionNotificationService.shared.cancel(scheduleID: schedule.id)
@@ -940,11 +950,11 @@ struct MacCashFlowView: View {
 
         case .finishRecurringTransaction(let schedule):
             return Alert(
-                title: Text(String(localized: "Finish Recurring Transaction?")),
+                title: Text("Finish Recurring Transaction?"),
                 message: Text(
-                    "\(schedule.category) will disappear from Recurring Transactions and no future occurrences will be inserted automatically."
+                    settings.localized("\(schedule.category) will disappear from Recurring Transactions and no future occurrences will be inserted automatically.")
                 ),
-                primaryButton: .default(Text(String(localized: "Finish"))) {
+                primaryButton: .default(Text("Finish")) {
                     finishRecurringTransaction(schedule)
                 },
                 secondaryButton: .cancel()
@@ -1013,7 +1023,7 @@ private struct MacCashFlowTransactionEditor: View {
         self.onSave = onSave
         _type = State(initialValue: transaction?.type ?? .expense)
         _amount = State(initialValue: transaction.map { String($0.amount) } ?? "")
-        _category = State(initialValue: transaction?.category ?? String(localized: "Food"))
+        _category = State(initialValue: transaction?.category ?? "Food")
         _note = State(initialValue: transaction?.description ?? "")
         _date = State(initialValue: transaction?.date ?? Date())
     }
@@ -1087,7 +1097,7 @@ private struct MacCashFlowTransactionEditor: View {
                         TextField("Custom category name", text: $customCategory)
                             .focused($isCustomCategoryFocused)
 
-                        Text("The category will be saved for future \(type.title.lowercased()) transactions.")
+                        Text(settings.localized("The category will be saved for future \(type.localizedTitle(appLanguage: settings.appLanguage).lowercased()) transactions."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LockView: View {
     @EnvironmentObject private var appLock: AppLockStore
+    @EnvironmentObject private var settings: AppSettings
 
     var body: some View {
         ZStack {
@@ -29,15 +30,18 @@ struct LockView: View {
                         Text("Wealth Compass")
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
-                        Text("Your financial view is protected")
+                        Text(settings.localized("Unlock with \(appLock.biometryName(appLanguage: settings.appLanguage))"))
                             .font(.subheadline)
                             .foregroundStyle(.white.opacity(0.48))
                     }
 
                     Button {
-                        Task { await appLock.unlock() }
+                        Task { await appLock.unlock(appLanguage: settings.appLanguage) }
                     } label: {
-                        Label("Unlock with \(appLock.biometryName)", systemImage: "faceid")
+                        Label(
+                            settings.localized("Unlock with \(appLock.biometryName(appLanguage: settings.appLanguage))"),
+                            systemImage: "faceid"
+                        )
                             .font(.headline)
                             .foregroundStyle(.black.opacity(0.82))
                             .frame(maxWidth: .infinity)
@@ -60,7 +64,7 @@ struct LockView: View {
             .padding(24)
         }
         .task {
-            await appLock.unlock()
+            await appLock.unlock(appLanguage: settings.appLanguage)
         }
     }
 }

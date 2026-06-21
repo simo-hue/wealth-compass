@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MacRootView: View {
+    @Environment(\.locale) private var locale
     @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
@@ -51,6 +52,7 @@ struct MacRootView: View {
             MacEditorSheet(editor: editor)
                 .environmentObject(finance)
                 .environmentObject(settings)
+                .appLanguage(settings.appLanguage)
         }
         .task {
             await handleAppBecameActive()
@@ -72,6 +74,36 @@ struct MacRootView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .macRecurringTransactionNotificationReceived)) { _ in
             Task { await processRecurringTransactions() }
+        }
+        .onChange(of: settings.appLanguage) { _, newLanguage in
+            // #region agent log
+            I18nDebugLog.log(
+                location: "MacRootView.swift:onChange(appLanguage)",
+                message: "swiftui locale vs string localized",
+                hypothesisId: "A",
+                data: [
+                    "appLanguage": newLanguage ?? "nil",
+                    "swiftUILocale": locale.identifier,
+                    "sidebarSettingsTitle": MacDestination.settings.localizedTitle(appLanguage: newLanguage),
+                    "sidebarDashboardTitle": MacDestination.dashboard.localizedTitle(appLanguage: newLanguage),
+                    "textLiteralWouldUseLocale": locale.identifier
+                ]
+            )
+            // #endregion
+        }
+        .onAppear {
+            // #region agent log
+            I18nDebugLog.log(
+                location: "MacRootView.swift:onAppear",
+                message: "root view appeared",
+                hypothesisId: "E",
+                data: [
+                    "appLanguage": settings.appLanguage ?? "nil",
+                    "swiftUILocale": locale.identifier,
+                    "sidebarCashFlowTitle": MacDestination.cashFlow.localizedTitle(appLanguage: settings.appLanguage)
+                ]
+            )
+            // #endregion
         }
         .onChange(of: finance.data.recurringTransactions) { _, _ in
             Task { await syncRecurringNotifications() }
@@ -131,10 +163,11 @@ struct MacRootView: View {
         }
 
         let marketResult = await refreshMarketPrices()
-        let exchangeMessage = exchangeResultForAlert?.message ?? ""
+        let exchangeMessage = exchangeResultForAlert?.localizedMessage(appLanguage: settings.appLanguage) ?? ""
+        let marketMessage = marketResult.localizedMessage(appLanguage: settings.appLanguage)
         alert = MacRootAlert(
-            title: marketResult.title,
-            message: String(localized: "\(exchangeMessage)\n\n\(marketResult.message)")
+            title: marketResult.localizedTitle(appLanguage: settings.appLanguage),
+            message: settings.localized("\(exchangeMessage)\n\n\(marketMessage)")
         )
     }
 
@@ -159,8 +192,8 @@ struct MacRootView: View {
 
         guard insertedCount > 0 else { return }
         alert = MacRootAlert(
-            title: String(localized: "Recurring Transactions Added"),
-            message: String(localized: "\(insertedCount) due transaction\(insertedCount == 1 ? " was" : "s were") added to Cash Flow.")
+            title: settings.localized("Recurring Transactions Added"),
+            message: settings.localized("\(insertedCount) due transaction\(insertedCount == 1 ? " was" : "s were") added to Cash Flow.")
         )
     }
 

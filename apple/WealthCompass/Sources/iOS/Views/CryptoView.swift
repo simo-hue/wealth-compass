@@ -11,7 +11,7 @@ struct CryptoView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 PageHeader(title: LocalizedStringKey( "Crypto assets"), subtitle: LocalizedStringKey( "Track holdings, allocation, and performance.")) {
-                    PrimaryActionButton(systemImage: "plus", accessibilityLabel: String(localized: "Add Crypto Holding")) {
+                    PrimaryActionButton(systemImage: "plus", accessibilityLabel: "Add Crypto Holding") {
                         editingHolding = nil
                         showingForm = true
                     }
@@ -140,7 +140,7 @@ struct CryptoView: View {
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    Text(String(localized: "Updated \(holding.updatedAt.formatted(date: .abbreviated, time: .omitted))"))
+                    Text(settings.localized("Updated \(holding.updatedAt.formatted(date: .abbreviated, time: .omitted))"))
                         .font(.caption2)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)

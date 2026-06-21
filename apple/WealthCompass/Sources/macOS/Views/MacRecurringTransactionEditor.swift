@@ -77,16 +77,16 @@ struct MacRecurringTransactionEditor: View {
 
     private var validationMessage: String? {
         if !amount.isEmpty, parsedAmount <= 0 {
-            return String(localized: "Enter an amount greater than zero.")
+            return settings.localized("Enter an amount greater than zero.")
         }
         if isCustomCategorySelected, trimmedCustomCategory.isEmpty {
-            return String(localized: "Enter a custom category name.")
+            return settings.localized("Enter a custom category name.")
         }
         if existingSchedule == nil, startDate <= Date() {
-            return String(localized: "The first occurrence must be in the future.")
+            return settings.localized("The first occurrence must be in the future.")
         }
         if normalizedEndDate.map({ $0 < startDate }) ?? false {
-            return String(localized: "The end date cannot be before the first occurrence.")
+            return settings.localized("The end date cannot be before the first occurrence.")
         }
         return nil
     }
@@ -133,7 +133,7 @@ struct MacRecurringTransactionEditor: View {
                         TextField("Custom category name", text: $customCategory)
                             .focused($isCustomCategoryFocused)
 
-                        Text("The category will be saved for future \(type.title.lowercased()) transactions.")
+                        Text(settings.localized("The category will be saved for future \(type.localizedTitle(appLanguage: settings.appLanguage).lowercased()) transactions."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

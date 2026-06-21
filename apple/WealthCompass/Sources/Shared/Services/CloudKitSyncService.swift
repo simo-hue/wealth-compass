@@ -2,6 +2,7 @@ import CloudKit
 import CryptoKit
 import Foundation
 import OSLog
+import SwiftUI
 
 // #region agent log
 private func wcDebugLog(_ location: String, _ message: String, _ data: [String: Any] = [:], _ hypothesis: String) {
@@ -34,37 +35,58 @@ enum CloudSyncStatus: Equatable, Sendable {
     case accountUnavailable(String)
     case error(String)
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
         case .disabled:
-            String(localized: "Off")
+            "Off"
         case .starting:
-            String(localized: "Connecting")
+            "Connecting"
         case .syncing:
-            String(localized: "Syncing")
+            "Syncing"
         case .upToDate:
-            String(localized: "Up to Date")
+            "Up to Date"
         case .accountUnavailable:
-            String(localized: "iCloud Unavailable")
+            "iCloud Unavailable"
         case .error:
-            String(localized: "Sync Error")
+            "Sync Error"
+        }
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        switch self {
+        case .disabled:
+            AppLocalization.string("Off", appLanguage: appLanguage)
+        case .starting:
+            AppLocalization.string("Connecting", appLanguage: appLanguage)
+        case .syncing:
+            AppLocalization.string("Syncing", appLanguage: appLanguage)
+        case .upToDate:
+            AppLocalization.string("Up to Date", appLanguage: appLanguage)
+        case .accountUnavailable:
+            AppLocalization.string("iCloud Unavailable", appLanguage: appLanguage)
+        case .error:
+            AppLocalization.string("Sync Error", appLanguage: appLanguage)
         }
     }
 
     var detail: String? {
+        localizedDetail(appLanguage: nil)
+    }
+
+    func localizedDetail(appLanguage: String?) -> String? {
         switch self {
         case .disabled:
-            String(localized: "Your data remains on this device.")
+            AppLocalization.string("Your data remains on this device.", appLanguage: appLanguage)
         case .starting:
-            String(localized: "Checking the iCloud account and preparing CloudKit.")
+            AppLocalization.string("Checking the iCloud account and preparing CloudKit.", appLanguage: appLanguage)
         case .syncing:
-            String(localized: "Sending local changes and fetching updates from iCloud.")
+            AppLocalization.string("Sending local changes and fetching updates from iCloud.", appLanguage: appLanguage)
         case .upToDate(let date):
             date.map {
-                String(localized: "Last synced \($0.formatted(date: .abbreviated, time: .shortened)).")
-            } ?? String(localized: "Local data is ready to sync.")
+                AppLocalization.string("Last synced \($0.formatted(date: .abbreviated, time: .shortened)).", appLanguage: appLanguage)
+            } ?? AppLocalization.string("Local data is ready to sync.", appLanguage: appLanguage)
         case .accountUnavailable(let message), .error(let message):
-            message
+            AppLocalization.string(String.LocalizationValue(message), appLanguage: appLanguage)
         }
     }
 
@@ -266,7 +288,7 @@ extension FinancialData {
 
         let value = try FinanceJSONCoding.decode(type, from: payload)
         guard value.id == mutation.key.id else {
-            throw CloudSyncError.invalidRecord(String(localized: "Record ID and payload ID do not match."))
+            throw CloudSyncError.invalidRecord("Record ID and payload ID do not match.")
         }
         if let index = updatedCollection.firstIndex(where: { $0.id == value.id }) {
             updatedCollection[index] = value
@@ -479,13 +501,20 @@ enum CloudSyncError: LocalizedError {
     case notRunning
 
     var errorDescription: String? {
+        localizedDescription(appLanguage: nil)
+    }
+
+    func localizedDescription(appLanguage: String?) -> String {
         switch self {
         case .accountUnavailable(let message), .invalidRecord(let message):
-            message
+            AppLocalization.string(String.LocalizationValue(message), appLanguage: appLanguage)
         case .accountChanged:
-            String(localized: "The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.")
+            AppLocalization.string(
+                "The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.",
+                appLanguage: appLanguage
+            )
         case .notRunning:
-            String(localized: "iCloud sync is not running.")
+            AppLocalization.string("iCloud sync is not running.", appLanguage: appLanguage)
         }
     }
 }
@@ -573,7 +602,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         do {
             guard try await accountStatusProvider() == .available else {
                 throw CloudSyncError.accountUnavailable(
-                    String(localized: "Sign in to iCloud and allow iCloud access for this app before turning on sync.")
+                    "Sign in to iCloud and allow iCloud access for this app before turning on sync."
                 )
             }
             guard isCurrent(generation) else {
@@ -956,7 +985,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             }
 
             guard let payload = record["payload"] as? Data else {
-                throw CloudSyncError.invalidRecord(String(localized: "CloudKit record \(record.recordID.recordName) has no payload."))
+                throw CloudSyncError.invalidRecord("CloudKit record \(record.recordID.recordName) has no payload.")
             }
             let remoteSnapshot = CloudSyncRecordSnapshot(
                 key: key,
@@ -1435,11 +1464,11 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         if let cloudError = error as? CKError {
             switch cloudError.code {
             case .notAuthenticated:
-                await statusHandler(.accountUnavailable(String(localized: "Sign in to iCloud to continue syncing.")))
+                await statusHandler(.accountUnavailable("Sign in to iCloud to continue syncing."))
             case .networkUnavailable, .networkFailure:
-                await statusHandler(.error(String(localized: "The network is unavailable. Local changes are saved and will retry automatically.")))
+                await statusHandler(.error("The network is unavailable. Local changes are saved and will retry automatically."))
             case .quotaExceeded:
-                await statusHandler(.error(String(localized: "The iCloud account does not have enough available storage.")))
+                await statusHandler(.error("The iCloud account does not have enough available storage."))
             default:
                 await statusHandler(.error(cloudError.localizedDescription))
             }

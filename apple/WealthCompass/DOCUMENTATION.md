@@ -276,3 +276,19 @@
 - [2026-06-20 18:44]: Apple Version Bump
   - *Details*: Incremented the marketing version to 1.0.5 and the build number to 6 across macOS and iOS targets for App Store Connect submission.
   - *Tech Notes*: Updated `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` using `agvtool` in `WealthCompass.xcodeproj/project.pbxproj`.
+
+- [2026-06-21 15:22]: In-App Language Switching Fix
+  - *Details*: Fixed partial localization when choosing a non-English language in Settings. Navigation labels, enum titles, alerts, and category pickers now respect the selected app language instead of resolving strings at the system locale.
+  - *Tech Notes*: Added `AppLocalization.swift` with locale-aware string resolution and `AppleLanguages` preference sync. Converted UI enum titles (`MacDestination`, `TransactionType`, `AnalyticsPeriod`, etc.) to `LocalizedStringKey`. Stored default transaction categories as English catalog keys. Applied `.appLanguage()` and view `.id()` refresh on macOS/iOS roots and editor sheets.
+
+- [2026-06-21 15:50]: Full UI Localization Pass + String Catalog Fill
+  - *Details*: Completed a repo-wide localization sweep: removed remaining `String(localized:)` from UI/services (now `settings.localized()` / `LocalizedStringKey`), localized macOS menu commands, settings sections, dashboard empty states, onboarding, sync status messages, and import errors. Filled `Localizable.xcstrings` with ~3,170 translations for es/it/de/fr/zh-Hans/ar via `fill_catalog_translations.cjs`.
+  - *Tech Notes*: Added `fill_catalog_translations.cjs` (no npm deps, uses gtx translate endpoint). Spanish coverage ~96% of catalog keys. Rebuild required after catalog changes.
+
+- [2026-06-21 15:41]: High-Priority Localization Pass
+  - *Details*: Replaced `String(localized:)` in settings, dashboard, cash flow, forms, menu commands, alerts, and shared services with `LocalizedStringKey` literals (SwiftUI) or `settings.localized()` / `AppLocalization.string(..., appLanguage:)` for dynamic strings. Exchange-rate and market-data refresh results now expose `localizedTitle(appLanguage:)` and `localizedMessage(appLanguage:)`.
+  - *Tech Notes*: Updated `SettingsSection`/`SettingsRow`, `DashboardEmptyState`, `PrivacyChartCover`, `AppLockStore`/`MacAppLockStore` biometry APIs, and `WealthCompassMacApp` `CommandMenu` labels. `I18nDebugLog` and CloudKit debug instrumentation left untouched. macOS scheme builds successfully.
+
+- [2026-06-21]: Remaining Localization Cleanup
+  - *Details*: Cleared the last `String(localized:)` usages in editor sheets, finance store, CloudKit sync, dashboard, onboarding, investments/crypto views, and iOS content view. Import category mapping now stores English catalog keys. Cloud sync status detail text respects the selected app language.
+  - *Tech Notes*: Added `CloudSyncStatus.localizedDetail(appLanguage:)` and `localizedDescription(appLanguage:)` on `CloudSyncError`/`FinanceImportError`. Settings views call `localizedDetail`. `assetAllocation` uses `settings.localized()`. WealthCompassMac build verified.

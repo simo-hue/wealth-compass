@@ -39,7 +39,7 @@ struct SettingsView: View {
                     
                     Picker("Base Currency", selection: $settings.currency) {
                         ForEach(Currency.allCases) { currency in
-                            Text("\(currency.displayName) (\(currency.rawValue))").tag(currency)
+                            (Text(currency.displayName) + Text(" (\(currency.rawValue))")).tag(currency)
                         }
                     }
                 }
@@ -55,7 +55,7 @@ struct SettingsView: View {
 
                 Section("Security") {
                     Toggle(isOn: biometricLockBinding) {
-                        Label("\(appLock.biometryName) App Lock", systemImage: "lock.shield")
+                        Label("\(appLock.biometryName(appLanguage: settings.appLanguage)) App Lock", systemImage: "lock.shield")
                     }
                     .tint(WCColor.primary)
 
@@ -92,8 +92,8 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
 
-                    LabeledContent("Status", value: finance.cloudSyncStatus.title)
-                    if let detail = finance.cloudSyncStatus.detail {
+                    LabeledContent("Status", value: finance.cloudSyncStatus.localizedTitle(appLanguage: settings.appLanguage))
+                    if let detail = finance.cloudSyncStatus.localizedDetail(appLanguage: settings.appLanguage) {
                         Text(detail)
                             .font(.caption)
                             .foregroundStyle(
@@ -108,7 +108,7 @@ struct SettingsView: View {
                                     try await finance.forceICloudSync()
                                 } catch {
                                     settingsAlert = SettingsAlertState(
-                                        title: String(localized: "Sync Failed"),
+                                        title: settings.localized("Sync Failed"),
                                         message: error.localizedDescription
                                     )
                                 }
@@ -258,9 +258,9 @@ struct SettingsView: View {
             }
             .alert(item: $pendingDestructiveAction) { action in
                 Alert(
-                    title: Text(action.title),
-                    message: Text(action.message),
-                    primaryButton: .destructive(Text(action.confirmButtonTitle)) {
+                    title: Text(action.localizedTitle(appLanguage: settings.appLanguage)),
+                    message: Text(action.message(appLanguage: settings.appLanguage)),
+                    primaryButton: .destructive(Text(action.localizedConfirmButtonTitle(appLanguage: settings.appLanguage))) {
                         performDestructiveAction(action)
                     },
                     secondaryButton: .cancel()
@@ -296,12 +296,12 @@ struct SettingsView: View {
                         color: WCColor.accent
                     )
                     settingsStatusChip(
-                        settings.isPrivacyMode ? String(localized: "Private") : String(localized: "Visible"),
+                        settings.isPrivacyMode ? settings.localized("Private") : settings.localized("Visible"),
                         systemImage: settings.isPrivacyMode ? "eye.slash.fill" : "eye.fill",
                         color: WCColor.primary
                     )
                     settingsStatusChip(
-                        settings.isICloudSyncEnabled ? String(localized: "iCloud") : String(localized: "Local"),
+                        settings.isICloudSyncEnabled ? settings.localized("iCloud") : settings.localized("Local"),
                         systemImage: settings.isICloudSyncEnabled ? "icloud.fill" : "internaldrive.fill",
                         color: .blue
                     )
@@ -352,7 +352,9 @@ struct SettingsView: View {
                 Task { await refreshExchangeRates() }
             } label: {
                 Label(
-                    settings.isRefreshingExchangeRates ? String(localized: "Refreshing Exchange Rates") : String(localized: "Refresh Exchange Rates"),
+                    settings.isRefreshingExchangeRates
+                        ? settings.localized("Refreshing Exchange Rates")
+                        : settings.localized("Refresh Exchange Rates"),
                     systemImage: "arrow.triangle.2.circlepath"
                 )
             }
@@ -405,7 +407,12 @@ struct SettingsView: View {
             Button {
                 Task { await refreshMarketPrices() }
             } label: {
-                Label(isRefreshingPrices ? String(localized: "Refreshing Market Data") : String(localized: "Refresh Market Data"), systemImage: "arrow.triangle.2.circlepath")
+                Label(
+                    isRefreshingPrices
+                        ? settings.localized("Refreshing Market Data")
+                        : settings.localized("Refresh Market Data"),
+                    systemImage: "arrow.triangle.2.circlepath"
+                )
             }
             .disabled(isRefreshingPrices || (finance.data.investments.isEmpty && finance.data.crypto.isEmpty))
         }
@@ -416,7 +423,7 @@ struct SettingsView: View {
             Label(title, systemImage: systemImage)
                 .foregroundStyle(.white)
             Spacer()
-            Text(isConfigured ? String(localized: "Configured") : String(localized: "Not Set"))
+            Text(isConfigured ? settings.localized("Configured") : settings.localized("Not Set"))
                 .font(.subheadline)
                 .foregroundStyle(isConfigured ? WCColor.primary : WCColor.textSecondary)
             Image(systemName: "chevron.right")
@@ -431,7 +438,7 @@ struct SettingsView: View {
             appLock.isLockEnabled
         } set: { isEnabled in
             if isEnabled {
-                Task { await appLock.enableLock() }
+                Task { await appLock.enableLock(appLanguage: settings.appLanguage) }
             } else {
                 appLock.disableLock()
             }
@@ -486,15 +493,21 @@ struct SettingsView: View {
                 let result = try finance.importBackup(from: url, mode: importMode, settings: settings)
                 backupURL = nil
                 backupError = nil
-                settingsAlert = SettingsAlertState(title: String(localized: "Import Complete"), message: result.message)
+                settingsAlert = SettingsAlertState(
+                    title: settings.localized("Import Complete"),
+                    message: result.message
+                )
             } catch {
                 settingsAlert = SettingsAlertState(
-                    title: String(localized: "Import Failed"),
+                    title: settings.localized("Import Failed"),
                     message: (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
                 )
             }
         case .failure(let error):
-            settingsAlert = SettingsAlertState(title: String(localized: "Import Failed"), message: error.localizedDescription)
+            settingsAlert = SettingsAlertState(
+                title: settings.localized("Import Failed"),
+                message: error.localizedDescription
+            )
         }
     }
 
@@ -532,12 +545,12 @@ struct SettingsView: View {
             activeCredentialEditor = nil
             refreshMarketDataKeyStatus()
             settingsAlert = SettingsAlertState(
-                title: String(localized: "\(credential.title) Saved"),
-                message: "\(message)\n\n\(String(localized: "The API key was saved securely in Keychain."))"
+                title: settings.localized("\(credential.localizedTitle(appLanguage: settings.appLanguage)) Saved"),
+                message: "\(message)\n\n\(settings.localized("The API key was saved securely in Keychain."))"
             )
         } catch {
             credentialEditorAlert = SettingsAlertState(
-                title: String(localized: "\(credential.title) Failed"),
+                title: settings.localized("\(credential.localizedTitle(appLanguage: settings.appLanguage)) Failed"),
                 message: SettingsView.errorMessage(error)
             )
         }
@@ -547,10 +560,10 @@ struct SettingsView: View {
         switch credential {
         case .finnhub:
             let quote = try await FinnhubQuoteClient(apiKey: apiKey).testConnection()
-            return String(localized: "Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
+            return settings.localized("Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
         case .coingecko:
             let quote = try await CoinGeckoPriceClient(apiKey: apiKey).testConnection()
-            return String(localized: "CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
+            return settings.localized("CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
         }
     }
 
@@ -568,12 +581,18 @@ struct SettingsView: View {
             settings: settings
         )
         refreshMarketDataKeyStatus()
-        settingsAlert = SettingsAlertState(title: result.title, message: result.message)
+        settingsAlert = SettingsAlertState(
+            title: result.localizedTitle(appLanguage: settings.appLanguage),
+            message: result.localizedMessage(appLanguage: settings.appLanguage)
+        )
     }
 
     private func refreshExchangeRates() async {
         await settings.refreshExchangeRatesAndRecalculate(finance: finance) { result in
-            settingsAlert = SettingsAlertState(title: result.title, message: result.message)
+            settingsAlert = SettingsAlertState(
+                title: result.localizedTitle(appLanguage: settings.appLanguage),
+                message: result.localizedMessage(appLanguage: settings.appLanguage)
+            )
         }
     }
 
@@ -594,21 +613,30 @@ private enum MarketDataCredentialKind: String, Identifiable {
 
     var id: String { rawValue }
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
         case .finnhub:
-            String(localized: "Finnhub API Key")
+            "Finnhub API Key"
         case .coingecko:
-            String(localized: "CoinGecko API Key")
+            "CoinGecko API Key"
         }
     }
 
-    var placeholder: String {
+    func localizedTitle(appLanguage: String?) -> String {
         switch self {
         case .finnhub:
-            String(localized: "Paste Finnhub API key")
+            AppLocalization.string("Finnhub API Key", appLanguage: appLanguage)
         case .coingecko:
-            String(localized: "Paste CoinGecko API key")
+            AppLocalization.string("CoinGecko API Key", appLanguage: appLanguage)
+        }
+    }
+
+    var placeholder: LocalizedStringKey {
+        switch self {
+        case .finnhub:
+            "Paste Finnhub API key"
+        case .coingecko:
+            "Paste CoinGecko API key"
         }
     }
 
@@ -621,12 +649,12 @@ private enum MarketDataCredentialKind: String, Identifiable {
         }
     }
 
-    var testAssetName: String {
+    var testAssetName: LocalizedStringKey {
         switch self {
         case .finnhub:
-            String(localized: "Apple (AAPL)")
+            "Apple (AAPL)"
         case .coingecko:
-            String(localized: "Bitcoin")
+            "Bitcoin"
         }
     }
 }
@@ -705,30 +733,39 @@ private enum SettingsDestructiveAction: Identifiable {
         }
     }
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
         case .deleteAllData:
-            String(localized: "Delete All Data?")
+            "Delete All Data?"
         case .deleteCustomCategory:
-            String(localized: "Delete Custom Category?")
+            "Delete Custom Category?"
         }
     }
 
-    var message: String {
+    func localizedTitle(appLanguage: String?) -> String {
         switch self {
         case .deleteAllData:
-            String(localized: "This permanently removes all local Wealth Compass data from this device.")
+            AppLocalization.string("Delete All Data?", appLanguage: appLanguage)
+        case .deleteCustomCategory:
+            AppLocalization.string("Delete Custom Category?", appLanguage: appLanguage)
+        }
+    }
+
+    func message(appLanguage: String?) -> String {
+        switch self {
+        case .deleteAllData:
+            AppLocalization.string("This permanently removes all local Wealth Compass data from this device.", appLanguage: appLanguage)
         case .deleteCustomCategory(let category, let type):
-            String(localized: "This removes \(category) from your custom \(type.title) categories. Existing transactions using this category will keep their current label.")
+            AppLocalization.string("This removes \(category) from your custom \(type.localizedTitle(appLanguage: appLanguage)) categories. Existing transactions using this category will keep their current label.", appLanguage: appLanguage)
         }
     }
 
-    var confirmButtonTitle: String {
+    func localizedConfirmButtonTitle(appLanguage: String?) -> String {
         switch self {
         case .deleteAllData:
-            String(localized: "Delete")
+            AppLocalization.string("Delete", appLanguage: appLanguage)
         case .deleteCustomCategory:
-            String(localized: "Delete Category")
+            AppLocalization.string("Delete Category", appLanguage: appLanguage)
         }
     }
 }

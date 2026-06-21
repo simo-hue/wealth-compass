@@ -11,7 +11,7 @@ struct InvestmentsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 PageHeader(title: LocalizedStringKey( "Investments"), subtitle: LocalizedStringKey( "Follow positions, allocation, and performance.")) {
-                    PrimaryActionButton(systemImage: "plus", accessibilityLabel: String(localized: "Add Investment")) {
+                    PrimaryActionButton(systemImage: "plus", accessibilityLabel: "Add Investment") {
                         editingInvestment = nil
                         showingForm = true
                     }
@@ -147,7 +147,7 @@ struct InvestmentsView: View {
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    Text(String(localized: "Updated \(investment.updatedAt.formatted(date: .abbreviated, time: .omitted))"))
+                    Text(settings.localized("Updated \(investment.updatedAt.formatted(date: .abbreviated, time: .omitted))"))
                         .font(.caption2)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)

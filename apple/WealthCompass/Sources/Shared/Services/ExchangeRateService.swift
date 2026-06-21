@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 struct ExchangeRateSnapshot: Codable, Equatable {
     let baseCurrency: Currency
@@ -33,28 +34,43 @@ struct ExchangeRateRefreshResult: Equatable {
         snapshot != nil && errorMessage == nil
     }
 
-    var title: String {
+    var title: LocalizedStringKey {
         if wasAlreadyRunning {
-            return String(localized: "Refresh Already Running")
+            "Refresh Already Running"
+        } else if succeeded {
+            "Exchange Rates Updated"
+        } else {
+            "Exchange Rate Refresh Failed"
         }
-        return succeeded ? String(localized: "Exchange Rates Updated") : String(localized: "Exchange Rate Refresh Failed")
     }
 
-    var message: String {
+    func localizedTitle(appLanguage: String?) -> String {
         if wasAlreadyRunning {
-            return String(localized: "An exchange-rate refresh is already in progress.")
+            AppLocalization.string("Refresh Already Running", appLanguage: appLanguage)
+        } else if succeeded {
+            AppLocalization.string("Exchange Rates Updated", appLanguage: appLanguage)
+        } else {
+            AppLocalization.string("Exchange Rate Refresh Failed", appLanguage: appLanguage)
+        }
+    }
+
+    func localizedMessage(appLanguage: String?) -> String {
+        if wasAlreadyRunning {
+            return AppLocalization.string("An exchange-rate refresh is already in progress.", appLanguage: appLanguage)
         }
 
         if let errorMessage {
-            let activeRates = snapshot == nil ? String(localized: "the built-in offline fallback rates") : String(localized: "the last cached rates")
-            return String(localized: "\(errorMessage)\n\nWealth Compass will continue using \(activeRates).")
+            let activeRates = snapshot == nil
+                ? AppLocalization.string("the built-in offline fallback rates", appLanguage: appLanguage)
+                : AppLocalization.string("the last cached rates", appLanguage: appLanguage)
+            return AppLocalization.string("\(errorMessage)\n\nWealth Compass will continue using \(activeRates).", appLanguage: appLanguage)
         }
 
         if let snapshot {
-            return String(localized: "Latest ECB reference rates are effective \(snapshot.effectiveDate.formatted(date: .long, time: .omitted)).\n\nThe rates are cached locally for offline use.")
+            return AppLocalization.string("Latest ECB reference rates are effective \(snapshot.effectiveDate.formatted(date: .long, time: .omitted)).\n\nThe rates are cached locally for offline use.", appLanguage: appLanguage)
         }
 
-        return errorMessage ?? String(localized: "The exchange-rate provider did not return a usable response.")
+        return AppLocalization.string("The exchange-rate provider did not return a usable response.", appLanguage: appLanguage)
     }
 }
 
@@ -65,18 +81,41 @@ enum ExchangeRateError: LocalizedError {
     case invalidPayload
     case incompleteRates
 
-    var errorDescription: String? {
+    var title: LocalizedStringKey {
         switch self {
         case .invalidURL:
-            return String(localized: "The exchange-rate request could not be created.")
+            "Exchange Rate Error"
         case .invalidResponse:
-            return String(localized: "The exchange-rate provider returned an invalid response.")
-        case .providerError(let statusCode):
-            return String(localized: "The exchange-rate provider returned HTTP \(statusCode).")
+            "Exchange Rate Error"
+        case .providerError:
+            "Exchange Rate Error"
         case .invalidPayload:
-            return String(localized: "The exchange-rate provider returned malformed data.")
+            "Exchange Rate Error"
         case .incompleteRates:
-            return String(localized: "The exchange-rate provider did not return all supported currencies.")
+            "Exchange Rate Error"
+        }
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        AppLocalization.string("Exchange Rate Error", appLanguage: appLanguage)
+    }
+
+    var errorDescription: String? {
+        localizedDescription(appLanguage: nil)
+    }
+
+    func localizedDescription(appLanguage: String?) -> String {
+        switch self {
+        case .invalidURL:
+            AppLocalization.string("The exchange-rate request could not be created.", appLanguage: appLanguage)
+        case .invalidResponse:
+            AppLocalization.string("The exchange-rate provider returned an invalid response.", appLanguage: appLanguage)
+        case .providerError(let statusCode):
+            AppLocalization.string("The exchange-rate provider returned HTTP \(statusCode).", appLanguage: appLanguage)
+        case .invalidPayload:
+            AppLocalization.string("The exchange-rate provider returned malformed data.", appLanguage: appLanguage)
+        case .incompleteRates:
+            AppLocalization.string("The exchange-rate provider did not return all supported currencies.", appLanguage: appLanguage)
         }
     }
 }

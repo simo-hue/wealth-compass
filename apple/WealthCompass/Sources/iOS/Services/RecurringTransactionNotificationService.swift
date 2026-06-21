@@ -86,14 +86,15 @@ actor RecurringTransactionNotificationService {
 
         for schedule in upcoming {
             let content = UNMutableNotificationContent()
-            content.title = String(localized: "Recurring \(schedule.type.title) due")
+            let appLanguage = UserDefaults.standard.string(forKey: "wc_mobile_app_language")
+            content.title = AppLocalization.string("Recurring \(schedule.type.localizedTitle(appLanguage: appLanguage)) due", appLanguage: appLanguage)
             if showAmounts {
                 let amount = schedule.amount.formatted(
                     FloatingPointFormatStyle<Double>.Currency(code: currencyCode)
                 )
-                content.body = String(localized: "\(schedule.category): \(amount). Wealth Compass records it automatically when the app is active.")
+                content.body = AppLocalization.string("\(schedule.category): \(amount). Wealth Compass records it automatically when the app is active.", appLanguage: appLanguage)
             } else {
-                content.body = String(localized: "\(schedule.category) is scheduled. Open Wealth Compass to review it.")
+                content.body = AppLocalization.string("\(schedule.category) is scheduled. Open Wealth Compass to review it.", appLanguage: appLanguage)
             }
             content.sound = .default
             content.userInfo = ["recurringTransactionID": schedule.id.uuidString]

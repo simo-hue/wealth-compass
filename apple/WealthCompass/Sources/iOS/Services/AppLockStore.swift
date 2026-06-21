@@ -1,5 +1,6 @@
 import Foundation
 import LocalAuthentication
+import SwiftUI
 
 @MainActor
 final class AppLockStore: ObservableObject {
@@ -17,19 +18,26 @@ final class AppLockStore: ObservableObject {
         isUnlocked = !enabled
     }
 
-    var biometryName: String {
+    func biometryName(appLanguage: String?) -> String {
         let context = LAContext()
         _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
         switch context.biometryType {
-        case .faceID: return String(localized: "Face ID")
-        case .touchID: return String(localized: "Touch ID")
-        case .opticID: return String(localized: "Optic ID")
-        default: return String(localized: "Biometrics")
+        case .faceID:
+            return AppLocalization.string("Face ID", appLanguage: appLanguage)
+        case .touchID:
+            return AppLocalization.string("Touch ID", appLanguage: appLanguage)
+        case .opticID:
+            return AppLocalization.string("Optic ID", appLanguage: appLanguage)
+        default:
+            return AppLocalization.string("Biometrics", appLanguage: appLanguage)
         }
     }
 
-    func enableLock() async -> Bool {
-        let success = await authenticate(reason: String(localized: "Enable biometric protection for Wealth Compass."))
+    func enableLock(appLanguage: String?) async -> Bool {
+        let success = await authenticate(
+            reason: AppLocalization.string("Enable biometric protection for Wealth Compass.", appLanguage: appLanguage),
+            appLanguage: appLanguage
+        )
         if success {
             isLockEnabled = true
             isUnlocked = true
@@ -51,20 +59,24 @@ final class AppLockStore: ObservableObject {
         isUnlocked = false
     }
 
-    func unlock() async {
-        if await authenticate(reason: String(localized: "Unlock your local Wealth Compass data.")) {
+    func unlock(appLanguage: String?) async {
+        if await authenticate(
+            reason: AppLocalization.string("Unlock your local Wealth Compass data.", appLanguage: appLanguage),
+            appLanguage: appLanguage
+        ) {
             isUnlocked = true
             lastError = nil
         }
     }
 
-    private func authenticate(reason: String) async -> Bool {
+    private func authenticate(reason: String, appLanguage: String?) async -> Bool {
         let context = LAContext()
         context.localizedFallbackTitle = ""
 
         var error: NSError?
         guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
-            lastError = error?.localizedDescription ?? String(localized: "Biometric authentication is not available on this device.")
+            lastError = error?.localizedDescription
+                ?? AppLocalization.string("Biometric authentication is not available on this device.", appLanguage: appLanguage)
             return false
         }
 
