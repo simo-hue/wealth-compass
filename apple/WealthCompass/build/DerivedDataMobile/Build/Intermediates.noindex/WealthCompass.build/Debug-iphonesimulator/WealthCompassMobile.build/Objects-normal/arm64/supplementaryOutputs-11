@@ -1,0 +1,23 @@
+{
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/iOS/Services/AppLockStore.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/AppLockStore.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/AppLockStore.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/AppLockStore.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/AppLockStore.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/AppLockStore.swiftdeps"
+  },
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/iOS/Services/RecurringTransactionNotificationService.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/RecurringTransactionNotificationService.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/RecurringTransactionNotificationService.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/RecurringTransactionNotificationService.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/RecurringTransactionNotificationService.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/RecurringTransactionNotificationService.swiftdeps"
+  },
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/iOS/Views/DashboardView.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/DashboardView.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/DashboardView.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/DashboardView.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/DashboardView.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/arm64/DashboardView.swiftdeps"
+  }
+}

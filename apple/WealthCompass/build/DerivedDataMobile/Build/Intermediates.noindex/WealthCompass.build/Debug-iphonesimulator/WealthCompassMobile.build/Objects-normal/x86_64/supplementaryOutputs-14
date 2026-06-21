@@ -1,0 +1,23 @@
+{
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/iOS/Views/CashFlowView.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/CashFlowView.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/CashFlowView.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/CashFlowView.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/CashFlowView.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/CashFlowView.swiftdeps"
+  },
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/iOS/Views/CryptoView.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/CryptoView.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/CryptoView.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/CryptoView.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/CryptoView.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/CryptoView.swiftdeps"
+  },
+  "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/iOS/Views/InvestmentsView.swift" : {
+    "const-values" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/InvestmentsView.swiftconstvalues",
+    "dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/InvestmentsView.d",
+    "diagnostics" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/InvestmentsView.dia",
+    "object" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/InvestmentsView.o",
+    "swift-dependencies" : "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/build/DerivedDataMobile/Build/Intermediates.noindex/WealthCompass.build/Debug-iphonesimulator/WealthCompassMobile.build/Objects-normal/x86_64/InvestmentsView.swiftdeps"
+  }
+}

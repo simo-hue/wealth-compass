@@ -1,0 +1,160 @@
+{
+  "source": "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/Shared/Services/CloudKitSyncService.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Off",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 41
+        }
+      },
+      {
+        "comment": "",
+        "key": "Connecting",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "Syncing",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 45
+        }
+      },
+      {
+        "comment": "",
+        "key": "Up to Date",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 47
+        }
+      },
+      {
+        "comment": "",
+        "key": "iCloud Unavailable",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sync Error",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 51
+        }
+      },
+      {
+        "comment": "",
+        "key": "Off",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "Connecting",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 60
+        }
+      },
+      {
+        "comment": "",
+        "key": "Syncing",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 62
+        }
+      },
+      {
+        "comment": "",
+        "key": "Up to Date",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 64
+        }
+      },
+      {
+        "comment": "",
+        "key": "iCloud Unavailable",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 66
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sync Error",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 68
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your data remains on this device.",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 79
+        }
+      },
+      {
+        "comment": "",
+        "key": "Checking the iCloud account and preparing CloudKit.",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 81
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sending local changes and fetching updates from iCloud.",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 83
+        }
+      },
+      {
+        "comment": "",
+        "key": "Last synced %@.",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 86
+        }
+      },
+      {
+        "comment": "",
+        "key": "Local data is ready to sync.",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 513
+        }
+      },
+      {
+        "comment": "",
+        "key": "iCloud sync is not running.",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 517
+        }
+      }
+    ]
+  },
+  "version": 1
+}

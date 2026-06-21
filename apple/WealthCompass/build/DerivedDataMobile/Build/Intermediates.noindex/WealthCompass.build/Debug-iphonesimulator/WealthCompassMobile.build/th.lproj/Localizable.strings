@@ -1,0 +1,1094 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key></key>
+	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld ธุรกรรมที่เกิดซ้ำเนื่องจากถูกเพิ่มไปยังกระแสเงินสด</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>มีการเพิ่มธุรกรรมที่เกิดซ้ำถึงกำหนดชำระ 1 รายการในกระแสเงินสด</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
+	<key>%@
+
+%@</key>
+	<string>%@
+
+%@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+คีย์ API ได้รับการบันทึกอย่างปลอดภัยในพวงกุญแจ</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+เข็มทิศความมั่งคั่งจะใช้ %@ ต่อไป</string>
+	<key>%@ %@</key>
+	<string>%@ %@</string>
+	<key>%@ (%@%%)</key>
+	<string>%@ (%@%%)</string>
+	<key>%@ (%@)</key>
+	<string>%@ (%@)</string>
+	<key>%@ / unit</key>
+	<string>%@ / หน่วย</string>
+	<key>%@ App Lock</key>
+	<string>%@ ล็อคแอป</string>
+	<key>%@ Cached or fallback rates remain active.</key>
+	<string>%@ อัตราแคชหรือทางเลือกยังคงทำงานอยู่</string>
+	<key>%@ Failed</key>
+	<string>%@ ล้มเหลว</string>
+	<key>%@ NET</key>
+	<string>%@ สุทธิ</string>
+	<key>%@ Removed</key>
+	<string>%@ ลบแล้ว</string>
+	<key>%@ Saved</key>
+	<string>%@ บันทึกแล้ว</string>
+	<key>%@ already exists and will be selected.</key>
+	<string>%@ มีอยู่แล้วและจะถูกเลือก</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ ไม่ได้ส่งคืนใบเสนอราคาที่ใช้งานได้สำหรับ %@</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ การนำเข้าเสร็จสมบูรณ์สำหรับ %@</string>
+	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
+	<string>%@ มีกำหนดการแล้ว เปิดเข็มทิศความมั่งคั่งเพื่อตรวจสอบ</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>%@ ถึงขีดจำกัดอัตราแล้ว ลองอีกครั้งในภายหลัง</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ ปฏิเสธคีย์ API</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ ส่งคืน HTTP %lld</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ ส่งคืนการตอบกลับที่ไม่ถูกต้อง</string>
+	<key>%@ units</key>
+	<string>%@ หน่วย</string>
+	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
+	<string>%@ จะหายไปจากธุรกรรมที่เกิดซ้ำ และจะไม่มีการแทรกเหตุการณ์ในอนาคตโดยอัตโนมัติ</string>
+	<key>%@ • %@</key>
+	<string>%@ • %@</string>
+	<key>%@%%</key>
+	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% ประสิทธิภาพ</string>
+	<key>%@%@</key>
+	<string>%@%@</string>
+	<key>%@))d ago</key>
+	<string>%@))d ที่แล้ว</string>
+	<key>%@))h ago</key>
+	<string>%@))ชั่วโมงที่ผ่านมา</string>
+	<key>%@)m ago</key>
+	<string>%@)ม.ที่แล้ว</string>
+	<key>%@. Fetched %@ and cached locally.</key>
+	<string>%@. ดึงข้อมูล %@ และแคชในเครื่อง</string>
+	<key>%@. Fetched %@) and cached locally.</key>
+	<string>%@. ดึงข้อมูล %@) และแคชไว้ในเครื่อง</string>
+	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
+	<string>%@: %@. Wealth Compass จะบันทึกโดยอัตโนมัติเมื่อแอปเปิดใช้งานอยู่</string>
+	<key>%@: %@. Wealth Compass records it while the app is active.</key>
+	<string>%@: %@. Wealth Compass จะบันทึกในขณะที่แอปทำงานอยู่</string>
+	<key>%@\n\nThe API key was saved securely in Keychain.</key>
+	<string>%@\n\nคีย์ API ได้รับการบันทึกอย่างปลอดภัยในพวงกุญแจ</string>
+	<key>%lld</key>
+	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld สแนปชอตปัจจุบันถูกสร้างขึ้นหลังจากการนำเข้า</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>%lld เพิ่มหมวดหมู่กระแสเงินสดที่กำหนดเองแล้ว</string>
+	<key>%lld due transaction%@ added to Cash Flow.</key>
+	<string>%lld ธุรกรรมครบกำหนด %@ เพิ่มไปยังกระแสเงินสด</string>
+	<key>%lld holdings</key>
+	<string>%lld การถือครอง</string>
+	<key>%lld liabilities</key>
+	<string>%lld หนี้สิน</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld บันทึกที่มีรูปแบบไม่ถูกต้องหรือไม่สมบูรณ์ถูกข้ามไป</string>
+	<key>%lld more transactions hidden by this view.</key>
+	<string>%lld ธุรกรรมเพิ่มเติมถูกซ่อนโดยมุมมองนี้</string>
+	<key>%lld positions</key>
+	<string>%lld ตำแหน่ง</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld ธุรกรรมตามกำหนดเวลาถูกเพิ่มไปยังกระแสเงินสดโดยอัตโนมัติ</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>ธุรกรรม %lld, กำหนดการที่เกิดซ้ำ %lld, การลงทุน %lld, การถือครอง crypto %lld, หนี้สิน %lld และสแนปช็อต %lld ถูกนำเข้าแล้ว</string>
+	<key>%lldd ago</key>
+	<string>%lldd ที่แล้ว</string>
+	<key>%lldh ago</key>
+	<string>%lldh ที่แล้ว</string>
+	<key>%lldm ago</key>
+	<string>%lldนาทีที่แล้ว</string>
+	<key>1 %@</key>
+	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 ถือ</string>
+	<key>1 liability</key>
+	<string>1 ความรับผิด</string>
+	<key>1 position</key>
+	<string>1 ตำแหน่ง</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>ธุรกรรมที่กำหนดเวลาไว้ 1 รายการถูกเพิ่มไปยังกระแสเงินสดโดยอัตโนมัติ</string>
+	<key>12M</key>
+	<string>12ม</string>
+	<key>3M</key>
+	<string>3เอ็ม</string>
+	<key>6M</key>
+	<string>6ม</string>
+	<key>6M NET</key>
+	<string>6M เน็ต</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>ต้องใช้คีย์ Finnhub API เพื่ออัปเดตราคาการลงทุน</string>
+	<key>A clear view of what you own, owe, earn, and spend.</key>
+	<string>มุมมองที่ชัดเจนเกี่ยวกับสิ่งที่คุณเป็นเจ้าของ เป็นหนี้ ได้รับ และใช้จ่าย</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>กำลังดำเนินการรีเฟรชราคาตลาดแล้ว</string>
+	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
+	<string>คีย์ API ได้รับการตรวจสอบเทียบกับใบเสนอราคาสดก่อนที่จะจัดเก็บไว้ในพวงกุญแจ macOS</string>
+	<key>ASSETS</key>
+	<string>สินทรัพย์</string>
+	<key>Across every asset</key>
+	<string>ในทุกสินทรัพย์</string>
+	<key>Add</key>
+	<string>เพิ่ม</string>
+	<key>Add Crypto</key>
+	<string>เพิ่มการเข้ารหัสลับ</string>
+	<key>Add Crypto Holding</key>
+	<string>เพิ่ม Crypto Holding</string>
+	<key>Add Investment</key>
+	<string>เพิ่มการลงทุน</string>
+	<key>Add Transaction</key>
+	<string>เพิ่มธุรกรรม</string>
+	<key>Add a holding to track its value and performance.</key>
+	<string>เพิ่มการถือครองเพื่อติดตามมูลค่าและประสิทธิภาพ</string>
+	<key>Add a holding to track its value.</key>
+	<string>เพิ่มการถือครองเพื่อติดตามมูลค่า</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>เพิ่มคีย์ใหม่ในแดชบอร์ดนักพัฒนาซอฟต์แวร์</string>
+	<key>Add another snapshot to see movement</key>
+	<string>เพิ่มสแนปชอตอื่นเพื่อดูการเคลื่อนไหว</string>
+	<key>Add another snapshot to see movement over time</key>
+	<string>เพิ่มสแนปชอตอื่นเพื่อดูการเคลื่อนไหวในช่วงเวลาหนึ่ง</string>
+	<key>Add recorded cash, an investment, or a crypto holding.</key>
+	<string>เพิ่มเงินสดที่บันทึกไว้ การลงทุน หรือการถือครองสกุลเงินดิจิทัล</string>
+	<key>Add stocks, ETFs, bonds, or other positions.</key>
+	<string>เพิ่มหุ้น ETF พันธบัตร หรือตำแหน่งอื่นๆ</string>
+	<key>Add your first income or expense.</key>
+	<string>เพิ่มรายได้หรือค่าใช้จ่ายแรกของคุณ</string>
+	<key>Add your first transaction</key>
+	<string>เพิ่มธุรกรรมแรกของคุณ</string>
+	<key>Adding a transaction or position records a snapshot for this chart.</key>
+	<string>การเพิ่มธุรกรรมหรือตำแหน่งจะบันทึกภาพรวมสำหรับแผนภูมินี้</string>
+	<key>All</key>
+	<string>ทั้งหมด</string>
+	<key>All Time</key>
+	<string>ตลอดเวลา</string>
+	<key>All World</key>
+	<string>โลกทั้งหมด</string>
+	<key>Allocation by Geography</key>
+	<string>การจัดสรรตามภูมิศาสตร์</string>
+	<key>Allocation by Sector</key>
+	<string>การจัดสรรตามภาค</string>
+	<key>Allocation by Type</key>
+	<string>การจัดสรรตามประเภท</string>
+	<key>Allocation concealed</key>
+	<string>การจัดสรรถูกปกปิด</string>
+	<key>Amount</key>
+	<string>จำนวน</string>
+	<key>Amount (%@)</key>
+	<string>จำนวนเงิน (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>กำลังดำเนินการรีเฟรชอัตราแลกเปลี่ยนอยู่แล้ว</string>
+	<key>Apple (AAPL)</key>
+	<string>แอปเปิ้ล (AAPL)</string>
+	<key>Asset Allocation</key>
+	<string>การจัดสรรสินทรัพย์</string>
+	<key>Automatic income and expenses</key>
+	<string>รายได้และค่าใช้จ่ายอัตโนมัติ</string>
+	<key>Average Buy Price</key>
+	<string>ราคาซื้อเฉลี่ย</string>
+	<key>Backup Exported</key>
+	<string>ส่งออกข้อมูลสำรองแล้ว</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>ยอดคงเหลือที่ได้มาจากกิจกรรมและการถือครองของคุณ</string>
+	<key>Base Currency</key>
+	<string>สกุลเงินฐาน</string>
+	<key>Biggest Loser</key>
+	<string>ผู้แพ้ที่ใหญ่ที่สุด</string>
+	<key>Biometric authentication is not available on this Mac.</key>
+	<string>การรับรองความถูกต้องด้วยไบโอเมตริกซ์ไม่พร้อมใช้งานบน Mac เครื่องนี้</string>
+	<key>Biometric authentication is not available on this device.</key>
+	<string>การรับรองความถูกต้องด้วยไบโอเมตริกซ์ไม่พร้อมใช้งานบนอุปกรณ์นี้</string>
+	<key>Biometrics</key>
+	<string>ไบโอเมตริกซ์</string>
+	<key>Bitcoin</key>
+	<string>บิทคอยน์</string>
+	<key>Bond</key>
+	<string>บอนด์</string>
+	<key>Breakdown of recorded spending</key>
+	<string>รายละเอียดของการใช้จ่ายที่บันทึกไว้</string>
+	<key>British Pound</key>
+	<string>ปอนด์อังกฤษ</string>
+	<key>Build your first financial view</key>
+	<string>สร้างมุมมองทางการเงินครั้งแรกของคุณ</string>
+	<key>Calculated Fee</key>
+	<string>ค่าธรรมเนียมที่คำนวณ</string>
+	<key>Cancel</key>
+	<string>ยกเลิก</string>
+	<key>Capital invested</key>
+	<string>ทุนที่ลงทุน</string>
+	<key>Cash</key>
+	<string>เงินสด</string>
+	<key>Cash Flow</key>
+	<string>กระแสเงินสด</string>
+	<key>Cash flow</key>
+	<string>กระแสเงินสด</string>
+	<key>Cash-flow chart concealed</key>
+	<string>แผนภูมิกระแสเงินสดถูกปกปิด</string>
+	<key>Category</key>
+	<string>หมวดหมู่</string>
+	<key>Change the search, type, or period filters.</key>
+	<string>เปลี่ยนการค้นหา ประเภท หรือตัวกรองช่วงเวลา</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>ไม่สามารถบันทึกการเปลี่ยนแปลงได้จนกว่าข้อผิดพลาดในการโหลดฐานข้อมูลภายในเครื่องจะได้รับการแก้ไข</string>
+	<key>Checking the iCloud account and preparing CloudKit.</key>
+	<string>กำลังตรวจสอบบัญชี iCloud และเตรียม CloudKit</string>
+	<key>Choose another period or record an expense.</key>
+	<string>เลือกช่วงเวลาอื่นหรือบันทึกค่าใช้จ่าย</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>เลือกระดับ Demo API ฟรี</string>
+	<key>Classification</key>
+	<string>การจำแนกประเภท</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>บันทึก CloudKit %@ ไม่มีเพย์โหลด</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
+	<key>CoinGecko API Key</key>
+	<string>คีย์ API ของ CoinGecko</string>
+	<key>CoinGecko API Key (Crypto)</key>
+	<string>คีย์ API ของ CoinGecko (คริปโต)</string>
+	<key>CoinGecko ID</key>
+	<string>CoinGecko ไอดี</string>
+	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
+	<string>CoinGecko คืนราคา Bitcoin จริงที่ %@))</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko คืนราคา Bitcoin จริงที่ %@</string>
+	<key>Commodity</key>
+	<string>สินค้าโภคภัณฑ์</string>
+	<key>Completed</key>
+	<string>สมบูรณ์</string>
+	<key>Configured</key>
+	<string>กำหนดค่าแล้ว</string>
+	<key>Confirm your email and sign in.</key>
+	<string>ยืนยันอีเมลของคุณและลงชื่อเข้าใช้</string>
+	<key>Connect Market Data</key>
+	<string>เชื่อมต่อข้อมูลการตลาด</string>
+	<key>Connecting</key>
+	<string>กำลังเชื่อมต่อ</string>
+	<key>Consumer</key>
+	<string>ผู้บริโภค</string>
+	<key>Continue</key>
+	<string>ดำเนินการต่อ</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>คัดลอกคีย์ API ของคุณแล้ววางไว้ด้านล่าง</string>
+	<key>Cost Basis</key>
+	<string>พื้นฐานต้นทุน</string>
+	<key>Create a free Finnhub account.</key>
+	<string>สร้างบัญชี Finnhub ฟรี</string>
+	<key>Create or sign in to your account.</key>
+	<string>สร้างหรือลงชื่อเข้าใช้บัญชีของคุณ</string>
+	<key>Crypto</key>
+	<string>การเข้ารหัสลับ</string>
+	<key>Crypto Allocation</key>
+	<string>การจัดสรร Crypto</string>
+	<key>Crypto Holdings</key>
+	<string>คริปโต โฮลดิ้งส์</string>
+	<key>Crypto Value</key>
+	<string>มูลค่าการเข้ารหัสลับ</string>
+	<key>Crypto assets</key>
+	<string>สินทรัพย์เข้ารหัส</string>
+	<key>Crypto failures: %@.</key>
+	<string>ความล้มเหลวของการเข้ารหัสลับ: %@</string>
+	<key>Crypto holdings</key>
+	<string>การถือครองสกุลเงินดิจิทัล</string>
+	<key>Crypto market prices</key>
+	<string>ราคาตลาดสกุลเงินดิจิตอล</string>
+	<key>Crypto skipped: %@.</key>
+	<string>การเข้ารหัสลับถูกข้าม: %@</string>
+	<key>Currency</key>
+	<string>สกุลเงิน</string>
+	<key>Current Price</key>
+	<string>ราคาปัจจุบัน</string>
+	<key>Current market value</key>
+	<string>มูลค่าตลาดปัจจุบัน</string>
+	<key>Custom Categories</key>
+	<string>หมวดหมู่ที่กำหนดเอง</string>
+	<key>Custom Category Name</key>
+	<string>ชื่อหมวดหมู่ที่กำหนดเอง</string>
+	<key>Custom category name</key>
+	<string>ชื่อหมวดหมู่ที่กำหนดเอง</string>
+	<key>Custom...</key>
+	<string>กำหนดเอง...</string>
+	<key>Daily</key>
+	<string>รายวัน</string>
+	<key>Danger Zone</key>
+	<string>โซนอันตราย</string>
+	<key>Dashboard</key>
+	<string>แดชบอร์ด</string>
+	<key>Data</key>
+	<string>ข้อมูล</string>
+	<key>Date</key>
+	<string>วันที่</string>
+	<key>Delete</key>
+	<string>ลบ</string>
+	<key>Delete %@</key>
+	<string>ลบ %@</string>
+	<key>Delete All Data</key>
+	<string>ลบข้อมูลทั้งหมด</string>
+	<key>Delete All Data?</key>
+	<string>ลบข้อมูลทั้งหมดใช่ไหม</string>
+	<key>Delete All Local Data...</key>
+	<string>ลบข้อมูลในเครื่องทั้งหมด...</string>
+	<key>Delete Category</key>
+	<string>ลบหมวดหมู่</string>
+	<key>Delete Crypto Holding?</key>
+	<string>ลบ Crypto Holding หรือไม่</string>
+	<key>Delete Custom Category?</key>
+	<string>ลบหมวดหมู่ที่กำหนดเองใช่ไหม</string>
+	<key>Delete Holding</key>
+	<string>ลบการถือครอง</string>
+	<key>Delete Investment</key>
+	<string>ลบการลงทุน</string>
+	<key>Delete Investment?</key>
+	<string>ลบการลงทุน?</string>
+	<key>Delete Recurring Transaction?</key>
+	<string>ลบธุรกรรมที่เกิดซ้ำใช่ไหม</string>
+	<key>Delete Transaction</key>
+	<string>ลบธุรกรรม</string>
+	<key>Delete Transaction?</key>
+	<string>ลบธุรกรรม?</string>
+	<key>Delete all local finance data?</key>
+	<string>ลบข้อมูลการเงินในท้องถิ่นทั้งหมดใช่ไหม</string>
+	<key>Delete schedule</key>
+	<string>ลบกำหนดการ</string>
+	<key>Delete transaction</key>
+	<string>ลบธุรกรรม</string>
+	<key>Description</key>
+	<string>คำอธิบาย</string>
+	<key>Details</key>
+	<string>รายละเอียด</string>
+	<key>Dividends</key>
+	<string>เงินปันผล</string>
+	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
+	<string>กำหนดการครบกำหนดจะถูกบันทึกโดยอัตโนมัติในขณะที่แอปทำงานอยู่และจะติดตามเมื่อเปิดครั้งถัดไป</string>
+	<key>Due schedules catch up on open</key>
+	<string>กำหนดการครบกำหนดจะทันเมื่อเปิด</string>
+	<key>ECB</key>
+	<string>อีซีบี</string>
+	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
+	<string>อัตราอ้างอิง ECB จะถูกรีเฟรชโดยอัตโนมัติและแคชไว้ในเครื่องเพื่อใช้แบบออฟไลน์</string>
+	<key>ETF</key>
+	<string>อีทีเอฟ</string>
+	<key>EXPENSES</key>
+	<string>ค่าใช้จ่าย</string>
+	<key>Edit</key>
+	<string>แก้ไข</string>
+	<key>Edit Crypto</key>
+	<string>แก้ไขการเข้ารหัสลับ</string>
+	<key>Edit Crypto Holding</key>
+	<string>แก้ไขการถือครอง Crypto</string>
+	<key>Edit Holding</key>
+	<string>แก้ไขการถือครอง</string>
+	<key>Edit Investment</key>
+	<string>แก้ไขการลงทุน</string>
+	<key>Edit Recurring Transaction</key>
+	<string>แก้ไขธุรกรรมที่เกิดซ้ำ</string>
+	<key>Edit Transaction</key>
+	<string>แก้ไขธุรกรรม</string>
+	<key>Edit schedule</key>
+	<string>แก้ไขกำหนดการ</string>
+	<key>Edit transaction</key>
+	<string>แก้ไขธุรกรรม</string>
+	<key>Emerging Markets</key>
+	<string>ตลาดเกิดใหม่</string>
+	<key>Enable biometric protection for Wealth Compass.</key>
+	<string>เปิดใช้งานการป้องกันไบโอเมตริกซ์สำหรับ Wealth Compass</string>
+	<key>End Date</key>
+	<string>วันที่สิ้นสุด</string>
+	<key>Ends</key>
+	<string>สิ้นสุด</string>
+	<key>Ends %@</key>
+	<string>สิ้นสุด %@</string>
+	<key>Ends %@)</key>
+	<string>สิ้นสุด %@)</string>
+	<key>Energy</key>
+	<string>พลังงาน</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>ป้อนชื่อหมวดหมู่ มันจะถูกบันทึกไว้สำหรับธุรกรรม %@ ในอนาคต</string>
+	<key>Enter a category name. It will be saved for future %@) transactions.</key>
+	<string>ป้อนชื่อหมวดหมู่ มันจะถูกบันทึกไว้สำหรับธุรกรรม %@) ในอนาคต</string>
+	<key>Enter a custom category name.</key>
+	<string>ป้อนชื่อหมวดหมู่ที่กำหนดเอง</string>
+	<key>Enter an amount greater than zero.</key>
+	<string>ป้อนจำนวนเงินที่มากกว่าศูนย์</string>
+	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
+	<string>ป้อนค่าธรรมเนียมนายหน้าหรือแพลตฟอร์มที่เรียกเก็บสำหรับธุรกรรมการลงทุนนี้ จะถูกเพิ่มเข้ากับต้นทุนตำแหน่ง</string>
+	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
+	<string>ป้อนคีย์ API ฟรีของคุณเพื่อรับราคาหุ้นสดและราคา crypto ขอแนะนำอย่างยิ่ง ไม่เช่นนั้นราคาสินทรัพย์จะไม่เป็นจริงหรือเป็นปัจจุบัน</string>
+	<key>Entertainment</key>
+	<string>ความบันเทิง</string>
+	<key>Euro</key>
+	<string>ยูโร</string>
+	<key>Europe</key>
+	<string>ยุโรป</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>ทุกสิ่งที่คุณเป็นเจ้าของ เป็นหนี้ รับ และใช้จ่าย</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>การรีเฟรชอัตราแลกเปลี่ยนล้มเหลว</string>
+	<key>Exchange Rates</key>
+	<string>อัตราแลกเปลี่ยน</string>
+	<key>Exchange Rates Updated</key>
+	<string>อัปเดตอัตราแลกเปลี่ยนแล้ว</string>
+	<key>Existing transactions using %@ will keep their current category label.</key>
+	<string>ธุรกรรมที่มีอยู่โดยใช้ %@ จะคงป้ายกำกับหมวดหมู่ปัจจุบันไว้</string>
+	<key>Expense</key>
+	<string>ค่าใช้จ่าย</string>
+	<key>Expense Categories</key>
+	<string>หมวดหมู่ค่าใช้จ่าย</string>
+	<key>Expense period</key>
+	<string>ระยะเวลาค่าใช้จ่าย</string>
+	<key>Expenses</key>
+	<string>ค่าใช้จ่าย</string>
+	<key>Expenses grouped by category</key>
+	<string>ค่าใช้จ่ายจัดกลุ่มตามหมวดหมู่</string>
+	<key>Export Failed</key>
+	<string>การส่งออกล้มเหลว</string>
+	<key>Export JSON...</key>
+	<string>ส่งออก JSON...</string>
+	<key>Face ID</key>
+	<string>รหัสใบหน้า</string>
+	<key>Fee Amount</key>
+	<string>จำนวนค่าธรรมเนียม</string>
+	<key>Fee Percentage</key>
+	<string>เปอร์เซ็นต์ค่าธรรมเนียม</string>
+	<key>Fee Type</key>
+	<string>ประเภทค่าธรรมเนียม</string>
+	<key>Finance</key>
+	<string>การเงิน</string>
+	<key>Financial horizon</key>
+	<string>ขอบฟ้าทางการเงิน</string>
+	<key>Finish</key>
+	<string>เสร็จ</string>
+	<key>Finish Recurring Transaction?</key>
+	<string>เสร็จสิ้นการทำธุรกรรมที่เกิดซ้ำ?</string>
+	<key>Finish schedule</key>
+	<string>เสร็จสิ้นกำหนดการ</string>
+	<key>Finnhub</key>
+	<string>ฟินน์ฮับ</string>
+	<key>Finnhub API Key</key>
+	<string>คีย์ Finnhub API</string>
+	<key>Finnhub API Key (Stocks)</key>
+	<string>คีย์ Finnhub API (หุ้น)</string>
+	<key>Finnhub returned a live AAPL quote at %@)).</key>
+	<string>Finnhub ส่งคืนใบเสนอราคา AAPL สดที่ %@))</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub ส่งคืนใบเสนอราคา AAPL สดที่ %@</string>
+	<key>First Occurrence</key>
+	<string>การเกิดขึ้นครั้งแรก</string>
+	<key>Fixed</key>
+	<string>ที่ตายตัว</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>ติดตามตำแหน่ง การจัดสรร และผลการดำเนินงาน</string>
+	<key>Food</key>
+	<string>อาหาร</string>
+	<key>Force Sync iCloud</key>
+	<string>บังคับให้ซิงค์ iCloud</string>
+	<key>Freelance</key>
+	<string>อิสระ</string>
+	<key>Fuel</key>
+	<string>เชื้อเพลิง</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>เหตุการณ์ %@ ในอนาคตสำหรับ %@ จะไม่ถูกสร้างขึ้นอีกต่อไป</string>
+	<key>Future %@) occurrences for %@ will no longer be created.</key>
+	<string>เหตุการณ์ %@) ในอนาคตสำหรับ %@ จะไม่ถูกสร้างขึ้นอีกต่อไป</string>
+	<key>General</key>
+	<string>ทั่วไป</string>
+	<key>Generated from a recurring schedule</key>
+	<string>สร้างจากกำหนดการที่เกิดซ้ำ</string>
+	<key>Geography</key>
+	<string>ภูมิศาสตร์</string>
+	<key>Get Started</key>
+	<string>เริ่มต้นเลย</string>
+	<key>Global</key>
+	<string>ทั่วโลก</string>
+	<key>Health</key>
+	<string>สุขภาพ</string>
+	<key>Healthcare</key>
+	<string>การดูแลสุขภาพ</string>
+	<key>Hide financial values throughout Wealth Compass.</key>
+	<string>ซ่อนมูลค่าทางการเงินไว้ใน Wealth Compass</string>
+	<key>Holdings</key>
+	<string>โฮลดิ้งส์</string>
+	<key>Housing</key>
+	<string>ที่อยู่อาศัย</string>
+	<key>How investable assets are distributed</key>
+	<string>วิธีการกระจายสินทรัพย์ที่ลงทุนได้</string>
+	<key>How the portfolio is distributed</key>
+	<string>วิธีการกระจายพอร์ตโฟลิโอ</string>
+	<key>How to get your API keys</key>
+	<string>วิธีรับคีย์ API ของคุณ</string>
+	<key>ISIN / ID</key>
+	<string>ไอซิน/ไอดี</string>
+	<key>Identity</key>
+	<string>ตัวตน</string>
+	<key>Import Behavior</key>
+	<string>พฤติกรรมการนำเข้า</string>
+	<key>Import Complete</key>
+	<string>นำเข้าเสร็จสมบูรณ์</string>
+	<key>Import Failed</key>
+	<string>การนำเข้าล้มเหลว</string>
+	<key>Import JSON Backup</key>
+	<string>นำเข้าข้อมูลสำรอง JSON</string>
+	<key>Import JSON...</key>
+	<string>นำเข้า JSON...</string>
+	<key>Import and Export</key>
+	<string>นำเข้าและส่งออก</string>
+	<key>Imported liquidity account: %@</key>
+	<string>บัญชีสภาพคล่องที่นำเข้า: %@</string>
+	<key>Income</key>
+	<string>รายได้</string>
+	<key>Income and expenses by month</key>
+	<string>รายได้และค่าใช้จ่ายตามเดือน</string>
+	<key>Income less expenses</key>
+	<string>รายได้หักค่าใช้จ่าย</string>
+	<key>Invalid API Key</key>
+	<string>คีย์ API ไม่ถูกต้อง</string>
+	<key>Investment</key>
+	<string>การลงทุน</string>
+	<key>Investment Fee</key>
+	<string>ค่าธรรมเนียมการลงทุน</string>
+	<key>Investment Transaction Fee</key>
+	<string>ค่าธรรมเนียมการทำธุรกรรมการลงทุน</string>
+	<key>Investment Transaction Fee %</key>
+	<string>ค่าธรรมเนียมการทำธุรกรรมการลงทุน %</string>
+	<key>Investment failures: %@.</key>
+	<string>ความล้มเหลวในการลงทุน: %@</string>
+	<key>Investments</key>
+	<string>การลงทุน</string>
+	<key>Investments skipped: %@.</key>
+	<string>การลงทุนถูกข้ามไป: %@</string>
+	<key>Just now</key>
+	<string>แค่ตอนนี้</string>
+	<key>Keychain operation failed with status %d.</key>
+	<string>การทำงานของพวงกุญแจล้มเหลวโดยมีสถานะ %d</string>
+	<key>Keys are stored securely in Keychain and only used to refresh market prices from this %@.</key>
+	<string>คีย์จะถูกเก็บไว้อย่างปลอดภัยในพวงกุญแจ และใช้เพื่อรีเฟรชราคาตลาดจาก %@ นี้เท่านั้น</string>
+	<key>Language</key>
+	<string>ภาษา</string>
+	<key>Last 3 Months</key>
+	<string>3 เดือนที่ผ่านมา</string>
+	<key>Last 30 Days</key>
+	<string>30 วันที่ผ่านมา</string>
+	<key>Last 7 Days</key>
+	<string>7 วันที่ผ่านมา</string>
+	<key>Last Updated</key>
+	<string>อัปเดตล่าสุด</string>
+	<key>Last refresh: %@.</key>
+	<string>รีเฟรชครั้งล่าสุด: %@</string>
+	<key>Last synced %@.</key>
+	<string>ซิงค์ครั้งล่าสุด %@</string>
+	<key>Latest ECB reference rates are effective %@.
+
+The rates are cached locally for offline use.</key>
+	<string>อัตราอ้างอิง ECB ล่าสุดมีผล %@
+
+อัตราจะถูกแคชไว้ในเครื่องสำหรับการใช้งานแบบออฟไลน์</string>
+	<key>Latest snapshot %@</key>
+	<string>สแนปชอตล่าสุด %@</string>
+	<key>Latest snapshot %@)</key>
+	<string>สแนปชอตล่าสุด %@)</string>
+	<key>Liabilities</key>
+	<string>หนี้สิน</string>
+	<key>Liquidity</key>
+	<string>สภาพคล่อง</string>
+	<key>Liquidity Account</key>
+	<string>บัญชีสภาพคล่อง</string>
+	<key>Local</key>
+	<string>ท้องถิ่น</string>
+	<key>Local Only</key>
+	<string>เฉพาะท้องถิ่นเท่านั้น</string>
+	<key>Local Storage</key>
+	<string>ที่เก็บข้อมูลท้องถิ่น</string>
+	<key>Local data is ready to sync.</key>
+	<string>ข้อมูลในเครื่องพร้อมที่จะซิงค์แล้ว</string>
+	<key>Local data loaded, but iCloud sync metadata could not be prepared. %@</key>
+	<string>โหลดข้อมูลในเครื่องแล้ว แต่ไม่สามารถเตรียมข้อมูลเมตาการซิงค์ iCloud ได้ %@</string>
+	<key>Manual Actions</key>
+	<string>การดำเนินการด้วยตนเอง</string>
+	<key>Market Data</key>
+	<string>ข้อมูลการตลาด</string>
+	<key>Merge</key>
+	<string>ผสาน</string>
+	<key>Merge With Existing Data</key>
+	<string>ผสานกับข้อมูลที่มีอยู่</string>
+	<key>Merge adds new records and updates matching IDs. Replace clears current local finance data before importing.</key>
+	<string>ผสานเพิ่มบันทึกใหม่และอัปเดตรหัสที่ตรงกัน แทนที่จะล้างข้อมูลการเงินในท้องถิ่นปัจจุบันก่อนนำเข้า</string>
+	<key>Merge with local data</key>
+	<string>ผสานกับข้อมูลในเครื่อง</string>
+	<key>Mode</key>
+	<string>โหมด</string>
+	<key>Month</key>
+	<string>เดือน</string>
+	<key>Monthly</key>
+	<string>รายเดือน</string>
+	<key>Monthly Expenses</key>
+	<string>ค่าใช้จ่ายรายเดือน</string>
+	<key>Monthly Income</key>
+	<string>รายได้ต่อเดือน</string>
+	<key>Monthly amounts and proportions are hidden.</key>
+	<string>จำนวนและสัดส่วนรายเดือนถูกซ่อนอยู่</string>
+	<key>NET WORTH</key>
+	<string>มูลค่าสุทธิ</string>
+	<key>Name</key>
+	<string>ชื่อ</string>
+	<key>Navigate</key>
+	<string>นำทาง</string>
+	<key>Net Savings</key>
+	<string>การออมสุทธิ</string>
+	<key>Net Worth</key>
+	<string>มูลค่าสุทธิ</string>
+	<key>Net worth range</key>
+	<string>ช่วงมูลค่าสุทธิ</string>
+	<key>Net-worth history concealed</key>
+	<string>ประวัติมูลค่าสุทธิถูกปกปิด</string>
+	<key>Never</key>
+	<string>ไม่เคย</string>
+	<key>New Crypto Holding</key>
+	<string>ใหม่ Crypto Holding</string>
+	<key>New Holding</key>
+	<string>นิว โฮลดิ้ง</string>
+	<key>New Investment</key>
+	<string>การลงทุนใหม่</string>
+	<key>New Recurring Transaction</key>
+	<string>ธุรกรรมที่เกิดขึ้นใหม่</string>
+	<key>New Transaction</key>
+	<string>ธุรกรรมใหม่</string>
+	<key>Next %@</key>
+	<string>ถัดไป %@</string>
+	<key>Next %@)</key>
+	<string>ถัดไป %@)</string>
+	<key>Next: %@</key>
+	<string>ถัดไป: %@</string>
+	<key>No Crypto Holdings</key>
+	<string>ไม่มีการถือครอง Crypto</string>
+	<key>No Investments</key>
+	<string>ไม่มีการลงทุน</string>
+	<key>No Matching Transactions</key>
+	<string>ไม่มีธุรกรรมที่ตรงกัน</string>
+	<key>No Prices Updated</key>
+	<string>ไม่มีการปรับปรุงราคา</string>
+	<key>No Transactions</key>
+	<string>ไม่มีการทำธุรกรรม</string>
+	<key>No activity yet</key>
+	<string>ยังไม่มีกิจกรรมใดๆ</string>
+	<key>No assets found</key>
+	<string>ไม่พบเนื้อหา</string>
+	<key>No assets to allocate</key>
+	<string>ไม่มีทรัพย์สินที่จะจัดสรร</string>
+	<key>No crypto holdings yet</key>
+	<string>ยังไม่มีการถือครอง crypto</string>
+	<key>No custom %@ categories yet.</key>
+	<string>ยังไม่มีหมวดหมู่ %@ ที่กำหนดเอง</string>
+	<key>No custom %@) categories yet.</key>
+	<string>ยังไม่มีหมวดหมู่ %@) ที่กำหนดเอง</string>
+	<key>No end date</key>
+	<string>ไม่มีวันสิ้นสุด</string>
+	<key>No expenses for this period</key>
+	<string>ไม่มีค่าใช้จ่ายในช่วงนี้</string>
+	<key>No expenses in the last 30 days</key>
+	<string>ไม่มีค่าใช้จ่ายในช่วง 30 วันที่ผ่านมา</string>
+	<key>No holdings were updated.</key>
+	<string>ไม่มีการอัปเดตการถือครอง</string>
+	<key>No investments yet</key>
+	<string>ยังไม่มีการลงทุน</string>
+	<key>No recent cash flow</key>
+	<string>ไม่มีกระแสเงินสดล่าสุด</string>
+	<key>No recurring transactions</key>
+	<string>ไม่มีธุรกรรมที่เกิดซ้ำ</string>
+	<key>No snapshots</key>
+	<string>ไม่มีสแนปชอต</string>
+	<key>No snapshots yet</key>
+	<string>ยังไม่มีสแนปชอต</string>
+	<key>No supported finance records were found in the selected JSON file.</key>
+	<string>ไม่พบบันทึกทางการเงินที่รองรับในไฟล์ JSON ที่เลือก</string>
+	<key>Not Set</key>
+	<string>Not Set</string>
+	<key>Notifications</key>
+	<string>Notifications</string>
+	<key>Notifications Disabled</key>
+	<string>Notifications Disabled</string>
+	<key>Notifications disabled</key>
+	<string>Notifications disabled</string>
+	<key>Notifications enabled</key>
+	<string>Notifications enabled</string>
+	<key>Notifications off</key>
+	<string>Notifications off</string>
+	<key>Notifications on</key>
+	<string>Notifications on</string>
+	<key>Notify When Due</key>
+	<string>Notify When Due</string>
+	<key>OK</key>
+	<string>OK</string>
+	<key>Off</key>
+	<string>Off</string>
+	<key>Offline fallback</key>
+	<string>Offline fallback</string>
+	<key>One-Time</key>
+	<string>One-Time</string>
+	<key>One-Time Transaction</key>
+	<string>One-Time Transaction</string>
+	<key>Optic ID</key>
+	<string>Optic ID</string>
+	<key>Optional Coin ID</key>
+	<string>Optional Coin ID</string>
+	<key>Other</key>
+	<string>Other</string>
+	<key>Overview</key>
+	<string>Overview</string>
+	<key>Paste CoinGecko API key</key>
+	<string>Paste CoinGecko API key</string>
+	<key>Paste CoinGecko key...</key>
+	<string>Paste CoinGecko key...</string>
+	<key>Paste Finnhub API key</key>
+	<string>Paste Finnhub API key</string>
+	<key>Paste Finnhub key...</key>
+	<string>Paste Finnhub key...</string>
+	<key>Pause schedule</key>
+	<string>Pause schedule</string>
+	<key>Paused</key>
+	<string>Paused</string>
+	<key>Percent</key>
+	<string>Percent</string>
+	<key>Performance</key>
+	<string>Performance</string>
+	<key>Period</key>
+	<string>Period</string>
+	<key>Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them.</key>
+	<string>Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them.</string>
+	<key>Portfolio Value</key>
+	<string>Portfolio Value</string>
+	<key>Position</key>
+	<string>Position</string>
+	<key>Positions</key>
+	<string>Positions</string>
+	<key>Prepare Backup</key>
+	<string>Prepare Backup</string>
+	<key>Privacy</key>
+	<string>Privacy</string>
+	<key>Privacy &amp; Security</key>
+	<string>Privacy &amp; Security</string>
+	<key>Privacy Mode</key>
+	<string>Privacy Mode</string>
+	<key>Privacy on</key>
+	<string>Privacy on</string>
+	<key>Privacy, sync, currency, and market data</key>
+	<string>Privacy, sync, currency, and market data</string>
+	<key>Profit / Loss</key>
+	<string>Profit / Loss</string>
+	<key>Quantity</key>
+	<string>Quantity</string>
+	<key>Range floor</key>
+	<string>Range floor</string>
+	<key>Real Estate</key>
+	<string>Real Estate</string>
+	<key>Recent Activity</key>
+	<string>Recent Activity</string>
+	<key>Recent Transactions</key>
+	<string>Recent Transactions</string>
+	<key>Record cash flow or add a position to bring this dashboard to life.</key>
+	<string>Record cash flow or add a position to bring this dashboard to life.</string>
+	<key>Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically.</key>
+	<string>Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically.</string>
+	<key>Record income or an expense to reveal the monthly pattern.</key>
+	<string>Record income or an expense to reveal the monthly pattern.</string>
+	<key>Recurring</key>
+	<string>Recurring</string>
+	<key>Recurring %@ due</key>
+	<string>Recurring %@ due</string>
+	<key>Recurring Schedules</key>
+	<string>Recurring Schedules</string>
+	<key>Recurring Transaction</key>
+	<string>Recurring Transaction</string>
+	<key>Recurring Transactions</key>
+	<string>Recurring Transactions</string>
+	<key>Recurring Transactions Added</key>
+	<string>Recurring Transactions Added</string>
+	<key>Refresh Data</key>
+	<string>Refresh Data</string>
+	<key>Refresh Exchange Rates</key>
+	<string>Refresh Exchange Rates</string>
+	<key>Refresh Market Data</key>
+	<string>Refresh Market Data</string>
+	<key>Refreshing Exchange Rates</key>
+	<string>Refreshing Exchange Rates</string>
+	<key>Refreshing Market Data</key>
+	<string>Refreshing Market Data</string>
+	<key>Region &amp; Language</key>
+	<string>Region &amp; Language</string>
+	<key>Remove %@</key>
+	<string>Remove %@</string>
+	<key>Remove %@?</key>
+	<string>Remove %@?</string>
+	<key>Remove Key</key>
+	<string>Remove Key</string>
+	<key>Remove custom category?</key>
+	<string>Remove custom category?</string>
+	<key>Repeats</key>
+	<string>Repeats</string>
+	<key>Replace Existing Data</key>
+	<string>Replace Existing Data</string>
+	<key>Replace local data</key>
+	<string>Replace local data</string>
+	<key>Resume schedule</key>
+	<string>Resume schedule</string>
+	<key>Retrieving %@ price...</key>
+	<string>Retrieving %@ price...</string>
+	<key>Salary</key>
+	<string>Salary</string>
+	<key>Save</key>
+	<string>Save</string>
+	<key>Savings Rate</key>
+	<string>Savings Rate</string>
+	<key>Schedule</key>
+	<string>Schedule</string>
+	<key>Schedule completed</key>
+	<string>Schedule completed</string>
+	<key>Search</key>
+	<string>Search</string>
+	<key>Sector</key>
+	<string>Sector</string>
+	<key>Security</key>
+	<string>Security</string>
+	<key>Selected Date</key>
+	<string>Selected Date</string>
+	<key>Selected date</key>
+	<string>Selected date</string>
+	<key>Selected net worth</key>
+	<string>Selected net worth</string>
+	<key>Sending local changes and fetching updates from iCloud.</key>
+	<string>Sending local changes and fetching updates from iCloud.</string>
+	<key>Settings</key>
+	<string>Settings</string>
+	<key>Share Backup</key>
+	<string>Share Backup</string>
+	<key>Shopping</key>
+	<string>Shopping</string>
+	<key>Showing %@ of %@</key>
+	<string>Showing %@ of %@</string>
+	<key>Showing %lld of %lld</key>
+	<string>Showing %lld of %lld</string>
+	<key>Skip for now</key>
+	<string>Skip for now</string>
+	<key>Snapshots</key>
+	<string>Snapshots</string>
+	<key>Source</key>
+	<string>Source</string>
+	<key>Status</key>
+	<string>Status</string>
+	<key>Status • %@ Sectors</key>
+	<string>Status • %@ Sectors</string>
+	<key>Status • %@) Coins</key>
+	<string>Status • %@) Coins</string>
+	<key>Status • %@) Sectors</key>
+	<string>Status • %@) Sectors</string>
+	<key>Stock</key>
+	<string>Stock</string>
+	<key>Storage</key>
+	<string>Storage</string>
+	<key>Swiss Franc</key>
+	<string>Swiss Franc</string>
+	<key>Switzerland</key>
+	<string>Switzerland</string>
+	<key>Symbol</key>
+	<string>Symbol</string>
+	<key>Sync Data with iCloud</key>
+	<string>Sync Data with iCloud</string>
+	<key>Sync Error</key>
+	<string>Sync Error</string>
+	<key>Sync Failed</key>
+	<string>Sync Failed</string>
+	<key>Syncing</key>
+	<string>Syncing</string>
+	<key>System</key>
+	<string>System</string>
+	<key>TOTAL</key>
+	<string>TOTAL</string>
+	<key>Technology</key>
+	<string>Technology</string>
+	<key>The API key was removed from the macOS Keychain.</key>
+	<string>The API key was removed from the macOS Keychain.</string>
+	<key>The broker or platform fee is added to the position cost basis.</key>
+	<string>The broker or platform fee is added to the position cost basis.</string>
+	<key>The category will be saved for future %@ transactions.</key>
+	<string>The category will be saved for future %@ transactions.</string>
+	<key>The category will be saved for future %@) transactions.</key>
+	<string>The category will be saved for future %@) transactions.</string>
+	<key>The end date cannot be before the first occurrence.</key>
+	<string>The end date cannot be before the first occurrence.</string>
+	<key>The first occurrence must be in the future.</key>
+	<string>The first occurrence must be in the future.</string>
+	<key>The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.</key>
+	<string>The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.</string>
+	<key>The key is saved only after %@ returns a live USD price.</key>
+	<string>The key is saved only after %@ returns a live USD price.</string>
+	<key>The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.</key>
+	<string>The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.</string>
+	<key>The stored credential will be deleted from the macOS Keychain.</key>
+	<string>The stored credential will be deleted from the macOS Keychain.</string>
+	<key>This category will be added to your %@) categories.</key>
+	<string>This category will be added to your %@) categories.</string>
+	<key>This permanently removes %@ from your crypto portfolio.</key>
+	<string>This permanently removes %@ from your crypto portfolio.</string>
+	<key>This permanently removes %@ from your investment portfolio.</key>
+	<string>This permanently removes %@ from your investment portfolio.</string>
+	<key>This permanently removes the %@ transaction from %@).</key>
+	<string>This permanently removes the %@ transaction from %@).</string>
+	<key>This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone.</key>
+	<string>This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone.</string>
+	<key>Top Expense Categories</key>
+	<string>Top Expense Categories</string>
+	<key>Top Holdings</key>
+	<string>Top Holdings</string>
+	<key>Top Performer</key>
+	<string>Top Performer</string>
+	<key>Total Cash</key>
+	<string>Total Cash</string>
+	<key>Touch ID</key>
+	<string>Touch ID</string>
+	<key>Transaction</key>
+	<string>Transaction</string>
+	<key>Transaction Fee</key>
+	<string>Transaction Fee</string>
+	<key>Transaction Period</key>
+	<string>Transaction Period</string>
+	<key>Transaction Type</key>
+	<string>Transaction Type</string>
+	<key>Transactions</key>
+	<string>Transactions</string>
+	<key>Transport</key>
+	<string>Transport</string>
+	<key>Turn off Privacy Mode to reveal values and movement.</key>
+	<string>Turn off Privacy Mode to reveal values and movement.</string>
+	<key>Type</key>
+	<string>Type</string>
+	<key>UK</key>
+	<string>UK</string>
+	<key>US</key>
+	<string>US</string>
+	<key>US Dollar</key>
+	<string>US Dollar</string>
+	<key>Unable to Refresh Market Data</key>
+	<string>Unable to Refresh Market Data</string>
+	<key>Unable to Remove %@</key>
+	<string>Unable to Remove %@</string>
+	<key>Unlock</key>
+	<string>Unlock</string>
+	<key>Unlock with %@</key>
+	<string>Unlock with %@</string>
+	<key>Unlock your local Wealth Compass data.</key>
+	<string>Unlock your local Wealth Compass data.</string>
+	<key>Up to Date</key>
+	<string>Up to Date</string>
+	<key>Updated %@</key>
+	<string>Updated %@</string>
+	<key>Utilities</key>
+	<string>Utilities</string>
+	<key>Validating...</key>
+	<string>Validating...</string>
+	<key>Validation Failed</key>
+	<string>Validation Failed</string>
+	<key>Value</key>
+	<string>Value</string>
+	<key>Values and proportions are hidden.</key>
+	<string>Values and proportions are hidden.</string>
+	<key>Verify &amp; Save</key>
+	<string>Verify &amp; Save</string>
+	<key>View All</key>
+	<string>View All</string>
+	<key>View Cash Flow</key>
+	<string>View Cash Flow</string>
+	<key>We don't use central servers. All your financial data is stored locally on your Mac or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</key>
+	<string>We don't use central servers. All your financial data is stored locally on your Mac or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</string>
+	<key>We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</key>
+	<string>We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</string>
+	<key>Wealth Compass</key>
+	<string>Wealth Compass</string>
+	<key>Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.</key>
+	<string>Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.</string>
+	<key>Weekly</key>
+	<string>Weekly</string>
+	<key>Welcome to WealthCompass</key>
+	<string>Welcome to WealthCompass</string>
+	<key>When enabled, Wealth Compass locks when the app is no longer active.</key>
+	<string>When enabled, Wealth Compass locks when the app is no longer active.</string>
+	<key>When enabled, Wealth Compass locks whenever the app leaves the foreground.</key>
+	<string>When enabled, Wealth Compass locks whenever the app leaves the foreground.</string>
+	<key>Where recorded spending is concentrated</key>
+	<string>Where recorded spending is concentrated</string>
+	<key>Year to Date</key>
+	<string>Year to Date</string>
+	<key>Yearly</key>
+	<string>Yearly</string>
+	<key>Yes</key>
+	<string>Yes</string>
+	<key>Your Data, Your Privacy</key>
+	<string>Your Data, Your Privacy</string>
+	<key>Your data remains on this device.</key>
+	<string>Your data remains on this device.</string>
+	<key>Your financial data stays available locally and syncs across your devices through your private CloudKit database.</key>
+	<string>Your financial data stays available locally and syncs across your devices through your private CloudKit database.</string>
+	<key>Your financial horizon</key>
+	<string>Your financial horizon</string>
+	<key>Your financial view is protected</key>
+	<string>Your financial view is protected</string>
+	<key>Your latest cash flow</key>
+	<string>Your latest cash flow</string>
+	<key>Your latest income and expenses will appear here.</key>
+	<string>Your latest income and expenses will appear here.</string>
+	<key>Your latest recorded cash movements</key>
+	<string>Your latest recorded cash movements</string>
+	<key>Your net-worth trail starts here</key>
+	<string>Your net-worth trail starts here</string>
+	<key>Your personal compass for tracking cash flow, investments, and expenses all in one beautifully designed dashboard.</key>
+	<string>Your personal compass for tracking cash flow, investments, and expenses all in one beautifully designed dashboard.</string>
+	<key>Your preferences</key>
+	<string>Your preferences</string>
+	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
+	<string>\n\n%@ เนื่องจากเกิดซ้ำ %@ เพิ่มไปยังกระแสเงินสด</string>
+	<key>for %@</key>
+	<string>สำหรับ %@</string>
+	<key>iCloud</key>
+	<string>ไอคลาวด์</string>
+	<key>iCloud Sync</key>
+	<string>การซิงค์ iCloud</string>
+	<key>iCloud Unavailable</key>
+	<string>iCloud ไม่พร้อมใช้งาน</string>
+	<key>iCloud sync is not running.</key>
+	<string>การซิงค์ iCloud ไม่ทำงาน</string>
+	<key>just now</key>
+	<string>แค่ตอนนี้</string>
+	<key>transaction was</key>
+	<string>transaction was</string>
+	<key>transactions were</key>
+	<string>transactions were</string>
+	<key>· %@</key>
+	<string>· %@</string>
+	<key>•</key>
+	<string>•</string>
+</dict>
+</plist>

@@ -1,0 +1,184 @@
+{
+  "source": "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/iOS/Views/InvestmentsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Investments",
+        "location": {
+          "startingColumn": 55,
+          "startingLine": 13
+        }
+      },
+      {
+        "comment": "",
+        "key": "Follow positions, allocation, and performance.",
+        "location": {
+          "startingColumn": 101,
+          "startingLine": 13
+        }
+      },
+      {
+        "comment": "",
+        "key": "Allocation by Sector",
+        "location": {
+          "startingColumn": 60,
+          "startingLine": 21
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete Investment?",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 34
+        }
+      },
+      {
+        "comment": "",
+        "key": "This permanently removes %@ from your investment portfolio.",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 36
+        }
+      },
+      {
+        "comment": "",
+        "key": "Portfolio Value",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current market value",
+        "location": {
+          "startingColumn": 196,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "Positions",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 54
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stocks, ETFs, and more",
+        "location": {
+          "startingColumn": 211,
+          "startingLine": 54
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cost Basis",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 55
+        }
+      },
+      {
+        "comment": "",
+        "key": "Capital invested",
+        "location": {
+          "startingColumn": 168,
+          "startingLine": 55
+        }
+      },
+      {
+        "comment": "",
+        "key": "Profit / Loss",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "Performance hidden",
+        "location": {
+          "startingColumn": 69,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%% performance",
+        "location": {
+          "startingColumn": 112,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "Positions",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 69
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap a position to edit its details",
+        "location": {
+          "startingColumn": 96,
+          "startingLine": 69
+        }
+      },
+      {
+        "comment": "",
+        "key": "No investments yet",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 72
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 82
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 88
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ • %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 128
+        }
+      },
+      {
+        "comment": "",
+        "key": "Updated %@",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 150
+        }
+      }
+    ]
+  },
+  "version": 1
+}

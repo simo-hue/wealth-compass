@@ -1,0 +1,1096 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key></key>
+	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld les transaccions recurrents degudes s'han afegit a Flux d'efectiu.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>S'ha afegit 1 transacció recurrent deguda a Flux d'efectiu.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
+	<key>%@
+
+%@</key>
+	<string>%@
+
+%@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+La clau de l'API s'ha desat de manera segura al Keychain.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Wealth Compass continuarà utilitzant %@.</string>
+	<key>%@ %@</key>
+	<string>%@ %@</string>
+	<key>%@ (%@%%)</key>
+	<string>%@ (%@%%)</string>
+	<key>%@ (%@)</key>
+	<string>%@ (%@)</string>
+	<key>%@ / unit</key>
+	<string>%@ / unitat</string>
+	<key>%@ App Lock</key>
+	<string>%@ Bloqueig d'aplicacions</string>
+	<key>%@ Cached or fallback rates remain active.</key>
+	<string>%@ Les taxes de memòria cau o alternatives continuen actives.</string>
+	<key>%@ Failed</key>
+	<string>%@ Ha fallat</string>
+	<key>%@ NET</key>
+	<string>%@ NET</string>
+	<key>%@ Removed</key>
+	<string>%@ S'ha eliminat</string>
+	<key>%@ Saved</key>
+	<string>%@ Desat</string>
+	<key>%@ already exists and will be selected.</key>
+	<string>%@ ja existeix i serà seleccionat.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ no ha retornat una cotització útil per a %@.</string>
+	<key>%@ import completed for %@.</key>
+	<string>%@ importació completada per a %@.</string>
+	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
+	<string>%@ està programat. Obriu Wealth Compass per revisar-lo.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>%@ límit de tarifa assolit. Torna-ho a provar més tard.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ ha rebutjat la clau de l'API.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ ha retornat HTTP %lld.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ ha retornat una resposta no vàlida.</string>
+	<key>%@ units</key>
+	<string>%@ unitats</string>
+	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
+	<string>%@ desapareixerà de les transaccions recurrents i no s'inserirà cap ocurrència futura automàticament.</string>
+	<key>%@ • %@</key>
+	<string>%@ • %@</string>
+	<key>%@%%</key>
+	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>%@%% de rendiment</string>
+	<key>%@%@</key>
+	<string>%@%@</string>
+	<key>%@))d ago</key>
+	<string>fa %@)) d</string>
+	<key>%@))h ago</key>
+	<string>fa %@))h</string>
+	<key>%@)m ago</key>
+	<string>fa %@) m</string>
+	<key>%@. Fetched %@ and cached locally.</key>
+	<string>%@. S'ha obtingut %@ i s'ha guardat a la memòria cau localment.</string>
+	<key>%@. Fetched %@) and cached locally.</key>
+	<string>%@. S'ha obtingut %@) i s'ha guardat a la memòria cau localment.</string>
+	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
+	<string>%@: %@. Wealth Compass el registra automàticament quan l'aplicació està activa.</string>
+	<key>%@: %@. Wealth Compass records it while the app is active.</key>
+	<string>%@: %@. Wealth Compass el registra mentre l'aplicació està activa.</string>
+	<key>%@\n\nThe API key was saved securely in Keychain.</key>
+	<string>%@\n\nLa clau de l'API s'ha desat de manera segura al Keychain.</string>
+	<key>%lld</key>
+	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>%lld s'ha generat la instantània actual després de la importació.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>S'han afegit %lld categories de flux d'efectiu personalitzades.</string>
+	<key>%lld due transaction%@ added to Cash Flow.</key>
+	<string>%lld transacció pendent%@ afegit a Cash Flow.</string>
+	<key>%lld holdings</key>
+	<string>%lld participacions</string>
+	<key>%lld liabilities</key>
+	<string>%lld passius</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld s'han omès registres amb format incorrecte o incomplets.</string>
+	<key>%lld more transactions hidden by this view.</key>
+	<string>%lld més transaccions amagades per aquesta vista.</string>
+	<key>%lld positions</key>
+	<string>%lld posicions</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld les transaccions programades s'han afegit automàticament a Cash Flow.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>S'han importat %lld transaccions, %lld programes recurrents, %lld inversions, %lld participacions criptogràfiques, %lld passius i %lld instantànies.</string>
+	<key>%lldd ago</key>
+	<string>fa %lldd</string>
+	<key>%lldh ago</key>
+	<string>fa %lldh</string>
+	<key>%lldm ago</key>
+	<string>fa %lldm</string>
+	<key>1 %@</key>
+	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 sosteniment</string>
+	<key>1 liability</key>
+	<string>1 responsabilitat</string>
+	<key>1 position</key>
+	<string>1 posició</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>S'ha afegit automàticament 1 transacció programada a Cash Flow.</string>
+	<key>12M</key>
+	<string>12M</string>
+	<key>3M</key>
+	<string>3M</string>
+	<key>6M</key>
+	<string>6M</string>
+	<key>6M NET</key>
+	<string>6M NET</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>Es necessita una clau API de Finnhub per actualitzar els preus d'inversió.</string>
+	<key>A clear view of what you own, owe, earn, and spend.</key>
+	<string>Una visió clara del que posseïu, deu, guanyeu i gasteu.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>Una actualització del preu del mercat ja està en curs.</string>
+	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
+	<string>Les claus de l'API es verifiquen amb una cotització en directe abans d'emmagatzemar-se al clauer de macOS.</string>
+	<key>ASSETS</key>
+	<string>ACTIUS</string>
+	<key>Across every asset</key>
+	<string>A tots els actius</string>
+	<key>Add</key>
+	<string>Afegeix</string>
+	<key>Add Crypto</key>
+	<string>Afegeix Crypto</string>
+	<key>Add Crypto Holding</key>
+	<string>Afegeix Crypto Holding</string>
+	<key>Add Investment</key>
+	<string>Afegeix inversió</string>
+	<key>Add Transaction</key>
+	<string>Afegeix una transacció</string>
+	<key>Add a holding to track its value and performance.</key>
+	<string>Afegiu una participació per fer un seguiment del seu valor i rendiment.</string>
+	<key>Add a holding to track its value.</key>
+	<string>Afegiu una participació per fer un seguiment del seu valor.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Afegiu una clau nova al tauler de control de desenvolupadors.</string>
+	<key>Add another snapshot to see movement</key>
+	<string>Afegeix una altra instantània per veure el moviment</string>
+	<key>Add another snapshot to see movement over time</key>
+	<string>Afegeix una altra instantània per veure el moviment al llarg del temps</string>
+	<key>Add recorded cash, an investment, or a crypto holding.</key>
+	<string>Afegiu efectiu registrat, una inversió o una propietat criptogràfica.</string>
+	<key>Add stocks, ETFs, bonds, or other positions.</key>
+	<string>Afegiu accions, ETF, bons o altres posicions.</string>
+	<key>Add your first income or expense.</key>
+	<string>Afegeix els teus primers ingressos o despeses.</string>
+	<key>Add your first transaction</key>
+	<string>Afegeix la teva primera transacció</string>
+	<key>Adding a transaction or position records a snapshot for this chart.</key>
+	<string>Afegir una transacció o una posició registra una instantània d'aquest gràfic.</string>
+	<key>All</key>
+	<string>Tots</string>
+	<key>All Time</key>
+	<string>Tot el temps</string>
+	<key>All World</key>
+	<string>Tot el món</string>
+	<key>Allocation by Geography</key>
+	<string>Assignació per geografia</string>
+	<key>Allocation by Sector</key>
+	<string>Assignació per sectors</string>
+	<key>Allocation by Type</key>
+	<string>Assignació per Tipus</string>
+	<key>Allocation concealed</key>
+	<string>Assignació oculta</string>
+	<key>Amount</key>
+	<string>Import</string>
+	<key>Amount (%@)</key>
+	<string>Import (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>Una actualització del tipus de canvi ja està en curs.</string>
+	<key>Apple (AAPL)</key>
+	<string>Apple (AAPL)</string>
+	<key>Asset Allocation</key>
+	<string>Assignació d'actius</string>
+	<key>Automatic income and expenses</key>
+	<string>Ingressos i despeses automàtics</string>
+	<key>Average Buy Price</key>
+	<string>Preu de compra mitjà</string>
+	<key>Backup Exported</key>
+	<string>Còpia de seguretat exportada</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Saldos derivats de la seva activitat i participacions</string>
+	<key>Base Currency</key>
+	<string>Moneda base</string>
+	<key>Biggest Loser</key>
+	<string>El major perdedor</string>
+	<key>Biometric authentication is not available on this Mac.</key>
+	<string>L'autenticació biomètrica no està disponible en aquest Mac.</string>
+	<key>Biometric authentication is not available on this device.</key>
+	<string>L'autenticació biomètrica no està disponible en aquest dispositiu.</string>
+	<key>Biometrics</key>
+	<string>Biometria</string>
+	<key>Bitcoin</key>
+	<string>Bitcoin</string>
+	<key>Bond</key>
+	<string>Vincle</string>
+	<key>Breakdown of recorded spending</key>
+	<string>Desglossament de la despesa registrada</string>
+	<key>British Pound</key>
+	<string>Lliura britànica</string>
+	<key>Build your first financial view</key>
+	<string>Construeix la teva primera visió financera</string>
+	<key>Calculated Fee</key>
+	<string>Quota calculada</string>
+	<key>Cancel</key>
+	<string>Cancel·la</string>
+	<key>Capital invested</key>
+	<string>Capital invertit</string>
+	<key>Cash</key>
+	<string>Efectiu</string>
+	<key>Cash Flow</key>
+	<string>Flux de caixa</string>
+	<key>Cash flow</key>
+	<string>Flux de caixa</string>
+	<key>Cash-flow chart concealed</key>
+	<string>Diagrama de flux de caixa amagat</string>
+	<key>Category</key>
+	<string>Categoria</string>
+	<key>Change the search, type, or period filters.</key>
+	<string>Canvieu els filtres de cerca, tipus o període.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>Els canvis no es poden desar fins que no es resolgui l'error de càrrega de la base de dades local.</string>
+	<key>Checking the iCloud account and preparing CloudKit.</key>
+	<string>Comprovant el compte d'iCloud i preparant CloudKit.</string>
+	<key>Choose another period or record an expense.</key>
+	<string>Trieu un altre període o registreu una despesa.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Trieu el nivell gratuït de l'API de demostració.</string>
+	<key>Classification</key>
+	<string>Classificació</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>El registre de CloudKit %@ no té càrrega útil.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
+	<key>CoinGecko API Key</key>
+	<string>Clau de l'API CoinGecko</string>
+	<key>CoinGecko API Key (Crypto)</key>
+	<string>Clau de l'API CoinGecko (Crypto)</string>
+	<key>CoinGecko ID</key>
+	<string>ID de CoinGecko</string>
+	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
+	<string>CoinGecko va retornar un preu de Bitcoin en directe a %@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko va retornar un preu de Bitcoin en directe a %@.</string>
+	<key>Commodity</key>
+	<string>Mercaderia</string>
+	<key>Completed</key>
+	<string>Completat</string>
+	<key>Configured</key>
+	<string>Configurat</string>
+	<key>Confirm your email and sign in.</key>
+	<string>Confirmeu el vostre correu electrònic i inicieu la sessió.</string>
+	<key>Connect Market Data</key>
+	<string>Connecteu les dades del mercat</string>
+	<key>Connecting</key>
+	<string>Connectant</string>
+	<key>Consumer</key>
+	<string>Consumidor</string>
+	<key>Continue</key>
+	<string>Continua</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>Copieu la vostra clau API i enganxeu-la a continuació.</string>
+	<key>Cost Basis</key>
+	<string>Base de costos</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Creeu un compte gratuït de Finnhub.</string>
+	<key>Create or sign in to your account.</key>
+	<string>Creeu o inicieu la sessió al vostre compte.</string>
+	<key>Crypto</key>
+	<string>Cripto</string>
+	<key>Crypto Allocation</key>
+	<string>Assignació de criptografia</string>
+	<key>Crypto Holdings</key>
+	<string>Crypto Holdings</string>
+	<key>Crypto Value</key>
+	<string>Valor criptogràfic</string>
+	<key>Crypto assets</key>
+	<string>Actius criptogràfics</string>
+	<key>Crypto failures: %@.</key>
+	<string>Errors de criptografia: %@.</string>
+	<key>Crypto holdings</key>
+	<string>Fons de criptografia</string>
+	<key>Crypto market prices</key>
+	<string>Preus del mercat criptogràfic</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Crypto saltat: %@.</string>
+	<key>Currency</key>
+	<string>Moneda</string>
+	<key>Current Price</key>
+	<string>Preu actual</string>
+	<key>Current market value</key>
+	<string>Valor de mercat actual</string>
+	<key>Custom Categories</key>
+	<string>Categories personalitzades</string>
+	<key>Custom Category Name</key>
+	<string>Nom de la categoria personalitzada</string>
+	<key>Custom category name</key>
+	<string>Nom de categoria personalitzada</string>
+	<key>Custom...</key>
+	<string>Personalitzat...</string>
+	<key>Daily</key>
+	<string>Diàriament</string>
+	<key>Danger Zone</key>
+	<string>Zona de perill</string>
+	<key>Dashboard</key>
+	<string>Tauler de control</string>
+	<key>Data</key>
+	<string>Dades</string>
+	<key>Date</key>
+	<string>Data</string>
+	<key>Delete</key>
+	<string>Suprimeix</string>
+	<key>Delete %@</key>
+	<string>Suprimeix %@</string>
+	<key>Delete All Data</key>
+	<string>Suprimeix totes les dades</string>
+	<key>Delete All Data?</key>
+	<string>Vols suprimir totes les dades?</string>
+	<key>Delete All Local Data...</key>
+	<string>Suprimeix totes les dades locals...</string>
+	<key>Delete Category</key>
+	<string>Suprimeix la categoria</string>
+	<key>Delete Crypto Holding?</key>
+	<string>Vols suprimir Crypto Holding?</string>
+	<key>Delete Custom Category?</key>
+	<string>Vols suprimir la categoria personalitzada?</string>
+	<key>Delete Holding</key>
+	<string>Suprimeix Holding</string>
+	<key>Delete Investment</key>
+	<string>Suprimeix la inversió</string>
+	<key>Delete Investment?</key>
+	<string>Vols suprimir la inversió?</string>
+	<key>Delete Recurring Transaction?</key>
+	<string>Vols suprimir la transacció recurrent?</string>
+	<key>Delete Transaction</key>
+	<string>Suprimeix la transacció</string>
+	<key>Delete Transaction?</key>
+	<string>Vols suprimir la transacció?</string>
+	<key>Delete all local finance data?</key>
+	<string>Vols suprimir totes les dades de finances locals?</string>
+	<key>Delete schedule</key>
+	<string>Suprimeix la programació</string>
+	<key>Delete transaction</key>
+	<string>Suprimeix la transacció</string>
+	<key>Description</key>
+	<string>Descripció</string>
+	<key>Details</key>
+	<string>Detalls</string>
+	<key>Dividends</key>
+	<string>Dividends</string>
+	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
+	<string>Els horaris pendents s'enregistren automàticament mentre l'aplicació està activa i es recupera la propera vegada que s'obri.</string>
+	<key>Due schedules catch up on open</key>
+	<string>Els horaris establerts es posen al dia</string>
+	<key>ECB</key>
+	<string>BCE</string>
+	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
+	<string>Els tipus de referència del BCE s'actualitzen automàticament i s'emmagatzemen a la memòria cau localment per utilitzar-los fora de línia.</string>
+	<key>ETF</key>
+	<string>ETF</string>
+	<key>EXPENSES</key>
+	<string>DESPESES</string>
+	<key>Edit</key>
+	<string>Edita</string>
+	<key>Edit Crypto</key>
+	<string>Edita Crypto</string>
+	<key>Edit Crypto Holding</key>
+	<string>Edita Crypto Holding</string>
+	<key>Edit Holding</key>
+	<string>Edita Holding</string>
+	<key>Edit Investment</key>
+	<string>Edita la inversió</string>
+	<key>Edit Recurring Transaction</key>
+	<string>Edita la transacció recurrent</string>
+	<key>Edit Transaction</key>
+	<string>Edita la transacció</string>
+	<key>Edit schedule</key>
+	<string>Edita l'horari</string>
+	<key>Edit transaction</key>
+	<string>Edita la transacció</string>
+	<key>Emerging Markets</key>
+	<string>Mercats emergents</string>
+	<key>Enable biometric protection for Wealth Compass.</key>
+	<string>Activa la protecció biomètrica per a Wealth Compass.</string>
+	<key>End Date</key>
+	<string>Data de finalització</string>
+	<key>Ends</key>
+	<string>Finalitza</string>
+	<key>Ends %@</key>
+	<string>Finalitza el %@</string>
+	<key>Ends %@)</key>
+	<string>Finalitza %@)</string>
+	<key>Energy</key>
+	<string>Energia</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Introduïu un nom de categoria. Es desarà per a futures transaccions %@.</string>
+	<key>Enter a category name. It will be saved for future %@) transactions.</key>
+	<string>Introduïu un nom de categoria. Es desarà per a futures transaccions %@).</string>
+	<key>Enter a custom category name.</key>
+	<string>Introduïu un nom de categoria personalitzada.</string>
+	<key>Enter an amount greater than zero.</key>
+	<string>Introduïu una quantitat superior a zero.</string>
+	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
+	<string>Introduïu la tarifa del corredor o de la plataforma que es cobra per aquesta transacció d'inversió. S'afegeix a la base del cost de la posició.</string>
+	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
+	<string>Introduïu les vostres claus d'API gratuïtes per obtenir preus en accions i criptografies. Això és molt recomanable; en cas contrari, els preus dels actius no seran reals ni actualitzats.</string>
+	<key>Entertainment</key>
+	<string>Entreteniment</string>
+	<key>Euro</key>
+	<string>Euro</string>
+	<key>Europe</key>
+	<string>Europa</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Tot el que posseïu, deu, guanyeu i gasteu.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>No s'ha pogut actualitzar el tipus de canvi</string>
+	<key>Exchange Rates</key>
+	<string>Tipus de canvi</string>
+	<key>Exchange Rates Updated</key>
+	<string>Tipus de canvi actualitzats</string>
+	<key>Existing transactions using %@ will keep their current category label.</key>
+	<string>Les transaccions existents amb %@ mantindran la seva etiqueta de categoria actual.</string>
+	<key>Expense</key>
+	<string>Despesa</string>
+	<key>Expense Categories</key>
+	<string>Categories de despeses</string>
+	<key>Expense period</key>
+	<string>Període de despesa</string>
+	<key>Expenses</key>
+	<string>Despeses</string>
+	<key>Expenses grouped by category</key>
+	<string>Despeses agrupades per categories</string>
+	<key>Export Failed</key>
+	<string>Ha fallat l'exportació</string>
+	<key>Export JSON...</key>
+	<string>Exporta JSON...</string>
+	<key>Face ID</key>
+	<string>Identificació facial</string>
+	<key>Fee Amount</key>
+	<string>Import de la quota</string>
+	<key>Fee Percentage</key>
+	<string>Percentatge de tarifa</string>
+	<key>Fee Type</key>
+	<string>Tipus de tarifa</string>
+	<key>Finance</key>
+	<string>Finances</string>
+	<key>Financial horizon</key>
+	<string>Horitzó financer</string>
+	<key>Finish</key>
+	<string>Acabar</string>
+	<key>Finish Recurring Transaction?</key>
+	<string>Acabar la transacció recurrent?</string>
+	<key>Finish schedule</key>
+	<string>Acaba la programació</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
+	<key>Finnhub API Key</key>
+	<string>Clau de l'API de Finnhub</string>
+	<key>Finnhub API Key (Stocks)</key>
+	<string>Clau de l'API de Finnhub (existències)</string>
+	<key>Finnhub returned a live AAPL quote at %@)).</key>
+	<string>Finnhub ha retornat una cotització AAPL en directe a %@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub ha retornat una cotització AAPL en directe a %@.</string>
+	<key>First Occurrence</key>
+	<string>Primera Ocurrència</string>
+	<key>Fixed</key>
+	<string>Arreglat</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Seguiu les posicions, l'assignació i el rendiment.</string>
+	<key>Food</key>
+	<string>Menjar</string>
+	<key>Force Sync iCloud</key>
+	<string>Força la sincronització d'iCloud</string>
+	<key>Freelance</key>
+	<string>Autònom</string>
+	<key>Fuel</key>
+	<string>Combustible</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>Les futures %@ ocurrències per a %@ ja no es crearan.</string>
+	<key>Future %@) occurrences for %@ will no longer be created.</key>
+	<string>Les futures ocurrències %@) per a %@ ja no es crearan.</string>
+	<key>General</key>
+	<string>General</string>
+	<key>Generated from a recurring schedule</key>
+	<string>Generat a partir d'una programació recurrent</string>
+	<key>Geography</key>
+	<string>Geografia</string>
+	<key>Get Started</key>
+	<string>Comença</string>
+	<key>Global</key>
+	<string>Global</string>
+	<key>Health</key>
+	<string>Salut</string>
+	<key>Healthcare</key>
+	<string>Sanitat</string>
+	<key>Hide financial values throughout Wealth Compass.</key>
+	<string>Amaga els valors financers de Wealth Compass.</string>
+	<key>Holdings</key>
+	<string>Explotacions</string>
+	<key>Housing</key>
+	<string>Habitatge</string>
+	<key>How investable assets are distributed</key>
+	<string>Com es distribueixen els actius invertibles</string>
+	<key>How the portfolio is distributed</key>
+	<string>Com es distribueix la cartera</string>
+	<key>How to get your API keys</key>
+	<string>Com obtenir les teves claus API</string>
+	<key>ISIN / ID</key>
+	<string>ISIN / ID</string>
+	<key>Identity</key>
+	<string>Identitat</string>
+	<key>Import Behavior</key>
+	<string>Comportament d'importació</string>
+	<key>Import Complete</key>
+	<string>Importació completada</string>
+	<key>Import Failed</key>
+	<string>La importació ha fallat</string>
+	<key>Import JSON Backup</key>
+	<string>Importa la còpia de seguretat JSON</string>
+	<key>Import JSON...</key>
+	<string>Importa JSON...</string>
+	<key>Import and Export</key>
+	<string>Importació i exportació</string>
+	<key>Imported liquidity account: %@</key>
+	<string>Compte de liquiditat importat: %@</string>
+	<key>Income</key>
+	<string>Ingressos</string>
+	<key>Income and expenses by month</key>
+	<string>Ingressos i despeses per mes</string>
+	<key>Income less expenses</key>
+	<string>Ingressos menys despeses</string>
+	<key>Invalid API Key</key>
+	<string>Clau d'API no vàlida</string>
+	<key>Investment</key>
+	<string>Inversió</string>
+	<key>Investment Fee</key>
+	<string>Comissió d'inversió</string>
+	<key>Investment Transaction Fee</key>
+	<string>Comissió de transacció d'inversió</string>
+	<key>Investment Transaction Fee %</key>
+	<string>Comissió de transacció d'inversió</string>
+	<key>Investment failures: %@.</key>
+	<string>Fallades d'inversió: %@.</string>
+	<key>Investments</key>
+	<string>Inversions</string>
+	<key>Investments skipped: %@.</key>
+	<string>Inversions omeses: %@.</string>
+	<key>Just now</key>
+	<string>Just ara</string>
+	<key>Keychain operation failed with status %d.</key>
+	<string>L'operació del clauer ha fallat amb l'estat %d.</string>
+	<key>Keys are stored securely in Keychain and only used to refresh market prices from this %@.</key>
+	<string>Les claus s'emmagatzemen de manera segura al Keychain i només s'utilitzen per actualitzar els preus del mercat des d'aquest %@.</string>
+	<key>Language</key>
+	<string>Llengua</string>
+	<key>Last 3 Months</key>
+	<string>Últims 3 mesos</string>
+	<key>Last 30 Days</key>
+	<string>Últims 30 dies</string>
+	<key>Last 7 Days</key>
+	<string>Últims 7 dies</string>
+	<key>Last Updated</key>
+	<string>Última actualització</string>
+	<key>Last refresh: %@.</key>
+	<string>Última actualització: %@.</string>
+	<key>Last synced %@.</key>
+	<string>Darrera sincronització %@.</string>
+	<key>Latest ECB reference rates are effective %@.
+
+The rates are cached locally for offline use.</key>
+	<string>Els darrers tipus de referència del BCE són efectius %@.
+
+Les tarifes s'emmagatzemen a la memòria cau localment per utilitzar-les fora de línia.</string>
+	<key>Latest snapshot %@</key>
+	<string>Darrera instantània %@</string>
+	<key>Latest snapshot %@)</key>
+	<string>Darrera instantània %@)</string>
+	<key>Liabilities</key>
+	<string>Passius</string>
+	<key>Liquidity</key>
+	<string>Liquiditat</string>
+	<key>Liquidity Account</key>
+	<string>Compte de liquiditat</string>
+	<key>Local</key>
+	<string>Local</string>
+	<key>Local Only</key>
+	<string>Només local</string>
+	<key>Local Storage</key>
+	<string>Emmagatzematge local</string>
+	<key>Local data is ready to sync.</key>
+	<string>Les dades locals estan a punt per sincronitzar-se.</string>
+	<key>Local data loaded, but iCloud sync metadata could not be prepared. %@</key>
+	<string>S'han carregat les dades locals, però no s'han pogut preparar les metadades de sincronització d'iCloud. %@</string>
+	<key>Manual Actions</key>
+	<string>Accions manuals</string>
+	<key>Market Data</key>
+	<string>Dades de mercat</string>
+	<key>Merge</key>
+	<string>Fusionar</string>
+	<key>Merge With Existing Data</key>
+	<string>Combina amb les dades existents</string>
+	<key>Merge adds new records and updates matching IDs. Replace clears current local finance data before importing.</key>
+	<string>La combinació afegeix nous registres i actualitza els ID coincidents. Reemplaça esborra les dades actuals de finances locals abans d'importar-les.</string>
+	<key>Merge with local data</key>
+	<string>Combina amb dades locals</string>
+	<key>Mode</key>
+	<string>Mode</string>
+	<key>Month</key>
+	<string>Mes</string>
+	<key>Monthly</key>
+	<string>Mensualment</string>
+	<key>Monthly Expenses</key>
+	<string>Despeses mensuals</string>
+	<key>Monthly Income</key>
+	<string>Ingressos mensuals</string>
+	<key>Monthly amounts and proportions are hidden.</key>
+	<string>S'amaguen les quantitats i proporcions mensuals.</string>
+	<key>NET WORTH</key>
+	<string>PATRIMONI NET</string>
+	<key>Name</key>
+	<string>Nom</string>
+	<key>Navigate</key>
+	<string>Navega</string>
+	<key>Net Savings</key>
+	<string>Estalvi net</string>
+	<key>Net Worth</key>
+	<string>Valor net</string>
+	<key>Net worth range</key>
+	<string>Net worth range</string>
+	<key>Net-worth history concealed</key>
+	<string>Història del patrimoni net oculta</string>
+	<key>Never</key>
+	<string>Mai</string>
+	<key>New Crypto Holding</key>
+	<string>Nou Crypto Holding</string>
+	<key>New Holding</key>
+	<string>Nova Holding</string>
+	<key>New Investment</key>
+	<string>Nova inversió</string>
+	<key>New Recurring Transaction</key>
+	<string>New Recurring Transaction</string>
+	<key>New Transaction</key>
+	<string>Nova transacció</string>
+	<key>Next %@</key>
+	<string>Següent %@</string>
+	<key>Next %@)</key>
+	<string>Següent %@)</string>
+	<key>Next: %@</key>
+	<string>Següent: %@</string>
+	<key>No Crypto Holdings</key>
+	<string>Sense Crypto Holdings</string>
+	<key>No Investments</key>
+	<string>Sense inversions</string>
+	<key>No Matching Transactions</key>
+	<string>No hi ha transaccions coincidents</string>
+	<key>No Prices Updated</key>
+	<string>No s'han actualitzat preus</string>
+	<key>No Transactions</key>
+	<string>No hi ha transaccions</string>
+	<key>No activity yet</key>
+	<string>Encara no hi ha activitat</string>
+	<key>No assets found</key>
+	<string>No s'han trobat recursos</string>
+	<key>No assets to allocate</key>
+	<string>No hi ha actius per assignar</string>
+	<key>No crypto holdings yet</key>
+	<string>Encara no hi ha cap possessió criptogràfica</string>
+	<key>No custom %@ categories yet.</key>
+	<string>Encara no hi ha categories personalitzades %@.</string>
+	<key>No custom %@) categories yet.</key>
+	<string>Encara no hi ha categories personalitzades %@).</string>
+	<key>No end date</key>
+	<string>Sense data de finalització</string>
+	<key>No expenses for this period</key>
+	<string>No hi ha despeses per aquest període</string>
+	<key>No expenses in the last 30 days</key>
+	<string>Sense despeses en els darrers 30 dies</string>
+	<key>No holdings were updated.</key>
+	<string>No s'ha actualitzat cap fons.</string>
+	<key>No investments yet</key>
+	<string>Encara no hi ha inversions</string>
+	<key>No recent cash flow</key>
+	<string>No hi ha flux de caixa recent</string>
+	<key>No recurring transactions</key>
+	<string>No hi ha transaccions recurrents</string>
+	<key>No snapshots</key>
+	<string>No hi ha instantànies</string>
+	<key>No snapshots yet</key>
+	<string>Encara no hi ha cap instantània</string>
+	<key>No supported finance records were found in the selected JSON file.</key>
+	<string>No s'han trobat registres financers compatibles al fitxer JSON seleccionat.</string>
+	<key>No transactions found</key>
+	<string>No s'han trobat transaccions</string>
+	<key>Not Set</key>
+	<string>Not Set</string>
+	<key>Notifications</key>
+	<string>Notifications</string>
+	<key>Notifications Disabled</key>
+	<string>Notifications Disabled</string>
+	<key>Notifications disabled</key>
+	<string>Notifications disabled</string>
+	<key>Notifications enabled</key>
+	<string>Notifications enabled</string>
+	<key>Notifications off</key>
+	<string>Notifications off</string>
+	<key>Notifications on</key>
+	<string>Notifications on</string>
+	<key>Notify When Due</key>
+	<string>Notify When Due</string>
+	<key>OK</key>
+	<string>OK</string>
+	<key>Off</key>
+	<string>Off</string>
+	<key>Offline fallback</key>
+	<string>Offline fallback</string>
+	<key>One-Time</key>
+	<string>One-Time</string>
+	<key>One-Time Transaction</key>
+	<string>One-Time Transaction</string>
+	<key>Optic ID</key>
+	<string>Optic ID</string>
+	<key>Optional Coin ID</key>
+	<string>Optional Coin ID</string>
+	<key>Other</key>
+	<string>Other</string>
+	<key>Overview</key>
+	<string>Overview</string>
+	<key>Paste CoinGecko API key</key>
+	<string>Paste CoinGecko API key</string>
+	<key>Paste CoinGecko key...</key>
+	<string>Paste CoinGecko key...</string>
+	<key>Paste Finnhub API key</key>
+	<string>Paste Finnhub API key</string>
+	<key>Paste Finnhub key...</key>
+	<string>Paste Finnhub key...</string>
+	<key>Pause schedule</key>
+	<string>Pause schedule</string>
+	<key>Paused</key>
+	<string>Paused</string>
+	<key>Percent</key>
+	<string>Percent</string>
+	<key>Performance</key>
+	<string>Performance</string>
+	<key>Period</key>
+	<string>Period</string>
+	<key>Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them.</key>
+	<string>Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them.</string>
+	<key>Portfolio Value</key>
+	<string>Portfolio Value</string>
+	<key>Position</key>
+	<string>Position</string>
+	<key>Positions</key>
+	<string>Positions</string>
+	<key>Prepare Backup</key>
+	<string>Prepare Backup</string>
+	<key>Privacy</key>
+	<string>Privacy</string>
+	<key>Privacy &amp; Security</key>
+	<string>Privacy &amp; Security</string>
+	<key>Privacy Mode</key>
+	<string>Privacy Mode</string>
+	<key>Privacy on</key>
+	<string>Privacy on</string>
+	<key>Privacy, sync, currency, and market data</key>
+	<string>Privacy, sync, currency, and market data</string>
+	<key>Profit / Loss</key>
+	<string>Profit / Loss</string>
+	<key>Quantity</key>
+	<string>Quantity</string>
+	<key>Range floor</key>
+	<string>Range floor</string>
+	<key>Real Estate</key>
+	<string>Real Estate</string>
+	<key>Recent Activity</key>
+	<string>Recent Activity</string>
+	<key>Recent Transactions</key>
+	<string>Recent Transactions</string>
+	<key>Record cash flow or add a position to bring this dashboard to life.</key>
+	<string>Record cash flow or add a position to bring this dashboard to life.</string>
+	<key>Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically.</key>
+	<string>Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically.</string>
+	<key>Record income or an expense to reveal the monthly pattern.</key>
+	<string>Record income or an expense to reveal the monthly pattern.</string>
+	<key>Recurring</key>
+	<string>Recurring</string>
+	<key>Recurring %@ due</key>
+	<string>Recurring %@ due</string>
+	<key>Recurring Schedules</key>
+	<string>Recurring Schedules</string>
+	<key>Recurring Transaction</key>
+	<string>Recurring Transaction</string>
+	<key>Recurring Transactions</key>
+	<string>Recurring Transactions</string>
+	<key>Recurring Transactions Added</key>
+	<string>Recurring Transactions Added</string>
+	<key>Refresh Data</key>
+	<string>Refresh Data</string>
+	<key>Refresh Exchange Rates</key>
+	<string>Refresh Exchange Rates</string>
+	<key>Refresh Market Data</key>
+	<string>Refresh Market Data</string>
+	<key>Refreshing Exchange Rates</key>
+	<string>Refreshing Exchange Rates</string>
+	<key>Refreshing Market Data</key>
+	<string>Refreshing Market Data</string>
+	<key>Region &amp; Language</key>
+	<string>Region &amp; Language</string>
+	<key>Remove %@</key>
+	<string>Remove %@</string>
+	<key>Remove %@?</key>
+	<string>Remove %@?</string>
+	<key>Remove Key</key>
+	<string>Remove Key</string>
+	<key>Remove custom category?</key>
+	<string>Remove custom category?</string>
+	<key>Repeats</key>
+	<string>Repeats</string>
+	<key>Replace Existing Data</key>
+	<string>Replace Existing Data</string>
+	<key>Replace local data</key>
+	<string>Replace local data</string>
+	<key>Resume schedule</key>
+	<string>Resume schedule</string>
+	<key>Retrieving %@ price...</key>
+	<string>Retrieving %@ price...</string>
+	<key>Salary</key>
+	<string>Salary</string>
+	<key>Save</key>
+	<string>Save</string>
+	<key>Savings Rate</key>
+	<string>Savings Rate</string>
+	<key>Schedule</key>
+	<string>Schedule</string>
+	<key>Schedule completed</key>
+	<string>Schedule completed</string>
+	<key>Search</key>
+	<string>Search</string>
+	<key>Sector</key>
+	<string>Sector</string>
+	<key>Security</key>
+	<string>Security</string>
+	<key>Selected Date</key>
+	<string>Selected Date</string>
+	<key>Selected date</key>
+	<string>Selected date</string>
+	<key>Selected net worth</key>
+	<string>Selected net worth</string>
+	<key>Sending local changes and fetching updates from iCloud.</key>
+	<string>Sending local changes and fetching updates from iCloud.</string>
+	<key>Settings</key>
+	<string>Settings</string>
+	<key>Share Backup</key>
+	<string>Share Backup</string>
+	<key>Shopping</key>
+	<string>Shopping</string>
+	<key>Showing %@ of %@</key>
+	<string>Showing %@ of %@</string>
+	<key>Showing %lld of %lld</key>
+	<string>Showing %lld of %lld</string>
+	<key>Skip for now</key>
+	<string>Skip for now</string>
+	<key>Snapshots</key>
+	<string>Snapshots</string>
+	<key>Source</key>
+	<string>Source</string>
+	<key>Status</key>
+	<string>Status</string>
+	<key>Status • %@ Sectors</key>
+	<string>Status • %@ Sectors</string>
+	<key>Status • %@) Coins</key>
+	<string>Status • %@) Coins</string>
+	<key>Status • %@) Sectors</key>
+	<string>Status • %@) Sectors</string>
+	<key>Stock</key>
+	<string>Stock</string>
+	<key>Storage</key>
+	<string>Storage</string>
+	<key>Swiss Franc</key>
+	<string>Swiss Franc</string>
+	<key>Switzerland</key>
+	<string>Switzerland</string>
+	<key>Symbol</key>
+	<string>Symbol</string>
+	<key>Sync Data with iCloud</key>
+	<string>Sync Data with iCloud</string>
+	<key>Sync Error</key>
+	<string>Sync Error</string>
+	<key>Sync Failed</key>
+	<string>Sync Failed</string>
+	<key>Syncing</key>
+	<string>Syncing</string>
+	<key>System</key>
+	<string>System</string>
+	<key>TOTAL</key>
+	<string>TOTAL</string>
+	<key>Technology</key>
+	<string>Technology</string>
+	<key>The API key was removed from the macOS Keychain.</key>
+	<string>The API key was removed from the macOS Keychain.</string>
+	<key>The broker or platform fee is added to the position cost basis.</key>
+	<string>The broker or platform fee is added to the position cost basis.</string>
+	<key>The category will be saved for future %@ transactions.</key>
+	<string>The category will be saved for future %@ transactions.</string>
+	<key>The category will be saved for future %@) transactions.</key>
+	<string>The category will be saved for future %@) transactions.</string>
+	<key>The end date cannot be before the first occurrence.</key>
+	<string>The end date cannot be before the first occurrence.</string>
+	<key>The first occurrence must be in the future.</key>
+	<string>The first occurrence must be in the future.</string>
+	<key>The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.</key>
+	<string>The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.</string>
+	<key>The key is saved only after %@ returns a live USD price.</key>
+	<string>The key is saved only after %@ returns a live USD price.</string>
+	<key>The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.</key>
+	<string>The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.</string>
+	<key>The stored credential will be deleted from the macOS Keychain.</key>
+	<string>The stored credential will be deleted from the macOS Keychain.</string>
+	<key>This category will be added to your %@) categories.</key>
+	<string>This category will be added to your %@) categories.</string>
+	<key>This permanently removes %@ from your crypto portfolio.</key>
+	<string>This permanently removes %@ from your crypto portfolio.</string>
+	<key>This permanently removes %@ from your investment portfolio.</key>
+	<string>This permanently removes %@ from your investment portfolio.</string>
+	<key>This permanently removes the %@ transaction from %@).</key>
+	<string>This permanently removes the %@ transaction from %@).</string>
+	<key>This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone.</key>
+	<string>This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone.</string>
+	<key>Top Expense Categories</key>
+	<string>Top Expense Categories</string>
+	<key>Top Holdings</key>
+	<string>Top Holdings</string>
+	<key>Top Performer</key>
+	<string>Top Performer</string>
+	<key>Total Cash</key>
+	<string>Total Cash</string>
+	<key>Touch ID</key>
+	<string>Touch ID</string>
+	<key>Transaction</key>
+	<string>Transaction</string>
+	<key>Transaction Fee</key>
+	<string>Transaction Fee</string>
+	<key>Transaction Period</key>
+	<string>Transaction Period</string>
+	<key>Transaction Type</key>
+	<string>Transaction Type</string>
+	<key>Transactions</key>
+	<string>Transactions</string>
+	<key>Transport</key>
+	<string>Transport</string>
+	<key>Turn off Privacy Mode to reveal values and movement.</key>
+	<string>Turn off Privacy Mode to reveal values and movement.</string>
+	<key>Type</key>
+	<string>Type</string>
+	<key>UK</key>
+	<string>UK</string>
+	<key>US</key>
+	<string>US</string>
+	<key>US Dollar</key>
+	<string>US Dollar</string>
+	<key>Unable to Refresh Market Data</key>
+	<string>Unable to Refresh Market Data</string>
+	<key>Unable to Remove %@</key>
+	<string>Unable to Remove %@</string>
+	<key>Unlock</key>
+	<string>Unlock</string>
+	<key>Unlock with %@</key>
+	<string>Unlock with %@</string>
+	<key>Unlock your local Wealth Compass data.</key>
+	<string>Unlock your local Wealth Compass data.</string>
+	<key>Up to Date</key>
+	<string>Up to Date</string>
+	<key>Updated %@</key>
+	<string>Updated %@</string>
+	<key>Utilities</key>
+	<string>Utilities</string>
+	<key>Validating...</key>
+	<string>Validating...</string>
+	<key>Validation Failed</key>
+	<string>Validation Failed</string>
+	<key>Value</key>
+	<string>Value</string>
+	<key>Values and proportions are hidden.</key>
+	<string>Values and proportions are hidden.</string>
+	<key>Verify &amp; Save</key>
+	<string>Verify &amp; Save</string>
+	<key>View All</key>
+	<string>View All</string>
+	<key>View Cash Flow</key>
+	<string>View Cash Flow</string>
+	<key>We don't use central servers. All your financial data is stored locally on your Mac or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</key>
+	<string>We don't use central servers. All your financial data is stored locally on your Mac or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</string>
+	<key>We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</key>
+	<string>We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</string>
+	<key>Wealth Compass</key>
+	<string>Wealth Compass</string>
+	<key>Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.</key>
+	<string>Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.</string>
+	<key>Weekly</key>
+	<string>Weekly</string>
+	<key>Welcome to WealthCompass</key>
+	<string>Welcome to WealthCompass</string>
+	<key>When enabled, Wealth Compass locks when the app is no longer active.</key>
+	<string>When enabled, Wealth Compass locks when the app is no longer active.</string>
+	<key>When enabled, Wealth Compass locks whenever the app leaves the foreground.</key>
+	<string>When enabled, Wealth Compass locks whenever the app leaves the foreground.</string>
+	<key>Where recorded spending is concentrated</key>
+	<string>Where recorded spending is concentrated</string>
+	<key>Year to Date</key>
+	<string>Year to Date</string>
+	<key>Yearly</key>
+	<string>Yearly</string>
+	<key>Yes</key>
+	<string>Yes</string>
+	<key>Your Data, Your Privacy</key>
+	<string>Your Data, Your Privacy</string>
+	<key>Your data remains on this device.</key>
+	<string>Your data remains on this device.</string>
+	<key>Your financial data stays available locally and syncs across your devices through your private CloudKit database.</key>
+	<string>Your financial data stays available locally and syncs across your devices through your private CloudKit database.</string>
+	<key>Your financial horizon</key>
+	<string>Your financial horizon</string>
+	<key>Your financial view is protected</key>
+	<string>Your financial view is protected</string>
+	<key>Your latest cash flow</key>
+	<string>Your latest cash flow</string>
+	<key>Your latest income and expenses will appear here.</key>
+	<string>Your latest income and expenses will appear here.</string>
+	<key>Your latest recorded cash movements</key>
+	<string>Your latest recorded cash movements</string>
+	<key>Your net-worth trail starts here</key>
+	<string>Your net-worth trail starts here</string>
+	<key>Your personal compass for tracking cash flow, investments, and expenses all in one beautifully designed dashboard.</key>
+	<string>Your personal compass for tracking cash flow, investments, and expenses all in one beautifully designed dashboard.</string>
+	<key>Your preferences</key>
+	<string>Your preferences</string>
+	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
+	<string>\n\n%@ a causa de %@ recurrent afegit al flux de caixa.</string>
+	<key>for %@</key>
+	<string>per %@</string>
+	<key>iCloud</key>
+	<string>iCloud</string>
+	<key>iCloud Sync</key>
+	<string>iCloud Sync</string>
+	<key>iCloud Unavailable</key>
+	<string>iCloud no disponible</string>
+	<key>iCloud sync is not running.</key>
+	<string>La sincronització d'iCloud no s'està executant.</string>
+	<key>just now</key>
+	<string>just ara</string>
+	<key>transaction was</key>
+	<string>transaction was</string>
+	<key>transactions were</key>
+	<string>transactions were</string>
+	<key>· %@</key>
+	<string>· %@</string>
+	<key>•</key>
+	<string>•</string>
+</dict>
+</plist>

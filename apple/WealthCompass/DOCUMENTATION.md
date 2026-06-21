@@ -288,7 +288,7 @@
 
 - [2026-06-21 19:30]: Compact Tab Bar Localization
   - *Details*: Fixed overcrowded iOS tab bar labels in languages with long word-by-word translations (e.g. Italian "Pannello di controllo"). Tab bar now uses dedicated short labels while page titles and navigation keep full translations.
-  - *Tech Notes*: Added `TabBarLabels.swift`, five `*, Tab Bar` keys in `Localizable.xcstrings` (34 locales), `scripts/add_tab_bar_localizations.py` audit script, and runtime width logging in `I18nDebugLog.auditTabBarLabels`.
+  - *Tech Notes*: Added generated `TabBarLabelResolver.swift` (embedded short labels for 35 locales, survives Xcode catalog sync), `scripts/add_tab_bar_localizations.py`, and runtime width logging in `I18nDebugLog.auditTabBarLabels`. Tab bar no longer uses `*, Tab Bar` xcstrings keys.
 
 - [2026-06-21]: Remaining Localization Cleanup
   - *Details*: Cleared the last `String(localized:)` usages in editor sheets, finance store, CloudKit sync, dashboard, onboarding, investments/crypto views, and iOS content view. Import category mapping now stores English catalog keys. Cloud sync status detail text respects the selected app language.

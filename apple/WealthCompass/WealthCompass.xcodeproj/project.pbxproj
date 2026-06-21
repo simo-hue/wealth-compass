@@ -23,7 +23,7 @@
 		AD0000000000000000000009 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000009 /* CloudKitSyncService.swift */; };
 		AD00000000000000000000F1 /* I18nDebugLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000F1 /* I18nDebugLog.swift */; };
 		AD00000000000000000000F3 /* AppLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000F3 /* AppLocalization.swift */; };
-		AD00000000000000000000F5 /* TabBarLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000F5 /* TabBarLabels.swift */; };
+		AD00000000000000000000F5 /* TabBarLabelResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000F5 /* TabBarLabelResolver.swift */; };
 		AD0000000000000000000011 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000001 /* FinanceModels.swift */; };
 		AD0000000000000000000012 /* FinancePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000002 /* FinancePersistence.swift */; };
 		AD00000000000000000000E2 /* ExchangeRatePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000E1 /* ExchangeRatePersistence.swift */; };
@@ -36,7 +36,7 @@
 		AD0000000000000000000019 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000009 /* CloudKitSyncService.swift */; };
 		AD00000000000000000000F2 /* I18nDebugLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000F1 /* I18nDebugLog.swift */; };
 		AD00000000000000000000F4 /* AppLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000F3 /* AppLocalization.swift */; };
-		AD00000000000000000000F6 /* TabBarLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000F5 /* TabBarLabels.swift */; };
+		AD00000000000000000000F6 /* TabBarLabelResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000F5 /* TabBarLabelResolver.swift */; };
 		AD0000000000000000000020 /* WealthCompassMobileApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000010 /* WealthCompassMobileApp.swift */; };
 		AD0000000000000000000021 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000011 /* ContentView.swift */; };
 		AD0000000000000000000022 /* AppLockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000012 /* AppLockStore.swift */; };
@@ -101,7 +101,7 @@
 		AC0000000000000000000009 /* CloudKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/CloudKitSyncService.swift; sourceTree = "<group>"; };
 		AC00000000000000000000F1 /* I18nDebugLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/I18nDebugLog.swift; sourceTree = "<group>"; };
 		AC00000000000000000000F3 /* AppLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AppLocalization.swift; sourceTree = "<group>"; };
-		AC00000000000000000000F5 /* TabBarLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/TabBarLabels.swift; sourceTree = "<group>"; };
+		AC00000000000000000000F5 /* TabBarLabelResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/TabBarLabelResolver.swift; sourceTree = "<group>"; };
 		AC0000000000000000000010 /* WealthCompassMobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WealthCompassMobileApp.swift; sourceTree = "<group>"; };
 		AC0000000000000000000011 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AC0000000000000000000012 /* AppLockStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AppLockStore.swift; sourceTree = "<group>"; };
@@ -271,7 +271,7 @@
 				AC0000000000000000000009 /* CloudKitSyncService.swift */,
 				AC00000000000000000000F1 /* I18nDebugLog.swift */,
 				AC00000000000000000000F3 /* AppLocalization.swift */,
-				AC00000000000000000000F5 /* TabBarLabels.swift */,
+				AC00000000000000000000F5 /* TabBarLabelResolver.swift */,
 				520A8B945E3C6A6E2657845A /* UI */,
 			);
 			path = Shared;
@@ -574,7 +574,7 @@
 				AD0000000000000000000009 /* CloudKitSyncService.swift in Sources */,
 				AD00000000000000000000F1 /* I18nDebugLog.swift in Sources */,
 				AD00000000000000000000F3 /* AppLocalization.swift in Sources */,
-				AD00000000000000000000F5 /* TabBarLabels.swift in Sources */,
+				AD00000000000000000000F5 /* TabBarLabelResolver.swift in Sources */,
 				AD0000000000000000000020 /* WealthCompassMobileApp.swift in Sources */,
 				AD0000000000000000000021 /* ContentView.swift in Sources */,
 				AD0000000000000000000022 /* AppLockStore.swift in Sources */,
@@ -610,7 +610,7 @@
 				AD0000000000000000000019 /* CloudKitSyncService.swift in Sources */,
 				AD00000000000000000000F2 /* I18nDebugLog.swift in Sources */,
 				AD00000000000000000000F4 /* AppLocalization.swift in Sources */,
-				AD00000000000000000000F6 /* TabBarLabels.swift in Sources */,
+				AD00000000000000000000F6 /* TabBarLabelResolver.swift in Sources */,
 				AD0000000000000000000030 /* WealthCompassMacApp.swift in Sources */,
 				AD0000000000000000000031 /* MacAppModel.swift in Sources */,
 				AD0000000000000000000032 /* MacRootView.swift in Sources */,

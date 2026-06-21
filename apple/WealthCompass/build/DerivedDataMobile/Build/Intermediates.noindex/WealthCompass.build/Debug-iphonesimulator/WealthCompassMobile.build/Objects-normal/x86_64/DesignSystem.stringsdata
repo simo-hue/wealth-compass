@@ -1,0 +1,48 @@
+{
+  "source": "/Users/simo/Downloads/DEV/wealth-compass/apple/WealthCompass/Sources/Shared/UI/DesignSystem.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%@ (%@%%)",
+        "location": {
+          "startingColumn": 14,
+          "startingLine": 237
+        }
+      },
+      {
+        "comment": "",
+        "key": "How the portfolio is distributed",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 256
+        }
+      },
+      {
+        "comment": "",
+        "key": "No assets found",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 259
+        }
+      },
+      {
+        "comment": "",
+        "key": "Value",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 265
+        }
+      },
+      {
+        "comment": "",
+        "key": "TOTAL",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 293
+        }
+      }
+    ]
+  },
+  "version": 1
+}

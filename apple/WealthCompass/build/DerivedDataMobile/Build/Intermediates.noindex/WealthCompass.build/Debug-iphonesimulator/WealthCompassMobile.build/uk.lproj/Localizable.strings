@@ -1,0 +1,1094 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key></key>
+	<string></string>
+	<key>
+
+%lld due recurring transactions were added to Cash Flow.</key>
+	<string>%lld належні повторювані транзакції додано до Cash Flow.</string>
+	<key>
+
+1 due recurring transaction was added to Cash Flow.</key>
+	<string>До грошового потоку додано 1 повторювану транзакцію, що має завершитися.</string>
+	<key> (%@)</key>
+	<string>(%@)</string>
+	<key>%@
+
+%@</key>
+	<string>%@
+
+%@</string>
+	<key>%@
+
+The API key was saved securely in Keychain.</key>
+	<string>%@
+
+Ключ API було безпечно збережено в Keychain.</string>
+	<key>%@
+
+Wealth Compass will continue using %@.</key>
+	<string>%@
+
+Wealth Compass продовжить використовувати %@.</string>
+	<key>%@ %@</key>
+	<string>%@ %@</string>
+	<key>%@ (%@%%)</key>
+	<string>%@ (%@%%)</string>
+	<key>%@ (%@)</key>
+	<string>%@ (%@)</string>
+	<key>%@ / unit</key>
+	<string>%@ / од</string>
+	<key>%@ App Lock</key>
+	<string>%@ Блокування програми</string>
+	<key>%@ Cached or fallback rates remain active.</key>
+	<string>%@ Кешовані або резервні ставки залишаються активними.</string>
+	<key>%@ Failed</key>
+	<string>%@ Помилка</string>
+	<key>%@ NET</key>
+	<string>%@ NET</string>
+	<key>%@ Removed</key>
+	<string>%@ Видалено</string>
+	<key>%@ Saved</key>
+	<string>%@ Збережено</string>
+	<key>%@ already exists and will be selected.</key>
+	<string>%@ вже існує та буде вибрано.</string>
+	<key>%@ did not return a usable quote for %@.</key>
+	<string>%@ не повернув придатну цитату для %@.</string>
+	<key>%@ import completed for %@.</key>
+	<string>Імпорт %@ завершено для %@.</string>
+	<key>%@ is scheduled. Open Wealth Compass to review it.</key>
+	<string>%@ заплановано. Відкрийте Wealth Compass, щоб переглянути його.</string>
+	<key>%@ rate limit reached. Try again later.</key>
+	<string>Досягнуто обмеження швидкості %@. Повторіть спробу пізніше.</string>
+	<key>%@ rejected the API key.</key>
+	<string>%@ відхилив ключ API.</string>
+	<key>%@ returned HTTP %lld.</key>
+	<string>%@ повернув HTTP %lld.</string>
+	<key>%@ returned an invalid response.</key>
+	<string>%@ повернув недійсну відповідь.</string>
+	<key>%@ units</key>
+	<string>%@ одиниць</string>
+	<key>%@ will disappear from Recurring Transactions and no future occurrences will be inserted automatically.</key>
+	<string>%@ зникне з повторюваних транзакцій, і жодні майбутні випадки не вставлятимуться автоматично.</string>
+	<key>%@ • %@</key>
+	<string>%@ • %@</string>
+	<key>%@%%</key>
+	<string>%@%%</string>
+	<key>%@%% performance</key>
+	<string>Продуктивність %@%%.</string>
+	<key>%@%@</key>
+	<string>%@%@</string>
+	<key>%@))d ago</key>
+	<string>%@)) дн. тому</string>
+	<key>%@))h ago</key>
+	<string>%@)) год тому</string>
+	<key>%@)m ago</key>
+	<string>%@)хв тому</string>
+	<key>%@. Fetched %@ and cached locally.</key>
+	<string>%@. Отримано %@ та збережено локально.</string>
+	<key>%@. Fetched %@) and cached locally.</key>
+	<string>%@. Отримано %@) і збережено локально.</string>
+	<key>%@: %@. Wealth Compass records it automatically when the app is active.</key>
+	<string>%@: %@. Wealth Compass записує його автоматично, коли програма активна.</string>
+	<key>%@: %@. Wealth Compass records it while the app is active.</key>
+	<string>%@: %@. Wealth Compass записує його, поки програма активна.</string>
+	<key>%@\n\nThe API key was saved securely in Keychain.</key>
+	<string>%@\n\nКлюч API безпечно збережено в Keychain.</string>
+	<key>%lld</key>
+	<string>%lld</string>
+	<key>%lld current snapshot was generated after import.</key>
+	<string>Після імпорту було створено поточний знімок %lld.</string>
+	<key>%lld custom cash-flow categories were added.</key>
+	<string>Додано %lld спеціальних категорій грошових потоків.</string>
+	<key>%lld due transaction%@ added to Cash Flow.</key>
+	<string>%lld due transaction%@ added to Cash Flow.</string>
+	<key>%lld holdings</key>
+	<string>%lld холдинги</string>
+	<key>%lld liabilities</key>
+	<string>%lld пасиви</string>
+	<key>%lld malformed or incomplete records were skipped.</key>
+	<string>%lld неправильних або неповних записів було пропущено.</string>
+	<key>%lld more transactions hidden by this view.</key>
+	<string>Ще %lld транзакцій, прихованих у цьому перегляді.</string>
+	<key>%lld positions</key>
+	<string>%lld позицій</string>
+	<key>%lld scheduled transactions were automatically added to Cash Flow.</key>
+	<string>%lld запланованих транзакцій було автоматично додано до Cash Flow.</string>
+	<key>%lld transactions, %lld recurring schedules, %lld investments, %lld crypto holdings, %lld liabilities, and %lld snapshots were imported.</key>
+	<string>Імпортовано %lld транзакцій, %lld повторюваних графіків, %lld інвестицій, %lld криптохолдингів, %lld зобов’язань і %lld знімків.</string>
+	<key>%lldd ago</key>
+	<string>%lldd тому</string>
+	<key>%lldh ago</key>
+	<string>%lld год тому</string>
+	<key>%lldm ago</key>
+	<string>%lldхв тому</string>
+	<key>1 %@</key>
+	<string>1 %@</string>
+	<key>1 holding</key>
+	<string>1 холдинг</string>
+	<key>1 liability</key>
+	<string>1 відповідальність</string>
+	<key>1 position</key>
+	<string>1 позиція</string>
+	<key>1 scheduled transaction was automatically added to Cash Flow.</key>
+	<string>1 запланована транзакція була автоматично додана до Cash Flow.</string>
+	<key>12M</key>
+	<string>12M</string>
+	<key>3M</key>
+	<string>3M</string>
+	<key>6M</key>
+	<string>6M</string>
+	<key>6M NET</key>
+	<string>6М НЕТ</string>
+	<key>A Finnhub API key is required to update investment prices.</key>
+	<string>Для оновлення інвестиційних цін потрібен ключ Finnhub API.</string>
+	<key>A clear view of what you own, owe, earn, and spend.</key>
+	<string>Чітке уявлення про те, чим ви володієте, заборгували, заробляєте та витрачаєте.</string>
+	<key>A market price refresh is already in progress.</key>
+	<string>Оновлення ринкової ціни вже триває.</string>
+	<key>API keys are verified against a live quote before they are stored in the macOS Keychain.</key>
+	<string>Ключі API перевіряються на реальну цитату, перш ніж вони зберігаються в macOS Keychain.</string>
+	<key>ASSETS</key>
+	<string>АКТИВИ</string>
+	<key>Across every asset</key>
+	<string>У кожному активі</string>
+	<key>Add</key>
+	<string>додати</string>
+	<key>Add Crypto</key>
+	<string>Додати Crypto</string>
+	<key>Add Crypto Holding</key>
+	<string>Додати Crypto Holding</string>
+	<key>Add Investment</key>
+	<string>Додати інвестиції</string>
+	<key>Add Transaction</key>
+	<string>Додати транзакцію</string>
+	<key>Add a holding to track its value and performance.</key>
+	<string>Додайте холдинг, щоб відстежувати його вартість і продуктивність.</string>
+	<key>Add a holding to track its value.</key>
+	<string>Додайте холдинг, щоб відстежувати його вартість.</string>
+	<key>Add a new key in Developer Dashboard.</key>
+	<string>Додайте новий ключ на інформаційну панель розробника.</string>
+	<key>Add another snapshot to see movement</key>
+	<string>Додайте ще один знімок, щоб побачити рух</string>
+	<key>Add another snapshot to see movement over time</key>
+	<string>Додайте ще один знімок, щоб побачити рух з часом</string>
+	<key>Add recorded cash, an investment, or a crypto holding.</key>
+	<string>Додайте зареєстровану готівку, інвестицію чи криптохолдинг.</string>
+	<key>Add stocks, ETFs, bonds, or other positions.</key>
+	<string>Додайте акції, ETF, облігації чи інші позиції.</string>
+	<key>Add your first income or expense.</key>
+	<string>Додайте свій перший дохід або витрату.</string>
+	<key>Add your first transaction</key>
+	<string>Додайте свою першу транзакцію</string>
+	<key>Adding a transaction or position records a snapshot for this chart.</key>
+	<string>Додавання транзакції або позиції записує знімок для цієї діаграми.</string>
+	<key>All</key>
+	<string>всі</string>
+	<key>All Time</key>
+	<string>Весь час</string>
+	<key>All World</key>
+	<string>Весь Світ</string>
+	<key>Allocation by Geography</key>
+	<string>Розподіл за географією</string>
+	<key>Allocation by Sector</key>
+	<string>Розподіл за секторами</string>
+	<key>Allocation by Type</key>
+	<string>Розподіл за типом</string>
+	<key>Allocation concealed</key>
+	<string>Виділення приховане</string>
+	<key>Amount</key>
+	<string>Сума</string>
+	<key>Amount (%@)</key>
+	<string>Сума (%@)</string>
+	<key>An exchange-rate refresh is already in progress.</key>
+	<string>Оновлення обмінного курсу вже триває.</string>
+	<key>Apple (AAPL)</key>
+	<string>Apple (AAPL)</string>
+	<key>Asset Allocation</key>
+	<string>Розподіл активів</string>
+	<key>Automatic income and expenses</key>
+	<string>Автоматичні доходи та витрати</string>
+	<key>Average Buy Price</key>
+	<string>Середня ціна покупки</string>
+	<key>Backup Exported</key>
+	<string>Резервну копію експортовано</string>
+	<key>Balances derived from your activity and holdings</key>
+	<string>Баланси, отримані з вашої діяльності та холдингів</string>
+	<key>Base Currency</key>
+	<string>Базова валюта</string>
+	<key>Biggest Loser</key>
+	<string>Найбільший невдаха</string>
+	<key>Biometric authentication is not available on this Mac.</key>
+	<string>Біометрична автентифікація недоступна на цьому Mac.</string>
+	<key>Biometric authentication is not available on this device.</key>
+	<string>Біометрична автентифікація недоступна на цьому пристрої.</string>
+	<key>Biometrics</key>
+	<string>Біометрія</string>
+	<key>Bitcoin</key>
+	<string>Bitcoin</string>
+	<key>Bond</key>
+	<string>Бонд</string>
+	<key>Breakdown of recorded spending</key>
+	<string>Розбивка зареєстрованих витрат</string>
+	<key>British Pound</key>
+	<string>Британський фунт</string>
+	<key>Build your first financial view</key>
+	<string>Створіть свій перший фінансовий погляд</string>
+	<key>Calculated Fee</key>
+	<string>Розрахована плата</string>
+	<key>Cancel</key>
+	<string>Скасувати</string>
+	<key>Capital invested</key>
+	<string>Вкладений капітал</string>
+	<key>Cash</key>
+	<string>Готівка</string>
+	<key>Cash Flow</key>
+	<string>Грошовий потік</string>
+	<key>Cash flow</key>
+	<string>Грошовий потік</string>
+	<key>Cash-flow chart concealed</key>
+	<string>Графік руху готівки приховано</string>
+	<key>Category</key>
+	<string>Категорія</string>
+	<key>Change the search, type, or period filters.</key>
+	<string>Змініть фільтри пошуку, типу або періоду.</string>
+	<key>Changes cannot be saved until the local database load error is resolved.</key>
+	<string>Зміни неможливо зберегти, доки не буде вирішено помилку завантаження локальної бази даних.</string>
+	<key>Checking the iCloud account and preparing CloudKit.</key>
+	<string>Перевірка облікового запису iCloud і підготовка CloudKit.</string>
+	<key>Choose another period or record an expense.</key>
+	<string>Виберіть інший період або зафіксуйте витрати.</string>
+	<key>Choose the free Demo API tier.</key>
+	<string>Виберіть безкоштовний демонстраційний рівень API.</string>
+	<key>Classification</key>
+	<string>Класифікація</string>
+	<key>CloudKit record %@ has no payload.</key>
+	<string>Запис CloudKit %@ не має корисного навантаження.</string>
+	<key>CoinGecko</key>
+	<string>CoinGecko</string>
+	<key>CoinGecko API Key</key>
+	<string>Ключ API CoinGecko</string>
+	<key>CoinGecko API Key (Crypto)</key>
+	<string>Ключ API CoinGecko (крипто)</string>
+	<key>CoinGecko ID</key>
+	<string>Ідентифікатор CoinGecko</string>
+	<key>CoinGecko returned a live Bitcoin price at %@)).</key>
+	<string>CoinGecko повернув реальну ціну біткойна на рівні %@)).</string>
+	<key>CoinGecko returned a live Bitcoin price at %@.</key>
+	<string>CoinGecko повернув поточну ціну біткойна на рівні %@.</string>
+	<key>Commodity</key>
+	<string>товарний</string>
+	<key>Completed</key>
+	<string>Виконано</string>
+	<key>Configured</key>
+	<string>Налаштовано</string>
+	<key>Confirm your email and sign in.</key>
+	<string>Підтвердьте свою електронну адресу та увійдіть.</string>
+	<key>Connect Market Data</key>
+	<string>Connect Market Data</string>
+	<key>Connecting</key>
+	<string>Підключення</string>
+	<key>Consumer</key>
+	<string>Споживач</string>
+	<key>Continue</key>
+	<string>Продовжити</string>
+	<key>Copy your API key and paste it below.</key>
+	<string>Скопіюйте свій ключ API та вставте його нижче.</string>
+	<key>Cost Basis</key>
+	<string>Основа витрат</string>
+	<key>Create a free Finnhub account.</key>
+	<string>Створіть безкоштовний обліковий запис Finnhub.</string>
+	<key>Create or sign in to your account.</key>
+	<string>Створіть або увійдіть у свій обліковий запис.</string>
+	<key>Crypto</key>
+	<string>Крипто</string>
+	<key>Crypto Allocation</key>
+	<string>Розподіл крипто</string>
+	<key>Crypto Holdings</key>
+	<string>Криптохолдинги</string>
+	<key>Crypto Value</key>
+	<string>Криптова вартість</string>
+	<key>Crypto assets</key>
+	<string>Криптоактиви</string>
+	<key>Crypto failures: %@.</key>
+	<string>Помилки крипто: %@.</string>
+	<key>Crypto holdings</key>
+	<string>Криптохолдинги</string>
+	<key>Crypto market prices</key>
+	<string>Ціни криптовалютного ринку</string>
+	<key>Crypto skipped: %@.</key>
+	<string>Крипто пропущено: %@.</string>
+	<key>Currency</key>
+	<string>Валюта</string>
+	<key>Current Price</key>
+	<string>Поточна ціна</string>
+	<key>Current market value</key>
+	<string>Поточна ринкова вартість</string>
+	<key>Custom Categories</key>
+	<string>Спеціальні категорії</string>
+	<key>Custom Category Name</key>
+	<string>Назва спеціальної категорії</string>
+	<key>Custom category name</key>
+	<string>Спеціальна назва категорії</string>
+	<key>Custom...</key>
+	<string>Спеціальний...</string>
+	<key>Daily</key>
+	<string>Щодня</string>
+	<key>Danger Zone</key>
+	<string>НЕБЕЗПЕЧНА ЗОНА</string>
+	<key>Dashboard</key>
+	<string>Приладова панель</string>
+	<key>Data</key>
+	<string>Дані</string>
+	<key>Date</key>
+	<string>Дата</string>
+	<key>Delete</key>
+	<string>Видалити</string>
+	<key>Delete %@</key>
+	<string>Видалити %@</string>
+	<key>Delete All Data</key>
+	<string>Видалити всі дані</string>
+	<key>Delete All Data?</key>
+	<string>Видалити всі дані?</string>
+	<key>Delete All Local Data...</key>
+	<string>Видалити всі локальні дані...</string>
+	<key>Delete Category</key>
+	<string>Видалити категорію</string>
+	<key>Delete Crypto Holding?</key>
+	<string>Видалити Crypto Holding?</string>
+	<key>Delete Custom Category?</key>
+	<string>Видалити спеціальну категорію?</string>
+	<key>Delete Holding</key>
+	<string>Видалити холдинг</string>
+	<key>Delete Investment</key>
+	<string>Видалити інвестиції</string>
+	<key>Delete Investment?</key>
+	<string>Видалити інвестиції?</string>
+	<key>Delete Recurring Transaction?</key>
+	<string>Видалити повторювану транзакцію?</string>
+	<key>Delete Transaction</key>
+	<string>Видалити транзакцію</string>
+	<key>Delete Transaction?</key>
+	<string>Видалити трансакцію?</string>
+	<key>Delete all local finance data?</key>
+	<string>Видалити всі місцеві фінансові дані?</string>
+	<key>Delete schedule</key>
+	<string>Видалити розклад</string>
+	<key>Delete transaction</key>
+	<string>Видалити транзакцію</string>
+	<key>Description</key>
+	<string>опис</string>
+	<key>Details</key>
+	<string>Подробиці</string>
+	<key>Dividends</key>
+	<string>Дивіденди</string>
+	<key>Due schedules are recorded automatically while the app is active and caught up the next time it opens.</key>
+	<string>Розклади записуються автоматично, поки програма активна, і повертаються під час наступного відкриття.</string>
+	<key>Due schedules catch up on open</key>
+	<string>Належні графіки наздоганяють відкрито</string>
+	<key>ECB</key>
+	<string>ЄЦБ</string>
+	<key>ECB reference rates are refreshed automatically and cached locally for offline use.</key>
+	<string>Довідкові ставки ЄЦБ оновлюються автоматично та зберігаються локально для використання в автономному режимі.</string>
+	<key>ETF</key>
+	<string>ETF</string>
+	<key>EXPENSES</key>
+	<string>ВИТРАТИ</string>
+	<key>Edit</key>
+	<string>Редагувати</string>
+	<key>Edit Crypto</key>
+	<string>Редагувати Crypto</string>
+	<key>Edit Crypto Holding</key>
+	<string>Редагувати Crypto Holding</string>
+	<key>Edit Holding</key>
+	<string>Редагувати Холдинг</string>
+	<key>Edit Investment</key>
+	<string>Редагувати інвестиції</string>
+	<key>Edit Recurring Transaction</key>
+	<string>Редагувати повторювану транзакцію</string>
+	<key>Edit Transaction</key>
+	<string>Редагувати транзакцію</string>
+	<key>Edit schedule</key>
+	<string>Редагувати розклад</string>
+	<key>Edit transaction</key>
+	<string>Редагувати транзакцію</string>
+	<key>Emerging Markets</key>
+	<string>Ринки, що розвиваються</string>
+	<key>Enable biometric protection for Wealth Compass.</key>
+	<string>Увімкніть біометричний захист для Wealth Compass.</string>
+	<key>End Date</key>
+	<string>Дата закінчення</string>
+	<key>Ends</key>
+	<string>Закінчується</string>
+	<key>Ends %@</key>
+	<string>Закінчується %@</string>
+	<key>Ends %@)</key>
+	<string>Закінчується %@)</string>
+	<key>Energy</key>
+	<string>Енергія</string>
+	<key>Enter a category name. It will be saved for future %@ transactions.</key>
+	<string>Введіть назву категорії. Його буде збережено для майбутніх транзакцій %@.</string>
+	<key>Enter a category name. It will be saved for future %@) transactions.</key>
+	<string>Введіть назву категорії. Його буде збережено для майбутніх %@) транзакцій.</string>
+	<key>Enter a custom category name.</key>
+	<string>Введіть власну назву категорії.</string>
+	<key>Enter an amount greater than zero.</key>
+	<string>Введіть суму, більшу за нуль.</string>
+	<key>Enter the broker or platform fee charged for this investment transaction. It is added to the position cost basis.</key>
+	<string>Введіть комісію брокера або платформи, що стягується за цю інвестиційну операцію. Він додається до бази вартості позиції.</string>
+	<key>Enter your free API keys to get live stock and crypto prices. This is highly recommended—otherwise, asset prices won't be real or up to date.</key>
+	<string>Введіть безкоштовні ключі API, щоб отримати ціни на акції та криптовалюти. Це настійно рекомендовано — інакше ціни на активи не будуть реальними чи актуальними.</string>
+	<key>Entertainment</key>
+	<string>Розваги</string>
+	<key>Euro</key>
+	<string>євро</string>
+	<key>Europe</key>
+	<string>Європа</string>
+	<key>Everything you own, owe, earn, and spend.</key>
+	<string>Усе, що ви маєте, маєте борг, заробляєте та витрачаєте.</string>
+	<key>Exchange Rate Refresh Failed</key>
+	<string>Не вдалося оновити курс обміну</string>
+	<key>Exchange Rates</key>
+	<string>Курси валют</string>
+	<key>Exchange Rates Updated</key>
+	<string>Курси валют оновлено</string>
+	<key>Existing transactions using %@ will keep their current category label.</key>
+	<string>Існуючі транзакції з використанням %@ збережуть поточну мітку категорії.</string>
+	<key>Expense</key>
+	<string>Витрати</string>
+	<key>Expense Categories</key>
+	<string>Категорії витрат</string>
+	<key>Expense period</key>
+	<string>Період витрат</string>
+	<key>Expenses</key>
+	<string>Витрати</string>
+	<key>Expenses grouped by category</key>
+	<string>Витрати згруповані за категоріями</string>
+	<key>Export Failed</key>
+	<string>Помилка експорту</string>
+	<key>Export JSON...</key>
+	<string>Експорт JSON...</string>
+	<key>Face ID</key>
+	<string>Face ID</string>
+	<key>Fee Amount</key>
+	<string>Розмір комісії</string>
+	<key>Fee Percentage</key>
+	<string>Відсоток комісії</string>
+	<key>Fee Type</key>
+	<string>Тип комісії</string>
+	<key>Finance</key>
+	<string>Фінанси</string>
+	<key>Financial horizon</key>
+	<string>Фінансовий горизонт</string>
+	<key>Finish</key>
+	<string>Закінчити</string>
+	<key>Finish Recurring Transaction?</key>
+	<string>Завершити повторювану транзакцію?</string>
+	<key>Finish schedule</key>
+	<string>Графік завершення</string>
+	<key>Finnhub</key>
+	<string>Finnhub</string>
+	<key>Finnhub API Key</key>
+	<string>Ключ API Finnhub</string>
+	<key>Finnhub API Key (Stocks)</key>
+	<string>Ключ API Finnhub (акції)</string>
+	<key>Finnhub returned a live AAPL quote at %@)).</key>
+	<string>Finnhub повернув поточну котирування AAPL о %@)).</string>
+	<key>Finnhub returned a live AAPL quote at %@.</key>
+	<string>Finnhub повернув актуальну котирування AAPL о %@.</string>
+	<key>First Occurrence</key>
+	<string>Перша поява</string>
+	<key>Fixed</key>
+	<string>Виправлено</string>
+	<key>Follow positions, allocation, and performance.</key>
+	<string>Слідкуйте за позиціями, розподілом і продуктивністю.</string>
+	<key>Food</key>
+	<string>харчування</string>
+	<key>Force Sync iCloud</key>
+	<string>Примусова синхронізація iCloud</string>
+	<key>Freelance</key>
+	<string>позаштатний</string>
+	<key>Fuel</key>
+	<string>паливо</string>
+	<key>Future %@ occurrences for %@ will no longer be created.</key>
+	<string>Майбутні %@ входження для %@ більше не створюватимуться.</string>
+	<key>Future %@) occurrences for %@ will no longer be created.</key>
+	<string>Майбутні %@) входження для %@ більше не створюватимуться.</string>
+	<key>General</key>
+	<string>Загальний</string>
+	<key>Generated from a recurring schedule</key>
+	<string>Створено з періодичного розкладу</string>
+	<key>Geography</key>
+	<string>Географія</string>
+	<key>Get Started</key>
+	<string>Почніть роботу</string>
+	<key>Global</key>
+	<string>Глобальний</string>
+	<key>Health</key>
+	<string>Здоров'я</string>
+	<key>Healthcare</key>
+	<string>Охорона здоров'я</string>
+	<key>Hide financial values throughout Wealth Compass.</key>
+	<string>Приховайте фінансові цінності в Wealth Compass.</string>
+	<key>Holdings</key>
+	<string>Холдинги</string>
+	<key>Housing</key>
+	<string>житло</string>
+	<key>How investable assets are distributed</key>
+	<string>Як розподіляються інвестиційні активи</string>
+	<key>How the portfolio is distributed</key>
+	<string>Як розподіляється портфоліо</string>
+	<key>How to get your API keys</key>
+	<string>Як отримати ключі API</string>
+	<key>ISIN / ID</key>
+	<string>ISIN / ID</string>
+	<key>Identity</key>
+	<string>Ідентичність</string>
+	<key>Import Behavior</key>
+	<string>Імпорт поведінки</string>
+	<key>Import Complete</key>
+	<string>Імпорт завершено</string>
+	<key>Import Failed</key>
+	<string>Помилка імпорту</string>
+	<key>Import JSON Backup</key>
+	<string>Імпорт резервної копії JSON</string>
+	<key>Import JSON...</key>
+	<string>Імпорт JSON...</string>
+	<key>Import and Export</key>
+	<string>Імпорт та експорт</string>
+	<key>Imported liquidity account: %@</key>
+	<string>Імпортований рахунок ліквідності: %@</string>
+	<key>Income</key>
+	<string>Дохід</string>
+	<key>Income and expenses by month</key>
+	<string>Доходи та витрати по місяцях</string>
+	<key>Income less expenses</key>
+	<string>Дохід мінус витрати</string>
+	<key>Invalid API Key</key>
+	<string>Недійсний ключ API</string>
+	<key>Investment</key>
+	<string>Інвестиції</string>
+	<key>Investment Fee</key>
+	<string>Комісія за інвестиції</string>
+	<key>Investment Transaction Fee</key>
+	<string>Комісія за інвестиційну операцію</string>
+	<key>Investment Transaction Fee %</key>
+	<string>Комісія за інвестиційні операції %</string>
+	<key>Investment failures: %@.</key>
+	<string>Невдалі інвестиції: %@.</string>
+	<key>Investments</key>
+	<string>Інвестиції</string>
+	<key>Investments skipped: %@.</key>
+	<string>Пропущені інвестиції: %@.</string>
+	<key>Just now</key>
+	<string>Просто зараз</string>
+	<key>Keychain operation failed with status %d.</key>
+	<string>Помилка операції брелка зі статусом %d.</string>
+	<key>Keys are stored securely in Keychain and only used to refresh market prices from this %@.</key>
+	<string>Ключі надійно зберігаються в Keychain і використовуються лише для оновлення ринкових цін із цього %@.</string>
+	<key>Language</key>
+	<string>Мова</string>
+	<key>Last 3 Months</key>
+	<string>Останні 3 місяці</string>
+	<key>Last 30 Days</key>
+	<string>Останні 30 днів</string>
+	<key>Last 7 Days</key>
+	<string>Останні 7 днів</string>
+	<key>Last Updated</key>
+	<string>Останнє оновлення</string>
+	<key>Last refresh: %@.</key>
+	<string>Останнє оновлення: %@.</string>
+	<key>Last synced %@.</key>
+	<string>Востаннє синхронізовано %@.</string>
+	<key>Latest ECB reference rates are effective %@.
+
+The rates are cached locally for offline use.</key>
+	<string>Останні довідкові ставки ЄЦБ набувають чинності %@.
+
+Тарифи зберігаються локально для використання в автономному режимі.</string>
+	<key>Latest snapshot %@</key>
+	<string>Останній знімок %@</string>
+	<key>Latest snapshot %@)</key>
+	<string>Останній знімок %@)</string>
+	<key>Liabilities</key>
+	<string>Зобов'язання</string>
+	<key>Liquidity</key>
+	<string>Ліквідність</string>
+	<key>Liquidity Account</key>
+	<string>Рахунок ліквідності</string>
+	<key>Local</key>
+	<string>Місцевий</string>
+	<key>Local Only</key>
+	<string>Тільки місцеві</string>
+	<key>Local Storage</key>
+	<string>Локальна пам'ять</string>
+	<key>Local data is ready to sync.</key>
+	<string>Локальні дані готові до синхронізації.</string>
+	<key>Local data loaded, but iCloud sync metadata could not be prepared. %@</key>
+	<string>Локальні дані завантажено, але метадані синхронізації iCloud не вдалося підготувати. %@</string>
+	<key>Manual Actions</key>
+	<string>Ручні дії</string>
+	<key>Market Data</key>
+	<string>Ринкові дані</string>
+	<key>Merge</key>
+	<string>Об’єднати</string>
+	<key>Merge With Existing Data</key>
+	<string>Об’єднати з існуючими даними</string>
+	<key>Merge adds new records and updates matching IDs. Replace clears current local finance data before importing.</key>
+	<string>Злиття додає нові записи та оновлює відповідні ідентифікатори. Замінити видаляє поточні місцеві фінансові дані перед імпортом.</string>
+	<key>Merge with local data</key>
+	<string>Об’єднати з локальними даними</string>
+	<key>Mode</key>
+	<string>Режим</string>
+	<key>Month</key>
+	<string>місяць</string>
+	<key>Monthly</key>
+	<string>Щомісяця</string>
+	<key>Monthly Expenses</key>
+	<string>Щомісячні витрати</string>
+	<key>Monthly Income</key>
+	<string>Щомісячний дохід</string>
+	<key>Monthly amounts and proportions are hidden.</key>
+	<string>Щомісячні суми та пропорції приховані.</string>
+	<key>NET WORTH</key>
+	<string>ЧИСТА ВАРТІСТЬ</string>
+	<key>Name</key>
+	<string>Ім'я</string>
+	<key>Navigate</key>
+	<string>Навігація</string>
+	<key>Net Savings</key>
+	<string>Чисті заощадження</string>
+	<key>Net Worth</key>
+	<string>чистий капітал</string>
+	<key>Net worth range</key>
+	<string>Діапазон чистої вартості</string>
+	<key>Net-worth history concealed</key>
+	<string>Історія власних статків прихована</string>
+	<key>Never</key>
+	<string>Ніколи</string>
+	<key>New Crypto Holding</key>
+	<string>Новий криптохолдинг</string>
+	<key>New Holding</key>
+	<string>Новий Холдинг</string>
+	<key>New Investment</key>
+	<string>Нові інвестиції</string>
+	<key>New Recurring Transaction</key>
+	<string>Нова повторювана транзакція</string>
+	<key>New Transaction</key>
+	<string>Нова транзакція</string>
+	<key>Next %@</key>
+	<string>Наступний %@</string>
+	<key>Next %@)</key>
+	<string>Наступний %@)</string>
+	<key>Next: %@</key>
+	<string>Далі: %@</string>
+	<key>No Crypto Holdings</key>
+	<string>Жодних криптохолдингів</string>
+	<key>No Investments</key>
+	<string>Ніяких інвестицій</string>
+	<key>No Matching Transactions</key>
+	<string>Немає відповідних транзакцій</string>
+	<key>No Prices Updated</key>
+	<string>Ціни не оновлені</string>
+	<key>No Transactions</key>
+	<string>Немає транзакцій</string>
+	<key>No activity yet</key>
+	<string>Активності ще немає</string>
+	<key>No assets found</key>
+	<string>Активи не знайдено</string>
+	<key>No assets to allocate</key>
+	<string>Немає активів для розподілу</string>
+	<key>No crypto holdings yet</key>
+	<string>Криптохолдингів ще немає</string>
+	<key>No custom %@ categories yet.</key>
+	<string>Ще немає спеціальних категорій %@.</string>
+	<key>No custom %@) categories yet.</key>
+	<string>Ще немає спеціальних %@) категорій.</string>
+	<key>No end date</key>
+	<string>Немає кінцевої дати</string>
+	<key>No expenses for this period</key>
+	<string>Витрат за цей період немає</string>
+	<key>No expenses in the last 30 days</key>
+	<string>Жодних витрат за останні 30 днів</string>
+	<key>No holdings were updated.</key>
+	<string>Жодних холдингів не оновлено.</string>
+	<key>No investments yet</key>
+	<string>Інвестицій поки немає</string>
+	<key>No recent cash flow</key>
+	<string>Немає останніх грошових потоків</string>
+	<key>No recurring transactions</key>
+	<string>Немає повторюваних транзакцій</string>
+	<key>No snapshots</key>
+	<string>Немає знімків</string>
+	<key>No snapshots yet</key>
+	<string>Ще немає знімків</string>
+	<key>No supported finance records were found in the selected JSON file.</key>
+	<string>У вибраному файлі JSON не знайдено підтримуваних фінансових записів.</string>
+	<key>Not Set</key>
+	<string>Not Set</string>
+	<key>Notifications</key>
+	<string>Notifications</string>
+	<key>Notifications Disabled</key>
+	<string>Notifications Disabled</string>
+	<key>Notifications disabled</key>
+	<string>Notifications disabled</string>
+	<key>Notifications enabled</key>
+	<string>Notifications enabled</string>
+	<key>Notifications off</key>
+	<string>Notifications off</string>
+	<key>Notifications on</key>
+	<string>Notifications on</string>
+	<key>Notify When Due</key>
+	<string>Notify When Due</string>
+	<key>OK</key>
+	<string>OK</string>
+	<key>Off</key>
+	<string>Off</string>
+	<key>Offline fallback</key>
+	<string>Offline fallback</string>
+	<key>One-Time</key>
+	<string>One-Time</string>
+	<key>One-Time Transaction</key>
+	<string>One-Time Transaction</string>
+	<key>Optic ID</key>
+	<string>Optic ID</string>
+	<key>Optional Coin ID</key>
+	<string>Optional Coin ID</string>
+	<key>Other</key>
+	<string>Other</string>
+	<key>Overview</key>
+	<string>Overview</string>
+	<key>Paste CoinGecko API key</key>
+	<string>Paste CoinGecko API key</string>
+	<key>Paste CoinGecko key...</key>
+	<string>Paste CoinGecko key...</string>
+	<key>Paste Finnhub API key</key>
+	<string>Paste Finnhub API key</string>
+	<key>Paste Finnhub key...</key>
+	<string>Paste Finnhub key...</string>
+	<key>Pause schedule</key>
+	<string>Pause schedule</string>
+	<key>Paused</key>
+	<string>Paused</string>
+	<key>Percent</key>
+	<string>Percent</string>
+	<key>Performance</key>
+	<string>Performance</string>
+	<key>Period</key>
+	<string>Period</string>
+	<key>Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them.</key>
+	<string>Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them.</string>
+	<key>Portfolio Value</key>
+	<string>Portfolio Value</string>
+	<key>Position</key>
+	<string>Position</string>
+	<key>Positions</key>
+	<string>Positions</string>
+	<key>Prepare Backup</key>
+	<string>Prepare Backup</string>
+	<key>Privacy</key>
+	<string>Privacy</string>
+	<key>Privacy &amp; Security</key>
+	<string>Privacy &amp; Security</string>
+	<key>Privacy Mode</key>
+	<string>Privacy Mode</string>
+	<key>Privacy on</key>
+	<string>Privacy on</string>
+	<key>Privacy, sync, currency, and market data</key>
+	<string>Privacy, sync, currency, and market data</string>
+	<key>Profit / Loss</key>
+	<string>Profit / Loss</string>
+	<key>Quantity</key>
+	<string>Quantity</string>
+	<key>Range floor</key>
+	<string>Range floor</string>
+	<key>Real Estate</key>
+	<string>Real Estate</string>
+	<key>Recent Activity</key>
+	<string>Recent Activity</string>
+	<key>Recent Transactions</key>
+	<string>Recent Transactions</string>
+	<key>Record cash flow or add a position to bring this dashboard to life.</key>
+	<string>Record cash flow or add a position to bring this dashboard to life.</string>
+	<key>Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically.</key>
+	<string>Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically.</string>
+	<key>Record income or an expense to reveal the monthly pattern.</key>
+	<string>Record income or an expense to reveal the monthly pattern.</string>
+	<key>Recurring</key>
+	<string>Recurring</string>
+	<key>Recurring %@ due</key>
+	<string>Recurring %@ due</string>
+	<key>Recurring Schedules</key>
+	<string>Recurring Schedules</string>
+	<key>Recurring Transaction</key>
+	<string>Recurring Transaction</string>
+	<key>Recurring Transactions</key>
+	<string>Recurring Transactions</string>
+	<key>Recurring Transactions Added</key>
+	<string>Recurring Transactions Added</string>
+	<key>Refresh Data</key>
+	<string>Refresh Data</string>
+	<key>Refresh Exchange Rates</key>
+	<string>Refresh Exchange Rates</string>
+	<key>Refresh Market Data</key>
+	<string>Refresh Market Data</string>
+	<key>Refreshing Exchange Rates</key>
+	<string>Refreshing Exchange Rates</string>
+	<key>Refreshing Market Data</key>
+	<string>Refreshing Market Data</string>
+	<key>Region &amp; Language</key>
+	<string>Region &amp; Language</string>
+	<key>Remove %@</key>
+	<string>Remove %@</string>
+	<key>Remove %@?</key>
+	<string>Remove %@?</string>
+	<key>Remove Key</key>
+	<string>Remove Key</string>
+	<key>Remove custom category?</key>
+	<string>Remove custom category?</string>
+	<key>Repeats</key>
+	<string>Repeats</string>
+	<key>Replace Existing Data</key>
+	<string>Replace Existing Data</string>
+	<key>Replace local data</key>
+	<string>Replace local data</string>
+	<key>Resume schedule</key>
+	<string>Resume schedule</string>
+	<key>Retrieving %@ price...</key>
+	<string>Retrieving %@ price...</string>
+	<key>Salary</key>
+	<string>Salary</string>
+	<key>Save</key>
+	<string>Save</string>
+	<key>Savings Rate</key>
+	<string>Savings Rate</string>
+	<key>Schedule</key>
+	<string>Schedule</string>
+	<key>Schedule completed</key>
+	<string>Schedule completed</string>
+	<key>Search</key>
+	<string>Search</string>
+	<key>Sector</key>
+	<string>Sector</string>
+	<key>Security</key>
+	<string>Security</string>
+	<key>Selected Date</key>
+	<string>Selected Date</string>
+	<key>Selected date</key>
+	<string>Selected date</string>
+	<key>Selected net worth</key>
+	<string>Selected net worth</string>
+	<key>Sending local changes and fetching updates from iCloud.</key>
+	<string>Sending local changes and fetching updates from iCloud.</string>
+	<key>Settings</key>
+	<string>Settings</string>
+	<key>Share Backup</key>
+	<string>Share Backup</string>
+	<key>Shopping</key>
+	<string>Shopping</string>
+	<key>Showing %@ of %@</key>
+	<string>Showing %@ of %@</string>
+	<key>Showing %lld of %lld</key>
+	<string>Showing %lld of %lld</string>
+	<key>Skip for now</key>
+	<string>Skip for now</string>
+	<key>Snapshots</key>
+	<string>Snapshots</string>
+	<key>Source</key>
+	<string>Source</string>
+	<key>Status</key>
+	<string>Status</string>
+	<key>Status • %@ Sectors</key>
+	<string>Status • %@ Sectors</string>
+	<key>Status • %@) Coins</key>
+	<string>Status • %@) Coins</string>
+	<key>Status • %@) Sectors</key>
+	<string>Status • %@) Sectors</string>
+	<key>Stock</key>
+	<string>Stock</string>
+	<key>Storage</key>
+	<string>Storage</string>
+	<key>Swiss Franc</key>
+	<string>Swiss Franc</string>
+	<key>Switzerland</key>
+	<string>Switzerland</string>
+	<key>Symbol</key>
+	<string>Symbol</string>
+	<key>Sync Data with iCloud</key>
+	<string>Sync Data with iCloud</string>
+	<key>Sync Error</key>
+	<string>Sync Error</string>
+	<key>Sync Failed</key>
+	<string>Sync Failed</string>
+	<key>Syncing</key>
+	<string>Syncing</string>
+	<key>System</key>
+	<string>System</string>
+	<key>TOTAL</key>
+	<string>TOTAL</string>
+	<key>Technology</key>
+	<string>Technology</string>
+	<key>The API key was removed from the macOS Keychain.</key>
+	<string>The API key was removed from the macOS Keychain.</string>
+	<key>The broker or platform fee is added to the position cost basis.</key>
+	<string>The broker or platform fee is added to the position cost basis.</string>
+	<key>The category will be saved for future %@ transactions.</key>
+	<string>The category will be saved for future %@ transactions.</string>
+	<key>The category will be saved for future %@) transactions.</key>
+	<string>The category will be saved for future %@) transactions.</string>
+	<key>The end date cannot be before the first occurrence.</key>
+	<string>The end date cannot be before the first occurrence.</string>
+	<key>The first occurrence must be in the future.</key>
+	<string>The first occurrence must be in the future.</string>
+	<key>The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.</key>
+	<string>The iCloud account changed. Sync was disabled to prevent data from crossing accounts. Enable it again to sync with the current account.</string>
+	<key>The key is saved only after %@ returns a live USD price.</key>
+	<string>The key is saved only after %@ returns a live USD price.</string>
+	<key>The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.</key>
+	<string>The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.</string>
+	<key>The stored credential will be deleted from the macOS Keychain.</key>
+	<string>The stored credential will be deleted from the macOS Keychain.</string>
+	<key>This category will be added to your %@) categories.</key>
+	<string>This category will be added to your %@) categories.</string>
+	<key>This permanently removes %@ from your crypto portfolio.</key>
+	<string>This permanently removes %@ from your crypto portfolio.</string>
+	<key>This permanently removes %@ from your investment portfolio.</key>
+	<string>This permanently removes %@ from your investment portfolio.</string>
+	<key>This permanently removes the %@ transaction from %@).</key>
+	<string>This permanently removes the %@ transaction from %@).</string>
+	<key>This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone.</key>
+	<string>This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone.</string>
+	<key>Top Expense Categories</key>
+	<string>Top Expense Categories</string>
+	<key>Top Holdings</key>
+	<string>Top Holdings</string>
+	<key>Top Performer</key>
+	<string>Top Performer</string>
+	<key>Total Cash</key>
+	<string>Total Cash</string>
+	<key>Touch ID</key>
+	<string>Touch ID</string>
+	<key>Transaction</key>
+	<string>Transaction</string>
+	<key>Transaction Fee</key>
+	<string>Transaction Fee</string>
+	<key>Transaction Period</key>
+	<string>Transaction Period</string>
+	<key>Transaction Type</key>
+	<string>Transaction Type</string>
+	<key>Transactions</key>
+	<string>Transactions</string>
+	<key>Transport</key>
+	<string>Transport</string>
+	<key>Turn off Privacy Mode to reveal values and movement.</key>
+	<string>Turn off Privacy Mode to reveal values and movement.</string>
+	<key>Type</key>
+	<string>Type</string>
+	<key>UK</key>
+	<string>UK</string>
+	<key>US</key>
+	<string>US</string>
+	<key>US Dollar</key>
+	<string>US Dollar</string>
+	<key>Unable to Refresh Market Data</key>
+	<string>Unable to Refresh Market Data</string>
+	<key>Unable to Remove %@</key>
+	<string>Unable to Remove %@</string>
+	<key>Unlock</key>
+	<string>Unlock</string>
+	<key>Unlock with %@</key>
+	<string>Unlock with %@</string>
+	<key>Unlock your local Wealth Compass data.</key>
+	<string>Unlock your local Wealth Compass data.</string>
+	<key>Up to Date</key>
+	<string>Up to Date</string>
+	<key>Updated %@</key>
+	<string>Updated %@</string>
+	<key>Utilities</key>
+	<string>Utilities</string>
+	<key>Validating...</key>
+	<string>Validating...</string>
+	<key>Validation Failed</key>
+	<string>Validation Failed</string>
+	<key>Value</key>
+	<string>Value</string>
+	<key>Values and proportions are hidden.</key>
+	<string>Values and proportions are hidden.</string>
+	<key>Verify &amp; Save</key>
+	<string>Verify &amp; Save</string>
+	<key>View All</key>
+	<string>View All</string>
+	<key>View Cash Flow</key>
+	<string>View Cash Flow</string>
+	<key>We don't use central servers. All your financial data is stored locally on your Mac or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</key>
+	<string>We don't use central servers. All your financial data is stored locally on your Mac or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</string>
+	<key>We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</key>
+	<string>We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.</string>
+	<key>Wealth Compass</key>
+	<string>Wealth Compass</string>
+	<key>Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.</key>
+	<string>Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.</string>
+	<key>Weekly</key>
+	<string>Weekly</string>
+	<key>Welcome to WealthCompass</key>
+	<string>Welcome to WealthCompass</string>
+	<key>When enabled, Wealth Compass locks when the app is no longer active.</key>
+	<string>When enabled, Wealth Compass locks when the app is no longer active.</string>
+	<key>When enabled, Wealth Compass locks whenever the app leaves the foreground.</key>
+	<string>When enabled, Wealth Compass locks whenever the app leaves the foreground.</string>
+	<key>Where recorded spending is concentrated</key>
+	<string>Where recorded spending is concentrated</string>
+	<key>Year to Date</key>
+	<string>Year to Date</string>
+	<key>Yearly</key>
+	<string>Yearly</string>
+	<key>Yes</key>
+	<string>Yes</string>
+	<key>Your Data, Your Privacy</key>
+	<string>Your Data, Your Privacy</string>
+	<key>Your data remains on this device.</key>
+	<string>Your data remains on this device.</string>
+	<key>Your financial data stays available locally and syncs across your devices through your private CloudKit database.</key>
+	<string>Your financial data stays available locally and syncs across your devices through your private CloudKit database.</string>
+	<key>Your financial horizon</key>
+	<string>Your financial horizon</string>
+	<key>Your financial view is protected</key>
+	<string>Your financial view is protected</string>
+	<key>Your latest cash flow</key>
+	<string>Your latest cash flow</string>
+	<key>Your latest income and expenses will appear here.</key>
+	<string>Your latest income and expenses will appear here.</string>
+	<key>Your latest recorded cash movements</key>
+	<string>Your latest recorded cash movements</string>
+	<key>Your net-worth trail starts here</key>
+	<string>Your net-worth trail starts here</string>
+	<key>Your personal compass for tracking cash flow, investments, and expenses all in one beautifully designed dashboard.</key>
+	<string>Your personal compass for tracking cash flow, investments, and expenses all in one beautifully designed dashboard.</string>
+	<key>Your preferences</key>
+	<string>Your preferences</string>
+	<key>\n\n%@ due recurring %@ added to Cash Flow.</key>
+	<string>\n\n%@ через регулярні %@ додано до грошового потоку.</string>
+	<key>for %@</key>
+	<string>для %@</string>
+	<key>iCloud</key>
+	<string>iCloud</string>
+	<key>iCloud Sync</key>
+	<string>iCloud Sync</string>
+	<key>iCloud Unavailable</key>
+	<string>iCloud недоступний</string>
+	<key>iCloud sync is not running.</key>
+	<string>Синхронізація iCloud не працює.</string>
+	<key>just now</key>
+	<string>тільки зараз</string>
+	<key>transaction was</key>
+	<string>transaction was</string>
+	<key>transactions were</key>
+	<string>transactions were</string>
+	<key>· %@</key>
+	<string>· %@</string>
+	<key>•</key>
+	<string>•</string>
+</dict>
+</plist>

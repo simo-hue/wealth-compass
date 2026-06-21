@@ -1,0 +1,1 @@
+WealthCompassMobile.debug.dylib
