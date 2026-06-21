@@ -156,27 +156,6 @@ struct PageHeader<Trailing: View>: View {
             Spacer(minLength: 8)
             trailing
         }
-        // #region agent log
-        .background {
-            GeometryReader { proxy in
-                Color.clear
-                    .onAppear {
-                        let titleText = String(localized: title)
-                        I18nDebugLog.auditPageHeaderTitle(
-                            titleText: titleText,
-                            containerWidth: proxy.size.width
-                        )
-                    }
-                    .onChange(of: proxy.size.width) { _, width in
-                        let titleText = String(localized: title)
-                        I18nDebugLog.auditPageHeaderTitle(
-                            titleText: titleText,
-                            containerWidth: width
-                        )
-                    }
-            }
-        }
-        // #endregion
     }
 }
 

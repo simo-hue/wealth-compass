@@ -76,19 +76,19 @@ struct ContentView: View {
     private var tabs: some View {
         TabView {
             DashboardView()
-                .tabItem { Label(TabBarLabels.dashboard, systemImage: "gauge.with.dots.needle.67percent") }
+                .tabItem { tabLabel(.dashboard, systemImage: "gauge.with.dots.needle.67percent") }
 
             CashFlowView()
-                .tabItem { Label(TabBarLabels.cashFlow, systemImage: "arrow.left.arrow.right") }
+                .tabItem { tabLabel(.cashFlow, systemImage: "arrow.left.arrow.right") }
 
             InvestmentsView()
-                .tabItem { Label(TabBarLabels.investments, systemImage: "chart.line.uptrend.xyaxis") }
+                .tabItem { tabLabel(.investments, systemImage: "chart.line.uptrend.xyaxis") }
 
             CryptoView()
-                .tabItem { Label(TabBarLabels.crypto, systemImage: "bitcoinsign.circle") }
+                .tabItem { tabLabel(.crypto, systemImage: "bitcoinsign.circle") }
 
             SettingsView()
-                .tabItem { Label(TabBarLabels.settings, systemImage: "gearshape") }
+                .tabItem { tabLabel(.settings, systemImage: "gearshape") }
         }
         .tint(WCColor.primary)
         .toolbarColorScheme(.dark, for: .tabBar)
@@ -101,6 +101,14 @@ struct ContentView: View {
             I18nDebugLog.auditTabBarLabels(appLanguage: settings.appLanguage, runId: "post-fix")
         }
         // #endregion
+    }
+
+    private func tabLabel(_ tab: TabBarLabelResolver.Tab, systemImage: String) -> some View {
+        Label {
+            Text(TabBarLabelResolver.title(for: tab, appLanguage: settings.appLanguage))
+        } icon: {
+            Image(systemName: systemImage)
+        }
     }
 
     private func handleAppBecameActive() async {
