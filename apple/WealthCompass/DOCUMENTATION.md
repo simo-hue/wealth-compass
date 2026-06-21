@@ -290,6 +290,14 @@
   - *Details*: Fixed overcrowded iOS tab bar labels in languages with long word-by-word translations (e.g. Italian "Pannello di controllo"). Tab bar now uses dedicated short labels while page titles and navigation keep full translations.
   - *Tech Notes*: Added generated `TabBarLabelResolver.swift` (embedded short labels for 35 locales, survives Xcode catalog sync), `scripts/add_tab_bar_localizations.py`, and runtime width logging in `I18nDebugLog.auditTabBarLabels`. Tab bar no longer uses `*, Tab Bar` xcstrings keys.
 
+- [2026-06-21]: Release Version Bump (1.0.6 / 7)
+  - *Details*: Incremented marketing version to 1.0.6 and build number to 7 across macOS and iOS targets for App Store Connect submission.
+  - *Tech Notes*: Updated `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in project.pbxproj and `Resources/iOS/Info.plist`.
+
 - [2026-06-21]: Remaining Localization Cleanup
   - *Details*: Cleared the last `String(localized:)` usages in editor sheets, finance store, CloudKit sync, dashboard, onboarding, investments/crypto views, and iOS content view. Import category mapping now stores English catalog keys. Cloud sync status detail text respects the selected app language.
   - *Tech Notes*: Added `CloudSyncStatus.localizedDetail(appLanguage:)` and `localizedDescription(appLanguage:)` on `CloudSyncError`/`FinanceImportError`. Settings views call `localizedDetail`. `assetAllocation` uses `settings.localized()`. WealthCompassMac build verified.
+
+- [2026-06-21]: I18nDebugLog Cross-Platform Build Fix
+  - *Details*: Fixed "No such module 'UIKit'" build failures on macOS and iOS by guarding UIKit imports and the tab-bar audit helper behind `#if canImport(UIKit)`.
+  - *Tech Notes*: `I18nDebugLog.swift` is shared by WealthCompassMac and WealthCompassMobile; only the Foundation-based `log()` runs on macOS. Both targets build successfully after the change.

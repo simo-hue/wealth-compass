@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 // #region agent log
 enum I18nDebugLog {
@@ -50,6 +52,7 @@ enum I18nDebugLog {
         URLSession.shared.dataTask(with: request).resume()
     }
 
+#if canImport(UIKit)
     static func auditTabBarLabels(appLanguage: String?, runId: String = "pre-fix") {
         let fullKeys: [(TabBarLabelResolver.Tab, String)] = [
             (.dashboard, "Dashboard"),
@@ -97,5 +100,6 @@ enum I18nDebugLog {
             runId: runId
         )
     }
+#endif
 }
 // #endregion
