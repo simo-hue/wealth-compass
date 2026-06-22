@@ -189,6 +189,35 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertTrue(statuses.isEmpty, "requestSync must not emit a sync status when nothing is running.")
     }
 
+    /// #6: a fetched CloudKit record with no `payload` must be skippable — the helper
+    /// returns `nil` so `handleFetchedRecordZoneChanges` can skip the record instead of
+    /// throwing (a throw would tear down the whole engine over one bad record). A
+    /// well-formed record maps to a snapshot with the payload and timestamps preserved.
+    func testRemoteSnapshotSkipsPayloadlessRecordAndMapsValidOne() throws {
+        let key = CloudSyncRecordKey(type: .transaction, id: UUID())
+        let record = CKRecord(
+            recordType: CloudSyncRecordType.transaction.rawValue,
+            recordID: CKRecord.ID(recordName: "any-record-name")
+        )
+
+        // No payload field → skip (nil), no throw.
+        XCTAssertNil(CloudKitSyncService.remoteSnapshot(from: record, key: key))
+
+        // Payload + timestamps present → a correctly-mapped snapshot.
+        let payload = Data("payload".utf8)
+        let created = Date(timeIntervalSince1970: 1_000)
+        let updated = Date(timeIntervalSince1970: 2_000)
+        record["payload"] = payload as NSData
+        record["createdAt"] = created as NSDate
+        record["updatedAt"] = updated as NSDate
+
+        let snapshot = try XCTUnwrap(CloudKitSyncService.remoteSnapshot(from: record, key: key))
+        XCTAssertEqual(snapshot.key, key)
+        XCTAssertEqual(snapshot.payload, payload)
+        XCTAssertEqual(snapshot.createdAt, created)
+        XCTAssertEqual(snapshot.updatedAt, updated)
+    }
+
     private func makeTransaction(id: UUID, amount: Double) -> Transaction {
         Transaction(
             id: id,

@@ -852,6 +852,20 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         ensureZonePending(on: syncEngine)
     }
 
+    /// Builds the remote snapshot for a fetched CloudKit record, or returns `nil` when
+    /// the record carries no `payload` (corrupt/incomplete). Callers skip a `nil` record
+    /// rather than throwing, so a single bad record can't tear down the whole engine (#6).
+    /// Pure and `static` so it stays unit-testable without a live `CKSyncEngine`.
+    static func remoteSnapshot(from record: CKRecord, key: CloudSyncRecordKey) -> CloudSyncRecordSnapshot? {
+        guard let payload = record["payload"] as? Data else { return nil }
+        return CloudSyncRecordSnapshot(
+            key: key,
+            payload: payload,
+            createdAt: record["createdAt"] as? Date ?? Date.distantPast,
+            updatedAt: record["updatedAt"] as? Date ?? record.modificationDate ?? Date.distantPast
+        )
+    }
+
     private func handleFetchedRecordZoneChanges(
         _ event: CKSyncEngine.Event.FetchedRecordZoneChanges,
         syncEngine: CKSyncEngine
@@ -869,6 +883,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         var mutations: [CloudSyncRemoteMutation] = []
         var pendingToRequeue = Set<CloudSyncRecordKey>()
         var touchedKeys = Set<CloudSyncRecordKey>()
+        var skippedPayloadlessRecords = 0
 
         for modification in event.modifications where modification.record.recordID.zoneID == zoneID {
             let record = modification.record
@@ -913,15 +928,19 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 continue
             }
 
-            guard let payload = record["payload"] as? Data else {
-                throw CloudSyncError.invalidRecord("CloudKit record \(record.recordID.recordName) has no payload.")
+            // #6: a record with no payload is corrupt/incomplete. Skip it instead of
+            // throwing — a throw bubbles to `handleEvent`'s catch and tears down the
+            // whole engine over one bad record. A clean skip leaves this key's metadata
+            // (and any good local value) untouched; CKSyncEngine still advances its
+            // change token for the batch, so the record isn't re-delivered unless it
+            // changes again.
+            guard let remoteSnapshot = Self.remoteSnapshot(from: record, key: key) else {
+                Self.logger.error("Skipping CloudKit record \(record.recordID.recordName, privacy: .public) of type \(key.type.rawValue, privacy: .public): no payload.")
+                skippedPayloadlessRecords += 1
+                touchedKeys.remove(key)
+                continue
             }
-            let remoteSnapshot = CloudSyncRecordSnapshot(
-                key: key,
-                payload: payload,
-                createdAt: record["createdAt"] as? Date ?? Date.distantPast,
-                updatedAt: record["updatedAt"] as? Date ?? record.modificationDate ?? Date.distantPast
-            )
+            let payload = remoteSnapshot.payload
 
             if metadata.bootstrapCompleted {
                 if state.pending != nil {
@@ -986,6 +1005,10 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                     expectedPendingRevision: originalMetadata.records[key.storageKey]?.pending?.revision
                 )
             )
+        }
+
+        if skippedPayloadlessRecords > 0 {
+            Self.logger.error("Skipped \(skippedPayloadlessRecords, privacy: .public) CloudKit record(s) with no payload in this fetch batch.")
         }
 
         let appliedMutationKeys = mutations.isEmpty
