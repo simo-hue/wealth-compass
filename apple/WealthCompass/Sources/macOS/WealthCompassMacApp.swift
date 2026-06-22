@@ -66,8 +66,11 @@ struct WealthCompassMacApp: App {
                     appModel.selection = .crypto
                 }
                 .keyboardShortcut("4", modifiers: .command)
-                // Settings is reached via the standard ⌘, Settings scene (M6) — no
-                // sidebar destination / ⌘5 navigation command.
+
+                Button(AppLocalization.string("Settings", appLanguage: settings.appLanguage)) {
+                    appModel.selection = .settings
+                }
+                .keyboardShortcut("5", modifiers: .command)
             }
 
             SidebarCommands()
