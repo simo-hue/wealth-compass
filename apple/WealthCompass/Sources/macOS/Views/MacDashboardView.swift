@@ -13,6 +13,8 @@ struct MacDashboardView: View {
     @State private var hoveredAssetSlice: AllocationSlice?
     @State private var hoveredCashFlowMonth: CashFlowMonth?
     @Namespace private var animationNamespace
+    @ScaledMetric(relativeTo: .largeTitle) private var headerSize: CGFloat = 30
+    @ScaledMetric(relativeTo: .largeTitle) private var netWorthSize: CGFloat = 42
 
     private var totals: FinanceTotals {
         finance.calculateTotals(settings: settings)
@@ -85,7 +87,7 @@ struct MacDashboardView: View {
         HStack(alignment: .center, spacing: 20) {
             VStack(alignment: .leading, spacing: 5) {
                 Text("Your financial horizon")
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .font(.system(size: headerSize, weight: .bold, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [.white, WCColor.primary.opacity(0.92)],
@@ -181,9 +183,9 @@ struct MacDashboardView: View {
                             Text("NET WORTH")
                                 .font(.caption.weight(.bold))
                                 .tracking(1.8)
-                                .foregroundStyle(.white.opacity(0.52))
+                                .foregroundStyle(WCColor.textTertiary)
                             Text(settings.privateCurrency(totals.netWorth))
-                                .font(.system(size: 42, weight: .bold, design: .rounded))
+                                .font(.system(size: netWorthSize, weight: .bold, design: .rounded))
                                 .monospacedDigit()
                                 .foregroundStyle(.white)
                                 .lineLimit(1)
@@ -195,14 +197,14 @@ struct MacDashboardView: View {
                                     Text(settings.privateCurrency(abs(rangeChange.value)))
                                     Text(privatePercent(abs(rangeChange.percentage)))
                                     Text("for \(timeRange.rawValue)")
-                                        .foregroundStyle(.white.opacity(0.48))
+                                        .foregroundStyle(WCColor.textTertiary)
                                 }
                                 .font(.subheadline.monospacedDigit().weight(.semibold))
                                 .foregroundStyle(rangeChange.value >= 0 ? WCColor.primary : WCColor.destructive)
                             } else {
                                 Text("Add another snapshot to see movement over time")
                                     .font(.subheadline)
-                                    .foregroundStyle(.white.opacity(0.5))
+                                    .foregroundStyle(WCColor.textTertiary)
                             }
                         }
 
@@ -248,6 +250,7 @@ struct MacDashboardView: View {
                                     )
                                 )
                                 .interpolationMethod(.monotone)
+                                .accessibilityHidden(true)
 
                                 LineMark(
                                     x: .value("Date", point.date),
@@ -258,12 +261,15 @@ struct MacDashboardView: View {
                                 .interpolationMethod(.monotone)
                                 .symbol(Circle())
                                 .symbolSize(22)
+                                .accessibilityLabel(Text(point.date.formatted(date: .abbreviated, time: .omitted)))
+                                .accessibilityValue(Text(settings.privateCurrency(point.value)))
                             }
 
                             if let selectedPoint {
                                 RuleMark(x: .value("Selected date", selectedPoint.date))
                                     .foregroundStyle(.white.opacity(0.34))
                                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                                    .accessibilityHidden(true)
                                     .annotation(
                                         position: .top,
                                         spacing: 0,
@@ -293,6 +299,7 @@ struct MacDashboardView: View {
                                 )
                                 .foregroundStyle(WCColor.primary)
                                 .symbolSize(64)
+                                .accessibilityHidden(true)
                             }
                         }
                         .chartYScale(domain: chartDomain(for: points))
@@ -301,13 +308,15 @@ struct MacDashboardView: View {
                                 AxisGridLine()
                                     .foregroundStyle(.white.opacity(0.06))
                                 AxisValueLabel()
-                                    .foregroundStyle(.white.opacity(0.45))
+                                    .foregroundStyle(WCColor.textTertiary)
                             }
                         }
                         .chartYAxis(.hidden)
                         .chartXSelection(value: $selectedNetWorthDate)
                         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: points)
                         .frame(height: 238)
+                        .accessibilityElement(children: .contain)
+                        .accessibilityLabel(Text("Net-worth history"))
 
                     }
                 }
@@ -330,13 +339,13 @@ struct MacDashboardView: View {
                         .foregroundStyle(.white.opacity(0.78))
                     Text(snapshot.date.formatted(date: .abbreviated, time: .shortened))
                         .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.42))
+                        .foregroundStyle(WCColor.textTertiary)
                 }
             }
         } else {
             Label("No snapshots yet", systemImage: "camera.metering.center.weighted")
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.52))
+                .foregroundStyle(WCColor.textTertiary)
         }
     }
 
@@ -375,6 +384,8 @@ struct MacDashboardView: View {
                                 .foregroundStyle(slice.color.gradient)
                                 .cornerRadius(5)
                                 .opacity(hoveredAssetSlice == nil || hoveredAssetSlice?.id == slice.id ? 1.0 : 0.3)
+                                .accessibilityLabel(Text(slice.name))
+                                .accessibilityValue(Text(settings.privateCurrency(slice.value)))
                             }
                             .chartLegend(.hidden)
                             .chartBackground { proxy in
@@ -400,7 +411,7 @@ struct MacDashboardView: View {
                                                 Text("ASSETS")
                                                     .font(.caption2.weight(.bold))
                                                     .tracking(1.3)
-                                                    .foregroundStyle(.white.opacity(0.45))
+                                                    .foregroundStyle(WCColor.textTertiary)
                                                 Text(settings.privateCurrency(allocationTotal))
                                                     .font(.headline.monospacedDigit().weight(.bold))
                                                     .foregroundStyle(.white)
@@ -417,6 +428,7 @@ struct MacDashboardView: View {
                                     if let plotFrame = proxy.plotFrame {
                                         let frame = geometry[plotFrame]
                                         Rectangle().fill(.clear).contentShape(Rectangle())
+                                            .accessibilityHidden(true)
                                             .onContinuousHover { phase in
                                                 switch phase {
                                                 case .active(let location):
@@ -433,6 +445,8 @@ struct MacDashboardView: View {
                                 }
                             }
                             .animation(.spring(response: 0.5, dampingFraction: 0.8), value: slices.map(\.value))
+                            .accessibilityElement(children: .contain)
+                            .accessibilityLabel(Text("Asset Allocation"))
                         }
                     }
                     .frame(height: 210)
@@ -453,7 +467,7 @@ struct MacDashboardView: View {
                                         .foregroundStyle(.white)
                                     Text(privatePercent(allocationTotal > 0 ? slice.value / allocationTotal * 100 : 0))
                                         .font(.caption2.monospacedDigit())
-                                        .foregroundStyle(.white.opacity(0.42))
+                                        .foregroundStyle(WCColor.textTertiary)
                                 }
                             }
                         }
@@ -513,6 +527,8 @@ struct MacDashboardView: View {
                         .position(by: .value("Type", "Income"))
                         .cornerRadius(6)
                         .opacity(hoveredCashFlowMonth == nil || hoveredCashFlowMonth?.id == month.id ? 1.0 : 0.3)
+                        .accessibilityLabel(Text("\(month.monthLabel), \(settings.localized("Income"))"))
+                        .accessibilityValue(Text(settings.privateCurrency(month.income)))
 
                         BarMark(
                             x: .value("Month", month.monthLabel),
@@ -522,11 +538,14 @@ struct MacDashboardView: View {
                         .position(by: .value("Type", "Expenses"))
                         .cornerRadius(6)
                         .opacity(hoveredCashFlowMonth == nil || hoveredCashFlowMonth?.id == month.id ? 1.0 : 0.3)
+                        .accessibilityLabel(Text("\(month.monthLabel), \(settings.localized("Expenses"))"))
+                        .accessibilityValue(Text(settings.privateCurrency(month.expense)))
                     }
                     .chartLegend(.hidden)
                     .chartOverlay { proxy in
                         GeometryReader { geometry in
                             Rectangle().fill(.clear).contentShape(Rectangle())
+                                .accessibilityHidden(true)
                                 .onContinuousHover { phase in
                                     switch phase {
                                     case .active(let location):
@@ -550,12 +569,14 @@ struct MacDashboardView: View {
                     .chartXAxis {
                         AxisMarks { _ in
                             AxisValueLabel()
-                                .foregroundStyle(.white.opacity(0.48))
+                                .foregroundStyle(WCColor.textTertiary)
                         }
                     }
                     .chartYAxis(.hidden)
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: trend)
                     .frame(height: 244)
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel(Text("Cash Flow"))
                 }
 
                 HStack(spacing: 20) {
@@ -581,7 +602,7 @@ struct MacDashboardView: View {
                         .textCase(.uppercase)
                         .font(.caption2.weight(.bold))
                         .tracking(1)
-                        .foregroundStyle(.white.opacity(0.4))
+                        .foregroundStyle(WCColor.textFaint)
                         let net = hoveredCashFlowMonth != nil ? (hoveredCashFlowMonth!.income - hoveredCashFlowMonth!.expense) : (totalIncome - totalExpense)
                         Text(settings.privateCurrency(net))
                             .font(.subheadline.monospacedDigit().weight(.bold))
@@ -628,7 +649,7 @@ struct MacDashboardView: View {
                                 HStack(spacing: 10) {
                                     Text("\(index + 1)")
                                         .font(.caption2.monospacedDigit().weight(.bold))
-                                        .foregroundStyle(.white.opacity(0.38))
+                                        .foregroundStyle(WCColor.textFaint)
                                         .frame(width: 18)
                                     Text(item.name)
                                         .font(.subheadline.weight(.medium))
@@ -640,7 +661,7 @@ struct MacDashboardView: View {
                                         .foregroundStyle(.white)
                                     Text(privatePercent(item.percentage))
                                         .font(.caption.monospacedDigit().weight(.medium))
-                                        .foregroundStyle(.white.opacity(0.44))
+                                        .foregroundStyle(WCColor.textTertiary)
                                         .frame(width: 48, alignment: .trailing)
                                 }
 
@@ -733,7 +754,7 @@ struct MacDashboardView: View {
                 .foregroundStyle(.white)
             Text(subtitle)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.45))
+                .foregroundStyle(WCColor.textTertiary)
         }
     }
 
@@ -857,7 +878,7 @@ struct CashFlowLegendItem: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.caption2.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.42))
+                    .foregroundStyle(WCColor.textTertiary)
                 Text(value)
                     .font(.caption.monospacedDigit().weight(.semibold))
                     .foregroundStyle(.white.opacity(0.82))
@@ -889,7 +910,7 @@ struct ActivityRow: View {
                     .lineLimit(1)
                 Text(transaction.description.isEmpty ? transaction.type.localizedTitle(appLanguage: appLanguage) : transaction.description)
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.38))
+                    .foregroundStyle(WCColor.textFaint)
                     .lineLimit(1)
             }
 
@@ -901,7 +922,7 @@ struct ActivityRow: View {
                     .foregroundStyle(transaction.type == .income ? WCColor.primary : .white.opacity(0.8))
                 Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.35))
+                    .foregroundStyle(WCColor.textFaint)
             }
         }
         .padding(.vertical, 9)
@@ -941,7 +962,7 @@ struct DashboardEmptyState: View {
                 .foregroundStyle(.white.opacity(0.84))
             Text(message)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.42))
+                .foregroundStyle(WCColor.textTertiary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 330)
 
@@ -976,7 +997,7 @@ struct PrivacyChartCover: View {
                     .foregroundStyle(.white.opacity(0.82))
                 Text(message)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(WCColor.textFaint)
                     .multilineTextAlignment(.center)
             }
             .padding()

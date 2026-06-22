@@ -289,6 +289,8 @@ struct MacCashFlowView: View {
                         .position(by: .value("Type", "Income"))
                         .cornerRadius(6)
                         .opacity(hoveredCashFlowMonth == nil || hoveredCashFlowMonth?.id == month.id ? 1.0 : 0.3)
+                        .accessibilityLabel(Text("\(month.monthLabel), \(settings.localized("Income"))"))
+                        .accessibilityValue(Text(settings.privateCurrency(month.income)))
 
                         BarMark(
                             x: .value("Month", month.monthLabel),
@@ -298,11 +300,14 @@ struct MacCashFlowView: View {
                         .position(by: .value("Type", "Expenses"))
                         .cornerRadius(6)
                         .opacity(hoveredCashFlowMonth == nil || hoveredCashFlowMonth?.id == month.id ? 1.0 : 0.3)
+                        .accessibilityLabel(Text("\(month.monthLabel), \(settings.localized("Expenses"))"))
+                        .accessibilityValue(Text(settings.privateCurrency(month.expense)))
                     }
                     .chartLegend(.hidden)
                     .chartOverlay { proxy in
                         GeometryReader { geometry in
                             Rectangle().fill(.clear).contentShape(Rectangle())
+                                .accessibilityHidden(true)
                                 .onContinuousHover { phase in
                                     switch phase {
                                     case .active(let location):
@@ -325,6 +330,8 @@ struct MacCashFlowView: View {
                     }
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: trend)
                     .frame(height: 244)
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel(Text("Cash Flow"))
                 }
 
                 HStack(spacing: 20) {
@@ -400,6 +407,8 @@ struct MacCashFlowView: View {
                             .foregroundStyle(by: .value("Category", item.name))
                             .cornerRadius(5)
                             .opacity(hoveredExpenseCategory == nil || hoveredExpenseCategory?.id == item.id ? 1.0 : 0.3)
+                            .accessibilityLabel(Text(item.name))
+                            .accessibilityValue(Text(settings.privateCurrency(item.value)))
                         }
                         .chartLegend(.hidden)
                         .chartBackground { proxy in
@@ -425,7 +434,7 @@ struct MacCashFlowView: View {
                                             Text("EXPENSES")
                                                 .font(.caption2.weight(.bold))
                                                 .tracking(1.3)
-                                                .foregroundStyle(.white.opacity(0.45))
+                                                .foregroundStyle(WCColor.textTertiary)
                                             Text(settings.privateCurrency(totalExpenses))
                                                 .font(.headline.monospacedDigit().weight(.bold))
                                                 .foregroundStyle(.white)
@@ -442,6 +451,7 @@ struct MacCashFlowView: View {
                                 if let plotFrame = proxy.plotFrame {
                                     let frame = geometry[plotFrame]
                                     Rectangle().fill(.clear).contentShape(Rectangle())
+                                        .accessibilityHidden(true)
                                         .onContinuousHover { phase in
                                             switch phase {
                                             case .active(let location):
@@ -458,6 +468,8 @@ struct MacCashFlowView: View {
                             }
                         }
                         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: categories.map(\.value))
+                        .accessibilityElement(children: .contain)
+                        .accessibilityLabel(Text("Expense Categories"))
                     }
                     .frame(minHeight: 250, maxHeight: .infinity)
                 }

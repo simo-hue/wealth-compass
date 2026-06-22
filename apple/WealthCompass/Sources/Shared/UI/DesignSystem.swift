@@ -6,7 +6,18 @@ enum WCColor {
     static let card = Color(red: 0.045, green: 0.064, blue: 0.105)
     static let cardElevated = Color(red: 0.075, green: 0.098, blue: 0.15)
     static let border = Color.white.opacity(0.09)
-    static let textSecondary = Color.white.opacity(0.62)
+
+    // MARK: Text color tokens
+    //
+    // Opacities are tuned to clear WCAG AA contrast on the app's dark surfaces
+    // (audit A3). `textTertiary` / `textFaint` replace the previously sub-AA caption
+    // and label opacities (≈0.34–0.52) that were scattered across the views as raw
+    // `.white.opacity(...)` literals. Use these instead of inlining new faint whites.
+    static let textPrimary = Color.white
+    static let textSecondary = Color.white.opacity(0.70)
+    static let textTertiary = Color.white.opacity(0.60)
+    static let textFaint = Color.white.opacity(0.55)
+
     static let primary = Color(red: 0.12, green: 0.86, blue: 0.60)
     static let accent = Color(red: 0.10, green: 0.78, blue: 0.82)
     static let destructive = Color(red: 0.95, green: 0.26, blue: 0.26)
@@ -126,6 +137,7 @@ struct PageHeader<Trailing: View>: View {
     let title: LocalizedStringKey
     let subtitle: LocalizedStringKey
     let trailing: Trailing
+    @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 30
 
     init(title: LocalizedStringKey, subtitle: LocalizedStringKey, @ViewBuilder trailing: () -> Trailing) {
         self.title = title
@@ -137,7 +149,7 @@ struct PageHeader<Trailing: View>: View {
         HStack(alignment: .center, spacing: 16) {
             VStack(alignment: .leading, spacing: 5) {
                 Text(title)
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .font(.system(size: titleSize, weight: .bold, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [.white, WCColor.primary.opacity(0.92)],
@@ -147,7 +159,7 @@ struct PageHeader<Trailing: View>: View {
                     )
                 Text(subtitle)
                     .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.52))
+                    .foregroundStyle(WCColor.textTertiary)
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .minimumScaleFactor(0.82)
@@ -184,7 +196,7 @@ struct MetricCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
                         .font(.caption.weight(.medium))
-                        .foregroundStyle(.white.opacity(0.48))
+                        .foregroundStyle(WCColor.textTertiary)
                     Text(value)
                         .font(.title3.monospacedDigit().weight(.bold))
                         .foregroundStyle(.white)
@@ -196,7 +208,7 @@ struct MetricCard: View {
                     if let detail {
                         Text(detail)
                             .font(.caption2)
-                            .foregroundStyle(.white.opacity(0.36))
+                            .foregroundStyle(WCColor.textFaint)
                             .lineLimit(1)
                     }
                 }
@@ -269,6 +281,8 @@ struct AllocationChart: View {
                         .foregroundStyle(slice.color.gradient)
                         .cornerRadius(5)
                         .opacity(hoveredSlice == nil || hoveredSlice?.id == slice.id ? 1.0 : 0.3)
+                        .accessibilityLabel(Text(slice.name))
+                        .accessibilityValue(Text(accessibilityValue(for: slice, total: total)))
                     }
                     .chartLegend(.hidden)
                     .chartBackground { proxy in
@@ -293,7 +307,7 @@ struct AllocationChart: View {
                                         Text("TOTAL")
                                             .font(.caption2.weight(.bold))
                                             .tracking(1.3)
-                                            .foregroundStyle(.white.opacity(0.4))
+                                            .foregroundStyle(WCColor.textFaint)
                                         Text(settings.privateCurrency(total))
                                             .font(.headline.monospacedDigit().weight(.bold))
                                             .foregroundStyle(.white)
@@ -310,6 +324,7 @@ struct AllocationChart: View {
                             if let plotFrame = proxy.plotFrame {
                                 let frame = geometry[plotFrame]
                                 Rectangle().fill(.clear).contentShape(Rectangle())
+                                    .accessibilityHidden(true)
                                     .onContinuousHover { phase in
                                         switch phase {
                                         case .active(let location):
@@ -342,6 +357,8 @@ struct AllocationChart: View {
                     }
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: slices.map(\.value))
                     .frame(height: 200)
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel(Text(title))
 
                     if showLegend {
                         VStack(spacing: 12) {
@@ -360,7 +377,7 @@ struct AllocationChart: View {
                                             .foregroundStyle(.white)
                                         Text(settings.isPrivacyMode ? settings.redactionToken : percentage(slice.value, total: total))
                                             .font(.caption2.monospacedDigit())
-                                            .foregroundStyle(.white.opacity(0.4))
+                                            .foregroundStyle(WCColor.textFaint)
                                     }
                                 }
                             }
@@ -380,6 +397,12 @@ struct AllocationChart: View {
     private func percentage(_ value: Double, total: Double) -> String {
         let percentage = total > 0 ? value / total * 100 : 0
         return "\(percentage.formatted(.number.precision(.fractionLength(1))))%"
+    }
+
+    /// VoiceOver value for a slice: amount + share, redacted in privacy mode.
+    private func accessibilityValue(for slice: AllocationSlice, total: Double) -> String {
+        guard !settings.isPrivacyMode else { return settings.redactionToken }
+        return "\(settings.privateCurrency(slice.value)), \(percentage(slice.value, total: total))"
     }
 }
 
@@ -401,7 +424,7 @@ struct SectionHeading: View {
             if let subtitle {
                 Text(subtitle)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.43))
+                    .foregroundStyle(WCColor.textTertiary)
             }
         }
     }
@@ -417,7 +440,7 @@ struct PrimaryActionButton: View {
             Image(systemName: systemImage)
                 .font(.system(size: 17, weight: .bold))
                 .foregroundStyle(.black.opacity(0.82))
-                .frame(width: 42, height: 42)
+                .frame(width: 44, height: 44)
                 .background(WCColor.primary.gradient, in: Circle())
                 .shadow(color: WCColor.primary.opacity(0.24), radius: 10, y: 5)
         }
@@ -475,7 +498,7 @@ struct MobilePrivacyChartCover: View {
                     .foregroundStyle(.white.opacity(0.82))
                 Text(message)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.42))
+                    .foregroundStyle(WCColor.textTertiary)
                     .multilineTextAlignment(.center)
             }
             .padding()
@@ -502,6 +525,10 @@ private struct PageChromeModifier: ViewModifier {
             .padding(.top, topCollisionBuffer)
             .background(ScreenBackground())
             .preferredColorScheme(.dark)
+            // A1: support Dynamic Type but cap the dense data screens (metric grids,
+            // fixed-height charts) at a large accessibility size so very large text
+            // enlarges meaningfully without shattering the layout.
+            .dynamicTypeSize(...DynamicTypeSize.accessibility3)
     }
 }
 

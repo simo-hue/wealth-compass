@@ -5,6 +5,7 @@ struct MacOnboardingView: View {
     @State private var currentTab = 0
     @State private var showingErrorAlert = false
     @StateObject private var viewModel = OnboardingViewModel()
+    @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 34
     
     var body: some View {
         ZStack {
@@ -82,7 +83,7 @@ struct MacOnboardingView: View {
             
             VStack(spacing: 15) {
                 Text("Welcome to WealthCompass")
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .font(.system(size: titleSize, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                 
@@ -127,7 +128,7 @@ struct MacOnboardingView: View {
 
             VStack(spacing: 15) {
                 Text("Make It Yours")
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .font(.system(size: titleSize, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
 
@@ -211,7 +212,7 @@ struct MacOnboardingView: View {
             
             VStack(spacing: 15) {
                 Text("Your Data, Your Privacy")
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .font(.system(size: titleSize, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                 
@@ -256,7 +257,7 @@ struct MacOnboardingView: View {
                     
                     VStack(spacing: 9) {
                         Text("Connect Market Data")
-                            .font(.system(size: 34, weight: .bold, design: .rounded))
+                            .font(.system(size: titleSize, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                             .multilineTextAlignment(.center)
                         

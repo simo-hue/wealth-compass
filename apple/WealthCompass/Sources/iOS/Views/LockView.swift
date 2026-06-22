@@ -3,6 +3,7 @@ import SwiftUI
 struct LockView: View {
     @EnvironmentObject private var appLock: AppLockStore
     @EnvironmentObject private var settings: AppSettings
+    @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 30
 
     var body: some View {
         ZStack {
@@ -28,11 +29,11 @@ struct LockView: View {
 
                     VStack(spacing: 8) {
                         Text("Wealth Compass")
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .font(.system(size: titleSize, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                         Text(settings.localized("Unlock with \(appLock.biometryName(appLanguage: settings.appLanguage))"))
                             .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.48))
+                            .foregroundStyle(WCColor.textTertiary)
                     }
 
                     Button {
