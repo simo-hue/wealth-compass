@@ -26,7 +26,7 @@ struct TransactionFormView: View {
         self.onSave = onSave
         self.onDelete = onDelete
         _type = State(initialValue: transaction?.type ?? .expense)
-        _amount = State(initialValue: transaction.map { String($0.amount) } ?? "")
+        _amount = State(initialValue: transaction.map { AmountInputFormatter.string($0.amount) } ?? "")
         _category = State(initialValue: transaction?.category ?? "Food")
         _note = State(initialValue: transaction?.description ?? "")
         _date = State(initialValue: transaction?.date ?? Date())
@@ -207,7 +207,7 @@ struct RecurringTransactionFormView: View {
         let defaultEndDate = Calendar.current.date(byAdding: .year, value: 1, to: initialStartDate) ?? initialStartDate
 
         _type = State(initialValue: schedule?.type ?? .expense)
-        _amount = State(initialValue: schedule.map { String($0.amount) } ?? "")
+        _amount = State(initialValue: schedule.map { AmountInputFormatter.string($0.amount) } ?? "")
         _category = State(initialValue: schedule?.category ?? "Food")
         _note = State(initialValue: schedule?.description ?? "")
         _startDate = State(initialValue: initialStartDate)
@@ -259,7 +259,10 @@ struct RecurringTransactionFormView: View {
                 }
                 .pickerStyle(.segmented)
                 .onChange(of: type) { _, newValue in
-                    category = settings.transactionCategories(for: newValue).first ?? ""
+                    // Only reset category when changing type if the current one isn't valid for the new type (L7)
+                    if !settings.transactionCategories(for: newValue).contains(category) && !isCustomCategorySelected {
+                        category = settings.transactionCategories(for: newValue).first ?? ""
+                    }
                     customCategory = ""
                     isCustomCategoryFocused = false
                 }
@@ -542,7 +545,7 @@ struct InvestmentFormView: View {
     }
 
     private static func formatInput(_ value: Double) -> String {
-        value == 0 ? "0" : String(format: "%.8g", value)
+        AmountInputFormatter.string(value)
     }
 }
 
@@ -684,6 +687,6 @@ struct CryptoFormView: View {
     }
 
     private static func formatInput(_ value: Double) -> String {
-        value == 0 ? "0" : String(format: "%.8g", value)
+        AmountInputFormatter.string(value)
     }
 }

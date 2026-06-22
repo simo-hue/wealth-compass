@@ -65,7 +65,10 @@ private struct MacTransactionEditor: View {
                     }
                     .pickerStyle(.segmented)
                     .onChange(of: type) { _, newType in
-                        category = settings.transactionCategories(for: newType).first ?? ""
+                        // Only reset category when changing type if the current one isn't valid for the new type (L7)
+                        if !settings.transactionCategories(for: newType).contains(category) && !isCustomCategorySelected {
+                            category = settings.transactionCategories(for: newType).first ?? ""
+                        }
                         customCategory = ""
                         isCustomCategoryFocused = false
                     }
@@ -327,7 +330,7 @@ private struct MacInvestmentEditor: View {
     }
 
     private static func input(_ value: Double) -> String {
-        value == 0 ? "0" : String(format: "%.8g", value)
+        AmountInputFormatter.string(value)
     }
 }
 
@@ -469,7 +472,7 @@ private struct MacCryptoEditor: View {
     }
 
     private static func input(_ value: Double) -> String {
-        value == 0 ? "0" : String(format: "%.8g", value)
+        AmountInputFormatter.string(value)
     }
 }
 

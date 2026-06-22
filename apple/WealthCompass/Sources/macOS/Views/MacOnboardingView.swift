@@ -190,7 +190,7 @@ struct MacOnboardingView: View {
                             }
                         }
 
-                        MarketDataAPIKeySecurityNote(deviceName: "Mac")
+                        MarketDataAPIKeySecurityNote()
                     }
                     .frame(maxWidth: 520)
                     

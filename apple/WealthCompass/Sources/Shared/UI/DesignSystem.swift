@@ -358,7 +358,7 @@ struct AllocationChart: View {
                                         Text(settings.privateCurrency(slice.value))
                                             .font(.subheadline.monospacedDigit().weight(.semibold))
                                             .foregroundStyle(.white)
-                                        Text(settings.isPrivacyMode ? "••••" : percentage(slice.value, total: total))
+                                        Text(settings.isPrivacyMode ? settings.redactionToken : percentage(slice.value, total: total))
                                             .font(.caption2.monospacedDigit())
                                             .foregroundStyle(.white.opacity(0.4))
                                     }

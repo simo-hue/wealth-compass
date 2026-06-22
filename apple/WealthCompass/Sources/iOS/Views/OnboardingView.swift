@@ -183,7 +183,7 @@ struct OnboardingView: View {
                             }
                         }
 
-                        MarketDataAPIKeySecurityNote(deviceName: "iPhone")
+                        MarketDataAPIKeySecurityNote()
                     }
                     
                     VStack(spacing: 14) {

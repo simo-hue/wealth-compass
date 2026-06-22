@@ -40,17 +40,17 @@ struct MacInvestmentsView: View {
                         
                         HStack(spacing: 24) {
                             AllocationChart(
-                                title: LocalizedStringKey( "Allocation by Sector"),
+                                title: LocalizedStringKey("Allocation by Sector"),
                                 slices: finance.investmentAllocation(settings: settings),
                                 settings: settings
                             )
                             AllocationChart(
-                                title: LocalizedStringKey( "Allocation by Type"),
+                                title: LocalizedStringKey("Allocation by Type"),
                                 slices: finance.investmentTypeAllocation(settings: settings),
                                 settings: settings
                             )
                             AllocationChart(
-                                title: LocalizedStringKey( "Allocation by Geography"),
+                                title: LocalizedStringKey("Allocation by Geography"),
                                 slices: finance.investmentGeographyAllocation(settings: settings),
                                 settings: settings
                             )
@@ -106,23 +106,23 @@ struct MacInvestmentsView: View {
 
         return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
             MetricCard(
-                title: LocalizedStringKey( "Portfolio Value"),
+                title: LocalizedStringKey("Portfolio Value"),
                 value: settings.privateCurrency(total),
                 systemImage: "chart.line.uptrend.xyaxis",
                 accent: .blue
             )
             MetricCard(
-                title: LocalizedStringKey( "Positions"),
+                title: LocalizedStringKey("Positions"),
                 value: privateCount(finance.data.investments.count),
                 systemImage: "number"
             )
             MetricCard(
-                title: LocalizedStringKey( "Cost Basis"),
+                title: LocalizedStringKey("Cost Basis"),
                 value: settings.privateCurrency(costBasis),
                 systemImage: "banknote"
             )
             MetricCard(
-                title: LocalizedStringKey( "Profit / Loss"),
+                title: LocalizedStringKey("Profit / Loss"),
                 value: settings.privateCurrency(gain),
                 systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
                 accent: gain >= 0 ? WCColor.primary : WCColor.destructive
@@ -130,7 +130,7 @@ struct MacInvestmentsView: View {
             
             if !settings.isPrivacyMode {
                 MetricCard(
-                    title: LocalizedStringKey( "Performance"),
+                    title: LocalizedStringKey("Performance"),
                     value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
                     systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
                     accent: percent >= 0 ? WCColor.primary : WCColor.destructive
@@ -140,7 +140,7 @@ struct MacInvestmentsView: View {
             let latestUpdate = finance.data.investments.map(\.updatedAt).max()
             let sectorCount = Set(finance.data.investments.map(\.sector).filter(isNonEmpty)).count
             MetricCard(
-                title: LocalizedStringKey( "Status • \(privateCount(sectorCount)) Sectors"),
+                title: LocalizedStringKey("Status • \(privateCount(sectorCount)) Sectors"),
                 value: latestUpdate.map(formattedUpdate) ?? settings.localized("Never"),
                 systemImage: "checkmark.circle"
             )
@@ -298,7 +298,7 @@ struct MacInvestmentsView: View {
     }
 
     private func privateCount(_ count: Int) -> String {
-        settings.isPrivacyMode ? "****" : "\(count)"
+        settings.isPrivacyMode ? settings.redactionToken : "\(count)"
     }
 
     private func formattedUpdate(_ date: Date) -> String {

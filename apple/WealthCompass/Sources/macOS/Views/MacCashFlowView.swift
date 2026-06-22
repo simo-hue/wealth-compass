@@ -235,13 +235,13 @@ struct MacCashFlowView: View {
             MetricCard(
                 title: "Savings Rate",
                 value: settings.isPrivacyMode
-                    ? "****"
+                    ? settings.redactionToken
                     : "\(cashFlow.savingsRate.formatted(.number.precision(.fractionLength(1))))%",
                 systemImage: "percent"
             )
             MetricCard(
                 title: "Transactions",
-                value: settings.isPrivacyMode ? "****" : "\(monthlyTransactionsCount)",
+                value: settings.isPrivacyMode ? settings.redactionToken : "\(monthlyTransactionsCount)",
                 systemImage: "arrow.left.arrow.right"
             )
             MetricCard(
@@ -877,7 +877,7 @@ struct MacCashFlowView: View {
     }
 
     private func signedAmount(for transaction: Transaction) -> String {
-        guard !settings.isPrivacyMode else { return "****" }
+        guard !settings.isPrivacyMode else { return settings.redactionToken }
         let prefix = transaction.type == .income ? "+" : "-"
         return prefix + settings.privateCurrency(transaction.amount)
     }
@@ -999,7 +999,7 @@ private struct MacCashFlowTransactionEditor: View {
         self.transaction = transaction
         self.onSave = onSave
         _type = State(initialValue: transaction?.type ?? .expense)
-        _amount = State(initialValue: transaction.map { String($0.amount) } ?? "")
+        _amount = State(initialValue: transaction.map { AmountInputFormatter.string($0.amount) } ?? "")
         _category = State(initialValue: transaction?.category ?? "Food")
         _note = State(initialValue: transaction?.description ?? "")
         _date = State(initialValue: transaction?.date ?? Date())
@@ -1055,7 +1055,7 @@ private struct MacCashFlowTransactionEditor: View {
                 Section("Category") {
                     Picker("Category", selection: $category) {
                         ForEach(categories, id: \.self) { category in
-                            Text(LocalizedStringKey(category)).tag(category)
+                            Text(verbatim: category).tag(category)
                         }
                         Text("Custom...").tag(Self.customCategoryTag)
                     }
