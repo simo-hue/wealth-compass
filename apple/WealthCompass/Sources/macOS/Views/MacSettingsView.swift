@@ -146,6 +146,7 @@ struct MacSettingsView: View {
         .sheet(item: $activeCredentialEditor) { credential in
             MacMarketDataCredentialEditor(
                 credential: credential,
+                appLanguage: settings.appLanguage,
                 apiKey: $credentialDraft,
                 alert: $credentialEditorAlert,
                 isConfigured: isCredentialConfigured(credential),
@@ -810,21 +811,18 @@ private enum MacMarketDataCredentialKind: String, Identifiable {
         }
     }
 
-    var testAssetName: LocalizedStringKey {
+    // A plain String, not a LocalizedStringKey: these are proper asset names that are not
+    // translated, and they get interpolated into localized `Text(...)` templates in the editor.
+    // A LocalizedStringKey cannot be interpolated into another LocalizedStringKey — it hits the
+    // deprecated generic `appendInterpolation` overload and renders an unlocalized debug
+    // description. As a String it uses the supported overload (the surrounding sentence stays
+    // localized as "… %@ …" with the name substituted in).
+    var testAssetName: String {
         switch self {
         case .finnhub:
             "Apple (AAPL)"
         case .coingecko:
             "Bitcoin"
-        }
-    }
-
-    func localizedTestAssetName(appLanguage: String?) -> String {
-        switch self {
-        case .finnhub:
-            AppLocalization.string("Apple (AAPL)", appLanguage: appLanguage)
-        case .coingecko:
-            AppLocalization.string("Bitcoin", appLanguage: appLanguage)
         }
     }
 }
@@ -863,6 +861,7 @@ private enum MacSettingsDestructiveAction {
 
 private struct MacMarketDataCredentialEditor: View {
     let credential: MacMarketDataCredentialKind
+    let appLanguage: String?
     @Binding var apiKey: String
     @Binding var alert: MacSettingsAlert?
     let isConfigured: Bool
@@ -929,7 +928,7 @@ private struct MacMarketDataCredentialEditor: View {
             )
         }
         .confirmationDialog(
-            "Remove \(credential.title)?",
+            "Remove \(credential.localizedTitle(appLanguage: appLanguage))?",
             isPresented: $showingRemoveConfirmation
         ) {
             Button("Remove Key", role: .destructive, action: onRemove)
