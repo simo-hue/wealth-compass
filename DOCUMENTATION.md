@@ -438,3 +438,7 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
   - *Tech Notes*:
     - Modified `release_notes.txt` in all `fastlane/metadata/*/` locale directories.
     - Executed `fastlane deliver` with `FASTLANE_ITC_TEAM_ID` set to `128920131` ("Simone Mattioli" group), `--app_version 1.0.6`, and bypass flags for binaries/screenshots.
+
+- [2026-06-22]: Fix Italian Translation for "Crypto"
+  - *Details*: Changed the Italian translation of "Crypto assets" from "Risorse crittografiche" to "Criptovalute" to make it contextual for a financial application.
+  - *Tech Notes*: Modified `Localizable.xcstrings` line 30983.

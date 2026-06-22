@@ -970,31 +970,8 @@ struct MacCashFlowView: View {
     }
 
     private func categorySlice(at location: CGPoint, in rect: CGRect, total: Double, categories: [CategoryTotal]) -> CategoryTotal? {
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        let dx = location.x - center.x
-        let dy = location.y - center.y
-        
-        let distance = sqrt(dx*dx + dy*dy)
-        let radius = min(rect.width, rect.height) / 2
-        let innerRadius = radius * 0.62
-        if distance < innerRadius || distance > radius {
-            return nil
-        }
-        
-        var angle = atan2(dy, dx) + .pi / 2
-        if angle < 0 { angle += 2 * .pi }
-        
-        let fraction = angle / (2 * .pi)
-        let selectedValue = fraction * total
-        
-        var cumulative = 0.0
-        for category in categories {
-            cumulative += category.value
-            if selectedValue <= cumulative {
-                return category
-            }
-        }
-        return nil
+        return PieSliceHitTester.sliceIndex(at: location, in: rect, values: categories.map(\.value))
+            .map { categories[$0] }
     }
 }
 

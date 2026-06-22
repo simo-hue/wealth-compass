@@ -208,41 +208,17 @@ struct MacRecurringTransactionEditor: View {
             selectedCategory = category
         }
 
-        let scheduleChanged = existingSchedule.map {
-            $0.frequency != frequency || abs($0.startDate.timeIntervalSince(startDate)) >= 1
-        } ?? true
-
-        let seed = RecurringTransaction(
-            id: existingSchedule?.id ?? UUID(),
+        let savedSchedule = RecurringScheduleBuilder.build(
+            existing: existingSchedule,
             type: type,
             category: selectedCategory,
             amount: parsedAmount,
             description: note,
             startDate: startDate,
             frequency: frequency,
-            nextDueDate: startDate,
             endDate: normalizedEndDate,
-            notificationsEnabled: notificationsEnabled,
-            isActive: existingSchedule?.isActive ?? true,
-            completedAt: existingSchedule?.completedAt,
-            createdAt: existingSchedule?.createdAt ?? Date(),
-            updatedAt: Date()
+            notificationsEnabled: notificationsEnabled
         )
-
-        var savedSchedule = seed
-        if savedSchedule.isCompleted {
-            savedSchedule.isActive = false
-        } else if !scheduleChanged, let existingSchedule {
-            savedSchedule.nextDueDate = existingSchedule.nextDueDate
-        } else if let nextDueDate = seed.firstOccurrence(onOrAfter: Date()) {
-            savedSchedule.nextDueDate = nextDueDate
-        } else {
-            savedSchedule.isActive = false
-        }
-
-        if let endDate = savedSchedule.endDate, savedSchedule.nextDueDate > endDate {
-            savedSchedule.isActive = false
-        }
 
         onSave(savedSchedule)
         dismiss()

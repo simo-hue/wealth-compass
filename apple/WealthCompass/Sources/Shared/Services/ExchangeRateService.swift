@@ -16,11 +16,12 @@ struct ExchangeRateSnapshot: Codable, Equatable {
     }
 
     var isValid: Bool {
-        guard baseCurrency == .eur else { return false }
-        return Currency.allCases.allSatisfy { currency in
-            guard let rate = unitsPerBaseCurrency(for: currency) else { return false }
-            return rate.isFinite && rate > 0
-        }
+        // EUR base is required (rates are expressed as units-per-EUR). We no longer
+        // require every supported currency to be present: the provider's published
+        // set can change, and any currency missing from the table converts via its
+        // offline fallback. We only require a non-empty, well-formed table.
+        guard baseCurrency == .eur, !rates.isEmpty else { return false }
+        return rates.values.allSatisfy { $0.isFinite && $0 > 0 }
     }
 }
 
@@ -124,18 +125,14 @@ struct ExchangeRateClient {
     var session: URLSession = .shared
 
     func latestRates() async throws -> ExchangeRateSnapshot {
-        let quoteCurrencies = Currency.allCases
-            .filter { $0 != .eur }
-            .map(\.rawValue)
-            .sorted()
-
-        guard var components = URLComponents(string: APIConfiguration.proxyBaseURL) else {
+        // Contact Frankfurter directly (no proxy). Request the full ECB table by
+        // omitting a `quotes` filter, so every currency the provider publishes is
+        // available for conversion; currencies it omits fall back per-currency.
+        guard var components = URLComponents(string: APIConfiguration.frankfurterRatesURL) else {
             throw ExchangeRateError.invalidURL
         }
-        components.path = "/api/rates"
         components.queryItems = [
             URLQueryItem(name: "base", value: Currency.eur.rawValue),
-            URLQueryItem(name: "quotes", value: quoteCurrencies.joined(separator: ",")),
             URLQueryItem(name: "providers", value: "ECB")
         ]
 
@@ -146,10 +143,7 @@ struct ExchangeRateClient {
         var request = URLRequest(url: url, cachePolicy: .reloadRevalidatingCacheData, timeoutInterval: 20)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        let (data, response) = try await session.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw ExchangeRateError.invalidResponse
-        }
+        let (data, httpResponse) = try await NetworkRetry.data(for: request, session: session)
         guard httpResponse.statusCode == 200 else {
             throw ExchangeRateError.providerError(statusCode: httpResponse.statusCode)
         }
@@ -170,11 +164,11 @@ struct ExchangeRateClient {
         }
 
         var rates: [String: Double] = [:]
-        for item in payload where quoteCurrencies.contains(item.quote) && item.rate.isFinite && item.rate > 0 {
+        for item in payload where item.rate.isFinite && item.rate > 0 {
             rates[item.quote] = item.rate
         }
 
-        guard quoteCurrencies.allSatisfy({ rates[$0] != nil }) else {
+        guard !rates.isEmpty else {
             throw ExchangeRateError.incompleteRates
         }
 

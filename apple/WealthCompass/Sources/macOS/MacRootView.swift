@@ -37,7 +37,7 @@ struct MacRootView: View {
                                 Button {
                                     Task { await refreshData() }
                                 } label: {
-                                    Label("Refresh Data", systemImage: "arrow.clockwise")
+                                    Label(refreshDataLabel, systemImage: "arrow.clockwise")
                                 }
                                 .disabled(isRefreshing)
                                 .keyboardShortcut("r", modifiers: .command)
@@ -48,6 +48,14 @@ struct MacRootView: View {
                 .navigationSplitViewStyle(.balanced)
             }
         }
+        .overlay(alignment: .top) {
+            if let persistenceError = finance.persistenceError {
+                PersistenceErrorBanner(message: persistenceError)
+                    .padding(.top, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.spring(response: 0.4, dampingFraction: 0.85), value: finance.persistenceError)
         .sheet(item: $appModel.editor) { editor in
             MacEditorSheet(editor: editor)
                 .environmentObject(finance)
@@ -75,36 +83,6 @@ struct MacRootView: View {
         .onReceive(NotificationCenter.default.publisher(for: .macRecurringTransactionNotificationReceived)) { _ in
             Task { await processRecurringTransactions() }
         }
-        .onChange(of: settings.appLanguage) { _, newLanguage in
-            // #region agent log
-            I18nDebugLog.log(
-                location: "MacRootView.swift:onChange(appLanguage)",
-                message: "swiftui locale vs string localized",
-                hypothesisId: "A",
-                data: [
-                    "appLanguage": newLanguage ?? "nil",
-                    "swiftUILocale": locale.identifier,
-                    "sidebarSettingsTitle": MacDestination.settings.localizedTitle(appLanguage: newLanguage),
-                    "sidebarDashboardTitle": MacDestination.dashboard.localizedTitle(appLanguage: newLanguage),
-                    "textLiteralWouldUseLocale": locale.identifier
-                ]
-            )
-            // #endregion
-        }
-        .onAppear {
-            // #region agent log
-            I18nDebugLog.log(
-                location: "MacRootView.swift:onAppear",
-                message: "root view appeared",
-                hypothesisId: "E",
-                data: [
-                    "appLanguage": settings.appLanguage ?? "nil",
-                    "swiftUILocale": locale.identifier,
-                    "sidebarCashFlowTitle": MacDestination.cashFlow.localizedTitle(appLanguage: settings.appLanguage)
-                ]
-            )
-            // #endregion
-        }
         .onChange(of: finance.data.recurringTransactions) { _, _ in
             Task { await syncRecurringNotifications() }
         }
@@ -123,6 +101,13 @@ struct MacRootView: View {
         }
     }
 
+    private var refreshDataLabel: String {
+        if let progress = finance.marketRefreshProgress, progress.total > 0 {
+            return settings.localized("Updating \(progress.done) of \(progress.total)")
+        }
+        return settings.localized("Refresh Data")
+    }
+
     @ViewBuilder
     private var detail: some View {
         switch appModel.selection ?? .dashboard {
@@ -134,8 +119,6 @@ struct MacRootView: View {
             MacInvestmentsView()
         case .crypto:
             MacCryptoView()
-        case .settings:
-            MacSettingsView()
         }
     }
 

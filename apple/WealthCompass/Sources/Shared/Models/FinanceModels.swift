@@ -1,47 +1,113 @@
 import Foundation
 import SwiftUI
 
+/// ISO-4217 currencies the app can represent and convert.
+///
+/// The set mirrors the currencies published by the European Central Bank and
+/// served by Frankfurter (our exchange-rate provider, EUR-based), so every case
+/// can be converted once a rate snapshot is cached. The four "major" cases are
+/// declared first so they surface at the top of pickers; the remainder follow
+/// alphabetically. Stored as the ISO code string, so existing JSON ("EUR", …)
+/// continues to decode unchanged.
 enum Currency: String, CaseIterable, Codable, Identifiable {
+    // Majors — surfaced first in pickers.
     case eur = "EUR"
     case usd = "USD"
     case gbp = "GBP"
     case chf = "CHF"
+    // Remaining ECB / Frankfurter-supported currencies (alphabetical).
+    case aud = "AUD"
+    case bgn = "BGN"
+    case brl = "BRL"
+    case cad = "CAD"
+    case cny = "CNY"
+    case czk = "CZK"
+    case dkk = "DKK"
+    case hkd = "HKD"
+    case huf = "HUF"
+    case idr = "IDR"
+    case ils = "ILS"
+    case inr = "INR"
+    case isk = "ISK"
+    case jpy = "JPY"
+    case krw = "KRW"
+    case mxn = "MXN"
+    case myr = "MYR"
+    case nok = "NOK"
+    case nzd = "NZD"
+    case php = "PHP"
+    case pln = "PLN"
+    case ron = "RON"
+    case sek = "SEK"
+    case sgd = "SGD"
+    case thb = "THB"
+    case `try` = "TRY"
+    case zar = "ZAR"
 
     var id: String { rawValue }
 
+    /// SwiftUI-only display name; resolves against the environment locale inside a `Text`.
+    /// Use `localizedDisplayName(appLanguage:)` everywhere a resolved `String` is needed.
     var displayName: LocalizedStringKey {
-        switch self {
-        case .eur: "Euro"
-        case .usd: "US Dollar"
-        case .gbp: "British Pound"
-        case .chf: "Swiss Franc"
-        }
+        LocalizedStringKey(Locale.current.localizedString(forCurrencyCode: rawValue) ?? rawValue)
     }
 
     func localizedDisplayName(appLanguage: String?) -> String {
-        switch self {
-        case .eur: AppLocalization.string("Euro", appLanguage: appLanguage)
-        case .usd: AppLocalization.string("US Dollar", appLanguage: appLanguage)
-        case .gbp: AppLocalization.string("British Pound", appLanguage: appLanguage)
-        case .chf: AppLocalization.string("Swiss Franc", appLanguage: appLanguage)
-        }
+        let locale = appLanguage.map { Locale(identifier: $0) } ?? Locale.current
+        return locale.localizedString(forCurrencyCode: rawValue) ?? rawValue
     }
 
     var symbol: String {
         switch self {
-        case .eur: "€"
-        case .usd: "$"
-        case .gbp: "£"
-        case .chf: "Fr"
+        case .eur: return "€"
+        case .usd: return "$"
+        case .gbp: return "£"
+        case .chf: return "Fr"
+        default:
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .currency
+            formatter.currencyCode = rawValue
+            return formatter.currencySymbol ?? rawValue
         }
     }
 
+    /// Approximate offline seed rates (units per 1 EUR), used only before the first
+    /// live ECB snapshot is cached; they are replaced by real rates on refresh.
+    /// A `.nan` here is fine — `AppSettings.convert` guards non-finite rates and
+    /// leaves the value unconverted rather than producing NaN chart geometry.
     var fallbackUnitsPerEuro: Double {
         switch self {
-        case .eur: 1.0
-        case .usd: 1 / 0.92
-        case .gbp: 1 / 1.17
-        case .chf: 1 / 1.05
+        case .eur: return 1.0
+        case .usd: return 1 / 0.92
+        case .gbp: return 1 / 1.17
+        case .chf: return 1 / 1.05
+        case .aud: return 1.63
+        case .bgn: return 1.956
+        case .brl: return 5.40
+        case .cad: return 1.47
+        case .cny: return 7.70
+        case .czk: return 25.2
+        case .dkk: return 7.46
+        case .hkd: return 8.40
+        case .huf: return 390
+        case .idr: return 17000
+        case .ils: return 4.00
+        case .inr: return 90
+        case .isk: return 150
+        case .jpy: return 165
+        case .krw: return 1450
+        case .mxn: return 18.5
+        case .myr: return 5.10
+        case .nok: return 11.5
+        case .nzd: return 1.78
+        case .php: return 61
+        case .pln: return 4.30
+        case .ron: return 4.97
+        case .sek: return 11.4
+        case .sgd: return 1.46
+        case .thb: return 39
+        case .`try`: return 35
+        case .zar: return 20
         }
     }
 }
@@ -272,8 +338,13 @@ struct RecurringTransaction: Identifiable, Codable, Equatable {
     func firstOccurrence(onOrAfter threshold: Date, calendar: Calendar = .current) -> Date? {
         var occurrence = startDate
         var iterationCount = 0
+        let maxIterations = 20_000
 
-        while occurrence < threshold && iterationCount < 20_000 {
+        while occurrence < threshold {
+            // If we exhaust the iteration budget before reaching the threshold, we
+            // must NOT return the last (still-past) occurrence — that would let a
+            // far back-dated schedule mass-generate history. Signal "no occurrence".
+            guard iterationCount < maxIterations else { return nil }
             guard let next = frequency.nextDate(after: occurrence, anchoredTo: startDate, calendar: calendar) else {
                 return nil
             }
