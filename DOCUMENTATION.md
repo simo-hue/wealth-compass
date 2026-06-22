@@ -432,3 +432,9 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
   - *Tech Notes*:
     - Created/updated `release_notes.txt` in all `fastlane/metadata/*/` locale directories.
     - Executed `fastlane deliver` with `FASTLANE_ITC_TEAM_ID` set to `128920131` ("Simone Mattioli" group) and `--submit_for_review true` to process the metadata upload and submission.
+
+- [2026-06-22]: App Store Connect Release Notes Update (1.0.6)
+  - *Details*: Updated the "What's New in This Version" (release notes) to "Translations improvements" for all localized languages for iOS version 1.0.6.
+  - *Tech Notes*:
+    - Modified `release_notes.txt` in all `fastlane/metadata/*/` locale directories.
+    - Executed `fastlane deliver` with `FASTLANE_ITC_TEAM_ID` set to `128920131` ("Simone Mattioli" group), `--app_version 1.0.6`, and bypass flags for binaries/screenshots.
