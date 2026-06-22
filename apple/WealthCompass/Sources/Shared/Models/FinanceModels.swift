@@ -419,7 +419,7 @@ struct NetWorthSnapshot: Identifiable, Codable, Equatable {
     var updatedAt: Date = Date()
 }
 
-struct FinancialData: Codable, Equatable {
+struct FinancialData: Codable, Equatable, Sendable {
     var transactions: [Transaction] = []
     var recurringTransactions: [RecurringTransaction] = []
     var investments: [Investment] = []

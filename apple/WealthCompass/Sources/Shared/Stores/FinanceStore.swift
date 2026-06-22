@@ -114,7 +114,21 @@ final class FinanceStore: ObservableObject {
     private let encoder: JSONEncoder
     private let syncMetadataStore: CloudSyncMetadataStore
     private weak var settings: AppSettings?
-    private var persistedData = FinancialData()
+    /// Owns the off-main-actor save pipeline: JSON encoding, the SHA-256 diff baseline,
+    /// the disk write and the sync-metadata recording all happen inside this actor so they
+    /// never block the main actor during an edit (M4). It replaces the old `persistedData`
+    /// field as the source of truth for diffing.
+    private let coordinator: PersistenceCoordinator
+    /// A single long-lived consumer drains this stream and forwards each snapshot to
+    /// `coordinator.save` in arrival order, guaranteeing save ordering (and last-wins
+    /// coalescing) even when mutations fire in bursts.
+    private var saveContinuation: AsyncStream<Int>.Continuation?
+    private var saveConsumerTask: Task<Void, Never>?
+    /// Generation bookkeeping (main-actor only) used to know when the save pipeline is
+    /// idle — both for correctness reasoning and for deterministic tests.
+    private var lastEnqueuedSaveGeneration = 0
+    private var lastProcessedSaveGeneration = 0
+    private var saveIdleWaiters: [CheckedContinuation<Void, Never>] = []
     private var localPersistenceError: Error?
     private var lastMarketPriceRefreshAttemptAt: Date?
 
@@ -126,7 +140,7 @@ final class FinanceStore: ObservableObject {
         },
         remoteMutationHandler: { [weak self] mutations in
             guard let self else { return [] }
-            return try self.applyRemoteMutations(mutations)
+            return try await self.applyRemoteMutations(mutations)
         },
         statusHandler: { [weak self] status in
             self?.updateCloudSyncStatus(status)
@@ -144,9 +158,14 @@ final class FinanceStore: ObservableObject {
         self.persistence = persistence
         self.settings = settings
         self.syncMetadataStore = syncMetadataStore
+        self.coordinator = PersistenceCoordinator(
+            persistence: persistence,
+            metadataStore: syncMetadataStore
+        )
         encoder = FinanceJSONCoding.makeEncoder(prettyPrinted: true)
 
-        load()
+        let seedRecords = load()
+        startSaveConsumer(seedRecords: seedRecords)
         let isSyncEnabled = settings?.isICloudSyncEnabled
             ?? UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
         if isSyncEnabled {
@@ -154,6 +173,11 @@ final class FinanceStore: ObservableObject {
                 await self?.setICloudSyncEnabled(true, userInitiated: false)
             }
         }
+    }
+
+    deinit {
+        saveContinuation?.finish()
+        saveConsumerTask?.cancel()
     }
 
     var transactions: [Transaction] {
@@ -704,12 +728,15 @@ final class FinanceStore: ObservableObject {
         )
     }
 
-    private func load() {
+    /// Loads the local DB into memory and returns the per-record snapshot that should seed
+    /// the coordinator's diff baseline (empty on a load failure, so no save is attempted
+    /// until the load error is resolved).
+    @discardableResult
+    private func load() -> [CloudSyncRecordKey: CloudSyncRecordSnapshot] {
         do {
             let loadedData = try persistence.load() ?? FinancialData()
             withAnimation {
                 self.data = loadedData
-                self.persistedData = loadedData
                 self.localPersistenceError = nil
                 self.iCloudSyncError = nil
             }
@@ -717,12 +744,14 @@ final class FinanceStore: ObservableObject {
             do {
                 let records = try loadedData.cloudSyncRecords()
                 try syncMetadataStore.reconcileLocalInventory(records)
+                return records
             } catch {
                 iCloudSyncError = AppLocalization.string(
                     "Local data loaded, but iCloud sync metadata could not be prepared. \(error.localizedDescription)",
                     appLanguage: settings?.appLanguage
                 )
                 cloudSyncStatus = .error(iCloudSyncError ?? error.localizedDescription)
+                return (try? loadedData.cloudSyncRecords()) ?? [:]
             }
         } catch {
             withAnimation {
@@ -735,6 +764,61 @@ final class FinanceStore: ObservableObject {
                     )
                 )
             }
+            return [:]
+        }
+    }
+
+    /// Starts the single long-lived consumer that serializes saves onto the coordinator.
+    /// `bufferingNewest(1)` coalesces bursts: while one save runs, only the most recent
+    /// queued tick survives, and the consumer always reads the latest `data` (last write
+    /// wins).
+    private func startSaveConsumer(seedRecords: [CloudSyncRecordKey: CloudSyncRecordSnapshot]) {
+        let (stream, continuation) = AsyncStream.makeStream(
+            of: Int.self,
+            bufferingPolicy: .bufferingNewest(1)
+        )
+        saveContinuation = continuation
+        saveConsumerTask = Task { [weak self] in
+            guard let self else { return }
+            await self.coordinator.seed(seedRecords)
+            for await generation in stream {
+                await self.processSave(generation: generation)
+            }
+        }
+    }
+
+    /// Off-main-actor save: the coordinator does the encode/diff/write/record work; this
+    /// method only reads the snapshot and updates main-actor-owned UI state.
+    ///
+    /// The snapshot is read *live* from `data` here — not frozen when `save()` enqueued the
+    /// tick — so a queued local save can never clobber a CloudKit remote mutation that
+    /// landed in between: it always persists the latest in-memory state, and a redundant
+    /// tick simply diffs to an empty change set.
+    private func processSave(generation: Int) async {
+        let snapshot = data
+        do {
+            let outcome = try await coordinator.save(snapshot)
+            iCloudSyncError = nil
+            persistenceError = nil
+            if outcome.didChange {
+                await cloudSyncService.localChangesRecorded()
+            }
+        } catch {
+            // Do NOT crash on a disk error (H5): in DEBUG `assertionFailure` aborted the
+            // app, and in release the failure was only visible in Settings. Log it and
+            // publish an app-wide error so the user learns their change didn't persist.
+            Self.logger.error("Failed to save local finance data: \(error.localizedDescription, privacy: .public)")
+            iCloudSyncError = error.localizedDescription
+            persistenceError = AppLocalization.string(
+                "Your latest change could not be saved to this device. \(error.localizedDescription)",
+                appLanguage: settings?.appLanguage
+            )
+        }
+        lastProcessedSaveGeneration = generation
+        if lastProcessedSaveGeneration == lastEnqueuedSaveGeneration {
+            let waiters = saveIdleWaiters
+            saveIdleWaiters.removeAll()
+            waiters.forEach { $0.resume() }
         }
     }
 
@@ -747,30 +831,17 @@ final class FinanceStore: ObservableObject {
             return
         }
 
-        do {
-            let oldRecords = try persistedData.cloudSyncRecords()
-            let newRecords = try data.cloudSyncRecords()
-            let changes = CloudSyncChangeSet.difference(from: oldRecords, to: newRecords)
-            try persistence.save(data)
-            try syncMetadataStore.recordLocalChanges(changes, currentRecords: newRecords)
-            persistedData = data
-            self.iCloudSyncError = nil
-            self.persistenceError = nil
-            if !changes.isEmpty {
-                Task { [weak self] in
-                    await self?.cloudSyncService.localChangesRecorded()
-                }
-            }
-        } catch {
-            // Do NOT crash on a disk error (H5): in DEBUG `assertionFailure` aborted the
-            // app, and in release the failure was only visible in Settings. Log it and
-            // publish an app-wide error so the user learns their change didn't persist.
-            Self.logger.error("Failed to save local finance data: \(error.localizedDescription, privacy: .public)")
-            self.iCloudSyncError = error.localizedDescription
-            self.persistenceError = AppLocalization.string(
-                "Your latest change could not be saved to this device. \(error.localizedDescription)",
-                appLanguage: settings?.appLanguage
-            )
+        // Non-blocking: nudge the serial consumer and return. All encoding, hashing and
+        // disk I/O happen off the main actor inside the coordinator.
+        lastEnqueuedSaveGeneration += 1
+        saveContinuation?.yield(lastEnqueuedSaveGeneration)
+    }
+
+    /// Test hook: suspends until the save pipeline has drained every enqueued snapshot.
+    func waitForPendingSaves() async {
+        if lastProcessedSaveGeneration == lastEnqueuedSaveGeneration { return }
+        await withCheckedContinuation { continuation in
+            saveIdleWaiters.append(continuation)
         }
     }
 
@@ -809,7 +880,7 @@ final class FinanceStore: ObservableObject {
 
     private func applyRemoteMutations(
         _ mutations: [CloudSyncRemoteMutation]
-    ) throws -> Set<CloudSyncRecordKey> {
+    ) async throws -> Set<CloudSyncRecordKey> {
         guard localPersistenceError == nil else {
             throw localPersistenceError ?? CloudSyncError.invalidRecord(
                 AppLocalization.string("The local database is unavailable.", appLanguage: settings?.appLanguage)
@@ -824,14 +895,16 @@ final class FinanceStore: ObservableObject {
         var updatedData = data
         try updatedData.applyCloudSyncMutations(applicableMutations)
         updatedData = updatedData.sortedForStorage()
-        try persistence.save(updatedData)
-        // Plain assignment (no withAnimation): remote applies are driven from
-        // CloudKit callbacks and can land during a SwiftUI view update, which makes
-        // `withAnimation` emit "Publishing changes from within view updates" and
-        // forces expensive animation transactions during bulk sync.
+        // Update the in-memory data synchronously on the main actor so the UI stays
+        // responsive and reads stay consistent. Plain assignment (no withAnimation):
+        // remote applies are driven from CloudKit callbacks and can land during a SwiftUI
+        // view update, which makes `withAnimation` emit "Publishing changes from within
+        // view updates" and forces expensive animation transactions during bulk sync.
         data = updatedData
-        persistedData = updatedData
         iCloudSyncError = nil
+        // Route the disk write through the coordinator so local + remote writes serialize
+        // and never interleave, and so the diff baseline advances to the applied records.
+        try await coordinator.applyRemote(updatedData)
         return Set(applicableMutations.map(\.key))
     }
 
@@ -892,5 +965,54 @@ extension FinancialData {
             liabilities: liabilities.sorted { $0.updatedAt > $1.updatedAt },
             snapshots: snapshots.sorted { $0.date < $1.date }
         )
+    }
+}
+
+/// Serializes every local-database write off the main actor (audit M4).
+///
+/// Owns `persistence`, `metadataStore`, and the diff baseline (`lastSavedRecords`) — the
+/// latter replaces `FinanceStore.persistedData` as the source of truth for diffing. Because
+/// it is an actor whose methods contain no internal suspension points, calls run to
+/// completion one at a time: local saves (via `save`) and remote applies (via `applyRemote`)
+/// never interleave on disk, and the baseline always advances atomically with the write.
+actor PersistenceCoordinator {
+    struct SaveOutcome: Sendable {
+        let didChange: Bool
+    }
+
+    private let persistence: FinancePersistence
+    private let metadataStore: CloudSyncMetadataStore
+    /// The per-record snapshot of what is currently on disk; the baseline every save diffs
+    /// against. Advanced only after a successful write, so a failed write cannot corrupt it.
+    private var lastSavedRecords: [CloudSyncRecordKey: CloudSyncRecordSnapshot] = [:]
+
+    init(persistence: FinancePersistence, metadataStore: CloudSyncMetadataStore) {
+        self.persistence = persistence
+        self.metadataStore = metadataStore
+    }
+
+    /// Seeds the diff baseline from the records loaded at startup.
+    func seed(_ records: [CloudSyncRecordKey: CloudSyncRecordSnapshot]) {
+        lastSavedRecords = records
+    }
+
+    /// Encodes the snapshot, diffs it against the baseline, writes it to disk, records the
+    /// changeset for CloudKit, then advances the baseline. All off the main actor.
+    func save(_ snapshot: FinancialData) throws -> SaveOutcome {
+        let newRecords = try snapshot.cloudSyncRecords()
+        let changes = CloudSyncChangeSet.difference(from: lastSavedRecords, to: newRecords)
+        try persistence.save(snapshot)
+        try metadataStore.recordLocalChanges(changes, currentRecords: newRecords)
+        lastSavedRecords = newRecords
+        return SaveOutcome(didChange: !changes.isEmpty)
+    }
+
+    /// Persists a snapshot produced by applying remote mutations and advances the baseline
+    /// to match. No changeset is recorded — the change originated remotely, and the sync
+    /// engine has already updated its own metadata for these records.
+    func applyRemote(_ snapshot: FinancialData) throws {
+        let newRecords = try snapshot.cloudSyncRecords()
+        try persistence.save(snapshot)
+        lastSavedRecords = newRecords
     }
 }

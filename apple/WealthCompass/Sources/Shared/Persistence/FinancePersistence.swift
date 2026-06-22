@@ -1,6 +1,6 @@
 import Foundation
 
-protocol FinancePersistence {
+protocol FinancePersistence: Sendable {
     var locationDescription: String { get }
 
     func load() throws -> FinancialData?
@@ -8,7 +8,10 @@ protocol FinancePersistence {
     func clear() throws
 }
 
-struct LocalFinancePersistence: FinancePersistence {
+/// Stateless file writer (it only holds immutable configuration), so it is safe to hand to
+/// the off-main-actor `PersistenceCoordinator`. `FileManager.default` is itself documented
+/// as thread-safe, hence the `@unchecked Sendable`.
+struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
     private let fileManager: FileManager
     private let storageURL: URL
     private let legacyStorageURLs: [URL]
