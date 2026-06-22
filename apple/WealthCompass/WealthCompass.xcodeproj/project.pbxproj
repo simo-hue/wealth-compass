@@ -89,11 +89,9 @@
 		AD00000000000000000000C3 /* RecurringScheduleBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */; };
 		AD00000000000000000000C4 /* AnalyticsEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C4 /* AnalyticsEngineTests.swift */; };
 		AD00000000000000000000C5 /* FinanceImportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C5 /* FinanceImportServiceTests.swift */; };
-		AFA8D2C0B984E687F87C05EA /* DynamicMasonryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3B18E883C3808CEB9592CB /* DynamicMasonryLayout.swift */; };
 		C0D3A0020000000000000001 /* MarketDataAPIKeyGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3A0010000000000000001 /* MarketDataAPIKeyGuide.swift */; };
 		C0D3A0030000000000000001 /* MarketDataAPIKeyGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3A0010000000000000001 /* MarketDataAPIKeyGuide.swift */; };
 		C16E71416991E8C87B178C96 /* DynamicMasonryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1614C7598D89322EDC6DD1C /* DynamicMasonryLayout.swift */; };
-		E14ADF289E9B4D9DE196ACBF /* DynamicMasonryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3B18E883C3808CEB9592CB /* DynamicMasonryLayout.swift */; };
 		E4A507349567FDF9A3CA4F11 /* DynamicMasonryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1614C7598D89322EDC6DD1C /* DynamicMasonryLayout.swift */; };
 		E9814262C71865036098CABF /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93DFB98D4B9C2FF8406A9F2A /* OnboardingView.swift */; };
 		FF92F90F0B92CE85C5C5801B /* APIConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03F2CE5F27A45BA11A85D0D /* APIConfiguration.swift */; };
@@ -176,7 +174,6 @@
 		AC0000000000000000000051 /* WealthCompassTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WealthCompassTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1614C7598D89322EDC6DD1C /* DynamicMasonryLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DynamicMasonryLayout.swift; path = Sources/Shared/UI/DynamicMasonryLayout.swift; sourceTree = "<group>"; };
 		C0D3A0010000000000000001 /* MarketDataAPIKeyGuide.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MarketDataAPIKeyGuide.swift; path = ../../../UI/MarketDataAPIKeyGuide.swift; sourceTree = "<group>"; };
-		DB3B18E883C3808CEB9592CB /* DynamicMasonryLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DynamicMasonryLayout.swift; path = ../../../UI/DynamicMasonryLayout.swift; sourceTree = "<group>"; };
 		E03F2CE5F27A45BA11A85D0D /* APIConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = APIConfiguration.swift; path = Sources/Shared/Services/APIConfiguration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -240,7 +237,6 @@
 		520A8B945E3C6A6E2657845A /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				DB3B18E883C3808CEB9592CB /* DynamicMasonryLayout.swift */,
 				C0D3A0010000000000000001 /* MarketDataAPIKeyGuide.swift */,
 			);
 			name = UI;
@@ -642,7 +638,6 @@
 				AD0000000000000000000028 /* SettingsView.swift in Sources */,
 				AD0000000000000000000029 /* Forms.swift in Sources */,
 				AD000000000000000000002A /* LockView.swift in Sources */,
-				E14ADF289E9B4D9DE196ACBF /* DynamicMasonryLayout.swift in Sources */,
 				E4A507349567FDF9A3CA4F11 /* DynamicMasonryLayout.swift in Sources */,
 				C0D3A0020000000000000001 /* MarketDataAPIKeyGuide.swift in Sources */,
 				E9814262C71865036098CABF /* OnboardingView.swift in Sources */,
@@ -688,7 +683,6 @@
 				AD0000000000000000000037 /* MacEditorSheet.swift in Sources */,
 				AD000000000000000000003A /* MacRecurringTransactionEditor.swift in Sources */,
 				AD0000000000000000000038 /* MacSettingsView.swift in Sources */,
-				AFA8D2C0B984E687F87C05EA /* DynamicMasonryLayout.swift in Sources */,
 				C16E71416991E8C87B178C96 /* DynamicMasonryLayout.swift in Sources */,
 				C0D3A0030000000000000001 /* MarketDataAPIKeyGuide.swift in Sources */,
 				1E6833B0C43E0B035AE4B46B /* MacOnboardingView.swift in Sources */,
