@@ -28,7 +28,7 @@ checkboxes. Items are ordered by severity within each section.
   *Fix:* delete `I18nDebugLog.swift`, all `wcDebugLog` helpers + `// #region agent log` blocks, and every
   call site (`I18nDebugLog.auditTabBarLabels`, `I18nDebugLog.log`). Already flagged in `WealthCompass/TO_IMPROVE.md`.
 
-- [x] **C2 — Build artifacts are committed to git.** ✅ Done 2026-06-22 — added `build/` to `.gitignore` and `git rm -r --cached` the 6,646 files (staged, not committed).
+- [x] **C2 — Build artifacts are committed to git.** ✅ Done 2026-06-22 — added `apple/.gitignore` (covers `build/`, `DerivedData/`, `xcuserdata`) and `git rm -r --cached` the 6,646 tracked `build/` files; committed on branch `code-audit`.
   `apple/WealthCompass/build/` (DerivedData, intermediates, `.o`, generated entitlements) is tracked; the
   root `.gitignore` only ignores `DerivedData/`, not `build/`.
   *Why it matters:* bloats the repo, leaks local build paths/derived entitlements, and causes noisy diffs.
