@@ -276,12 +276,12 @@ extension FinancialData {
     }
 }
 
-private enum CloudSyncPendingOrigin: String, Codable, Sendable {
+enum CloudSyncPendingOrigin: String, Codable, Sendable {
     case inventory
     case localChange
 }
 
-private enum CloudSyncPendingMutation: Codable, Equatable, Sendable {
+enum CloudSyncPendingMutation: Codable, Equatable, Sendable {
     case save(modifiedAt: Date, revision: UUID, origin: CloudSyncPendingOrigin, allowsResurrection: Bool)
     case delete(deletedAt: Date, revision: UUID)
 
@@ -958,7 +958,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                     )
                 }
             } else {
-                let decision = bootstrapDecision(
+                let decision = Self.bootstrapDecision(
                     pending: state.pending,
                     local: localSnapshot,
                     remote: remoteSnapshot
@@ -1234,13 +1234,18 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         }
     }
 
-    private enum BootstrapDecision {
+    enum BootstrapDecision: Equatable {
         case local
         case remote
         case identical
     }
 
-    private func bootstrapDecision(
+    /// First-sync (bootstrap) merge decision for one record: whether the local value
+    /// wins, the remote value wins, or they're identical — in which case the local
+    /// pending upload is dropped, which is what stops a second already-populated device
+    /// from re-inserting records that already exist remotely (#8). Pure and `static`
+    /// so the collision-avoidance logic stays unit-testable without a live CKSyncEngine.
+    static func bootstrapDecision(
         pending: CloudSyncPendingMutation?,
         local: CloudSyncRecordSnapshot?,
         remote: CloudSyncRecordSnapshot
