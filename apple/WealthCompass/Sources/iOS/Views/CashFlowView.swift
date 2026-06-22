@@ -59,7 +59,7 @@ struct CashFlowView: View {
                         Image(systemName: "plus")
                             .font(.system(size: 17, weight: .bold))
                             .foregroundStyle(.black.opacity(0.82))
-                            .frame(width: 42, height: 42)
+                            .frame(width: 44, height: 44)
                             .background(WCColor.primary.gradient, in: Circle())
                             .shadow(color: WCColor.primary.opacity(0.24), radius: 10, y: 5)
                     }
@@ -151,6 +151,8 @@ struct CashFlowView: View {
                             .foregroundStyle(by: .value("Category", item.name))
                             .cornerRadius(5)
                             .opacity(hoveredExpenseCategory == nil || hoveredExpenseCategory?.id == item.id ? 1.0 : 0.3)
+                            .accessibilityLabel(Text(item.name))
+                            .accessibilityValue(Text(settings.privateCurrency(item.value)))
                         }
                         .chartLegend(.hidden)
                         .chartBackground { proxy in
@@ -175,7 +177,7 @@ struct CashFlowView: View {
                                             Text("EXPENSES")
                                                 .font(.caption2.weight(.bold))
                                                 .tracking(1.3)
-                                                .foregroundStyle(.white.opacity(0.45))
+                                                .foregroundStyle(WCColor.textTertiary)
                                             Text(settings.privateCurrency(totalExpenses))
                                                 .font(.headline.monospacedDigit().weight(.bold))
                                                 .foregroundStyle(.white)
@@ -192,6 +194,7 @@ struct CashFlowView: View {
                                 if let plotFrame = proxy.plotFrame {
                                     let frame = geometry[plotFrame]
                                     Rectangle().fill(.clear).contentShape(Rectangle())
+                                        .accessibilityHidden(true)
                                         .gesture(
                                             DragGesture(minimumDistance: 0)
                                                 .onChanged { value in
@@ -209,6 +212,8 @@ struct CashFlowView: View {
                             }
                         }
                         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: categories.map(\.value))
+                        .accessibilityElement(children: .contain)
+                        .accessibilityLabel(Text("Spending analytics"))
                     }
                     .frame(minHeight: 250, maxHeight: .infinity)
 
@@ -322,12 +327,14 @@ struct CashFlowView: View {
                         .font(.subheadline.monospacedDigit().weight(.bold))
                         .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
 
-                    HStack(spacing: 14) {
+                    HStack(spacing: 0) {
                         if !schedule.isCompleted {
                             Button {
                                 activeAlert = .finishRecurringTransaction(schedule)
                             } label: {
                                 Image(systemName: "checkmark")
+                                    .frame(width: 44, height: 44)
+                                    .contentShape(Rectangle())
                             }
                             .accessibilityLabel("Finish schedule")
 
@@ -335,12 +342,15 @@ struct CashFlowView: View {
                                 toggleRecurringTransaction(schedule)
                             } label: {
                                 Image(systemName: schedule.isActive ? "pause.fill" : "play.fill")
+                                    .frame(width: 44, height: 44)
+                                    .contentShape(Rectangle())
                             }
                             .accessibilityLabel(schedule.isActive
                                 ? settings.localized("Pause schedule")
                                 : settings.localized("Resume schedule"))
                         } else {
                             Image(systemName: "checkmark.circle.fill")
+                                .frame(width: 44, height: 44)
                                 .accessibilityLabel("Schedule completed")
                         }
 
@@ -348,6 +358,8 @@ struct CashFlowView: View {
                             recurringEditor = RecurringTransactionEditor(schedule: schedule)
                         } label: {
                             Image(systemName: "pencil")
+                                .frame(width: 44, height: 44)
+                                .contentShape(Rectangle())
                         }
                         .accessibilityLabel("Edit schedule")
                     }

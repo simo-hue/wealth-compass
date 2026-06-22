@@ -7,6 +7,7 @@ struct DashboardView: View {
     @State private var timeRange: TimeRange = .oneYear
     @State private var showingAddTransaction = false
     @State private var selectedNetWorthDate: Date?
+    @ScaledMetric(relativeTo: .largeTitle) private var netWorthSize: CGFloat = 35
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -93,7 +94,7 @@ struct DashboardView: View {
                             .foregroundStyle(.white)
                         Text("Record cash flow or add a position to bring this dashboard to life.")
                             .font(.caption)
-                            .foregroundStyle(.white.opacity(0.48))
+                            .foregroundStyle(WCColor.textTertiary)
                     }
                 }
 
@@ -125,9 +126,9 @@ struct DashboardView: View {
                             Text("NET WORTH")
                                 .font(.caption2.weight(.bold))
                                 .tracking(1.7)
-                                .foregroundStyle(.white.opacity(0.48))
+                                .foregroundStyle(WCColor.textTertiary)
                             Text(settings.privateCurrency(totals.netWorth))
-                                .font(.system(size: 35, weight: .bold, design: .rounded))
+                                .font(.system(size: netWorthSize, weight: .bold, design: .rounded))
                                 .monospacedDigit()
                                 .foregroundStyle(.white)
                                 .lineLimit(1)
@@ -139,14 +140,14 @@ struct DashboardView: View {
                                     Text(settings.privateCurrency(abs(rangeChange.value)))
                                     Text(privatePercent(abs(rangeChange.percentage)))
                                     Text(timeRange.rawValue)
-                                        .foregroundStyle(.white.opacity(0.42))
+                                        .foregroundStyle(WCColor.textTertiary)
                                 }
                                 .font(.caption.monospacedDigit().weight(.semibold))
                                 .foregroundStyle(rangeChange.value >= 0 ? WCColor.primary : WCColor.destructive)
                             } else {
                                 Text("Add another snapshot to see movement")
                                     .font(.caption)
-                                    .foregroundStyle(.white.opacity(0.43))
+                                    .foregroundStyle(WCColor.textTertiary)
                             }
                         }
 
@@ -181,6 +182,7 @@ struct DashboardView: View {
                                 RuleMark(x: .value("Selected Date", selectedPoint.date))
                                     .foregroundStyle(WCColor.primary.opacity(0.6))
                                     .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [5, 5]))
+                                    .accessibilityHidden(true)
                                     .annotation(position: .top) {
                                         VStack(spacing: 4) {
                                             Text(selectedPoint.date.formatted(date: .abbreviated, time: .omitted))
@@ -211,6 +213,7 @@ struct DashboardView: View {
                                     )
                                 )
                                 .interpolationMethod(.monotone)
+                                .accessibilityHidden(true)
 
                                 LineMark(
                                     x: .value("Date", point.date),
@@ -221,6 +224,8 @@ struct DashboardView: View {
                                 .interpolationMethod(.monotone)
                                 .symbol(Circle())
                                 .symbolSize(22)
+                                .accessibilityLabel(Text(point.date.formatted(date: .abbreviated, time: .omitted)))
+                                .accessibilityValue(Text(settings.privateCurrency(point.value)))
                             }
                         }
                         .chartYScale(domain: chartDomain(for: points))
@@ -229,6 +234,8 @@ struct DashboardView: View {
                         .chartYAxis(.hidden)
                         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: points)
                         .frame(height: 205)
+                        .accessibilityElement(children: .contain)
+                        .accessibilityLabel(Text("Net-worth history"))
                     }
                 }
             }
@@ -250,12 +257,12 @@ struct DashboardView: View {
                 }
                 Text(snapshot.date.formatted(date: .abbreviated, time: .omitted))
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.34))
+                    .foregroundStyle(WCColor.textFaint)
             }
         } else {
             Label("No snapshots", systemImage: "camera.metering.center.weighted")
                 .font(.caption2.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.48))
+                .foregroundStyle(WCColor.textTertiary)
         }
     }
 
@@ -340,6 +347,8 @@ struct DashboardView: View {
                         .foregroundStyle(WCColor.primary.gradient)
                         .position(by: .value(settings.localized("Type"), settings.localized("Income")))
                         .cornerRadius(6)
+                        .accessibilityLabel(Text("\(month.monthLabel), \(settings.localized("Income"))"))
+                        .accessibilityValue(Text(settings.privateCurrency(month.income)))
 
                         BarMark(
                             x: .value(settings.localized("Month"), month.monthLabel),
@@ -348,17 +357,21 @@ struct DashboardView: View {
                         .foregroundStyle(WCColor.destructive.opacity(0.8).gradient)
                         .position(by: .value(settings.localized("Type"), settings.localized("Expenses")))
                         .cornerRadius(6)
+                        .accessibilityLabel(Text("\(month.monthLabel), \(settings.localized("Expenses"))"))
+                        .accessibilityValue(Text(settings.privateCurrency(month.expense)))
                     }
                     .chartLegend(.hidden)
                     .chartXAxis {
                         AxisMarks { _ in
                             AxisValueLabel()
-                                .foregroundStyle(.white.opacity(0.42))
+                                .foregroundStyle(WCColor.textTertiary)
                         }
                     }
                     .chartYAxis(.hidden)
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: trend)
                     .frame(height: 210)
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel(Text("Six-Month Cash Flow"))
                 }
 
                 HStack(spacing: 18) {
@@ -369,7 +382,7 @@ struct DashboardView: View {
                         Text("6M NET")
                             .font(.caption2.weight(.bold))
                             .tracking(1)
-                            .foregroundStyle(.white.opacity(0.38))
+                            .foregroundStyle(WCColor.textFaint)
                         Text(settings.privateCurrency(totalIncome - totalExpense))
                             .font(.caption.monospacedDigit().weight(.bold))
                             .foregroundStyle(totalIncome - totalExpense >= 0 ? WCColor.primary : WCColor.destructive)
@@ -387,7 +400,7 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(WCColor.textFaint)
                 Text(settings.privateCurrency(value))
                     .font(.caption.monospacedDigit().weight(.semibold))
                     .foregroundStyle(.white.opacity(0.82))
@@ -414,7 +427,7 @@ struct DashboardView: View {
                                 HStack(spacing: 9) {
                                     Text("\(index + 1)")
                                         .font(.caption2.monospacedDigit().weight(.bold))
-                                        .foregroundStyle(.white.opacity(0.34))
+                                        .foregroundStyle(WCColor.textFaint)
                                         .frame(width: 17)
                                     Text(item.name)
                                         .font(.subheadline.weight(.medium))
@@ -480,7 +493,7 @@ struct DashboardView: View {
                                             .lineLimit(1)
                                         Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
                                             .font(.caption2)
-                                            .foregroundStyle(.white.opacity(0.38))
+                                            .foregroundStyle(WCColor.textFaint)
                                     }
 
                                     Spacer(minLength: 8)

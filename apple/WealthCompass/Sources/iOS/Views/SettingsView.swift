@@ -285,7 +285,7 @@ struct SettingsView: View {
                             .foregroundStyle(.white)
                         Text("Privacy, sync, currency, and market data")
                             .font(.caption)
-                            .foregroundStyle(.white.opacity(0.44))
+                            .foregroundStyle(WCColor.textTertiary)
                     }
                 }
 

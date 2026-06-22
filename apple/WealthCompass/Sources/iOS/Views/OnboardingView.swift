@@ -5,6 +5,7 @@ struct OnboardingView: View {
     @State private var currentTab = 0
     @State private var showingErrorAlert = false
     @StateObject private var viewModel = OnboardingViewModel()
+    @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 28
     
     var body: some View {
         ZStack {
@@ -44,6 +45,9 @@ struct OnboardingView: View {
             }
         }
         .preferredColorScheme(.dark)
+        // A1: the welcome/privacy/personalize pages don't scroll, so cap very large
+        // accessibility text sizes to keep their fixed layouts from overflowing.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
         .onAppear { viewModel.loadConfiguredState() }
         .alert("Validation Failed", isPresented: $showingErrorAlert) {
             Button("OK", role: .cancel) {}
@@ -73,7 +77,7 @@ struct OnboardingView: View {
             
             VStack(spacing: 15) {
                 Text("Welcome to WealthCompass")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: titleSize, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                 
@@ -118,7 +122,7 @@ struct OnboardingView: View {
             
             VStack(spacing: 15) {
                 Text("Your Data, Your Privacy")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: titleSize, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                 
@@ -163,7 +167,7 @@ struct OnboardingView: View {
 
             VStack(spacing: 15) {
                 Text("Make It Yours")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: titleSize, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
 
@@ -244,7 +248,7 @@ struct OnboardingView: View {
                     
                     VStack(spacing: 9) {
                         Text("Connect Market Data")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .font(.system(size: titleSize, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                             .multilineTextAlignment(.center)
                         

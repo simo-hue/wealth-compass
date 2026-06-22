@@ -225,24 +225,44 @@ checkboxes. Items are ordered by severity within each section.
 
 ## A — Accessibility
 
-- [ ] **A1 — Fixed font sizes don't scale with Dynamic Type.**
+- [x] **A1 — Fixed font sizes don't scale with Dynamic Type.** ✅ Done 2026-06-22 — wrapped the hero/title fixed
+  sizes in `@ScaledMetric` (`PageHeader` 30pt, iOS net-worth 35pt, mac net-worth 42pt + dashboard header 30pt,
+  iOS Lock title, and the iOS/mac onboarding page titles) so they track Dynamic Type, and capped the four
+  dense iOS data screens — plus the non-scrolling onboarding pages — at `.accessibility3` via `pageChrome()`
+  so text enlarges substantially without shattering the metric grids/fixed-height charts. Decorative icon
+  glyphs inside fixed-size frames stay fixed; everything already on semantic styles (`.title3`, `.caption`, …)
+  scaled already.
   Pervasive `.font(.system(size: …))` (e.g. `PageHeader` 30pt, net-worth 35/42pt, metric values) plus heavy
   `minimumScaleFactor` means large-text users get clipped/shrunk UI rather than reflow.
   *Fix:* prefer semantic text styles (`.title`, `.headline`, …) or `@ScaledMetric`; reserve fixed sizes for
   decorative numerics only.
 
-- [ ] **A2 — Charts are invisible to VoiceOver.**
+- [x] **A2 — Charts are invisible to VoiceOver.** ✅ Done 2026-06-22 — every Chart is now an
+  `.accessibilityElement(children: .contain)` with a descriptive label, and each mark carries
+  `.accessibilityLabel`/`.accessibilityValue`: date→amount for the net-worth line, month+type→amount for the
+  cash-flow bars, and category→amount for the allocation/expense pies (privacy-redacted via `privateCurrency`).
+  VoiceOver users can now navigate each data point without the pointer; decorative area fills, the
+  pointer-only selection rule/point marks, and the transparent gesture overlays are `.accessibilityHidden(true)`.
   Net-worth, cash-flow, and allocation charts have no `accessibilityLabel`/`AXChartDescriptor`; the pie
   selection is pointer/drag-only.
   *Fix:* add chart accessibility descriptors and an accessible data summary; provide a non-pointer way to
   inspect slices.
 
-- [ ] **A3 — Low-contrast text on dark background.**
+- [x] **A3 — Low-contrast text on dark background.** ✅ Done 2026-06-22 — added a centralized text-color scale
+  to `WCColor` (`textPrimary` / `textSecondary` 0.70 / `textTertiary` 0.60 / `textFaint` 0.55) tuned to clear
+  WCAG AA on the app's dark surfaces, and replaced every sub-AA caption/label `.white.opacity(0.34–0.52)`
+  foregroundStyle across iOS + macOS with the right token (faintest band → `textFaint`, the 0.42–0.52 band →
+  `textTertiary`), preserving the visual hierarchy. Non-text fills/strokes/gradients/dividers and the single
+  decorative chart selection line were left unchanged ("Targeted AA" — minimal visual change).
   Frequent `.foregroundStyle(.white.opacity(0.35–0.45))` for captions likely fails WCAG AA contrast.
   *Fix:* audit secondary/tertiary text opacities against contrast targets; centralize as named tokens in
   `WCColor`.
 
-- [ ] **A4 — Tap targets / hit areas.**
+- [x] **A4 — Tap targets / hit areas.** ✅ Done 2026-06-22 — the iOS recurring-row action buttons
+  (finish / pause-resume / edit) now expand to 44×44 hit areas via `.frame(width: 44, height: 44)
+  .contentShape(Rectangle())` (glyphs stay small, the tappable area meets the HIG minimum), and the two 42pt
+  circular action buttons (`PrimaryActionButton` and the Cash-Flow "add" menu) were bumped to 44pt. macOS row
+  buttons are pointer-targeted (`.borderless`) and intentionally left as-is.
   Several icon-only buttons in dense rows (recurring row actions) are below the 44pt target.
   *Fix:* enforce minimum hit areas.
 
