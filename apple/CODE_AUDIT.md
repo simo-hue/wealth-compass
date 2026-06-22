@@ -146,7 +146,7 @@ checkboxes. Items are ordered by severity within each section.
   *Fix:* compute once per change in the store (cache keyed by data version) or hoist into a view model;
   precompute sorted arrays.
 
-- [ ] **M4 — Whole-database rewrite + full re-hash on every mutation.**
+- [x] **M4 — Whole-database rewrite + full re-hash on every mutation.** ✅ Done 2026-06-22 — added a serializing `PersistenceCoordinator` actor that owns persistence, the sync-metadata store, and the diff baseline (replacing `FinanceStore.persistedData`). `save()` is now non-blocking: it nudges a single long-lived `AsyncStream` consumer that reads the latest `data` live and runs encode → SHA-256 diff → disk-write → metadata-record off the main actor; remote applies route their write through the same coordinator so local/remote writes never interleave. Single-JSON-file format + `CloudSync*` model unchanged; the incremental/per-record/SQLite store stays deferred (see `TO_IMPROVE.md` #26). New `PersistenceCoordinatorTests` cover burst ordering, last-write-wins, failed-save baseline integrity, remote-apply baseline advance, and the H5 banner. (Implements `TO_IMPROVE.md` #10; partially addresses #9 and #25.)
   `FinanceStore.save()` re-encodes the entire `FinancialData` to pretty-printed JSON and SHA-256-hashes every
   record on each edit, on the main actor (`save()` → `cloudSyncRecords()` → `CloudSyncChangeSet.difference`).
   For large datasets this makes each add/edit increasingly expensive. (Partially noted for sync in
