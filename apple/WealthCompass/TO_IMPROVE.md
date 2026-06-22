@@ -43,6 +43,13 @@ These fixes are in the codebase but still need a clean verification run before c
 
 ### 6. Stop treating a single bad CloudKit record as a fatal sync stop
 
+> ✅ **Done 2026-06-23 (scope A — missing-`payload` only):**
+> - **Step 1 (skip, don't throw):** extracted `CloudKitSyncService.remoteSnapshot(from:key:) -> CloudSyncRecordSnapshot?` (returns `nil` when the record has no `payload`). The fetch loop now does `guard let remoteSnapshot = … else { log; skippedPayloadlessRecords += 1; touchedKeys.remove(key); continue }` instead of throwing. The clean skip leaves the key's metadata (and any good local value) untouched, and `CKSyncEngine` still advances its change token for the batch, so the corrupt record isn't re-delivered unless it changes again. **No tombstone** (that would wrongly mark the record deleted locally).
+> - **Step 2 (observability):** log-only. Per-record `OSLog .error` (record name + type, `privacy: .public`, never the payload) plus a per-batch summary count; `cloudSyncStatus` stays truthful (`.upToDate`, because sync genuinely succeeded). A user-visible warning was judged disproportionate for what is normally a single rare corrupt record (the audit's "only if many fail").
+> - **Step 3 (test):** `CloudSyncCoreTests.testRemoteSnapshotSkipsPayloadlessRecordAndMapsValidOne` — `remoteSnapshot` returns `nil` for a payload-less `CKRecord` and a correctly-mapped snapshot otherwise. `CKSyncEngine.Event.FetchedRecordZoneChanges` has no public initializer, so the full-batch guarantee (one bad + several good → good ones still applied, token advances) can't be unit-tested here; it's left to the 2-device verify pass.
+> - **Deliberately out of scope:** a *present-but-undecodable* payload still throws at apply time (`applying(_:to:decoding:)`) and remains fatal — making that per-record-resilient needs an `applyCloudSyncMutations` rework and is a separate, larger change.
+> - **Verify:** both targets build; full suite green on iPhone 17. Committed to `main`.
+
 **Problem:** In `handleFetchedRecordZoneChanges`, a record with missing `payload` throws `CloudSyncError.invalidRecord`, which flows to `handleEvent` → `stopAfterFatalError` and tears down the whole engine.
 
 **Steps:**
@@ -269,11 +276,11 @@ Store rolling net-worth history as chunked monthly aggregates locally; sync fewe
 | 5 | 8 — Fetch-first bootstrap | L | High — kills collision storm | ☐ Open |
 | 6 | 9–10 — Batch remote apply + incremental save diff | L | High — fixes lag | 🟡 #10 done (M4), #9 partial |
 | 7 | 11–12 — Snapshot + metadata pruning | M | Medium | ☐ Open |
-| 8 | 6 — Non-fatal corrupt records | S | Medium | ☐ Open |
+| 8 | 6 — Non-fatal corrupt records | S | Medium | ✅ Done (scope A) |
 | 9 | 22 — Tests for 5–10 | M | Long-term stability | ☐ Open |
 
 Also done outside this table: **#18** (assertionFailure → banner, H5) and **#25** (sync metadata / persistence off the main actor, M4).
 
 ---
 
-*Last updated: 2026-06-23 — #7 (foreground sync API split + debounce) landed. 2026-06-22: M4 (off-main-actor save pipeline) landed; backlog status reconciled. Originally from the 2026-06-20 sync investigation session (macOS structured logs + iOS console).*
+*Last updated: 2026-06-23 — #6 (skip payload-less records, no fatal stop; scope A) + #7 (foreground sync API split + debounce) landed. 2026-06-22: M4 (off-main-actor save pipeline) landed; backlog status reconciled. Originally from the 2026-06-20 sync investigation session (macOS structured logs + iOS console).*
