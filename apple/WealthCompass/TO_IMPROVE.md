@@ -77,6 +77,17 @@ These fixes are in the codebase but still need a clean verification run before c
 
 ### 8. Improve first-sync strategy when both devices already have data
 
+> ✅ **Done 2026-06-23 — already fetch-first; closed the test gap.** Investigation found steps 1–3 were **already implemented** in the original CKSyncEngine work (`f91b0dc`):
+> - `reconcileEngineState` enqueues local pending into the engine only `if metadata.bootstrapCompleted`, so on first sync the engine has nothing to upload (step 1 — fetch-first). `reconcileLocalInventory` marks records *metadata*-pending with `origin: .inventory`, but that is not the engine's upload queue.
+> - `synchronize` fetches first; `handleFetchedRecordZoneChanges` → `bootstrapDecision` returns `.identical` for matching local/remote (clears the pending upload, adopts `systemFields`) and `.remote`/`.local` otherwise (steps 2–3).
+> - `.didFetchChanges` then flips `bootstrapCompleted` and enqueues only the **remaining** (truly local-only / local-newer) records.
+>
+> The real gap was **zero test coverage** on `bootstrapDecision` (the collision-avoidance core). Made it a pure `static` (widening `BootstrapDecision` / `CloudSyncPendingMutation` / `CloudSyncPendingOrigin` to internal) and added `CloudSyncCoreTests`: missing-local → remote, identical → drop upload, local-edit/delete → local, inventory/nil → recency, and the equal-timestamp deterministic hash tie-break.
+>
+> **Step 4 caveat:** the literal "two in-memory stores → enable sync → zero collisions" integration test isn't feasible here — `CKSyncEngine` has no public initializer and needs a live CloudKit container (same constraint that blocks the other engine-level sync tests). The end-to-end guarantee stays on the 2-device verify pass (this file's "verify" items #1–3).
+>
+> **On "the root race remains":** the one case fetch-first ordering can't eliminate is two devices enabling sync *near-simultaneously* (both fetch an ~empty zone, both upload, inserts cross). That's an inherent distributed race, handled downstream by CloudKit partial-failure + engine retry + `resolveServerConflict` (hardened by #15) — not by bootstrap ordering.
+
 **Problem:** Enabling sync on two populated devices marks **every** local record as pending upload. Both sides attempt inserts; CloudKit returns hundreds of `serverRecordChanged` / “record to insert already exists”. Batching mitigates metadata I/O but the root race remains.
 
 **Steps:**
@@ -273,7 +284,7 @@ Store rolling net-worth history as chunked monthly aggregates locally; sync fewe
 | 2 | 1–3 — Verify recent fixes | S | Confidence | ⏳ In progress (2-device test) |
 | 3 | 5 — CloudKit push wiring | M | High — background sync | ⏸️ Deferred (C4 removed unused entitlements) |
 | 4 | 7 — Foreground sync API split + debounce | S | High — less churn | ✅ Done |
-| 5 | 8 — Fetch-first bootstrap | L | High — kills collision storm | ☐ Open |
+| 5 | 8 — Fetch-first bootstrap | L | High — kills collision storm | ✅ Done (shipped f91b0dc; tests added) |
 | 6 | 9–10 — Batch remote apply + incremental save diff | L | High — fixes lag | 🟡 #10 done (M4), #9 partial |
 | 7 | 11–12 — Snapshot + metadata pruning | M | Medium | ☐ Open |
 | 8 | 6 — Non-fatal corrupt records | S | Medium | ✅ Done (scope A) |
@@ -283,4 +294,4 @@ Also done outside this table: **#18** (assertionFailure → banner, H5) and **#2
 
 ---
 
-*Last updated: 2026-06-23 — #6 (skip payload-less records, no fatal stop; scope A) + #7 (foreground sync API split + debounce) landed. 2026-06-22: M4 (off-main-actor save pipeline) landed; backlog status reconciled. Originally from the 2026-06-20 sync investigation session (macOS structured logs + iOS console).*
+*Last updated: 2026-06-23 — #8 (fetch-first bootstrap: confirmed already shipped in f91b0dc; added bootstrapDecision unit tests) + #6 (skip payload-less records, no fatal stop; scope A) + #7 (foreground sync API split + debounce) landed. 2026-06-22: M4 (off-main-actor save pipeline) landed; backlog status reconciled. Originally from the 2026-06-20 sync investigation session (macOS structured logs + iOS console).*

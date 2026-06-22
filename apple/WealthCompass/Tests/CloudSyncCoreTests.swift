@@ -218,6 +218,89 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(snapshot.updatedAt, updated)
     }
 
+    // MARK: - #8 fetch-first bootstrap: per-record merge decision
+    //
+    // `bootstrapDecision` is the collision-avoidance heart of the first-sync merge: the
+    // engine doesn't enqueue local inventory for upload until after the first fetch, and
+    // for each fetched record this decides local-wins / remote-wins / identical. The
+    // `.identical` outcome drops the local pending upload, which is what stops a second
+    // already-populated device from re-inserting records that already exist remotely.
+
+    private func bootstrapSnapshot(payload: String, updatedAt: Date, id: UUID = UUID()) -> CloudSyncRecordSnapshot {
+        CloudSyncRecordSnapshot(
+            key: CloudSyncRecordKey(type: .transaction, id: id),
+            payload: Data(payload.utf8),
+            createdAt: Date(timeIntervalSince1970: 0),
+            updatedAt: updatedAt
+        )
+    }
+
+    private func inventoryPending() -> CloudSyncPendingMutation {
+        .save(modifiedAt: Date(), revision: UUID(), origin: .inventory, allowsResurrection: false)
+    }
+
+    private func localChangePending() -> CloudSyncPendingMutation {
+        .save(modifiedAt: Date(), revision: UUID(), origin: .localChange, allowsResurrection: false)
+    }
+
+    private func deletePending() -> CloudSyncPendingMutation {
+        .delete(deletedAt: Date(), revision: UUID())
+    }
+
+    /// No local snapshot → adopt remote (there's nothing local to upload).
+    func testBootstrapDecisionMissingLocalAdoptsRemote() {
+        let remote = bootstrapSnapshot(payload: "remote", updatedAt: Date())
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: nil, local: nil, remote: remote), .remote)
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: inventoryPending(), local: nil, remote: remote), .remote)
+    }
+
+    /// Identical payloads → `.identical`, so the local pending upload is dropped. This is
+    /// the core zero-collision guarantee, and it short-circuits regardless of pending
+    /// kind or timestamps.
+    func testBootstrapDecisionIdenticalPayloadDropsUpload() {
+        let local = bootstrapSnapshot(payload: "same", updatedAt: Date(timeIntervalSince1970: 1_000))
+        let remote = bootstrapSnapshot(payload: "same", updatedAt: Date(timeIntervalSince1970: 8_000))
+        XCTAssertEqual(local.payloadHash, remote.payloadHash)
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: inventoryPending(), local: local, remote: remote), .identical)
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: localChangePending(), local: local, remote: remote), .identical)
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: nil, local: local, remote: remote), .identical)
+    }
+
+    /// A genuine local edit or a local delete wins over a differing remote, even if the
+    /// remote is newer.
+    func testBootstrapDecisionLocalChangeAndDeleteWinOverRemote() {
+        let local = bootstrapSnapshot(payload: "local", updatedAt: Date(timeIntervalSince1970: 1_000))
+        let remote = bootstrapSnapshot(payload: "remote", updatedAt: Date(timeIntervalSince1970: 9_000))
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: localChangePending(), local: local, remote: remote), .local)
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: deletePending(), local: local, remote: remote), .local)
+    }
+
+    /// With only inventory-origin pending (or none), the more recently updated side wins.
+    func testBootstrapDecisionInventoryAndNilResolveByRecency() {
+        let older = bootstrapSnapshot(payload: "old", updatedAt: Date(timeIntervalSince1970: 1_000))
+        let newer = bootstrapSnapshot(payload: "new", updatedAt: Date(timeIntervalSince1970: 9_000))
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: inventoryPending(), local: newer, remote: older), .local)
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: nil, local: newer, remote: older), .local)
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: inventoryPending(), local: older, remote: newer), .remote)
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: nil, local: older, remote: newer), .remote)
+    }
+
+    /// Equal timestamps fall back to a deterministic payload-hash tie-break, so two
+    /// devices independently pick the *same* winner (no ping-pong). The chosen winner is
+    /// the same record whichever side it's presented on.
+    func testBootstrapDecisionEqualTimestampsTieBreakDeterministically() {
+        let when = Date(timeIntervalSince1970: 5_000)
+        let local = bootstrapSnapshot(payload: "alpha", updatedAt: when)
+        let remote = bootstrapSnapshot(payload: "omega", updatedAt: when)
+        XCTAssertNotEqual(local.payloadHash, remote.payloadHash)
+
+        let expected: CloudKitSyncService.BootstrapDecision = local.payloadHash > remote.payloadHash ? .local : .remote
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: inventoryPending(), local: local, remote: remote), expected)
+
+        let expectedSwapped: CloudKitSyncService.BootstrapDecision = remote.payloadHash > local.payloadHash ? .local : .remote
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: inventoryPending(), local: remote, remote: local), expectedSwapped)
+    }
+
     private func makeTransaction(id: UUID, amount: Double) -> Transaction {
         Transaction(
             id: id,
