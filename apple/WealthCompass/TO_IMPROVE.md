@@ -21,7 +21,7 @@ These fixes are in the codebase but still need a clean verification run before c
    - On a test account, enable sync on two devices that already share the same local data.
    - Confirm iOS no longer freezes for minutes and macOS metadata writes are not one ~900 KB rewrite per conflicting record.
 
-4. **Remove temporary debug instrumentation**
+4. **Remove temporary debug instrumentation** — ✅ **Done 2026-06-22** (CODE_AUDIT C1): `I18nDebugLog.swift`, all `// #region agent log` blocks, every `wcDebugLog(...)` helper, and the localhost POST were deleted. Verified: 0 occurrences remain in `Sources/`.
    - Delete all `// #region agent log` blocks and `wcDebugLog(...)` helpers from:
      - `Sources/Shared/Services/CloudKitSyncService.swift`
      - `Sources/Shared/Stores/FinanceStore.swift`
@@ -77,6 +77,8 @@ These fixes are in the codebase but still need a clean verification run before c
 
 ### 9. Batch remote mutations instead of one full JSON rewrite per CloudKit batch
 
+> 🟡 **Partially done 2026-06-22 (CODE_AUDIT M4):** `applyRemoteMutations` applies in memory once (step 1), updates `@Published data` on the main actor, then routes the JSON encode/write **off** the main actor through `PersistenceCoordinator.applyRemote` (step 3 ✅), which serializes it against local saves. Steps 2 (time-based debounce) and 4 (one write per CloudKit batch vs per apply call) and the move away from a whole-file rewrite are still open — the latter is folded into #26.
+
 **Problem:** `applyRemoteMutations` still decodes/applies all mutations then writes the **entire** `wealth-compass-local-data.json` and updates `@Published data` on the main actor. Logs showed 175 ms for 200 mutations and repeated UI invalidation.
 
 **Steps:**
@@ -86,6 +88,8 @@ These fixes are in the codebase but still need a clean verification run before c
 4. Target: one disk write per CloudKit batch, not per internal retry.
 
 ### 10. Reduce cost of every local `save()` during sync
+
+> ✅ **Done 2026-06-22 (CODE_AUDIT M4):** the main-thread stall is resolved. `save()` is now non-blocking — it nudges a single serial `AsyncStream` consumer and returns; the full encode + SHA-256 diff + write run inside `PersistenceCoordinator` off the main actor, with `bufferingNewest(1)` coalescing bursts to the latest state. The full-dataset diff itself is unchanged (it just no longer blocks UI); the incremental dirty-key approach below stays available as a further optimization if profiling still shows cost, and naturally folds into #26.
 
 **Problem:** `FinanceStore.save()` calls `persistedData.cloudSyncRecords()` and `data.cloudSyncRecords()` on every change — full JSON encode + SHA256 of all records (~300 ms in logs for small edits).
 
@@ -160,6 +164,8 @@ These fixes are in the codebase but still need a clean verification run before c
 
 ### 18. Replace `assertionFailure` on save errors in production
 
+> ✅ **Done 2026-06-22 (CODE_AUDIT H5):** the `assertionFailure` was replaced with `os.Logger` + a published `persistenceError`, surfaced app-wide by a `PersistenceErrorBanner` on both root views. M4 preserved this behaviour — the consumer sets `persistenceError` on the main actor when `PersistenceCoordinator.save` throws, with no crash. Covered by `PersistenceCoordinatorTests.testDiskFailureSetsPersistenceErrorOnMainActor`.
+
 **Problem:** Failed local save calls `assertionFailure` — crashes debug builds and hides recoverable errors from users.
 
 **Steps:**
@@ -231,6 +237,8 @@ These fixes are in the codebase but still need a clean verification run before c
 
 ### 25. Move sync metadata off main actor
 
+> ✅ **Done 2026-06-22 (CODE_AUDIT M4):** `PersistenceCoordinator` is exactly the dedicated serial actor called for here — finance-data JSON persistence and the `CloudSyncMetadataStore.recordLocalChanges` write now run on it, off the main actor, while `@Published data` stays main-actor-only. `CloudSyncMetadataStore` remains `@unchecked Sendable` (NSLock-guarded), safe to hold inside the actor.
+
 Long term: `CloudSyncMetadataStore` and JSON persistence for finance data should not block UI. Consider a dedicated serial queue/actor for disk I/O with main-actor-only `@Published` snapshots.
 
 ### 26. Incremental local persistence
@@ -245,18 +253,20 @@ Store rolling net-worth history as chunked monthly aggregates locally; sync fewe
 
 ## Suggested execution order (summary)
 
-| Step | Item | Effort | Impact |
-|------|------|--------|--------|
-| 1 | 4 — Remove debug instrumentation | S | Required before release |
-| 2 | 1–3 — Verify recent fixes | S | Confidence |
-| 3 | 5 — CloudKit push wiring | M | High — background sync |
-| 4 | 7 — Foreground sync API split + debounce | S | High — less churn |
-| 5 | 8 — Fetch-first bootstrap | L | High — kills collision storm |
-| 6 | 9–10 — Batch remote apply + incremental save diff | L | High — fixes lag |
-| 7 | 11–12 — Snapshot + metadata pruning | M | Medium |
-| 8 | 6 — Non-fatal corrupt records | S | Medium |
-| 9 | 22 — Tests for 5–10 | M | Long-term stability |
+| Step | Item | Effort | Impact | Status |
+|------|------|--------|--------|--------|
+| 1 | 4 — Remove debug instrumentation | S | Required before release | ✅ Done |
+| 2 | 1–3 — Verify recent fixes | S | Confidence | ⏳ In progress (2-device test) |
+| 3 | 5 — CloudKit push wiring | M | High — background sync | ⏸️ Deferred (C4 removed unused entitlements) |
+| 4 | 7 — Foreground sync API split + debounce | S | High — less churn | ☐ Open |
+| 5 | 8 — Fetch-first bootstrap | L | High — kills collision storm | ☐ Open |
+| 6 | 9–10 — Batch remote apply + incremental save diff | L | High — fixes lag | 🟡 #10 done (M4), #9 partial |
+| 7 | 11–12 — Snapshot + metadata pruning | M | Medium | ☐ Open |
+| 8 | 6 — Non-fatal corrupt records | S | Medium | ☐ Open |
+| 9 | 22 — Tests for 5–10 | M | Long-term stability | ☐ Open |
+
+Also done outside this table: **#18** (assertionFailure → banner, H5) and **#25** (sync metadata / persistence off the main actor, M4).
 
 ---
 
-*Last updated: 2026-06-20 — from sync investigation session (macOS structured logs + iOS console).*
+*Last updated: 2026-06-22 — M4 (off-main-actor save pipeline) landed; backlog status reconciled. Originally from the 2026-06-20 sync investigation session (macOS structured logs + iOS console).*
