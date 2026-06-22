@@ -44,8 +44,6 @@ struct SettingsView: View {
                     }
                 }
 
-                exchangeRatesSection
-
                 Section("Privacy") {
                     Toggle(isOn: $settings.isPrivacyMode) {
                         Label("Privacy Mode", systemImage: settings.isPrivacyMode ? "eye.slash" : "eye")
@@ -202,6 +200,8 @@ struct SettingsView: View {
                             .foregroundStyle(WCColor.textSecondary)
                     }
                 }
+
+                exchangeRatesSection
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
