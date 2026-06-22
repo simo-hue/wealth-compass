@@ -527,7 +527,7 @@ struct MacDashboardView: View {
                         .position(by: .value("Type", "Income"))
                         .cornerRadius(6)
                         .opacity(hoveredCashFlowMonth == nil || hoveredCashFlowMonth?.id == month.id ? 1.0 : 0.3)
-                        .accessibilityLabel(Text("\(month.monthLabel), \(settings.localized("Income"))"))
+                        .accessibilityLabel(Text(verbatim: "\(month.monthLabel), \(settings.localized("Income"))"))
                         .accessibilityValue(Text(settings.privateCurrency(month.income)))
 
                         BarMark(
@@ -538,7 +538,7 @@ struct MacDashboardView: View {
                         .position(by: .value("Type", "Expenses"))
                         .cornerRadius(6)
                         .opacity(hoveredCashFlowMonth == nil || hoveredCashFlowMonth?.id == month.id ? 1.0 : 0.3)
-                        .accessibilityLabel(Text("\(month.monthLabel), \(settings.localized("Expenses"))"))
+                        .accessibilityLabel(Text(verbatim: "\(month.monthLabel), \(settings.localized("Expenses"))"))
                         .accessibilityValue(Text(settings.privateCurrency(month.expense)))
                     }
                     .chartLegend(.hidden)
