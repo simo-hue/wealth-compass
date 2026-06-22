@@ -16,14 +16,36 @@ struct MacOnboardingView: View {
                         welcomePage
                             .transition(slideTransition)
                     } else if currentTab == 1 {
-                        privacyPage
+                        personalizePage
                             .transition(slideTransition)
                     } else if currentTab == 2 {
+                        privacyPage
+                            .transition(slideTransition)
+                    } else if currentTab == 3 {
                         apiSetupPage
                             .transition(slideTransition)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(alignment: .topLeading) {
+                    if currentTab > 0 {
+                        Button {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { currentTab -= 1 }
+                        } label: {
+                            Image(systemName: "chevron.left")
+                                .font(.headline.weight(.semibold))
+                                .foregroundStyle(.white)
+                                .frame(width: 44, height: 44)
+                                .background(.white.opacity(0.08), in: Circle())
+                                .contentShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.leading, 20)
+                        .padding(.top, 16)
+                        .accessibilityLabel(settings.localized("Back"))
+                        .transition(.opacity)
+                    }
+                }
             }
             .padding(.bottom, 20)
         }
@@ -87,7 +109,91 @@ struct MacOnboardingView: View {
             .padding(.bottom, 40)
         }
     }
-    
+
+    private var personalizePage: some View {
+        VStack(spacing: 30) {
+            Spacer()
+
+            Image(systemName: "globe.europe.africa.fill")
+                .font(.system(size: 90, weight: .light))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [WCColor.primary, WCColor.accent],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .shadow(color: WCColor.primary.opacity(0.3), radius: 25, y: 15)
+
+            VStack(spacing: 15) {
+                Text("Make It Yours")
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+
+                Text("Pick your base currency and language. You can change both anytime in Settings.")
+                    .font(.title3)
+                    .foregroundStyle(WCColor.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+            }
+
+            VStack(spacing: 12) {
+                InsetFinanceRow {
+                    HStack {
+                        Label("Base Currency", systemImage: "coloncurrencysign.circle")
+                            .foregroundStyle(.white)
+                        Spacer()
+                        Picker("Base Currency", selection: $settings.currency) {
+                            ForEach(Currency.allCases) { currency in
+                                (Text(currency.displayName) + Text(" (\(currency.rawValue))")).tag(currency)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .tint(WCColor.primary)
+                        .frame(maxWidth: 240)
+                    }
+                }
+
+                InsetFinanceRow {
+                    HStack {
+                        Label("Language", systemImage: "character.bubble")
+                            .foregroundStyle(.white)
+                        Spacer()
+                        Picker("Language", selection: $settings.appLanguage) {
+                            Text("System").tag(String?.none)
+                            ForEach(settings.availableLanguages, id: \.self) { code in
+                                Text(settings.languageName(for: code)).tag(String?.some(code))
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .tint(WCColor.primary)
+                        .frame(maxWidth: 240)
+                    }
+                }
+            }
+            .frame(maxWidth: 520)
+            .padding(.horizontal, 40)
+
+            Spacer()
+
+            Button {
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { currentTab = 2 }
+            } label: {
+                Text("Continue")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.black)
+                    .frame(maxWidth: 320)
+                    .padding(.vertical, 14)
+                    .background(WCColor.primary.gradient, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .padding(.bottom, 40)
+        }
+    }
+
     private var privacyPage: some View {
         VStack(spacing: 30) {
             Spacer()
@@ -119,7 +225,7 @@ struct MacOnboardingView: View {
             Spacer()
             
             Button {
-                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { currentTab = 2 }
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { currentTab = 3 }
             } label: {
                 Text("Continue")
                     .font(.headline.weight(.semibold))

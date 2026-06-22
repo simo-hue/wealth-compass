@@ -209,7 +209,7 @@ checkboxes. Items are ordered by severity within each section.
   appear unused; `selectedTransaction`/`selectedInvestment` selection state is largely vestigial.
   *Fix:* delete unused members.
 
-- [ ] **L6 — Onboarding can't go back and omits currency/language.**
+- [x] **L6 — Onboarding can't go back and omits currency/language.** ✅ Done 2026-06-22 — added a "Personalize" step (base-currency + in-app-language pickers mirroring Settings) as the second onboarding page on both platforms, plus a 44pt back affordance shown on every page after the first.
   Both onboarding flows are forward-only and never let the user choose base currency or language up front
   (the most impactful settings for a finance app).
   *Fix:* add a back affordance and a currency (and optional language) step.

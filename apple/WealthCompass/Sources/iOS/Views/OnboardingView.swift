@@ -13,15 +13,35 @@ struct OnboardingView: View {
             TabView(selection: $currentTab) {
                 welcomePage
                     .tag(0)
-                
-                privacyPage
+
+                personalizePage
                     .tag(1)
-                
-                apiSetupPage
+
+                privacyPage
                     .tag(2)
+
+                apiSetupPage
+                    .tag(3)
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .padding(.bottom, 20)
+            .overlay(alignment: .topLeading) {
+                if currentTab > 0 {
+                    Button {
+                        withAnimation { currentTab -= 1 }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 44, height: 44)
+                            .background(.white.opacity(0.08), in: Circle())
+                    }
+                    .padding(.leading, 16)
+                    .padding(.top, 4)
+                    .accessibilityLabel(settings.localized("Back"))
+                    .transition(.opacity)
+                }
+            }
         }
         .preferredColorScheme(.dark)
         .onAppear { viewModel.loadConfiguredState() }
@@ -112,6 +132,87 @@ struct OnboardingView: View {
             Spacer()
             
             Button {
+                withAnimation { currentTab = 3 }
+            } label: {
+                Text("Continue")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(WCColor.primary.gradient, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+                    .padding(.horizontal, 40)
+            }
+            .padding(.bottom, 60)
+        }
+    }
+
+    private var personalizePage: some View {
+        VStack(spacing: 30) {
+            Spacer()
+
+            Image(systemName: "globe.europe.africa.fill")
+                .font(.system(size: 80, weight: .light))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [WCColor.primary, WCColor.accent],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .shadow(color: WCColor.primary.opacity(0.3), radius: 20, y: 10)
+
+            VStack(spacing: 15) {
+                Text("Make It Yours")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+
+                Text("Pick your base currency and language. You can change both anytime in Settings.")
+                    .font(.body)
+                    .foregroundStyle(WCColor.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 30)
+            }
+
+            VStack(spacing: 12) {
+                InsetFinanceRow {
+                    HStack {
+                        Label("Base Currency", systemImage: "coloncurrencysign.circle")
+                            .foregroundStyle(.white)
+                        Spacer()
+                        Picker("Base Currency", selection: $settings.currency) {
+                            ForEach(Currency.allCases) { currency in
+                                (Text(currency.displayName) + Text(" (\(currency.rawValue))")).tag(currency)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .tint(WCColor.primary)
+                    }
+                }
+
+                InsetFinanceRow {
+                    HStack {
+                        Label("Language", systemImage: "character.bubble")
+                            .foregroundStyle(.white)
+                        Spacer()
+                        Picker("Language", selection: $settings.appLanguage) {
+                            Text("System").tag(String?.none)
+                            ForEach(settings.availableLanguages, id: \.self) { code in
+                                Text(settings.languageName(for: code)).tag(String?.some(code))
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .tint(WCColor.primary)
+                    }
+                }
+            }
+            .padding(.horizontal, 30)
+
+            Spacer()
+
+            Button {
                 withAnimation { currentTab = 2 }
             } label: {
                 Text("Continue")
@@ -125,7 +226,7 @@ struct OnboardingView: View {
             .padding(.bottom, 60)
         }
     }
-    
+
     private var apiSetupPage: some View {
         GeometryReader { proxy in
             ScrollView {
