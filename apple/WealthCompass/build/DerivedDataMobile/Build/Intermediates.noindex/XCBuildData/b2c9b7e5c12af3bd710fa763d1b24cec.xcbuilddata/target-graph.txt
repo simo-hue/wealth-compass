@@ -1,2 +1,0 @@
-Target dependency graph (1 target)
-Target 'WealthCompassMobile' in project 'WealthCompass' (no dependencies)
