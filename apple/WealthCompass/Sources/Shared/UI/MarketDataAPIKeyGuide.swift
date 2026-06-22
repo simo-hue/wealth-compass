@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct MarketDataAPIKeyGuide: View {
     private let providers = MarketDataAPIProviderGuide.onboardingProviders
@@ -43,7 +46,14 @@ struct MarketDataAPIKeyGuide: View {
 }
 
 struct MarketDataAPIKeySecurityNote: View {
-    let deviceName: String
+    /// Derived from the running device rather than hardcoded per call site (L3).
+    private var deviceName: String {
+        #if canImport(UIKit)
+        return UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone"
+        #else
+        return "Mac"
+        #endif
+    }
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {

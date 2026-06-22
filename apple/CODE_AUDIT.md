@@ -180,13 +180,13 @@ checkboxes. Items are ordered by severity within each section.
 
 ## P3 — Low / Polish / Consistency
 
-- [ ] **L1 — App display name differs across platforms.**
+- [x] **L1 — App display name differs across platforms.** ✅ Done 2026-06-22 — unified on "Wealth Compass Tracker" (matches App Store metadata + iOS); set the macOS target's `INFOPLIST_KEY_CFBundleDisplayName` and removed the dead iOS `INFOPLIST_KEY_*` keys (`GENERATE_INFOPLIST_FILE = NO`), verified with `plutil -lint`.
   iOS shows **"Wealth Compass Tracker"** (`Resources/iOS/Info.plist` `CFBundleDisplayName`) while macOS shows
   **"Wealth Compass"** (`INFOPLIST_KEY_CFBundleDisplayName`). The `INFOPLIST_KEY_CFBundleDisplayName` on the
   mobile target is dead (mobile uses `GENERATE_INFOPLIST_FILE = NO`).
   *Fix:* pick one name; remove the dead mobile `INFOPLIST_KEY_*` settings.
 
-- [ ] **L2 — Inconsistent localized-string usage.**
+- [x] **L2 — Inconsistent localized-string usage.** ✅ Done 2026-06-22 — removed the 32 stray-space `LocalizedStringKey( "…")` literals; the lone `Text(LocalizedStringKey(category))` that localized user-entered categories is now `Text(verbatim:)` (matching how categories render everywhere else).
   Many views wrap literals as `LocalizedStringKey( "Crypto assets")` (note the stray space) — e.g.
   `iOS/Views/CryptoView.swift`, `InvestmentsView.swift`, `macOS/Views/MacInvestmentsView.swift` — while most
   views pass plain literals. Mixed `Text(LocalizedStringKey(category))` for user-entered categories also
@@ -194,17 +194,17 @@ checkboxes. Items are ordered by severity within each section.
   *Fix:* standardize on plain string literals for `LocalizedStringKey` params; use `Text(verbatim:)` for
   user-entered content.
 
-- [ ] **L3 — Hardcoded, non-localized device/biometry strings.**
+- [x] **L3 — Hardcoded, non-localized device/biometry strings.** ✅ Done 2026-06-22 — added `BiometricLockStore.biometrySymbolName()` (Face/Touch/Optic ID → matching SF Symbol) so `LockView` no longer hardcodes `"faceid"`; `MarketDataAPIKeySecurityNote` now derives the device noun (iPhone/iPad/Mac) from the running device instead of a per-call-site literal.
   `MarketDataAPIKeySecurityNote(deviceName: "iPhone" / "Mac")` is hardcoded; `LockView` always uses the
   `"faceid"` SF Symbol even on Touch ID / Optic ID devices.
   *Fix:* derive device/biometry symbol+name from `LAContext.biometryType` and localize.
 
-- [ ] **L4 — Amount fields seeded with `String(Double)`.**
+- [x] **L4 — Amount fields seeded with `String(Double)`.** ✅ Done 2026-06-22 — added shared `AmountInputFormatter` (no grouping, no scientific notation, "." decimal, ≤8 fraction digits; round-trips with the forms' comma-normalizing `Double(...)` parse) and routed every amount-field seed (`String($0.amount)`) and the ad-hoc `%.8g` helpers through it.
   `String($0.amount)` (e.g. `Forms.swift:29`, `MacCashFlowView` editor) can produce scientific notation or
   locale-mismatched separators; editing uses `%.8g` elsewhere. Inconsistent.
   *Fix:* one shared number→input formatter used everywhere a numeric field is seeded.
 
-- [ ] **L5 — Dead code.**
+- [x] **L5 — Dead code.** ✅ Done 2026-06-22 — deleted the unused `compactCurrency(_:)` (iOS + macOS dashboards) and `countLabel(_:singular:)` (macOS dashboard); confirmed no call sites first.
   `compactCurrency(_:)` (DashboardView & MacDashboardView) and `countLabel(_:singular:)` (MacDashboardView)
   appear unused; `selectedTransaction`/`selectedInvestment` selection state is largely vestigial.
   *Fix:* delete unused members.
@@ -214,11 +214,11 @@ checkboxes. Items are ordered by severity within each section.
   (the most impactful settings for a finance app).
   *Fix:* add a back affordance and a currency (and optional language) step.
 
-- [ ] **L7 — Inconsistent category-reset behavior between forms.**
+- [x] **L7 — Inconsistent category-reset behavior between forms.** ✅ Done 2026-06-22 — the two recurring editors and the Mac transaction editor now preserve a still-valid category on type change (the `!contains(category) && !isCustomCategorySelected` guard from `TransactionFormView`) instead of resetting unconditionally.
   `RecurringTransactionFormView`/Mac editors reset category on type change unconditionally, while
   `TransactionFormView` preserves a still-valid selection. Pick one behavior.
 
-- [ ] **L8 — Privacy mask string differs (`"****"` vs `"••••"`) across screens.**
+- [x] **L8 — Privacy mask string differs (`"****"` vs `"••••"`) across screens.** ✅ Done 2026-06-22 — added `AppSettings.redactionToken` ("••••") as the single source of truth and replaced every `"****"`/`"••••"` literal across the views.
   Standardize the redaction token in one helper on `AppSettings`.
 
 ---

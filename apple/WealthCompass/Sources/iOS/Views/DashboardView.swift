@@ -515,23 +515,14 @@ struct DashboardView: View {
         return (minimum - padding)...(maximum + padding)
     }
 
-    private func compactCurrency(_ value: Double) -> String {
-        let compactValue = value.formatted(
-            .number
-                .notation(.compactName)
-                .precision(.fractionLength(0...1))
-        )
-        return "\(settings.currency.symbol)\(compactValue)"
-    }
-
     private func privatePercent(_ value: Double) -> String {
         settings.isPrivacyMode
-            ? "••••"
+            ? settings.redactionToken
             : "\(value.formatted(.number.precision(.fractionLength(1))))%"
     }
 
     private func signedAmount(for transaction: Transaction) -> String {
-        guard !settings.isPrivacyMode else { return "••••" }
+        guard !settings.isPrivacyMode else { return settings.redactionToken }
         let prefix = transaction.type == .income ? "+" : "−"
         return prefix + settings.formatCurrency(transaction.amount)
     }

@@ -40,7 +40,7 @@ struct LockView: View {
                     } label: {
                         Label(
                             settings.localized("Unlock with \(appLock.biometryName(appLanguage: settings.appLanguage))"),
-                            systemImage: "faceid"
+                            systemImage: appLock.biometrySymbolName()
                         )
                             .font(.headline)
                             .foregroundStyle(.black.opacity(0.82))

@@ -43,3 +43,24 @@ struct CurrencyConverter {
         return convert(value, from: source, to: target)
     }
 }
+
+/// Single number→input-field formatter (L4).
+///
+/// Amount fields were seeded inconsistently — `String(Double)` (which can emit scientific
+/// notation, e.g. "1e-07", or locale-mismatched separators) in some forms and ad-hoc
+/// `String(format: "%.8g")` in others. This produces one clean, editable decimal string
+/// everywhere: no grouping separators, no scientific notation, "." decimal, up to 8
+/// fractional digits — round-tripping with the forms'
+/// `Double(text.replacingOccurrences(of: ",", with: "."))` parse.
+enum AmountInputFormatter {
+    static func string(_ value: Double) -> String {
+        guard value.isFinite, value != 0 else { return "0" }
+        let formatter = NumberFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.numberStyle = .decimal
+        formatter.usesGroupingSeparator = false
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 8
+        return formatter.string(from: NSNumber(value: value)) ?? "0"
+    }
+}

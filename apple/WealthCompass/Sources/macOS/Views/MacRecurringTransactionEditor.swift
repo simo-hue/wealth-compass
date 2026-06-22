@@ -33,7 +33,7 @@ struct MacRecurringTransactionEditor: View {
         let defaultEndDate = Calendar.current.date(byAdding: .year, value: 1, to: initialStartDate) ?? initialStartDate
 
         _type = State(initialValue: schedule?.type ?? .expense)
-        _amount = State(initialValue: schedule.map { String($0.amount) } ?? "")
+        _amount = State(initialValue: schedule.map { AmountInputFormatter.string($0.amount) } ?? "")
         _category = State(initialValue: schedule?.category ?? "Food")
         _note = State(initialValue: schedule?.description ?? "")
         _startDate = State(initialValue: initialStartDate)
@@ -102,7 +102,10 @@ struct MacRecurringTransactionEditor: View {
                     }
                     .pickerStyle(.segmented)
                     .onChange(of: type) { _, newType in
-                        category = settings.transactionCategories(for: newType).first ?? ""
+                        // Only reset category when changing type if the current one isn't valid for the new type (L7)
+                        if !settings.transactionCategories(for: newType).contains(category) && !isCustomCategorySelected {
+                            category = settings.transactionCategories(for: newType).first ?? ""
+                        }
                         customCategory = ""
                         isCustomCategoryFocused = false
                     }

@@ -85,23 +85,23 @@ struct MacCryptoView: View {
 
         return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
             MetricCard(
-                title: LocalizedStringKey( "Crypto Value"),
+                title: LocalizedStringKey("Crypto Value"),
                 value: settings.privateCurrency(total),
                 systemImage: "bitcoinsign.circle",
                 accent: WCColor.warning
             )
             MetricCard(
-                title: LocalizedStringKey( "Holdings"),
+                title: LocalizedStringKey("Holdings"),
                 value: privateCount(finance.data.crypto.count),
                 systemImage: "number"
             )
             MetricCard(
-                title: LocalizedStringKey( "Cost Basis"),
+                title: LocalizedStringKey("Cost Basis"),
                 value: settings.privateCurrency(costBasis),
                 systemImage: "banknote"
             )
             MetricCard(
-                title: LocalizedStringKey( "Profit / Loss"),
+                title: LocalizedStringKey("Profit / Loss"),
                 value: settings.privateCurrency(gain),
                 systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
                 accent: gain >= 0 ? WCColor.primary : WCColor.destructive
@@ -109,7 +109,7 @@ struct MacCryptoView: View {
             
             if !settings.isPrivacyMode {
                 MetricCard(
-                    title: LocalizedStringKey( "Performance"),
+                    title: LocalizedStringKey("Performance"),
                     value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
                     systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
                     accent: percent >= 0 ? WCColor.primary : WCColor.destructive
@@ -119,7 +119,7 @@ struct MacCryptoView: View {
             let latestUpdate = finance.data.crypto.map(\.updatedAt).max()
             let uniqueCryptoCount = Set(finance.data.crypto.map(\.symbol).filter(isNonEmpty)).count
             MetricCard(
-                title: LocalizedStringKey( "Status • \(privateCount(uniqueCryptoCount)) Coins"),
+                title: LocalizedStringKey("Status • \(privateCount(uniqueCryptoCount)) Coins"),
                 value: latestUpdate.map(formattedUpdate) ?? settings.localized("Never"),
                 systemImage: "checkmark.circle"
             )
@@ -132,7 +132,7 @@ struct MacCryptoView: View {
             
             HStack(spacing: 24) {
                 AllocationChart(
-                    title: LocalizedStringKey( "Crypto Allocation"),
+                    title: LocalizedStringKey("Crypto Allocation"),
                     slices: finance.cryptoAllocation(settings: settings),
                     settings: settings,
                     showLegend: false
@@ -357,7 +357,7 @@ struct MacCryptoView: View {
     }
 
     private func privateCount(_ count: Int) -> String {
-        settings.isPrivacyMode ? "****" : "\(count)"
+        settings.isPrivacyMode ? settings.redactionToken : "\(count)"
     }
 
     private func formattedUpdate(_ date: Date) -> String {

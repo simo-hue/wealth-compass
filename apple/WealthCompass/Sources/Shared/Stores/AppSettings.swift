@@ -237,6 +237,9 @@ final class AppSettings: ObservableObject {
         showResult?(result)
     }
 
+    /// Single source of truth for the privacy-mode redaction glyph (L8).
+    let redactionToken = "••••"
+
     func formatCurrency(_ value: Double, sourceCurrency: Currency? = nil) -> String {
         let converted = convert(value, from: sourceCurrency)
         return converted.formatted(.currency(code: currency.rawValue))
@@ -247,11 +250,11 @@ final class AppSettings: ObservableObject {
     }
 
     func privateCurrency(_ value: Double, sourceCurrency: Currency? = nil) -> String {
-        isPrivacyMode ? "****" : formatCurrency(value, sourceCurrency: sourceCurrency)
+        isPrivacyMode ? redactionToken : formatCurrency(value, sourceCurrency: sourceCurrency)
     }
 
     func privateNumber(_ value: Double, fractionDigits: Int = 2) -> String {
-        guard !isPrivacyMode else { return "****" }
+        guard !isPrivacyMode else { return redactionToken }
         return value.formatted(.number.precision(.fractionLength(0...fractionDigits)))
     }
 

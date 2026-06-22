@@ -37,6 +37,22 @@ class BiometricLockStore: ObservableObject {
         }
     }
 
+    /// SF Symbol matching the device's biometry, so the lock UI doesn't hardcode "faceid" (L3).
+    func biometrySymbolName() -> String {
+        let context = LAContext()
+        _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+        switch context.biometryType {
+        case .faceID:
+            return "faceid"
+        case .touchID:
+            return "touchid"
+        case .opticID:
+            return "opticid"
+        default:
+            return "lock.fill"
+        }
+    }
+
     func enableLock(appLanguage: String?) async -> Bool {
         let success = await authenticate(
             reason: AppLocalization.string("Enable biometric protection for Wealth Compass.", appLanguage: appLanguage),

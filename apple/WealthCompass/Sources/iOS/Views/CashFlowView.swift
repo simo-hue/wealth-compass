@@ -117,7 +117,7 @@ struct CashFlowView: View {
             MetricCard(title: "Monthly Income", value: settings.privateCurrency(cashFlow.monthlyIncome), systemImage: "arrow.down.left", accent: WCColor.primary, detail: "This month")
             MetricCard(title: "Monthly Expenses", value: settings.privateCurrency(cashFlow.monthlyExpenses), systemImage: "arrow.up.right", accent: WCColor.destructive, detail: "This month")
             MetricCard(title: "Net Savings", value: settings.privateCurrency(cashFlow.netSavings), systemImage: "wallet.pass.fill", accent: cashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive, detail: "Income less expenses")
-            MetricCard(title: "Savings Rate", value: settings.isPrivacyMode ? "****" : "\(cashFlow.savingsRate.formatted(.number.precision(.fractionLength(1))))%", systemImage: "percent", detail: "Of monthly income")
+            MetricCard(title: "Savings Rate", value: settings.isPrivacyMode ? settings.redactionToken : "\(cashFlow.savingsRate.formatted(.number.precision(.fractionLength(1))))%", systemImage: "percent", detail: "Of monthly income")
         }
     }
 
