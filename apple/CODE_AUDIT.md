@@ -253,14 +253,14 @@ checkboxes. Items are ordered by severity within each section.
 Only `Tests/CloudSyncCoreTests.swift` exists (cloud-sync record keys, change-set diff, mutation round-trip,
 legacy migration, sync lifecycle). High-value pure logic is **untested**:
 
-- [x] **T1 — Currency conversion** incl. the NaN/Inf/zero-rate guards in `AppSettings.convert`. ✅ written 2026-06-22 (`CurrencyConverterTests`) — pending first run in Xcode.
-- [x] **T2 — Recurring date math** ✅ written 2026-06-22 (`RecurringScheduleBuilderTests`, pending first run): monthly/yearly anchoring, end-of-month clamping, DST boundaries,
+- [x] **T1 — Currency conversion** incl. the NaN/Inf/zero-rate guards in `AppSettings.convert`. ✅ written 2026-06-22 (`CurrencyConverterTests`) — verified passing 2026-06-22 (full suite, 39 cases green on iPhone 17 sim).
+- [x] **T2 — Recurring date math** ✅ written 2026-06-22 (`RecurringScheduleBuilderTests`, verified passing 2026-06-22): monthly/yearly anchoring, end-of-month clamping, DST boundaries,
   `firstOccurrence(onOrAfter:)`, and `processDueRecurringTransactions` catch-up + dedup.
-- [x] **T3 — Snapshot engine** ✅ written 2026-06-22 (`SnapshotEngineTests`, pending first run): `appendSnapshot` backfill (incl. > 60-day gaps) and
+- [x] **T3 — Snapshot engine** ✅ written 2026-06-22 (`SnapshotEngineTests`, verified passing 2026-06-22): `appendSnapshot` backfill (incl. > 60-day gaps) and
   `adjustHistoricalSnapshots` after back-dated edits/deletes.
-- [x] **T4 — Import parser** ✅ written 2026-06-22 (`FinanceImportServiceTests`, pending first run): lossy arrays, legacy web shapes (`income`/`expenses`/`liquidity`), multiple date
+- [x] **T4 — Import parser** ✅ written 2026-06-22 (`FinanceImportServiceTests`, verified passing 2026-06-22): lossy arrays, legacy web shapes (`income`/`expenses`/`liquidity`), multiple date
   formats, comma decimals, and skipped-record counting.
-- [x] **T5 — Analytics** ✅ written 2026-06-22 (`AnalyticsEngineTests`, pending first run): `expensesByCategory`, `cashFlowTrend`, totals/allocations.
+- [x] **T5 — Analytics** ✅ written 2026-06-22 (`AnalyticsEngineTests`, verified passing 2026-06-22): `expensesByCategory`, `cashFlowTrend`, totals/allocations.
   *Prerequisite:* M1 (extract pure logic so it's testable without the `@MainActor` store).
 
 ---
