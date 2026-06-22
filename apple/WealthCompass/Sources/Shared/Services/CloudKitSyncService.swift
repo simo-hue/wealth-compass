@@ -473,7 +473,7 @@ enum CloudSyncError: LocalizedError {
 
 actor CloudKitSyncService: CKSyncEngineDelegate {
     typealias SnapshotProvider = @MainActor @Sendable () throws -> [CloudSyncRecordKey: CloudSyncRecordSnapshot]
-    typealias RemoteMutationHandler = @MainActor @Sendable ([CloudSyncRemoteMutation]) throws -> Set<CloudSyncRecordKey>
+    typealias RemoteMutationHandler = @MainActor @Sendable ([CloudSyncRemoteMutation]) async throws -> Set<CloudSyncRecordKey>
     typealias StatusHandler = @MainActor @Sendable (CloudSyncStatus) -> Void
     typealias DisableHandler = @MainActor @Sendable () -> Void
     typealias AccountStatusProvider = @Sendable () async throws -> CKAccountStatus

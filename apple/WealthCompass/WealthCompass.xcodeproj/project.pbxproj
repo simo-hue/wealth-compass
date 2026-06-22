@@ -84,6 +84,7 @@
 		AD0000000000000000000042 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000032 /* Assets.xcassets */; };
 		AD0000000000000000000043 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000033 /* PrivacyInfo.xcprivacy */; };
 		AD0000000000000000000050 /* CloudSyncCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000050 /* CloudSyncCoreTests.swift */; };
+		AD00000000000000000000C6 /* PersistenceCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C6 /* PersistenceCoordinatorTests.swift */; };
 		AD00000000000000000000C1 /* CurrencyConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C1 /* CurrencyConverterTests.swift */; };
 		AD00000000000000000000C2 /* SnapshotEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C2 /* SnapshotEngineTests.swift */; };
 		AD00000000000000000000C3 /* RecurringScheduleBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */; };
@@ -166,6 +167,7 @@
 		AC0000000000000000000040 /* WealthCompassMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WealthCompassMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC0000000000000000000041 /* Wealth Compass.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wealth Compass.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC0000000000000000000050 /* CloudSyncCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncCoreTests.swift; sourceTree = "<group>"; };
+		AC00000000000000000000C6 /* PersistenceCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceCoordinatorTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C1 /* CurrencyConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C2 /* SnapshotEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotEngineTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringScheduleBuilderTests.swift; sourceTree = "<group>"; };
@@ -408,6 +410,7 @@
 				AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */,
 				AC00000000000000000000C4 /* AnalyticsEngineTests.swift */,
 				AC00000000000000000000C5 /* FinanceImportServiceTests.swift */,
+				AC00000000000000000000C6 /* PersistenceCoordinatorTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -700,6 +703,7 @@
 				AD00000000000000000000C3 /* RecurringScheduleBuilderTests.swift in Sources */,
 				AD00000000000000000000C4 /* AnalyticsEngineTests.swift in Sources */,
 				AD00000000000000000000C5 /* FinanceImportServiceTests.swift in Sources */,
+				AD00000000000000000000C6 /* PersistenceCoordinatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
