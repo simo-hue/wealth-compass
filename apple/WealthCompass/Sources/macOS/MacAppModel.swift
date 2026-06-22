@@ -6,6 +6,7 @@ enum MacDestination: String, CaseIterable, Identifiable {
     case cashFlow
     case investments
     case crypto
+    case settings
 
     var id: String { rawValue }
 
@@ -15,6 +16,7 @@ enum MacDestination: String, CaseIterable, Identifiable {
         case .cashFlow: "Cash Flow"
         case .investments: "Investments"
         case .crypto: "Crypto"
+        case .settings: "Settings"
         }
     }
 
@@ -24,6 +26,7 @@ enum MacDestination: String, CaseIterable, Identifiable {
         case .cashFlow: AppLocalization.string("Cash Flow", appLanguage: appLanguage)
         case .investments: AppLocalization.string("Investments", appLanguage: appLanguage)
         case .crypto: AppLocalization.string("Crypto", appLanguage: appLanguage)
+        case .settings: AppLocalization.string("Settings", appLanguage: appLanguage)
         }
     }
 
@@ -33,6 +36,7 @@ enum MacDestination: String, CaseIterable, Identifiable {
         case .cashFlow: "arrow.left.arrow.right"
         case .investments: "chart.line.uptrend.xyaxis"
         case .crypto: "bitcoinsign.circle"
+        case .settings: "gearshape"
         }
     }
 }
@@ -65,7 +69,7 @@ final class MacAppModel: ObservableObject {
             editor = .investment(nil)
         case .crypto:
             editor = .crypto(nil)
-        case .dashboard, .cashFlow, nil:
+        case .dashboard, .cashFlow, .settings, nil:
             editor = .transaction
         }
     }
