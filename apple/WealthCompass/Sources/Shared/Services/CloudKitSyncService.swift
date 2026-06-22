@@ -1133,15 +1133,35 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         }
 
         if !nonDeletedConflicts.isEmpty {
+            // #15: don't blindly re-upload a record just because its insert collided. The
+            // dominant first-sync case is two devices uploading the *same* records, so the
+            // server already holds an identical payload — there we adopt the server's
+            // system fields and DROP the pending upload instead of re-sending identical
+            // data (the source of the "hundreds of collisions" churn). Identity is decided
+            // by the same `bootstrapDecision` used by the fetch merge. Genuinely divergent
+            // records still requeue and re-upload as an update with the adopted fields.
+            // (Applying a *newer* server payload on divergence — audit #15 step 2 — is a
+            // deliberate follow-up; this change can only ever drop a redundant upload, so
+            // worst case it falls back to today's requeue behaviour.)
+            let localRecords = (try? await snapshotProvider()) ?? [:]
             var conflictRequeue = Set<CloudSyncRecordKey>()
             try metadataStore.update { metadata in
                 for (key, serverRecord) in nonDeletedConflicts {
                     var state = metadata.records[key.storageKey] ?? CloudSyncRecordState()
                     state.systemFields = encodeSystemFields(serverRecord)
-                    metadata.records[key.storageKey] = state
-                    if state.pending != nil {
+
+                    let serverSnapshot = Self.remoteSnapshot(from: serverRecord, key: key)
+                    if let serverSnapshot,
+                       Self.bootstrapDecision(pending: state.pending, local: localRecords[key], remote: serverSnapshot) == .identical {
+                        state.pending = nil
+                        state.isTombstone = false
+                        state.deletedAt = nil
+                        metadata.knownLocalHashes[key.storageKey] = serverSnapshot.payloadHash
+                    } else if state.pending != nil {
                         conflictRequeue.insert(key)
                     }
+
+                    metadata.records[key.storageKey] = state
                 }
             }
             simpleRequeue.formUnion(conflictRequeue)
