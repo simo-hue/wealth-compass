@@ -442,3 +442,11 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-06-22]: Fix Italian Translation for "Crypto"
   - *Details*: Changed the Italian translation of "Crypto assets" from "Risorse crittografiche" to "Criptovalute" to make it contextual for a financial application.
   - *Tech Notes*: Modified `Localizable.xcstrings` line 30983.
+
+- [2026-06-22]: Settings Layout Update
+  - *Details*: Moved Exchange Rates from a popover in the Global Currency section to its own dedicated Card at the bottom of the Settings page.
+  - *Tech Notes*: Modified src/pages/Settings.tsx to extract the currencyRates iteration into a new card.
+
+- [2026-06-22]: iOS Settings Page Section Reorder
+  - *Details*: Moved the "Exchange Rates" section to be the last section in the iOS Settings page, positioned below the "Storage" section, for a more logical layout.
+  - *Tech Notes*: Modified `SettingsView.swift` — moved `exchangeRatesSection` reference from after "Region & Language" to after "Storage".
