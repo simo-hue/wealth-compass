@@ -347,7 +347,7 @@ struct DashboardView: View {
                         .foregroundStyle(WCColor.primary.gradient)
                         .position(by: .value(settings.localized("Type"), settings.localized("Income")))
                         .cornerRadius(6)
-                        .accessibilityLabel(Text("\(month.monthLabel), \(settings.localized("Income"))"))
+                        .accessibilityLabel(Text(verbatim: "\(month.monthLabel), \(settings.localized("Income"))"))
                         .accessibilityValue(Text(settings.privateCurrency(month.income)))
 
                         BarMark(
@@ -357,7 +357,7 @@ struct DashboardView: View {
                         .foregroundStyle(WCColor.destructive.opacity(0.8).gradient)
                         .position(by: .value(settings.localized("Type"), settings.localized("Expenses")))
                         .cornerRadius(6)
-                        .accessibilityLabel(Text("\(month.monthLabel), \(settings.localized("Expenses"))"))
+                        .accessibilityLabel(Text(verbatim: "\(month.monthLabel), \(settings.localized("Expenses"))"))
                         .accessibilityValue(Text(settings.privateCurrency(month.expense)))
                     }
                     .chartLegend(.hidden)

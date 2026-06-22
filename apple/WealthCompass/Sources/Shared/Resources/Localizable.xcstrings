@@ -21049,6 +21049,9 @@
         }
       }
     },
+    "Back" : {
+
+    },
     "Backup Exported" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -65441,6 +65444,9 @@
         }
       }
     },
+    "Make It Yours" : {
+
+    },
     "Manual Actions" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -69222,6 +69228,9 @@
           }
         }
       }
+    },
+    "Net-worth history" : {
+
     },
     "Net-worth history concealed" : {
       "extractionState" : "manual",
@@ -82633,6 +82642,9 @@
           }
         }
       }
+    },
+    "Pick your base currency and language. You can change both anytime in Settings." : {
+
     },
     "Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them." : {
       "extractionState" : "manual",
