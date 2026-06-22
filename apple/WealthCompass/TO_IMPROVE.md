@@ -52,6 +52,13 @@ These fixes are in the codebase but still need a clean verification run before c
 
 ### 7. Fix `refreshICloudSyncIfNeeded()` calling `start()` on every activation
 
+> ✅ **Done 2026-06-23:** Split the API and debounced the foreground path.
+> - **Service (`CloudKitSyncService`):** `start(allowAccountReplacement:)` is now purely "ensure running" — when an engine already exists it returns immediately instead of falling through to `synchronize()` (it still performs the full startup + one initial sync when the engine is `nil`). Added `requestSync()`: sync-only, no-ops when the engine isn't running (it never starts it), and debounced via a new in-memory `lastSyncStartedAt` + `foregroundSyncMinimumInterval` (30 s). `synchronize(generation:using:)` stamps `lastSyncStartedAt` when a sync actually begins, so cold-start, Force Sync, and change-driven syncs all reset the debounce window; `synchronize()` (Force Sync) and change-driven `localChangesRecorded()` are **not** gated.
+> - **Store (`FinanceStore`):** replaced `refreshICloudSyncIfNeeded()` with `ensureICloudSyncRunning()` (→ `start`) and `requestICloudSync()` (→ `requestSync`); factored the enabled-check into `isICloudSyncEnabledResolved` (also used by `forceICloudSync`). Toggle-on still uses `start` via `setICloudSyncEnabled`.
+> - **Call sites:** `ContentView` + `MacRootView` `handleAppBecameActive()` now call `ensureICloudSyncRunning()` then `requestICloudSync()`. Net effect: cold launch starts the engine (+ one sync) and the immediately-following `requestSync` is debounced away; later foregrounds skip the startup entirely and only sync if ≥ 30 s since the last sync.
+> - **Test:** `CloudSyncCoreTests.testRequestSyncWithoutRunningEngineIsNoOp` locks in that `requestSync()` never starts the engine, checks the account, or emits a status when nothing is running. (The engine-*running* debounce path isn't unit-tested — `CKSyncEngine` needs a real CloudKit container — and is left to the 2-device verify pass / item #22.)
+> - **Verify:** both targets build; full suite green on iPhone 17.
+
 **Problem:** `ContentView` / `MacRootView` call `refreshICloudSyncIfNeeded()` whenever the app becomes active. That calls `cloudSyncService.start(...)`, which can re-run startup work (account checks, inventory reconcile, engine setup) even when the engine is already running.
 
 **Steps:**
@@ -258,7 +265,7 @@ Store rolling net-worth history as chunked monthly aggregates locally; sync fewe
 | 1 | 4 — Remove debug instrumentation | S | Required before release | ✅ Done |
 | 2 | 1–3 — Verify recent fixes | S | Confidence | ⏳ In progress (2-device test) |
 | 3 | 5 — CloudKit push wiring | M | High — background sync | ⏸️ Deferred (C4 removed unused entitlements) |
-| 4 | 7 — Foreground sync API split + debounce | S | High — less churn | ☐ Open |
+| 4 | 7 — Foreground sync API split + debounce | S | High — less churn | ✅ Done |
 | 5 | 8 — Fetch-first bootstrap | L | High — kills collision storm | ☐ Open |
 | 6 | 9–10 — Batch remote apply + incremental save diff | L | High — fixes lag | 🟡 #10 done (M4), #9 partial |
 | 7 | 11–12 — Snapshot + metadata pruning | M | Medium | ☐ Open |
@@ -269,4 +276,4 @@ Also done outside this table: **#18** (assertionFailure → banner, H5) and **#2
 
 ---
 
-*Last updated: 2026-06-22 — M4 (off-main-actor save pipeline) landed; backlog status reconciled. Originally from the 2026-06-20 sync investigation session (macOS structured logs + iOS console).*
+*Last updated: 2026-06-23 — #7 (foreground sync API split + debounce) landed. 2026-06-22: M4 (off-main-actor save pipeline) landed; backlog status reconciled. Originally from the 2026-06-20 sync investigation session (macOS structured logs + iOS console).*

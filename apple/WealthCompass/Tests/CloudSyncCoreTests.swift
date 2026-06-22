@@ -149,6 +149,46 @@ final class CloudSyncCoreTests: XCTestCase {
         })
     }
 
+    /// #7: the foreground `requestSync()` path must be sync-only. With no engine
+    /// running it has to be a complete no-op — it must never run the startup work
+    /// (`start()`), so it must not create the engine, check the iCloud account, look
+    /// up the user record, reconcile inventory, or emit any status.
+    @MainActor
+    func testRequestSyncWithoutRunningEngineIsNoOp() async {
+        let engineFactoryCalled = ThreadSafeFlag()
+        var statuses: [CloudSyncStatus] = []
+        let metadataStore = CloudSyncMetadataStore(
+            directoryName: "WealthCompassTests-\(UUID().uuidString)"
+        )
+        let service = CloudKitSyncService(
+            metadataStore: metadataStore,
+            snapshotProvider: {
+                XCTFail("requestSync must not reconcile local inventory without a running engine.")
+                return [:]
+            },
+            remoteMutationHandler: { _ in [] },
+            statusHandler: { statuses.append($0) },
+            disableHandler: {},
+            accountStatusProvider: {
+                XCTFail("requestSync must not check the iCloud account; only start() may.")
+                return .available
+            },
+            userRecordIDProvider: {
+                XCTFail("requestSync must not look up the user record.")
+                return CKRecord.ID(recordName: "test-user")
+            },
+            engineFactory: { _ in
+                engineFactoryCalled.setTrue()
+                throw TestCloudSyncLifecycleError.engineShouldNotStart
+            }
+        )
+
+        await service.requestSync()
+
+        XCTAssertFalse(engineFactoryCalled.isSet, "requestSync must not start the sync engine.")
+        XCTAssertTrue(statuses.isEmpty, "requestSync must not emit a sync status when nothing is running.")
+    }
+
     private func makeTransaction(id: UUID, amount: Double) -> Transaction {
         Transaction(
             id: id,

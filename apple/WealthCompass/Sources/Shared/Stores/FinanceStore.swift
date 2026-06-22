@@ -845,10 +845,15 @@ final class FinanceStore: ObservableObject {
         }
     }
 
-    func forceICloudSync() async throws {
-        guard settings?.isICloudSyncEnabled
+    /// Whether iCloud sync is enabled, resolved from settings (falling back to the
+    /// persisted default when settings aren't attached yet).
+    private var isICloudSyncEnabledResolved: Bool {
+        settings?.isICloudSyncEnabled
             ?? UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
-        else {
+    }
+
+    func forceICloudSync() async throws {
+        guard isICloudSyncEnabledResolved else {
             throw CloudSyncError.notRunning
         }
         await cloudSyncService.synchronize()
@@ -869,13 +874,19 @@ final class FinanceStore: ObservableObject {
         }
     }
 
-    func refreshICloudSyncIfNeeded() async {
-        guard settings?.isICloudSyncEnabled
-            ?? UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
-        else {
-            return
-        }
+    /// Cold launch / app becoming active: make sure the sync engine is running. Starts
+    /// it only if it isn't already up, and never forces a sync when already running —
+    /// use `requestICloudSync()` for opportunistic foreground syncing (#7).
+    func ensureICloudSyncRunning() async {
+        guard isICloudSyncEnabledResolved else { return }
         await cloudSyncService.start(allowAccountReplacement: false)
+    }
+
+    /// Opportunistic, debounced sync (e.g. on returning to the foreground). No-ops if
+    /// sync is disabled or the engine isn't running yet.
+    func requestICloudSync() async {
+        guard isICloudSyncEnabledResolved else { return }
+        await cloudSyncService.requestSync()
     }
 
     private func applyRemoteMutations(
