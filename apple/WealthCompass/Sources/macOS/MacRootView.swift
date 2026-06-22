@@ -125,7 +125,8 @@ struct MacRootView: View {
     }
 
     private func handleAppBecameActive() async {
-        await finance.refreshICloudSyncIfNeeded()
+        await finance.ensureICloudSyncRunning()
+        await finance.requestICloudSync()
         await processRecurringTransactions()
 
         if settings.shouldAutoRefreshExchangeRates() {

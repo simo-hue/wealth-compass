@@ -504,6 +504,12 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     // CloudKit awaits and CKSyncEngine callbacks can resume after a user toggles sync.
     private var syncRequested = false
     private var lifecycleGeneration = 0
+    /// When the most recent `synchronize` actually began. Used to debounce the
+    /// opportunistic foreground sync (`requestSync`) so repeatedly returning to the
+    /// app doesn't trigger a full fetch+send each time. A user-initiated
+    /// `synchronize()` (Force Sync) and change-driven sync are not gated by this.
+    private var lastSyncStartedAt = Date.distantPast
+    private let foregroundSyncMinimumInterval: TimeInterval = 30
 
     init(
         metadataStore: CloudSyncMetadataStore,
@@ -532,10 +538,14 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         self.engineFactory = engineFactory
     }
 
+    /// Ensure the sync engine is running, performing the heavy startup (account
+    /// check, inventory reconcile, engine setup, and one initial sync) only when it
+    /// isn't already up. When the engine already exists this is a no-op — returning
+    /// to the foreground must not re-run startup work; opportunistic syncing goes
+    /// through `requestSync()` instead (#7).
     func start(allowAccountReplacement: Bool) async {
         syncRequested = true
-        if let engine {
-            await synchronize(generation: lifecycleGeneration, using: engine)
+        if engine != nil {
             return
         }
         guard !isStarting else {
@@ -644,9 +654,19 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         await synchronize(generation: lifecycleGeneration, using: engine)
     }
 
+    /// Opportunistic sync used on app activation. No-ops if the engine isn't running
+    /// (it never starts it — that's `start()`'s job) and is debounced so rapid
+    /// foreground transitions don't each trigger a full fetch+send (#7).
+    func requestSync() async {
+        guard syncRequested, let engine else { return }
+        guard Date().timeIntervalSince(lastSyncStartedAt) >= foregroundSyncMinimumInterval else { return }
+        await synchronize(generation: lifecycleGeneration, using: engine)
+    }
+
     private func synchronize(generation: Int, using engine: CKSyncEngine) async {
         guard isCurrent(generation, engine: engine), !isSynchronizing else { return }
         isSynchronizing = true
+        lastSyncStartedAt = Date()
         await statusHandler(.syncing)
         defer { finishSynchronizing(generation: generation, engine: engine) }
         guard isCurrent(generation, engine: engine) else { return }
