@@ -142,28 +142,17 @@ final class AppSettings: ObservableObject {
         }
     }
 
+    /// Pure converter bound to the current rate snapshot (see `CurrencyConverter`, M1/T1).
+    var currencyConverter: CurrencyConverter {
+        CurrencyConverter(snapshot: exchangeRateSnapshot)
+    }
+
     func convert(_ value: Double, from sourceCurrency: Currency?) -> Double {
-        guard let sourceCurrency else { return value }
-        return convert(value, from: sourceCurrency, to: currency)
+        currencyConverter.convert(value, from: sourceCurrency, to: currency)
     }
 
     func convert(_ value: Double, from sourceCurrency: Currency, to targetCurrency: Currency) -> Double {
-        guard sourceCurrency != targetCurrency else { return value }
-
-        let sourceUnitsPerEuro = unitsPerEuro(for: sourceCurrency)
-        let targetUnitsPerEuro = unitsPerEuro(for: targetCurrency)
-        // Guard against malformed exchange-rate data (a zero or non-finite rate),
-        // which would otherwise yield Inf/NaN and propagate into chart geometry,
-        // triggering "invalid numeric value (NaN) to CoreGraphics" errors.
-        guard
-            value.isFinite,
-            sourceUnitsPerEuro.isFinite, sourceUnitsPerEuro > 0,
-            targetUnitsPerEuro.isFinite, targetUnitsPerEuro > 0
-        else {
-            return value
-        }
-        let result = value / sourceUnitsPerEuro * targetUnitsPerEuro
-        return result.isFinite ? result : value
+        currencyConverter.convert(value, from: sourceCurrency, to: targetCurrency)
     }
 
     func shouldAutoRefreshExchangeRates(
@@ -269,10 +258,6 @@ final class AppSettings: ObservableObject {
     private func saveStringArray(_ values: [String], key: String) {
         guard let data = try? JSONEncoder().encode(values) else { return }
         userDefaults.set(data, forKey: key)
-    }
-
-    private func unitsPerEuro(for currency: Currency) -> Double {
-        exchangeRateSnapshot?.unitsPerBaseCurrency(for: currency) ?? currency.fallbackUnitsPerEuro
     }
 
     private static func loadStringArray(key: String, userDefaults: UserDefaults) -> [String] {

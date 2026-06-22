@@ -373,31 +373,8 @@ struct AllocationChart: View {
     }
 
     private func slice(at location: CGPoint, in rect: CGRect, total: Double) -> AllocationSlice? {
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        let dx = location.x - center.x
-        let dy = location.y - center.y
-        
-        let distance = sqrt(dx*dx + dy*dy)
-        let radius = min(rect.width, rect.height) / 2
-        let innerRadius = radius * 0.72
-        if distance < innerRadius || distance > radius {
-            return nil
-        }
-        
-        var angle = atan2(dy, dx) + .pi / 2
-        if angle < 0 { angle += 2 * .pi }
-        
-        let fraction = angle / (2 * .pi)
-        let selectedValue = fraction * total
-        
-        var cumulative = 0.0
-        for slice in slices {
-            cumulative += slice.value
-            if selectedValue <= cumulative {
-                return slice
-            }
-        }
-        return nil
+        PieSliceHitTester.sliceIndex(at: location, in: rect, values: slices.map(\.value), innerRadiusRatio: 0.72)
+            .map { slices[$0] }
     }
 
     private func percentage(_ value: Double, total: Double) -> String {
@@ -534,29 +511,6 @@ struct CryptoIconView: View {
     var cornerRadius: CGFloat = 11
 
     var body: some View {
-        let url = URL(string: "https://assets.coincap.io/assets/icons/\\(symbol.lowercased())@2x.png")
-        
-        AsyncImage(url: url) { phase in
-            switch phase {
-            case .empty:
-                ProgressView()
-                    .frame(width: size, height: size)
-                    .background(WCColor.cardElevated, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            case .success(let image):
-                image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: size, height: size)
-                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            case .failure:
-                fallbackView
-            @unknown default:
-                fallbackView
-            }
-        }
-    }
-    
-    private var fallbackView: some View {
         ZStack {
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(colorForSymbol(symbol).opacity(0.15))
@@ -632,5 +586,42 @@ struct MacSelectorIsland<Tab: MacSelectorTab>: View {
         )
         .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selection)
+    }
+}
+
+/// App-wide banner shown when a local save fails (H5).
+///
+/// `FinanceStore.persistenceError` is published when a `save()` hits a disk error and
+/// cleared on the next successful save, so this banner stays visible exactly while the
+/// user's most recent change is unpersisted — it is intentionally not manually
+/// dismissible, since hiding it would mask a real data-loss risk.
+struct PersistenceErrorBanner: View {
+    let message: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.white)
+                .font(.headline)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Save Failed")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                Text(verbatim: message)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.9))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(Color.red.opacity(0.9), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(.white.opacity(0.18))
+        )
+        .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
+        .padding(.horizontal, 16)
+        .accessibilityElement(children: .combine)
     }
 }

@@ -408,9 +408,7 @@ struct SettingsView: View {
                 Task { await refreshMarketPrices() }
             } label: {
                 Label(
-                    isRefreshingPrices
-                        ? settings.localized("Refreshing Market Data")
-                        : settings.localized("Refresh Market Data"),
+                    refreshMarketDataLabel,
                     systemImage: "arrow.triangle.2.circlepath"
                 )
             }
@@ -557,14 +555,22 @@ struct SettingsView: View {
     }
 
     private func validationMessage(for credential: MarketDataCredentialKind, apiKey: String) async throws -> String {
+        let provider: SettingsViewModel.MarketDataProvider
         switch credential {
-        case .finnhub:
-            let quote = try await FinnhubQuoteClient(apiKey: apiKey).testConnection()
-            return settings.localized("Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
-        case .coingecko:
-            let quote = try await CoinGeckoPriceClient(apiKey: apiKey).testConnection()
-            return settings.localized("CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
+        case .finnhub: provider = .finnhub
+        case .coingecko: provider = .coingecko
         }
+        return try await SettingsViewModel.validateMarketDataKey(provider, apiKey: apiKey, appLanguage: settings.appLanguage)
+    }
+
+    private var refreshMarketDataLabel: String {
+        guard isRefreshingPrices else {
+            return settings.localized("Refresh Market Data")
+        }
+        if let progress = finance.marketRefreshProgress, progress.total > 0 {
+            return settings.localized("Updating \(progress.done) of \(progress.total)")
+        }
+        return settings.localized("Refreshing Market Data")
     }
 
     private func refreshMarketPrices() async {

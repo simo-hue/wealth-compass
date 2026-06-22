@@ -3,11 +3,8 @@ import SwiftUI
 struct OnboardingView: View {
     @EnvironmentObject private var settings: AppSettings
     @State private var currentTab = 0
-    @State private var finnhubKey = ""
-    @State private var coinGeckoKey = ""
-    @State private var isValidating = false
     @State private var showingErrorAlert = false
-    @State private var validationError: String? = nil
+    @StateObject private var viewModel = OnboardingViewModel()
     
     var body: some View {
         ZStack {
@@ -27,14 +24,11 @@ struct OnboardingView: View {
             .padding(.bottom, 20)
         }
         .preferredColorScheme(.dark)
-        .onAppear {
-            finnhubKey = (try? KeychainCredentialStore.shared.string(for: .finnhubAPIKey)) ?? ""
-            coinGeckoKey = (try? KeychainCredentialStore.shared.string(for: .coingeckoAPIKey)) ?? ""
-        }
+        .onAppear { viewModel.loadConfiguredState() }
         .alert("Validation Failed", isPresented: $showingErrorAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            if let validationError {
+            if let validationError = viewModel.validationError {
                 Text(validationError)
             } else {
                 Text("Invalid API Key")
@@ -108,7 +102,7 @@ struct OnboardingView: View {
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                 
-                Text("We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers.")
+                Text("Your financial data stays on your device and in your private iCloud — there's no Wealth Compass server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests.")
                     .font(.body)
                     .foregroundStyle(WCColor.textSecondary)
                     .multilineTextAlignment(.center)
@@ -165,22 +159,24 @@ struct OnboardingView: View {
                     VStack(spacing: 12) {
                         InsetFinanceRow {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Finnhub API Key (Stocks)")
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(WCColor.textSecondary)
-                                SecureField("Paste Finnhub key...", text: $finnhubKey)
+                                credentialFieldHeader(title: "Finnhub API Key (Stocks)", isConfigured: viewModel.hasFinnhubKey)
+                                SecureField(
+                                    viewModel.hasFinnhubKey ? settings.localized("Enter a new key to replace…") : settings.localized("Paste Finnhub key…"),
+                                    text: $viewModel.finnhubKey
+                                )
                                     .textFieldStyle(.plain)
                                     .foregroundStyle(.white)
                                     .submitLabel(.done)
                             }
                         }
-                        
+
                         InsetFinanceRow {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("CoinGecko API Key (Crypto)")
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(WCColor.textSecondary)
-                                SecureField("Paste CoinGecko key...", text: $coinGeckoKey)
+                                credentialFieldHeader(title: "CoinGecko API Key (Crypto)", isConfigured: viewModel.hasCoinGeckoKey)
+                                SecureField(
+                                    viewModel.hasCoinGeckoKey ? settings.localized("Enter a new key to replace…") : settings.localized("Paste CoinGecko key…"),
+                                    text: $viewModel.coinGeckoKey
+                                )
                                     .textFieldStyle(.plain)
                                     .foregroundStyle(.white)
                                     .submitLabel(.done)
@@ -192,10 +188,16 @@ struct OnboardingView: View {
                     
                     VStack(spacing: 14) {
                         Button {
-                            Task { await finishOnboarding() }
+                            Task {
+                                if await viewModel.submit(appLanguage: settings.appLanguage) {
+                                    completeOnboarding()
+                                } else {
+                                    showingErrorAlert = true
+                                }
+                            }
                         } label: {
                             HStack {
-                                if isValidating {
+                                if viewModel.isValidating {
                                     ProgressView()
                                         .tint(.black)
                                         .padding(.trailing, 5)
@@ -210,14 +212,14 @@ struct OnboardingView: View {
                             .padding(.vertical, 16)
                             .background(WCColor.primary.gradient, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
                         }
-                        .disabled(isValidating)
-                        
+                        .disabled(viewModel.isValidating)
+
                         Button(action: skipOnboarding) {
                             Text("Skip for now")
                                 .font(.subheadline.weight(.medium))
                                 .foregroundStyle(WCColor.textSecondary)
                         }
-                        .disabled(isValidating)
+                        .disabled(viewModel.isValidating)
                     }
                     .padding(.top, 2)
                 }
@@ -232,37 +234,21 @@ struct OnboardingView: View {
         }
     }
     
-    private func finishOnboarding() async {
-        let finnhub = finnhubKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        let coinGecko = coinGeckoKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        if finnhub.isEmpty && coinGecko.isEmpty {
-            validationError = settings.localized("Please insert at least one API key, or tap 'Skip for now' if you wish to proceed without them.")
-            showingErrorAlert = true
-            return
-        }
-        
-        isValidating = true
-        validationError = nil
-        
-        do {
-            if !finnhub.isEmpty {
-                _ = try await FinnhubQuoteClient(apiKey: finnhub).testConnection()
-                try? KeychainCredentialStore.shared.save(finnhub, for: .finnhubAPIKey)
+    @ViewBuilder
+    private func credentialFieldHeader(title: LocalizedStringKey, isConfigured: Bool) -> some View {
+        HStack {
+            Text(title)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(WCColor.textSecondary)
+            Spacer()
+            if isConfigured {
+                Label("Configured", systemImage: "checkmark.seal.fill")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(WCColor.primary)
             }
-            if !coinGecko.isEmpty {
-                _ = try await CoinGeckoPriceClient(apiKey: coinGecko).testConnection()
-                try? KeychainCredentialStore.shared.save(coinGecko, for: .coingeckoAPIKey)
-            }
-            
-            completeOnboarding()
-        } catch {
-            isValidating = false
-            validationError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
-            showingErrorAlert = true
         }
     }
-    
+
     private func skipOnboarding() {
         completeOnboarding()
     }

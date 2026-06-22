@@ -1,28 +1,6 @@
 import Foundation
+import OSLog
 import SwiftUI
-
-// #region agent log
-private func wcDebugLog(_ location: String, _ message: String, _ data: [String: Any] = [:], _ hypothesis: String) {
-    var payload: [String: Any] = [
-        "sessionId": "4c10e7",
-        "location": location,
-        "message": message,
-        "hypothesisId": hypothesis,
-        "timestamp": Date().timeIntervalSince1970 * 1000
-    ]
-    payload["data"] = data
-    guard
-        let body = try? JSONSerialization.data(withJSONObject: payload),
-        let url = URL(string: "http://127.0.0.1:7504/ingest/61db8831-ab92-46de-81de-fd622a59ac18")
-    else { return }
-    var req = URLRequest(url: url)
-    req.httpMethod = "POST"
-    req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    req.setValue("4c10e7", forHTTPHeaderField: "X-Debug-Session-Id")
-    req.httpBody = body
-    URLSession.shared.dataTask(with: req).resume()
-}
-// #endregion
 
 enum FinanceImportMode: String, Identifiable {
     case merge
@@ -111,10 +89,26 @@ enum FinanceImportError: LocalizedError {
 
 @MainActor
 final class FinanceStore: ObservableObject {
-    @Published private(set) var data = FinancialData()
+    @Published private(set) var data = FinancialData() {
+        didSet { dataVersion &+= 1 } // invalidates the derived-data cache (M3)
+    }
+    /// Monotonic counter bumped on every `data` mutation; part of the analytics cache key.
+    private var dataVersion: Int = 0
+    /// Memoized totals (M3). The key is the full set of inputs to `calculateTotals`
+    /// — data version + display currency + rate-snapshot timestamp — so it can never
+    /// return a stale result after a data, currency, or exchange-rate change.
+    private var cachedTotals: (version: Int, currency: Currency, rateStamp: Date?, value: FinanceTotals)?
     @Published private(set) var isRefreshingMarketPrices = false
+    /// Per-item progress of the (serial, rate-limited) Finnhub refresh, for an "x of N"
+    /// UI indicator (M7). Nil when not refreshing investments.
+    @Published private(set) var marketRefreshProgress: (done: Int, total: Int)?
     @Published private(set) var iCloudSyncError: String?
     @Published private(set) var cloudSyncStatus: CloudSyncStatus = .disabled
+    /// A user-visible, app-wide error set when a local save fails so the user is told
+    /// their latest change did not persist (H5). Surfaced as a banner by the root views.
+    @Published private(set) var persistenceError: String?
+
+    private static let logger = Logger(subsystem: "com.wealthcompass.persistence", category: "FinanceStore")
 
     private let persistence: FinancePersistence
     private let encoder: JSONEncoder
@@ -285,6 +279,13 @@ final class FinanceStore: ObservableObject {
         guard !data.recurringTransactions.isEmpty else { return 0 }
 
         let calendar = Calendar.current
+        // Bound retroactive catch-up: occurrences older than this window are skipped
+        // (the schedule fast-forwards instead of mass-generating back-dated
+        // transactions, each of which rewrites snapshot history). Matches the
+        // snapshot-backfill window and guards against back-dated edits, long gaps,
+        // and past nextDueDate values arriving via sync/import (H7).
+        let maxCatchUpDays = 60
+        let catchUpFloor = calendar.date(byAdding: .day, value: -maxCatchUpDays, to: now) ?? now
         var generatedCount = 0
         var schedulesChanged = false
 
@@ -293,6 +294,24 @@ final class FinanceStore: ObservableObject {
             guard schedule.isActive, !schedule.isCompleted else { continue }
 
             var occurrence = schedule.nextDueDate
+
+            // Fast-forward past occurrences older than the catch-up window without
+            // generating them, jumping to the first aligned occurrence in-window.
+            if occurrence < catchUpFloor {
+                if let caughtUp = schedule.firstOccurrence(onOrAfter: catchUpFloor, calendar: calendar) {
+                    occurrence = caughtUp
+                    schedule.nextDueDate = caughtUp
+                    schedule.updatedAt = now
+                    schedulesChanged = true
+                } else {
+                    // No safe forward occurrence (pathological back-date) — deactivate.
+                    schedule.isActive = false
+                    schedulesChanged = true
+                    data.recurringTransactions[index] = schedule
+                    continue
+                }
+            }
+
             var processedOccurrences = 0
 
             while occurrence <= now && processedOccurrences < 1_000 {
@@ -419,7 +438,10 @@ final class FinanceStore: ObservableObject {
 
         isRefreshingMarketPrices = true
         lastMarketPriceRefreshAttemptAt = Date()
-        defer { isRefreshingMarketPrices = false }
+        defer {
+            isRefreshingMarketPrices = false
+            marketRefreshProgress = nil
+        }
 
         let trimmedFinnhubKey = finnhubAPIKey?.trimmingCharacters(in: .whitespacesAndNewlines)
         let hasFinnhubKey = trimmedFinnhubKey?.isEmpty == false
@@ -427,18 +449,34 @@ final class FinanceStore: ObservableObject {
         let hasCoinGeckoKey = trimmedCoinGeckoKey?.isEmpty == false
         var result = MarketPriceRefreshResult()
         var investmentQuotes: [UUID: MarketPriceQuote] = [:]
-        var cryptoQuotes: [UUID: (id: String, quote: MarketPriceQuote)] = [:]
+        // Price is resolved into each holding's own currency at fetch time, so a
+        // refresh never re-bases a holding's cost-basis currency (H2).
+        var cryptoQuotes: [UUID: (id: String, price: Double, asOf: Date)] = [:]
 
         if data.investments.isEmpty {
             result.skippedInvestments = []
         } else if let trimmedFinnhubKey, hasFinnhubKey {
             let client = FinnhubQuoteClient(apiKey: trimmedFinnhubKey)
+            let total = data.investments.count
+            var completed = 0
+            marketRefreshProgress = (done: 0, total: total)
+            // Pace requests to stay under Finnhub's free-tier limit; start small and
+            // back off only if we actually get rate-limited (M7). NetworkRetry already
+            // retries an individual 429 with backoff (M8); this spaces out the queue.
+            var interRequestDelay: UInt64 = 300_000_000 // 0.3s
             for investment in data.investments {
                 do {
                     investmentQuotes[investment.id] = try await client.quote(for: investment.symbol)
-                    try await Task.sleep(nanoseconds: 1_000_000_000)
                 } catch {
                     result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error))")
+                    if let marketError = error as? MarketDataError, case .rateLimited = marketError {
+                        interRequestDelay = min(interRequestDelay * 3, 3_000_000_000) // cap 3s
+                    }
+                }
+                completed += 1
+                marketRefreshProgress = (done: completed, total: total)
+                if completed < total {
+                    try? await Task.sleep(nanoseconds: interRequestDelay)
                 }
             }
         } else {
@@ -465,14 +503,23 @@ final class FinanceStore: ObservableObject {
 
         if let trimmedCoinGeckoKey, hasCoinGeckoKey, !cryptoLookups.isEmpty {
             do {
-                let prices = try await CoinGeckoPriceClient(apiKey: trimmedCoinGeckoKey, preferredCurrency: settings.currency).prices(for: Array(cryptoLookups.values))
+                // Request every distinct holding currency in one batched call.
+                let neededCurrencies = Array(Set(data.crypto.compactMap { cryptoLookups[$0.id] != nil ? $0.currency : nil }))
+                let client = CoinGeckoPriceClient(apiKey: trimmedCoinGeckoKey, currencies: neededCurrencies)
+                let table = try await client.priceTable(for: Array(cryptoLookups.values))
                 for holding in data.crypto {
                     guard let coinID = cryptoLookups[holding.id] else { continue }
-                    guard let quote = prices[coinID] else {
+                    guard
+                        let coinQuote = table[coinID],
+                        let resolved = coinQuote.resolved(in: holding.currency)
+                    else {
                         result.failedCrypto.append("\(holding.symbol): no CoinGecko price for \(coinID)")
                         continue
                     }
-                    cryptoQuotes[holding.id] = (coinID, quote)
+                    // Always express the live price in the holding's own currency,
+                    // converting only if the provider couldn't return that currency.
+                    let priceInHoldingCurrency = settings.convert(resolved.price, from: resolved.currency, to: holding.currency)
+                    cryptoQuotes[holding.id] = (coinID, priceInHoldingCurrency, coinQuote.asOf)
                 }
             } catch {
                 result.failedCrypto = data.crypto
@@ -491,12 +538,13 @@ final class FinanceStore: ObservableObject {
 
         for index in data.crypto.indices {
             guard let update = cryptoQuotes[data.crypto[index].id] else { continue }
-            data.crypto[index].currentPrice = update.quote.price
-            data.crypto[index].currency = update.quote.currency
+            data.crypto[index].currentPrice = update.price
+            // Note: holding.currency is intentionally NOT overwritten here (H2) — the
+            // price above is already expressed in the holding's existing currency.
             if data.crypto[index].coinId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 data.crypto[index].coinId = update.id
             }
-            data.crypto[index].updatedAt = update.quote.asOf
+            data.crypto[index].updatedAt = update.asOf
             result.updatedCrypto += 1
         }
 
@@ -509,32 +557,29 @@ final class FinanceStore: ObservableObject {
         return result
     }
 
-    func calculateTotals(settings: AppSettings) -> FinanceTotals {
-        let totalLiquidity = data.transactions.reduce(into: 0.0) { result, transaction in
-            switch transaction.type {
-            case .income:  result += transaction.amount
-            case .expense: result -= transaction.amount
-            }
-        }
-        let totalInvestments = data.investments.reduce(0) {
-            $0 + settings.convert($1.currentValue, from: $1.currency)
-        }
-        let totalCrypto = data.crypto.reduce(0) {
-            $0 + settings.convert($1.currentValue, from: $1.currency)
-        }
-        let totalLiabilities = data.liabilities.reduce(0) {
-            $0 + settings.convert($1.currentBalance, from: $1.currency)
-        }
-        let totalAssets = totalLiquidity + totalInvestments + totalCrypto
+    private let snapshotEngine = SnapshotEngine()
 
-        return FinanceTotals(
-            totalLiquidity: totalLiquidity,
-            totalInvestments: totalInvestments,
-            totalCrypto: totalCrypto,
-            totalAssets: totalAssets,
-            totalLiabilities: totalLiabilities,
-            netWorth: totalAssets - totalLiabilities
+    /// Builds a pure analytics engine bound to the current data + settings (M1).
+    private func analytics(_ settings: AppSettings) -> AnalyticsEngine {
+        AnalyticsEngine(
+            data: data,
+            converter: settings.currencyConverter,
+            displayCurrency: settings.currency,
+            appLanguage: settings.appLanguage
         )
+    }
+
+    func calculateTotals(settings: AppSettings) -> FinanceTotals {
+        let rateStamp = settings.exchangeRateSnapshot?.fetchedAt
+        if let cache = cachedTotals,
+           cache.version == dataVersion,
+           cache.currency == settings.currency,
+           cache.rateStamp == rateStamp {
+            return cache.value
+        }
+        let totals = analytics(settings).calculateTotals()
+        cachedTotals = (dataVersion, settings.currency, rateStamp, totals)
+        return totals
     }
 
     func hasForeignCurrencyExposure(relativeTo baseCurrency: Currency) -> Bool {
@@ -549,231 +594,52 @@ final class FinanceStore: ObservableObject {
     }
 
     private func appendSnapshot(settings: AppSettings) {
-        let calendar = Calendar.current
-        let now = Date()
-        let today = calendar.startOfDay(for: now)
-        
-        // Backfill missing days using the carry-forward strategy
-        if let lastSnapshot = data.snapshots.last {
-            let lastSnapshotDate = calendar.startOfDay(for: lastSnapshot.date)
-            
-            // If the last snapshot is strictly before today
-            if lastSnapshotDate < today {
-                let components = calendar.dateComponents([.day], from: lastSnapshotDate, to: today)
-                if let daysMissing = components.day, daysMissing > 0 {
-                    let backfillDays = min(daysMissing, 60) // Cap at 60 days to prevent performance issues
-                    
-                    for dayOffset in 1...backfillDays {
-                        if let backfillDate = calendar.date(byAdding: .day, value: dayOffset, to: lastSnapshotDate),
-                           backfillDate < today { // Only backfill up to yesterday
-                            
-                            // Set the backfill time to end of day to represent closing balance
-                            var components = calendar.dateComponents([.year, .month, .day], from: backfillDate)
-                            components.hour = 23
-                            components.minute = 59
-                            components.second = 59
-                            let finalBackfillDate = calendar.date(from: components) ?? backfillDate
-                            
-                            let missingSnapshot = NetWorthSnapshot(
-                                date: finalBackfillDate,
-                                totalAssets: lastSnapshot.totalAssets,
-                                totalLiabilities: lastSnapshot.totalLiabilities,
-                                netWorth: lastSnapshot.netWorth,
-                                liquidity: lastSnapshot.liquidity,
-                                investments: lastSnapshot.investments,
-                                crypto: lastSnapshot.crypto
-                            )
-                            data.snapshots.append(missingSnapshot)
-                        }
-                    }
-                }
-            }
-        }
-
         let totals = calculateTotals(settings: settings)
-        let snapshot = NetWorthSnapshot(
-            date: now,
-            totalAssets: totals.totalAssets,
-            totalLiabilities: totals.totalLiabilities,
-            netWorth: totals.netWorth,
-            liquidity: totals.totalLiquidity,
-            investments: totals.totalInvestments,
-            crypto: totals.totalCrypto
-        )
-        
-        if let lastIndex = data.snapshots.indices.last, calendar.isDate(data.snapshots[lastIndex].date, inSameDayAs: now) {
-            data.snapshots[lastIndex] = snapshot
-        } else {
-            data.snapshots.append(snapshot)
-        }
-        data.snapshots.sort { $0.date < $1.date }
+        data.snapshots = snapshotEngine.appendingSnapshot(to: data.snapshots, totals: totals)
     }
 
     private func adjustHistoricalSnapshots(from date: Date, liquidityDelta: Double) {
-        let startOfDay = Calendar.current.startOfDay(for: date)
-        for i in data.snapshots.indices {
-            if data.snapshots[i].date >= startOfDay {
-                data.snapshots[i].liquidity += liquidityDelta
-                data.snapshots[i].totalAssets += liquidityDelta
-                data.snapshots[i].netWorth += liquidityDelta
-            }
-        }
+        data.snapshots = snapshotEngine.adjustingHistoricalSnapshots(data.snapshots, from: date, liquidityDelta: liquidityDelta)
     }
 
     func monthlyCashFlow(for month: Date) -> MonthlyCashFlow {
-        let calendar = Calendar.current
-        let income = data.transactions
-            .filter { $0.type == .income && calendar.isDate($0.date, equalTo: month, toGranularity: .month) }
-            .reduce(0) { $0 + $1.amount }
-        let expenses = data.transactions
-            .filter { $0.type == .expense && calendar.isDate($0.date, equalTo: month, toGranularity: .month) }
-            .reduce(0) { $0 + $1.amount }
-        return MonthlyCashFlow(monthlyIncome: income, monthlyExpenses: expenses)
+        AnalyticsEngine(data: data).monthlyCashFlow(for: month)
     }
 
     func snapshots(range: TimeRange) -> [NetWorthPoint] {
-        let calendar = Calendar.current
-        let now = Date()
-        let cutoff: Date
-
-        switch range {
-        case .oneWeek:
-            cutoff = calendar.date(byAdding: .day, value: -7, to: now) ?? .distantPast
-        case .oneMonth:
-            cutoff = calendar.date(byAdding: .month, value: -1, to: now) ?? .distantPast
-        case .sixMonths:
-            cutoff = calendar.date(byAdding: .month, value: -6, to: now) ?? .distantPast
-        case .oneYear:
-            cutoff = calendar.date(byAdding: .year, value: -1, to: now) ?? .distantPast
-        case .all:
-            cutoff = .distantPast
-        }
-
-        return data.snapshots
-            .filter { $0.date >= cutoff }
-            .sorted { $0.date < $1.date }
-            .map { NetWorthPoint(date: $0.date, value: $0.netWorth) }
+        AnalyticsEngine(data: data).snapshots(range: range)
     }
 
     func cashFlowTrend(months: Int = 6) -> [CashFlowMonth] {
-        let calendar = Calendar.current
-        let now = Date()
-        let monthFormatter = DateFormatter()
-        monthFormatter.dateFormat = "yyyy-MM"
-        let labelFormatter = DateFormatter()
-        labelFormatter.dateFormat = "MMM"
-
-        return stride(from: months - 1, through: 0, by: -1).compactMap { offset in
-            guard let date = calendar.date(byAdding: .month, value: -offset, to: now) else { return nil }
-            let monthKey = monthFormatter.string(from: date)
-            let transactions = data.transactions.filter { monthFormatter.string(from: $0.date) == monthKey }
-            let income = transactions.filter { $0.type == .income }.reduce(0) { $0 + $1.amount }
-            let expense = transactions.filter { $0.type == .expense }.reduce(0) { $0 + $1.amount }
-
-            return CashFlowMonth(
-                monthKey: monthKey,
-                monthLabel: labelFormatter.string(from: date),
-                income: income,
-                expense: expense
-            )
-        }
+        AnalyticsEngine(data: data).cashFlowTrend(months: months)
     }
 
     func expensesByCategory(period: AnalyticsPeriod) -> [CategoryTotal] {
-        let expenses = filteredTransactions(period: period).filter { $0.type == .expense }
-        let grouped = Dictionary(grouping: expenses, by: \.category)
-            .mapValues { $0.reduce(0) { $0 + $1.amount } }
-        let total = grouped.values.reduce(0, +)
-
-        return grouped.map { key, value in
-            CategoryTotal(name: key, value: value, percentage: total > 0 ? (value / total) * 100 : 0)
-        }
-        .sorted { $0.value > $1.value }
+        AnalyticsEngine(data: data).expensesByCategory(period: period)
     }
 
     func spendingTimeline(period: AnalyticsPeriod) -> [CategoryTotal] {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM dd"
-        let expenses = filteredTransactions(period: period).filter { $0.type == .expense }
-        let grouped = Dictionary(grouping: expenses) { formatter.string(from: $0.date) }
-            .mapValues { $0.reduce(0) { $0 + $1.amount } }
-
-        return grouped.map { CategoryTotal(name: $0.key, value: $0.value, percentage: 0) }
-            .sorted { $0.name < $1.name }
+        AnalyticsEngine(data: data).spendingTimeline(period: period)
     }
 
     func assetAllocation(settings: AppSettings) -> [AllocationSlice] {
-        let totals = calculateTotals(settings: settings)
-        return [
-            AllocationSlice(name: settings.localized("Investments"), value: totals.totalInvestments, color: .blue),
-            AllocationSlice(name: settings.localized("Crypto"), value: totals.totalCrypto, color: .orange),
-            AllocationSlice(name: settings.localized("Cash"), value: totals.totalLiquidity, color: .green)
-        ].filter { $0.value > 0 }
+        analytics(settings).assetAllocation()
     }
 
     func investmentAllocation(settings: AppSettings) -> [AllocationSlice] {
-        let grouped = Dictionary(grouping: data.investments, by: \.sector)
-            .mapValues { items in
-                items.reduce(0) { partial, investment in
-                    partial + settings.convert(investment.currentValue, from: investment.currency)
-                }
-            }
-        return grouped
-            .map { (name: $0.key, value: $0.value) }
-            .sorted { $0.value > $1.value }
-            .enumerated()
-            .map { index, item in
-                AllocationSlice(name: item.name, value: item.value, color: ColorPalette.chart[index % ColorPalette.chart.count])
-            }
+        analytics(settings).investmentAllocation()
     }
 
     func investmentTypeAllocation(settings: AppSettings) -> [AllocationSlice] {
-        let grouped = Dictionary(grouping: data.investments, by: { $0.type.rawValue })
-            .mapValues { items in
-                items.reduce(0) { partial, investment in
-                    partial + settings.convert(investment.currentValue, from: investment.currency)
-                }
-            }
-        return grouped
-            .map { (name: $0.key, value: $0.value) }
-            .sorted { $0.value > $1.value }
-            .enumerated()
-            .map { index, item in
-                let type = InvestmentType(rawValue: item.name) ?? .other
-                return AllocationSlice(
-                    name: type.localizedTitle(appLanguage: settings.appLanguage),
-                    value: item.value,
-                    color: ColorPalette.chartType[index % ColorPalette.chartType.count]
-                )
-            }
+        analytics(settings).investmentTypeAllocation()
     }
 
     func investmentGeographyAllocation(settings: AppSettings) -> [AllocationSlice] {
-        let grouped = Dictionary(grouping: data.investments, by: \.geography)
-            .mapValues { items in
-                items.reduce(0) { partial, investment in
-                    partial + settings.convert(investment.currentValue, from: investment.currency)
-                }
-            }
-        return grouped
-            .map { (name: $0.key, value: $0.value) }
-            .sorted { $0.value > $1.value }
-            .enumerated()
-            .map { index, item in
-                AllocationSlice(name: item.name, value: item.value, color: ColorPalette.chartGeography[index % ColorPalette.chartGeography.count])
-            }
+        analytics(settings).investmentGeographyAllocation()
     }
 
     func cryptoAllocation(settings: AppSettings) -> [AllocationSlice] {
-        data.crypto.enumerated().map { index, holding in
-            AllocationSlice(
-                name: holding.symbol,
-                value: settings.convert(holding.currentValue, from: holding.currency),
-                color: ColorPalette.chart[index % ColorPalette.chart.count]
-            )
-        }
-        .filter { $0.value > 0 }
-        .sorted { $0.value > $1.value }
+        analytics(settings).cryptoAllocation()
     }
 
     func clearData() {
@@ -803,14 +669,7 @@ final class FinanceStore: ObservableObject {
         let payload = try Data(contentsOf: url)
         guard !payload.isEmpty else { throw FinanceImportError.emptyFile }
 
-        let imported: ImportedFinancialData
-        do {
-            imported = try JSONDecoder().decode(ImportedFinancialData.self, from: payload)
-        } catch {
-            throw FinanceImportError.invalidJSON(error.localizedDescription)
-        }
-
-        let normalized = imported.normalized(settings: settings)
+        let normalized = try FinanceImportService.parse(payload, settings: settings)
         guard normalized.data.hasImportableContent else {
             throw FinanceImportError.noSupportedRecords
         }
@@ -843,27 +702,6 @@ final class FinanceStore: ObservableObject {
             categoriesAdded: categoriesAdded,
             skippedRecords: normalized.skippedRecords
         )
-    }
-
-    private func filteredTransactions(period: AnalyticsPeriod) -> [Transaction] {
-        let calendar = Calendar.current
-        let now = Date()
-        let start: Date
-
-        switch period {
-        case .sevenDays:
-            start = calendar.date(byAdding: .day, value: -7, to: now) ?? .distantPast
-        case .thirtyDays:
-            start = calendar.date(byAdding: .day, value: -30, to: now) ?? .distantPast
-        case .threeMonths:
-            start = calendar.date(byAdding: .month, value: -3, to: now) ?? .distantPast
-        case .yearToDate:
-            start = calendar.date(from: calendar.dateComponents([.year], from: now)) ?? .distantPast
-        case .all:
-            return data.transactions
-        }
-
-        return data.transactions.filter { $0.date >= start && $0.date <= now }
     }
 
     private func load() {
@@ -910,9 +748,6 @@ final class FinanceStore: ObservableObject {
         }
 
         do {
-            // #region agent log
-            let _wcStart = Date()
-            // #endregion
             let oldRecords = try persistedData.cloudSyncRecords()
             let newRecords = try data.cloudSyncRecords()
             let changes = CloudSyncChangeSet.difference(from: oldRecords, to: newRecords)
@@ -920,24 +755,22 @@ final class FinanceStore: ObservableObject {
             try syncMetadataStore.recordLocalChanges(changes, currentRecords: newRecords)
             persistedData = data
             self.iCloudSyncError = nil
-            // #region agent log
-            wcDebugLog("FinanceStore.swift:save", "local save completed", [
-                "totalRecords": newRecords.count,
-                "changedCount": changes.changed.count,
-                "deletedCount": changes.deleted.count,
-                "changedKeys": changes.changed.prefix(8).map { $0.key.storageKey },
-                "durationMs": Date().timeIntervalSince(_wcStart) * 1000,
-                "syncEnabled": settings?.isICloudSyncEnabled ?? false
-            ], "A,B")
-            // #endregion
+            self.persistenceError = nil
             if !changes.isEmpty {
                 Task { [weak self] in
                     await self?.cloudSyncService.localChangesRecorded()
                 }
             }
         } catch {
+            // Do NOT crash on a disk error (H5): in DEBUG `assertionFailure` aborted the
+            // app, and in release the failure was only visible in Settings. Log it and
+            // publish an app-wide error so the user learns their change didn't persist.
+            Self.logger.error("Failed to save local finance data: \(error.localizedDescription, privacy: .public)")
             self.iCloudSyncError = error.localizedDescription
-            assertionFailure("Failed to save local finance data: \(error)")
+            self.persistenceError = AppLocalization.string(
+                "Your latest change could not be saved to this device. \(error.localizedDescription)",
+                appLanguage: settings?.appLanguage
+            )
         }
     }
 
@@ -986,17 +819,8 @@ final class FinanceStore: ObservableObject {
         let applicableMutations = mutations.filter {
             syncMetadataStore.pendingRevision(for: $0.key) == $0.expectedPendingRevision
         }
-        // #region agent log
-        wcDebugLog("FinanceStore.swift:applyRemoteMutations", "remote mutations received", [
-            "incoming": mutations.count,
-            "applicable": applicableMutations.count
-        ], "A")
-        // #endregion
         guard !applicableMutations.isEmpty else { return [] }
 
-        // #region agent log
-        let _wcStart = Date()
-        // #endregion
         var updatedData = data
         try updatedData.applyCloudSyncMutations(applicableMutations)
         updatedData = updatedData.sortedForStorage()
@@ -1008,14 +832,6 @@ final class FinanceStore: ObservableObject {
         data = updatedData
         persistedData = updatedData
         iCloudSyncError = nil
-        // #region agent log
-        wcDebugLog("FinanceStore.swift:applyRemoteMutations", "remote mutations applied (full file rewrite + UI update)", [
-            "applied": applicableMutations.count,
-            "totalTransactions": updatedData.transactions.count,
-            "totalSnapshots": updatedData.snapshots.count,
-            "durationMs": Date().timeIntervalSince(_wcStart) * 1000
-        ], "A")
-        // #endregion
         return Set(applicableMutations.map(\.key))
     }
 
@@ -1054,849 +870,6 @@ final class FinanceStore: ObservableObject {
     }
 }
 
-private struct NormalizedFinanceImport {
-    var data: FinancialData
-    var skippedRecords: Int
-}
-
-private struct ImportedFinancialData: Decodable {
-    private let income: LossyArray<ImportedIncomeEntry>
-    private let expenses: LossyArray<ImportedExpenseEntry>
-    private let investments: LossyArray<ImportedInvestment>
-    private let crypto: LossyArray<ImportedCryptoHolding>
-    private let liabilities: LossyArray<ImportedLiability>
-    private let liquidity: LossyArray<ImportedLiquidityAccount>
-    private let transactions: LossyArray<ImportedTransaction>
-    private let recurringTransactions: LossyArray<ImportedRecurringTransaction>
-    private let snapshots: LossyArray<ImportedSnapshot>
-
-    private enum CodingKeys: String, CodingKey {
-        case income
-        case expenses
-        case investments
-        case crypto
-        case liabilities
-        case liquidity
-        case transactions
-        case recurringTransactions
-        case snapshots
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        income = container.decodeLossyArrayIfPresent(ImportedIncomeEntry.self, forKey: .income)
-        expenses = container.decodeLossyArrayIfPresent(ImportedExpenseEntry.self, forKey: .expenses)
-        investments = container.decodeLossyArrayIfPresent(ImportedInvestment.self, forKey: .investments)
-        crypto = container.decodeLossyArrayIfPresent(ImportedCryptoHolding.self, forKey: .crypto)
-        liabilities = container.decodeLossyArrayIfPresent(ImportedLiability.self, forKey: .liabilities)
-        liquidity = container.decodeLossyArrayIfPresent(ImportedLiquidityAccount.self, forKey: .liquidity)
-        transactions = container.decodeLossyArrayIfPresent(ImportedTransaction.self, forKey: .transactions)
-        recurringTransactions = container.decodeLossyArrayIfPresent(ImportedRecurringTransaction.self, forKey: .recurringTransactions)
-        snapshots = container.decodeLossyArrayIfPresent(ImportedSnapshot.self, forKey: .snapshots)
-    }
-
-    @MainActor
-    func normalized(settings: AppSettings) -> NormalizedFinanceImport {
-        let importedTransactions = transactions.elements.compactMap { $0.model() }
-        let importedRecurringTransactions = recurringTransactions.elements.compactMap { $0.model() }
-        let importedIncome = income.elements.compactMap { $0.transaction() }
-        let importedExpenses = expenses.elements.compactMap { $0.transaction() }
-        let importedLiquidity = liquidity.elements.compactMap { $0.transaction(settings: settings) }
-        let importedInvestments = investments.elements.compactMap { $0.model() }
-        let importedCrypto = crypto.elements.compactMap { $0.model() }
-        let importedLiabilities = liabilities.elements.compactMap { $0.model(defaultCurrency: settings.currency) }
-        let importedSnapshots = snapshots.elements.compactMap { $0.model() }
-
-        let skippedTransactions = transactions.skippedCount + max(0, transactions.elements.count - importedTransactions.count)
-        let skippedRecurringTransactions = recurringTransactions.skippedCount
-            + max(0, recurringTransactions.elements.count - importedRecurringTransactions.count)
-        let skippedIncome = income.skippedCount + max(0, income.elements.count - importedIncome.count)
-        let skippedExpenses = expenses.skippedCount + max(0, expenses.elements.count - importedExpenses.count)
-        let skippedLiquidity = liquidity.skippedCount + max(0, liquidity.elements.count - importedLiquidity.count)
-        let skippedInvestments = investments.skippedCount + max(0, investments.elements.count - importedInvestments.count)
-        let skippedCrypto = crypto.skippedCount + max(0, crypto.elements.count - importedCrypto.count)
-        let skippedLiabilities = liabilities.skippedCount + max(0, liabilities.elements.count - importedLiabilities.count)
-        let skippedSnapshots = snapshots.skippedCount + max(0, snapshots.elements.count - importedSnapshots.count)
-        let skippedRecords = skippedTransactions + skippedRecurringTransactions + skippedIncome + skippedExpenses
-            + skippedLiquidity + skippedInvestments + skippedCrypto + skippedLiabilities + skippedSnapshots
-
-        return NormalizedFinanceImport(
-            data: FinancialData(
-                transactions: (importedTransactions + importedIncome + importedExpenses + importedLiquidity).uniquedByID(),
-                recurringTransactions: importedRecurringTransactions.uniquedByID(),
-                investments: importedInvestments.uniquedByID(),
-                crypto: importedCrypto.uniquedByID(),
-                liabilities: importedLiabilities.uniquedByID(),
-                snapshots: importedSnapshots.uniquedByID()
-            ).sortedForStorage(),
-            skippedRecords: skippedRecords
-        )
-    }
-}
-
-private struct ImportedTransaction: Decodable {
-    let id: UUID?
-    let type: String?
-    let category: String?
-    let amount: Double?
-    let description: String?
-    let date: String?
-    let createdAt: String?
-    let recurringTransactionID: UUID?
-    let recurringOccurrenceDate: String?
-
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case type
-        case category
-        case amount
-        case description
-        case date
-        case createdAt
-        case recurringTransactionID
-        case recurringOccurrenceDate
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = container.decodeUUIDIfPresent(forKey: .id)
-        type = container.decodeImportedStringIfPresent(forKey: .type)
-        category = container.decodeImportedStringIfPresent(forKey: .category)
-        amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
-        description = container.decodeImportedStringIfPresent(forKey: .description)
-        date = container.decodeImportedStringIfPresent(forKey: .date)
-        createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
-        recurringTransactionID = container.decodeUUIDIfPresent(forKey: .recurringTransactionID)
-        recurringOccurrenceDate = container.decodeImportedStringIfPresent(forKey: .recurringOccurrenceDate)
-    }
-
-    func model() -> Transaction? {
-        guard
-            let rawType = type?.lowercased(),
-            let transactionType = TransactionType(rawValue: rawType),
-            let amount = amount?.positiveImportedAmount,
-            let date = ImportDateParser.parseDateOnly(date)
-        else {
-            return nil
-        }
-
-        return Transaction(
-            id: id ?? UUID(),
-            type: transactionType,
-            category: category ?? "Other",
-            amount: amount,
-            description: description ?? "",
-            date: date,
-            createdAt: ImportDateParser.parse(createdAt) ?? date,
-            recurringTransactionID: recurringTransactionID,
-            recurringOccurrenceDate: ImportDateParser.parse(recurringOccurrenceDate)
-        )
-    }
-}
-
-private struct ImportedRecurringTransaction: Decodable {
-    let id: UUID?
-    let type: String?
-    let category: String?
-    let amount: Double?
-    let description: String?
-    let startDate: String?
-    let frequency: String?
-    let nextDueDate: String?
-    let endDate: String?
-    let notificationsEnabled: Bool?
-    let isActive: Bool?
-    let completedAt: String?
-    let createdAt: String?
-    let updatedAt: String?
-
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case type
-        case category
-        case amount
-        case description
-        case startDate
-        case frequency
-        case nextDueDate
-        case endDate
-        case notificationsEnabled
-        case isActive
-        case completedAt
-        case createdAt
-        case updatedAt
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = container.decodeUUIDIfPresent(forKey: .id)
-        type = container.decodeImportedStringIfPresent(forKey: .type)
-        category = container.decodeImportedStringIfPresent(forKey: .category)
-        amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
-        description = container.decodeImportedStringIfPresent(forKey: .description)
-        startDate = container.decodeImportedStringIfPresent(forKey: .startDate)
-        frequency = container.decodeImportedStringIfPresent(forKey: .frequency)
-        nextDueDate = container.decodeImportedStringIfPresent(forKey: .nextDueDate)
-        endDate = container.decodeImportedStringIfPresent(forKey: .endDate)
-        notificationsEnabled = container.decodeImportedBoolIfPresent(forKey: .notificationsEnabled)
-        isActive = container.decodeImportedBoolIfPresent(forKey: .isActive)
-        completedAt = container.decodeImportedStringIfPresent(forKey: .completedAt)
-        createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
-        updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
-    }
-
-    func model() -> RecurringTransaction? {
-        guard
-            let rawType = type?.lowercased(),
-            let transactionType = TransactionType(rawValue: rawType),
-            let amount = amount?.positiveImportedAmount,
-            let startDate = ImportDateParser.parse(startDate),
-            let rawFrequency = frequency?.lowercased(),
-            let frequency = RecurringTransactionFrequency(rawValue: rawFrequency),
-            let nextDueDate = ImportDateParser.parse(nextDueDate)
-        else {
-            return nil
-        }
-
-        let parsedEndDate = ImportDateParser.parse(endDate)
-        let parsedCompletedAt = ImportDateParser.parse(completedAt)
-        guard parsedEndDate.map({ $0 >= startDate }) ?? true else { return nil }
-
-        return RecurringTransaction(
-            id: id ?? UUID(),
-            type: transactionType,
-            category: category ?? "Other",
-            amount: amount,
-            description: description ?? "",
-            startDate: startDate,
-            frequency: frequency,
-            nextDueDate: nextDueDate,
-            endDate: parsedEndDate,
-            notificationsEnabled: notificationsEnabled ?? true,
-            isActive: parsedCompletedAt == nil && (isActive ?? true),
-            completedAt: parsedCompletedAt,
-            createdAt: ImportDateParser.parse(createdAt) ?? startDate,
-            updatedAt: ImportDateParser.parse(updatedAt) ?? startDate
-        )
-    }
-}
-
-private struct ImportedIncomeEntry: Decodable {
-    let id: UUID?
-    let type: String?
-    let amount: Double?
-    let description: String?
-    let date: String?
-    let createdAt: String?
-
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case type
-        case amount
-        case description
-        case date
-        case createdAt
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = container.decodeUUIDIfPresent(forKey: .id)
-        type = container.decodeImportedStringIfPresent(forKey: .type)
-        amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
-        description = container.decodeImportedStringIfPresent(forKey: .description)
-        date = container.decodeImportedStringIfPresent(forKey: .date)
-        createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
-    }
-
-    func transaction() -> Transaction? {
-        guard
-            let amount = amount?.positiveImportedAmount,
-            let date = ImportDateParser.parseDateOnly(date)
-        else {
-            return nil
-        }
-
-        return Transaction(
-            id: id ?? UUID(),
-            type: .income,
-            category: Self.categoryName(from: type),
-            amount: amount,
-            description: description ?? "",
-            date: date,
-            createdAt: ImportDateParser.parse(createdAt) ?? date
-        )
-    }
-
-    private static func categoryName(from rawType: String?) -> String {
-        switch rawType?.lowercased() {
-        case "salary": "Salary"
-        case "dividends": "Dividends"
-        case "freelance": "Freelance"
-        case "other": "Other"
-        case .some(let value): value.importTitleCased
-        case .none: "Other"
-        }
-    }
-}
-
-private struct ImportedExpenseEntry: Decodable {
-    let id: UUID?
-    let category: String?
-    let amount: Double?
-    let description: String?
-    let date: String?
-    let createdAt: String?
-
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case category
-        case amount
-        case description
-        case date
-        case createdAt
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = container.decodeUUIDIfPresent(forKey: .id)
-        category = container.decodeImportedStringIfPresent(forKey: .category)
-        amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
-        description = container.decodeImportedStringIfPresent(forKey: .description)
-        date = container.decodeImportedStringIfPresent(forKey: .date)
-        createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
-    }
-
-    func transaction() -> Transaction? {
-        guard
-            let amount = amount?.positiveImportedAmount,
-            let date = ImportDateParser.parseDateOnly(date)
-        else {
-            return nil
-        }
-
-        return Transaction(
-            id: id ?? UUID(),
-            type: .expense,
-            category: category ?? "Other",
-            amount: amount,
-            description: description ?? "",
-            date: date,
-            createdAt: ImportDateParser.parse(createdAt) ?? date
-        )
-    }
-}
-
-private struct ImportedLiquidityAccount: Decodable {
-    let id: UUID?
-    let type: String?
-    let name: String?
-    let balance: Double?
-    let currency: String?
-    let updatedAt: String?
-    let createdAt: String?
-
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case type
-        case name
-        case balance
-        case currency
-        case updatedAt
-        case createdAt
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = container.decodeUUIDIfPresent(forKey: .id)
-        type = container.decodeImportedStringIfPresent(forKey: .type)
-        name = container.decodeImportedStringIfPresent(forKey: .name)
-        balance = container.decodeImportedDoubleIfPresent(forKey: .balance)
-        currency = container.decodeImportedStringIfPresent(forKey: .currency)
-        updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
-        createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
-    }
-
-    @MainActor
-    func transaction(settings: AppSettings) -> Transaction? {
-        guard let balance, balance.isFinite, balance != 0 else { return nil }
-
-        let sourceCurrency = Currency.imported(currency, default: settings.currency)
-        let convertedAmount = settings.convert(abs(balance), from: sourceCurrency)
-        guard convertedAmount > 0, convertedAmount.isFinite else { return nil }
-
-        let accountName = name ?? type?.importTitleCased ?? "Liquidity Account"
-        let importedDate = ImportDateParser.parse(updatedAt) ?? ImportDateParser.parse(createdAt) ?? Date()
-        let transactionType: TransactionType = balance >= 0 ? .income : .expense
-
-        return Transaction(
-            id: id ?? UUID(),
-            type: transactionType,
-            category: "Liquidity",
-            amount: convertedAmount,
-            description: "Imported liquidity account: \(accountName)",
-            date: Calendar.current.startOfDay(for: importedDate),
-            createdAt: ImportDateParser.parse(createdAt) ?? importedDate
-        )
-    }
-}
-
-private struct ImportedInvestment: Decodable {
-    let id: UUID?
-    let type: String?
-    let symbol: String?
-    let name: String?
-    let quantity: Double?
-    let costBasis: Double?
-    let currentValue: Double?
-    let currentPrice: Double?
-    let currency: String?
-    let geography: String?
-    let sector: String?
-    let isin: String?
-    let fees: Double?
-    let lastPriceUpdate: String?
-    let updatedAt: String?
-    let createdAt: String?
-
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case type
-        case symbol
-        case name
-        case quantity
-        case costBasis
-        case currentValue
-        case currentPrice
-        case currency
-        case geography
-        case sector
-        case isin
-        case fees
-        case lastPriceUpdate
-        case updatedAt
-        case createdAt
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = container.decodeUUIDIfPresent(forKey: .id)
-        type = container.decodeImportedStringIfPresent(forKey: .type)
-        symbol = container.decodeImportedStringIfPresent(forKey: .symbol)
-        name = container.decodeImportedStringIfPresent(forKey: .name)
-        quantity = container.decodeImportedDoubleIfPresent(forKey: .quantity)
-        costBasis = container.decodeImportedDoubleIfPresent(forKey: .costBasis)
-        currentValue = container.decodeImportedDoubleIfPresent(forKey: .currentValue)
-        currentPrice = container.decodeImportedDoubleIfPresent(forKey: .currentPrice)
-        currency = container.decodeImportedStringIfPresent(forKey: .currency)
-        geography = container.decodeImportedStringIfPresent(forKey: .geography)
-        sector = container.decodeImportedStringIfPresent(forKey: .sector)
-        isin = container.decodeImportedStringIfPresent(forKey: .isin)
-        fees = container.decodeImportedDoubleIfPresent(forKey: .fees)
-        lastPriceUpdate = container.decodeImportedStringIfPresent(forKey: .lastPriceUpdate)
-        updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
-        createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
-    }
-
-    func model() -> Investment? {
-        guard
-            let symbol,
-            let name,
-            let quantity = quantity?.positiveImportedAmount
-        else {
-            return nil
-        }
-
-        let costBasis = costBasis?.nonNegativeImportedAmount ?? 0
-        let currentPrice = currentPrice?.nonNegativeImportedAmount
-            ?? currentValue.flatMap { quantity > 0 ? ($0 / quantity).nonNegativeImportedAmount : nil }
-            ?? 0
-        let currentValue = currentValue?.nonNegativeImportedAmount ?? quantity * currentPrice
-        let importedUpdatedAt = ImportDateParser.parse(updatedAt) ?? ImportDateParser.parse(lastPriceUpdate) ?? Date()
-
-        return Investment(
-            id: id ?? UUID(),
-            type: InvestmentType(rawValue: type?.lowercased() ?? "") ?? .other,
-            symbol: symbol.uppercased(),
-            name: name,
-            quantity: quantity,
-            costBasis: costBasis,
-            currentValue: currentValue,
-            currentPrice: currentPrice,
-            currency: Currency.imported(currency, default: .usd),
-            geography: geography ?? "Other",
-            sector: sector ?? "Other",
-            isin: isin?.uppercased() ?? "",
-            fees: fees?.nonNegativeImportedAmount ?? 0,
-            updatedAt: importedUpdatedAt,
-            createdAt: ImportDateParser.parse(createdAt) ?? importedUpdatedAt
-        )
-    }
-}
-
-private struct ImportedCryptoHolding: Decodable {
-    let id: UUID?
-    let symbol: String?
-    let name: String?
-    let quantity: Double?
-    let avgBuyPrice: Double?
-    let currentPrice: Double?
-    let currency: String?
-    let fees: Double?
-    let coinId: String?
-    let lastPriceUpdate: String?
-    let updatedAt: String?
-    let createdAt: String?
-
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case symbol
-        case name
-        case quantity
-        case avgBuyPrice
-        case currentPrice
-        case currency
-        case fees
-        case coinId
-        case lastPriceUpdate
-        case updatedAt
-        case createdAt
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = container.decodeUUIDIfPresent(forKey: .id)
-        symbol = container.decodeImportedStringIfPresent(forKey: .symbol)
-        name = container.decodeImportedStringIfPresent(forKey: .name)
-        quantity = container.decodeImportedDoubleIfPresent(forKey: .quantity)
-        avgBuyPrice = container.decodeImportedDoubleIfPresent(forKey: .avgBuyPrice)
-        currentPrice = container.decodeImportedDoubleIfPresent(forKey: .currentPrice)
-        currency = container.decodeImportedStringIfPresent(forKey: .currency)
-        fees = container.decodeImportedDoubleIfPresent(forKey: .fees)
-        coinId = container.decodeImportedStringIfPresent(forKey: .coinId)
-        lastPriceUpdate = container.decodeImportedStringIfPresent(forKey: .lastPriceUpdate)
-        updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
-        createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
-    }
-
-    func model() -> CryptoHolding? {
-        guard
-            let symbol,
-            let name,
-            let quantity = quantity?.positiveImportedAmount
-        else {
-            return nil
-        }
-
-        let importedUpdatedAt = ImportDateParser.parse(updatedAt) ?? ImportDateParser.parse(lastPriceUpdate) ?? Date()
-
-        return CryptoHolding(
-            id: id ?? UUID(),
-            symbol: symbol.uppercased(),
-            name: name,
-            quantity: quantity,
-            avgBuyPrice: avgBuyPrice?.nonNegativeImportedAmount ?? 0,
-            currentPrice: currentPrice?.nonNegativeImportedAmount ?? 0,
-            currency: Currency.imported(currency, default: .usd),
-            fees: fees?.nonNegativeImportedAmount ?? 0,
-            coinId: coinId?.lowercased() ?? "",
-            updatedAt: importedUpdatedAt,
-            createdAt: ImportDateParser.parse(createdAt) ?? importedUpdatedAt
-        )
-    }
-}
-
-private struct ImportedLiability: Decodable {
-    let id: UUID?
-    let type: String?
-    let name: String?
-    let principal: Double?
-    let currentBalance: Double?
-    let currency: String?
-    let updatedAt: String?
-    let createdAt: String?
-
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case type
-        case name
-        case principal
-        case currentBalance
-        case currency
-        case updatedAt
-        case createdAt
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = container.decodeUUIDIfPresent(forKey: .id)
-        type = container.decodeImportedStringIfPresent(forKey: .type)
-        name = container.decodeImportedStringIfPresent(forKey: .name)
-        principal = container.decodeImportedDoubleIfPresent(forKey: .principal)
-        currentBalance = container.decodeImportedDoubleIfPresent(forKey: .currentBalance)
-        currency = container.decodeImportedStringIfPresent(forKey: .currency)
-        updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
-        createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
-    }
-
-    func model(defaultCurrency: Currency) -> Liability? {
-        guard let balance = (currentBalance ?? principal)?.nonNegativeImportedAmount else {
-            return nil
-        }
-
-        let importedUpdatedAt = ImportDateParser.parse(updatedAt) ?? Date()
-
-        return Liability(
-            id: id ?? UUID(),
-            name: name ?? type?.importTitleCased ?? "Liability",
-            currentBalance: balance,
-            currency: Currency.imported(currency, default: defaultCurrency),
-            createdAt: ImportDateParser.parse(createdAt) ?? importedUpdatedAt,
-            updatedAt: importedUpdatedAt
-        )
-    }
-}
-
-private struct ImportedSnapshot: Decodable {
-    let id: UUID?
-    let date: String?
-    let totalAssets: Double?
-    let totalLiabilities: Double?
-    let netWorth: Double?
-    let liquidity: Double?
-    let investments: Double?
-    let crypto: Double?
-    let createdAt: String?
-
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case date
-        case totalAssets
-        case totalLiabilities
-        case netWorth
-        case liquidity
-        case investments
-        case crypto
-        case createdAt
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = container.decodeUUIDIfPresent(forKey: .id)
-        date = container.decodeImportedStringIfPresent(forKey: .date)
-        totalAssets = container.decodeImportedDoubleIfPresent(forKey: .totalAssets)
-        totalLiabilities = container.decodeImportedDoubleIfPresent(forKey: .totalLiabilities)
-        netWorth = container.decodeImportedDoubleIfPresent(forKey: .netWorth)
-        liquidity = container.decodeImportedDoubleIfPresent(forKey: .liquidity)
-        investments = container.decodeImportedDoubleIfPresent(forKey: .investments)
-        crypto = container.decodeImportedDoubleIfPresent(forKey: .crypto)
-        createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
-    }
-
-    func model() -> NetWorthSnapshot? {
-        guard
-            let date = ImportDateParser.parse(date),
-            let netWorth,
-            netWorth.isFinite
-        else {
-            return nil
-        }
-
-        let totalLiabilities = totalLiabilities?.finiteImportedAmount ?? 0
-        let totalAssets = totalAssets?.finiteImportedAmount ?? netWorth + totalLiabilities
-
-        return NetWorthSnapshot(
-            id: id ?? UUID(),
-            date: date,
-            totalAssets: totalAssets,
-            totalLiabilities: totalLiabilities,
-            netWorth: netWorth,
-            liquidity: liquidity?.finiteImportedAmount ?? 0,
-            investments: investments?.finiteImportedAmount ?? 0,
-            crypto: crypto?.finiteImportedAmount ?? 0,
-            createdAt: ImportDateParser.parse(createdAt) ?? date
-        )
-    }
-}
-
-private struct LossyArray<Element: Decodable>: Decodable {
-    var elements: [Element]
-    var skippedCount: Int
-
-    init() {
-        elements = []
-        skippedCount = 0
-    }
-
-    init(from decoder: Decoder) throws {
-        var container = try decoder.unkeyedContainer()
-        var elements: [Element] = []
-        var skippedCount = 0
-
-        while !container.isAtEnd {
-            do {
-                elements.append(try container.decode(Element.self))
-            } catch {
-                skippedCount += 1
-                _ = try? container.decode(DiscardedJSONValue.self)
-            }
-        }
-
-        self.elements = elements
-        self.skippedCount = skippedCount
-    }
-}
-
-private enum DiscardedJSONValue: Decodable {
-    case string(String)
-    case number(Double)
-    case bool(Bool)
-    case object([String: DiscardedJSONValue])
-    case array([DiscardedJSONValue])
-    case null
-
-    init(from decoder: Decoder) throws {
-        if let container = try? decoder.singleValueContainer() {
-            if container.decodeNil() {
-                self = .null
-                return
-            }
-            if let value = try? container.decode(Bool.self) {
-                self = .bool(value)
-                return
-            }
-            if let value = try? container.decode(Double.self) {
-                self = .number(value)
-                return
-            }
-            if let value = try? container.decode(String.self) {
-                self = .string(value)
-                return
-            }
-        }
-
-        if let values = try? [DiscardedJSONValue](from: decoder) {
-            self = .array(values)
-            return
-        }
-
-        if let values = try? [String: DiscardedJSONValue](from: decoder) {
-            self = .object(values)
-            return
-        }
-
-        throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unsupported JSON value"))
-    }
-}
-
-private enum ImportDateParser {
-    private static let isoWithFractionalSeconds: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter
-    }()
-
-    private static let iso: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter
-    }()
-
-    private static let dateOnlyFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.calendar = Calendar(identifier: .gregorian)
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter
-    }()
-
-    static func parse(_ rawValue: String?) -> Date? {
-        guard let value = rawValue?.trimmedForImport else { return nil }
-
-        if let date = isoWithFractionalSeconds.date(from: value) {
-            return date
-        }
-        if let date = iso.date(from: value) {
-            return date
-        }
-        if let date = dateOnlyFormatter.date(from: value) {
-            return date
-        }
-
-        return nil
-    }
-
-    static func parseDateOnly(_ rawValue: String?) -> Date? {
-        guard let date = parse(rawValue) else { return nil }
-        return Calendar.current.startOfDay(for: date)
-    }
-}
-
-private extension KeyedDecodingContainer {
-    func decodeLossyArrayIfPresent<Element: Decodable>(_ type: Element.Type, forKey key: Key) -> LossyArray<Element> {
-        (try? decode(LossyArray<Element>.self, forKey: key)) ?? LossyArray<Element>()
-    }
-
-    func decodeImportedStringIfPresent(forKey key: Key) -> String? {
-        if let value = try? decode(String.self, forKey: key) {
-            return value.trimmedForImport
-        }
-
-        if let value = try? decode(Double.self, forKey: key), value.isFinite {
-            return String(value)
-        }
-
-        if let value = try? decode(Bool.self, forKey: key) {
-            return String(value)
-        }
-
-        return nil
-    }
-
-    func decodeImportedDoubleIfPresent(forKey key: Key) -> Double? {
-        if let value = try? decode(Double.self, forKey: key), value.isFinite {
-            return value
-        }
-
-        if let value = try? decode(String.self, forKey: key) {
-            let normalized = value
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .replacingOccurrences(of: ",", with: ".")
-            if let parsed = Double(normalized), parsed.isFinite {
-                return parsed
-            }
-        }
-
-        return nil
-    }
-
-    func decodeUUIDIfPresent(forKey key: Key) -> UUID? {
-        guard let rawValue = decodeImportedStringIfPresent(forKey: key) else { return nil }
-        return UUID(uuidString: rawValue)
-    }
-
-    func decodeImportedBoolIfPresent(forKey key: Key) -> Bool? {
-        if let value = try? decode(Bool.self, forKey: key) {
-            return value
-        }
-        guard let value = try? decode(String.self, forKey: key) else { return nil }
-        switch value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
-        case "true", "1", "yes":
-            return true
-        case "false", "0", "no":
-            return false
-        default:
-            return nil
-        }
-    }
-}
-
-private extension Currency {
-    static func imported(_ rawValue: String?, default defaultCurrency: Currency) -> Currency {
-        guard let rawValue = rawValue?.trimmedForImport else { return defaultCurrency }
-        return Currency(rawValue: rawValue.uppercased()) ?? defaultCurrency
-    }
-}
-
 extension FinancialData {
     var hasImportableContent: Bool {
         !transactions.isEmpty || !recurringTransactions.isEmpty || !investments.isEmpty
@@ -1919,46 +892,5 @@ extension FinancialData {
             liabilities: liabilities.sorted { $0.updatedAt > $1.updatedAt },
             snapshots: snapshots.sorted { $0.date < $1.date }
         )
-    }
-}
-
-private extension Array where Element: Identifiable, Element.ID == UUID {
-    func uniquedByID() -> [Element] {
-        var seen = Set<UUID>()
-        return filter { item in
-            seen.insert(item.id).inserted
-        }
-    }
-}
-
-private extension Double {
-    var finiteImportedAmount: Double? {
-        isFinite ? self : nil
-    }
-
-    var positiveImportedAmount: Double? {
-        isFinite && self > 0 ? self : nil
-    }
-
-    var nonNegativeImportedAmount: Double? {
-        isFinite && self >= 0 ? self : nil
-    }
-}
-
-private extension String {
-    var trimmedForImport: String? {
-        let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
-
-    var importTitleCased: String {
-        replacingOccurrences(of: "_", with: " ")
-            .replacingOccurrences(of: "-", with: " ")
-            .split(separator: " ")
-            .map { word in
-                let lowercased = word.lowercased()
-                return lowercased.prefix(1).uppercased() + lowercased.dropFirst()
-            }
-            .joined(separator: " ")
     }
 }

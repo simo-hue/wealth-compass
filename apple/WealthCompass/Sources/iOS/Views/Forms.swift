@@ -359,41 +359,17 @@ struct RecurringTransactionFormView: View {
             selectedCategory = category
         }
 
-        let scheduleChanged = existingSchedule.map {
-            $0.frequency != frequency || abs($0.startDate.timeIntervalSince(startDate)) >= 1
-        } ?? true
-
-        let seed = RecurringTransaction(
-            id: existingSchedule?.id ?? UUID(),
+        let savedSchedule = RecurringScheduleBuilder.build(
+            existing: existingSchedule,
             type: type,
             category: selectedCategory,
             amount: parsedAmount,
             description: note,
             startDate: startDate,
             frequency: frequency,
-            nextDueDate: startDate,
             endDate: normalizedEndDate,
-            notificationsEnabled: notificationsEnabled,
-            isActive: existingSchedule?.isActive ?? true,
-            completedAt: existingSchedule?.completedAt,
-            createdAt: existingSchedule?.createdAt ?? Date(),
-            updatedAt: Date()
+            notificationsEnabled: notificationsEnabled
         )
-
-        var savedSchedule = seed
-        if savedSchedule.isCompleted {
-            savedSchedule.isActive = false
-        } else if !scheduleChanged, let existingSchedule {
-            savedSchedule.nextDueDate = existingSchedule.nextDueDate
-        } else if let nextDueDate = seed.firstOccurrence(onOrAfter: Date()) {
-            savedSchedule.nextDueDate = nextDueDate
-        } else {
-            savedSchedule.isActive = false
-        }
-
-        if let endDate = savedSchedule.endDate, savedSchedule.nextDueDate > endDate {
-            savedSchedule.isActive = false
-        }
 
         onSave(savedSchedule)
         dismiss()
@@ -584,6 +560,8 @@ struct CryptoFormView: View {
     @State private var currentPrice: String
     @State private var feeMode: FeeMode = .fixed
     @State private var feeValue: String
+    @State private var currency: Currency
+    @State private var hasInitializedCurrency = false
 
     init(holding: CryptoHolding?, onSave: @escaping (CryptoHolding) -> Void) {
         self.holding = holding
@@ -596,6 +574,9 @@ struct CryptoFormView: View {
         _avgBuyPrice = State(initialValue: holding == nil ? "" : Self.formatInput(rawAverage))
         _currentPrice = State(initialValue: holding.map { Self.formatInput($0.currentPrice) } ?? "")
         _feeValue = State(initialValue: holding.map { Self.formatInput($0.fees) } ?? "0")
+        // Placeholder; a new holding adopts the app's display currency in onAppear
+        // (the environment isn't available during init).
+        _currency = State(initialValue: holding?.currency ?? .eur)
     }
 
     private var parsedQuantity: Double { parse(quantity) }
@@ -617,6 +598,11 @@ struct CryptoFormView: View {
                 }
 
                 Section {
+                    Picker("Currency", selection: $currency) {
+                        ForEach(Currency.allCases) { currency in
+                            (Text(currency.displayName) + Text(" (\(currency.rawValue))")).tag(currency)
+                        }
+                    }
                     TextField("Quantity", text: $quantity)
                         .keyboardType(.decimalPad)
                     TextField("Average Buy Price", text: $avgBuyPrice)
@@ -642,12 +628,17 @@ struct CryptoFormView: View {
                     HStack {
                         Text("Calculated Fee")
                         Spacer()
-                        Text(calculatedFee.formatted(.currency(code: Currency.usd.rawValue)))
+                        Text(calculatedFee.formatted(.currency(code: currency.rawValue)))
                             .font(.body.monospacedDigit())
                     }
                 }
             }
             .navigationTitle(holding == nil ? "Add Crypto" : "Edit Crypto")
+            .onAppear {
+                guard !hasInitializedCurrency else { return }
+                if holding == nil { currency = settings.currency }
+                hasInitializedCurrency = true
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -683,6 +674,7 @@ struct CryptoFormView: View {
         item.avgBuyPrice = effectiveAverage
         item.currentPrice = parsedCurrentPrice
         item.fees = calculatedFee
+        item.currency = currency
         item.updatedAt = Date()
         onSave(item)
     }

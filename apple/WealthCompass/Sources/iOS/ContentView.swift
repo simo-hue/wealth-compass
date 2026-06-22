@@ -40,6 +40,14 @@ struct ContentView: View {
                 tabs
             }
         }
+        .overlay(alignment: .top) {
+            if let persistenceError = finance.persistenceError {
+                PersistenceErrorBanner(message: persistenceError)
+                    .padding(.top, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.spring(response: 0.4, dampingFraction: 0.85), value: finance.persistenceError)
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .background || newPhase == .inactive {
                 appLock.lock()
@@ -93,14 +101,6 @@ struct ContentView: View {
         .tint(WCColor.primary)
         .toolbarColorScheme(.dark, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
-        // #region agent log
-        .onAppear {
-            I18nDebugLog.auditTabBarLabels(appLanguage: settings.appLanguage, runId: "post-fix")
-        }
-        .onChange(of: settings.appLanguage) { _, _ in
-            I18nDebugLog.auditTabBarLabels(appLanguage: settings.appLanguage, runId: "post-fix")
-        }
-        // #endregion
     }
 
     private func tabLabel(_ tab: TabBarLabelResolver.Tab, systemImage: String) -> some View {

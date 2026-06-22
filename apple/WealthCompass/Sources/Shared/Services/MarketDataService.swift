@@ -258,8 +258,9 @@ struct FinnhubQuoteClient {
             throw MarketDataError.noQuote(provider: "Finnhub", symbol: symbol)
         }
 
-        var components = URLComponents(string: APIConfiguration.proxyBaseURL)!
-        components.path = "/api/quote"
+        guard var components = URLComponents(string: APIConfiguration.finnhubQuoteURL) else {
+            throw MarketDataError.invalidURL
+        }
         components.queryItems = [
             URLQueryItem(name: "symbol", value: normalizedSymbol)
         ]
@@ -281,7 +282,7 @@ struct FinnhubQuoteClient {
             request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
         }
 
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await NetworkRetry.data(for: request, session: session)
         try Self.validate(response: response, provider: "Finnhub")
 
         let quote = try JSONDecoder().decode(FinnhubQuoteResponse.self, from: data)
@@ -317,40 +318,62 @@ struct FinnhubQuoteClient {
     }
 }
 
+/// A coin's live prices from CoinGecko, resolved per requested currency in one call.
+struct CoinGeckoCoinQuote {
+    let prices: [Currency: Double]
+    let asOf: Date
+
+    /// Resolves the price in `currency`, falling back to EUR (then any available
+    /// currency) if the provider didn't return the requested one.
+    func resolved(in currency: Currency) -> (price: Double, currency: Currency)? {
+        if let value = prices[currency] { return (value, currency) }
+        if let eur = prices[.eur] { return (eur, .eur) }
+        return prices.first.map { ($0.value, $0.key) }
+    }
+}
+
 struct CoinGeckoPriceClient {
     var apiKey: String?
-    var preferredCurrency: Currency = .eur
+    /// Currencies to request. Each crypto holding's price is resolved in its own
+    /// currency from a single batched call, so a refresh never silently re-bases
+    /// a holding's cost-basis currency (see H2 in CODE_AUDIT.md).
+    var currencies: [Currency] = [.eur]
     var session: URLSession = .shared
 
     func testConnection() async throws -> MarketPriceQuote {
-        let quotes = try await pricesForChunk(["bitcoin"], validationNonce: UUID().uuidString)
-        guard let quote = quotes["bitcoin"] else {
+        let table = try await priceTable(for: ["bitcoin"], validationNonce: UUID().uuidString)
+        guard
+            let quote = table["bitcoin"],
+            let resolved = quote.resolved(in: currencies.first ?? .eur)
+        else {
             throw MarketDataError.noQuote(provider: "CoinGecko", symbol: "bitcoin")
         }
-        return quote
+        return MarketPriceQuote(price: resolved.price, currency: resolved.currency, asOf: quote.asOf, provider: "CoinGecko")
     }
 
-    func prices(for coinIDs: [String]) async throws -> [String: MarketPriceQuote] {
+    func priceTable(for coinIDs: [String]) async throws -> [String: CoinGeckoCoinQuote] {
         let ids = Array(Set(coinIDs.map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }))
             .filter { !$0.isEmpty }
             .sorted()
         guard !ids.isEmpty else { return [:] }
 
-        var quotes: [String: MarketPriceQuote] = [:]
+        var quotes: [String: CoinGeckoCoinQuote] = [:]
         for chunk in ids.chunked(into: 100) {
-            let partial = try await pricesForChunk(chunk, validationNonce: nil)
+            let partial = try await priceTable(for: chunk, validationNonce: nil)
             quotes.merge(partial) { _, incoming in incoming }
         }
         return quotes
     }
 
-    private func pricesForChunk(_ coinIDs: [String], validationNonce: String?) async throws -> [String: MarketPriceQuote] {
-        var components = URLComponents(string: APIConfiguration.proxyBaseURL)!
-        components.path = "/api/price"
-        var vsCurrencies = [preferredCurrency.rawValue.lowercased()]
-        if preferredCurrency != .eur {
-            vsCurrencies.append("eur")
+    private func priceTable(for coinIDs: [String], validationNonce: String?) async throws -> [String: CoinGeckoCoinQuote] {
+        guard var components = URLComponents(string: APIConfiguration.coinGeckoSimplePriceURL) else {
+            throw MarketDataError.invalidURL
         }
+        // EUR is always included as a safety net so a value resolves even when a
+        // holding's currency isn't among those CoinGecko returned.
+        var requested = currencies
+        if !requested.contains(.eur) { requested.append(.eur) }
+        let vsCurrencies = Array(Set(requested.map { $0.rawValue.lowercased() })).sorted()
         components.queryItems = [
             URLQueryItem(name: "ids", value: coinIDs.joined(separator: ",")),
             URLQueryItem(name: "vs_currencies", value: vsCurrencies.joined(separator: ",")),
@@ -374,14 +397,20 @@ struct CoinGeckoPriceClient {
             request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
         }
 
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await NetworkRetry.data(for: request, session: session)
         try Self.validate(response: response, provider: "CoinGecko")
 
         let payload = try JSONDecoder().decode([String: CoinGeckoSimplePriceResponse].self, from: data)
         return payload.compactMapValues { value in
-            guard let (price, resolvedCurrency) = value.preferredPrice(for: preferredCurrency) else { return nil }
+            var resolved: [Currency: Double] = [:]
+            for currency in requested {
+                if let price = value.price(for: currency) {
+                    resolved[currency] = price
+                }
+            }
+            guard !resolved.isEmpty else { return nil }
             let asOf = value.lastUpdatedAt.map(Date.init(timeIntervalSince1970:)) ?? Date()
-            return MarketPriceQuote(price: price, currency: resolvedCurrency, asOf: asOf, provider: "CoinGecko")
+            return CoinGeckoCoinQuote(prices: resolved, asOf: asOf)
         }
     }
 
@@ -420,35 +449,40 @@ private struct FinnhubQuoteResponse: Decodable {
     }
 }
 
+/// Decodes CoinGecko's `simple/price` per-coin object, which carries one key per
+/// requested `vs_currency` (lowercased ISO code) plus `last_updated_at`. Decoded
+/// dynamically so any currency the app requests is supported without code changes.
 private struct CoinGeckoSimplePriceResponse: Decodable {
-    let eur: Double?
-    let usd: Double?
-    let gbp: Double?
-    let chf: Double?
+    let prices: [String: Double]
     let lastUpdatedAt: TimeInterval?
 
-    private enum CodingKeys: String, CodingKey {
-        case eur, usd, gbp, chf
-        case lastUpdatedAt = "last_updated_at"
+    private struct DynamicKey: CodingKey {
+        var stringValue: String
+        var intValue: Int?
+        init?(stringValue: String) { self.stringValue = stringValue; intValue = nil }
+        init?(intValue: Int) { stringValue = String(intValue); self.intValue = intValue }
     }
 
-    func preferredPrice(for currency: Currency) -> (Double, Currency)? {
-        if let price = price(for: currency), price > 0, price.isFinite {
-            return (price, currency)
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicKey.self)
+        var collected: [String: Double] = [:]
+        var updatedAt: TimeInterval?
+        for key in container.allKeys {
+            if key.stringValue == "last_updated_at" {
+                updatedAt = try? container.decode(TimeInterval.self, forKey: key)
+            } else if let value = try? container.decode(Double.self, forKey: key) {
+                collected[key.stringValue] = value
+            }
         }
-        if currency != .eur, let eurPrice = eur, eurPrice > 0, eurPrice.isFinite {
-            return (eurPrice, .eur)
-        }
-        return nil
+        prices = collected
+        lastUpdatedAt = updatedAt
     }
 
-    private func price(for currency: Currency) -> Double? {
-        switch currency {
-        case .eur: eur
-        case .usd: usd
-        case .gbp: gbp
-        case .chf: chf
+    func price(for currency: Currency) -> Double? {
+        guard let value = prices[currency.rawValue.lowercased()], value > 0, value.isFinite else {
+            return nil
         }
+        return value
     }
 }
 

@@ -345,6 +345,8 @@ private struct MacCryptoEditor: View {
     @State private var currentPrice: String
     @State private var feeMode: FeeMode = .fixed
     @State private var feeValue: String
+    @State private var currency: Currency
+    @State private var hasInitializedCurrency = false
 
     init(holding: CryptoHolding?) {
         self.holding = holding
@@ -356,6 +358,9 @@ private struct MacCryptoEditor: View {
         _averagePrice = State(initialValue: holding.map { _ in Self.input(average) } ?? "")
         _currentPrice = State(initialValue: holding.map { Self.input($0.currentPrice) } ?? "")
         _feeValue = State(initialValue: holding.map { Self.input($0.fees) } ?? "0")
+        // Placeholder; a new holding adopts the app's display currency in onAppear
+        // (the environment isn't available during init).
+        _currency = State(initialValue: holding?.currency ?? .eur)
     }
 
     private var parsedQuantity: Double { parse(quantity) }
@@ -382,6 +387,11 @@ private struct MacCryptoEditor: View {
                 }
 
                 Section("Position") {
+                    Picker("Currency", selection: $currency) {
+                        ForEach(Currency.allCases) { currency in
+                            (Text(currency.displayName) + Text(" (\(currency.rawValue))")).tag(currency)
+                        }
+                    }
                     TextField("Quantity", text: $quantity)
                     TextField("Average Buy Price", text: $averagePrice)
                     TextField("Current Price", text: $currentPrice)
@@ -403,12 +413,17 @@ private struct MacCryptoEditor: View {
                     )
 
                     LabeledContent("Calculated Fee") {
-                        Text(calculatedFee.formatted(.currency(code: Currency.usd.rawValue)))
+                        Text(calculatedFee.formatted(.currency(code: currency.rawValue)))
                             .monospacedDigit()
                     }
                 }
             }
             .formStyle(.grouped)
+            .onAppear {
+                guard !hasInitializedCurrency else { return }
+                if holding == nil { currency = settings.currency }
+                hasInitializedCurrency = true
+            }
             .navigationTitle(holding == nil ? "New Crypto Holding" : "Edit Crypto Holding")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -443,6 +458,7 @@ private struct MacCryptoEditor: View {
         value.avgBuyPrice = effectiveAverage
         value.currentPrice = parsedCurrentPrice
         value.fees = calculatedFee
+        value.currency = currency
         value.updatedAt = Date()
         finance.upsertCrypto(value, settings: settings)
         dismiss()

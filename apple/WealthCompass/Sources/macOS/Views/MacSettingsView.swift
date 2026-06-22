@@ -606,14 +606,12 @@ struct MacSettingsView: View {
         for credential: MacMarketDataCredentialKind,
         apiKey: String
     ) async throws -> String {
+        let provider: SettingsViewModel.MarketDataProvider
         switch credential {
-        case .finnhub:
-            let quote = try await FinnhubQuoteClient(apiKey: apiKey).testConnection()
-            return settings.localized("Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
-        case .coingecko:
-            let quote = try await CoinGeckoPriceClient(apiKey: apiKey).testConnection()
-            return settings.localized("CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).")
+        case .finnhub: provider = .finnhub
+        case .coingecko: provider = .coingecko
         }
+        return try await SettingsViewModel.validateMarketDataKey(provider, apiKey: apiKey, appLanguage: settings.appLanguage)
     }
 
     private func removeMarketDataCredential(_ credential: MacMarketDataCredentialKind) {
