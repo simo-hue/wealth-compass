@@ -301,6 +301,34 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: inventoryPending(), local: remote, remote: local), expectedSwapped)
     }
 
+    /// #15 step 2: resolution for a non-deleted save conflict. The headline property is
+    /// the safety boundary — a deliberate local edit or delete must NEVER be overwritten
+    /// by the server (never `.applyServer`); the server is only adopted for records with
+    /// no deliberate local change when it's newer.
+    func testConflictActionRouting() {
+        let older = bootstrapSnapshot(payload: "old", updatedAt: Date(timeIntervalSince1970: 1_000))
+        let newer = bootstrapSnapshot(payload: "new", updatedAt: Date(timeIntervalSince1970: 9_000))
+        let same = bootstrapSnapshot(payload: "x", updatedAt: Date(timeIntervalSince1970: 5_000))
+        let sameOtherTime = bootstrapSnapshot(payload: "x", updatedAt: Date(timeIntervalSince1970: 6_000))
+
+        // Safety boundary: a real local edit / delete always keeps local, even vs a newer server.
+        XCTAssertEqual(CloudKitSyncService.conflictAction(pending: localChangePending(), local: older, server: newer), .requeueLocal)
+        XCTAssertEqual(CloudKitSyncService.conflictAction(pending: deletePending(), local: older, server: newer), .requeueLocal)
+
+        // Identical payload → drop the redundant upload (no data apply).
+        XCTAssertEqual(CloudKitSyncService.conflictAction(pending: inventoryPending(), local: same, server: sameOtherTime), .adoptServerIdentical)
+
+        // No deliberate local edit + server newer → adopt the server payload.
+        XCTAssertEqual(CloudKitSyncService.conflictAction(pending: inventoryPending(), local: older, server: newer), .applyServer)
+        XCTAssertEqual(CloudKitSyncService.conflictAction(pending: nil, local: older, server: newer), .applyServer)
+
+        // No deliberate edit but local is newer → keep local.
+        XCTAssertEqual(CloudKitSyncService.conflictAction(pending: inventoryPending(), local: newer, server: older), .requeueLocal)
+
+        // Unreadable server payload (nil) → keep local; never apply nil.
+        XCTAssertEqual(CloudKitSyncService.conflictAction(pending: inventoryPending(), local: older, server: nil), .requeueLocal)
+    }
+
     private func makeTransaction(id: UUID, amount: Double) -> Transaction {
         Transaction(
             id: id,
