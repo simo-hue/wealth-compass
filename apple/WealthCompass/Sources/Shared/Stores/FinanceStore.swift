@@ -23,7 +23,9 @@ enum FinanceImportMode: String, Identifiable {
     }
 }
 
-struct FinanceImportResult {
+struct FinanceImportResult: Identifiable {
+    /// Fresh per import so presenting it re-triggers a `.sheet(item:)` each time.
+    let id = UUID()
     let sourceFileName: String
     let mode: FinanceImportMode
     let transactions: Int

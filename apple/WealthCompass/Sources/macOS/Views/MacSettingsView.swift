@@ -104,7 +104,9 @@ struct MacSettingsView: View {
     @EnvironmentObject private var appLock: MacAppLockStore
     @State private var importMode: FinanceImportMode = .merge
     @State private var selectedTab: MacSettingsTab = .general
-    
+
+    @State private var importSummary: FinanceImportResult?
+    @State private var importSummaryNote: String?
     @State private var settingsAlert: MacSettingsAlert?
     @State private var credentialEditorAlert: MacSettingsAlert?
     @State private var activeCredentialEditor: MacMarketDataCredentialKind?
@@ -159,6 +161,17 @@ struct MacSettingsView: View {
                     removeMarketDataCredential(credential)
                 }
             )
+        }
+        .sheet(item: $importSummary) { summary in
+            ImportSummaryView(
+                result: summary,
+                appLanguage: settings.appLanguage,
+                additionalNote: importSummaryNote
+            ) {
+                importSummary = nil
+                importSummaryNote = nil
+            }
+            .frame(width: 460, height: 580)
         }
         .alert(item: $settingsAlert) { alert in
             Alert(
@@ -688,18 +701,18 @@ struct MacSettingsView: View {
             Task {
                 await syncRecurringNotifications()
 
-                var message = result.message
-                if insertedCount > 0 {
-                    if insertedCount == 1 {
-                        message += settings.localized("\n\n1 due recurring transaction was added to Cash Flow.")
-                    } else {
-                        message += settings.localized("\n\n\(insertedCount) due recurring transactions were added to Cash Flow.")
-                    }
+                // Reuse the existing localized lines (trimmed of their paragraph spacing)
+                // as the summary's extra footnote so we don't add new strings.
+                if insertedCount == 1 {
+                    importSummaryNote = settings.localized("\n\n1 due recurring transaction was added to Cash Flow.")
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                } else if insertedCount > 1 {
+                    importSummaryNote = settings.localized("\n\n\(insertedCount) due recurring transactions were added to Cash Flow.")
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                } else {
+                    importSummaryNote = nil
                 }
-                settingsAlert = MacSettingsAlert(
-                    title: settings.localized("Import Complete"),
-                    message: message
-                )
+                importSummary = result
             }
         } catch {
             settingsAlert = MacSettingsAlert(

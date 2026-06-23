@@ -106,3 +106,12 @@
     Translate to the catalog languages when convenient (the sibling sync-error messages —
     network / quota / sign-in — already carry ar/de/es/fr/it/zh-Hans). Purely localization; no
     code or build action needed.
+
+## Import summary popup (2026-06-23) — follow-up
+
+19. **Translate the 5 new import-summary strings.** Added to
+    `Sources/Shared/Resources/Localizable.xcstrings` as English-only source entries for the new
+    "Import Complete" stats sheet (English fallback until translated): `"Done"`,
+    `"Records imported"`, `"New categories"`, `"Records skipped"`, `"Snapshot generated"`. The
+    category tile labels (Transactions/Recurring/Investments/Crypto/Liabilities/Snapshots) reuse
+    existing translated keys. Purely localization; no code or build action needed.

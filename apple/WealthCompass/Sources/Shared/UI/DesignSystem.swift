@@ -652,3 +652,217 @@ struct PersistenceErrorBanner: View {
         .accessibilityElement(children: .combine)
     }
 }
+
+/// Celebratory, on-brand summary shown after a successful JSON import — replaces the old
+/// plain-text alert with a visual breakdown of what landed. Pure content (its own dark
+/// backdrop + scroll + Done button); each platform presents it in a `.sheet` and applies
+/// its own sizing/detents. Reuses the app's color + card tokens so it stays coherent, and
+/// is given `appLanguage` so it honors the in-app language override like the rest of the UI.
+struct ImportSummaryView: View {
+    let result: FinanceImportResult
+    var appLanguage: String?
+    /// Optional extra line (e.g. macOS "N due recurring transactions were added").
+    var additionalNote: String?
+    let onDone: () -> Void
+
+    @State private var appeared = false
+
+    private var categoryTiles: [(label: LocalizedStringKey, count: Int, icon: String)] {
+        [
+            ("Transactions", result.transactions, "arrow.left.arrow.right"),
+            ("Recurring", result.recurringTransactions, "repeat"),
+            ("Investments", result.investments, "chart.line.uptrend.xyaxis"),
+            ("Crypto", result.crypto, "bitcoinsign.circle"),
+            ("Liabilities", result.liabilities, "creditcard"),
+            ("Snapshots", result.snapshots, "camera")
+        ]
+    }
+
+    var body: some View {
+        ZStack {
+            WCColor.background.ignoresSafeArea()
+            LinearGradient(
+                colors: [WCColor.primary.opacity(0.14), .clear],
+                startPoint: .top,
+                endPoint: .center
+            )
+            .ignoresSafeArea()
+
+            ScrollView {
+                VStack(spacing: 22) {
+                    header
+                    totalHero
+                    grid
+                    extras
+                    doneButton
+                }
+                .padding(24)
+                .frame(maxWidth: 460)
+                .frame(maxWidth: .infinity)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 12)
+            }
+        }
+        .preferredColorScheme(.dark)
+        .appLanguage(appLanguage)
+        .presentationBackground(WCColor.background)
+        .onAppear {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.78)) { appeared = true }
+        }
+    }
+
+    private var header: some View {
+        VStack(spacing: 14) {
+            ZStack {
+                Circle().fill(WCColor.primary.opacity(0.16)).frame(width: 84, height: 84)
+                Circle()
+                    .fill(WCColor.primary.gradient)
+                    .frame(width: 60, height: 60)
+                    .shadow(color: WCColor.primary.opacity(0.5), radius: 14, y: 6)
+                Image(systemName: "checkmark")
+                    .font(.system(size: 27, weight: .bold))
+                    .foregroundStyle(.black.opacity(0.85))
+            }
+            .scaleEffect(appeared ? 1 : 0.55)
+
+            VStack(spacing: 7) {
+                Text("Import Complete")
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(.white)
+                HStack(spacing: 7) {
+                    Text(result.mode.title)
+                        .font(.caption2.weight(.bold))
+                        .textCase(.uppercase)
+                        .tracking(0.6)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(WCColor.primary.opacity(0.16), in: Capsule())
+                        .foregroundStyle(WCColor.primary)
+                    Text(verbatim: result.sourceFileName)
+                        .font(.caption)
+                        .foregroundStyle(WCColor.textTertiary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var totalHero: some View {
+        VStack(spacing: 2) {
+            Text("\(result.importedRecordCount)")
+                .font(.system(size: 46, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(
+                    LinearGradient(colors: [.white, WCColor.primary], startPoint: .top, endPoint: .bottom)
+                )
+            Text("Records imported")
+                .font(.caption.weight(.medium))
+                .textCase(.uppercase)
+                .tracking(1.3)
+                .foregroundStyle(WCColor.textTertiary)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var grid: some View {
+        LazyVGrid(
+            columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+            spacing: 12
+        ) {
+            ForEach(Array(categoryTiles.enumerated()), id: \.offset) { _, tile in
+                statTile(label: tile.label, count: tile.count, icon: tile.icon)
+            }
+        }
+    }
+
+    private func statTile(label: LocalizedStringKey, count: Int, icon: String) -> some View {
+        InsetFinanceRow {
+            HStack(spacing: 11) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(count > 0 ? WCColor.primary : WCColor.textFaint)
+                    .frame(width: 34, height: 34)
+                    .background(
+                        (count > 0 ? WCColor.primary : Color.white).opacity(count > 0 ? 0.12 : 0.05),
+                        in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    )
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("\(count)")
+                        .font(.title3.monospacedDigit().weight(.bold))
+                        .foregroundStyle(.white)
+                    Text(label)
+                        .font(.caption2)
+                        .foregroundStyle(WCColor.textTertiary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+                Spacer(minLength: 0)
+            }
+        }
+        .opacity(count > 0 ? 1 : 0.55)
+        .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder private var extras: some View {
+        let hasExtras = result.generatedSnapshots > 0
+            || result.categoriesAdded > 0
+            || result.skippedRecords > 0
+            || additionalNote != nil
+        if hasExtras {
+            VStack(spacing: 8) {
+                if result.generatedSnapshots > 0 {
+                    footnoteRow(icon: "camera.fill", tint: WCColor.primary, label: Text("Snapshot generated"))
+                }
+                if result.categoriesAdded > 0 {
+                    footnoteRow(icon: "folder.badge.plus", tint: WCColor.accent, label: Text("New categories"), count: result.categoriesAdded)
+                }
+                if result.skippedRecords > 0 {
+                    footnoteRow(icon: "exclamationmark.triangle.fill", tint: WCColor.warning, label: Text("Records skipped"), count: result.skippedRecords)
+                }
+                if let additionalNote {
+                    footnoteRow(icon: "calendar.badge.clock", tint: WCColor.primary, label: Text(verbatim: additionalNote))
+                }
+            }
+        }
+    }
+
+    private func footnoteRow(icon: String, tint: Color, label: Text, count: Int? = nil) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(tint)
+                .frame(width: 22)
+            label
+                .font(.caption)
+                .foregroundStyle(WCColor.textSecondary)
+            Spacer(minLength: 8)
+            if let count {
+                Text("\(count)")
+                    .font(.caption.monospacedDigit().weight(.bold))
+                    .foregroundStyle(tint)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 9)
+        .background(tint.opacity(0.08), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(tint.opacity(0.18), lineWidth: 1))
+        .accessibilityElement(children: .combine)
+    }
+
+    private var doneButton: some View {
+        Button(action: onDone) {
+            Text("Done")
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.black.opacity(0.85))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(WCColor.primary.gradient, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .shadow(color: WCColor.primary.opacity(0.3), radius: 12, y: 6)
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 4)
+    }
+}
