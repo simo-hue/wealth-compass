@@ -93,3 +93,16 @@
     - This was an App Store build (1.0.5/6); ship the rebuilt binary (bump `CURRENT_PROJECT_VERSION`) so affected users stop crashing.
 
 17. **Recommended next: make sync resilient, not just non-crashing (`WealthCompass/TO_IMPROVE.md` #6).** The crash fix stops the process abort, but `handleEvent` still tears the engine down on ANY thrown error (e.g. one remote record that fails to decode / has no `payload`). If your Mac was crashing because an iPhone/web-uploaded record won't decode, sync will now *stop with an error* instead of working. Implement #6 (log+skip a bad record instead of `throw`) so a single bad record can't halt sync. I did not do this (it changes sync semantics and I can't runtime-test it here).
+
+## iCloud sync error classification (2026-06-23) — follow-up
+
+18. **Translate the 3 new sync-error strings (`WealthCompass/TO_IMPROVE.md` #14).** Added to
+    `Sources/Shared/Resources/Localizable.xcstrings` as English-only source entries — they fall
+    back to English until translated (same as the existing `Exchange Rate Error` / `Keychain
+    Error` titles):
+    - `"The connection to iCloud was lost. Your changes are saved and will sync automatically when it is restored."`
+    - `"iCloud is temporarily limiting sync requests. Sync will resume automatically in a moment."`
+    - `"iCloud is still preparing your sync data. This usually resolves on the next sync."`
+    Translate to the catalog languages when convenient (the sibling sync-error messages —
+    network / quota / sign-in — already carry ar/de/es/fr/it/zh-Hans). Purely localization; no
+    code or build action needed.

@@ -2,7 +2,7 @@
 
 Step-by-step backlog from code review + runtime investigation (macOS debug logs, iOS console). Items are ordered by priority within each section.
 
-> **Completed items have been pruned** from this backlog to keep it focused on remaining work; their full implementation records live in `DOCUMENTATION.md` + git history (and `CODE_AUDIT.md`, which is 100% done). **Item numbers are stable** — they're referenced in commit messages and docs — so the sequence below has intentional gaps. Removed as done: **#4, #6, #7, #8, #10, #15, #18, #25**.
+> **Completed items have been pruned** from this backlog to keep it focused on remaining work; their full implementation records live in `DOCUMENTATION.md` + git history (and `CODE_AUDIT.md`, which is 100% done). **Item numbers are stable** — they're referenced in commit messages and docs — so the sequence below has intentional gaps. Removed as done: **#4, #6, #7, #8, #10, #14, #15, #18, #25**.
 
 ---
 
@@ -85,14 +85,6 @@ These fixes are in the codebase but still need a clean verification run on two i
 ---
 
 ## P2 — Correctness & edge cases
-
-### 14. Fix misleading `forceICloudSync()` errors
-
-**Problem:** Any post-sync error status is rethrown as `CloudSyncError.invalidRecord(message)`, even for network/quota/account errors.
-
-**Steps:**
-1. Map `cloudSyncStatus` cases to the correct error types (`accountUnavailable`, network, quota).
-2. Surface distinct UI copy in Settings for each case.
 
 ### 16. Guard chart inputs beyond currency conversion
 
@@ -191,7 +183,6 @@ Store rolling net-worth history as chunked monthly aggregates locally; sync fewe
 | Item | Effort | Impact | Status |
 |------|--------|--------|--------|
 | 1–3 — Verify recent fixes on two devices | S | Confidence | ⏳ manual (in progress) |
-| 14 — Map `forceICloudSync` error types | S | Correctness | ☐ open |
 | 13 — Dedupe manual + automatic sync | S | Less churn | ☐ open |
 | 16 / 17 — Chart NaN guard + remove `withAnimation` on load | S | Robustness | ☐ open |
 | 9 (remaining) — debounce remote apply + one write per batch | M | Fixes lag | 🟡 partial |
@@ -204,4 +195,4 @@ Non-code follow-ups live in `TO_SIMO_DO.md` (translate new strings, manual provi
 
 ---
 
-*Last updated: 2026-06-23 — pruned completed items (#4, #6, #7, #8, #10, #15, #18, #25; full records in `DOCUMENTATION.md` + git) to keep this backlog focused on remaining work. #6/#7/#8/#15 landed 2026-06-23; M4 (#10/#18/#25) 2026-06-22. Originally from the 2026-06-20 sync investigation session (macOS structured logs + iOS console).*
+*Last updated: 2026-06-23 — pruned completed items (#4, #6, #7, #8, #10, #14, #15, #18, #25; full records in `DOCUMENTATION.md` + git) to keep this backlog focused on remaining work. #14 (forceICloudSync error classification) and #6/#7/#8/#15 landed 2026-06-23; M4 (#10/#18/#25) 2026-06-22. Originally from the 2026-06-20 sync investigation session (macOS structured logs + iOS console).*

@@ -45526,6 +45526,15 @@
     "Exchange Rate Error" : {
 
     },
+    "The connection to iCloud was lost. Your changes are saved and will sync automatically when it is restored." : {
+
+    },
+    "iCloud is still preparing your sync data. This usually resolves on the next sync." : {
+
+    },
+    "iCloud is temporarily limiting sync requests. Sync will resume automatically in a moment." : {
+
+    },
     "Exchange Rate Refresh Failed" : {
       "localizations" : {
         "ar" : {
