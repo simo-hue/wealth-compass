@@ -63,4 +63,24 @@ final class FinanceImportServiceTests: XCTestCase {
         let result = try parse("{}")
         XCTAssertFalse(result.data.hasImportableContent)
     }
+
+    /// The headline number in the import summary popup: `importedRecordCount` sums only the
+    /// six entity counts — it must NOT fold in generated snapshots, added categories, or
+    /// skipped records (those are reported separately).
+    func testImportedRecordCountSumsEntitiesOnly() {
+        let result = FinanceImportResult(
+            sourceFileName: "backup.json",
+            mode: .merge,
+            transactions: 5,
+            recurringTransactions: 2,
+            investments: 3,
+            crypto: 1,
+            liabilities: 4,
+            snapshots: 6,
+            generatedSnapshots: 1,
+            categoriesAdded: 7,
+            skippedRecords: 9
+        )
+        XCTAssertEqual(result.importedRecordCount, 5 + 2 + 3 + 1 + 4 + 6)
+    }
 }

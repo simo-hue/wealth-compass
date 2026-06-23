@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var importMode: FinanceImportMode = .merge
     @State private var showingImportOptions = false
     @State private var showingFileImporter = false
+    @State private var importSummary: FinanceImportResult?
     @State private var settingsAlert: SettingsAlertState?
     @State private var credentialEditorAlert: SettingsAlertState?
     @State private var activeCredentialEditor: MarketDataCredentialKind?
@@ -250,6 +251,13 @@ struct SettingsView: View {
                         Task { await saveAndTestMarketDataCredential(credential) }
                     }
                 )
+            }
+            .sheet(item: $importSummary) { summary in
+                ImportSummaryView(result: summary, appLanguage: settings.appLanguage) {
+                    importSummary = nil
+                }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
             }
             .alert(item: $settingsAlert) { alert in
                 Alert(
@@ -493,10 +501,7 @@ struct SettingsView: View {
                 let result = try finance.importBackup(from: url, mode: importMode, settings: settings)
                 backupURL = nil
                 backupError = nil
-                settingsAlert = SettingsAlertState(
-                    title: settings.localized("Import Complete"),
-                    message: result.message
-                )
+                importSummary = result
             } catch {
                 settingsAlert = SettingsAlertState(
                     title: settings.localized("Import Failed"),

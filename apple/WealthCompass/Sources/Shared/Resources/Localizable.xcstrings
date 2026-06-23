@@ -45526,6 +45526,21 @@
     "Exchange Rate Error" : {
 
     },
+    "Done" : {
+
+    },
+    "Records imported" : {
+
+    },
+    "New categories" : {
+
+    },
+    "Records skipped" : {
+
+    },
+    "Snapshot generated" : {
+
+    },
     "The connection to iCloud was lost. Your changes are saved and will sync automatically when it is restored." : {
 
     },
