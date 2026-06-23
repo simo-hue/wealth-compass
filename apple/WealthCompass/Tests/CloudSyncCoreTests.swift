@@ -401,6 +401,90 @@ final class CloudSyncCoreTests: XCTestCase {
             updatedAt: fixedDate
         )
     }
+
+    // MARK: - Factory reset (purgeCloudData)
+
+    /// The happy path deletes the WealthCompass zone exactly once and resolves cleanly.
+    @MainActor
+    func testPurgeCloudDataDeletesTheZoneWhenAccountIsAvailable() async throws {
+        let deletedZoneName = ThreadSafeBox<String>()
+        let service = makePurgeTestService(accountStatus: .available) { zoneID in
+            deletedZoneName.value = zoneID.zoneName
+        }
+
+        try await service.purgeCloudData()
+
+        XCTAssertEqual(deletedZoneName.value, "WealthCompassZone")
+    }
+
+    /// No iCloud account → `.accountUnavailable` (the caller wipes locally) and the zone
+    /// delete is never attempted.
+    @MainActor
+    func testPurgeCloudDataThrowsAccountUnavailableAndSkipsDeleteWhenSignedOut() async {
+        let deleterCalled = ThreadSafeFlag()
+        let service = makePurgeTestService(accountStatus: .noAccount) { _ in
+            deleterCalled.setTrue()
+        }
+
+        do {
+            try await service.purgeCloudData()
+            XCTFail("A signed-out purge must throw .accountUnavailable.")
+        } catch CloudSyncError.accountUnavailable {
+            // expected
+        } catch {
+            XCTFail("Expected .accountUnavailable, got \(error).")
+        }
+        XCTAssertFalse(deleterCalled.isSet, "A signed-out purge must not attempt a zone delete.")
+    }
+
+    /// An already-absent zone counts as success: the erase is complete by definition.
+    @MainActor
+    func testPurgeCloudDataTreatsMissingZoneAsSuccess() async throws {
+        let service = makePurgeTestService(accountStatus: .available) { _ in
+            throw self.makeCKError(.zoneNotFound)
+        }
+
+        try await service.purgeCloudData()  // must not throw
+    }
+
+    /// A genuine delete failure surfaces as `.syncFailed`, so the caller aborts with the
+    /// local data still intact rather than half-erasing.
+    @MainActor
+    func testPurgeCloudDataSurfacesDeleteFailureAsSyncFailed() async {
+        let service = makePurgeTestService(accountStatus: .available) { _ in
+            throw self.makeCKError(.networkUnavailable)
+        }
+
+        do {
+            try await service.purgeCloudData()
+            XCTFail("A failed zone delete must throw .syncFailed.")
+        } catch CloudSyncError.syncFailed {
+            // expected
+        } catch {
+            XCTFail("Expected .syncFailed, got \(error).")
+        }
+    }
+
+    private func makePurgeTestService(
+        accountStatus: CKAccountStatus,
+        zoneDeleter: @escaping CloudKitSyncService.ZoneDeleter
+    ) -> CloudKitSyncService {
+        CloudKitSyncService(
+            metadataStore: CloudSyncMetadataStore(directoryName: "WealthCompassTests-\(UUID().uuidString)"),
+            snapshotProvider: { [:] },
+            remoteMutationHandler: { _ in [] },
+            statusHandler: { _ in },
+            disableHandler: {},
+            accountStatusProvider: { accountStatus },
+            userRecordIDProvider: { CKRecord.ID(recordName: "test-user") },
+            engineFactory: { _ in throw TestCloudSyncLifecycleError.engineShouldNotStart },
+            zoneDeleter: zoneDeleter
+        )
+    }
+
+    private func makeCKError(_ code: CKError.Code) -> CKError {
+        CKError(_nsError: NSError(domain: CKError.errorDomain, code: code.rawValue))
+    }
 }
 
 private enum TestCloudSyncLifecycleError: Error {
@@ -446,5 +530,24 @@ private final class ThreadSafeFlag {
         lock.lock()
         value = true
         lock.unlock()
+    }
+}
+
+/// Thread-safe holder so a `@Sendable` test closure can record a value the test reads back.
+private final class ThreadSafeBox<Value>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var stored: Value?
+
+    var value: Value? {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return stored
+        }
+        set {
+            lock.lock()
+            stored = newValue
+            lock.unlock()
+        }
     }
 }

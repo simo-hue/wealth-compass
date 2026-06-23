@@ -60,6 +60,12 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
     }
 
     func clear() throws {
+        // Also remove the one-time pre-CloudKit migration backup: it is a verbatim copy of
+        // the user's finance data, so a "real and complete" erase must not leave it behind.
+        let backupURL = storageURL.appendingPathExtension("pre-cloudkit-backup")
+        if fileManager.fileExists(atPath: backupURL.path) {
+            try fileManager.removeItem(at: backupURL)
+        }
         guard fileManager.fileExists(atPath: storageURL.path) else { return }
         try fileManager.removeItem(at: storageURL)
     }

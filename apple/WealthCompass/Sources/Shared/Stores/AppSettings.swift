@@ -142,6 +142,38 @@ final class AppSettings: ObservableObject {
         }
     }
 
+    /// Restores every preference to its first-launch default for a factory reset: clears all
+    /// `wc_mobile_*` keys, resets the in-memory published state, and removes the cached
+    /// exchange-rate snapshot. Flipping `hasSeenOnboarding` to false makes the root view
+    /// navigate back to onboarding. Market-data API keys live in the Keychain (cleared
+    /// separately by the reset), never here.
+    func resetToDefaults() {
+        // Clear the keys up front so the two manually-persisted retry fields (which have no
+        // `didSet`) don't leave a stale value behind; the property assignments below then
+        // re-persist clean defaults for everything else.
+        let keys = [
+            Keys.currency, Keys.privacyMode, Keys.customIncomeCategories,
+            Keys.customExpenseCategories, Keys.iCloudSyncEnabled, Keys.hasSeenOnboarding,
+            Keys.appLanguage, Keys.lastExchangeRateRefreshAttempt, Keys.consecutiveExchangeRateFailures
+        ]
+        keys.forEach { userDefaults.removeObject(forKey: $0) }
+
+        currency = .eur
+        isPrivacyMode = false
+        isICloudSyncEnabled = false
+        hasSeenOnboarding = false
+        appLanguage = nil
+        customIncomeCategories = []
+        customExpenseCategories = []
+
+        exchangeRatePersistence.clear()
+        exchangeRateSnapshot = nil
+        exchangeRateError = nil
+        isRefreshingExchangeRates = false
+        lastExchangeRateRefreshAttemptAt = nil
+        consecutiveExchangeRateFailures = 0
+    }
+
     /// Pure converter bound to the current rate snapshot (see `CurrencyConverter`, M1/T1).
     var currencyConverter: CurrencyConverter {
         CurrencyConverter(snapshot: exchangeRateSnapshot)

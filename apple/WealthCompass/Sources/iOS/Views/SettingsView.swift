@@ -20,6 +20,9 @@ struct SettingsView: View {
     @State private var isSavingMarketDataCredential = false
     @State private var isRefreshingPrices = false
     @State private var pendingDestructiveAction: SettingsDestructiveAction?
+    @State private var showingEraseFailure = false
+    @State private var eraseFailureMessage = ""
+    @State private var isErasing = false
 
     var body: some View {
         NavigationStack {
@@ -155,8 +158,9 @@ struct SettingsView: View {
                     Button(role: .destructive) {
                         pendingDestructiveAction = .deleteAllData
                     } label: {
-                        Label("Delete All Data", systemImage: "trash")
+                        Label("Erase Everything", systemImage: "trash")
                     }
+                    .disabled(isErasing)
                 }
 
                 Section("Storage") {
@@ -275,6 +279,17 @@ struct SettingsView: View {
                     },
                     secondaryButton: .cancel()
                 )
+            }
+            .alert("Couldn't Delete iCloud Data", isPresented: $showingEraseFailure) {
+                Button("Retry") {
+                    Task { await performErase(deleteCloud: true) }
+                }
+                Button("Delete This Device Only", role: .destructive) {
+                    Task { await performErase(deleteCloud: false) }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text(eraseFailureMessage)
             }
         }
     }
@@ -484,13 +499,28 @@ struct SettingsView: View {
     private func performDestructiveAction(_ action: SettingsDestructiveAction) {
         switch action {
         case .deleteAllData:
-            finance.clearData()
-            backupURL = nil
-            Task {
-                await RecurringTransactionNotificationService.shared.cancelAll()
-            }
+            Task { await performErase(deleteCloud: true) }
         case .deleteCustomCategory(let category, let type):
             settings.removeCustomTransactionCategory(category, for: type)
+        }
+    }
+
+    /// Runs the factory reset. On success the root view navigates to onboarding (via
+    /// `hasSeenOnboarding`), so there's nothing more to show here. If the iCloud deletion
+    /// fails, we surface the Retry / "Delete this device only" dialog and keep the data.
+    private func performErase(deleteCloud: Bool) async {
+        isErasing = true
+        defer { isErasing = false }
+        do {
+            try await finance.eraseEverything(deleteCloud: deleteCloud)
+            appLock.disableLock()
+            await RecurringTransactionNotificationService.shared.cancelAll()
+            backupURL = nil
+        } catch {
+            let syncError = error as? CloudSyncError
+            eraseFailureMessage = syncError?.localizedDescription(appLanguage: settings.appLanguage)
+                ?? error.localizedDescription
+            showingEraseFailure = true
         }
     }
 
@@ -749,7 +779,7 @@ private enum SettingsDestructiveAction: Identifiable {
     var title: LocalizedStringKey {
         switch self {
         case .deleteAllData:
-            "Delete All Data?"
+            "Erase Everything?"
         case .deleteCustomCategory:
             "Delete Custom Category?"
         }
@@ -758,7 +788,7 @@ private enum SettingsDestructiveAction: Identifiable {
     func localizedTitle(appLanguage: String?) -> String {
         switch self {
         case .deleteAllData:
-            AppLocalization.string("Delete All Data?", appLanguage: appLanguage)
+            AppLocalization.string("Erase Everything?", appLanguage: appLanguage)
         case .deleteCustomCategory:
             AppLocalization.string("Delete Custom Category?", appLanguage: appLanguage)
         }
@@ -767,7 +797,7 @@ private enum SettingsDestructiveAction: Identifiable {
     func message(appLanguage: String?) -> String {
         switch self {
         case .deleteAllData:
-            AppLocalization.string("This permanently removes all local Wealth Compass data from this device.", appLanguage: appLanguage)
+            AppLocalization.string("This permanently deletes all finance data on this device and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data.", appLanguage: appLanguage)
         case .deleteCustomCategory(let category, let type):
             AppLocalization.string("This removes \(category) from your custom \(type.localizedTitle(appLanguage: appLanguage)) categories. Existing transactions using this category will keep their current label.", appLanguage: appLanguage)
         }
@@ -776,7 +806,7 @@ private enum SettingsDestructiveAction: Identifiable {
     func localizedConfirmButtonTitle(appLanguage: String?) -> String {
         switch self {
         case .deleteAllData:
-            AppLocalization.string("Delete", appLanguage: appLanguage)
+            AppLocalization.string("Erase Everything", appLanguage: appLanguage)
         case .deleteCustomCategory:
             AppLocalization.string("Delete Category", appLanguage: appLanguage)
         }

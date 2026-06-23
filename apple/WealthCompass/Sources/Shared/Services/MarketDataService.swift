@@ -123,7 +123,7 @@ enum MarketDataError: LocalizedError {
     }
 }
 
-enum KeychainCredential: String {
+enum KeychainCredential: String, CaseIterable {
     case finnhubAPIKey = "finnhub_api_key"
     case coingeckoAPIKey = "coingecko_api_key"
 }
@@ -228,6 +228,15 @@ final class KeychainCredentialStore {
             return try string(for: credential) != nil
         } catch {
             return false
+        }
+    }
+
+    /// Removes every stored market-data credential. Used by the factory reset so the
+    /// Finnhub/CoinGecko keys never survive an "Erase Everything". Best-effort per key:
+    /// a single failing delete must not block wiping the rest.
+    func deleteAll() {
+        for credential in KeychainCredential.allCases {
+            try? delete(credential)
         }
     }
 

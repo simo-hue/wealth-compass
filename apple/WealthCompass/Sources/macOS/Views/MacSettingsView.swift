@@ -116,6 +116,9 @@ struct MacSettingsView: View {
     @State private var isSavingMarketDataCredential = false
     @State private var isRefreshingPrices = false
     @State private var pendingDestructiveAction: MacSettingsDestructiveAction?
+    @State private var showingEraseFailure = false
+    @State private var eraseFailureMessage = ""
+    @State private var isErasing = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -190,6 +193,17 @@ struct MacSettingsView: View {
             }
         } message: { action in
             Text(action.localizedMessage(appLanguage: settings.appLanguage))
+        }
+        .alert("Couldn't Delete iCloud Data", isPresented: $showingEraseFailure) {
+            Button("Retry") {
+                Task { await performErase(deleteCloud: true) }
+            }
+            Button("Delete This Device Only", role: .destructive) {
+                Task { await performErase(deleteCloud: false) }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(eraseFailureMessage)
         }
     }
 
@@ -428,9 +442,10 @@ struct MacSettingsView: View {
             }
 
             SettingsSection(title: "Danger Zone") {
-                Button("Delete All Local Data...", role: .destructive) {
+                Button("Erase Everything...", role: .destructive) {
                     pendingDestructiveAction = .deleteAllData
                 }
+                .disabled(isErasing)
             }
         }
     }
@@ -746,14 +761,29 @@ struct MacSettingsView: View {
     private func performDestructiveAction(_ action: MacSettingsDestructiveAction) {
         switch action {
         case .deleteAllData:
-            finance.clearData()
-            Task {
-                await MacRecurringTransactionNotificationService.shared.cancelAll()
-            }
+            Task { await performErase(deleteCloud: true) }
         case .deleteCustomCategory(let category, let type):
             settings.removeCustomTransactionCategory(category, for: type)
         }
         pendingDestructiveAction = nil
+    }
+
+    /// Runs the factory reset. On success the root view navigates to onboarding (via
+    /// `hasSeenOnboarding`). If the iCloud deletion fails, we surface the Retry /
+    /// "Delete this device only" dialog and keep the data intact.
+    private func performErase(deleteCloud: Bool) async {
+        isErasing = true
+        defer { isErasing = false }
+        do {
+            try await finance.eraseEverything(deleteCloud: deleteCloud)
+            appLock.disableLock()
+            await MacRecurringTransactionNotificationService.shared.cancelAll()
+        } catch {
+            let syncError = error as? CloudSyncError
+            eraseFailureMessage = syncError?.localizedDescription(appLanguage: settings.appLanguage)
+                ?? error.localizedDescription
+            showingEraseFailure = true
+        }
     }
 
     private func syncRecurringNotifications() async {
@@ -849,7 +879,7 @@ private enum MacSettingsDestructiveAction {
     func localizedTitle(appLanguage: String?) -> String {
         switch self {
         case .deleteAllData:
-            AppLocalization.string("Delete all local finance data?", appLanguage: appLanguage)
+            AppLocalization.string("Erase Everything?", appLanguage: appLanguage)
         case .deleteCustomCategory:
             AppLocalization.string("Remove custom category?", appLanguage: appLanguage)
         }
@@ -858,7 +888,7 @@ private enum MacSettingsDestructiveAction {
     func localizedMessage(appLanguage: String?) -> String {
         switch self {
         case .deleteAllData:
-            AppLocalization.string("This permanently removes the local Mac database and its scheduled notifications. This action cannot be undone.", appLanguage: appLanguage)
+            AppLocalization.string("This permanently deletes all finance data on this Mac and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data.", appLanguage: appLanguage)
         case .deleteCustomCategory(let category, _):
             AppLocalization.string("Existing transactions using \(category) will keep their current category label.", appLanguage: appLanguage)
         }
@@ -867,7 +897,7 @@ private enum MacSettingsDestructiveAction {
     func localizedConfirmButtonTitle(appLanguage: String?) -> String {
         switch self {
         case .deleteAllData:
-            AppLocalization.string("Delete All Data", appLanguage: appLanguage)
+            AppLocalization.string("Erase Everything", appLanguage: appLanguage)
         case .deleteCustomCategory(let category, _):
             AppLocalization.string("Remove \(category)", appLanguage: appLanguage)
         }
