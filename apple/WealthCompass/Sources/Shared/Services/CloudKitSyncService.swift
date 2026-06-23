@@ -1133,38 +1133,80 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         }
 
         if !nonDeletedConflicts.isEmpty {
-            // #15: don't blindly re-upload a record just because its insert collided. The
-            // dominant first-sync case is two devices uploading the *same* records, so the
-            // server already holds an identical payload — there we adopt the server's
-            // system fields and DROP the pending upload instead of re-sending identical
-            // data (the source of the "hundreds of collisions" churn). Identity is decided
-            // by the same `bootstrapDecision` used by the fetch merge. Genuinely divergent
-            // records still requeue and re-upload as an update with the adopted fields.
-            // (Applying a *newer* server payload on divergence — audit #15 step 2 — is a
-            // deliberate follow-up; this change can only ever drop a redundant upload, so
-            // worst case it falls back to today's requeue behaviour.)
+            // #15: don't blindly re-upload a record just because its insert collided.
+            // Compare each conflicting server record to the current local value via the
+            // shared merge decision (`conflictAction`):
+            //  - identical payload  -> adopt the server's system fields and DROP the
+            //    pending upload (the concurrent-enable "hundreds of collisions" churn);
+            //  - server wins (newer, and no deliberate local edit) -> apply the server
+            //    payload locally and clear pending (step 2);
+            //  - local wins (a real local edit, or local newer) -> requeue and re-upload
+            //    as an update with the adopted system fields.
             let localRecords = (try? await snapshotProvider()) ?? [:]
             var conflictRequeue = Set<CloudSyncRecordKey>()
+            var serverWins: [(key: CloudSyncRecordKey, snapshot: CloudSyncRecordSnapshot, expectedRevision: UUID?)] = []
+
             try metadataStore.update { metadata in
                 for (key, serverRecord) in nonDeletedConflicts {
                     var state = metadata.records[key.storageKey] ?? CloudSyncRecordState()
                     state.systemFields = encodeSystemFields(serverRecord)
-
                     let serverSnapshot = Self.remoteSnapshot(from: serverRecord, key: key)
-                    if let serverSnapshot,
-                       Self.bootstrapDecision(pending: state.pending, local: localRecords[key], remote: serverSnapshot) == .identical {
+
+                    switch Self.conflictAction(pending: state.pending, local: localRecords[key], server: serverSnapshot) {
+                    case .adoptServerIdentical:
                         state.pending = nil
                         state.isTombstone = false
                         state.deletedAt = nil
-                        metadata.knownLocalHashes[key.storageKey] = serverSnapshot.payloadHash
-                    } else if state.pending != nil {
-                        conflictRequeue.insert(key)
+                        if let serverSnapshot {
+                            metadata.knownLocalHashes[key.storageKey] = serverSnapshot.payloadHash
+                        }
+                    case .applyServer:
+                        // Keep pending until the apply lands; cleared revision-safely below.
+                        if let serverSnapshot {
+                            serverWins.append((key, serverSnapshot, state.pending?.revision))
+                        } else if state.pending != nil {
+                            conflictRequeue.insert(key)
+                        }
+                    case .requeueLocal:
+                        if state.pending != nil {
+                            conflictRequeue.insert(key)
+                        }
                     }
 
                     metadata.records[key.storageKey] = state
                 }
             }
             simpleRequeue.formUnion(conflictRequeue)
+
+            // Step 2: apply the server-wins payloads in one batched call, then clear their
+            // pending in a revision-checked write — mirrors the deleted-conflict path. A
+            // record whose local pending changed underneath (or that the apply skipped) is
+            // requeued so the local change is re-sent rather than lost.
+            if !serverWins.isEmpty {
+                let appliedKeys = try await remoteMutationHandler(serverWins.map {
+                    CloudSyncRemoteMutation(key: $0.key, payload: $0.snapshot.payload, expectedPendingRevision: $0.expectedRevision)
+                })
+                var applyRequeue = Set<CloudSyncRecordKey>()
+                try metadataStore.update { metadata in
+                    for win in serverWins {
+                        guard appliedKeys.contains(win.key) else {
+                            applyRequeue.insert(win.key)
+                            continue
+                        }
+                        var state = metadata.records[win.key.storageKey] ?? CloudSyncRecordState()
+                        guard state.pending?.revision == win.expectedRevision else {
+                            if state.pending != nil { applyRequeue.insert(win.key) }
+                            continue
+                        }
+                        state.pending = nil
+                        state.isTombstone = false
+                        state.deletedAt = nil
+                        metadata.knownLocalHashes[win.key.storageKey] = win.snapshot.payloadHash
+                        metadata.records[win.key.storageKey] = state
+                    }
+                }
+                simpleRequeue.formUnion(applyRequeue)
+            }
         }
 
         enqueue(keys: Array(simpleRequeue), on: syncEngine)
@@ -1285,6 +1327,31 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 return local.updatedAt > remote.updatedAt ? .local : .remote
             }
             return local.payloadHash > remote.payloadHash ? .local : .remote
+        }
+    }
+
+    enum ConflictAction: Equatable {
+        case requeueLocal          // re-upload the local record (local wins, or server unreadable)
+        case adoptServerIdentical  // server already holds the same payload — drop the redundant upload
+        case applyServer           // server's payload wins — apply it locally, then clear pending
+    }
+
+    /// Resolution for one non-deleted save conflict (a `serverRecordChanged` rejection on
+    /// upload): re-upload local, drop a redundant identical upload, or adopt the server's
+    /// newer payload (#15). A thin, intention-revealing wrapper over `bootstrapDecision`,
+    /// plus the defensive "unreadable server payload → keep local" edge. Because it routes
+    /// through `bootstrapDecision`, a deliberate local edit (`.localChange`/`.delete`)
+    /// never resolves to `applyServer`, so step 2 can't overwrite a real local change.
+    static func conflictAction(
+        pending: CloudSyncPendingMutation?,
+        local: CloudSyncRecordSnapshot?,
+        server: CloudSyncRecordSnapshot?
+    ) -> ConflictAction {
+        guard let server else { return .requeueLocal }
+        switch bootstrapDecision(pending: pending, local: local, remote: server) {
+        case .identical: return .adoptServerIdentical
+        case .remote: return .applyServer
+        case .local: return .requeueLocal
         }
     }
 
