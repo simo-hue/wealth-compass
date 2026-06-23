@@ -1,0 +1,11 @@
+# Appfile — identifies the app + accounts fastlane uses.
+# Docs: https://docs.fastlane.tools/advanced/#appfile
+
+app_identifier("com.wealthcompass.mobile") # bundle id (shared by the iOS + macOS targets)
+apple_id("mattioli.simone.10@gmail.com")   # your Apple ID (App Store Connect login)
+
+# App Store Connect team / provider — pick "MATTIOLI SIMONE" (the 3rd option) when prompted.
+itc_team_name("MATTIOLI SIMONE")
+
+# Apple Developer Portal team — the DEVELOPMENT_TEAM from project.pbxproj.
+team_id("8528AN28A3")

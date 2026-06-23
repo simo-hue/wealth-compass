@@ -30062,12 +30062,6 @@
     "Couldn't reach iCloud to delete your data. Check your connection and try again." : {
       "extractionState" : "manual"
     },
-    "The iCloud data couldn't be deleted. Check your connection and try again." : {
-      "extractionState" : "manual"
-    },
-    "You're not signed in to iCloud, so there's no iCloud copy to delete." : {
-      "extractionState" : "manual"
-    },
     "Create a free Finnhub account." : {
       "localizations" : {
         "ar" : {
@@ -44709,6 +44703,9 @@
 
     },
     "Erase Everything?" : {
+
+    },
+    "Erase Everything..." : {
 
     },
     "ETF" : {
@@ -101384,6 +101381,9 @@
         }
       }
     },
+    "The iCloud data couldn't be deleted. Check your connection and try again." : {
+      "extractionState" : "manual"
+    },
     "The key is saved only after %@ returns a live USD price." : {
       "localizations" : {
         "ar" : {
@@ -102671,6 +102671,9 @@
       }
     },
     "This permanently deletes all finance data on this device and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data." : {
+
+    },
+    "This permanently deletes all finance data on this Mac and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data." : {
 
     },
     "This permanently removes %@ from your crypto portfolio." : {
@@ -113656,6 +113659,9 @@
           }
         }
       }
+    },
+    "You're not signed in to iCloud, so there's no iCloud copy to delete." : {
+      "extractionState" : "manual"
     },
     "Your data remains on this device." : {
       "localizations" : {

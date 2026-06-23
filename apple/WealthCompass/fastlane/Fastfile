@@ -1,0 +1,93 @@
+# Fastfile — Wealth Compass releases (iOS App Store / TestFlight, + optional macOS).
+#
+# Run from the folder that contains this `fastlane/` directory:
+#     cd apple/WealthCompass
+#     fastlane ios metadata        # push the "What's New" text + other metadata only
+#     fastlane ios beta            # build + upload to TestFlight
+#     fastlane ios release         # build + upload binary & metadata (no auto-submit)
+#
+# Versions are managed by hand in project.pbxproj (per CLAUDE.md) — these lanes do NOT
+# bump them. Currently MARKETING_VERSION 1.0.7 / build 8.
+#
+# Signing uses Xcode automatic signing (DEVELOPMENT_TEAM 8528AN28A3). Sign in with the
+# Apple ID in the Appfile; you'll handle 2FA interactively (or set an app-specific
+# password via the FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD env var).
+
+default_platform(:ios)
+
+PROJECT     = "WealthCompass.xcodeproj"
+IOS_SCHEME  = "WealthCompassMobile"
+MAC_SCHEME  = "WealthCompassMac"
+
+platform :ios do
+  # Text metadata only (release notes, description, keywords, …). No binary, no
+  # screenshots, no submission. Safe to run anytime — great for fixing the "What's New".
+  desc "Upload App Store text metadata only (no binary, no submit)"
+  lane :metadata do
+    upload_to_app_store(
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      run_precheck_before_submit: false
+    )
+  end
+
+  # Build the iOS app and send it to TestFlight. TestFlight runs against the PRODUCTION
+  # CloudKit environment, so this is the right way to verify the schema you just deployed
+  # (including WCLiability) on real devices before submitting to the App Store.
+  desc "Build and upload an iOS build to TestFlight"
+  lane :beta do
+    build_app(
+      project: PROJECT,
+      scheme: IOS_SCHEME,
+      export_method: "app-store"
+    )
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      distribute_external: false
+    )
+  end
+
+  # Build the iOS app and upload the binary + metadata to App Store Connect.
+  # Respects the Deliverfile (submit_for_review false, automatic_release false): it does
+  # NOT submit for review — you press "Submit for Review" yourself in App Store Connect.
+  desc "Build and upload iOS binary + metadata to App Store Connect (no auto-submit)"
+  lane :release do
+    build_app(
+      project: PROJECT,
+      scheme: IOS_SCHEME,
+      export_method: "app-store"
+    )
+    upload_to_app_store(
+      skip_screenshots: true,
+      run_precheck_before_submit: false
+    )
+  end
+end
+
+# Optional macOS lanes. Only use these if you ship the Mac app to the Mac App Store under
+# the same app record (universal purchase). Run with: `fastlane mac beta` / `fastlane mac release`.
+platform :mac do
+  desc "Build and upload a macOS build to TestFlight"
+  lane :beta do
+    build_app(
+      project: PROJECT,
+      scheme: MAC_SCHEME,
+      export_method: "app-store"
+    )
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+
+  desc "Build and upload macOS binary + metadata to App Store Connect (no auto-submit)"
+  lane :release do
+    build_app(
+      project: PROJECT,
+      scheme: MAC_SCHEME,
+      export_method: "app-store"
+    )
+    upload_to_app_store(
+      platform: "osx",
+      skip_screenshots: true,
+      run_precheck_before_submit: false
+    )
+  end
+end
