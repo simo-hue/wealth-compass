@@ -355,6 +355,18 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
         }
     }
 
+    /// Wipes all sync metadata back to a clean slate (no account, no engine state, no
+    /// per-record state) and removes the backing file. Used by the factory reset — both
+    /// after a zone delete and as the safety net on the local-only / escape-hatch paths
+    /// where the zone delete didn't run.
+    func reset() throws {
+        try lock.withLock {
+            cached = CloudSyncMetadata()
+            guard fileManager.fileExists(atPath: url.path) else { return }
+            try fileManager.removeItem(at: url)
+        }
+    }
+
     func pendingRevision(for key: CloudSyncRecordKey) -> UUID? {
         read().records[key.storageKey]?.pending?.revision
     }
@@ -496,6 +508,9 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     typealias AccountStatusProvider = @Sendable () async throws -> CKAccountStatus
     typealias UserRecordIDProvider = @Sendable () async throws -> CKRecord.ID
     typealias EngineFactory = (CKSyncEngine.Configuration) throws -> CKSyncEngine
+    /// Deletes the whole custom zone (every record + the zone itself) server-side. Injected
+    /// so the factory-reset purge is unit-testable without a live CloudKit database.
+    typealias ZoneDeleter = @Sendable (CKRecordZone.ID) async throws -> Void
 
     private static let containerIdentifier = "iCloud.com.wealthcompasstracker"
     private static let zoneName = "WealthCompassZone"
@@ -513,6 +528,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     private let accountStatusProvider: AccountStatusProvider
     private let userRecordIDProvider: UserRecordIDProvider
     private let engineFactory: EngineFactory
+    private let zoneDeleter: ZoneDeleter
     private let zoneID = CKRecordZone.ID(zoneName: zoneName, ownerName: CKCurrentUserDefaultName)
 
     private var engine: CKSyncEngine?
@@ -536,7 +552,8 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         disableHandler: @escaping DisableHandler,
         accountStatusProvider: AccountStatusProvider? = nil,
         userRecordIDProvider: UserRecordIDProvider? = nil,
-        engineFactory: @escaping EngineFactory = { CKSyncEngine($0) }
+        engineFactory: @escaping EngineFactory = { CKSyncEngine($0) },
+        zoneDeleter: ZoneDeleter? = nil
     ) {
         let container = CKContainer(identifier: Self.containerIdentifier)
         self.container = container
@@ -553,6 +570,11 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             try await container.userRecordID()
         }
         self.engineFactory = engineFactory
+        // Capture the known-Sendable container (not the database) to sidestep any
+        // CKDatabase Sendability question, mirroring the account-status default above.
+        self.zoneDeleter = zoneDeleter ?? { zoneID in
+            _ = try await container.privateCloudDatabase.deleteRecordZone(withID: zoneID)
+        }
     }
 
     /// Ensure the sync engine is running, performing the heavy startup (account
@@ -658,6 +680,61 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         }
         guard lifecycleGeneration == generation, !syncRequested else { return }
         await statusHandler(.disabled)
+    }
+
+    /// Hard-deletes the entire CloudKit zone (every record + the zone itself) for a factory
+    /// reset, then wipes local sync metadata. The engine is stopped first so a fetched
+    /// zone-deletion can't trigger the resurrection path (recreate zone + re-upload).
+    ///
+    /// Throws `.accountUnavailable` when there's no usable iCloud account — the caller treats
+    /// that as "nothing to delete server-side" and proceeds with a local-only wipe. Throws
+    /// `.syncFailed` when iCloud can't be reached or the delete genuinely fails, so the caller
+    /// can abort with the local data still intact. A zone that's already gone counts as success.
+    func purgeCloudData() async throws {
+        let status: CKAccountStatus
+        do {
+            status = try await accountStatusProvider()
+        } catch {
+            throw CloudSyncError.syncFailed("Couldn't reach iCloud to delete your data. Check your connection and try again.")
+        }
+
+        switch status {
+        case .available:
+            break
+        case .noAccount, .restricted:
+            throw CloudSyncError.accountUnavailable("You're not signed in to iCloud, so there's no iCloud copy to delete.")
+        default:
+            throw CloudSyncError.syncFailed("Couldn't reach iCloud to delete your data. Check your connection and try again.")
+        }
+
+        // Tear the engine down before deleting so it can't observe the zone deletion and
+        // resurrect it. `stop()` cancels in-flight operations and clears `engine`.
+        await stop()
+
+        do {
+            try await zoneDeleter(zoneID)
+        } catch {
+            guard Self.isZoneAlreadyGone(error) else {
+                throw CloudSyncError.syncFailed("The iCloud data couldn't be deleted. Check your connection and try again.")
+            }
+            // Nothing on the server to remove — a complete erase by definition.
+        }
+
+        try metadataStore.reset()
+    }
+
+    private static let zoneGoneCodes: Set<CKError.Code> = [.zoneNotFound, .unknownItem, .userDeletedZone]
+
+    /// True when a delete failed only because the zone was already absent (so the erase is
+    /// effectively complete), including a partial failure whose every item error says so.
+    private static func isZoneAlreadyGone(_ error: Error) -> Bool {
+        guard let ckError = error as? CKError else { return false }
+        if zoneGoneCodes.contains(ckError.code) { return true }
+        if ckError.code == .partialFailure,
+           let partials = ckError.partialErrorsByItemID?.values, !partials.isEmpty {
+            return partials.allSatisfy { ($0 as? CKError).map { zoneGoneCodes.contains($0.code) } ?? false }
+        }
+        return false
     }
 
     func localChangesRecorded() async {

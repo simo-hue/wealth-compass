@@ -668,9 +668,65 @@ final class FinanceStore: ObservableObject {
         analytics(settings).cryptoAllocation()
     }
 
-    func clearData() {
+    /// The result of a factory reset, so the UI can word its feedback honestly.
+    enum EraseOutcome: Sendable {
+        case complete            // device + iCloud copy both wiped
+        case localOnlyNoAccount  // device wiped; no iCloud account, so there was nothing to delete server-side
+        case localOnly           // device wiped; iCloud copy deliberately left ("delete this device only")
+    }
+
+    /// Factory reset ("Erase Everything"). When `deleteCloud` is true, the entire iCloud zone
+    /// is deleted FIRST; if that genuinely fails (network/CloudKit) the error propagates and
+    /// **the local data is left untouched**, so we never destroy the last copy while claiming a
+    /// complete erase. A missing iCloud account is not a failure — it just means there is no
+    /// server copy to remove (`.localOnlyNoAccount`). After the cloud step (or immediately, on
+    /// the `deleteCloud == false` "delete this device only" escape hatch) the local wipe is
+    /// unconditional and best-effort.
+    @discardableResult
+    func eraseEverything(deleteCloud: Bool) async throws -> EraseOutcome {
+        var outcome: EraseOutcome = deleteCloud ? .complete : .localOnly
+
+        if deleteCloud {
+            do {
+                try await cloudSyncService.purgeCloudData()
+            } catch CloudSyncError.accountUnavailable(_) {
+                // No usable iCloud account → nothing to delete server-side. Not a failure:
+                // fall through to the local wipe and report it honestly.
+                outcome = .localOnlyNoAccount
+            }
+            // Any other error (network/CloudKit) propagates: the caller keeps the local data
+            // and offers Retry / Delete this device only.
+        }
+
+        await wipeLocalState()
+        return outcome
+    }
+
+    /// Removes everything this device persists and resets the store to a clean, empty state so
+    /// the same long-lived `FinanceStore` instance keeps working after the user re-onboards.
+    /// Best-effort throughout: a single failing step must not strand the erase half-done.
+    private func wipeLocalState() async {
+        await waitForPendingSaves()
+        // Ensure the engine is down before we reset metadata, on every path (the no-account
+        // and escape-hatch paths never went through `purgeCloudData`'s own `stop()`).
+        await cloudSyncService.stop()
+
         data = FinancialData()
-        save()
+        try? persistence.clear()          // finance DB + the pre-CloudKit backup sidecar
+        try? syncMetadataStore.reset()    // safety net for the local-only / escape-hatch paths
+        await coordinator.seed([:])       // reset the diff baseline to match the now-empty DB
+
+        settings?.resetToDefaults()
+        KeychainCredentialStore.shared.deleteAll()
+        // Scheduled "recurring due" notifications are cancelled by the platform caller — the
+        // notification service is platform-specific (iOS/macOS wrappers), so it can't be
+        // named from shared code.
+
+        iCloudSyncError = nil
+        persistenceError = nil
+        localPersistenceError = nil
+        cloudSyncStatus = .disabled
+        marketRefreshProgress = nil
     }
 
     func exportBackupURL() throws -> URL {

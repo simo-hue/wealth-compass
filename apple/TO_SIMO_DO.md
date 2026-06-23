@@ -115,3 +115,28 @@
     `"Records imported"`, `"New categories"`, `"Records skipped"`, `"Snapshot generated"`. The
     category tile labels (Transactions/Recurring/Investments/Crypto/Liabilities/Snapshots) reuse
     existing translated keys. Purely localization; no code or build action needed.
+
+## "Erase Everything" factory reset (2026-06-23) — follow-ups
+
+20. **Verify the iCloud zone deletion end-to-end on a real signed-in device — I could only
+    unit-test it against a mocked CloudKit database.** The new "Erase Everything" button
+    (Settings → Data on iOS, Settings → Data → Danger Zone on macOS) deletes the whole
+    `WealthCompassZone` server-side via `CKDatabase.deleteRecordZone`. To confirm the live
+    behaviour: on a device signed in to iCloud with **sync ON and real data present**, open the
+    CloudKit console (or a second device) to confirm the zone/records exist, tap **Erase
+    Everything → confirm**, then verify (a) local data is gone and the app returns to onboarding,
+    (b) the `WealthCompassZone` is gone from the CloudKit **private database**. Also test the
+    offline path: turn on Airplane Mode with sync ON, tap Erase Everything, and confirm the
+    "Couldn't Delete iCloud Data" dialog appears with **Retry** / **Delete This Device Only**
+    (and that "Delete This Device Only" wipes locally while leaving the toggle/data abort intact).
+    No CloudKit **schema** change is required — we only delete, no new record types.
+
+21. **Translate the new "Erase Everything" strings (English-only source entries for now).** The
+    UI strings (`"Erase Everything"`, `"Erase Everything?"`, the long confirmation messages,
+    `"Couldn't Delete iCloud Data"`, `"Delete This Device Only"`, `"Retry"`) were auto-extracted
+    into `Sources/Shared/Resources/Localizable.xcstrings` by the build; the three runtime
+    `CloudSyncError` messages were added by hand with `extractionState: manual`
+    (`"Couldn't reach iCloud to delete your data. Check your connection and try again."`,
+    `"The iCloud data couldn't be deleted. Check your connection and try again."`,
+    `"You're not signed in to iCloud, so there's no iCloud copy to delete."`). All fall back to
+    English until translated. Purely localization; no code or build action needed.

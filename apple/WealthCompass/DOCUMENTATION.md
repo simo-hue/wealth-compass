@@ -301,3 +301,7 @@
 - [2026-06-21]: I18nDebugLog Cross-Platform Build Fix
   - *Details*: Fixed "No such module 'UIKit'" build failures on macOS and iOS by guarding UIKit imports and the tab-bar audit helper behind `#if canImport(UIKit)`.
   - *Tech Notes*: `I18nDebugLog.swift` is shared by WealthCompassMac and WealthCompassMobile; only the Foundation-based `log()` runs on macOS. Both targets build successfully after the change.
+
+- [2026-06-23]: Increment Application Version
+  - *Details*: Incremented the application version to 1.0.7 for the upcoming release.
+  - *Tech Notes*: Updated `MARKETING_VERSION` to `1.0.7` and `CURRENT_PROJECT_VERSION` to `8` in `project.pbxproj` for the Apple/iOS App.

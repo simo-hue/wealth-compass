@@ -3,6 +3,7 @@ import Foundation
 protocol ExchangeRatePersistence {
     func load() -> ExchangeRateSnapshot?
     func save(_ snapshot: ExchangeRateSnapshot)
+    func clear()
 }
 
 struct LocalExchangeRatePersistence: ExchangeRatePersistence {
@@ -41,6 +42,13 @@ struct LocalExchangeRatePersistence: ExchangeRatePersistence {
         createStorageDirectoryIfNeeded()
         guard let data = try? encoder.encode(snapshot) else { return }
         try? data.write(to: storageURL, options: [.atomic, .completeFileProtectionUnlessOpen])
+    }
+
+    /// Removes the cached rate file so a factory reset leaves no snapshot behind. The next
+    /// launch falls back to the bundled offline rates until a fresh fetch succeeds.
+    func clear() {
+        guard fileManager.fileExists(atPath: storageURL.path) else { return }
+        try? fileManager.removeItem(at: storageURL)
     }
 
     // MARK: - Migration

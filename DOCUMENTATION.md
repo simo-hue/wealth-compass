@@ -446,3 +446,7 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-06-22]: Settings Layout Update
   - *Details*: Moved Exchange Rates from a popover in the Global Currency section to its own dedicated Card at the bottom of the Settings page.
   - *Tech Notes*: Modified src/pages/Settings.tsx to extract the currencyRates iteration into a new card.
+
+- [2026-06-23]: Increment Application Version
+  - *Details*: Incremented the application version to 1.0.7 for the upcoming release.
+  - *Tech Notes*: Updated `MARKETING_VERSION` to `1.0.7` and `CURRENT_PROJECT_VERSION` to `8` in `project.pbxproj` for the Apple/iOS App.

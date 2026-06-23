@@ -26499,6 +26499,7 @@
       }
     },
     "CloudKit record %@ has no payload." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30054,6 +30055,18 @@
           }
         }
       }
+    },
+    "Couldn't Delete iCloud Data" : {
+
+    },
+    "Couldn't reach iCloud to delete your data. Check your connection and try again." : {
+      "extractionState" : "manual"
+    },
+    "The iCloud data couldn't be deleted. Check your connection and try again." : {
+      "extractionState" : "manual"
+    },
+    "You're not signed in to iCloud, so there's no iCloud copy to delete." : {
+      "extractionState" : "manual"
     },
     "Create a free Finnhub account." : {
       "localizations" : {
@@ -35272,6 +35285,7 @@
       }
     },
     "Delete All Data" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35480,6 +35494,7 @@
       }
     },
     "Delete All Data?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35688,6 +35703,7 @@
       }
     },
     "Delete All Local Data..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -37774,6 +37790,9 @@
         }
       }
     },
+    "Delete This Device Only" : {
+
+    },
     "Delete transaction" : {
       "localizations" : {
         "ar" : {
@@ -39021,6 +39040,9 @@
           }
         }
       }
+    },
+    "Done" : {
+
     },
     "Due schedules are recorded automatically while the app is active and caught up the next time it opens." : {
       "localizations" : {
@@ -44683,6 +44705,12 @@
         }
       }
     },
+    "Erase Everything" : {
+
+    },
+    "Erase Everything?" : {
+
+    },
     "ETF" : {
       "localizations" : {
         "ar" : {
@@ -45524,30 +45552,6 @@
       }
     },
     "Exchange Rate Error" : {
-
-    },
-    "Done" : {
-
-    },
-    "Records imported" : {
-
-    },
-    "New categories" : {
-
-    },
-    "Records skipped" : {
-
-    },
-    "Snapshot generated" : {
-
-    },
-    "The connection to iCloud was lost. Your changes are saved and will sync automatically when it is restored." : {
-
-    },
-    "iCloud is still preparing your sync data. This usually resolves on the next sync." : {
-
-    },
-    "iCloud is temporarily limiting sync requests. Sync will resume automatically in a moment." : {
 
     },
     "Exchange Rate Refresh Failed" : {
@@ -56047,6 +56051,12 @@
           }
         }
       }
+    },
+    "iCloud is still preparing your sync data. This usually resolves on the next sync." : {
+
+    },
+    "iCloud is temporarily limiting sync requests. Sync will resume automatically in a moment." : {
+
     },
     "iCloud Sync" : {
       "localizations" : {
@@ -69678,6 +69688,9 @@
           }
         }
       }
+    },
+    "New categories" : {
+
     },
     "New Crypto Holding" : {
       "localizations" : {
@@ -87351,6 +87364,12 @@
         }
       }
     },
+    "Records imported" : {
+
+    },
+    "Records skipped" : {
+
+    },
     "Recurring" : {
       "localizations" : {
         "ar" : {
@@ -91813,6 +91832,9 @@
         }
       }
     },
+    "Retry" : {
+
+    },
     "Salary" : {
       "localizations" : {
         "ar" : {
@@ -95699,6 +95721,9 @@
           }
         }
       }
+    },
+    "Snapshot generated" : {
+
     },
     "Snapshots" : {
       "localizations" : {
@@ -100438,6 +100463,9 @@
         }
       }
     },
+    "The connection to iCloud was lost. Your changes are saved and will sync automatically when it is restored." : {
+
+    },
     "The end date cannot be before the first occurrence." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -102642,6 +102670,9 @@
         }
       }
     },
+    "This permanently deletes all finance data on this device and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data." : {
+
+    },
     "This permanently removes %@ from your crypto portfolio." : {
       "localizations" : {
         "ar" : {
@@ -103059,6 +103090,7 @@
       }
     },
     "This permanently removes all local Wealth Compass data from this device." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
