@@ -329,6 +329,66 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(CloudKitSyncService.conflictAction(pending: inventoryPending(), local: older, server: nil), .requeueLocal)
     }
 
+    // MARK: - #14 sync error classification
+    //
+    // Before #14, `forceICloudSync()` rethrew every post-sync failure as `invalidRecord`
+    // and `report(_:)` only special-cased a couple of CKError codes. These cover the pure
+    // classifier that now drives both: the error → category map, and the category →
+    // user-facing status (account problems must stay `.accountUnavailable`, never `.error`,
+    // and each classified code must carry its own message).
+
+    private func ckError(_ code: CKError.Code) -> CKError {
+        CKError(_nsError: NSError(domain: CKError.errorDomain, code: code.rawValue))
+    }
+
+    func testFailureCategoryMapsCKErrorCodes() {
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.notAuthenticated)), .notSignedIn)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.networkUnavailable)), .networkUnavailable)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.networkFailure)), .networkUnavailable)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.serverResponseLost)), .connectionLost)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.quotaExceeded)), .quotaExceeded)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.requestRateLimited)), .rateLimited)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.zoneNotFound)), .zoneMissing)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.internalError)), .unknown)
+    }
+
+    func testFailureCategoryMapsOwnErrors() {
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: CloudSyncError.accountUnavailable("x")), .notSignedIn)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: CloudSyncError.accountChanged), .accountChanged)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: CloudSyncError.invalidRecord("x")), .unknown)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: CloudSyncError.notRunning), .unknown)
+    }
+
+    /// The anti-mislabel guarantee: an account failure resolves to `.accountUnavailable`
+    /// (so Settings reads "iCloud Unavailable"), preserving a custom sign-in message when
+    /// present; the not-signed-in CKError falls back to canned copy.
+    func testSyncStatusRoutesAccountFailuresToAccountUnavailable() {
+        XCTAssertEqual(
+            CloudKitSyncService.syncStatus(for: CloudSyncError.accountUnavailable("Please sign in.")),
+            .accountUnavailable("Please sign in.")
+        )
+        guard case .accountUnavailable(let message) = CloudKitSyncService.syncStatus(for: ckError(.notAuthenticated)) else {
+            return XCTFail("notAuthenticated must map to .accountUnavailable.")
+        }
+        XCTAssertFalse(message.isEmpty)
+    }
+
+    /// Network / quota / throttling / zone failures each become `.error` (never
+    /// `.accountUnavailable`) with their own non-empty copy — the old behavior gave them
+    /// all one indistinct message.
+    func testSyncStatusGivesDistinctErrorCopyPerCategory() {
+        let codes: [CKError.Code] = [.networkUnavailable, .serverResponseLost, .quotaExceeded, .requestRateLimited, .zoneNotFound]
+        var messages: [String] = []
+        for code in codes {
+            guard case .error(let message) = CloudKitSyncService.syncStatus(for: ckError(code)) else {
+                return XCTFail("\(code) must map to .error, not .accountUnavailable.")
+            }
+            XCTAssertFalse(message.isEmpty, "Empty message for \(code).")
+            messages.append(message)
+        }
+        XCTAssertEqual(Set(messages).count, messages.count, "Each classified CKError code must produce distinct copy.")
+    }
+
     private func makeTransaction(id: UUID, amount: Double) -> Transaction {
         Transaction(
             id: id,

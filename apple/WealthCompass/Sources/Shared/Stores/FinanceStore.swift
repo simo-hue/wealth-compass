@@ -857,9 +857,13 @@ final class FinanceStore: ObservableObject {
             throw CloudSyncError.notRunning
         }
         await cloudSyncService.synchronize()
+        // Rethrow with the matching error type so Settings can show meaningful copy: an
+        // account problem is an account problem, not a bogus "invalid record" (#14).
         switch cloudSyncStatus {
-        case .error(let message), .accountUnavailable(let message):
-            throw CloudSyncError.invalidRecord(message)
+        case .accountUnavailable(let message):
+            throw CloudSyncError.accountUnavailable(message)
+        case .error(let message):
+            throw CloudSyncError.syncFailed(message)
         case .disabled, .starting, .syncing, .upToDate:
             break
         }

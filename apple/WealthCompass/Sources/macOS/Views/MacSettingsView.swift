@@ -460,9 +460,11 @@ struct MacSettingsView: View {
                             do {
                                 try await finance.forceICloudSync()
                             } catch {
+                                let syncError = error as? CloudSyncError
                                 settingsAlert = MacSettingsAlert(
-                                    title: settings.localized("Sync Failed"),
-                                    message: error.localizedDescription
+                                    title: settings.localized(syncError?.alertTitleKey ?? "Sync Failed"),
+                                    message: syncError?.localizedDescription(appLanguage: settings.appLanguage)
+                                        ?? error.localizedDescription
                                 )
                             }
                         }

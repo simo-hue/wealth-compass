@@ -450,6 +450,11 @@ enum CloudSyncError: LocalizedError {
     case accountUnavailable(String)
     case accountChanged
     case invalidRecord(String)
+    /// A sync attempt failed for a non-account reason (network, quota, throttling, …).
+    /// Carries an already-resolved, user-meaningful message produced by
+    /// `CloudKitSyncService.syncStatus(for:)`, so `forceICloudSync()` no longer has to
+    /// mislabel these as `invalidRecord` (#14).
+    case syncFailed(String)
     case notRunning
 
     var errorDescription: String? {
@@ -458,7 +463,7 @@ enum CloudSyncError: LocalizedError {
 
     func localizedDescription(appLanguage: String?) -> String {
         switch self {
-        case .accountUnavailable(let message), .invalidRecord(let message):
+        case .accountUnavailable(let message), .invalidRecord(let message), .syncFailed(let message):
             AppLocalization.string(String.LocalizationValue(message), appLanguage: appLanguage)
         case .accountChanged:
             AppLocalization.string(
@@ -467,6 +472,18 @@ enum CloudSyncError: LocalizedError {
             )
         case .notRunning:
             AppLocalization.string("iCloud sync is not running.", appLanguage: appLanguage)
+        }
+    }
+
+    /// Title for a Force Sync failure alert in Settings: account problems read as
+    /// "iCloud Unavailable"; every other failure as "Sync Failed". Lives on the error so
+    /// both platforms' Settings screens pick the same title (#14).
+    var alertTitleKey: String.LocalizationValue {
+        switch self {
+        case .accountUnavailable, .accountChanged:
+            "iCloud Unavailable"
+        case .invalidRecord, .syncFailed, .notRunning:
+            "Sync Failed"
         }
     }
 }
@@ -1502,23 +1519,71 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         await report(error)
     }
 
-    private func report(_ error: Error) async {
-        Self.logger.error("CloudKit sync error: \(error.localizedDescription, privacy: .public)")
+    /// Stable, user-meaningful classification of a sync failure, independent of the exact
+    /// display copy. Extracted as a pure `static` map (CKError code / our own
+    /// `CloudSyncError` → category) so it stays unit-testable without a live CloudKit
+    /// container, and so account / network / quota / throttling failures are no longer
+    /// collapsed into one generic status (#14).
+    enum SyncFailureCategory: Equatable, Sendable {
+        case notSignedIn        // not signed in to iCloud — surfaced as "iCloud Unavailable"
+        case accountChanged     // the iCloud user changed; sync was disabled to protect data
+        case networkUnavailable // offline / no usable connection
+        case connectionLost     // the request reached iCloud but the response was lost
+        case quotaExceeded      // the iCloud account is out of storage
+        case rateLimited        // CloudKit throttled the request; it retries automatically
+        case zoneMissing        // the sync zone isn't there yet / was removed
+        case unknown            // anything else — fall back to the system description
+    }
+
+    static func failureCategory(for error: Error) -> SyncFailureCategory {
         if let cloudError = error as? CKError {
             switch cloudError.code {
-            case .notAuthenticated:
-                await statusHandler(.accountUnavailable("Sign in to iCloud to continue syncing."))
-            case .networkUnavailable, .networkFailure:
-                await statusHandler(.error("The network is unavailable. Local changes are saved and will retry automatically."))
-            case .quotaExceeded:
-                await statusHandler(.error("The iCloud account does not have enough available storage."))
-            default:
-                await statusHandler(.error(cloudError.localizedDescription))
+            case .notAuthenticated: return .notSignedIn
+            case .networkUnavailable, .networkFailure: return .networkUnavailable
+            case .serverResponseLost: return .connectionLost
+            case .quotaExceeded: return .quotaExceeded
+            case .requestRateLimited: return .rateLimited
+            case .zoneNotFound: return .zoneMissing
+            default: return .unknown
             }
-        } else if case CloudSyncError.accountUnavailable(let message) = error {
-            await statusHandler(.accountUnavailable(message))
-        } else {
-            await statusHandler(.error(error.localizedDescription))
         }
+        if case CloudSyncError.accountUnavailable = error { return .notSignedIn }
+        if case CloudSyncError.accountChanged = error { return .accountChanged }
+        return .unknown
+    }
+
+    /// Maps a failure to the user-facing status to publish: account problems become
+    /// `.accountUnavailable` (Settings reads "iCloud Unavailable" with a sign-in hint),
+    /// everything else becomes `.error` with copy specific to the category — instead of
+    /// the previous behavior where network / quota / throttling all shared one message.
+    /// Pure + `static` so `report(_:)` is a thin actor wrapper and the mapping is testable.
+    static func syncStatus(for error: Error) -> CloudSyncStatus {
+        switch failureCategory(for: error) {
+        case .notSignedIn:
+            // Preserve a custom sign-in message (e.g. the start-time prompt) when present.
+            if case CloudSyncError.accountUnavailable(let message) = error {
+                return .accountUnavailable(message)
+            }
+            return .accountUnavailable("Sign in to iCloud to continue syncing.")
+        case .accountChanged:
+            return .error(CloudSyncError.accountChanged.localizedDescription(appLanguage: nil))
+        case .networkUnavailable:
+            return .error("The network is unavailable. Local changes are saved and will retry automatically.")
+        case .connectionLost:
+            return .error("The connection to iCloud was lost. Your changes are saved and will sync automatically when it is restored.")
+        case .quotaExceeded:
+            return .error("The iCloud account does not have enough available storage.")
+        case .rateLimited:
+            return .error("iCloud is temporarily limiting sync requests. Sync will resume automatically in a moment.")
+        case .zoneMissing:
+            return .error("iCloud is still preparing your sync data. This usually resolves on the next sync.")
+        case .unknown:
+            return .error(error.localizedDescription)
+        }
+    }
+
+    private func report(_ error: Error) async {
+        Self.logger.error("CloudKit sync error: \(error.localizedDescription, privacy: .public)")
+        await statusHandler(Self.syncStatus(for: error))
     }
 }
