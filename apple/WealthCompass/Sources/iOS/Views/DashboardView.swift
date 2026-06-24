@@ -112,8 +112,9 @@ struct DashboardView: View {
     }
 
     private var netWorthHero: some View {
-        let points = finance.snapshots(range: timeRange)
+        let points = finance.snapshotsForChart(range: timeRange, settings: settings)
         let rangeChange = netWorthChange(in: points)
+        let yDomain = chartDomain(for: points)
 
         return FinanceCard {
             ZStack {
@@ -202,7 +203,7 @@ struct DashboardView: View {
                             ForEach(points) { point in
                                 AreaMark(
                                     x: .value("Date", point.date),
-                                    yStart: .value("Range floor", chartDomain(for: points).lowerBound),
+                                    yStart: .value("Range floor", yDomain.lowerBound),
                                     yEnd: .value("Net Worth", point.value)
                                 )
                                 .foregroundStyle(
@@ -212,7 +213,7 @@ struct DashboardView: View {
                                         endPoint: .bottom
                                     )
                                 )
-                                .interpolationMethod(.monotone)
+                                .interpolationMethod(.linear)
                                 .accessibilityHidden(true)
 
                                 LineMark(
@@ -221,14 +222,14 @@ struct DashboardView: View {
                                 )
                                 .foregroundStyle(WCColor.primary)
                                 .lineStyle(StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
-                                .interpolationMethod(.monotone)
+                                .interpolationMethod(.linear)
                                 .symbol(Circle())
                                 .symbolSize(22)
                                 .accessibilityLabel(Text(point.date.formatted(date: .abbreviated, time: .omitted)))
                                 .accessibilityValue(Text(settings.privateCurrency(point.value)))
                             }
                         }
-                        .chartYScale(domain: chartDomain(for: points))
+                        .chartYScale(domain: yDomain)
                         .chartXSelection(value: $selectedNetWorthDate)
                         .chartXAxis(.hidden)
                         .chartYAxis(.hidden)

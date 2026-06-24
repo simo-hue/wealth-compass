@@ -7,7 +7,7 @@
 #     fastlane ios release         # build + upload binary & metadata (no auto-submit)
 #
 # Versions are managed by hand in project.pbxproj (per CLAUDE.md) — these lanes do NOT
-# bump them. Currently MARKETING_VERSION 1.0.7 / build 8.
+# bump them. Currently MARKETING_VERSION 1.0.8 / build 9.
 #
 # Signing uses Xcode automatic signing (DEVELOPMENT_TEAM 8528AN28A3). Sign in with the
 # Apple ID in the Appfile; you'll handle 2FA interactively (or set an app-specific
@@ -25,9 +25,11 @@ platform :ios do
   desc "Upload App Store text metadata only (no binary, no submit)"
   lane :metadata do
     upload_to_app_store(
+      app_version: get_version_number(xcodeproj: PROJECT, target: IOS_SCHEME),
       skip_binary_upload: true,
       skip_screenshots: true,
-      run_precheck_before_submit: false
+      run_precheck_before_submit: false,
+      force: true
     )
   end
 

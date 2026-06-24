@@ -81,10 +81,41 @@ struct AnalyticsEngine {
         case .all:       cutoff = .distantPast
         }
 
-        return data.snapshots
+        let filtered = data.snapshots
             .filter { $0.date >= cutoff }
             .sorted { $0.date < $1.date }
-            .map { NetWorthPoint(date: $0.date, value: $0.netWorth) }
+        return filtered.map { NetWorthPoint(date: $0.date, value: $0.netWorth) }
+    }
+
+    /// Display-ready net-worth series: finite values only, one point per calendar day,
+    /// and today's point aligned with the live total shown in the dashboard header.
+    func snapshotsForChart(range: TimeRange, currentNetWorth: Double) -> [NetWorthPoint] {
+        let finitePoints = snapshots(range: range).filter { $0.value.isFinite }
+
+        var latestByDay: [Date: NetWorthPoint] = [:]
+        for point in finitePoints {
+            let day = calendar.startOfDay(for: point.date)
+            if let existing = latestByDay[day] {
+                if point.date > existing.date {
+                    latestByDay[day] = point
+                }
+            } else {
+                latestByDay[day] = point
+            }
+        }
+
+        var points = latestByDay.values.sorted { $0.date < $1.date }
+
+        guard currentNetWorth.isFinite else { return points }
+
+        if let lastIndex = points.indices.last,
+           calendar.isDate(points[lastIndex].date, inSameDayAs: now) {
+            points[lastIndex] = NetWorthPoint(date: now, value: currentNetWorth)
+        } else {
+            points.append(NetWorthPoint(date: now, value: currentNetWorth))
+        }
+
+        return points
     }
 
     func cashFlowTrend(months: Int = 6) -> [CashFlowMonth] {

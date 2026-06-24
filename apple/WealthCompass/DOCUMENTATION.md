@@ -305,3 +305,7 @@
 - [2026-06-23]: Increment Application Version
   - *Details*: Incremented the application version to 1.0.7 for the upcoming release.
   - *Tech Notes*: Updated `MARKETING_VERSION` to `1.0.7` and `CURRENT_PROJECT_VERSION` to `8` in `project.pbxproj` for the Apple/iOS App.
+
+- [2026-06-24]: Net Worth Chart Rendering Fix
+  - *Details*: Fixed folded-fill/sunburst artifacts on the dashboard net-worth chart and aligned the chart's right edge with the live header total.
+  - *Tech Notes*: `AnalyticsEngine.snapshotsForChart` deduplicates to one point per day, filters non-finite values, and overrides today with `calculateTotals()`. iOS/macOS dashboards use `.linear` interpolation and a precomputed `yDomain`. Tests in `AnalyticsEngineTests`.

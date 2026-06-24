@@ -1,1 +1,1 @@
-Improved stability and reliability throughout the app, including more dependable iCloud sync and clearer sync status. Thank you for using Wealth Compass!
+UI improvements

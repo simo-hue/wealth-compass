@@ -68,4 +68,72 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual(slices.count, 1, "investments and crypto are zero, so only Cash remains")
         XCTAssertEqual(slices.first?.value, 500)
     }
+
+    private func snapshot(
+        _ year: Int, _ month: Int, _ day: Int,
+        hour: Int = 12, minute: Int = 0,
+        netWorth: Double
+    ) -> NetWorthSnapshot {
+        var comps = DateComponents()
+        comps.year = year; comps.month = month; comps.day = day
+        comps.hour = hour; comps.minute = minute
+        let when = utc.date(from: comps)!
+        return NetWorthSnapshot(
+            date: when,
+            totalAssets: netWorth,
+            totalLiabilities: 0,
+            netWorth: netWorth,
+            liquidity: netWorth,
+            investments: 0,
+            crypto: 0
+        )
+    }
+
+    func testSnapshotsForChartCollapsesSameDayToLatest() {
+        let now = date(2026, 6, 22)
+        let data = FinancialData(snapshots: [
+            snapshot(2026, 6, 20, hour: 9, netWorth: 100),
+            snapshot(2026, 6, 22, hour: 8, netWorth: 200),
+            snapshot(2026, 6, 22, hour: 18, netWorth: 500)
+        ])
+        let points = engine(data, now: now).snapshotsForChart(range: .oneMonth, currentNetWorth: 999)
+        XCTAssertEqual(points.count, 2)
+        XCTAssertEqual(points.last?.value, 999, "today aligns with live total")
+        XCTAssertEqual(points[0].value, 100)
+    }
+
+    func testSnapshotsForChartFiltersNonFiniteValues() {
+        let now = date(2026, 6, 22)
+        let data = FinancialData(snapshots: [
+            snapshot(2026, 6, 20, netWorth: 100),
+            NetWorthSnapshot(
+                date: date(2026, 6, 21),
+                totalAssets: 0,
+                totalLiabilities: 0,
+                netWorth: .nan,
+                liquidity: 0,
+                investments: 0,
+                crypto: 0
+            )
+        ])
+        let points = engine(data, now: now).snapshotsForChart(range: .oneMonth, currentNetWorth: 150)
+        XCTAssertEqual(points.map(\.value), [100, 150])
+    }
+
+    func testSnapshotsForChartBackfillLikeSeriesHasOnePointPerDay() {
+        let now = date(2026, 6, 22)
+        var snapshots: [NetWorthSnapshot] = []
+        for day in 18...21 {
+            snapshots.append(snapshot(2026, 6, day, hour: 23, minute: 59, netWorth: 1_000))
+            snapshots.append(snapshot(2026, 6, day, hour: 11, netWorth: 1_000))
+        }
+        snapshots.append(snapshot(2026, 6, 22, hour: 10, netWorth: 5_000))
+
+        let data = FinancialData(snapshots: snapshots)
+        let points = engine(data, now: now).snapshotsForChart(range: .oneMonth, currentNetWorth: 827_000)
+
+        XCTAssertEqual(points.count, 5, "18, 19, 20, 21, 22")
+        XCTAssertEqual(Set(points.map { utc.startOfDay(for: $0.date) }).count, 5)
+        XCTAssertEqual(points.last?.value, 827_000)
+    }
 }
