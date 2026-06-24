@@ -169,9 +169,10 @@ struct MacDashboardView: View {
     }
 
     private var netWorthHero: some View {
-        let points = finance.snapshots(range: timeRange)
+        let points = finance.snapshotsForChart(range: timeRange, settings: settings)
         let selectedPoint = selectedPoint(in: points)
         let rangeChange = netWorthChange(in: points)
+        let yDomain = chartDomain(for: points)
 
         return DashboardGlassCard(padding: 0) {
             ZStack {
@@ -239,7 +240,7 @@ struct MacDashboardView: View {
                             ForEach(points) { point in
                                 AreaMark(
                                     x: .value("Date", point.date),
-                                    yStart: .value("Range floor", chartDomain(for: points).lowerBound),
+                                    yStart: .value("Range floor", yDomain.lowerBound),
                                     yEnd: .value("Net Worth", point.value)
                                 )
                                 .foregroundStyle(
@@ -249,7 +250,7 @@ struct MacDashboardView: View {
                                         endPoint: .bottom
                                     )
                                 )
-                                .interpolationMethod(.monotone)
+                                .interpolationMethod(.linear)
                                 .accessibilityHidden(true)
 
                                 LineMark(
@@ -258,7 +259,7 @@ struct MacDashboardView: View {
                                 )
                                 .foregroundStyle(WCColor.primary)
                                 .lineStyle(StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
-                                .interpolationMethod(.monotone)
+                                .interpolationMethod(.linear)
                                 .symbol(Circle())
                                 .symbolSize(22)
                                 .accessibilityLabel(Text(point.date.formatted(date: .abbreviated, time: .omitted)))
@@ -302,7 +303,7 @@ struct MacDashboardView: View {
                                 .accessibilityHidden(true)
                             }
                         }
-                        .chartYScale(domain: chartDomain(for: points))
+                        .chartYScale(domain: yDomain)
                         .chartXAxis {
                             AxisMarks(values: .automatic(desiredCount: 6)) { _ in
                                 AxisGridLine()

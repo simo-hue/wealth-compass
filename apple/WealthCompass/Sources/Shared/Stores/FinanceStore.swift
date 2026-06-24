@@ -636,6 +636,11 @@ final class FinanceStore: ObservableObject {
         AnalyticsEngine(data: data).snapshots(range: range)
     }
 
+    func snapshotsForChart(range: TimeRange, settings: AppSettings) -> [NetWorthPoint] {
+        let totals = calculateTotals(settings: settings)
+        return analytics(settings).snapshotsForChart(range: range, currentNetWorth: totals.netWorth)
+    }
+
     func cashFlowTrend(months: Int = 6) -> [CashFlowMonth] {
         AnalyticsEngine(data: data).cashFlowTrend(months: months)
     }
