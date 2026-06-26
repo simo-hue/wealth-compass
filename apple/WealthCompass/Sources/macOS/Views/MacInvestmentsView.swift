@@ -140,7 +140,7 @@ struct MacInvestmentsView: View {
             let latestUpdate = finance.data.investments.map(\.updatedAt).max()
             let sectorCount = Set(finance.data.investments.map(\.sector).filter(isNonEmpty)).count
             MetricCard(
-                title: LocalizedStringKey("Status • \(privateCount(sectorCount)) Sectors"),
+                title: LocalizedStringKey(settings.localized("Status • \(privateCount(sectorCount)) Sectors")),
                 value: latestUpdate.map(formattedUpdate) ?? settings.localized("Never"),
                 systemImage: "checkmark.circle"
             )
