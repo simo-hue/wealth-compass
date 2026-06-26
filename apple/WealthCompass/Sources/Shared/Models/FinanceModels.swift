@@ -221,9 +221,13 @@ struct Transaction: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var type: TransactionType
     var category: String
-    var amount: Double
+    var amount: Decimal
     var description: String
     var date: Date
+    /// Currency the amount was entered in (WC-M1). `nil` on legacy rows written before
+    /// this field existed; callers read it as `?? base currency`, and `FinanceStore.load`
+    /// backfills `nil` to the base currency once, freezing old cash at migration-time base.
+    var currency: Currency? = nil
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
     var recurringTransactionID: UUID?
@@ -319,12 +323,15 @@ struct RecurringTransaction: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var type: TransactionType
     var category: String
-    var amount: Double
+    var amount: Decimal
     var description: String
     var startDate: Date
     var frequency: RecurringTransactionFrequency
     var nextDueDate: Date
     var endDate: Date?
+    /// Currency generated occurrences inherit (WC-M1). `nil` on legacy schedules; read as
+    /// `?? base currency` and backfilled on first load.
+    var currency: Currency? = nil
     var notificationsEnabled: Bool = true
     var isActive: Bool = true
     var completedAt: Date?
@@ -362,45 +369,49 @@ struct Investment: Identifiable, Codable, Equatable {
     var type: InvestmentType
     var symbol: String
     var name: String
-    var quantity: Double
-    var costBasis: Double
-    var currentValue: Double
-    var currentPrice: Double
+    var quantity: Decimal
+    var costBasis: Decimal
+    var currentValue: Decimal
+    var currentPrice: Decimal
     var currency: Currency
     var geography: String
     var sector: String
     var isin: String
-    var fees: Double
+    var fees: Decimal
     var updatedAt: Date = Date()
     var createdAt: Date = Date()
 
-    var gainLoss: Double { currentValue - costBasis }
-    var gainLossPercent: Double { costBasis > 0 ? (gainLoss / costBasis) * 100 : 0 }
+    var gainLoss: Decimal { currentValue - costBasis }
+    var gainLossPercent: Double {
+        costBasis > 0 ? (gainLoss.doubleValue / costBasis.doubleValue) * 100 : 0
+    }
 }
 
 struct CryptoHolding: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var symbol: String
     var name: String
-    var quantity: Double
-    var avgBuyPrice: Double
-    var currentPrice: Double
+    var quantity: Decimal
+    var avgBuyPrice: Decimal
+    var currentPrice: Decimal
     var currency: Currency = .usd
-    var fees: Double
+    var fees: Decimal
     var coinId: String
     var updatedAt: Date = Date()
     var createdAt: Date = Date()
 
-    var costBasis: Double { quantity * avgBuyPrice }
-    var currentValue: Double { quantity * currentPrice }
-    var gainLoss: Double { currentValue - costBasis }
-    var gainLossPercent: Double { costBasis > 0 ? (gainLoss / costBasis) * 100 : 0 }
+    var costBasis: Decimal { quantity * avgBuyPrice }
+    var currentValue: Decimal { quantity * currentPrice }
+    var gainLoss: Decimal { currentValue - costBasis }
+    var gainLossPercent: Double {
+        costBasis > 0 ? (gainLoss.doubleValue / costBasis.doubleValue) * 100 : 0
+    }
 }
 
 struct Liability: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var name: String
-    var currentBalance: Double
+    var currentBalance: Decimal
     var currency: Currency
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
@@ -409,12 +420,12 @@ struct Liability: Identifiable, Codable, Equatable {
 struct NetWorthSnapshot: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var date: Date
-    var totalAssets: Double
-    var totalLiabilities: Double
-    var netWorth: Double
-    var liquidity: Double
-    var investments: Double
-    var crypto: Double
+    var totalAssets: Decimal
+    var totalLiabilities: Decimal
+    var netWorth: Decimal
+    var liquidity: Decimal
+    var investments: Decimal
+    var crypto: Decimal
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
 }
@@ -464,20 +475,22 @@ struct FinancialData: Codable, Equatable, Sendable {
 }
 
 struct FinanceTotals: Equatable {
-    var totalLiquidity: Double = 0
-    var totalInvestments: Double = 0
-    var totalCrypto: Double = 0
-    var totalAssets: Double = 0
-    var totalLiabilities: Double = 0
-    var netWorth: Double = 0
+    var totalLiquidity: Decimal = 0
+    var totalInvestments: Decimal = 0
+    var totalCrypto: Decimal = 0
+    var totalAssets: Decimal = 0
+    var totalLiabilities: Decimal = 0
+    var netWorth: Decimal = 0
 }
 
 struct MonthlyCashFlow: Equatable {
-    var monthlyIncome: Double = 0
-    var monthlyExpenses: Double = 0
+    var monthlyIncome: Decimal = 0
+    var monthlyExpenses: Decimal = 0
 
-    var netSavings: Double { monthlyIncome - monthlyExpenses }
-    var savingsRate: Double { monthlyIncome > 0 ? (netSavings / monthlyIncome) * 100 : 0 }
+    var netSavings: Decimal { monthlyIncome - monthlyExpenses }
+    var savingsRate: Double {
+        monthlyIncome > 0 ? (netSavings.doubleValue / monthlyIncome.doubleValue) * 100 : 0
+    }
 }
 
 struct CashFlowMonth: Identifiable, Equatable {

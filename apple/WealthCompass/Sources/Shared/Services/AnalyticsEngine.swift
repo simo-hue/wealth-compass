@@ -19,8 +19,15 @@ struct AnalyticsEngine {
     var calendar: Calendar = .current
     var now: Date = Date()
 
-    private func convert(_ value: Double, from currency: Currency) -> Double {
+    private func convert(_ value: Decimal, from currency: Currency) -> Decimal {
         converter.convert(value, from: currency, to: displayCurrency)
+    }
+
+    /// A transaction's amount expressed in the display currency (WC-M1). Legacy rows with no
+    /// currency are treated as already in the display currency (no conversion) until
+    /// `FinanceStore.load` backfills them to the base currency.
+    private func displayAmount(_ transaction: Transaction) -> Decimal {
+        converter.convert(transaction.amount, from: transaction.currency ?? displayCurrency, to: displayCurrency)
     }
 
     private func localized(_ key: String.LocalizationValue) -> String {
@@ -28,19 +35,19 @@ struct AnalyticsEngine {
     }
 
     func calculateTotals() -> FinanceTotals {
-        let totalLiquidity = data.transactions.reduce(into: 0.0) { result, transaction in
+        let totalLiquidity = data.transactions.reduce(Decimal(0)) { result, transaction in
             switch transaction.type {
-            case .income:  result += transaction.amount
-            case .expense: result -= transaction.amount
+            case .income:  return result + displayAmount(transaction)
+            case .expense: return result - displayAmount(transaction)
             }
         }
-        let totalInvestments = data.investments.reduce(0) {
+        let totalInvestments = data.investments.reduce(Decimal(0)) {
             $0 + convert($1.currentValue, from: $1.currency)
         }
-        let totalCrypto = data.crypto.reduce(0) {
+        let totalCrypto = data.crypto.reduce(Decimal(0)) {
             $0 + convert($1.currentValue, from: $1.currency)
         }
-        let totalLiabilities = data.liabilities.reduce(0) {
+        let totalLiabilities = data.liabilities.reduce(Decimal(0)) {
             $0 + convert($1.currentBalance, from: $1.currency)
         }
         let totalAssets = totalLiquidity + totalInvestments + totalCrypto
@@ -64,10 +71,10 @@ struct AnalyticsEngine {
     func monthlyCashFlow(for month: Date) -> MonthlyCashFlow {
         let income = data.transactions
             .filter { $0.type == .income && calendar.isDate($0.date, equalTo: month, toGranularity: .month) }
-            .reduce(0) { $0 + $1.amount }
+            .reduce(Decimal(0)) { $0 + displayAmount($1) }
         let expenses = data.transactions
             .filter { $0.type == .expense && calendar.isDate($0.date, equalTo: month, toGranularity: .month) }
-            .reduce(0) { $0 + $1.amount }
+            .reduce(Decimal(0)) { $0 + displayAmount($1) }
         return MonthlyCashFlow(monthlyIncome: income, monthlyExpenses: expenses)
     }
 
@@ -84,7 +91,7 @@ struct AnalyticsEngine {
         let filtered = data.snapshots
             .filter { $0.date >= cutoff }
             .sorted { $0.date < $1.date }
-        return filtered.map { NetWorthPoint(date: $0.date, value: $0.netWorth) }
+        return filtered.map { NetWorthPoint(date: $0.date, value: $0.netWorth.doubleValue) }
     }
 
     /// Display-ready net-worth series: finite values only, one point per calendar day,
@@ -128,14 +135,14 @@ struct AnalyticsEngine {
             guard let date = calendar.date(byAdding: .month, value: -offset, to: now) else { return nil }
             let monthKey = monthFormatter.string(from: date)
             let transactions = data.transactions.filter { monthFormatter.string(from: $0.date) == monthKey }
-            let income = transactions.filter { $0.type == .income }.reduce(0) { $0 + $1.amount }
-            let expense = transactions.filter { $0.type == .expense }.reduce(0) { $0 + $1.amount }
+            let income = transactions.filter { $0.type == .income }.reduce(Decimal(0)) { $0 + displayAmount($1) }
+            let expense = transactions.filter { $0.type == .expense }.reduce(Decimal(0)) { $0 + displayAmount($1) }
 
             return CashFlowMonth(
                 monthKey: monthKey,
                 monthLabel: labelFormatter.string(from: date),
-                income: income,
-                expense: expense
+                income: income.doubleValue,
+                expense: expense.doubleValue
             )
         }
     }
@@ -143,39 +150,32 @@ struct AnalyticsEngine {
     func expensesByCategory(period: AnalyticsPeriod) -> [CategoryTotal] {
         let expenses = filteredTransactions(period: period).filter { $0.type == .expense }
         let grouped = Dictionary(grouping: expenses, by: \.category)
-            .mapValues { $0.reduce(0) { $0 + $1.amount } }
-        let total = grouped.values.reduce(0, +)
+            .mapValues { $0.reduce(Decimal(0)) { $0 + displayAmount($1) } }
+        let total = grouped.values.reduce(Decimal(0), +)
 
         return grouped.map { key, value in
-            CategoryTotal(name: key, value: value, percentage: total > 0 ? (value / total) * 100 : 0)
+            CategoryTotal(
+                name: key,
+                value: value.doubleValue,
+                percentage: total > 0 ? (value.doubleValue / total.doubleValue) * 100 : 0
+            )
         }
         .sorted { $0.value > $1.value }
-    }
-
-    func spendingTimeline(period: AnalyticsPeriod) -> [CategoryTotal] {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM dd"
-        let expenses = filteredTransactions(period: period).filter { $0.type == .expense }
-        let grouped = Dictionary(grouping: expenses) { formatter.string(from: $0.date) }
-            .mapValues { $0.reduce(0) { $0 + $1.amount } }
-
-        return grouped.map { CategoryTotal(name: $0.key, value: $0.value, percentage: 0) }
-            .sorted { $0.name < $1.name }
     }
 
     func assetAllocation() -> [AllocationSlice] {
         let totals = calculateTotals()
         return [
-            AllocationSlice(name: localized("Investments"), value: totals.totalInvestments, color: .blue),
-            AllocationSlice(name: localized("Crypto"), value: totals.totalCrypto, color: .orange),
-            AllocationSlice(name: localized("Cash"), value: totals.totalLiquidity, color: .green)
+            AllocationSlice(name: localized("Investments"), value: totals.totalInvestments.doubleValue, color: .blue),
+            AllocationSlice(name: localized("Crypto"), value: totals.totalCrypto.doubleValue, color: .orange),
+            AllocationSlice(name: localized("Cash"), value: totals.totalLiquidity.doubleValue, color: .green)
         ].filter { $0.value > 0 }
     }
 
     func investmentAllocation() -> [AllocationSlice] {
         let grouped = Dictionary(grouping: data.investments, by: \.sector)
             .mapValues { items in
-                items.reduce(0) { partial, investment in
+                items.reduce(Decimal(0)) { partial, investment in
                     partial + convert(investment.currentValue, from: investment.currency)
                 }
             }
@@ -184,14 +184,14 @@ struct AnalyticsEngine {
             .sorted { $0.value > $1.value }
             .enumerated()
             .map { index, item in
-                AllocationSlice(name: item.name, value: item.value, color: ColorPalette.chart[index % ColorPalette.chart.count])
+                AllocationSlice(name: item.name, value: item.value.doubleValue, color: ColorPalette.chart[index % ColorPalette.chart.count])
             }
     }
 
     func investmentTypeAllocation() -> [AllocationSlice] {
         let grouped = Dictionary(grouping: data.investments, by: { $0.type.rawValue })
             .mapValues { items in
-                items.reduce(0) { partial, investment in
+                items.reduce(Decimal(0)) { partial, investment in
                     partial + convert(investment.currentValue, from: investment.currency)
                 }
             }
@@ -203,7 +203,7 @@ struct AnalyticsEngine {
                 let type = InvestmentType(rawValue: item.name) ?? .other
                 return AllocationSlice(
                     name: type.localizedTitle(appLanguage: appLanguage),
-                    value: item.value,
+                    value: item.value.doubleValue,
                     color: ColorPalette.chartType[index % ColorPalette.chartType.count]
                 )
             }
@@ -212,7 +212,7 @@ struct AnalyticsEngine {
     func investmentGeographyAllocation() -> [AllocationSlice] {
         let grouped = Dictionary(grouping: data.investments, by: \.geography)
             .mapValues { items in
-                items.reduce(0) { partial, investment in
+                items.reduce(Decimal(0)) { partial, investment in
                     partial + convert(investment.currentValue, from: investment.currency)
                 }
             }
@@ -221,7 +221,7 @@ struct AnalyticsEngine {
             .sorted { $0.value > $1.value }
             .enumerated()
             .map { index, item in
-                AllocationSlice(name: item.name, value: item.value, color: ColorPalette.chartGeography[index % ColorPalette.chartGeography.count])
+                AllocationSlice(name: item.name, value: item.value.doubleValue, color: ColorPalette.chartGeography[index % ColorPalette.chartGeography.count])
             }
     }
 
@@ -229,7 +229,7 @@ struct AnalyticsEngine {
         data.crypto.enumerated().map { index, holding in
             AllocationSlice(
                 name: holding.symbol,
-                value: convert(holding.currentValue, from: holding.currency),
+                value: convert(holding.currentValue, from: holding.currency).doubleValue,
                 color: ColorPalette.chart[index % ColorPalette.chart.count]
             )
         }

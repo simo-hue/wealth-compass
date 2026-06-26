@@ -150,7 +150,7 @@ private struct ImportedTransaction: Decodable {
             id: id ?? UUID(),
             type: transactionType,
             category: category ?? "Other",
-            amount: amount,
+            amount: Decimal(amount),
             description: description ?? "",
             date: date,
             createdAt: ImportDateParser.parse(createdAt) ?? date,
@@ -232,7 +232,7 @@ private struct ImportedRecurringTransaction: Decodable {
             id: id ?? UUID(),
             type: transactionType,
             category: category ?? "Other",
-            amount: amount,
+            amount: Decimal(amount),
             description: description ?? "",
             startDate: startDate,
             frequency: frequency,
@@ -286,7 +286,7 @@ private struct ImportedIncomeEntry: Decodable {
             id: id ?? UUID(),
             type: .income,
             category: Self.categoryName(from: type),
-            amount: amount,
+            amount: Decimal(amount),
             description: description ?? "",
             date: date,
             createdAt: ImportDateParser.parse(createdAt) ?? date
@@ -344,7 +344,7 @@ private struct ImportedExpenseEntry: Decodable {
             id: id ?? UUID(),
             type: .expense,
             category: category ?? "Other",
-            amount: amount,
+            amount: Decimal(amount),
             description: description ?? "",
             date: date,
             createdAt: ImportDateParser.parse(createdAt) ?? date
@@ -387,7 +387,7 @@ private struct ImportedLiquidityAccount: Decodable {
         guard let balance, balance.isFinite, balance != 0 else { return nil }
 
         let sourceCurrency = Currency.imported(currency, default: settings.currency)
-        let convertedAmount = settings.convert(abs(balance), from: sourceCurrency)
+        let convertedAmount = settings.convert(Decimal(abs(balance)), from: sourceCurrency)
         guard convertedAmount > 0, convertedAmount.isFinite else { return nil }
 
         let accountName = name ?? type?.importTitleCased ?? "Liquidity Account"
@@ -484,15 +484,15 @@ private struct ImportedInvestment: Decodable {
             type: InvestmentType(rawValue: type?.lowercased() ?? "") ?? .other,
             symbol: symbol.uppercased(),
             name: name,
-            quantity: quantity,
-            costBasis: costBasis,
-            currentValue: currentValue,
-            currentPrice: currentPrice,
+            quantity: Decimal(quantity),
+            costBasis: Decimal(costBasis),
+            currentValue: Decimal(currentValue),
+            currentPrice: Decimal(currentPrice),
             currency: Currency.imported(currency, default: .usd),
             geography: geography ?? "Other",
             sector: sector ?? "Other",
             isin: isin?.uppercased() ?? "",
-            fees: fees?.nonNegativeImportedAmount ?? 0,
+            fees: Decimal(fees?.nonNegativeImportedAmount ?? 0),
             updatedAt: importedUpdatedAt,
             createdAt: ImportDateParser.parse(createdAt) ?? importedUpdatedAt
         )
@@ -559,11 +559,11 @@ private struct ImportedCryptoHolding: Decodable {
             id: id ?? UUID(),
             symbol: symbol.uppercased(),
             name: name,
-            quantity: quantity,
-            avgBuyPrice: avgBuyPrice?.nonNegativeImportedAmount ?? 0,
-            currentPrice: currentPrice?.nonNegativeImportedAmount ?? 0,
+            quantity: Decimal(quantity),
+            avgBuyPrice: Decimal(avgBuyPrice?.nonNegativeImportedAmount ?? 0),
+            currentPrice: Decimal(currentPrice?.nonNegativeImportedAmount ?? 0),
             currency: Currency.imported(currency, default: .usd),
-            fees: fees?.nonNegativeImportedAmount ?? 0,
+            fees: Decimal(fees?.nonNegativeImportedAmount ?? 0),
             coinId: coinId?.lowercased() ?? "",
             updatedAt: importedUpdatedAt,
             createdAt: ImportDateParser.parse(createdAt) ?? importedUpdatedAt
@@ -614,7 +614,7 @@ private struct ImportedLiability: Decodable {
         return Liability(
             id: id ?? UUID(),
             name: name ?? type?.importTitleCased ?? "Liability",
-            currentBalance: balance,
+            currentBalance: Decimal(balance),
             currency: Currency.imported(currency, default: defaultCurrency),
             createdAt: ImportDateParser.parse(createdAt) ?? importedUpdatedAt,
             updatedAt: importedUpdatedAt
@@ -673,12 +673,12 @@ private struct ImportedSnapshot: Decodable {
         return NetWorthSnapshot(
             id: id ?? UUID(),
             date: date,
-            totalAssets: totalAssets,
-            totalLiabilities: totalLiabilities,
-            netWorth: netWorth,
-            liquidity: liquidity?.finiteImportedAmount ?? 0,
-            investments: investments?.finiteImportedAmount ?? 0,
-            crypto: crypto?.finiteImportedAmount ?? 0,
+            totalAssets: Decimal(totalAssets),
+            totalLiabilities: Decimal(totalLiabilities),
+            netWorth: Decimal(netWorth),
+            liquidity: Decimal(liquidity?.finiteImportedAmount ?? 0),
+            investments: Decimal(investments?.finiteImportedAmount ?? 0),
+            crypto: Decimal(crypto?.finiteImportedAmount ?? 0),
             createdAt: ImportDateParser.parse(createdAt) ?? date
         )
     }

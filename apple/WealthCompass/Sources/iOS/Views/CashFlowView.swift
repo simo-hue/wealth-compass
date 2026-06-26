@@ -75,19 +75,20 @@ struct CashFlowView: View {
         }
         .pageChrome()
         .sheet(isPresented: $showingAddTransaction) {
-            TransactionFormView { _, type, amount, category, description, date in
+            TransactionFormView { _, type, amount, category, description, date, currency in
                 finance.addTransaction(
                     type: type,
                     amount: amount,
                     category: category,
                     description: description,
                     date: date,
+                    currency: currency,
                     settings: settings
                 )
             }
         }
         .sheet(item: $transactionToEdit) { transaction in
-            TransactionFormView(transaction: transaction) { original, type, amount, category, description, date in
+            TransactionFormView(transaction: transaction) { original, type, amount, category, description, date, currency in
                 if let original {
                     finance.updateTransaction(
                         original,
@@ -96,6 +97,7 @@ struct CashFlowView: View {
                         category: category,
                         description: description,
                         date: date,
+                        currency: currency,
                         settings: settings
                     )
                 }
@@ -112,7 +114,7 @@ struct CashFlowView: View {
     }
 
     private var summaryCards: some View {
-        let cashFlow = finance.monthlyCashFlow(for: Date())
+        let cashFlow = finance.monthlyCashFlow(for: Date(), settings: settings)
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             MetricCard(title: "Monthly Income", value: settings.privateCurrency(cashFlow.monthlyIncome), systemImage: "arrow.down.left", accent: WCColor.primary, detail: "This month")
             MetricCard(title: "Monthly Expenses", value: settings.privateCurrency(cashFlow.monthlyExpenses), systemImage: "arrow.up.right", accent: WCColor.destructive, detail: "This month")
@@ -136,7 +138,7 @@ struct CashFlowView: View {
                     .tint(WCColor.primary)
                 }
 
-                let categories = finance.expensesByCategory(period: period)
+                let categories = finance.expensesByCategory(period: period, settings: settings)
                 let totalExpenses = categories.reduce(0) { $0 + $1.value }
                 if categories.isEmpty {
                     EmptyState(title: "No expenses for this period", systemImage: "chart.pie")

@@ -140,3 +140,33 @@
     `"The iCloud data couldn't be deleted. Check your connection and try again."`,
     `"You're not signed in to iCloud, so there's no iCloud copy to delete."`). All fall back to
     English until translated. Purely localization; no code or build action needed.
+
+## Full audit implementation — `IOS_MACOS_BUG_AUDIT.md` (2026-06-26, branch `audit-fixes`)
+
+> This pass implements **all 51 items** from `IOS_MACOS_BUG_AUDIT.md`, including the big
+> **`Double`→`Decimal` money migration (WC-A1)** and **per-transaction currency (WC-M1)**.
+> I have **NO Xcode in this environment** (CommandLineTools only — `xcodebuild` unavailable,
+> no simulators). I validated pure logic with the standalone `swift` compiler and used
+> single-file SourceKit diagnostics to catch same-file type errors, but **a full build and the
+> test suite could not be run here.** The items below are the verification you need to do.
+
+22. **Build BOTH schemes in Xcode — REQUIRED before anything else.** The Decimal migration
+    touches ~30 files; the first real cross-file type-check happens on your machine.
+    - `xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMac -destination 'platform=macOS' build`
+    - `xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile -destination 'generic/platform=iOS Simulator' build`
+    - Expect a few residual `Decimal`/`Double` mismatches the single-file linter couldn't see
+      across files. Paste any compiler errors back to me and I'll fix them.
+
+23. **Run the unit tests** (updated to Decimal + new regressions for WC-H1/H3/M1/M9):
+    - `xcodebuild test -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile -destination 'platform=iOS Simulator,name=iPhone 16'`
+
+24. **A new shared source file was added: `Sources/Shared/Models/MoneyDecimal.swift`** (Decimal
+    helpers + `MoneyParser`). It must be in BOTH app targets' Compile Sources. I will wire it into
+    `project.pbxproj` by hand; confirm Xcode sees it in both targets when you open the project.
+
+25. **Runtime-verify the money migration on a device with REAL existing data + iCloud sync:**
+    - Existing transactions/investments load with correct amounts (Decimal decodes old JSON numbers).
+    - Net worth / totals match what they were before.
+    - Change base currency in Settings → confirm cash/liquidity now re-converts (the WC-M1 fix).
+    - First launch after update performs a one-time currency backfill (legacy rows stamped with
+      base currency) and re-syncs those records once to iCloud — expect a small one-time sync.

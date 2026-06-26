@@ -133,6 +133,9 @@ final class FinanceStore: ObservableObject {
     private var saveIdleWaiters: [CheckedContinuation<Void, Never>] = []
     private var localPersistenceError: Error?
     private var lastMarketPriceRefreshAttemptAt: Date?
+    /// Set by `load()` when the one-time WC-M1 currency backfill stamped legacy rows, so
+    /// `init` can persist the migration once the save pipeline is up.
+    private var needsCurrencyBackfillSave = false
 
     private lazy var cloudSyncService = CloudKitSyncService(
         metadataStore: syncMetadataStore,
@@ -168,6 +171,11 @@ final class FinanceStore: ObservableObject {
 
         let seedRecords = load()
         startSaveConsumer(seedRecords: seedRecords)
+        // Persist the WC-M1 currency backfill (if any) now that the save pipeline exists; it
+        // diffs against the on-disk baseline seeded above, so only the stamped rows are written.
+        if needsCurrencyBackfillSave {
+            save()
+        }
         let isSyncEnabled = settings?.isICloudSyncEnabled
             ?? UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
         if isSyncEnabled {
@@ -202,49 +210,55 @@ final class FinanceStore: ObservableObject {
         persistence.locationDescription
     }
 
-    func addTransaction(type: TransactionType, amount: Double, category: String, description: String, date: Date, settings: AppSettings) {
+    func addTransaction(type: TransactionType, amount: Decimal, category: String, description: String, date: Date, currency: Currency, settings: AppSettings) {
         let transaction = Transaction(
             type: type,
             category: category,
             amount: amount,
             description: description,
-            date: Calendar.current.startOfDay(for: date)
+            date: Calendar.current.startOfDay(for: date),
+            currency: currency
         )
-        
-        let delta = type == .income ? amount : -amount
-        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: delta)
-        
+
+        // Snapshots store liquidity in the display currency, so convert the transaction's
+        // own-currency delta before adjusting history (WC-M1; no-op when currency == base).
+        let delta: Decimal = type == .income ? amount : -amount
+        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: settings.convert(delta, from: currency))
+
         data.transactions.append(transaction)
         appendSnapshot(settings: settings)
         save()
     }
 
     func deleteTransaction(_ transaction: Transaction, settings: AppSettings) {
-        let delta = transaction.type == .income ? -transaction.amount : transaction.amount
-        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: delta)
-        
+        let delta: Decimal = transaction.type == .income ? -transaction.amount : transaction.amount
+        let txCurrency = transaction.currency ?? settings.currency
+        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: settings.convert(delta, from: txCurrency))
+
         data.transactions.removeAll { $0.id == transaction.id }
         appendSnapshot(settings: settings)
         save()
     }
 
-    func updateTransaction(_ transaction: Transaction, type: TransactionType, amount: Double, category: String, description: String, date: Date, settings: AppSettings) {
+    func updateTransaction(_ transaction: Transaction, type: TransactionType, amount: Decimal, category: String, description: String, date: Date, currency: Currency, settings: AppSettings) {
         guard let index = data.transactions.firstIndex(where: { $0.id == transaction.id }) else { return }
-        
-        let oldDelta = transaction.type == .income ? -transaction.amount : transaction.amount
-        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: oldDelta)
-        
+
+        let oldDelta: Decimal = transaction.type == .income ? -transaction.amount : transaction.amount
+        let oldCurrency = transaction.currency ?? settings.currency
+        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: settings.convert(oldDelta, from: oldCurrency))
+
         let newDate = Calendar.current.startOfDay(for: date)
-        let newDelta = type == .income ? amount : -amount
-        adjustHistoricalSnapshots(from: newDate, liquidityDelta: newDelta)
-        
+        let newDelta: Decimal = type == .income ? amount : -amount
+        adjustHistoricalSnapshots(from: newDate, liquidityDelta: settings.convert(newDelta, from: currency))
+
         data.transactions[index].type = type
         data.transactions[index].amount = amount
         data.transactions[index].category = category
         data.transactions[index].description = description
         data.transactions[index].date = newDate
+        data.transactions[index].currency = currency
         data.transactions[index].updatedAt = Date()
-        
+
         appendSnapshot(settings: settings)
         save()
     }
@@ -359,9 +373,13 @@ final class FinanceStore: ObservableObject {
 
                 if !alreadyGenerated {
                     let occurrenceStartOfDay = calendar.startOfDay(for: occurrence)
-                    let delta = schedule.type == .income ? schedule.amount : -schedule.amount
-                    adjustHistoricalSnapshots(from: occurrenceStartOfDay, liquidityDelta: delta)
-                    
+                    let scheduleCurrency = schedule.currency ?? settings.currency
+                    let delta: Decimal = schedule.type == .income ? schedule.amount : -schedule.amount
+                    adjustHistoricalSnapshots(
+                        from: occurrenceStartOfDay,
+                        liquidityDelta: settings.convert(delta, from: scheduleCurrency)
+                    )
+
                     data.transactions.append(
                         Transaction(
                             type: schedule.type,
@@ -369,6 +387,7 @@ final class FinanceStore: ObservableObject {
                             amount: schedule.amount,
                             description: schedule.description,
                             date: occurrenceStartOfDay,
+                            currency: scheduleCurrency,
                             recurringTransactionID: schedule.id,
                             recurringOccurrenceDate: occurrence
                         )
@@ -556,15 +575,19 @@ final class FinanceStore: ObservableObject {
 
         for index in data.investments.indices {
             guard let quote = investmentQuotes[data.investments[index].id] else { continue }
-            data.investments[index].currentPrice = quote.price
-            data.investments[index].currentValue = data.investments[index].quantity * quote.price
+            // Network prices are Double; cross to Decimal at the storage boundary and drop a
+            // non-finite quote rather than corrupting stored money (WC-A1 / WC-H1).
+            guard let price = Decimal(finite: quote.price) else { continue }
+            data.investments[index].currentPrice = price
+            data.investments[index].currentValue = data.investments[index].quantity * price
             data.investments[index].updatedAt = quote.asOf
             result.updatedInvestments += 1
         }
 
         for index in data.crypto.indices {
             guard let update = cryptoQuotes[data.crypto[index].id] else { continue }
-            data.crypto[index].currentPrice = update.price
+            guard let price = Decimal(finite: update.price) else { continue }
+            data.crypto[index].currentPrice = price
             // Note: holding.currency is intentionally NOT overwritten here (H2) — the
             // price above is already expressed in the holding's existing currency.
             if data.crypto[index].coinId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -624,12 +647,12 @@ final class FinanceStore: ObservableObject {
         data.snapshots = snapshotEngine.appendingSnapshot(to: data.snapshots, totals: totals)
     }
 
-    private func adjustHistoricalSnapshots(from date: Date, liquidityDelta: Double) {
+    private func adjustHistoricalSnapshots(from date: Date, liquidityDelta: Decimal) {
         data.snapshots = snapshotEngine.adjustingHistoricalSnapshots(data.snapshots, from: date, liquidityDelta: liquidityDelta)
     }
 
-    func monthlyCashFlow(for month: Date) -> MonthlyCashFlow {
-        AnalyticsEngine(data: data).monthlyCashFlow(for: month)
+    func monthlyCashFlow(for month: Date, settings: AppSettings) -> MonthlyCashFlow {
+        analytics(settings).monthlyCashFlow(for: month)
     }
 
     func snapshots(range: TimeRange) -> [NetWorthPoint] {
@@ -638,19 +661,15 @@ final class FinanceStore: ObservableObject {
 
     func snapshotsForChart(range: TimeRange, settings: AppSettings) -> [NetWorthPoint] {
         let totals = calculateTotals(settings: settings)
-        return analytics(settings).snapshotsForChart(range: range, currentNetWorth: totals.netWorth)
+        return analytics(settings).snapshotsForChart(range: range, currentNetWorth: totals.netWorth.doubleValue)
     }
 
-    func cashFlowTrend(months: Int = 6) -> [CashFlowMonth] {
-        AnalyticsEngine(data: data).cashFlowTrend(months: months)
+    func cashFlowTrend(months: Int = 6, settings: AppSettings) -> [CashFlowMonth] {
+        analytics(settings).cashFlowTrend(months: months)
     }
 
-    func expensesByCategory(period: AnalyticsPeriod) -> [CategoryTotal] {
-        AnalyticsEngine(data: data).expensesByCategory(period: period)
-    }
-
-    func spendingTimeline(period: AnalyticsPeriod) -> [CategoryTotal] {
-        AnalyticsEngine(data: data).spendingTimeline(period: period)
+    func expensesByCategory(period: AnalyticsPeriod, settings: AppSettings) -> [CategoryTotal] {
+        analytics(settings).expensesByCategory(period: period)
     }
 
     func assetAllocation(settings: AppSettings) -> [AllocationSlice] {
@@ -798,8 +817,14 @@ final class FinanceStore: ObservableObject {
     private func load() -> [CloudSyncRecordKey: CloudSyncRecordSnapshot] {
         do {
             let loadedData = try persistence.load() ?? FinancialData()
+            // WC-M1 one-time migration: stamp legacy currency-less transactions/schedules with
+            // the base currency so old cash stays anchored to it instead of floating when the
+            // user later changes their base currency. Records below are taken from the original
+            // (pre-migration) `loadedData`, so the post-init save persists exactly these stamps.
+            let (migrated, didBackfill) = loadedData.backfillingCurrencies(base: settings?.currency ?? .eur)
+            needsCurrencyBackfillSave = didBackfill
             withAnimation {
-                self.data = loadedData
+                self.data = migrated
                 self.localPersistenceError = nil
                 self.iCloudSyncError = nil
             }
@@ -1025,6 +1050,24 @@ extension FinancialData {
     var hasImportableContent: Bool {
         !transactions.isEmpty || !recurringTransactions.isEmpty || !investments.isEmpty
             || !crypto.isEmpty || !liabilities.isEmpty || !snapshots.isEmpty
+    }
+
+    /// One-time WC-M1 migration: stamps legacy transactions/recurring schedules that predate
+    /// the per-record `currency` field (so their `currency` is `nil`) with `base`. This freezes
+    /// pre-existing cash at the base currency in effect at first launch after the update,
+    /// instead of letting it silently re-value when the user later changes their base currency.
+    func backfillingCurrencies(base: Currency) -> (data: FinancialData, didChange: Bool) {
+        var copy = self
+        var changed = false
+        for index in copy.transactions.indices where copy.transactions[index].currency == nil {
+            copy.transactions[index].currency = base
+            changed = true
+        }
+        for index in copy.recurringTransactions.indices where copy.recurringTransactions[index].currency == nil {
+            copy.recurringTransactions[index].currency = base
+            changed = true
+        }
+        return (copy, changed)
     }
 
     func sortedForStorage() -> FinancialData {
