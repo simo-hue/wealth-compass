@@ -62,10 +62,16 @@ private struct SettingsRow<Content: View>: View {
     }
 
     init(title: String, subtitle: String? = nil, @ViewBuilder content: () -> Content) {
-        self.titleKey = nil
-        self.titleString = title
-        self.subtitleKey = nil
-        self.subtitleString = subtitle
+        // WC-H2: string literals bind to this `String` overload, and the old body rendered
+        // them through the verbatim `Text(_: String)` initializer — so the whole Settings
+        // screen ignored the in-app language. Wrap into `LocalizedStringKey` (as
+        // `SettingsSection` already does) so literals localize. Already-resolved strings
+        // (e.g. `settings.localized(...)`) are dynamic and won't collide with catalog keys,
+        // so they pass through unchanged.
+        self.titleKey = LocalizedStringKey(title)
+        self.titleString = nil
+        self.subtitleKey = subtitle.map { LocalizedStringKey($0) }
+        self.subtitleString = nil
         self.content = content()
     }
 
