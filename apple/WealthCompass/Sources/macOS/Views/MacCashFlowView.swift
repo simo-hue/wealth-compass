@@ -175,7 +175,7 @@ struct MacCashFlowView: View {
         .sheet(item: $editor) { editor in
             switch editor {
             case .transaction(let transaction):
-                MacCashFlowTransactionEditor(transaction: transaction) { original, type, amount, category, description, date in
+                MacCashFlowTransactionEditor(transaction: transaction) { original, type, amount, category, description, date, currency in
                     if let original {
                         finance.updateTransaction(
                             original,
@@ -184,6 +184,7 @@ struct MacCashFlowView: View {
                             category: category,
                             description: description,
                             date: date,
+                            currency: currency,
                             settings: settings
                         )
                     } else {
@@ -193,6 +194,7 @@ struct MacCashFlowView: View {
                             category: category,
                             description: description,
                             date: date,
+                            currency: currency,
                             settings: settings
                         )
                     }
@@ -209,7 +211,7 @@ struct MacCashFlowView: View {
     }
 
     private var summaryCards: some View {
-        let cashFlow = finance.monthlyCashFlow(for: Date())
+        let cashFlow = finance.monthlyCashFlow(for: Date(), settings: settings)
         let totals = finance.calculateTotals(settings: settings)
         let monthlyTransactionsCount = finance.transactions.filter { Calendar.current.isDate($0.date, equalTo: Date(), toGranularity: .month) }.count
 
@@ -254,7 +256,7 @@ struct MacCashFlowView: View {
     }
 
     private var cashFlowTrendCard: some View {
-        let trend = finance.cashFlowTrend(months: cashFlowRange.rawValue)
+        let trend = finance.cashFlowTrend(months: cashFlowRange.rawValue, settings: settings)
         let hasCashFlow = trend.contains { $0.income != 0 || $0.expense != 0 }
         let totalIncome = trend.reduce(0) { $0 + $1.income }
         let totalExpense = trend.reduce(0) { $0 + $1.expense }
@@ -391,7 +393,7 @@ struct MacCashFlowView: View {
                     .frame(width: 142)
                 }
 
-                let categories = finance.expensesByCategory(period: analyticsPeriod)
+                let categories = finance.expensesByCategory(period: analyticsPeriod, settings: settings)
                 let totalExpenses = categories.reduce(0) { $0 + $1.value }
                 if categories.isEmpty {
                     EmptyState(title: "No expenses for this period", systemImage: "chart.pie")
@@ -992,7 +994,7 @@ private struct MacCashFlowTransactionEditor: View {
     @EnvironmentObject private var settings: AppSettings
 
     let transaction: Transaction?
-    let onSave: (Transaction?, TransactionType, Double, String, String, Date) -> Void
+    let onSave: (Transaction?, TransactionType, Decimal, String, String, Date, Currency) -> Void
 
     private static let customCategoryTag = "__wealth_compass_mac_custom_category__"
 
@@ -1001,12 +1003,14 @@ private struct MacCashFlowTransactionEditor: View {
     @State private var category: String
     @State private var note: String
     @State private var date: Date
+    @State private var currency: Currency
+    @State private var hasInitializedCurrency = false
     @State private var customCategory = ""
     @FocusState private var isCustomCategoryFocused: Bool
 
     init(
         transaction: Transaction? = nil,
-        onSave: @escaping (Transaction?, TransactionType, Double, String, String, Date) -> Void
+        onSave: @escaping (Transaction?, TransactionType, Decimal, String, String, Date, Currency) -> Void
     ) {
         self.transaction = transaction
         self.onSave = onSave
@@ -1015,6 +1019,7 @@ private struct MacCashFlowTransactionEditor: View {
         _category = State(initialValue: transaction?.category ?? "Food")
         _note = State(initialValue: transaction?.description ?? "")
         _date = State(initialValue: transaction?.date ?? Date())
+        _currency = State(initialValue: transaction?.currency ?? .eur)
     }
 
     private var categories: [String] {
@@ -1033,12 +1038,13 @@ private struct MacCashFlowTransactionEditor: View {
         isCustomCategorySelected ? trimmedCustomCategory : category
     }
 
-    private var parsedAmount: Double {
-        Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+    private var parsedAmount: Decimal? {
+        MoneyParser.decimal(from: amount)
     }
 
     private var isSaveDisabled: Bool {
-        parsedAmount <= 0 || currentCategoryName.isEmpty
+        guard let parsedAmount, parsedAmount > 0 else { return true }
+        return currentCategoryName.isEmpty
     }
 
     var body: some View {
@@ -1059,7 +1065,12 @@ private struct MacCashFlowTransactionEditor: View {
                         isCustomCategoryFocused = false
                     }
 
-                    TextField("Amount (\(settings.currency.rawValue))", text: $amount)
+                    TextField("Amount (\(currency.rawValue))", text: $amount)
+                    Picker("Currency", selection: $currency) {
+                        ForEach(Currency.allCases) { currencyOption in
+                            (Text(currencyOption.displayName) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
+                        }
+                    }
                     DatePicker("Date", selection: $date, displayedComponents: .date)
                     TextField("Description", text: $note)
                 }
@@ -1067,7 +1078,8 @@ private struct MacCashFlowTransactionEditor: View {
                 Section("Category") {
                     Picker("Category", selection: $category) {
                         ForEach(categories, id: \.self) { category in
-                            Text(verbatim: category).tag(category)
+                            // Localize built-in category names; custom user ones fall through verbatim (WC-M10).
+                            Text(LocalizedStringKey(category)).tag(category)
                         }
                         Text("Custom...").tag(Self.customCategoryTag)
                     }
@@ -1093,6 +1105,11 @@ private struct MacCashFlowTransactionEditor: View {
                 }
             }
             .formStyle(.grouped)
+            .onAppear {
+                guard !hasInitializedCurrency else { return }
+                if transaction == nil { currency = settings.currency }
+                hasInitializedCurrency = true
+            }
             .navigationTitle(transaction == nil ? "New Transaction" : "Edit Transaction")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -1111,7 +1128,7 @@ private struct MacCashFlowTransactionEditor: View {
     }
 
     private func saveTransaction() {
-        guard parsedAmount > 0 else { return }
+        guard let parsedAmount, parsedAmount > 0 else { return }
 
         let selectedCategory: String
         if isCustomCategorySelected {
@@ -1123,7 +1140,7 @@ private struct MacCashFlowTransactionEditor: View {
             selectedCategory = category
         }
 
-        onSave(transaction, type, parsedAmount, selectedCategory, note, date)
+        onSave(transaction, type, parsedAmount, selectedCategory, note, date, currency)
         dismiss()
     }
 }

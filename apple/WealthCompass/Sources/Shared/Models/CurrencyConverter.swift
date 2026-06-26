@@ -42,6 +42,22 @@ struct CurrencyConverter {
         guard let source else { return value }
         return convert(value, from: source, to: target)
     }
+
+    /// `Decimal` overload (WC-A1). Money is stored as `Decimal`, but the FX rate is an
+    /// approximate `Double`, so we cross to `Double` for the multiply — the second of the
+    /// two sanctioned `Double` boundaries — reusing the guarded `Double` path above and
+    /// returning the value unchanged if the result is non-finite.
+    func convert(_ value: Decimal, from source: Currency, to target: Currency) -> Decimal {
+        guard source != target else { return value }
+        let converted = convert(value.doubleValue, from: source, to: target)
+        return Decimal(finite: converted) ?? value
+    }
+
+    /// Converts from an optional source currency (nil → no conversion).
+    func convert(_ value: Decimal, from source: Currency?, to target: Currency) -> Decimal {
+        guard let source else { return value }
+        return convert(value, from: source, to: target)
+    }
 }
 
 /// Single number→input-field formatter (L4).

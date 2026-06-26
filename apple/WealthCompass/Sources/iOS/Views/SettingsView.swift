@@ -363,7 +363,7 @@ struct SettingsView: View {
             }
 
             ForEach(Currency.allCases.filter { $0 != settings.currency }) { quoteCurrency in
-                let converted = settings.convert(1, from: settings.currency, to: quoteCurrency)
+                let converted: Double = settings.convert(1, from: settings.currency, to: quoteCurrency)
                 HStack {
                     Text("1 \(settings.currency.rawValue)")
                     Spacer()

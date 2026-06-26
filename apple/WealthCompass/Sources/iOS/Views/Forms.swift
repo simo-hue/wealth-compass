@@ -4,7 +4,7 @@ struct TransactionFormView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var settings: AppSettings
     let transaction: Transaction?
-    let onSave: (Transaction?, TransactionType, Double, String, String, Date) -> Void
+    let onSave: (Transaction?, TransactionType, Decimal, String, String, Date, Currency) -> Void
     let onDelete: (() -> Void)?
 
     private static let customCategoryTag = "__wealth_compass_custom_category__"
@@ -14,12 +14,14 @@ struct TransactionFormView: View {
     @State private var category: String
     @State private var note: String
     @State private var date: Date
+    @State private var currency: Currency
+    @State private var hasInitializedCurrency = false
     @State private var customCategory = ""
     @FocusState private var isCustomCategoryFocused: Bool
 
     init(
         transaction: Transaction? = nil,
-        onSave: @escaping (Transaction?, TransactionType, Double, String, String, Date) -> Void,
+        onSave: @escaping (Transaction?, TransactionType, Decimal, String, String, Date, Currency) -> Void,
         onDelete: (() -> Void)? = nil
     ) {
         self.transaction = transaction
@@ -30,6 +32,9 @@ struct TransactionFormView: View {
         _category = State(initialValue: transaction?.category ?? "Food")
         _note = State(initialValue: transaction?.description ?? "")
         _date = State(initialValue: transaction?.date ?? Date())
+        // Placeholder; a new transaction adopts the base currency in onAppear (the
+        // environment isn't available during init). Existing rows keep their own currency.
+        _currency = State(initialValue: transaction?.currency ?? .eur)
     }
 
     private var categories: [String] {
@@ -49,7 +54,8 @@ struct TransactionFormView: View {
     }
 
     private var isSaveDisabled: Bool {
-        parsedAmount <= 0 || currentCategoryName.isEmpty
+        guard let amount = parsedAmount, amount > 0 else { return true }
+        return currentCategoryName.isEmpty
     }
 
     private var customCategoryHint: String {
@@ -65,8 +71,8 @@ struct TransactionFormView: View {
         return settings.localized("This category will be added to your \(typeName) categories.")
     }
 
-    private var parsedAmount: Double {
-        Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+    private var parsedAmount: Decimal? {
+        MoneyParser.decimal(from: amount)
     }
 
     var body: some View {
@@ -90,6 +96,11 @@ struct TransactionFormView: View {
                 Section("Details") {
                     TextField("Amount", text: $amount)
                         .keyboardType(.decimalPad)
+                    Picker("Currency", selection: $currency) {
+                        ForEach(Currency.allCases) { currencyOption in
+                            (Text(currencyOption.displayName) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
+                        }
+                    }
                     DatePicker("Date", selection: $date, displayedComponents: .date)
                     TextField("Description", text: $note)
                 }
@@ -153,11 +164,16 @@ struct TransactionFormView: View {
                 }
             }
         }
+        .onAppear {
+            guard !hasInitializedCurrency else { return }
+            if transaction == nil { currency = settings.currency }
+            hasInitializedCurrency = true
+        }
         .preferredColorScheme(.dark)
     }
 
     private func saveTransaction() {
-        guard parsedAmount > 0 else { return }
+        guard let amount = parsedAmount, amount > 0 else { return }
 
         let selectedCategory: String
         if isCustomCategorySelected {
@@ -169,7 +185,7 @@ struct TransactionFormView: View {
             selectedCategory = category
         }
 
-        onSave(transaction, type, parsedAmount, selectedCategory, note, date)
+        onSave(transaction, type, amount, selectedCategory, note, date, currency)
         dismiss()
     }
 }
@@ -192,6 +208,8 @@ struct RecurringTransactionFormView: View {
     @State private var hasEndDate: Bool
     @State private var endDate: Date
     @State private var notificationsEnabled: Bool
+    @State private var currency: Currency
+    @State private var hasInitializedCurrency = false
     @State private var customCategory = ""
     @FocusState private var isCustomCategoryFocused: Bool
 
@@ -215,6 +233,7 @@ struct RecurringTransactionFormView: View {
         _hasEndDate = State(initialValue: schedule?.endDate != nil)
         _endDate = State(initialValue: schedule?.endDate ?? defaultEndDate)
         _notificationsEnabled = State(initialValue: schedule?.notificationsEnabled ?? true)
+        _currency = State(initialValue: schedule?.currency ?? .eur)
     }
 
     private var categories: [String] {
@@ -233,8 +252,8 @@ struct RecurringTransactionFormView: View {
         category == Self.customCategoryTag
     }
 
-    private var parsedAmount: Double {
-        Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+    private var parsedAmount: Decimal? {
+        MoneyParser.decimal(from: amount)
     }
 
     private var normalizedEndDate: Date? {
@@ -243,8 +262,8 @@ struct RecurringTransactionFormView: View {
     }
 
     private var isSaveDisabled: Bool {
-        parsedAmount <= 0
-            || currentCategoryName.isEmpty
+        guard let amount = parsedAmount, amount > 0 else { return true }
+        return currentCategoryName.isEmpty
             || (existingSchedule == nil && startDate <= Date())
             || (normalizedEndDate.map { $0 < startDate } ?? false)
     }
@@ -268,8 +287,13 @@ struct RecurringTransactionFormView: View {
                 }
 
                 Section("Transaction") {
-                    TextField("Amount (\(settings.currency.rawValue))", text: $amount)
+                    TextField("Amount (\(currency.rawValue))", text: $amount)
                         .keyboardType(.decimalPad)
+                    Picker("Currency", selection: $currency) {
+                        ForEach(Currency.allCases) { currencyOption in
+                            (Text(currencyOption.displayName) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
+                        }
+                    }
                     TextField("Description", text: $note)
                 }
 
@@ -346,11 +370,16 @@ struct RecurringTransactionFormView: View {
                 }
             }
         }
+        .onAppear {
+            guard !hasInitializedCurrency else { return }
+            if existingSchedule == nil { currency = settings.currency }
+            hasInitializedCurrency = true
+        }
         .preferredColorScheme(.dark)
     }
 
     private func saveSchedule() {
-        guard parsedAmount > 0 else { return }
+        guard let amount = parsedAmount, amount > 0 else { return }
 
         let selectedCategory: String
         if isCustomCategorySelected {
@@ -366,12 +395,13 @@ struct RecurringTransactionFormView: View {
             existing: existingSchedule,
             type: type,
             category: selectedCategory,
-            amount: parsedAmount,
+            amount: amount,
             description: note,
             startDate: startDate,
             frequency: frequency,
             endDate: normalizedEndDate,
-            notificationsEnabled: notificationsEnabled
+            notificationsEnabled: notificationsEnabled,
+            currency: currency
         )
 
         onSave(savedSchedule)
@@ -418,11 +448,11 @@ struct InvestmentFormView: View {
         _feeValue = State(initialValue: investment.map { Self.formatInput($0.fees) } ?? "0")
     }
 
-    private var parsedQuantity: Double { parse(quantity) }
-    private var parsedAverage: Double { parse(avgBuyPrice) }
-    private var parsedCurrentPrice: Double { parse(currentPrice) }
-    private var parsedFeeValue: Double { parse(feeValue) }
-    private var calculatedFee: Double {
+    private var parsedQuantity: Decimal { parse(quantity) }
+    private var parsedAverage: Decimal { parse(avgBuyPrice) }
+    private var parsedCurrentPrice: Decimal { parse(currentPrice) }
+    private var parsedFeeValue: Decimal { parse(feeValue) }
+    private var calculatedFee: Decimal {
         feeMode == .fixed ? parsedFeeValue : (parsedQuantity * parsedAverage) * (parsedFeeValue / 100)
     }
 
@@ -540,11 +570,13 @@ struct InvestmentFormView: View {
         onSave(item)
     }
 
-    private func parse(_ value: String) -> Double {
-        Double(value.replacingOccurrences(of: ",", with: ".")) ?? 0
+    private func parse(_ value: String) -> Decimal {
+        // Finite, locale-aware parse (WC-H1/M9); rejects inf/nan/grouped-garbage to 0,
+        // which the `> 0` save guards then block.
+        MoneyParser.decimal(from: value) ?? 0
     }
 
-    private static func formatInput(_ value: Double) -> String {
+    private static func formatInput(_ value: Decimal) -> String {
         AmountInputFormatter.string(value)
     }
 }
@@ -582,11 +614,11 @@ struct CryptoFormView: View {
         _currency = State(initialValue: holding?.currency ?? .eur)
     }
 
-    private var parsedQuantity: Double { parse(quantity) }
-    private var parsedAverage: Double { parse(avgBuyPrice) }
-    private var parsedCurrentPrice: Double { parse(currentPrice) }
-    private var parsedFeeValue: Double { parse(feeValue) }
-    private var calculatedFee: Double {
+    private var parsedQuantity: Decimal { parse(quantity) }
+    private var parsedAverage: Decimal { parse(avgBuyPrice) }
+    private var parsedCurrentPrice: Decimal { parse(currentPrice) }
+    private var parsedFeeValue: Decimal { parse(feeValue) }
+    private var calculatedFee: Decimal {
         feeMode == .fixed ? parsedFeeValue : (parsedQuantity * parsedAverage) * (parsedFeeValue / 100)
     }
 
@@ -682,11 +714,13 @@ struct CryptoFormView: View {
         onSave(item)
     }
 
-    private func parse(_ value: String) -> Double {
-        Double(value.replacingOccurrences(of: ",", with: ".")) ?? 0
+    private func parse(_ value: String) -> Decimal {
+        // Finite, locale-aware parse (WC-H1/M9); rejects inf/nan/grouped-garbage to 0,
+        // which the `> 0` save guards then block.
+        MoneyParser.decimal(from: value) ?? 0
     }
 
-    private static func formatInput(_ value: Double) -> String {
+    private static func formatInput(_ value: Decimal) -> String {
         AmountInputFormatter.string(value)
     }
 }

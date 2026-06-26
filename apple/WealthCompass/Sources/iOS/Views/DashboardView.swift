@@ -19,7 +19,7 @@ struct DashboardView: View {
     }
 
     private var currentMonthCashFlow: MonthlyCashFlow {
-        finance.monthlyCashFlow(for: Date())
+        finance.monthlyCashFlow(for: Date(), settings: settings)
     }
 
     private var isCompletelyEmpty: Bool {
@@ -54,13 +54,14 @@ struct DashboardView: View {
         }
         .pageChrome()
         .sheet(isPresented: $showingAddTransaction) {
-            TransactionFormView { _, type, amount, category, description, date in
+            TransactionFormView { _, type, amount, category, description, date, currency in
                 finance.addTransaction(
                     type: type,
                     amount: amount,
                     category: category,
                     description: description,
                     date: date,
+                    currency: currency,
                     settings: settings
                 )
             }
@@ -321,7 +322,7 @@ struct DashboardView: View {
     }
 
     private var cashFlowTrend: some View {
-        let trend = finance.cashFlowTrend(months: 6)
+        let trend = finance.cashFlowTrend(months: 6, settings: settings)
         let hasCashFlow = trend.contains { $0.income != 0 || $0.expense != 0 }
         let totalIncome = trend.reduce(0) { $0 + $1.income }
         let totalExpense = trend.reduce(0) { $0 + $1.expense }
@@ -410,7 +411,7 @@ struct DashboardView: View {
     }
 
     private var topExpenses: some View {
-        let expenses = Array(finance.expensesByCategory(period: .thirtyDays).prefix(5))
+        let expenses = Array(finance.expensesByCategory(period: .thirtyDays, settings: settings).prefix(5))
 
         return FinanceCard {
             VStack(alignment: .leading, spacing: 18) {

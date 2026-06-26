@@ -18,6 +18,8 @@ struct MacRecurringTransactionEditor: View {
     @State private var hasEndDate: Bool
     @State private var endDate: Date
     @State private var notificationsEnabled: Bool
+    @State private var currency: Currency
+    @State private var hasInitializedCurrency = false
     @State private var customCategory = ""
     @FocusState private var isCustomCategoryFocused: Bool
 
@@ -41,6 +43,7 @@ struct MacRecurringTransactionEditor: View {
         _hasEndDate = State(initialValue: schedule?.endDate != nil)
         _endDate = State(initialValue: schedule?.endDate ?? defaultEndDate)
         _notificationsEnabled = State(initialValue: schedule?.notificationsEnabled ?? true)
+        _currency = State(initialValue: schedule?.currency ?? .eur)
     }
 
     private var categories: [String] {
@@ -59,8 +62,8 @@ struct MacRecurringTransactionEditor: View {
         isCustomCategorySelected ? trimmedCustomCategory : category
     }
 
-    private var parsedAmount: Double {
-        Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+    private var parsedAmount: Decimal? {
+        MoneyParser.decimal(from: amount)
     }
 
     private var normalizedEndDate: Date? {
@@ -69,14 +72,14 @@ struct MacRecurringTransactionEditor: View {
     }
 
     private var isSaveDisabled: Bool {
-        parsedAmount <= 0
-            || currentCategoryName.isEmpty
+        guard let parsedAmount, parsedAmount > 0 else { return true }
+        return currentCategoryName.isEmpty
             || (existingSchedule == nil && startDate <= Date())
             || (normalizedEndDate.map { $0 < startDate } ?? false)
     }
 
     private var validationMessage: String? {
-        if !amount.isEmpty, parsedAmount <= 0 {
+        if !amount.isEmpty, (parsedAmount ?? 0) <= 0 {
             return settings.localized("Enter an amount greater than zero.")
         }
         if isCustomCategorySelected, trimmedCustomCategory.isEmpty {
@@ -110,14 +113,20 @@ struct MacRecurringTransactionEditor: View {
                         isCustomCategoryFocused = false
                     }
 
-                    TextField("Amount (\(settings.currency.rawValue))", text: $amount)
+                    TextField("Amount (\(currency.rawValue))", text: $amount)
+                    Picker("Currency", selection: $currency) {
+                        ForEach(Currency.allCases) { currencyOption in
+                            (Text(currencyOption.displayName) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
+                        }
+                    }
                     TextField("Description", text: $note)
                 }
 
                 Section("Category") {
                     Picker("Category", selection: $category) {
                         ForEach(categories, id: \.self) { category in
-                            Text(category).tag(category)
+                            // Localize built-in category names; custom user ones fall through verbatim (WC-M10).
+                            Text(LocalizedStringKey(category)).tag(category)
                         }
                         Text("Custom...").tag(Self.customCategoryTag)
                     }
@@ -181,6 +190,11 @@ struct MacRecurringTransactionEditor: View {
                 }
             }
             .formStyle(.grouped)
+            .onAppear {
+                guard !hasInitializedCurrency else { return }
+                if existingSchedule == nil { currency = settings.currency }
+                hasInitializedCurrency = true
+            }
             .navigationTitle(existingSchedule == nil ? "New Recurring Transaction" : "Edit Recurring Transaction")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -199,7 +213,7 @@ struct MacRecurringTransactionEditor: View {
     }
 
     private func saveSchedule() {
-        guard parsedAmount > 0 else { return }
+        guard let parsedAmount, parsedAmount > 0 else { return }
 
         let selectedCategory: String
         if isCustomCategorySelected {
@@ -220,7 +234,8 @@ struct MacRecurringTransactionEditor: View {
             startDate: startDate,
             frequency: frequency,
             endDate: normalizedEndDate,
-            notificationsEnabled: notificationsEnabled
+            notificationsEnabled: notificationsEnabled,
+            currency: currency
         )
 
         onSave(savedSchedule)

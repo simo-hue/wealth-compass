@@ -27,6 +27,8 @@ private struct MacTransactionEditor: View {
     @State private var category = "Food"
     @State private var note = ""
     @State private var date = Date()
+    @State private var currency: Currency = .eur
+    @State private var hasInitializedCurrency = false
     @State private var customCategory = ""
     @FocusState private var isCustomCategoryFocused: Bool
 
@@ -46,12 +48,13 @@ private struct MacTransactionEditor: View {
         category == Self.customCategoryTag
     }
 
-    private var parsedAmount: Double {
-        Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+    private var parsedAmount: Decimal? {
+        MoneyParser.decimal(from: amount)
     }
 
     private var isSaveDisabled: Bool {
-        parsedAmount <= 0 || selectedCategoryName.isEmpty
+        guard let parsedAmount, parsedAmount > 0 else { return true }
+        return selectedCategoryName.isEmpty
     }
 
     var body: some View {
@@ -74,6 +77,11 @@ private struct MacTransactionEditor: View {
                     }
 
                     TextField("Amount", text: $amount)
+                    Picker("Currency", selection: $currency) {
+                        ForEach(Currency.allCases) { currencyOption in
+                            (Text(currencyOption.displayName) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
+                        }
+                    }
                     Picker("Category", selection: $category) {
                         ForEach(categories, id: \.self) {
                             Text(LocalizedStringKey($0)).tag($0)
@@ -104,6 +112,11 @@ private struct MacTransactionEditor: View {
                 }
             }
             .formStyle(.grouped)
+            .onAppear {
+                guard !hasInitializedCurrency else { return }
+                currency = settings.currency
+                hasInitializedCurrency = true
+            }
             .navigationTitle("New Transaction")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -120,6 +133,8 @@ private struct MacTransactionEditor: View {
     }
 
     private func save() {
+        guard let parsedAmount, parsedAmount > 0 else { return }
+
         let categoryToSave: String
         if isCustomCategorySelected {
             guard let savedCategory = settings.addCustomTransactionCategory(trimmedCustomCategory, for: type) else {
@@ -136,6 +151,7 @@ private struct MacTransactionEditor: View {
             category: categoryToSave,
             description: note,
             date: date,
+            currency: currency,
             settings: settings
         )
         dismiss()
@@ -201,11 +217,11 @@ private struct MacInvestmentEditor: View {
         _feeValue = State(initialValue: investment.map { Self.input($0.fees) } ?? "0")
     }
 
-    private var parsedQuantity: Double { parse(quantity) }
-    private var parsedAveragePrice: Double { parse(averagePrice) }
-    private var parsedCurrentPrice: Double { parse(currentPrice) }
-    private var parsedFeeValue: Double { parse(feeValue) }
-    private var calculatedFee: Double {
+    private var parsedQuantity: Decimal { parse(quantity) }
+    private var parsedAveragePrice: Decimal { parse(averagePrice) }
+    private var parsedCurrentPrice: Decimal { parse(currentPrice) }
+    private var parsedFeeValue: Decimal { parse(feeValue) }
+    private var calculatedFee: Decimal {
         feeMode == .fixed
             ? parsedFeeValue
             : (parsedQuantity * parsedAveragePrice) * (parsedFeeValue / 100)
@@ -325,11 +341,12 @@ private struct MacInvestmentEditor: View {
         dismiss()
     }
 
-    private func parse(_ value: String) -> Double {
-        Double(value.replacingOccurrences(of: ",", with: ".")) ?? 0
+    private func parse(_ value: String) -> Decimal {
+        // Finite, locale-aware parse (WC-H1/M9); inf/nan/garbage → 0, blocked by `> 0` guards.
+        MoneyParser.decimal(from: value) ?? 0
     }
 
-    private static func input(_ value: Double) -> String {
+    private static func input(_ value: Decimal) -> String {
         AmountInputFormatter.string(value)
     }
 }
@@ -366,11 +383,11 @@ private struct MacCryptoEditor: View {
         _currency = State(initialValue: holding?.currency ?? .eur)
     }
 
-    private var parsedQuantity: Double { parse(quantity) }
-    private var parsedAveragePrice: Double { parse(averagePrice) }
-    private var parsedCurrentPrice: Double { parse(currentPrice) }
-    private var parsedFeeValue: Double { parse(feeValue) }
-    private var calculatedFee: Double {
+    private var parsedQuantity: Decimal { parse(quantity) }
+    private var parsedAveragePrice: Decimal { parse(averagePrice) }
+    private var parsedCurrentPrice: Decimal { parse(currentPrice) }
+    private var parsedFeeValue: Decimal { parse(feeValue) }
+    private var calculatedFee: Decimal {
         feeMode == .fixed
             ? parsedFeeValue
             : (parsedQuantity * parsedAveragePrice) * (parsedFeeValue / 100)
@@ -467,11 +484,12 @@ private struct MacCryptoEditor: View {
         dismiss()
     }
 
-    private func parse(_ value: String) -> Double {
-        Double(value.replacingOccurrences(of: ",", with: ".")) ?? 0
+    private func parse(_ value: String) -> Decimal {
+        // Finite, locale-aware parse (WC-H1/M9); inf/nan/garbage → 0, blocked by `> 0` guards.
+        MoneyParser.decimal(from: value) ?? 0
     }
 
-    private static func input(_ value: Double) -> String {
+    private static func input(_ value: Decimal) -> String {
         AmountInputFormatter.string(value)
     }
 }

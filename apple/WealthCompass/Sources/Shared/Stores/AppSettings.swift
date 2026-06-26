@@ -93,12 +93,31 @@ final class AppSettings: ObservableObject {
         AppLocalization.applyLanguagePreference(appLanguage)
     }
 
+    /// Languages offered in the picker, sorted by their *displayed* name in the effective
+    /// in-app locale (WC-L23) rather than by raw ISO code.
     var availableLanguages: [String] {
-        Bundle.main.localizations.filter { $0 != "Base" }.sorted()
+        let locale = effectiveLocale
+        return Bundle.main.localizations
+            .filter { $0 != "Base" }
+            .sorted {
+                languageName(for: $0, locale: locale)
+                    .localizedCaseInsensitiveCompare(languageName(for: $1, locale: locale)) == .orderedAscending
+            }
     }
 
+    /// Names a language code in the user's chosen in-app language (WC-L23) — not the system
+    /// locale — and preserves each language's own casing convention (no forced capitalization).
     func languageName(for code: String) -> String {
-        Locale.current.localizedString(forIdentifier: code)?.capitalized ?? code
+        languageName(for: code, locale: effectiveLocale)
+    }
+
+    private func languageName(for code: String, locale: Locale) -> String {
+        locale.localizedString(forIdentifier: code) ?? code
+    }
+
+    /// The locale the in-app language override resolves to, falling back to the system locale.
+    private var effectiveLocale: Locale {
+        appLanguage.map(Locale.init(identifier:)) ?? .current
     }
 
     func localized(_ key: String.LocalizationValue) -> String {
@@ -142,8 +161,9 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    /// Restores every preference to its first-launch default for a factory reset: clears all
-    /// `wc_mobile_*` keys, resets the in-memory published state, and removes the cached
+    /// Restores every preference to its first-launch default for a factory reset: clears the
+    /// `wc_mobile_*` preference keys (including the biometric App-Lock flag owned by
+    /// `AppLockStore`, WC-L22), resets the in-memory published state, and removes the cached
     /// exchange-rate snapshot. Flipping `hasSeenOnboarding` to false makes the root view
     /// navigate back to onboarding. Market-data API keys live in the Keychain (cleared
     /// separately by the reset), never here.
@@ -154,7 +174,10 @@ final class AppSettings: ObservableObject {
         let keys = [
             Keys.currency, Keys.privacyMode, Keys.customIncomeCategories,
             Keys.customExpenseCategories, Keys.iCloudSyncEnabled, Keys.hasSeenOnboarding,
-            Keys.appLanguage, Keys.lastExchangeRateRefreshAttempt, Keys.consecutiveExchangeRateFailures
+            Keys.appLanguage, Keys.lastExchangeRateRefreshAttempt, Keys.consecutiveExchangeRateFailures,
+            // Owned by AppLockStore, but cleared here so a factory reset truly removes the
+            // biometric App-Lock preference instead of leaving it enabled (WC-L22).
+            "wc_mobile_biometric_lock_enabled"
         ]
         keys.forEach { userDefaults.removeObject(forKey: $0) }
 
@@ -286,6 +309,36 @@ final class AppSettings: ObservableObject {
     }
 
     func privateNumber(_ value: Double, fractionDigits: Int = 2) -> String {
+        guard !isPrivacyMode else { return redactionToken }
+        return value.formatted(.number.precision(.fractionLength(0...fractionDigits)))
+    }
+
+    // MARK: - Decimal (money) overloads (WC-A1)
+    // Money and quantities are stored as `Decimal`; these mirror the `Double` helpers so the
+    // views format and convert money without crossing back to `Double` except inside the
+    // converter's FX multiply.
+
+    func convert(_ value: Decimal, from sourceCurrency: Currency?) -> Decimal {
+        currencyConverter.convert(value, from: sourceCurrency, to: currency)
+    }
+
+    func convert(_ value: Decimal, from sourceCurrency: Currency, to targetCurrency: Currency) -> Decimal {
+        currencyConverter.convert(value, from: sourceCurrency, to: targetCurrency)
+    }
+
+    func formatCurrency(_ value: Decimal, sourceCurrency: Currency? = nil) -> String {
+        convert(value, from: sourceCurrency).formatted(.currency(code: currency.rawValue))
+    }
+
+    func formatSourceCurrency(_ value: Decimal, currency sourceCurrency: Currency) -> String {
+        value.formatted(.currency(code: sourceCurrency.rawValue))
+    }
+
+    func privateCurrency(_ value: Decimal, sourceCurrency: Currency? = nil) -> String {
+        isPrivacyMode ? redactionToken : formatCurrency(value, sourceCurrency: sourceCurrency)
+    }
+
+    func privateNumber(_ value: Decimal, fractionDigits: Int = 2) -> String {
         guard !isPrivacyMode else { return redactionToken }
         return value.formatted(.number.precision(.fractionLength(0...fractionDigits)))
     }

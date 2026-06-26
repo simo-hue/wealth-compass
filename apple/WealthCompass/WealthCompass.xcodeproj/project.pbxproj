@@ -14,6 +14,8 @@
 		AD0000000000000000000001 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000001 /* FinanceModels.swift */; };
 		AD00000000000000000000A1 /* CurrencyConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A1 /* CurrencyConverter.swift */; };
 		AD00000000000000000000B1 /* CurrencyConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A1 /* CurrencyConverter.swift */; };
+		AD0000000000000000000FD1 /* MoneyDecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000FD0 /* MoneyDecimal.swift */; };
+		AD0000000000000000000FD2 /* MoneyDecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000FD0 /* MoneyDecimal.swift */; };
 		AD00000000000000000000A2 /* SnapshotEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A2 /* SnapshotEngine.swift */; };
 		AD00000000000000000000B2 /* SnapshotEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A2 /* SnapshotEngine.swift */; };
 		AD00000000000000000000A3 /* AnalyticsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A3 /* AnalyticsEngine.swift */; };
@@ -115,6 +117,7 @@
 		93DFB98D4B9C2FF8406A9F2A /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = Sources/iOS/Views/OnboardingView.swift; sourceTree = "<group>"; };
 		AC0000000000000000000001 /* FinanceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/FinanceModels.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A1 /* CurrencyConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/CurrencyConverter.swift; sourceTree = "<group>"; };
+		AC0000000000000000000FD0 /* MoneyDecimal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/MoneyDecimal.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A2 /* SnapshotEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SnapshotEngine.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A3 /* AnalyticsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AnalyticsEngine.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A4 /* PieSliceHitTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/PieSliceHitTester.swift; sourceTree = "<group>"; };
@@ -299,6 +302,7 @@
 			children = (
 				AC0000000000000000000001 /* FinanceModels.swift */,
 				AC00000000000000000000A1 /* CurrencyConverter.swift */,
+				AC0000000000000000000FD0 /* MoneyDecimal.swift */,
 				AC00000000000000000000A2 /* SnapshotEngine.swift */,
 				AC00000000000000000000A3 /* AnalyticsEngine.swift */,
 				AC00000000000000000000A4 /* PieSliceHitTester.swift */,
@@ -609,6 +613,7 @@
 			files = (
 				AD0000000000000000000001 /* FinanceModels.swift in Sources */,
 				AD00000000000000000000A1 /* CurrencyConverter.swift in Sources */,
+				AD0000000000000000000FD1 /* MoneyDecimal.swift in Sources */,
 				AD00000000000000000000A2 /* SnapshotEngine.swift in Sources */,
 				AD00000000000000000000A3 /* AnalyticsEngine.swift in Sources */,
 				AD00000000000000000000A4 /* PieSliceHitTester.swift in Sources */,
@@ -654,6 +659,7 @@
 			files = (
 				AD0000000000000000000011 /* FinanceModels.swift in Sources */,
 				AD00000000000000000000B1 /* CurrencyConverter.swift in Sources */,
+				AD0000000000000000000FD2 /* MoneyDecimal.swift in Sources */,
 				AD00000000000000000000B2 /* SnapshotEngine.swift in Sources */,
 				AD00000000000000000000B3 /* AnalyticsEngine.swift in Sources */,
 				AD00000000000000000000B4 /* PieSliceHitTester.swift in Sources */,

@@ -43,11 +43,11 @@ struct CryptoView: View {
 
     private var summary: some View {
         let total = finance.calculateTotals(settings: settings).totalCrypto
-        let costBasis = finance.data.crypto.reduce(0) {
+        let costBasis = finance.data.crypto.reduce(Decimal(0)) {
             $0 + settings.convert($1.costBasis, from: $1.currency)
         }
         let gain = total - costBasis
-        let percent = costBasis > 0 ? (gain / costBasis) * 100 : 0
+        let percent = costBasis > 0 ? (gain.doubleValue / costBasis.doubleValue) * 100 : 0
 
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             MetricCard(title: LocalizedStringKey("Crypto Value"), value: settings.privateCurrency(total), systemImage: "bitcoinsign.circle.fill", accent: WCColor.warning, detail: LocalizedStringKey("Current market value"))
@@ -134,7 +134,7 @@ struct CryptoView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                     ValueDelta(
-                        value: holding.gainLoss,
+                        value: holding.gainLoss.doubleValue,
                         formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
                         percent: holding.gainLossPercent
                     )

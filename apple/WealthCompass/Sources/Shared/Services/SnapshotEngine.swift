@@ -29,9 +29,13 @@ struct SnapshotEngine {
                 let components = calendar.dateComponents([.day], from: lastSnapshotDate, to: today)
                 if let daysMissing = components.day, daysMissing > 0 {
                     let backfillDays = min(daysMissing, Self.maxBackfillDays)
+                    // Carry-forward the most recent `backfillDays` days *before today* (WC-L9).
+                    // On a gap longer than the cap, the recent run is what the chart needs
+                    // filled — the previous code filled the oldest days right after the last
+                    // snapshot and left the recent gap empty.
                     for dayOffset in 1...backfillDays {
-                        if let backfillDate = calendar.date(byAdding: .day, value: dayOffset, to: lastSnapshotDate),
-                           backfillDate < today {
+                        if let backfillDate = calendar.date(byAdding: .day, value: -dayOffset, to: today),
+                           backfillDate > lastSnapshotDate {
                             // End-of-day timestamp represents the closing balance.
                             var components = calendar.dateComponents([.year, .month, .day], from: backfillDate)
                             components.hour = 23
@@ -78,7 +82,7 @@ struct SnapshotEngine {
     func adjustingHistoricalSnapshots(
         _ snapshots: [NetWorthSnapshot],
         from date: Date,
-        liquidityDelta: Double
+        liquidityDelta: Decimal
     ) -> [NetWorthSnapshot] {
         let startOfDay = calendar.startOfDay(for: date)
         var snapshots = snapshots

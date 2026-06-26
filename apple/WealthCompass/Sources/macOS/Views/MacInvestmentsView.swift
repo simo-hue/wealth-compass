@@ -98,11 +98,11 @@ struct MacInvestmentsView: View {
 
     private var summaryCards: some View {
         let total = finance.calculateTotals(settings: settings).totalInvestments
-        let costBasis = finance.data.investments.reduce(0) {
+        let costBasis = finance.data.investments.reduce(Decimal(0)) {
             $0 + settings.convert($1.costBasis, from: $1.currency)
         }
         let gain = total - costBasis
-        let percent = costBasis > 0 ? (gain / costBasis) * 100 : 0
+        let percent = costBasis > 0 ? (gain.doubleValue / costBasis.doubleValue) * 100 : 0
 
         return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
             MetricCard(
@@ -221,7 +221,7 @@ struct MacInvestmentsView: View {
                             .font(.headline.monospacedDigit())
                             .foregroundStyle(.white)
                         ValueDelta(
-                            value: investment.gainLoss,
+                            value: investment.gainLoss.doubleValue,
                             formattedValue: settings.privateCurrency(investment.gainLoss, sourceCurrency: investment.currency),
                             percent: investment.gainLossPercent
                         )

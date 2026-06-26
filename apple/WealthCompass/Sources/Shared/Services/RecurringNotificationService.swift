@@ -63,13 +63,15 @@ actor RecurringNotificationService {
             .sorted { $0.nextDueDate < $1.nextDueDate }
             .prefix(60)
 
+        // Read the in-app language once, not once per schedule (WC-L31).
+        let appLanguage = UserDefaults.standard.string(forKey: "wc_mobile_app_language")
         for schedule in upcoming {
             let content = UNMutableNotificationContent()
-            let appLanguage = UserDefaults.standard.string(forKey: "wc_mobile_app_language")
             content.title = AppLocalization.string("Recurring \(schedule.type.localizedTitle(appLanguage: appLanguage)) due", appLanguage: appLanguage)
             if showAmounts {
+                // `schedule.amount` is Decimal (WC-A1); use the Decimal currency format style.
                 let amount = schedule.amount.formatted(
-                    FloatingPointFormatStyle<Double>.Currency(code: currencyCode)
+                    .currency(code: currencyCode)
                 )
                 content.body = AppLocalization.string("\(schedule.category): \(amount). Wealth Compass records it automatically when the app is active.", appLanguage: appLanguage)
             } else {

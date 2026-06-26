@@ -294,7 +294,7 @@ struct MacSettingsView: View {
             Divider().background(WCColor.border)
 
             ForEach(Currency.allCases.filter { $0 != settings.currency }) { quoteCurrency in
-                let converted = settings.convert(1, from: settings.currency, to: quoteCurrency)
+                let converted: Double = settings.convert(1, from: settings.currency, to: quoteCurrency)
                 SettingsRow(title: "1 \(settings.currency.rawValue)") {
                     Text("\(converted.formatted(.number.precision(.fractionLength(2...4)))) \(quoteCurrency.rawValue)")
                         .monospacedDigit()

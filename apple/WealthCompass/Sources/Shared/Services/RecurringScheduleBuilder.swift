@@ -13,12 +13,13 @@ enum RecurringScheduleBuilder {
         existing: RecurringTransaction?,
         type: TransactionType,
         category: String,
-        amount: Double,
+        amount: Decimal,
         description: String,
         startDate: Date,
         frequency: RecurringTransactionFrequency,
         endDate: Date?,
         notificationsEnabled: Bool,
+        currency: Currency,
         now: Date = Date()
     ) -> RecurringTransaction {
         let scheduleChanged = existing.map {
@@ -35,6 +36,7 @@ enum RecurringScheduleBuilder {
             frequency: frequency,
             nextDueDate: startDate,
             endDate: endDate,
+            currency: currency,
             notificationsEnabled: notificationsEnabled,
             isActive: existing?.isActive ?? true,
             completedAt: existing?.completedAt,

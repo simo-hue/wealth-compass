@@ -21,7 +21,7 @@ struct MacDashboardView: View {
     }
 
     private var currentMonthCashFlow: MonthlyCashFlow {
-        finance.monthlyCashFlow(for: Date())
+        finance.monthlyCashFlow(for: Date(), settings: settings)
     }
 
     private var isCompletelyEmpty: Bool {
@@ -480,7 +480,7 @@ struct MacDashboardView: View {
     }
 
     private var cashFlowCard: some View {
-        let trend = finance.cashFlowTrend(months: cashFlowRange.rawValue)
+        let trend = finance.cashFlowTrend(months: cashFlowRange.rawValue, settings: settings)
         let hasCashFlow = trend.contains { $0.income != 0 || $0.expense != 0 }
         let totalIncome = trend.reduce(0) { $0 + $1.income }
         let totalExpense = trend.reduce(0) { $0 + $1.expense }
@@ -616,7 +616,7 @@ struct MacDashboardView: View {
     }
 
     private var topExpensesCard: some View {
-        let expenses = Array(finance.expensesByCategory(period: expensePeriod).prefix(5))
+        let expenses = Array(finance.expensesByCategory(period: expensePeriod, settings: settings).prefix(5))
 
         return DashboardGlassCard {
             VStack(alignment: .leading, spacing: 18) {
