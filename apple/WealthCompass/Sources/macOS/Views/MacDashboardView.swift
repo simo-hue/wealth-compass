@@ -20,9 +20,6 @@ struct MacDashboardView: View {
         finance.calculateTotals(settings: settings)
     }
 
-    private var currentMonthCashFlow: MonthlyCashFlow {
-        finance.monthlyCashFlow(for: Date(), settings: settings)
-    }
 
     private var isCompletelyEmpty: Bool {
         finance.data.transactions.isEmpty
@@ -434,7 +431,7 @@ struct MacDashboardView: View {
                                                 switch phase {
                                                 case .active(let location):
                                                     withAnimation(.easeInOut(duration: 0.15)) {
-                                                        hoveredAssetSlice = slice(at: location, in: frame, total: allocationTotal, slices: slices)
+                                                        hoveredAssetSlice = slice(at: location, in: frame, slices: slices)
                                                     }
                                                 case .ended:
                                                     withAnimation(.easeInOut(duration: 0.15)) {
@@ -825,7 +822,7 @@ struct MacDashboardView: View {
         return .white.opacity(0.35)
     }
 
-    private func slice(at location: CGPoint, in rect: CGRect, total: Double, slices: [AllocationSlice]) -> AllocationSlice? {
+    private func slice(at location: CGPoint, in rect: CGRect, slices: [AllocationSlice]) -> AllocationSlice? {
         return PieSliceHitTester.sliceIndex(at: location, in: rect, values: slices.map(\.value), innerRadiusRatio: 0.72)
             .map { slices[$0] }
     }

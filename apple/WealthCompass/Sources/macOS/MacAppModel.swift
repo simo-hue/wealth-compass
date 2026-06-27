@@ -20,16 +20,6 @@ enum MacDestination: String, CaseIterable, Identifiable {
         }
     }
 
-    func localizedTitle(appLanguage: String?) -> String {
-        switch self {
-        case .dashboard: AppLocalization.string("Dashboard", appLanguage: appLanguage)
-        case .cashFlow: AppLocalization.string("Cash Flow", appLanguage: appLanguage)
-        case .investments: AppLocalization.string("Investments", appLanguage: appLanguage)
-        case .crypto: AppLocalization.string("Crypto", appLanguage: appLanguage)
-        case .settings: AppLocalization.string("Settings", appLanguage: appLanguage)
-        }
-    }
-
     var systemImage: String {
         switch self {
         case .dashboard: "gauge.with.dots.needle.67percent"
