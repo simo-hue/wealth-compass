@@ -153,5 +153,12 @@ struct CryptoView: View {
             editingHolding = holding
             showingForm = true
         }
+        // WC-L24: surface tap-to-edit as an activatable button for VoiceOver / Switch Control.
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction {
+            editingHolding = holding
+            showingForm = true
+        }
     }
 }

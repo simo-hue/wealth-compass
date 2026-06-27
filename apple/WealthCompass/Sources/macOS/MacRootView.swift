@@ -189,9 +189,10 @@ struct MacRootView: View {
 
     private func processRecurringTransactions() async {
         let insertedCount = finance.processDueRecurringTransactions(settings: settings)
-        await syncRecurringNotifications()
-
+        // WC-L1: only re-sync notifications when occurrences were generated (schedule edits are
+        // handled by the .onChange observers), so the 30s timer doesn't churn notifications.
         guard insertedCount > 0 else { return }
+        await syncRecurringNotifications()
         // WC-L18: use two explicit keys instead of concatenating grammar fragments, so
         // translators get full sentences (mirrors the singular/plural pattern in MacSettingsView).
         let message = insertedCount == 1

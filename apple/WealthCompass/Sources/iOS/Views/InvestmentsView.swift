@@ -160,5 +160,12 @@ struct InvestmentsView: View {
             editingInvestment = investment
             showingForm = true
         }
+        // WC-L24: surface tap-to-edit as an activatable button for VoiceOver / Switch Control.
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction {
+            editingInvestment = investment
+            showingForm = true
+        }
     }
 }
