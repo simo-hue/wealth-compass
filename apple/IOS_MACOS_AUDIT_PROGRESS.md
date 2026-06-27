@@ -58,14 +58,25 @@ Localization, Services, Persistence-perf, Shared-UI, Docs, Tests — complete.
 Intentionally skipped within these (not low-risk / against project guidance, noted in commits):
 WC-L8 (don't tighten forgiving import decoders), WC-L28 (restructuring data-migration path).
 
-## REMAINING (Med/High risk — deferred per request; do after a build)
-- **Sync hardening (High)**: WC-H3 (undecodable record tears down engine), WC-H4 (makeRecord
-  re-encodes per record), WC-M2 (transient error fatal), WC-M3 (lock across IO), WC-L29.
-- **Security/lock (Med)**: WC-L2 (passcode fallback), L3 (auth to disable), L26 (blur on inactive), M6.
-- **macOS dedup/UX (Med)**: WC-M5 (lang reset onboarding), M8 (merge dup tx editors),
-  M12 (drop stray Refresh on settings), L16 (dead table state), L17 (minus glyph), A2 (dedup helpers).
-- **iOS perf/a11y (Med)**: WC-M13 (re-sort per render), L1 (notif churn 30s), L24 (a11y row buttons),
-  L25 (UITabBar.appearance in init), L15 (dead pie `total:` param).
+## ✅ MEDIUM BATCHES DONE (commits b509521 → bae2c86)
+- **Security/lock**: WC-L2, L3, L26, M6 — `b509521`.
+- **macOS UX cleanup**: WC-M12, L16, L17 — `947abca`.
+- **Onboarding language reset**: WC-M5 (iOS + macOS) — `2ffe632`.
+- **iOS perf/a11y**: WC-M13, L1, L24, L25, L15 — `bae2c86`.
+
+### Deferred (pure refactors — NO functional bug; do after a build)
+- **WC-M8** (merge the two macOS transaction editors): the actual bug (the global editor
+  skipped validation) was already fixed in the Decimal batch — both editors now have the
+  `>0` guard + currency picker. Only the structural merge (restructuring MacEditor/sheet
+  routing) remains; risky without a compiler, zero functional gain.
+- **WC-A2** (dedup `syncRecurringNotifications` ×3 + the cash-flow chart card): the clean
+  shared helper hits actor-isolation subtleties (`RecurringNotificationService` is an actor)
+  that want a compiler to verify; pure dedup, no behavior change.
+
+## REMAINING (High — sync hardening, deferred per request; do after a build + with a sync test)
+- WC-H3 (undecodable record tears down engine), WC-H4 (makeRecord re-encodes per record),
+  WC-M2 (transient error fatal), WC-M3 (lock across IO), WC-L29. All in CloudKitSyncService —
+  delicate, and really want a runtime iCloud-sync test.
 
 ## ⚠️ RECOMMENDED CHECKPOINT
 Before layering the remaining ~30 items on top, run a build (TO_SIMO_DO.md #22) to surface any
