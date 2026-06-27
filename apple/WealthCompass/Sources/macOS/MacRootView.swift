@@ -72,6 +72,10 @@ struct MacRootView: View {
                 appLock.lock()
             }
         }
+        .onChange(of: appLock.isUnlocked) { _, isUnlocked in
+            // WC-M6: became-active work is guarded out while locked, so run it once the user unlocks.
+            if isUnlocked { Task { await handleAppBecameActive() } }
+        }
         .onReceive(recurringCheckTimer) { _ in
             guard scenePhase == .active, appLock.isUnlocked else { return }
             Task { await processRecurringTransactions() }
@@ -125,6 +129,9 @@ struct MacRootView: View {
     }
 
     private func handleAppBecameActive() async {
+        // WC-M6: don't sync, generate recurring transactions, or surface their alert while the
+        // lock screen is up; the .onChange(isUnlocked) handler re-runs this right after unlock.
+        guard appLock.isUnlocked else { return }
         await finance.ensureICloudSyncRunning()
         await finance.requestICloudSync()
         await processRecurringTransactions()

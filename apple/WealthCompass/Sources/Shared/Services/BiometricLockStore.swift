@@ -67,11 +67,29 @@ class BiometricLockStore: ObservableObject {
         return success
     }
 
+    /// Non-authenticated state reset. Reserved for the factory-erase flow (already confirmed,
+    /// and `resetToDefaults` clears the preference anyway). The user-facing toggle must use
+    /// `confirmDisableLock` instead.
     func disableLock() {
         isLockEnabled = false
         isUnlocked = true
         lastError = nil
         UserDefaults.standard.set(false, forKey: defaultsKey)
+    }
+
+    /// WC-L3: turning the lock off from Settings requires authentication first, mirroring
+    /// `enableLock` — otherwise anyone holding the unlocked device could silently remove the
+    /// protection. With WC-L2 the prompt offers a device-passcode fallback.
+    @discardableResult
+    func confirmDisableLock(appLanguage: String?) async -> Bool {
+        let success = await authenticate(
+            reason: AppLocalization.string("Turn off app protection for Wealth Compass.", appLanguage: appLanguage),
+            appLanguage: appLanguage
+        )
+        if success {
+            disableLock()
+        }
+        return success
     }
 
     func lock() {
@@ -90,18 +108,20 @@ class BiometricLockStore: ObservableObject {
     }
 
     private func authenticate(reason: String, appLanguage: String?) async -> Bool {
+        // WC-L2: `.deviceOwnerAuthentication` is biometrics WITH an automatic device-passcode
+        // fallback, so a Face/Touch ID lockout can't strand the user out of the app. We no
+        // longer suppress the fallback button (`localizedFallbackTitle`).
         let context = LAContext()
-        context.localizedFallbackTitle = ""
 
         var error: NSError?
-        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+        guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
             lastError = error?.localizedDescription
                 ?? AppLocalization.string("Biometric authentication is not available on this device.", appLanguage: appLanguage)
             return false
         }
 
         return await withCheckedContinuation { continuation in
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
+            context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, authenticationError in
                 Task { @MainActor in
                     if let authenticationError {
                         self.lastError = authenticationError.localizedDescription

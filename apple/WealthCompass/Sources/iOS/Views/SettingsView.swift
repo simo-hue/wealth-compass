@@ -463,7 +463,8 @@ struct SettingsView: View {
             if isEnabled {
                 Task { await appLock.enableLock(appLanguage: settings.appLanguage) }
             } else {
-                appLock.disableLock()
+                // WC-L3: require auth to turn the lock off (passcode fallback via WC-L2).
+                Task { await appLock.confirmDisableLock(appLanguage: settings.appLanguage) }
             }
         }
     }
