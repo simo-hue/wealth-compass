@@ -21,7 +21,9 @@ struct WealthCompassMobileApp: App {
                 .environmentObject(appLock)
                 .preferredColorScheme(.dark)
                 .appLanguage(settings.appLanguage)
-                .id(settings.appLanguage ?? "system")
+                // WC-M5: the language-change `.id` re-render lives on the post-onboarding `tabs`
+                // inside ContentView, so picking a language during onboarding (page 2) no longer
+                // resets the flow. (Also stops ContentView.init re-running on every change — WC-L25.)
         }
     }
 }
