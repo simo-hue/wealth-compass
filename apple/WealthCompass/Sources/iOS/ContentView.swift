@@ -11,24 +11,6 @@ struct ContentView: View {
     private let recurringCheckTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
     private let exchangeRateRefreshTimer = Timer.publish(every: 5 * 60 * 60, on: .main, in: .common).autoconnect()
 
-    init() {
-        let appearance = UITabBarAppearance()
-        appearance.configureWithTransparentBackground()
-        appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
-        appearance.backgroundColor = UIColor(red: 0.035, green: 0.05, blue: 0.085, alpha: 0.78)
-        appearance.shadowColor = UIColor.white.withAlphaComponent(0.08)
-
-        let normalColor = UIColor.white.withAlphaComponent(0.52)
-        let selectedColor = UIColor(red: 0.12, green: 0.86, blue: 0.60, alpha: 1)
-        appearance.stackedLayoutAppearance.normal.iconColor = normalColor
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: normalColor]
-        appearance.stackedLayoutAppearance.selected.iconColor = selectedColor
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: selectedColor]
-
-        UITabBar.appearance().standardAppearance = appearance
-        UITabBar.appearance().scrollEdgeAppearance = appearance
-    }
-
     var body: some View {
         Group {
             if appLock.isLockEnabled && !appLock.isUnlocked {
@@ -144,9 +126,11 @@ struct ContentView: View {
 
     private func processRecurringTransactions() async {
         let insertedCount = finance.processDueRecurringTransactions(settings: settings)
-        await syncRecurringNotifications()
-
+        // WC-L1: only re-sync notifications when occurrences were actually generated. Schedule
+        // edits are handled by the .onChange(recurringTransactions) observer, so the 30s timer
+        // no longer tears down and rebuilds every notification request each tick.
         guard insertedCount > 0 else { return }
+        await syncRecurringNotifications()
         let message = insertedCount == 1
             ? settings.localized("1 scheduled transaction was automatically added to Cash Flow.")
             : settings.localized("\(insertedCount) scheduled transactions were automatically added to Cash Flow.")

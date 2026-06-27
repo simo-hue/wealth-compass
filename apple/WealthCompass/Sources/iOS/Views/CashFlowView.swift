@@ -62,6 +62,7 @@ struct CashFlowView: View {
                             .frame(width: 44, height: 44)
                             .background(WCColor.primary.gradient, in: Circle())
                             .shadow(color: WCColor.primary.opacity(0.24), radius: 10, y: 5)
+                            .accessibilityLabel("Add Transaction") // WC-L24: was an unlabeled "+" glyph
                     }
                     .buttonStyle(.plain)
                 }
@@ -201,7 +202,7 @@ struct CashFlowView: View {
                                             DragGesture(minimumDistance: 0)
                                                 .onChanged { value in
                                                     withAnimation(.easeInOut(duration: 0.15)) {
-                                                        hoveredExpenseCategory = categorySlice(at: value.location, in: frame, total: totalExpenses, categories: categories)
+                                                        hoveredExpenseCategory = categorySlice(at: value.location, in: frame, categories: categories)
                                                     }
                                                 }
                                                 .onEnded { _ in
@@ -373,23 +374,36 @@ struct CashFlowView: View {
     }
 
     private var transactions: some View {
-        FinanceCard {
+        // WC-M13: derive the sorted/filtered/visible lists once per render. `finance.transactions`
+        // re-sorts on every access and `filteredTransactions` re-filters, so the header, list and
+        // hidden-count previously re-ran the O(n log n) sort and the filter several times per frame.
+        // `finance.data.transactions` is the unsorted backing array, so the emptiness check is free.
+        let hasAnyTransactions = !finance.data.transactions.isEmpty
+        let filtered = filteredTransactions
+        let visible = Array(filtered.prefix(transactionDisplayLimit))
+        let hiddenCount = max(0, filtered.count - visible.count)
+        return FinanceCard {
             VStack(alignment: .leading, spacing: 14) {
-                transactionHeader
+                transactionHeader(visibleCount: visible.count, totalCount: filtered.count)
                 transactionFilters
 
-                if finance.transactions.isEmpty {
+                if !hasAnyTransactions {
                     EmptyState(title: "No transactions found", systemImage: "tray")
-                } else if filteredTransactions.isEmpty {
+                } else if filtered.isEmpty {
                     EmptyState(title: "No transactions match these filters", systemImage: "line.3.horizontal.decrease.circle")
                 } else {
                     VStack(spacing: 12) {
-                        ForEach(visibleTransactions) { transaction in
+                        ForEach(visible) { transaction in
                             transactionRow(transaction)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     transactionToEdit = transaction
                                 }
+                                // WC-L24: expose the tap-to-edit affordance to VoiceOver / Switch
+                                // Control as one activatable button (onTapGesture alone isn't surfaced).
+                                .accessibilityElement(children: .combine)
+                                .accessibilityAddTraits(.isButton)
+                                .accessibilityAction { transactionToEdit = transaction }
                                 .contextMenu {
                                     Button {
                                         transactionToEdit = transaction
@@ -406,8 +420,8 @@ struct CashFlowView: View {
                         }
                     }
 
-                    if hiddenTransactionCount > 0 {
-                        Text("\(hiddenTransactionCount) more transactions hidden by this view.")
+                    if hiddenCount > 0 {
+                        Text("\(hiddenCount) more transactions hidden by this view.")
                             .font(.caption)
                             .foregroundStyle(WCColor.textSecondary)
                             .frame(maxWidth: .infinity, alignment: .center)
@@ -418,7 +432,7 @@ struct CashFlowView: View {
         }
     }
 
-    private var transactionHeader: some View {
+    private func transactionHeader(visibleCount: Int, totalCount: Int) -> some View {
         HStack(alignment: .firstTextBaseline) {
             Text("Recent Transactions")
                 .font(.headline)
@@ -426,8 +440,8 @@ struct CashFlowView: View {
 
             Spacer()
 
-            if !finance.transactions.isEmpty {
-                Text("Showing \(visibleTransactions.count) of \(filteredTransactions.count)")
+            if totalCount > 0 {
+                Text("Showing \(visibleCount) of \(totalCount)")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(WCColor.textSecondary)
             }
@@ -469,13 +483,6 @@ struct CashFlowView: View {
         }
     }
 
-    private var visibleTransactions: [Transaction] {
-        Array(filteredTransactions.prefix(transactionDisplayLimit))
-    }
-
-    private var hiddenTransactionCount: Int {
-        max(0, filteredTransactions.count - visibleTransactions.count)
-    }
 
     private var transactionStartDate: Date? {
         let calendar = Calendar.current
@@ -620,7 +627,7 @@ struct CashFlowView: View {
         }
     }
 
-    private func categorySlice(at location: CGPoint, in rect: CGRect, total: Double, categories: [CategoryTotal]) -> CategoryTotal? {
+    private func categorySlice(at location: CGPoint, in rect: CGRect, categories: [CategoryTotal]) -> CategoryTotal? {
         PieSliceHitTester.sliceIndex(at: location, in: rect, values: categories.map(\.value))
             .map { categories[$0] }
     }
