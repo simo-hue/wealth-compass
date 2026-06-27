@@ -232,7 +232,7 @@ struct EmptyState: View {
                 .background(WCColor.primary.opacity(0.09), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             Text(title)
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(.white.opacity(0.64))
+                .foregroundStyle(WCColor.textSecondary) // WC-L20: was raw .white.opacity(0.64)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
@@ -302,7 +302,7 @@ struct AllocationChart: View {
                                             .minimumScaleFactor(0.68)
                                         Text(percentage(hoveredSlice.value, total: total))
                                             .font(.caption2.monospacedDigit())
-                                            .foregroundStyle(.white.opacity(0.6))
+                                            .foregroundStyle(WCColor.textTertiary) // WC-L20: was raw .white.opacity(0.6)
                                     } else {
                                         Text("TOTAL")
                                             .font(.caption2.weight(.bold))
@@ -369,7 +369,7 @@ struct AllocationChart: View {
                                         .frame(width: 10, height: 10)
                                     Text(slice.name)
                                         .font(.subheadline.weight(.medium))
-                                        .foregroundStyle(.white.opacity(0.76))
+                                        .foregroundStyle(WCColor.textSecondary) // WC-L20: was raw .white.opacity(0.76)
                                     Spacer()
                                     VStack(alignment: .trailing, spacing: 2) {
                                         Text(settings.privateCurrency(slice.value))
@@ -495,7 +495,7 @@ struct MobilePrivacyChartCover: View {
                     .foregroundStyle(WCColor.primary.opacity(0.76))
                 Text(title)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.82))
+                    .foregroundStyle(WCColor.textSecondary) // WC-L20: was raw .white.opacity(0.82)
                 Text(message)
                     .font(.caption)
                     .foregroundStyle(WCColor.textTertiary)
@@ -559,7 +559,9 @@ struct CryptoIconView: View {
             hash = (hash &* 31) &+ Int(char)
         }
         
-        return colors[abs(hash) % colors.count]
+        // WC-L13: `abs(Int.min)` traps; the wrapping hash above can legitimately reach it.
+        // Use the sign-agnostic magnitude so indexing is always safe.
+        return colors[Int(hash.magnitude % UInt(colors.count))]
     }
 }
 
