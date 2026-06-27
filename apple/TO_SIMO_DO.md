@@ -182,3 +182,46 @@
     to `Localizable.xcstrings` (build once to auto-extract): `"Turn off app protection for Wealth
     Compass."` (WC-L3 disable-lock prompt). The privacy shield, a11y labels, and toolbar changes
     add no user-facing copy beyond existing keys.
+
+## CloudKit sync hardening — `IOS_MACOS_BUG_AUDIT.md` High batch (2026-06-27, branch `audit-fixes`)
+
+> WC-H3/H4/M2/M3/L29 — five per-item commits (`372e461`, `fcfe7b9`, `d2d6c2e`, `24030ef`,
+> `babf370`). These change sync **semantics**, so a clean build is necessary but NOT sufficient:
+> they need a real two-device / cross-version iCloud test. **No Xcode in this environment
+> (CommandLineTools only — `xcodebuild` unavailable), so nothing below was built or run by me.**
+> **No CloudKit schema or JSON wire-format change** in any of the five items.
+
+28. **Build both schemes + run the unit tests — REQUIRED first.**
+    - `xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMac -destination 'platform=macOS' build`
+    - `xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile -destination 'generic/platform=iOS Simulator' build`
+    - `xcodebuild test -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile -destination 'platform=iOS Simulator,name=iPhone 16'`
+    - New/changed tests (all in `Tests/CloudSyncCoreTests.swift`, no `project.pbxproj` change — no new files): `testApplyCloudSyncMutationsQuarantinesBadRecordsAndAppliesTheRest`, `testApplyCloudSyncMutationsWithAllBadRecordsAppliesNothing` (H3), `testMakeRecordsEncodesSnapshotOncePerBatch` (H4), `testPartialFailureIsBenignOnlyWhenEveryItemIsRetryableOrConflict` (L29). The existing `testRemoteUpsertAndDeleteRoundTrip` was updated (its `applyCloudSyncMutations` calls dropped `try` — the function no longer throws).
+    - If the cross-file type-check surfaces anything (e.g. the new `FinancialData.RemoteMutationOutcome` return, the `makeRecords` signature, or the two-lock store), paste the errors back.
+
+29. **Runtime sync verification — the real test. Use TWO devices (or two app versions with
+    different schemas) signed into the SAME iCloud account, sync ON.** A green build does not
+    prove any of these; each fix changes behavior only observable at runtime.
+    - **WC-H3 (quarantine, not teardown):** get a forward-incompatible / corrupt record into the
+      zone — easiest is a build with an extra **required** field on one model (e.g. `Transaction`)
+      on device A, create that record, then fetch it on device B running the shipping schema (or
+      hand-edit one record's `payload` to invalid bytes in the CloudKit console). Expect: device B
+      logs `Skipped undecodable remote record …` (OSLog subsystem `com.wealthcompass.persistence`),
+      the **rest of the batch still applies**, and sync **stays enabled and keeps working**. Toggle
+      sync off/on — it must NOT re-disable on the same record. Critically, confirm device B does
+      **not** delete that record from the server (no tombstone): device A must still have it after
+      B syncs.
+    - **WC-H4 (no main-thread stall):** on a device with a **large** dataset (thousands of records),
+      make a change that triggers a send batch. Expect no multi-second UI freeze / no watchdog kill.
+      In Instruments → Time Profiler, `cloudSyncRecords()` should appear **once per send batch**,
+      not once per record.
+    - **WC-M2 (transient error isn't fatal):** simulate a metadata-write failure during sync (e.g.
+      fill the disk, or background the app so the file-protected `…cloud-sync.json` can't be written
+      while locked). Expect sync to show an error status but **NOT permanently disable** — a later
+      sync (disk free / device unlocked) recovers on its own, no user re-enable.
+    - **WC-M3 (lock off the disk write):** drive heavy concurrent local edits while a sync is in
+      flight; confirm no UI hitch attributable to sync-metadata writes, and that `…cloud-sync.json`
+      stays internally consistent (decodes, last write wins).
+    - **WC-L29 (rejections surface):** induce a non-retryable batch rejection (e.g. fill iCloud
+      quota, then save). Expect the status to show the error — **not** "Up to Date." Conversely, a
+      first multi-device sync that only collides on `serverRecordChanged` must still settle to
+      "Up to Date."
