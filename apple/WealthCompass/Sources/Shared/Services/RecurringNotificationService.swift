@@ -80,10 +80,16 @@ actor RecurringNotificationService {
             content.sound = .default
             content.userInfo = ["recurringTransactionID": schedule.id.uuidString]
 
-            let dateComponents = Calendar.current.dateComponents(
+            var dateComponents = Calendar.current.dateComponents(
                 [.year, .month, .day, .hour, .minute],
                 from: schedule.nextDueDate
             )
+            // WC-L5: date-only / imported schedules carry a midnight time, which would fire the
+            // reminder at 00:00. Pin those to 9:00 local; schedules with a real time keep it.
+            if (dateComponents.hour ?? 0) == 0 && (dateComponents.minute ?? 0) == 0 {
+                dateComponents.hour = 9
+                dateComponents.minute = 0
+            }
             let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
             let request = UNNotificationRequest(
                 identifier: notificationIdentifier(for: schedule.id),

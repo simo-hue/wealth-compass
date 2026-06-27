@@ -46,11 +46,15 @@ final class OnboardingViewModel: ObservableObject {
         do {
             if !finnhub.isEmpty {
                 _ = try await FinnhubQuoteClient(apiKey: finnhub).testConnection()
-                try? KeychainCredentialStore.shared.save(finnhub, for: .finnhubAPIKey)
+                // WC-M7: use `try`, not `try?`, so a Keychain write failure surfaces as a
+                // validation error instead of completing onboarding with no key stored.
+                try KeychainCredentialStore.shared.save(finnhub, for: .finnhubAPIKey)
+                hasFinnhubKey = true
             }
             if !coinGecko.isEmpty {
                 _ = try await CoinGeckoPriceClient(apiKey: coinGecko).testConnection()
-                try? KeychainCredentialStore.shared.save(coinGecko, for: .coingeckoAPIKey)
+                try KeychainCredentialStore.shared.save(coinGecko, for: .coingeckoAPIKey)
+                hasCoinGeckoKey = true
             }
             return true
         } catch {

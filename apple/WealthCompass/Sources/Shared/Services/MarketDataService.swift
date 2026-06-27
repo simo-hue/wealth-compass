@@ -283,7 +283,9 @@ struct FinnhubQuoteClient {
 
         var request = URLRequest(
             url: url,
-            cachePolicy: validationNonce == nil ? .useProtocolCachePolicy : .reloadIgnoringLocalAndRemoteCacheData,
+            // WC-L11: revalidate with the provider on a real (user-triggered) refresh so a
+            // cached quote/price isn't returned as if fresh; validation still ignores cache.
+            cachePolicy: validationNonce == nil ? .reloadRevalidatingCacheData : .reloadIgnoringLocalAndRemoteCacheData,
             timeoutInterval: 20
         )
         request.setValue(apiKey, forHTTPHeaderField: "X-Finnhub-Token")
@@ -398,7 +400,9 @@ struct CoinGeckoPriceClient {
 
         var request = URLRequest(
             url: url,
-            cachePolicy: validationNonce == nil ? .useProtocolCachePolicy : .reloadIgnoringLocalAndRemoteCacheData,
+            // WC-L11: revalidate with the provider on a real (user-triggered) refresh so a
+            // cached quote/price isn't returned as if fresh; validation still ignores cache.
+            cachePolicy: validationNonce == nil ? .reloadRevalidatingCacheData : .reloadIgnoringLocalAndRemoteCacheData,
             timeoutInterval: 20
         )
         addAPIKeyHeader(to: &request)

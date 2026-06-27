@@ -34,7 +34,7 @@ enum NetworkRetry {
                     throw URLError(.badServerResponse)
                 }
                 if retryableStatus(http.statusCode), attempt < policy.maxAttempts {
-                    try await backoff(attempt: attempt, policy: policy)
+                    try await backoff(attempt: attempt, policy: policy, retryAfter: Self.retryAfter(from: http))
                     continue
                 }
                 return (data, http)
@@ -56,8 +56,28 @@ enum NetworkRetry {
         }
     }
 
-    private static func backoff(attempt: Int, policy: Policy) async throws {
-        let delay = min(policy.maxDelay, policy.baseDelay * pow(2, Double(attempt - 1)))
-        try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+    private static func backoff(attempt: Int, policy: Policy, retryAfter: TimeInterval? = nil) async throws {
+        let base: TimeInterval
+        if let retryAfter {
+            // Honor the provider's Retry-After on 429 (WC-L10), clamped to maxDelay so a long
+            // server cooldown can't block a user-triggered refresh for our few bounded attempts.
+            base = min(policy.maxDelay, max(0, retryAfter))
+        } else {
+            base = min(policy.maxDelay, policy.baseDelay * pow(2, Double(attempt - 1)))
+        }
+        // Full jitter so concurrent clients don't retry in lockstep and re-trip the limit.
+        let jittered = base * Double.random(in: 0.5...1.0)
+        try await Task.sleep(nanoseconds: UInt64(max(0, jittered) * 1_000_000_000))
+    }
+
+    /// Parses the delta-seconds form of a `Retry-After` header (the HTTP-date form is ignored).
+    private static func retryAfter(from response: HTTPURLResponse) -> TimeInterval? {
+        guard
+            let value = response.value(forHTTPHeaderField: "Retry-After"),
+            let seconds = TimeInterval(value.trimmingCharacters(in: .whitespaces))
+        else {
+            return nil
+        }
+        return seconds
     }
 }
