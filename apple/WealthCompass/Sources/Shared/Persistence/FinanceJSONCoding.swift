@@ -45,22 +45,28 @@ enum FinanceJSONCoding {
         )
     }
 
-    private static func format(_ date: Date) -> String {
+    // WC-M4: cache the ISO-8601 formatters instead of allocating one per date value.
+    // `ISO8601DateFormatter` is thread-safe for format/parse, so static reuse is safe even with
+    // concurrent encode/decode, and avoids the notoriously expensive per-date construction
+    // that previously dominated save/sync CPU.
+    private static let iso8601WithFractionalSeconds: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter.string(from: date)
+        return formatter
+    }()
+
+    private static let iso8601: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
+
+    private static func format(_ date: Date) -> String {
+        iso8601WithFractionalSeconds.string(from: date)
     }
 
     private static func parse(_ value: String) -> Date? {
-        let fractionalFormatter = ISO8601DateFormatter()
-        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = fractionalFormatter.date(from: value) {
-            return date
-        }
-
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter.date(from: value)
+        iso8601WithFractionalSeconds.date(from: value) ?? iso8601.date(from: value)
     }
 
     private static func migrateLegacyFinancialDataJSON(_ data: Data) throws -> Data {
