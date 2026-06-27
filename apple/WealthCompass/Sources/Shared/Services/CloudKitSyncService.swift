@@ -885,8 +885,20 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             }
         } catch {
             guard syncRequested, engine === syncEngine else { return }
-            Self.logger.error("CloudKit event handling failed: \(error.localizedDescription, privacy: .public)")
-            await stopAfterFatalError(error)
+            // WC-M2: only a genuine account change is fatal — tear the engine down (which
+            // also disables sync to protect the previous account's data). Every other error
+            // reaching this catch (a transient metadata-disk write now that WC-M3's `update`
+            // is synchronous+throwing, a network blip, a non-retryable record save, an
+            // engine-state encode) is reported but leaves the engine running so CKSyncEngine
+            // retries — instead of permanently self-disabling sync over a recoverable
+            // condition (which, with WC-H3, it was far too eager to do).
+            if Self.failureCategory(for: error) == .accountChanged {
+                Self.logger.error("CloudKit event handling hit a fatal account change: \(error.localizedDescription, privacy: .public)")
+                await stopAfterFatalError(error)
+            } else {
+                Self.logger.error("CloudKit event handling failed (non-fatal, will retry): \(error.localizedDescription, privacy: .public)")
+                await report(error)
+            }
         }
     }
 
