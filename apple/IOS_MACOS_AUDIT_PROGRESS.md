@@ -73,10 +73,32 @@ WC-L8 (don't tighten forgiving import decoders), WC-L28 (restructuring data-migr
   shared helper hits actor-isolation subtleties (`RecurringNotificationService` is an actor)
   that want a compiler to verify; pure dedup, no behavior change.
 
-## REMAINING (High — sync hardening, deferred per request; do after a build + with a sync test)
-- WC-H3 (undecodable record tears down engine), WC-H4 (makeRecord re-encodes per record),
-  WC-M2 (transient error fatal), WC-M3 (lock across IO), WC-L29. All in CloudKitSyncService —
-  delicate, and really want a runtime iCloud-sync test.
+## ✅ HIGH BATCH DONE (CloudKit sync hardening, branch `audit-fixes`)
+Five per-item commits (grilled first; design notes in the commit bodies):
+- **WC-H3** `372e461` — undecodable / id-mismatched remote records are quarantined
+  (skip-with-log) in `applyCloudSyncMutations`, which now returns applied vs skipped keys;
+  the throw no longer reaches `handleEvent`'s catch → `stopAfterFatalError`. Skipped keys are
+  reported not-applied so `knownLocalHashes` is never advanced (no cross-version tombstone).
+- **WC-H4** `fcfe7b9` — `nextRecordZoneChangeBatch` encodes the snapshot once per batch via a
+  new `makeRecords(for:)` (was B×N full-dataset encodes on the main actor); `FinanceStore`
+  memoizes `cloudSyncRecords()` by `dataVersion`.
+- **WC-M3** `d2d6c2e` — `CloudSyncMetadataStore` split into `dataLock` (guards `cached`) +
+  `writeLock` (serializes disk writes, hand-over-hand); `read()` never blocks on disk, writes
+  stay ordered, `update` stays synchronous+throwing. On-disk format unchanged.
+- **WC-M2** `24030ef` — `handleEvent` catch tears down only on `.accountChanged`; every other
+  error is `report`-ed and the engine keeps retrying (no more self-disable on a disk/network blip).
+- **WC-L29** `babf370` — `synchronize` reports `.upToDate` on a `partialFailure` only when every
+  item error is benign (retryable / `.serverRecordChanged` / `.zoneNotFound`, matching the
+  sent-side non-throw set); a genuine rejection or an opaque partial failure surfaces instead.
+
+Tests added to `CloudSyncCoreTests` (offline): H3 batch-skip + all-bad batch, H4 provider-
+invoked-once-per-batch, L29 benign-vs-rejection predicate. **No build/test run here (no Xcode —
+CommandLineTools only); runtime sync verification is REQUIRED — see `TO_SIMO_DO.md` #28.**
+No CloudKit schema or JSON wire-format change in any item.
+
+## ✅ AUDIT COMPLETE
+All batches (Decimal migration, Low, Medium, High sync hardening) implemented on `audit-fixes`.
+Deferred pure-refactors only: WC-M8 (editor merge), WC-A2 (notification dedup) — no functional bug.
 
 ## ⚠️ RECOMMENDED CHECKPOINT
 Before layering the remaining ~30 items on top, run a build (TO_SIMO_DO.md #22) to surface any
