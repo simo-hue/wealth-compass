@@ -996,7 +996,17 @@ final class FinanceStore: ObservableObject {
         guard !applicableMutations.isEmpty else { return [] }
 
         var updatedData = data
-        try updatedData.applyCloudSyncMutations(applicableMutations)
+        let outcome = updatedData.applyCloudSyncMutations(applicableMutations)
+        for skip in outcome.skipped {
+            // WC-H3: a single undecodable / forward-incompatible record is quarantined here
+            // (logged, not thrown) so it can't propagate to handleEvent's catch and disable
+            // the whole engine. It's reported as not-applied below, so its metadata
+            // (knownLocalHashes) is never advanced and no spurious tombstone is enqueued.
+            Self.logger.error("Skipped undecodable remote record \(skip.key.recordName, privacy: .public) (type \(skip.key.type.rawValue, privacy: .public)): \(skip.error.localizedDescription, privacy: .public)")
+        }
+        // Nothing decoded — don't persist or advance the baseline; report none-applied so
+        // every key is treated as not-applied by the caller.
+        guard !outcome.appliedKeys.isEmpty else { return [] }
         updatedData = updatedData.sortedForStorage()
         // Update the in-memory data synchronously on the main actor so the UI stays
         // responsive and reads stay consistent. Plain assignment (no withAnimation):
@@ -1008,7 +1018,7 @@ final class FinanceStore: ObservableObject {
         // Route the disk write through the coordinator so local + remote writes serialize
         // and never interleave, and so the diff baseline advances to the applied records.
         try await coordinator.applyRemote(updatedData)
-        return Set(applicableMutations.map(\.key))
+        return outcome.appliedKeys
     }
 
     private func updateCloudSyncStatus(_ status: CloudSyncStatus) {

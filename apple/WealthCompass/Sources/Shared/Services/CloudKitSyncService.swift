@@ -208,47 +208,48 @@ extension FinancialData {
         return records
     }
 
-    mutating func applyCloudSyncMutations(_ mutations: [CloudSyncRemoteMutation]) throws {
+    /// The result of applying a batch of remote mutations: the keys that were applied, and
+    /// the keys that were skipped because their payload couldn't be decoded or its embedded
+    /// id didn't match the record key (WC-H3). Skipping — rather than throwing — quarantines
+    /// a single forward-incompatible / corrupt record so one bad record can't tear down the
+    /// whole sync engine. The caller logs `skipped` and treats only `appliedKeys` as applied,
+    /// so a skipped record's metadata is never advanced (no spurious tombstone).
+    struct RemoteMutationOutcome {
+        var appliedKeys: Set<CloudSyncRecordKey> = []
+        var skipped: [(key: CloudSyncRecordKey, error: Error)] = []
+    }
+
+    @discardableResult
+    mutating func applyCloudSyncMutations(_ mutations: [CloudSyncRemoteMutation]) -> RemoteMutationOutcome {
+        var outcome = RemoteMutationOutcome()
         for mutation in mutations {
-            switch mutation.key.type {
-            case .transaction:
-                transactions = try Self.applying(
-                    mutation,
-                    to: transactions,
-                    decoding: Transaction.self
-                )
-            case .recurringTransaction:
-                recurringTransactions = try Self.applying(
-                    mutation,
-                    to: recurringTransactions,
-                    decoding: RecurringTransaction.self
-                )
-            case .investment:
-                investments = try Self.applying(
-                    mutation,
-                    to: investments,
-                    decoding: Investment.self
-                )
-            case .crypto:
-                crypto = try Self.applying(
-                    mutation,
-                    to: crypto,
-                    decoding: CryptoHolding.self
-                )
-            case .liability:
-                liabilities = try Self.applying(
-                    mutation,
-                    to: liabilities,
-                    decoding: Liability.self
-                )
-            case .snapshot:
-                snapshots = try Self.applying(
-                    mutation,
-                    to: snapshots,
-                    decoding: NetWorthSnapshot.self
-                )
+            do {
+                switch mutation.key.type {
+                case .transaction:
+                    transactions = try Self.applying(mutation, to: transactions, decoding: Transaction.self)
+                case .recurringTransaction:
+                    recurringTransactions = try Self.applying(mutation, to: recurringTransactions, decoding: RecurringTransaction.self)
+                case .investment:
+                    investments = try Self.applying(mutation, to: investments, decoding: Investment.self)
+                case .crypto:
+                    crypto = try Self.applying(mutation, to: crypto, decoding: CryptoHolding.self)
+                case .liability:
+                    liabilities = try Self.applying(mutation, to: liabilities, decoding: Liability.self)
+                case .snapshot:
+                    snapshots = try Self.applying(mutation, to: snapshots, decoding: NetWorthSnapshot.self)
+                }
+                outcome.appliedKeys.insert(mutation.key)
+            } catch {
+                // WC-H3: quarantine one undecodable / id-mismatched record instead of
+                // throwing. `applying` builds a new collection and only assigns it on
+                // success, so a throw here leaves this entity's collection untouched and the
+                // rest of the batch still applies. Excluding the key from `appliedKeys` means
+                // the caller never advances its `knownLocalHashes` (no spurious tombstone),
+                // mirroring the existing payloadless `remoteSnapshot(...)` nil-skip.
+                outcome.skipped.append((mutation.key, error))
             }
         }
+        return outcome
     }
 
     private static func applying<T: Codable & Identifiable>(

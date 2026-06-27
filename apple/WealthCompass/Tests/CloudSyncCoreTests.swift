@@ -64,7 +64,7 @@ final class CloudSyncCoreTests: XCTestCase {
         )
         var destination = FinancialData()
 
-        try destination.applyCloudSyncMutations([
+        destination.applyCloudSyncMutations([
             CloudSyncRemoteMutation(
                 key: snapshot.key,
                 payload: snapshot.payload,
@@ -73,7 +73,7 @@ final class CloudSyncCoreTests: XCTestCase {
         ])
         XCTAssertEqual(destination.transactions, [transaction])
 
-        try destination.applyCloudSyncMutations([
+        destination.applyCloudSyncMutations([
             CloudSyncRemoteMutation(
                 key: snapshot.key,
                 payload: nil,
@@ -81,6 +81,51 @@ final class CloudSyncCoreTests: XCTestCase {
             )
         ])
         XCTAssertTrue(destination.transactions.isEmpty)
+    }
+
+    /// WC-H3: a batch containing an undecodable payload and an id-mismatched record must
+    /// skip exactly those two, apply the rest, report only the applied keys, and — the
+    /// headline property — NOT throw. The throw is precisely what previously propagated to
+    /// `handleEvent`'s catch and disabled the whole engine over one bad record; skipping
+    /// keeps the engine running and the good records flowing.
+    func testApplyCloudSyncMutationsQuarantinesBadRecordsAndAppliesTheRest() throws {
+        let goodA = makeTransaction(id: UUID(uuidString: "50000000-0000-0000-0000-000000000005")!, amount: 11)
+        let goodB = makeTransaction(id: UUID(uuidString: "60000000-0000-0000-0000-000000000006")!, amount: 22)
+        let records = try FinancialData(transactions: [goodA, goodB]).cloudSyncRecords()
+        let snapA = try XCTUnwrap(records[CloudSyncRecordKey(type: .transaction, id: goodA.id)])
+        let snapB = try XCTUnwrap(records[CloudSyncRecordKey(type: .transaction, id: goodB.id)])
+
+        // A valid key carrying garbage bytes (forward-incompatible / corrupt payload).
+        let undecodableKey = CloudSyncRecordKey(type: .transaction, id: UUID(uuidString: "70000000-0000-0000-0000-000000000007")!)
+        // goodB's payload delivered under a different record key (id mismatch).
+        let mismatchKey = CloudSyncRecordKey(type: .transaction, id: UUID(uuidString: "80000000-0000-0000-0000-000000000008")!)
+
+        var destination = FinancialData()
+        let outcome = destination.applyCloudSyncMutations([
+            CloudSyncRemoteMutation(key: snapA.key, payload: snapA.payload, expectedPendingRevision: nil),
+            CloudSyncRemoteMutation(key: undecodableKey, payload: Data("not valid json".utf8), expectedPendingRevision: nil),
+            CloudSyncRemoteMutation(key: mismatchKey, payload: snapB.payload, expectedPendingRevision: nil),
+            CloudSyncRemoteMutation(key: snapB.key, payload: snapB.payload, expectedPendingRevision: nil)
+        ])
+
+        // The two valid records applied; the two bad ones were skipped (not thrown).
+        XCTAssertEqual(Set(destination.transactions.map(\.id)), [goodA.id, goodB.id])
+        XCTAssertEqual(outcome.appliedKeys, [snapA.key, snapB.key])
+        XCTAssertEqual(Set(outcome.skipped.map(\.key)), [undecodableKey, mismatchKey])
+    }
+
+    /// WC-H3 corollary: when *every* record in the batch is undecodable, nothing applies and
+    /// the applied-key set is empty (so the caller advances no metadata) — still no throw.
+    func testApplyCloudSyncMutationsWithAllBadRecordsAppliesNothing() {
+        let key = CloudSyncRecordKey(type: .investment, id: UUID(uuidString: "90000000-0000-0000-0000-000000000009")!)
+        var destination = FinancialData()
+        let outcome = destination.applyCloudSyncMutations([
+            CloudSyncRemoteMutation(key: key, payload: Data("garbage".utf8), expectedPendingRevision: nil)
+        ])
+
+        XCTAssertTrue(destination.investments.isEmpty)
+        XCTAssertTrue(outcome.appliedKeys.isEmpty)
+        XCTAssertEqual(outcome.skipped.map(\.key), [key])
     }
 
     func testLegacyJSONMigrationAddsUpdatedAt() throws {
