@@ -74,7 +74,6 @@ private enum MacCashFlowTab: MacSelectorTab {
 struct MacCashFlowView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
-    @State private var selection: Transaction.ID?
     @State private var searchText = ""
     @State private var analyticsPeriod: AnalyticsPeriod = .all
     @State private var transactionPeriod: AnalyticsPeriod = .thirtyDays
@@ -602,7 +601,7 @@ struct MacCashFlowView: View {
 
             Spacer()
 
-            let prefix = schedule.type == .income ? "+" : "-"
+            let prefix = schedule.type == .income ? "+" : "−"
             Text("\(prefix)\(settings.privateCurrency(schedule.amount))")
                 .font(.headline.monospacedDigit())
                 .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
@@ -770,7 +769,7 @@ struct MacCashFlowView: View {
                     }
                     Spacer()
                     
-                    let prefix = transaction.type == .income ? "+" : "-"
+                    let prefix = transaction.type == .income ? "+" : "−"
                     Text("\(prefix)\(settings.privateCurrency(transaction.amount))")
                         .font(.headline.monospacedDigit())
                         .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
@@ -849,10 +848,6 @@ struct MacCashFlowView: View {
         }
     }
 
-    private var selectedTransaction: Transaction? {
-        guard let selection else { return nil }
-        return filteredTransactions.first { $0.id == selection }
-    }
 
     private var transactionStartDate: Date? {
         let calendar = Calendar.current
@@ -892,7 +887,7 @@ struct MacCashFlowView: View {
 
     private func signedAmount(for transaction: Transaction) -> String {
         guard !settings.isPrivacyMode else { return settings.redactionToken }
-        let prefix = transaction.type == .income ? "+" : "-"
+        let prefix = transaction.type == .income ? "+" : "−"
         return prefix + settings.privateCurrency(transaction.amount)
     }
 
@@ -944,7 +939,6 @@ struct MacCashFlowView: View {
                 ),
                 primaryButton: .destructive(Text("Delete")) {
                     finance.deleteTransaction(transaction, settings: settings)
-                    selection = nil
                 },
                 secondaryButton: .cancel()
             )

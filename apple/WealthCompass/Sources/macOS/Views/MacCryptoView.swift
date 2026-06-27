@@ -16,7 +16,6 @@ struct MacCryptoView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appModel: MacAppModel
-    @State private var selection: CryptoHolding.ID?
     @State private var holdingPendingDeletion: CryptoHolding?
     @State private var selectedTab: MacCryptoTab = .overview
 
@@ -64,7 +63,6 @@ struct MacCryptoView: View {
         ) { holding in
             Button("Delete \(holding.symbol)", role: .destructive) {
                 finance.deleteCrypto(holding, settings: settings)
-                selection = nil
                 holdingPendingDeletion = nil
             }
             Button("Cancel", role: .cancel) {
@@ -338,11 +336,6 @@ struct MacCryptoView: View {
                 Label("Delete Holding", systemImage: "trash")
             }
         }
-    }
-
-    private var selectedHolding: CryptoHolding? {
-        guard let selection else { return nil }
-        return finance.data.crypto.first { $0.id == selection }
     }
 
     private var isShowingDeleteConfirmation: Binding<Bool> {

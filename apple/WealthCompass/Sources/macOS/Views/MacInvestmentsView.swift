@@ -16,7 +16,6 @@ struct MacInvestmentsView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appModel: MacAppModel
-    @State private var selection: Investment.ID?
     @State private var investmentPendingDeletion: Investment?
     @State private var selectedTab: MacInvestmentsTab = .overview
 
@@ -85,7 +84,6 @@ struct MacInvestmentsView: View {
         ) { investment in
             Button("Delete \(investment.symbol)", role: .destructive) {
                 finance.deleteInvestment(investment, settings: settings)
-                selection = nil
                 investmentPendingDeletion = nil
             }
             Button("Cancel", role: .cancel) {
@@ -279,11 +277,6 @@ struct MacInvestmentsView: View {
                 Label("Delete Investment", systemImage: "trash")
             }
         }
-    }
-
-    private var selectedInvestment: Investment? {
-        guard let selection else { return nil }
-        return finance.data.investments.first { $0.id == selection }
     }
 
     private var isShowingDeleteConfirmation: Binding<Bool> {

@@ -34,14 +34,17 @@ struct MacRootView: View {
                         .frame(minWidth: 520, minHeight: 400)
                         .toolbar {
                             ToolbarItemGroup(placement: .primaryAction) {
-                                Button {
-                                    Task { await refreshData() }
-                                } label: {
-                                    Label(refreshDataLabel, systemImage: "arrow.clockwise")
+                                // WC-M12: "Refresh Data" is meaningless on the Settings page —
+                                // hide it (and its ⌘R) there. Settings stays a sidebar destination.
+                                if appModel.selection != .settings {
+                                    Button {
+                                        Task { await refreshData() }
+                                    } label: {
+                                        Label(refreshDataLabel, systemImage: "arrow.clockwise")
+                                    }
+                                    .disabled(isRefreshing)
+                                    .keyboardShortcut("r", modifiers: .command)
                                 }
-                                .disabled(isRefreshing)
-                                .keyboardShortcut("r", modifiers: .command)
-
                             }
                         }
                 }
