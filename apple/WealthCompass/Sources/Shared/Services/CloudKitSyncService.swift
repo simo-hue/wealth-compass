@@ -313,7 +313,15 @@ private struct CloudSyncMetadata: Codable, Sendable {
 }
 
 final class CloudSyncMetadataStore: @unchecked Sendable {
-    private let lock = NSLock()
+    /// Guards the in-memory `cached` value only. Held briefly for reads and for the in-memory
+    /// portion of an update — never across a disk write (WC-M3), so `read()` (called on the
+    /// hot CloudKitSyncService actor path) never blocks on I/O.
+    private let dataLock = NSLock()
+    /// Serializes the full-file disk writes in `persist`/`reset`, outside the `dataLock`
+    /// critical section. `update` takes this before releasing `dataLock` (hand-over-hand), so
+    /// writes land in the same order as the in-memory updates without holding `dataLock`
+    /// across the write.
+    private let writeLock = NSLock()
     private let fileManager: FileManager
     private let url: URL
     private var cached: CloudSyncMetadata
@@ -343,17 +351,30 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
     }
 
     fileprivate func read() -> CloudSyncMetadata {
-        lock.withLock { cached }
+        dataLock.withLock { cached }
     }
 
     fileprivate func update<T>(_ body: (inout CloudSyncMetadata) throws -> T) throws -> T {
-        try lock.withLock {
-            var updated = cached
-            let result = try body(&updated)
-            try persist(updated)
-            cached = updated
-            return result
+        dataLock.lock()
+        var updated = cached
+        let result: T
+        do {
+            result = try body(&updated)
+        } catch {
+            dataLock.unlock()
+            throw error
         }
+        cached = updated
+        // Hand-over-hand: take `writeLock` before releasing `dataLock` so concurrent updates
+        // persist in the same order they committed in memory, then release `dataLock` so the
+        // disk write happens outside its critical section (WC-M3). A persist failure throws
+        // (surfaced by WC-M2 as a transient, non-fatal error); the in-memory value is already
+        // committed and the next successful update re-persists it.
+        writeLock.lock()
+        dataLock.unlock()
+        defer { writeLock.unlock() }
+        try persist(updated)
+        return result
     }
 
     /// Wipes all sync metadata back to a clean slate (no account, no engine state, no
@@ -361,11 +382,16 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
     /// after a zone delete and as the safety net on the local-only / escape-hatch paths
     /// where the zone delete didn't run.
     func reset() throws {
-        try lock.withLock {
-            cached = CloudSyncMetadata()
-            guard fileManager.fileExists(atPath: url.path) else { return }
-            try fileManager.removeItem(at: url)
-        }
+        dataLock.lock()
+        cached = CloudSyncMetadata()
+        // Same hand-over-hand discipline as `update`: wipe the in-memory value under
+        // `dataLock`, then remove the file under `writeLock` (serialized with persists) so a
+        // concurrent write can't race the removal, all without holding `dataLock` across I/O.
+        writeLock.lock()
+        dataLock.unlock()
+        defer { writeLock.unlock() }
+        guard fileManager.fileExists(atPath: url.path) else { return }
+        try fileManager.removeItem(at: url)
     }
 
     func pendingRevision(for key: CloudSyncRecordKey) -> UUID? {
