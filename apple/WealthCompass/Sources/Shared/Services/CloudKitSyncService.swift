@@ -872,14 +872,45 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         let pending = syncEngine.state.pendingRecordZoneChanges.filter {
             context.options.scope.contains($0)
         }
-        return await CKSyncEngine.RecordZoneChangeBatch(pendingChanges: pending) { [weak self] recordID in
-            guard let self else { return nil }
-            return await self.makeRecord(for: recordID, syncEngine: syncEngine)
+        let recordIDs = pending.compactMap { change -> CKRecord.ID? in
+            switch change {
+            case .saveRecord(let recordID), .deleteRecord(let recordID):
+                return recordID
+            @unknown default:
+                return nil
+            }
+        }
+        // WC-H4: encode the per-entity snapshot ONCE for the whole batch (inside
+        // `makeRecords`) rather than once per record. The per-record provider closure below
+        // just indexes the precomputed dictionary, so a B-record batch over an N-record
+        // dataset performs one full-dataset encode, not B*N — and only one hop onto the
+        // main actor instead of B.
+        let records = await makeRecords(for: recordIDs)
+        return await CKSyncEngine.RecordZoneChangeBatch(pendingChanges: pending) { recordID in
+            records[recordID]
         }
     }
 
-    private func makeRecord(for recordID: CKRecord.ID, syncEngine: CKSyncEngine) async -> CKRecord? {
-        guard syncRequested, engine === syncEngine else { return nil }
+    /// Builds the CloudKit records for a batch of pending record IDs, fetching the
+    /// per-entity snapshot exactly once for the whole batch (WC-H4). Engine/lifecycle
+    /// guarding is the caller's responsibility (`nextRecordZoneChangeBatch` already checks
+    /// `syncRequested` / `engine === syncEngine`); keeping this free of the engine makes it
+    /// unit-testable from just the metadata store and an injected snapshot provider.
+    func makeRecords(for recordIDs: [CKRecord.ID]) async -> [CKRecord.ID: CKRecord] {
+        let snapshot = (try? await snapshotProvider()) ?? [:]
+        var records: [CKRecord.ID: CKRecord] = [:]
+        for recordID in recordIDs {
+            if let record = makeRecord(for: recordID, snapshot: snapshot) {
+                records[recordID] = record
+            }
+        }
+        return records
+    }
+
+    private func makeRecord(
+        for recordID: CKRecord.ID,
+        snapshot: [CloudSyncRecordKey: CloudSyncRecordSnapshot]
+    ) -> CKRecord? {
         guard recordID.zoneID == zoneID, let key = CloudSyncRecordKey(recordName: recordID.recordName) else {
             return nil
         }
@@ -903,15 +934,13 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             record["updatedAt"] = nil
 
         case .save(let modifiedAt, let revision, _, _):
-            guard
-                let snapshot = try? await snapshotProvider()[key]
-            else {
+            guard let entitySnapshot = snapshot[key] else {
                 return nil
             }
             record["isDeleted"] = false as NSNumber
-            record["payload"] = snapshot.payload as NSData
-            record["createdAt"] = snapshot.createdAt as NSDate
-            record["updatedAt"] = snapshot.updatedAt as NSDate
+            record["payload"] = entitySnapshot.payload as NSData
+            record["createdAt"] = entitySnapshot.createdAt as NSDate
+            record["updatedAt"] = entitySnapshot.updatedAt as NSDate
             record["clientModifiedAt"] = modifiedAt as NSDate
             record["revision"] = revision.uuidString as NSString
             record["deletedAt"] = nil

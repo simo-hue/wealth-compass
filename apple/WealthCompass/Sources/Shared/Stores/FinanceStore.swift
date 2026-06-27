@@ -100,6 +100,12 @@ final class FinanceStore: ObservableObject {
     /// — data version + display currency + rate-snapshot timestamp — so it can never
     /// return a stale result after a data, currency, or exchange-rate change.
     private var cachedTotals: (version: Int, currency: Currency, rateStamp: Date?, value: FinanceTotals)?
+    /// Cache of the encoded per-entity CloudKit sync snapshot, keyed by `dataVersion` (H4).
+    /// `cloudSyncRecords()` is a full-dataset JSON-encode + SHA-256 and the snapshot provider
+    /// can be invoked several times within one sync pass (send batch, bootstrap merge,
+    /// conflict path). `dataVersion` bumps on every `data` mutation, so a version match is
+    /// always current; a mismatch recomputes.
+    private var cachedCloudSyncSnapshot: (version: Int, records: [CloudSyncRecordKey: CloudSyncRecordSnapshot])?
     @Published private(set) var isRefreshingMarketPrices = false
     /// Per-item progress of the (serial, rate-limited) Finnhub refresh, for an "x of N"
     /// UI indicator (M7). Nil when not refreshing investments.
@@ -141,7 +147,7 @@ final class FinanceStore: ObservableObject {
         metadataStore: syncMetadataStore,
         snapshotProvider: { [weak self] in
             guard let self else { return [:] }
-            return try self.data.cloudSyncRecords()
+            return try self.currentCloudSyncRecords()
         },
         remoteMutationHandler: { [weak self] mutations in
             guard let self else { return [] }
@@ -154,6 +160,18 @@ final class FinanceStore: ObservableObject {
             self?.settings?.isICloudSyncEnabled = false
         }
     )
+
+    /// Returns the encoded per-entity sync snapshot, memoized by `dataVersion` (H4) so a
+    /// full-dataset encode isn't repeated when the data hasn't changed between calls within
+    /// a sync pass. Backs the sync service's `snapshotProvider`.
+    private func currentCloudSyncRecords() throws -> [CloudSyncRecordKey: CloudSyncRecordSnapshot] {
+        if let cache = cachedCloudSyncSnapshot, cache.version == dataVersion {
+            return cache.records
+        }
+        let records = try data.cloudSyncRecords()
+        cachedCloudSyncSnapshot = (dataVersion, records)
+        return records
+    }
 
     init(
         persistence: FinancePersistence = LocalFinancePersistence(),
