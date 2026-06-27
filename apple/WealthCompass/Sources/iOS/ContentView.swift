@@ -48,22 +48,37 @@ struct ContentView: View {
             }
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: finance.persistenceError)
+        .overlay {
+            // WC-L26: opaque privacy shield over the app-switcher snapshot and transient
+            // interruptions, so financial data isn't exposed without forcing a re-auth.
+            if scenePhase != .active {
+                PrivacyShield()
+            }
+        }
         .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .background || newPhase == .inactive {
+            // WC-L26: hard-lock only on .background. Transient .inactive events (Control Center,
+            // the share sheet, an incoming call) are covered by the shield above instead, so the
+            // user isn't forced to re-authenticate after every harmless interruption.
+            if newPhase == .background {
                 appLock.lock()
             } else if newPhase == .active {
                 Task { await handleAppBecameActive() }
             }
         }
+        .onChange(of: appLock.isUnlocked) { _, isUnlocked in
+            // WC-M6: handleAppBecameActive is guarded out while locked, so run it once the user
+            // actually unlocks — otherwise sync/recurring would be skipped until the next foreground.
+            if isUnlocked { Task { await handleAppBecameActive() } }
+        }
         .task {
             await handleAppBecameActive()
         }
         .onReceive(recurringCheckTimer) { _ in
-            guard scenePhase == .active else { return }
+            guard scenePhase == .active, appLock.isUnlocked else { return }
             Task { await processRecurringTransactions() }
         }
         .onReceive(exchangeRateRefreshTimer) { _ in
-            guard scenePhase == .active else { return }
+            guard scenePhase == .active, appLock.isUnlocked else { return }
             Task { await refreshExchangeRatesIfNeeded() }
         }
         .onReceive(NotificationCenter.default.publisher(for: .recurringTransactionNotificationReceived)) { _ in
@@ -112,6 +127,9 @@ struct ContentView: View {
     }
 
     private func handleAppBecameActive() async {
+        // WC-M6: don't sync, generate recurring transactions, or surface their alert while the
+        // lock screen is up; the .onChange(isUnlocked) handler re-runs this right after unlock.
+        guard appLock.isUnlocked else { return }
         await finance.ensureICloudSyncRunning()
         await finance.requestICloudSync()
         await processRecurringTransactions()
@@ -174,4 +192,18 @@ struct ContentView: View {
 private struct RecurringInsertionAlert: Identifiable {
     let id = UUID()
     let message: String
+}
+
+/// WC-L26: an opaque cover shown whenever the scene isn't active, so the app-switcher snapshot
+/// and transient interruptions never expose financial data. Opaque (not a blur) so nothing leaks.
+private struct PrivacyShield: View {
+    var body: some View {
+        ZStack {
+            WCColor.background
+            Image(systemName: "lock.shield.fill")
+                .font(.system(size: 56))
+                .foregroundStyle(WCColor.primary.opacity(0.5))
+        }
+        .ignoresSafeArea()
+    }
 }
