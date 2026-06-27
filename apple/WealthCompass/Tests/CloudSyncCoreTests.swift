@@ -263,6 +263,49 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(snapshot.updatedAt, updated)
     }
 
+    /// WC-H4: building a send batch must encode the per-entity snapshot ONCE, not once per
+    /// record. `makeRecords` fetches the snapshot a single time and indexes it for every
+    /// record in the batch, so a counting provider is invoked exactly once regardless of how
+    /// many records the batch contains (previously the provider — a full-dataset JSON-encode
+    /// + SHA-256 on the main actor — ran once per record).
+    @MainActor
+    func testMakeRecordsEncodesSnapshotOncePerBatch() async throws {
+        let metadataStore = CloudSyncMetadataStore(
+            directoryName: "WealthCompassTests-\(UUID().uuidString)"
+        )
+
+        // Seed three pending local saves so the batch contains multiple records.
+        let txA = makeTransaction(id: UUID(uuidString: "11111111-0000-0000-0000-000000000001")!, amount: 5)
+        let txB = makeTransaction(id: UUID(uuidString: "22222222-0000-0000-0000-000000000002")!, amount: 6)
+        let txC = makeTransaction(id: UUID(uuidString: "33333333-0000-0000-0000-000000000003")!, amount: 7)
+        let records = try FinancialData(transactions: [txA, txB, txC]).cloudSyncRecords()
+        try metadataStore.recordLocalChanges(
+            CloudSyncChangeSet(changed: Array(records.values), deleted: [], changedAt: fixedDate),
+            currentRecords: records
+        )
+
+        let providerCalls = ThreadSafeCounter()
+        let service = CloudKitSyncService(
+            metadataStore: metadataStore,
+            snapshotProvider: {
+                providerCalls.increment()
+                return records
+            },
+            remoteMutationHandler: { _ in [] },
+            statusHandler: { _ in },
+            disableHandler: {}
+        )
+
+        let zoneID = CKRecordZone.ID(zoneName: "WealthCompassZone", ownerName: CKCurrentUserDefaultName)
+        let recordIDs = records.keys.map { CKRecord.ID(recordName: $0.recordName, zoneID: zoneID) }
+        XCTAssertEqual(recordIDs.count, 3)
+
+        let built = await service.makeRecords(for: recordIDs)
+
+        XCTAssertEqual(providerCalls.value, 1, "The snapshot must be encoded once per batch, not once per record.")
+        XCTAssertEqual(built.count, recordIDs.count, "Every pending record should be built from the single snapshot.")
+    }
+
     // MARK: - #8 fetch-first bootstrap: per-record merge decision
     //
     // `bootstrapDecision` is the collision-avoidance heart of the first-sync merge: the
@@ -574,6 +617,24 @@ private final class ThreadSafeFlag {
     func setTrue() {
         lock.lock()
         value = true
+        lock.unlock()
+    }
+}
+
+/// Thread-safe call counter for asserting how many times a `@Sendable` provider closure ran.
+private final class ThreadSafeCounter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var count = 0
+
+    var value: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return count
+    }
+
+    func increment() {
+        lock.lock()
+        count += 1
         lock.unlock()
     }
 }
