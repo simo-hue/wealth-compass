@@ -65,8 +65,8 @@ Each app's `@main` App constructs `AppSettings` first, then `FinanceStore(settin
 ### CloudKit sync (opt-in)
 `CloudKitSyncService` is an `actor` implementing `CKSyncEngineDelegate`: one CloudKit record per entity (record types `WCTransaction`, `WCInvestment`, … in custom zone `WealthCompassZone`), tombstones for deletes, a bootstrap merge with deterministic conflict resolution (`bootstrapDecision`), and account-change protection that disables sync if the iCloud user changes. Sync metadata persists in `wealth-compass-cloud-sync.json`. Toggled by `AppSettings.isICloudSyncEnabled`; remote mutations are applied back through a `@MainActor` handler on `FinanceStore`. Design notes and remaining work are in `ICLOUD_SYNC.md` and `WealthCompass/TO_IMPROVE.md`.
 
-### External data goes through a Cloudflare Worker proxy
-`ExchangeRateService` and `MarketDataService` never call third-party APIs directly — they hit `APIConfiguration.proxyBaseURL` at `/api/rates` (Frankfurter, base EUR), `/api/quote` (Finnhub), and `/api/price` (CoinGecko). The worker source is in `../proxy/` (deploy with `npx wrangler deploy`); if you change `proxyBaseURL`, update both. Finnhub/CoinGecko keys are user-entered and stored in the Keychain via `KeychainCredentialStore` (service `com.wealthcompass.mobile.marketdata`) — they are **never** synced to iCloud. Exchange rates auto-refresh on a 12h staleness window with exponential backoff, persisted via `ExchangeRatePersistence`.
+### External data is fetched directly from the providers
+`ExchangeRateService` and `MarketDataService` call Frankfurter (`/v2/rates`, base EUR), Finnhub (`/quote`), and CoinGecko (`/simple/price`) **directly** from the device — see `APIConfiguration` for the endpoints. There is no intermediary proxy. Finnhub/CoinGecko keys are user-entered and stored in the Keychain via `KeychainCredentialStore` (service `com.wealthcompass.mobile.marketdata`) — they are **never** synced to iCloud and travel only as request headers over HTTPS to the issuing provider. Exchange rates auto-refresh on a 12h staleness window with exponential backoff, persisted via `ExchangeRatePersistence`. (The old `../proxy/` Cloudflare Worker is retired and no longer used by the app.)
 
 ### Localization — the dual-API pattern (important)
 The app supports an **in-app language override** (`AppSettings.appLanguage`) that is independent of the system language. Because of this, model enums expose strings two ways and you must pick the right one:
@@ -78,7 +78,7 @@ New user-facing strings go into `Sources/Shared/Resources/Localizable.xcstrings`
 
 ## Conventions & gotchas
 
-- **Remove the debug instrumentation before shipping.** `CloudKitSyncService.swift` and `FinanceStore.swift` contain `// #region agent log` blocks and a `wcDebugLog(...)` helper that POSTs to `http://127.0.0.1:7504/...`, and `ContentView` runs `I18nDebugLog` audits. These are temporary; per `WealthCompass/TO_IMPROVE.md` they must not ship (localhost HTTP logging spams the network stack on a real device).
+- **Debug instrumentation has been removed — do not reintroduce it.** Earlier builds had `// #region agent log` blocks, a `wcDebugLog(...)` helper, and an `I18nDebugLog` audit that POSTed app data to `http://127.0.0.1:7504/...`. These were deleted (see `CODE_AUDIT.md` C1) and must stay gone: cleartext localhost logging spams the network stack on a real device and trips ATS / App Review.
 - Concurrency: `FinanceStore` and `AppSettings` are `@MainActor`; `CloudKitSyncService` is an `actor`. Keep finance mutations on the main actor and route remote applies through the existing `@MainActor` handler.
 - Currency conversion in `AppSettings.convert` deliberately guards against zero / NaN / Inf rates because the results feed Swift Charts geometry (a NaN propagates into CoreGraphics and logs errors). Preserve those guards.
 - Both apps force `.preferredColorScheme(.dark)` and re-`.id(...)` the root view on language change to force a full re-render.
