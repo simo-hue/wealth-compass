@@ -39,6 +39,38 @@ verify via the steps in `TO_SIMO_DO.md` (items 22–25). Per-theme commits.
 - [x] Verified: 0 leftover `Double(...replacingOccurrences)` parses; all 6 tx-calls + 2 builder-calls carry `currency:`;
   no bare-literal ambiguity in format overloads; notification services handle no money.
 
+## DONE (commit d702f64 — localization HIGH)
+- [x] WC-H2: `SettingsRow` String init wraps into LocalizedStringKey → macOS Settings localizes.
+- [x] WC-M11: "Status • N Sectors/Coins" cards routed through `settings.localized(...)`.
+
+## COMMITS SO FAR
+- `7855977` WC-A1/M1 Decimal migration + per-tx currency (+ H1, M9, M10, L9, L12, L22, L23, L31)
+- `d702f64` WC-H2/M11 localization
+- `3bed088` WC-L4/L18/L19/L21 localization polish
+- `ca91570` WC-M7/L5/L6/L7/L10/L11 services & networking
+- `c8107c3` WC-M4/L27 persistence perf + logging
+- `6637329` WC-L13/L14/L20 shared UI
+- `a549648` WC-A3 docs (stale proxy/instrumentation)
+- `7034905` tests updated to Decimal + WC-H1/M9/M1 regressions
+
+## ✅ ALL LOW-RISK BATCHES DONE
+Localization, Services, Persistence-perf, Shared-UI, Docs, Tests — complete.
+Intentionally skipped within these (not low-risk / against project guidance, noted in commits):
+WC-L8 (don't tighten forgiving import decoders), WC-L28 (restructuring data-migration path).
+
+## REMAINING (Med/High risk — deferred per request; do after a build)
+- **Sync hardening (High)**: WC-H3 (undecodable record tears down engine), WC-H4 (makeRecord
+  re-encodes per record), WC-M2 (transient error fatal), WC-M3 (lock across IO), WC-L29.
+- **Security/lock (Med)**: WC-L2 (passcode fallback), L3 (auth to disable), L26 (blur on inactive), M6.
+- **macOS dedup/UX (Med)**: WC-M5 (lang reset onboarding), M8 (merge dup tx editors),
+  M12 (drop stray Refresh on settings), L16 (dead table state), L17 (minus glyph), A2 (dedup helpers).
+- **iOS perf/a11y (Med)**: WC-M13 (re-sort per render), L1 (notif churn 30s), L24 (a11y row buttons),
+  L25 (UITabBar.appearance in init), L15 (dead pie `total:` param).
+
+## ⚠️ RECOMMENDED CHECKPOINT
+Before layering the remaining ~30 items on top, run a build (TO_SIMO_DO.md #22) to surface any
+cross-file `Decimal`/`Double` errors the single-file linter can't see — cheaper to fix now than buried.
+
 ## NEXT STEP (immediate)
 **Batch 11 — Tests**: update the 7 XCTest files (Double money literals → Decimal) + add regressions for
 WC-H1 (MoneyParser rejects inf/nan), WC-M1 (per-currency conversion in calculateTotals), WC-M9 (locale parse),
