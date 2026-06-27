@@ -49,6 +49,9 @@ struct MacRootView: View {
                         }
                 }
                 .navigationSplitViewStyle(.balanced)
+                // WC-M5: force the language re-render here (post-onboarding) instead of at the
+                // app root, so changing language never resets the onboarding flow.
+                .id(settings.appLanguage ?? "system")
             }
         }
         .overlay(alignment: .top) {

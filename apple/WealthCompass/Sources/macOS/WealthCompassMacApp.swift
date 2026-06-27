@@ -23,7 +23,9 @@ struct WealthCompassMacApp: App {
                 .environmentObject(appLock)
                 .preferredColorScheme(.dark)
                 .appLanguage(settings.appLanguage)
-                .id(settings.appLanguage ?? "system")
+                // WC-M5: the language-change `.id` re-render lives inside MacRootView on the
+                // post-onboarding view only — applying it here destroyed the onboarding view
+                // (resetting its page + entered API keys) when the user picked a language on page 2.
         }
         .defaultSize(width: 1240, height: 780)
         .windowResizability(.contentMinSize)

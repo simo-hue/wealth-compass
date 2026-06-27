@@ -38,6 +38,7 @@ struct ContentView: View {
                     .transition(.opacity)
             } else {
                 tabs
+                    .id(settings.appLanguage ?? "system")
             }
         }
         .overlay(alignment: .top) {
