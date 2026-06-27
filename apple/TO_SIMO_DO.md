@@ -177,3 +177,8 @@
     `Localizable.xcstrings`. Build once so Xcode auto-extracts them. (WC-L4 added no new keys; WC-L21
     tab translations live in `scripts/add_tab_bar_localizations.py` and are already generated — some
     Latin-script locales still show English "Investments", left as fallback rather than guessed.)
+
+27. **More new localizable strings (Medium batches) need translation.** English-only until added
+    to `Localizable.xcstrings` (build once to auto-extract): `"Turn off app protection for Wealth
+    Compass."` (WC-L3 disable-lock prompt). The privacy shield, a11y labels, and toolbar changes
+    add no user-facing copy beyond existing keys.
