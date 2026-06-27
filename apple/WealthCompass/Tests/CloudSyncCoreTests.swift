@@ -477,6 +477,44 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(Set(messages).count, messages.count, "Each classified CKError code must produce distinct copy.")
     }
 
+    /// WC-L29: `synchronize` may report `.upToDate` on a `CKError.partialFailure` only when
+    /// every per-item error is benign (retryable / a server-record conflict / a missing zone,
+    /// matching what `handleSentRecordZoneChanges` already declines to throw on). A partial
+    /// failure that carries a genuine rejection — or one with no introspectable item errors —
+    /// must NOT be treated as benign, so it surfaces instead of reading "Up to Date."
+    func testPartialFailureIsBenignOnlyWhenEveryItemIsRetryableOrConflict() {
+        // Every item benign: retryable blip + first-sync conflict + zone recreation.
+        XCTAssertTrue(CloudKitSyncService.partialFailureIsBenign(
+            partialFailure(items: [.networkUnavailable, .serverRecordChanged, .zoneNotFound, .batchRequestFailed])
+        ))
+
+        // A single genuine rejection makes the whole partial failure non-benign.
+        XCTAssertFalse(CloudKitSyncService.partialFailureIsBenign(
+            partialFailure(items: [.serverRecordChanged, .quotaExceeded])
+        ))
+        XCTAssertFalse(CloudKitSyncService.partialFailureIsBenign(
+            partialFailure(items: [.permissionFailure])
+        ))
+
+        // An opaque partial failure with no item errors is not benign (don't swallow it).
+        XCTAssertFalse(CloudKitSyncService.partialFailureIsBenign(partialFailure(items: [])))
+
+        // A non-partial-failure CKError is never a "benign partial failure".
+        XCTAssertFalse(CloudKitSyncService.partialFailureIsBenign(ckError(.networkUnavailable)))
+    }
+
+    private func partialFailure(items: [CKError.Code]) -> CKError {
+        var byItem: [CKRecord.ID: Error] = [:]
+        for (index, code) in items.enumerated() {
+            byItem[CKRecord.ID(recordName: "item-\(index)")] = NSError(domain: CKError.errorDomain, code: code.rawValue)
+        }
+        return CKError(_nsError: NSError(
+            domain: CKError.errorDomain,
+            code: CKError.Code.partialFailure.rawValue,
+            userInfo: byItem.isEmpty ? [:] : [CKPartialErrorsByItemIDKey: byItem]
+        ))
+    }
+
     private func makeTransaction(id: UUID, amount: Double) -> Transaction {
         Transaction(
             id: id,

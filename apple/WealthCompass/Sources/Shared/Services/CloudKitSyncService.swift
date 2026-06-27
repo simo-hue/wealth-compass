@@ -814,11 +814,14 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             await statusHandler(.upToDate(date))
         } catch {
             guard isCurrent(generation, engine: engine) else { return }
-            // A partial failure means some records were rejected (e.g. first-sync
-            // "record already exists" collisions). Those are handled per-record in
-            // the sent/fetched event callbacks and retried by the engine, so this is
-            // not a fatal, user-facing sync error.
-            if (error as? CKError)?.code == .partialFailure {
+            // A partial failure means some records were rejected. The benign cases (first-sync
+            // "record already exists" collisions, retryable blips, a zone being recreated) are
+            // handled per-record in the sent/fetched event callbacks and retried by the engine,
+            // so they're not user-facing — report `.upToDate`. But a partial failure that
+            // carries a genuine rejection (quota, permission, server-rejected, …) must NOT be
+            // mislabeled "Up to Date" — surface it so the user can see the records didn't sync
+            // (WC-L29). The benign set matches `handleSentRecordZoneChanges`'s non-throw set.
+            if let ckError = error as? CKError, Self.partialFailureIsBenign(ckError) {
                 let date = Date()
                 try? metadataStore.update { $0.lastSyncAt = date }
                 await statusHandler(.upToDate(date))
@@ -1217,7 +1220,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         }
 
         for failure in event.failedZoneSaves where failure.zone.zoneID == zoneID {
-            if isRetryable(failure.error) {
+            if Self.isRetryable(failure.error) {
                 ensureZonePending(on: syncEngine)
             } else {
                 throw failure.error
@@ -1282,7 +1285,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             } else if failure.error.code == .zoneNotFound {
                 needsZoneRecreation = true
                 simpleRequeue.insert(key)
-            } else if isRetryable(failure.error) {
+            } else if Self.isRetryable(failure.error) {
                 simpleRequeue.insert(key)
             } else {
                 throw failure.error
@@ -1619,13 +1622,36 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         return UUID(uuidString: value)
     }
 
-    private func isRetryable(_ error: CKError) -> Bool {
+    static func isRetryable(_ error: CKError) -> Bool {
         switch error.code {
         case .networkUnavailable, .networkFailure, .serviceUnavailable, .requestRateLimited,
              .zoneBusy, .resultsTruncated, .batchRequestFailed:
             true
         default:
             false
+        }
+    }
+
+    /// Whether a `CKError.partialFailure` is fully recoverable — i.e. every per-item error is
+    /// one the sent-side classifier (`handleSentRecordZoneChanges`) already declines to throw
+    /// on: a retryable blip, a `.serverRecordChanged` conflict that's resolved per record, or
+    /// a `.zoneNotFound` that triggers zone recreation. When true, `synchronize` may still
+    /// report `.upToDate`; otherwise the batch contains a genuine rejection (quota, permission,
+    /// server-rejected, invalid-arguments, …) that must surface to the user instead of being
+    /// mislabeled "Up to Date" (WC-L29). A partial failure with no introspectable item errors
+    /// is treated as non-benign, so an opaque failure isn't silently swallowed. Pure + static
+    /// so it's unit-testable without a live CloudKit container, and kept in lock-step with the
+    /// sent-side non-throw set so the two paths never disagree about the same error.
+    static func partialFailureIsBenign(_ error: CKError) -> Bool {
+        guard error.code == .partialFailure,
+              let itemErrors = error.partialErrorsByItemID, !itemErrors.isEmpty else {
+            return false
+        }
+        return itemErrors.values.allSatisfy { itemError in
+            guard let ckError = itemError as? CKError else { return false }
+            return isRetryable(ckError)
+                || ckError.code == .serverRecordChanged
+                || ckError.code == .zoneNotFound
         }
     }
 
