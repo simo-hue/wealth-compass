@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 protocol ExchangeRatePersistence {
     func load() -> ExchangeRateSnapshot?
@@ -7,6 +8,7 @@ protocol ExchangeRatePersistence {
 }
 
 struct LocalExchangeRatePersistence: ExchangeRatePersistence {
+    private static let logger = Logger(subsystem: "com.wealthcompass.persistence", category: "ExchangeRates")
     private let fileManager: FileManager
     private let storageURL: URL
     private let encoder = JSONEncoder()
@@ -40,15 +42,25 @@ struct LocalExchangeRatePersistence: ExchangeRatePersistence {
 
     func save(_ snapshot: ExchangeRateSnapshot) {
         createStorageDirectoryIfNeeded()
-        guard let data = try? encoder.encode(snapshot) else { return }
-        try? data.write(to: storageURL, options: [.atomic, .completeFileProtectionUnlessOpen])
+        // WC-L27: log instead of silently swallowing — a failed write means stale FX rates.
+        do {
+            let data = try encoder.encode(snapshot)
+            try data.write(to: storageURL, options: [.atomic, .completeFileProtectionUnlessOpen])
+        } catch {
+            Self.logger.error("Failed to persist exchange-rate snapshot: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     /// Removes the cached rate file so a factory reset leaves no snapshot behind. The next
     /// launch falls back to the bundled offline rates until a fresh fetch succeeds.
     func clear() {
         guard fileManager.fileExists(atPath: storageURL.path) else { return }
-        try? fileManager.removeItem(at: storageURL)
+        // WC-L27: a silently-failing clear would leave a stale rate cache after a factory reset.
+        do {
+            try fileManager.removeItem(at: storageURL)
+        } catch {
+            Self.logger.error("Failed to clear cached exchange rates on reset: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     // MARK: - Migration
@@ -67,8 +79,14 @@ struct LocalExchangeRatePersistence: ExchangeRatePersistence {
         }
 
         createStorageDirectoryIfNeeded()
-        try? legacyData.write(to: storageURL, options: [.atomic, .completeFileProtectionUnlessOpen])
-        UserDefaults.standard.removeObject(forKey: legacyKey)
+        // WC-L27: only drop the legacy key once the file write succeeded, and log failures
+        // rather than losing the legacy snapshot silently.
+        do {
+            try legacyData.write(to: storageURL, options: [.atomic, .completeFileProtectionUnlessOpen])
+            UserDefaults.standard.removeObject(forKey: legacyKey)
+        } catch {
+            Self.logger.error("Failed to migrate legacy exchange rates: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     private func createStorageDirectoryIfNeeded() {
