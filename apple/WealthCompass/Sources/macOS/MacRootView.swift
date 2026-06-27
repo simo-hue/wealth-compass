@@ -151,9 +151,11 @@ struct MacRootView: View {
         let marketResult = await refreshMarketPrices()
         let exchangeMessage = exchangeResultForAlert?.localizedMessage(appLanguage: settings.appLanguage) ?? ""
         let marketMessage = marketResult.localizedMessage(appLanguage: settings.appLanguage)
+        // WC-L19: both parts are already localized — concatenate directly rather than running
+        // them through a `"%@\n\n%@"` lookup (which also left stray newlines when one was empty).
         alert = MacRootAlert(
             title: marketResult.localizedTitle(appLanguage: settings.appLanguage),
-            message: settings.localized("\(exchangeMessage)\n\n\(marketMessage)")
+            message: [exchangeMessage, marketMessage].filter { !$0.isEmpty }.joined(separator: "\n\n")
         )
     }
 
@@ -177,9 +179,14 @@ struct MacRootView: View {
         await syncRecurringNotifications()
 
         guard insertedCount > 0 else { return }
+        // WC-L18: use two explicit keys instead of concatenating grammar fragments, so
+        // translators get full sentences (mirrors the singular/plural pattern in MacSettingsView).
+        let message = insertedCount == 1
+            ? settings.localized("1 due transaction was added to Cash Flow.")
+            : settings.localized("\(insertedCount) due transactions were added to Cash Flow.")
         alert = MacRootAlert(
             title: settings.localized("Recurring Transactions Added"),
-            message: settings.localized("\(insertedCount) due transaction\(insertedCount == 1 ? " was" : "s were") added to Cash Flow.")
+            message: message
         )
     }
 

@@ -170,3 +170,10 @@
     - Change base currency in Settings → confirm cash/liquidity now re-converts (the WC-M1 fix).
     - First launch after update performs a one-time currency backfill (legacy rows stamped with
       base currency) and re-syncs those records once to iCloud — expect a small one-time sync.
+
+26. **New localizable strings (WC-L18) need translation.** Two singular/plural keys were added for
+    the macOS "Recurring Transactions Added" alert: `"1 due transaction was added to Cash Flow."`
+    and `"%lld due transactions were added to Cash Flow."` They fall back to English until added to
+    `Localizable.xcstrings`. Build once so Xcode auto-extracts them. (WC-L4 added no new keys; WC-L21
+    tab translations live in `scripts/add_tab_bar_localizations.py` and are already generated — some
+    Latin-script locales still show English "Investments", left as fallback rather than guessed.)
