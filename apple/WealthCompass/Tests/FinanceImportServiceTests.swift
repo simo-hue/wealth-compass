@@ -34,7 +34,7 @@ final class FinanceImportServiceTests: XCTestCase {
     func testCommaDecimalAmountIsParsed() throws {
         // The parser swaps "," for "." (decimal comma); it does NOT strip thousands separators.
         let result = try parse(#"{"transactions":[{"type":"expense","amount":"1234,56","category":"Rent","date":"2026-06-03"}]}"#)
-        XCTAssertEqual(result.data.transactions.first?.amount ?? 0, 1234.56, accuracy: 0.001)
+        XCTAssertEqual((result.data.transactions.first?.amount ?? 0).doubleValue, 1234.56, accuracy: 0.001)
     }
 
     func testMultipleDateFormatsBothParse() throws {

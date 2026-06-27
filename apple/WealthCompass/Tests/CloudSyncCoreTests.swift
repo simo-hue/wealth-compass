@@ -394,7 +394,7 @@ final class CloudSyncCoreTests: XCTestCase {
             id: id,
             type: .expense,
             category: "Testing",
-            amount: amount,
+            amount: Decimal(amount),
             description: "Cloud sync test",
             date: fixedDate,
             createdAt: fixedDate,

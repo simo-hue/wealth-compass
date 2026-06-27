@@ -96,10 +96,11 @@ final class PersistenceCoordinatorTests: XCTestCase {
         for index in 1...25 {
             store.addTransaction(
                 type: .income,
-                amount: Double(index),
+                amount: Decimal(index),
                 category: "Salary",
                 description: "Burst \(index)",
                 date: fixedDate,
+                currency: settings.currency,
                 settings: settings
             )
         }
@@ -120,6 +121,7 @@ final class PersistenceCoordinatorTests: XCTestCase {
             category: "Rent",
             description: "Original",
             date: fixedDate,
+            currency: settings.currency,
             settings: settings
         )
         await store.waitForPendingSaves()
@@ -129,10 +131,11 @@ final class PersistenceCoordinatorTests: XCTestCase {
             store.updateTransaction(
                 original,
                 type: .expense,
-                amount: Double(amount),
+                amount: Decimal(amount),
                 category: "Rent",
                 description: "Update \(amount)",
                 date: fixedDate,
+                currency: settings.currency,
                 settings: settings
             )
         }
@@ -156,6 +159,7 @@ final class PersistenceCoordinatorTests: XCTestCase {
             category: "Bonus",
             description: "Will fail",
             date: fixedDate,
+            currency: settings.currency,
             settings: settings
         )
 
@@ -192,7 +196,7 @@ final class PersistenceCoordinatorTests: XCTestCase {
                 Liability(
                     id: UUID(uuidString: "50000000-0000-0000-0000-000000000005")!,
                     name: "Loan",
-                    currentBalance: balance,
+                    currentBalance: Decimal(balance),
                     currency: .eur,
                     createdAt: fixedDate,
                     updatedAt: fixedDate

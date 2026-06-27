@@ -28,7 +28,7 @@ final class RecurringScheduleBuilderTests: XCTestCase {
         let result = RecurringScheduleBuilder.build(
             existing: nil, type: .expense, category: "Rent", amount: 500, description: "Rent",
             startDate: date(2026, 7, 1), frequency: .monthly, endDate: nil,
-            notificationsEnabled: true, now: date(2026, 6, 22)
+            notificationsEnabled: true, currency: .eur, now: date(2026, 6, 22)
         )
         XCTAssertEqual(result.nextDueDate, date(2026, 7, 1))
         XCTAssertTrue(result.isActive)
@@ -39,7 +39,7 @@ final class RecurringScheduleBuilderTests: XCTestCase {
         let result = RecurringScheduleBuilder.build(
             existing: nil, type: .expense, category: "Rent", amount: 500, description: "Rent",
             startDate: date(2026, 1, 1), frequency: .monthly, endDate: nil,
-            notificationsEnabled: true, now: now
+            notificationsEnabled: true, currency: .eur, now: now
         )
         XCTAssertGreaterThanOrEqual(result.nextDueDate, now, "next due must never be back-dated (H7)")
     }
@@ -48,7 +48,7 @@ final class RecurringScheduleBuilderTests: XCTestCase {
         let result = RecurringScheduleBuilder.build(
             existing: nil, type: .income, category: "X", amount: 10, description: "",
             startDate: date(2026, 7, 1), frequency: .monthly, endDate: date(2026, 6, 25),
-            notificationsEnabled: true, now: date(2026, 6, 22)
+            notificationsEnabled: true, currency: .eur, now: date(2026, 6, 22)
         )
         XCTAssertFalse(result.isActive)
     }
@@ -59,7 +59,7 @@ final class RecurringScheduleBuilderTests: XCTestCase {
         let rebuilt = RecurringScheduleBuilder.build(
             existing: existing, type: .expense, category: "Rent", amount: 500, description: "Rent",
             startDate: start, frequency: .monthly, endDate: nil,
-            notificationsEnabled: true, now: date(2026, 6, 22)
+            notificationsEnabled: true, currency: .eur, now: date(2026, 6, 22)
         )
         XCTAssertEqual(rebuilt.nextDueDate, existing.nextDueDate)
         XCTAssertEqual(rebuilt.id, existing.id)
