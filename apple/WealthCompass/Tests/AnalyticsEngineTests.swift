@@ -16,7 +16,7 @@ final class AnalyticsEngineTests: XCTestCase {
     }
 
     private func tx(_ type: TransactionType, _ amount: Double, _ category: String, _ when: Date) -> Transaction {
-        Transaction(type: type, category: category, amount: amount, description: "", date: when)
+        Transaction(type: type, category: category, amount: Decimal(amount), description: "", date: when)
     }
 
     private func engine(_ data: FinancialData, now: Date) -> AnalyticsEngine {
@@ -34,6 +34,26 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual(totals.totalInvestments, 150)
         XCTAssertEqual(totals.totalLiabilities, 200)
         XCTAssertEqual(totals.netWorth, 650)
+    }
+
+    func testCalculateTotalsConvertsTransactionsByOwnCurrency() {
+        // WC-M1: each transaction converts from its own currency to the display currency
+        // before summing into cash/liquidity.
+        let converter = CurrencyConverter(snapshot: ExchangeRateSnapshot(
+            baseCurrency: .eur,
+            rates: ["USD": 1.25],
+            effectiveDate: Date(timeIntervalSince1970: 1_700_000_000),
+            fetchedAt: Date(timeIntervalSince1970: 1_700_000_000),
+            provider: "test"
+        ))
+        var eurTx = tx(.income, 100, "Salary", date(2026, 6, 1)); eurTx.currency = .eur
+        var usdTx = tx(.income, 125, "Bonus", date(2026, 6, 2)); usdTx.currency = .usd
+        let totals = AnalyticsEngine(
+            data: FinancialData(transactions: [eurTx, usdTx]),
+            converter: converter, displayCurrency: .eur, calendar: utc, now: date(2026, 6, 22)
+        ).calculateTotals()
+        // 100 EUR + (125 USD ÷ 1.25) = 200 EUR
+        XCTAssertEqual(totals.totalLiquidity.doubleValue, 200, accuracy: 0.01)
     }
 
     func testExpensesByCategoryGroupsRanksAndExcludesIncome() {
@@ -80,10 +100,10 @@ final class AnalyticsEngineTests: XCTestCase {
         let when = utc.date(from: comps)!
         return NetWorthSnapshot(
             date: when,
-            totalAssets: netWorth,
+            totalAssets: Decimal(netWorth),
             totalLiabilities: 0,
-            netWorth: netWorth,
-            liquidity: netWorth,
+            netWorth: Decimal(netWorth),
+            liquidity: Decimal(netWorth),
             investments: 0,
             crypto: 0
         )
@@ -110,7 +130,9 @@ final class AnalyticsEngineTests: XCTestCase {
                 date: date(2026, 6, 21),
                 totalAssets: 0,
                 totalLiabilities: 0,
-                netWorth: .nan,
+                // Decimal can't hold a float-literal NaN; use the NSDecimalNumber NaN whose
+                // doubleValue is NaN, so the chart's `.isFinite` filter is still exercised.
+                netWorth: NSDecimalNumber.notANumber.decimalValue,
                 liquidity: 0,
                 investments: 0,
                 crypto: 0
