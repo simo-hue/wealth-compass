@@ -83,17 +83,39 @@ private struct ImportedFinancialData: Decodable {
         let skippedCrypto = crypto.skippedCount + max(0, crypto.elements.count - importedCrypto.count)
         let skippedLiabilities = liabilities.skippedCount + max(0, liabilities.elements.count - importedLiabilities.count)
         let skippedSnapshots = snapshots.skippedCount + max(0, snapshots.elements.count - importedSnapshots.count)
+        // Unique once so we can also count records dropped for a duplicate UUID (WC-L7) —
+        // previously those vanished from the totals without incrementing `skippedRecords`.
+        let uniqueTransactions = (importedTransactions + importedIncome + importedExpenses + importedLiquidity).uniquedByID()
+        let uniqueRecurring = importedRecurringTransactions.uniquedByID()
+        let uniqueInvestments = importedInvestments.uniquedByID()
+        let uniqueCrypto = importedCrypto.uniquedByID()
+        let uniqueLiabilities = importedLiabilities.uniquedByID()
+        let uniqueSnapshots = importedSnapshots.uniquedByID()
+
+        // Broken into simple binary ops to keep the type-checker fast.
+        let combinedTransactionCount = importedTransactions.count + importedIncome.count
+            + importedExpenses.count + importedLiquidity.count
+        let droppedTransactions = combinedTransactionCount - uniqueTransactions.count
+        let droppedRecurring = importedRecurringTransactions.count - uniqueRecurring.count
+        let droppedInvestments = importedInvestments.count - uniqueInvestments.count
+        let droppedCrypto = importedCrypto.count - uniqueCrypto.count
+        let droppedLiabilities = importedLiabilities.count - uniqueLiabilities.count
+        let droppedSnapshots = importedSnapshots.count - uniqueSnapshots.count
+        let droppedDuplicates = droppedTransactions + droppedRecurring + droppedInvestments
+            + droppedCrypto + droppedLiabilities + droppedSnapshots
+
         let skippedRecords = skippedTransactions + skippedRecurringTransactions + skippedIncome + skippedExpenses
             + skippedLiquidity + skippedInvestments + skippedCrypto + skippedLiabilities + skippedSnapshots
+            + droppedDuplicates
 
         return NormalizedFinanceImport(
             data: FinancialData(
-                transactions: (importedTransactions + importedIncome + importedExpenses + importedLiquidity).uniquedByID(),
-                recurringTransactions: importedRecurringTransactions.uniquedByID(),
-                investments: importedInvestments.uniquedByID(),
-                crypto: importedCrypto.uniquedByID(),
-                liabilities: importedLiabilities.uniquedByID(),
-                snapshots: importedSnapshots.uniquedByID()
+                transactions: uniqueTransactions,
+                recurringTransactions: uniqueRecurring,
+                investments: uniqueInvestments,
+                crypto: uniqueCrypto,
+                liabilities: uniqueLiabilities,
+                snapshots: uniqueSnapshots
             ).sortedForStorage(),
             skippedRecords: skippedRecords
         )
@@ -793,6 +815,16 @@ private enum ImportDateParser {
 
     static func parseDateOnly(_ rawValue: String?) -> Date? {
         guard let date = parse(rawValue) else { return nil }
+        // WC-L6: an ISO date-time near midnight UTC, collapsed with the device's local calendar,
+        // could land on the wrong calendar day (and thus the wrong cash-flow month). For values
+        // that carry a time component (contain "T"), take the calendar day in UTC — the wire
+        // format the web app emits. Pure "yyyy-MM-dd" values are already tz-stable, so they keep
+        // the local startOfDay behavior unchanged.
+        if rawValue?.trimmedForImport.contains("T") == true {
+            var utc = Calendar(identifier: .gregorian)
+            utc.timeZone = TimeZone(identifier: "UTC") ?? .current
+            return utc.startOfDay(for: date)
+        }
         return Calendar.current.startOfDay(for: date)
     }
 }
