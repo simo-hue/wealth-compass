@@ -7,7 +7,10 @@ struct DynamicMasonryLayout: Layout {
     var spacing: CGFloat = 32
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let width = proposal.width ?? 0
+        // WC-L14: a `nil` proposal is handled by `?? 0`, but an *infinite* proposed width would
+        // make `Int(...)` trap. Clamp non-finite widths to 0 (→ a single column).
+        let proposed = proposal.width ?? 0
+        let width = proposed.isFinite ? proposed : 0
         let columns = max(1, Int((width + spacing) / (minColumnWidth + spacing)))
         let columnWidth = max(0, (width - spacing * CGFloat(columns - 1)) / CGFloat(columns))
         
