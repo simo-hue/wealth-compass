@@ -315,7 +315,10 @@ struct DashboardView: View {
                     value: settings.privateCurrency(currentMonthCashFlow.netSavings),
                     systemImage: currentMonthCashFlow.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
                     accent: currentMonthCashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive,
-                    detail: LocalizedStringKey(Date().formatted(.dateTime.month(.wide)))
+                    // WC-L4: `.formatted` ignores the SwiftUI environment locale, so pass the
+                    // effective (in-app language) locale explicitly; otherwise the month stayed
+                    // in the system language. The result is already-localized data, rendered verbatim.
+                    detail: LocalizedStringKey(Date().formatted(.dateTime.month(.wide).locale(AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))))
                 )
             }
         }
