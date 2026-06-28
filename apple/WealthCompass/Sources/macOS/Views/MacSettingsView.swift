@@ -476,14 +476,19 @@ struct MacSettingsView: View {
                 Divider().background(WCColor.border)
 
                 SettingsRow(title: "Status") {
-                    Text(finance.cloudSyncStatus.title)
-                        .foregroundStyle(finance.iCloudSyncError == nil ? .secondary : WCColor.destructive)
+                    Label {
+                        Text(finance.cloudSyncStatus.title)
+                    } icon: {
+                        Image(systemName: finance.cloudSyncStatus.symbolName)
+                    }
+                    .labelStyle(.titleAndIcon)
+                    .foregroundStyle(finance.cloudSyncStatus.tint)
                 }
 
                 if let detail = finance.cloudSyncStatus.localizedDetail(appLanguage: settings.appLanguage) {
                     Text(detail)
                         .font(.caption)
-                        .foregroundStyle(finance.iCloudSyncError == nil ? .secondary : WCColor.destructive)
+                        .foregroundStyle(finance.cloudSyncStatus.tint)
                 }
             }
             

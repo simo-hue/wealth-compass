@@ -9,8 +9,10 @@ enum CloudSyncStatus: Equatable, Sendable {
     case starting
     case syncing
     case upToDate(Date?)
-    case accountUnavailable(String)
-    case error(String)
+    case waiting(String)          // transient & self-resolving (offline, throttled, preparing)
+    case accountUnavailable(String) // not signed in to iCloud
+    case actionNeeded(String)     // persistent, the user must act (storage full, restricted, account changed)
+    case error(String)            // unexpected failure
 
     var title: LocalizedStringKey {
         switch self {
@@ -22,8 +24,12 @@ enum CloudSyncStatus: Equatable, Sendable {
             "Syncing"
         case .upToDate:
             "Up to Date"
+        case .waiting:
+            "Waiting to Sync"
         case .accountUnavailable:
             "iCloud Unavailable"
+        case .actionNeeded:
+            "Action Needed"
         case .error:
             "Sync Error"
         }
@@ -39,8 +45,12 @@ enum CloudSyncStatus: Equatable, Sendable {
             AppLocalization.string("Syncing", appLanguage: appLanguage)
         case .upToDate:
             AppLocalization.string("Up to Date", appLanguage: appLanguage)
+        case .waiting:
+            AppLocalization.string("Waiting to Sync", appLanguage: appLanguage)
         case .accountUnavailable:
             AppLocalization.string("iCloud Unavailable", appLanguage: appLanguage)
+        case .actionNeeded:
+            AppLocalization.string("Action Needed", appLanguage: appLanguage)
         case .error:
             AppLocalization.string("Sync Error", appLanguage: appLanguage)
         }
@@ -62,13 +72,47 @@ enum CloudSyncStatus: Equatable, Sendable {
             date.map {
                 AppLocalization.string("Last synced \($0.formatted(date: .abbreviated, time: .shortened)).", appLanguage: appLanguage)
             } ?? AppLocalization.string("Local data is ready to sync.", appLanguage: appLanguage)
-        case .accountUnavailable(let message), .error(let message):
+        case .waiting(let message), .accountUnavailable(let message), .actionNeeded(let message), .error(let message):
             AppLocalization.string(String.LocalizationValue(message), appLanguage: appLanguage)
         }
     }
 
     var isBusy: Bool {
         self == .starting || self == .syncing
+    }
+
+    enum Severity: Equatable, Sendable { case ok, info, attention, error }
+
+    /// Visual severity for color + icon. Transient states (`.waiting`) are `.info` — calm and
+    /// neutral, never red: being offline or throttled is normal operation, not a failure.
+    var severity: Severity {
+        switch self {
+        case .disabled, .upToDate: .ok
+        case .starting, .syncing, .waiting: .info
+        case .accountUnavailable, .actionNeeded: .attention
+        case .error: .error
+        }
+    }
+
+    /// Tint for the status row's icon / title / detail, derived from `severity`.
+    var tint: Color {
+        switch severity {
+        case .ok, .info: WCColor.textSecondary
+        case .attention: WCColor.warning
+        case .error: WCColor.destructive
+        }
+    }
+
+    /// SF Symbol for the status row.
+    var symbolName: String {
+        switch self {
+        case .disabled: "icloud.slash"
+        case .starting, .syncing: "arrow.triangle.2.circlepath.icloud"
+        case .upToDate: "checkmark.icloud"
+        case .waiting: "icloud"
+        case .accountUnavailable, .actionNeeded: "exclamationmark.icloud"
+        case .error: "xmark.icloud"
+        }
     }
 }
 
@@ -1706,24 +1750,28 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     /// container, and so account / network / quota / throttling failures are no longer
     /// collapsed into one generic status (#14).
     enum SyncFailureCategory: Equatable, Sendable {
-        case notSignedIn        // not signed in to iCloud — surfaced as "iCloud Unavailable"
-        case accountChanged     // the iCloud user changed; sync was disabled to protect data
-        case networkUnavailable // offline / no usable connection
-        case connectionLost     // the request reached iCloud but the response was lost
-        case quotaExceeded      // the iCloud account is out of storage
-        case rateLimited        // CloudKit throttled the request; it retries automatically
-        case zoneMissing        // the sync zone isn't there yet / was removed
-        case unknown            // anything else — fall back to the system description
+        case notSignedIn            // not signed in to iCloud — surfaced as "iCloud Unavailable"
+        case accountChanged         // the iCloud user changed; sync was disabled to protect data
+        case restricted             // CloudKit blocked by device management / Screen Time
+        case networkUnavailable     // offline / no usable connection
+        case connectionLost         // the request reached iCloud but the response was lost
+        case temporarilyUnavailable // iCloud / the account is briefly unavailable (booting, blip)
+        case quotaExceeded          // the iCloud account is out of storage
+        case rateLimited            // CloudKit throttled the request; it retries automatically
+        case zoneMissing            // the sync zone isn't there yet / was removed
+        case unknown                // anything else — fall back to the system description
     }
 
     static func failureCategory(for error: Error) -> SyncFailureCategory {
         if let cloudError = error as? CKError {
             switch cloudError.code {
             case .notAuthenticated: return .notSignedIn
+            case .managedAccountRestricted: return .restricted
             case .networkUnavailable, .networkFailure: return .networkUnavailable
             case .serverResponseLost: return .connectionLost
+            case .serviceUnavailable, .accountTemporarilyUnavailable: return .temporarilyUnavailable
             case .quotaExceeded: return .quotaExceeded
-            case .requestRateLimited: return .rateLimited
+            case .requestRateLimited, .zoneBusy: return .rateLimited
             case .zoneNotFound: return .zoneMissing
             default: return .unknown
             }
@@ -1747,17 +1795,22 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             }
             return .accountUnavailable("Sign in to iCloud to continue syncing.")
         case .accountChanged:
-            return .error(CloudSyncError.accountChanged.localizedDescription(appLanguage: nil))
-        case .networkUnavailable:
-            return .error("The network is unavailable. Local changes are saved and will retry automatically.")
-        case .connectionLost:
-            return .error("The connection to iCloud was lost. Your changes are saved and will sync automatically when it is restored.")
+            return .actionNeeded(CloudSyncError.accountChanged.localizedDescription(appLanguage: nil))
+        case .restricted:
+            return .actionNeeded("iCloud is restricted on this device. Allow it in Screen Time or device-management settings to keep syncing.")
         case .quotaExceeded:
-            return .error("The iCloud account does not have enough available storage.")
+            return .actionNeeded("Your iCloud storage is full. Free up space or upgrade iCloud+ to keep syncing.")
+        // Transient & self-resolving — calm "waiting", never a red error.
+        case .networkUnavailable:
+            return .waiting("You're offline. Changes are saved and will sync automatically when you reconnect.")
+        case .connectionLost:
+            return .waiting("The connection to iCloud was lost. Your changes are saved and will sync automatically when it's restored.")
+        case .temporarilyUnavailable:
+            return .waiting("iCloud is temporarily unavailable. Sync will resume automatically in a moment.")
         case .rateLimited:
-            return .error("iCloud is temporarily limiting sync requests. Sync will resume automatically in a moment.")
+            return .waiting("iCloud is busy right now. Sync will resume automatically in a moment.")
         case .zoneMissing:
-            return .error("iCloud is still preparing your sync data. This usually resolves on the next sync.")
+            return .waiting("iCloud is still preparing your sync data. This usually resolves on the next sync.")
         case .unknown:
             return .error(error.localizedDescription)
         }

@@ -94,13 +94,19 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
 
-                    LabeledContent("Status", value: finance.cloudSyncStatus.localizedTitle(appLanguage: settings.appLanguage))
+                    LabeledContent("Status") {
+                        Label {
+                            Text(finance.cloudSyncStatus.localizedTitle(appLanguage: settings.appLanguage))
+                        } icon: {
+                            Image(systemName: finance.cloudSyncStatus.symbolName)
+                        }
+                        .labelStyle(.titleAndIcon)
+                        .foregroundStyle(finance.cloudSyncStatus.tint)
+                    }
                     if let detail = finance.cloudSyncStatus.localizedDetail(appLanguage: settings.appLanguage) {
                         Text(detail)
                             .font(.caption)
-                            .foregroundStyle(
-                                finance.iCloudSyncError == nil ? WCColor.textSecondary : WCColor.destructive
-                            )
+                            .foregroundStyle(finance.cloudSyncStatus.tint)
                     }
                     
                     if settings.isICloudSyncEnabled {

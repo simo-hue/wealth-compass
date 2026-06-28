@@ -1052,9 +1052,11 @@ final class FinanceStore: ObservableObject {
         switch cloudSyncStatus {
         case .accountUnavailable(let message):
             throw CloudSyncError.accountUnavailable(message)
-        case .error(let message):
+        case .actionNeeded(let message), .error(let message):
             throw CloudSyncError.syncFailed(message)
-        case .disabled, .starting, .syncing, .upToDate:
+        // .waiting is transient (offline/throttled): the calm status row already shows it, so a
+        // manual Force Sync doesn't raise an alarming alert.
+        case .disabled, .starting, .syncing, .upToDate, .waiting:
             break
         }
     }
@@ -1126,9 +1128,10 @@ final class FinanceStore: ObservableObject {
     private func updateCloudSyncStatus(_ status: CloudSyncStatus) {
         cloudSyncStatus = status
         switch status {
-        case .error(let message), .accountUnavailable(let message):
+        case .error(let message), .accountUnavailable(let message), .actionNeeded(let message):
             iCloudSyncError = message
-        case .disabled, .starting, .syncing, .upToDate:
+        // .waiting is transient, not a failure → don't raise the error flag (keeps the UI calm).
+        case .disabled, .starting, .syncing, .upToDate, .waiting:
             if localPersistenceError == nil {
                 iCloudSyncError = nil
             }

@@ -16,6 +16,10 @@ This document tracks manual actions and considerations for you to address.
   - Run the full sync suite: `xcodebuild test -scheme WealthCompassMobile -only-testing:WealthCompassTests/CloudSyncCoreTests -destination 'platform=iOS Simulator,name=iPhone 16'` (includes the new `testBootstrapDecisionTieBreakIsConvergentAcrossDevices`), plus `MarketDataServiceTests`.
   - **Currency unification — no regression**: confirm a USD holding priced by Finnhub and a EUR holding priced by Yahoo both still show correct values after a refresh (the conversion now runs through one `storedPrice` boundary; `nil`/same-currency must be a no-op). Standalone Swift verified the rule (11/11), but confirm against live data.
 - [ ] *(Optional, improves accuracy)* Set VWCE's ISIN to `IE00BK5BQT80` in the investment editor. Not required — the bare-symbol search already resolves it — but the ISIN makes the listing lookup exact. Likewise, for any crypto whose ticker is ambiguous, setting an explicit Coin ID avoids the `/search` guess.
+- [ ] **Verify the iCloud sync status-UX batch on Xcode** (status-severity model + CKError taxonomy). 
+  - Build both schemes; run `xcodebuild test -scheme WealthCompassMobile -only-testing:WealthCompassTests/CloudSyncCoreTests -destination 'platform=iOS Simulator,name=iPhone 16'` (new `testSyncStatusRoutesEachCategoryToTheRightToneAndSeverity` + extended `testFailureCategoryMapsCKErrorCodes`).
+  - **Visual check** in Settings on both platforms: the status row now shows an SF Symbol + severity color. Confirm the layout is fine with the new `Label`/`LabeledContent` shape. Best smoke test: turn on Airplane Mode with sync enabled → the status should read a calm grey **"Waiting to Sync" / "You're offline…"**, NOT a red "Sync Error".
+  - **Localize new strings** in `Sources/Shared/Resources/Localizable.xcstrings` (~40 languages): `"Waiting to Sync"`, `"Action Needed"`, and the new `.waiting`/`.actionNeeded` message copy (offline / connection-lost / temporarily-unavailable / busy / preparing / storage-full / restricted). Until translated they fall back to English.
 
 
 ---

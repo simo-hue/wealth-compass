@@ -456,11 +456,15 @@ final class CloudSyncCoreTests: XCTestCase {
 
     func testFailureCategoryMapsCKErrorCodes() {
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.notAuthenticated)), .notSignedIn)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.managedAccountRestricted)), .restricted)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.networkUnavailable)), .networkUnavailable)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.networkFailure)), .networkUnavailable)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.serverResponseLost)), .connectionLost)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.serviceUnavailable)), .temporarilyUnavailable)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.accountTemporarilyUnavailable)), .temporarilyUnavailable)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.quotaExceeded)), .quotaExceeded)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.requestRateLimited)), .rateLimited)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.zoneBusy)), .rateLimited)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.zoneNotFound)), .zoneMissing)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.internalError)), .unknown)
     }
@@ -486,20 +490,44 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertFalse(message.isEmpty)
     }
 
-    /// Network / quota / throttling / zone failures each become `.error` (never
-    /// `.accountUnavailable`) with their own non-empty copy — the old behavior gave them
-    /// all one indistinct message.
-    func testSyncStatusGivesDistinctErrorCopyPerCategory() {
-        let codes: [CKError.Code] = [.networkUnavailable, .serverResponseLost, .quotaExceeded, .requestRateLimited, .zoneNotFound]
+    /// Each common failure now maps to the right *tone*: transient conditions become `.waiting`
+    /// (info severity — never a red error), persistent user-actionable ones become `.actionNeeded`
+    /// (attention), and only the genuinely unexpected stays `.error`. Distinct, non-empty copy per
+    /// category (the old behaviour collapsed several into one message — and showed offline as red).
+    func testSyncStatusRoutesEachCategoryToTheRightToneAndSeverity() {
+        // Transient & self-resolving → calm `.waiting` / `.info` (one representative code per category).
+        let transient: [CKError.Code] = [.networkUnavailable, .serverResponseLost, .serviceUnavailable, .requestRateLimited, .zoneNotFound]
         var messages: [String] = []
-        for code in codes {
-            guard case .error(let message) = CloudKitSyncService.syncStatus(for: ckError(code)) else {
-                return XCTFail("\(code) must map to .error, not .accountUnavailable.")
+        for code in transient {
+            let status = CloudKitSyncService.syncStatus(for: ckError(code))
+            guard case .waiting(let message) = status else {
+                return XCTFail("\(code) must be a calm .waiting status, not an error.")
             }
             XCTAssertFalse(message.isEmpty, "Empty message for \(code).")
+            XCTAssertEqual(status.severity, .info, "\(code) must read as info severity, never error/red.")
             messages.append(message)
         }
-        XCTAssertEqual(Set(messages).count, messages.count, "Each classified CKError code must produce distinct copy.")
+        XCTAssertEqual(Set(messages).count, messages.count, "Each transient category must produce distinct copy.")
+
+        // Persistent — the user must act → `.actionNeeded` / `.attention`.
+        for code in [CKError.Code.quotaExceeded, .managedAccountRestricted] {
+            let status = CloudKitSyncService.syncStatus(for: ckError(code))
+            guard case .actionNeeded(let message) = status, !message.isEmpty else {
+                return XCTFail("\(code) must be a non-empty .actionNeeded status.")
+            }
+            XCTAssertEqual(status.severity, .attention)
+        }
+        XCTAssertEqual(CloudKitSyncService.syncStatus(for: CloudSyncError.accountChanged).severity, .attention)
+
+        // Codes that share a category share their copy/tone (no spurious distinct messages).
+        XCTAssertEqual(CloudKitSyncService.syncStatus(for: ckError(.networkFailure)),
+                       CloudKitSyncService.syncStatus(for: ckError(.networkUnavailable)))
+        XCTAssertEqual(CloudKitSyncService.syncStatus(for: ckError(.zoneBusy)),
+                       CloudKitSyncService.syncStatus(for: ckError(.requestRateLimited)))
+
+        // Sign-in stays its own actionable status; anything unexpected stays a real error.
+        XCTAssertEqual(CloudKitSyncService.syncStatus(for: ckError(.notAuthenticated)).severity, .attention)
+        XCTAssertEqual(CloudKitSyncService.syncStatus(for: ckError(.internalError)).severity, .error)
     }
 
     /// WC-L29: `synchronize` may report `.upToDate` on a `CKError.partialFailure` only when
