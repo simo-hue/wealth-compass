@@ -24,6 +24,10 @@ This document tracks manual actions and considerations for you to address.
   - Run `xcodebuild test -scheme WealthCompassMobile -only-testing:WealthCompassTests/SnapshotEngineTests -only-testing:WealthCompassTests/AnalyticsEngineTests -only-testing:WealthCompassTests/CloudSyncCoreTests -destination 'platform=iOS Simulator,name=iPhone 16'`.
   - **Eyeball the net-worth chart** (Dashboard, all ranges, both platforms): it must still be **continuous and flat across inactivity** — the carry-forward now happens at render instead of from stored rows. A gap longer than ~60 days now renders flat (previously it sloped); confirm that reads correctly. Existing users keep their already-stored backfill rows (harmless duplicates on flat runs); only new gaps are render-filled.
   - *(Optional)* Note the metadata file (`wealth-compass-cloud-sync.json`) is now minified and self-compacts settled tombstones on each write — its size should stop growing with churn.
+- [ ] **Verify the sync dedup (#13) on two devices** — this is engine-event-driven, so it can't be unit-tested (only the pure gate is). Confirm:
+  - **Foregrounding still pulls remote changes**: change data on device A; bring device B to the foreground; B should still reflect A's change (the opportunistic sync must not be permanently suppressed). Status should reach "Up to Date".
+  - **Force Sync always works**, even while a sync is already running (it's intentionally not gated).
+  - The dedup itself is invisible (just fewer redundant fetch/send round-trips) — the thing to watch for is a *regression*: if foregrounding ever stops pulling changes, the `engineSyncActivity` counter may not be balancing against real CKSyncEngine will/did events (it resets on engine teardown / app relaunch as a safety net).
 
 
 ---
