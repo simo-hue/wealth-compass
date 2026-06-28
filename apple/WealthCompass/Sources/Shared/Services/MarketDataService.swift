@@ -452,6 +452,264 @@ struct CoinGeckoPriceClient {
     }
 }
 
+/// Keyless fallback quote source for instruments Finnhub's free (US-only) tier can't price.
+///
+/// The refresh pipeline calls this only when Finnhub returns `.noQuote` for a symbol — the
+/// signature of a non-US listing such as a European UCITS ETF (`VWCE`). Yahoo covers those
+/// venues and, unlike Finnhub's `/quote`, returns the listing's **currency**, so the caller
+/// can store the price in the holding's own currency instead of assuming USD.
+///
+/// This is an unofficial endpoint with no stability guarantee; it is deliberately a
+/// best-effort *fallback*, never the primary source, and a failure here leaves the holding's
+/// existing (e.g. manually entered) price untouched.
+struct YahooQuoteClient {
+    var session: URLSession = .shared
+
+    /// Resolves a holding to a live quote in the listing's **native** currency.
+    ///
+    /// Resolution cascade (mirrors `CryptoHolding.coinGeckoID`'s explicit-then-fallback shape):
+    /// 1. `symbol` already carries an exchange suffix (contains ".") → quote it directly.
+    /// 2. else `isin` is set → search by ISIN and pick the best candidate.
+    /// 3. else → search by the bare symbol and pick the best candidate.
+    func resolvedQuote(
+        symbol: String,
+        isin: String,
+        name: String,
+        preferredCurrency: Currency
+    ) async throws -> MarketPriceQuote {
+        let trimmedSymbol = symbol.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedSymbol.isEmpty else {
+            throw MarketDataError.noQuote(provider: Self.provider, symbol: symbol)
+        }
+
+        // (1) Explicit exchange-qualified symbol — trust it, no search needed.
+        if trimmedSymbol.contains(".") {
+            return try await quote(forResolvedSymbol: trimmedSymbol)
+        }
+
+        // (2)/(3) Resolve via search, preferring ISIN when present.
+        let trimmedISIN = isin.trimmingCharacters(in: .whitespacesAndNewlines)
+        let query = trimmedISIN.isEmpty ? trimmedSymbol : trimmedISIN
+        let candidates = try await search(query: query)
+        guard let best = Self.bestCandidate(candidates, preferredCurrency: preferredCurrency, name: name) else {
+            throw MarketDataError.noQuote(provider: Self.provider, symbol: symbol)
+        }
+        return try await quote(forResolvedSymbol: best.symbol)
+    }
+
+    /// Fetches the live price for an already-resolved, exchange-qualified symbol.
+    func quote(forResolvedSymbol symbol: String) async throws -> MarketPriceQuote {
+        let normalized = symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        guard
+            !normalized.isEmpty,
+            let encoded = normalized.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
+            let url = URL(string: APIConfiguration.yahooChartURL + encoded)
+        else {
+            throw MarketDataError.invalidURL
+        }
+
+        let (data, response) = try await NetworkRetry.data(for: Self.request(url: url), session: session)
+        try Self.validate(response: response)
+        return try Self.decodeChart(data, requestedSymbol: normalized)
+    }
+
+    /// Searches Yahoo for candidate listings matching a bare symbol or ISIN.
+    func search(query: String) async throws -> [YahooSearchCandidate] {
+        guard var components = URLComponents(string: APIConfiguration.yahooSearchURL) else {
+            throw MarketDataError.invalidURL
+        }
+        components.queryItems = [
+            URLQueryItem(name: "q", value: query),
+            URLQueryItem(name: "quotesCount", value: "10"),
+            URLQueryItem(name: "newsCount", value: "0")
+        ]
+        guard let url = components.url else { throw MarketDataError.invalidURL }
+
+        let (data, response) = try await NetworkRetry.data(for: Self.request(url: url), session: session)
+        try Self.validate(response: response)
+        return try Self.decodeSearch(data)
+    }
+
+    // MARK: - Pure helpers (unit-tested without the network)
+
+    static let provider = "Yahoo Finance"
+
+    /// Chooses the most likely listing for a holding. Equity/ETF types only; then prefer a
+    /// currency match (avoids an unnecessary FX hop), then the closest name, then Yahoo's own
+    /// relevance order (first wins ties). Correctness never depends on this — the price is
+    /// always re-expressed in the holding's currency afterwards — it only reduces the chance
+    /// of locking onto a same-ticker *different* instrument.
+    static func bestCandidate(
+        _ candidates: [YahooSearchCandidate],
+        preferredCurrency: Currency,
+        name: String
+    ) -> YahooSearchCandidate? {
+        let eligible = candidates.filter { $0.isEquityLike }
+        let pool = eligible.isEmpty ? candidates : eligible
+        guard let first = pool.first else { return nil }
+
+        func score(_ candidate: YahooSearchCandidate) -> Double {
+            var value = 0.0
+            if let currency = candidate.currency?.uppercased(), currency == preferredCurrency.rawValue {
+                value += 100
+            }
+            value += Self.nameSimilarity(candidate.displayName, name) * 10
+            return value
+        }
+
+        // Stable max: iterate in Yahoo's order so an equal score keeps the higher-ranked listing.
+        var best = first
+        var bestScore = score(first)
+        for candidate in pool.dropFirst() {
+            let candidateScore = score(candidate)
+            if candidateScore > bestScore {
+                best = candidate
+                bestScore = candidateScore
+            }
+        }
+        return best
+    }
+
+    /// Jaccard overlap of lowercased alphanumeric word tokens (0…1). Deterministic and
+    /// locale-light so "Vanguard FTSE All-World UCITS ETF" scores high against "VWCE All World".
+    static func nameSimilarity(_ lhs: String, _ rhs: String) -> Double {
+        let left = Self.tokens(lhs)
+        let right = Self.tokens(rhs)
+        guard !left.isEmpty, !right.isEmpty else { return 0 }
+        let union = left.union(right).count
+        return union == 0 ? 0 : Double(left.intersection(right).count) / Double(union)
+    }
+
+    private static func tokens(_ value: String) -> Set<String> {
+        Set(
+            value.lowercased()
+                .components(separatedBy: CharacterSet.alphanumerics.inverted)
+                .filter { $0.count > 1 }
+        )
+    }
+
+    static func decodeChart(_ data: Data, requestedSymbol: String) throws -> MarketPriceQuote {
+        let payload = try JSONDecoder().decode(YahooChartResponse.self, from: data)
+        guard
+            let result = payload.chart.result?.first,
+            let rawPrice = result.meta.regularMarketPrice, rawPrice > 0, rawPrice.isFinite,
+            let rawCurrency = result.meta.currency
+        else {
+            throw MarketDataError.noQuote(provider: provider, symbol: requestedSymbol)
+        }
+
+        // Yahoo quotes some London listings in pence ("GBp"/"GBX"); normalize to major units so
+        // the stored price isn't 100× off. Any currency outside our table fails cleanly (a safe
+        // no-update) rather than risking a wrong value.
+        let price: Double
+        let isoCode: String
+        if rawCurrency == "GBp" || rawCurrency == "GBX" {
+            price = rawPrice / 100.0
+            isoCode = "GBP"
+        } else {
+            price = rawPrice
+            isoCode = rawCurrency.uppercased()
+        }
+        guard let currency = Currency(rawValue: isoCode) else {
+            throw MarketDataError.noQuote(provider: provider, symbol: requestedSymbol)
+        }
+
+        let asOf = result.meta.regularMarketTime.map(Date.init(timeIntervalSince1970:)) ?? Date()
+        return MarketPriceQuote(price: price, currency: currency, asOf: asOf, provider: provider)
+    }
+
+    static func decodeSearch(_ data: Data) throws -> [YahooSearchCandidate] {
+        let payload = try JSONDecoder().decode(YahooSearchResponse.self, from: data)
+        return payload.quotes?.compactMap { $0.asCandidate } ?? []
+    }
+
+    private static func request(url: URL) -> URLRequest {
+        var request = URLRequest(url: url, cachePolicy: .reloadRevalidatingCacheData, timeoutInterval: 20)
+        // Yahoo rejects requests that don't carry a browser-like User-Agent.
+        request.setValue(
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+            forHTTPHeaderField: "User-Agent"
+        )
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        return request
+    }
+
+    private static func validate(response: URLResponse) throws {
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw MarketDataError.invalidResponse(provider: provider)
+        }
+        switch httpResponse.statusCode {
+        case 200:
+            return
+        case 401, 403:
+            throw MarketDataError.unauthorized(provider: provider)
+        case 429:
+            throw MarketDataError.rateLimited(provider: provider)
+        default:
+            throw MarketDataError.providerError(provider: provider, statusCode: httpResponse.statusCode)
+        }
+    }
+}
+
+/// A single listing returned by Yahoo's search endpoint.
+struct YahooSearchCandidate: Equatable {
+    let symbol: String
+    let quoteType: String?
+    let shortName: String?
+    let longName: String?
+    let currency: String?
+
+    var displayName: String { longName ?? shortName ?? symbol }
+
+    /// Yahoo `quoteType` values for tradable equities/funds we'd price (excludes news,
+    /// futures, options, currencies…).
+    var isEquityLike: Bool {
+        guard let quoteType = quoteType?.uppercased() else { return false }
+        return ["EQUITY", "ETF", "MUTUALFUND", "INDEX"].contains(quoteType)
+    }
+}
+
+private struct YahooChartResponse: Decodable {
+    let chart: Chart
+
+    struct Chart: Decodable {
+        let result: [Result]?
+    }
+
+    struct Result: Decodable {
+        let meta: Meta
+    }
+
+    struct Meta: Decodable {
+        let currency: String?
+        let regularMarketPrice: Double?
+        let regularMarketTime: TimeInterval?
+    }
+}
+
+private struct YahooSearchResponse: Decodable {
+    let quotes: [Quote]?
+
+    struct Quote: Decodable {
+        let symbol: String?
+        let quoteType: String?
+        let shortname: String?
+        let longname: String?
+        let currency: String?
+
+        var asCandidate: YahooSearchCandidate? {
+            guard let symbol, !symbol.isEmpty else { return nil }
+            return YahooSearchCandidate(
+                symbol: symbol,
+                quoteType: quoteType,
+                shortName: shortname,
+                longName: longname,
+                currency: currency
+            )
+        }
+    }
+}
+
 private struct FinnhubQuoteResponse: Decodable {
     let currentPrice: Double?
     let timestamp: TimeInterval?
