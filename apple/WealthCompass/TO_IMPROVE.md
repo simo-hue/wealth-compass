@@ -57,6 +57,8 @@ These fixes are in the codebase but still need a clean verification run on two i
 
 ### 11. Cap snapshot sync amplification from backfill
 
+> ✅ **Done (2026-06-28).** Took render-time carry-forward (a cleaner option than the original steps): `SnapshotEngine.appendingSnapshot` no longer materializes the up-to-60 carry-forward rows, and `AnalyticsEngine.snapshotsForChart.carryingForwardDailyGaps` fills inactive days flat at render time. A 172-day gap now adds 1 snapshot, not 62. Records sync only on real point-in-time changes. (DOCUMENTATION.md 2026-06-28.)
+
 **Problem:** `appendSnapshot()` can create up to **60** backfill snapshots in one save; each snapshot is its own CloudKit record. A single market-price refresh or transaction can trigger dozens of sync uploads.
 
 **Steps:**
@@ -65,6 +67,8 @@ These fixes are in the codebase but still need a clean verification run on two i
 3. Add metric: snapshot record count vs transaction count in metadata.
 
 ### 12. Compact and prune sync metadata file
+
+> ✅ **Done (2026-06-28).** `CloudKitSyncService.pruningSettledTombstones` drops settled-tombstone `records` entries on every metadata write (step 1); `prettyPrinted: false` (step 2). Step 3 (split engine vs per-record state) not needed yet. (DOCUMENTATION.md 2026-06-28.)
 
 **Problem:** Logs showed `recordsCount: 317` but `knownHashesCount: 238` — ~80 stale metadata entries. File is ~900 KB with `prettyPrinted: true`, rewritten on many events.
 
@@ -186,7 +190,7 @@ Store rolling net-worth history as chunked monthly aggregates locally; sync fewe
 | 13 — Dedupe manual + automatic sync | S | Less churn | ☐ open |
 | 16 / 17 — Chart NaN guard + remove `withAnimation` on load | S | Robustness | ☐ open |
 | 9 (remaining) — debounce remote apply + one write per batch | M | Fixes lag | 🟡 partial |
-| 11 / 12 — Snapshot amplification + metadata pruning | M | Medium | ☐ open |
+| 11 / 12 — Snapshot amplification + metadata pruning | M | Medium | ✅ done (2026-06-28) |
 | 22 / 23 / 24 — More sync tests, OSLog signposts, CI schema check | M | Stability | ☐ open |
 | 5 — CloudKit push wiring (background sync) | M–L | High (needs APS entitlement → provisioning) | ⏸️ deferred |
 | 26 / 27 — Incremental persistence, snapshot model redesign | L | Scale | ☐ open |

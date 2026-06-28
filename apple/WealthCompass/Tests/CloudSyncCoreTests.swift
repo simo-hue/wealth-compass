@@ -476,6 +476,24 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: CloudSyncError.notRunning), .unknown)
     }
 
+    /// #12 metadata compaction: a fully-settled tombstone (deleted, acknowledged, and gone from
+    /// knownLocalHashes) is dropped; a live record or a still-in-flight delete is kept.
+    func testPruningDropsOnlySettledTombstones() {
+        let records: [String: CloudSyncRecordState] = [
+            "live": CloudSyncRecordState(systemFields: nil, pending: nil, isTombstone: false, deletedAt: nil),
+            "settled": CloudSyncRecordState(systemFields: nil, pending: nil, isTombstone: true, deletedAt: fixedDate),
+            "pendingDelete": CloudSyncRecordState(systemFields: nil, pending: deletePending(), isTombstone: true, deletedAt: fixedDate)
+        ]
+        let knownHashes = ["live": "hash"] // settled + pendingDelete are no longer locally present
+
+        let pruned = CloudKitSyncService.pruningSettledTombstones(from: records, knownLocalHashes: knownHashes)
+
+        XCTAssertNotNil(pruned["live"], "a live record is kept")
+        XCTAssertNotNil(pruned["pendingDelete"], "a tombstone whose delete is still in flight is kept")
+        XCTAssertNil(pruned["settled"], "a fully-settled tombstone is compacted away")
+        XCTAssertEqual(pruned.count, 2)
+    }
+
     /// The anti-mislabel guarantee: an account failure resolves to `.accountUnavailable`
     /// (so Settings reads "iCloud Unavailable"), preserving a custom sign-in message when
     /// present; the not-signed-in CKError falls back to canned copy.

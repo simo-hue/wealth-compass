@@ -36,6 +36,21 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual(totals.netWorth, 650)
     }
 
+    /// WC-#11: backfill snapshots are no longer stored; the chart carries the prior value forward to
+    /// fill no-activity days, so two real snapshots 4 days apart still render a continuous flat line
+    /// (not a slope), without a row per gap day in storage/iCloud.
+    func testSnapshotsForChartCarriesForwardGapDays() {
+        let snaps = [
+            NetWorthSnapshot(date: date(2026, 6, 18), totalAssets: 100, totalLiabilities: 0, netWorth: 100, liquidity: 100, investments: 0, crypto: 0),
+            NetWorthSnapshot(date: date(2026, 6, 22), totalAssets: 200, totalLiabilities: 0, netWorth: 200, liquidity: 200, investments: 0, crypto: 0)
+        ]
+        let points = engine(FinancialData(snapshots: snaps), now: date(2026, 6, 22))
+            .snapshotsForChart(range: .all, currentNetWorth: 200)
+
+        XCTAssertEqual(points.count, 5, "one point per day 18→22 inclusive")
+        XCTAssertEqual(points.map(\.value), [100, 100, 100, 100, 200], "gap days carry the 18th's value forward (flat), not interpolated")
+    }
+
     func testCalculateTotalsConvertsTransactionsByOwnCurrency() {
         // WC-M1: each transaction converts from its own currency to the display currency
         // before summing into cash/liquidity.

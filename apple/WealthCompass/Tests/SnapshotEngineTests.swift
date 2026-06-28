@@ -40,19 +40,20 @@ final class SnapshotEngineTests: XCTestCase {
         XCTAssertEqual(second[0].netWorth, 200)
     }
 
-    func testBackfillsMissingDays() {
+    func testDoesNotMaterializeCarryForwardGaps() {
+        // No-activity days are filled by the chart at render time, not stored — so appending after a
+        // gap adds exactly one new snapshot (today), never a backfill burst (WC-#11).
         let seed = engine.appendingSnapshot(to: [], totals: totals, now: date(2026, 6, 18))
-        // 18 (seed) + carry-forward 19, 20, 21 + 22 (today) = 5
         let result = engine.appendingSnapshot(to: seed, totals: totals, now: date(2026, 6, 22))
-        XCTAssertEqual(result.count, 5)
-        XCTAssertTrue(result.map(\.date) == result.map(\.date).sorted())
+        XCTAssertEqual(result.count, 2, "seed (18) + today (22), no carry-forward rows")
+        XCTAssertEqual(result.map(\.date), result.map(\.date).sorted())
     }
 
-    func testBackfillCapsAt60Days() {
+    func testLongGapStillAddsOnlyOneSnapshot() {
+        // A ~172-day gap previously spawned 60 backfill records; now it adds just today's snapshot.
         let seed = engine.appendingSnapshot(to: [], totals: totals, now: date(2026, 1, 1))
-        // 1 (seed) + 60 backfilled (cap) + 1 (today) = 62, even though the gap is ~172 days.
         let result = engine.appendingSnapshot(to: seed, totals: totals, now: date(2026, 6, 22))
-        XCTAssertEqual(result.count, 62)
+        XCTAssertEqual(result.count, 2)
     }
 
     func testAdjustsOnlySnapshotsOnOrAfterDate() {
