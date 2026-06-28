@@ -520,6 +520,9 @@ final class FinanceStore: ObservableObject {
             result.skippedInvestments = []
         } else if let trimmedFinnhubKey, hasFinnhubKey {
             let client = FinnhubQuoteClient(apiKey: trimmedFinnhubKey)
+            // Keyless fallback for symbols Finnhub's free (US-only) tier can't price — e.g.
+            // European-listed ETFs like VWCE. Only consulted when Finnhub returns `.noQuote`.
+            let yahooClient = YahooQuoteClient()
             let total = data.investments.count
             var completed = 0
             marketRefreshProgress = (done: 0, total: total)
@@ -530,11 +533,44 @@ final class FinanceStore: ObservableObject {
             for investment in data.investments {
                 do {
                     investmentQuotes[investment.id] = try await client.quote(for: investment.symbol)
+                } catch let marketError as MarketDataError {
+                    switch marketError {
+                    case .noQuote:
+                        // Finnhub doesn't carry this listing (the European-ETF case). Try Yahoo,
+                        // then re-express the price in the holding's own currency (mirrors the
+                        // crypto path) so a EUR ETF on a EUR listing stores 1:1 and a cross-listing
+                        // converts via FX. A second failure names both providers.
+                        do {
+                            let nativeQuote = try await yahooClient.resolvedQuote(
+                                symbol: investment.symbol,
+                                isin: investment.isin,
+                                name: investment.name,
+                                preferredCurrency: investment.currency
+                            )
+                            let priceInHoldingCurrency = settings.convert(
+                                nativeQuote.price,
+                                from: nativeQuote.currency,
+                                to: investment.currency
+                            )
+                            investmentQuotes[investment.id] = MarketPriceQuote(
+                                price: priceInHoldingCurrency,
+                                currency: investment.currency,
+                                asOf: nativeQuote.asOf,
+                                provider: nativeQuote.provider
+                            )
+                        } catch {
+                            result.failedInvestments.append(
+                                "\(investment.symbol): \(Self.errorMessage(marketError)) \(Self.errorMessage(error))"
+                            )
+                        }
+                    case .rateLimited:
+                        result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError))")
+                        interRequestDelay = min(interRequestDelay * 3, 3_000_000_000) // cap 3s
+                    default:
+                        result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError))")
+                    }
                 } catch {
                     result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error))")
-                    if let marketError = error as? MarketDataError, case .rateLimited = marketError {
-                        interRequestDelay = min(interRequestDelay * 3, 3_000_000_000) // cap 3s
-                    }
                 }
                 completed += 1
                 marketRefreshProgress = (done: completed, total: total)
