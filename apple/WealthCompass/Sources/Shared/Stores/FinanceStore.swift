@@ -925,11 +925,12 @@ final class FinanceStore: ObservableObject {
             // (pre-migration) `loadedData`, so the post-init save persists exactly these stamps.
             let (migrated, didBackfill) = loadedData.backfillingCurrencies(base: settings?.currency ?? .eur)
             needsCurrencyBackfillSave = didBackfill
-            withAnimation {
-                self.data = migrated
-                self.localPersistenceError = nil
-                self.iCloudSyncError = nil
-            }
+            // Plain assignment, not withAnimation: `load()` can run during a view update, where
+            // animating a `@Published` write emits "Publishing changes from within view updates"
+            // warnings — same reasoning as the remote-apply path below (WC-#17).
+            self.data = migrated
+            self.localPersistenceError = nil
+            self.iCloudSyncError = nil
 
             do {
                 let records = try loadedData.cloudSyncRecords()
@@ -944,16 +945,15 @@ final class FinanceStore: ObservableObject {
                 return (try? loadedData.cloudSyncRecords()) ?? [:]
             }
         } catch {
-            withAnimation {
-                self.localPersistenceError = error
-                self.iCloudSyncError = error.localizedDescription
-                self.cloudSyncStatus = .error(
-                    AppLocalization.string(
-                        "The local database could not be loaded. The original file was left untouched. \(error.localizedDescription)",
-                        appLanguage: settings?.appLanguage
-                    )
+            // Plain assignment, not withAnimation — see the success path above (WC-#17).
+            self.localPersistenceError = error
+            self.iCloudSyncError = error.localizedDescription
+            self.cloudSyncStatus = .error(
+                AppLocalization.string(
+                    "The local database could not be loaded. The original file was left untouched. \(error.localizedDescription)",
+                    appLanguage: settings?.appLanguage
                 )
-            }
+            )
             return [:]
         }
     }

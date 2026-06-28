@@ -94,6 +94,8 @@ These fixes are in the codebase but still need a clean verification run on two i
 
 ### 16. Guard chart inputs beyond currency conversion
 
+> ✅ **Done (2026-06-28).** Audit confirmed chart data is already finite (all `Decimal.doubleValue` + `snapshotsForChart` filter). The real risk was `chartDomain` trapping on a non-finite bound; extracted + hardened it into the tested `AnalyticsEngine.chartYDomain(for:)` (filters to finite, safe default for empty/all-non-finite), and both dashboards now `.filter(\.value.isFinite)` chart points at the boundary. Change-% / allocation-% divisions were already guarded. Step 3 (CG_NUMERICS backtrace) is in TO_SIMO_DO — the residual flood, if any, is geometric (ScreenBackground / chart spring). (DOCUMENTATION.md 2026-06-28.)
+
 **Problem:** macOS reported CoreGraphics NaN warnings. `AppSettings.convert()` is now guarded, but charts can still receive NaN from investment/crypto prices, division edge cases, or empty series during partial sync.
 
 **Steps:**
@@ -102,6 +104,8 @@ These fixes are in the codebase but still need a clean verification run on two i
 3. Re-run with `CG_NUMERICS_SHOW_BACKTRACE=1` once to pinpoint any remaining source.
 
 ### 17. Remove remaining risky `withAnimation` on store loads
+
+> ✅ **Done (2026-06-28).** `FinanceStore.load()` (success + error paths) now uses plain `@Published` assignment, matching the remote-apply path. Grep confirms no `withAnimation` remains in Stores/Services/Persistence. (DOCUMENTATION.md 2026-06-28.)
 
 **Problem:** `FinanceStore.load()` still wraps data assignment in `withAnimation`. Same class of "Publishing changes from within view updates" warnings seen during sync.
 
@@ -190,7 +194,7 @@ Store rolling net-worth history as chunked monthly aggregates locally; sync fewe
 |------|--------|--------|--------|
 | 1–3 — Verify recent fixes on two devices | S | Confidence | ⏳ manual (in progress) |
 | 13 — Dedupe manual + automatic sync | S | Less churn | ✅ done (2026-06-28) |
-| 16 / 17 — Chart NaN guard + remove `withAnimation` on load | S | Robustness | ☐ open |
+| 16 / 17 — Chart NaN guard + remove `withAnimation` on load | S | Robustness | ✅ done (2026-06-28) |
 | 9 (remaining) — debounce remote apply + one write per batch | M | Fixes lag | 🟡 partial |
 | 11 / 12 — Snapshot amplification + metadata pruning | M | Medium | ✅ done (2026-06-28) |
 | 22 / 23 / 24 — More sync tests, OSLog signposts, CI schema check | M | Stability | ☐ open |

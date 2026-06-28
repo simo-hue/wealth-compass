@@ -113,7 +113,9 @@ struct DashboardView: View {
     }
 
     private var netWorthHero: some View {
-        let points = finance.snapshotsForChart(range: timeRange, settings: settings)
+        // Defensive: only finite points reach Swift Charts (the engine already guards, but the chart
+        // boundary is the last line of defense against a NaN/Inf y emitting CoreGraphics warnings) (WC-#16).
+        let points = finance.snapshotsForChart(range: timeRange, settings: settings).filter { $0.value.isFinite }
         let rangeChange = netWorthChange(in: points)
         let yDomain = chartDomain(for: points)
 
@@ -524,13 +526,7 @@ struct DashboardView: View {
     }
 
     private func chartDomain(for points: [NetWorthPoint]) -> ClosedRange<Double> {
-        let values = points.map(\.value)
-        guard let minimum = values.min(), let maximum = values.max() else {
-            return 0...1
-        }
-        let spread = max(maximum - minimum, max(abs(maximum), 1) * 0.08)
-        let padding = spread * 0.18
-        return (minimum - padding)...(maximum + padding)
+        AnalyticsEngine.chartYDomain(for: points)
     }
 
     private func privatePercent(_ value: Double) -> String {

@@ -28,6 +28,7 @@ This document tracks manual actions and considerations for you to address.
   - **Foregrounding still pulls remote changes**: change data on device A; bring device B to the foreground; B should still reflect A's change (the opportunistic sync must not be permanently suppressed). Status should reach "Up to Date".
   - **Force Sync always works**, even while a sync is already running (it's intentionally not gated).
   - The dedup itself is invisible (just fewer redundant fetch/send round-trips) — the thing to watch for is a *regression*: if foregrounding ever stops pulling changes, the `engineSyncActivity` counter may not be balancing against real CKSyncEngine will/did events (it resets on engine teardown / app relaunch as a safety net).
+- [ ] **Confirm the CoreGraphics-NaN flood is gone (#16 step 3).** The chart-data path is now hardened (the y-domain can't trap on a non-finite value, and points are finite-filtered), but the original macOS NaN *flood* was suspected to be geometric (the animated `ScreenBackground` or the net-worth chart spring), not data. Re-run the macOS app once with `CG_NUMERICS_SHOW_BACKTRACE=1` (the env var is already on the `WealthCompassMac` Run scheme per earlier notes); if warnings persist, the backtrace points at the geometric source. **Remove that diagnostic env var afterward.** Build verification: the two dashboards now forward `chartDomain` to `AnalyticsEngine.chartYDomain` and filter points — confirm the net-worth chart still renders.
 
 
 ---
