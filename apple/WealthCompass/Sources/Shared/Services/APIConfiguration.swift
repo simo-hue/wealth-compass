@@ -18,6 +18,10 @@ enum APIConfiguration {
     /// CoinGecko simple price. Authenticated with the user's `x-cg-demo-api-key` header.
     static let coinGeckoSimplePriceURL = "https://api.coingecko.com/api/v3/simple/price"
 
+    /// CoinGecko coin search — resolves a ticker/name to a CoinGecko coin id when a holding has
+    /// no explicit Coin ID and isn't in the built-in common map. Authenticated like /simple/price.
+    static let coinGeckoSearchURL = "https://api.coingecko.com/api/v3/search"
+
     /// Yahoo Finance chart endpoint (keyless, HTTPS). Used as a fallback for instruments
     /// Finnhub's free tier can't price — notably European-listed ETFs (e.g. `VWCE.MI`).
     /// The resolved exchange-qualified symbol is appended to the path. Returns the live

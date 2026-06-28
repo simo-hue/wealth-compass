@@ -369,9 +369,22 @@ struct CoinGeckoPriceClient {
         guard !ids.isEmpty else { return [:] }
 
         var quotes: [String: CoinGeckoCoinQuote] = [:]
+        var lastError: Error?
         for chunk in ids.chunked(into: 100) {
-            let partial = try await priceTable(for: chunk, validationNonce: nil)
-            quotes.merge(partial) { _, incoming in incoming }
+            // Preserve partial success: a failed chunk must not discard the coins already fetched
+            // (WC-B1 — one later batch failing used to orphan every earlier price). Coins from a
+            // failed chunk simply stay absent and are reported per-holding by the caller.
+            do {
+                let partial = try await priceTable(for: chunk, validationNonce: nil)
+                quotes.merge(partial) { _, incoming in incoming }
+            } catch {
+                lastError = error
+            }
+        }
+        // Surface an error only when nothing came back at all, so the caller's catch still reports
+        // a total outage; any partial table is returned and used.
+        if quotes.isEmpty, let lastError {
+            throw lastError
         }
         return quotes
     }
@@ -449,6 +462,81 @@ struct CoinGeckoPriceClient {
             return
         }
         request.setValue(key, forHTTPHeaderField: "x-cg-demo-api-key")
+    }
+
+    // MARK: - Symbol resolution (I2)
+
+    /// Resolves a holding's ticker/name to a CoinGecko coin id via `/search`, for holdings that
+    /// carry neither an explicit `coinId` nor a built-in mapping. Returns nil when nothing matches
+    /// confidently — a clear skip beats pricing the wrong coin.
+    func searchCoinID(symbol: String, name: String) async throws -> String? {
+        let trimmed = symbol.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        guard var components = URLComponents(string: APIConfiguration.coinGeckoSearchURL) else {
+            throw MarketDataError.invalidURL
+        }
+        components.queryItems = [URLQueryItem(name: "query", value: trimmed)]
+        guard let url = components.url else { throw MarketDataError.invalidURL }
+
+        var request = URLRequest(url: url, cachePolicy: .reloadRevalidatingCacheData, timeoutInterval: 20)
+        addAPIKeyHeader(to: &request)
+
+        let (data, response) = try await NetworkRetry.data(for: request, session: session)
+        try Self.validate(response: response, provider: "CoinGecko")
+        return Self.bestCoinID(try Self.decodeSearch(data), symbol: trimmed, name: name)
+    }
+
+    static func decodeSearch(_ data: Data) throws -> [CoinGeckoSearchCoin] {
+        let payload = try JSONDecoder().decode(CoinGeckoSearchResponse.self, from: data)
+        return payload.coins?.compactMap { $0.asCoin } ?? []
+    }
+
+    /// Picks the coin whose ticker matches exactly (case-insensitive), preferring the best
+    /// market-cap rank (lowest number) to break ticker collisions; falls back to a *unique* exact
+    /// name match. Returns nil when nothing matches confidently.
+    static func bestCoinID(_ coins: [CoinGeckoSearchCoin], symbol: String, name: String) -> String? {
+        let wantedSymbol = symbol.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let symbolMatches = coins.filter { $0.symbol?.lowercased() == wantedSymbol }
+        if !symbolMatches.isEmpty {
+            return symbolMatches.min {
+                ($0.marketCapRank ?? Int.max) < ($1.marketCapRank ?? Int.max)
+            }?.id
+        }
+        let wantedName = name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if !wantedName.isEmpty {
+            let nameMatches = coins.filter { $0.name?.lowercased() == wantedName }
+            if nameMatches.count == 1 { return nameMatches.first?.id }
+        }
+        return nil
+    }
+}
+
+/// A coin returned by CoinGecko's `/search` endpoint.
+struct CoinGeckoSearchCoin: Equatable {
+    let id: String
+    let symbol: String?
+    let name: String?
+    let marketCapRank: Int?
+}
+
+private struct CoinGeckoSearchResponse: Decodable {
+    let coins: [Coin]?
+
+    struct Coin: Decodable {
+        let id: String?
+        let symbol: String?
+        let name: String?
+        let marketCapRank: Int?
+
+        private enum CodingKeys: String, CodingKey {
+            case id, symbol, name
+            case marketCapRank = "market_cap_rank"
+        }
+
+        var asCoin: CoinGeckoSearchCoin? {
+            guard let id, !id.isEmpty else { return nil }
+            return CoinGeckoSearchCoin(id: id, symbol: symbol, name: name, marketCapRank: marketCapRank)
+        }
     }
 }
 

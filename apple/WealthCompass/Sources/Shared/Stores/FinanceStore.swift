@@ -518,11 +518,41 @@ final class FinanceStore: ObservableObject {
 
         if data.investments.isEmpty {
             result.skippedInvestments = []
-        } else if let trimmedFinnhubKey, hasFinnhubKey {
-            let client = FinnhubQuoteClient(apiKey: trimmedFinnhubKey)
-            // Keyless fallback for symbols Finnhub's free (US-only) tier can't price — e.g.
-            // European-listed ETFs like VWCE. Only consulted when Finnhub returns `.noQuote`.
+        } else {
+            // Finnhub is the primary quote source (US listings). Yahoo is a keyless fallback for
+            // anything Finnhub can't price (European ETFs like VWCE) and, when no Finnhub key is
+            // set at all, the sole source — so investments still auto-update without a key (I3).
+            let finnhubClient: FinnhubQuoteClient?
+            if let trimmedFinnhubKey, hasFinnhubKey {
+                finnhubClient = FinnhubQuoteClient(apiKey: trimmedFinnhubKey)
+            } else {
+                finnhubClient = nil
+            }
             let yahooClient = YahooQuoteClient()
+
+            // Resolves a holding via Yahoo and re-expresses the price in the holding's own currency
+            // (mirrors the crypto path), so a EUR ETF on a EUR listing stores 1:1 and a cross-listing
+            // converts via FX.
+            func yahooQuote(for investment: Investment) async throws -> MarketPriceQuote {
+                let nativeQuote = try await yahooClient.resolvedQuote(
+                    symbol: investment.symbol,
+                    isin: investment.isin,
+                    name: investment.name,
+                    preferredCurrency: investment.currency
+                )
+                let priceInHoldingCurrency = settings.convert(
+                    nativeQuote.price,
+                    from: nativeQuote.currency,
+                    to: investment.currency
+                )
+                return MarketPriceQuote(
+                    price: priceInHoldingCurrency,
+                    currency: investment.currency,
+                    asOf: nativeQuote.asOf,
+                    provider: nativeQuote.provider
+                )
+            }
+
             let total = data.investments.count
             var completed = 0
             marketRefreshProgress = (done: 0, total: total)
@@ -531,46 +561,37 @@ final class FinanceStore: ObservableObject {
             // retries an individual 429 with backoff (M8); this spaces out the queue.
             var interRequestDelay: UInt64 = 300_000_000 // 0.3s
             for investment in data.investments {
-                do {
-                    investmentQuotes[investment.id] = try await client.quote(for: investment.symbol)
-                } catch let marketError as MarketDataError {
-                    switch marketError {
-                    case .noQuote:
-                        // Finnhub doesn't carry this listing (the European-ETF case). Try Yahoo,
-                        // then re-express the price in the holding's own currency (mirrors the
-                        // crypto path) so a EUR ETF on a EUR listing stores 1:1 and a cross-listing
-                        // converts via FX. A second failure names both providers.
-                        do {
-                            let nativeQuote = try await yahooClient.resolvedQuote(
-                                symbol: investment.symbol,
-                                isin: investment.isin,
-                                name: investment.name,
-                                preferredCurrency: investment.currency
-                            )
-                            let priceInHoldingCurrency = settings.convert(
-                                nativeQuote.price,
-                                from: nativeQuote.currency,
-                                to: investment.currency
-                            )
-                            investmentQuotes[investment.id] = MarketPriceQuote(
-                                price: priceInHoldingCurrency,
-                                currency: investment.currency,
-                                asOf: nativeQuote.asOf,
-                                provider: nativeQuote.provider
-                            )
-                        } catch {
-                            result.failedInvestments.append(
-                                "\(investment.symbol): \(Self.errorMessage(marketError)) \(Self.errorMessage(error))"
-                            )
+                if let finnhubClient {
+                    do {
+                        investmentQuotes[investment.id] = try await finnhubClient.quote(for: investment.symbol)
+                    } catch let marketError as MarketDataError {
+                        switch marketError {
+                        case .noQuote:
+                            // Finnhub doesn't carry this listing (the European-ETF case). Fall back
+                            // to Yahoo; a second failure names both providers.
+                            do {
+                                investmentQuotes[investment.id] = try await yahooQuote(for: investment)
+                            } catch {
+                                result.failedInvestments.append(
+                                    "\(investment.symbol): \(Self.errorMessage(marketError)) \(Self.errorMessage(error))"
+                                )
+                            }
+                        case .rateLimited:
+                            result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError))")
+                            interRequestDelay = min(interRequestDelay * 3, 3_000_000_000) // cap 3s
+                        default:
+                            result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError))")
                         }
-                    case .rateLimited:
-                        result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError))")
-                        interRequestDelay = min(interRequestDelay * 3, 3_000_000_000) // cap 3s
-                    default:
-                        result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError))")
+                    } catch {
+                        result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error))")
                     }
-                } catch {
-                    result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error))")
+                } else {
+                    // No Finnhub key — Yahoo (keyless) is the only source.
+                    do {
+                        investmentQuotes[investment.id] = try await yahooQuote(for: investment)
+                    } catch {
+                        result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error))")
+                    }
                 }
                 completed += 1
                 marketRefreshProgress = (done: completed, total: total)
@@ -578,76 +599,99 @@ final class FinanceStore: ObservableObject {
                     try? await Task.sleep(nanoseconds: interRequestDelay)
                 }
             }
-        } else {
-            result.skippedInvestments = data.investments.map { "\($0.symbol): Finnhub key missing" }
         }
 
-        if !data.crypto.isEmpty, !hasCoinGeckoKey {
+        if hasCoinGeckoKey, let trimmedCoinGeckoKey, !data.crypto.isEmpty {
+            // Resolve each holding to a CoinGecko id: explicit coinId / built-in map first, then a
+            // /search fallback (I2) so coins outside the built-in map — e.g. "S" — still price
+            // instead of being skipped outright.
+            let searchClient = CoinGeckoPriceClient(apiKey: trimmedCoinGeckoKey)
+            var lookups: [UUID: String] = [:]
+            for holding in data.crypto {
+                if let coinID = holding.coinGeckoID {
+                    lookups[holding.id] = coinID
+                }
+            }
+            for holding in data.crypto where lookups[holding.id] == nil {
+                // Non-fatal: a search miss/error just leaves the holding unresolved → skipped below.
+                if let resolved = try? await searchClient.searchCoinID(symbol: holding.symbol, name: holding.name) {
+                    lookups[holding.id] = resolved
+                }
+            }
+
+            let unresolvedIDs = Set(data.crypto.map(\.id)).subtracting(lookups.keys)
+            result.skippedCrypto = data.crypto
+                .filter { unresolvedIDs.contains($0.id) }
+                .map { "\($0.symbol): no matching CoinGecko coin" }
+
+            if !lookups.isEmpty {
+                do {
+                    // Request every distinct holding currency in one batched call.
+                    let neededCurrencies = Array(Set(data.crypto.compactMap { lookups[$0.id] != nil ? $0.currency : nil }))
+                    let client = CoinGeckoPriceClient(apiKey: trimmedCoinGeckoKey, currencies: neededCurrencies)
+                    let table = try await client.priceTable(for: Array(lookups.values))
+                    for holding in data.crypto {
+                        guard let coinID = lookups[holding.id] else { continue }
+                        guard
+                            let coinQuote = table[coinID],
+                            let resolved = coinQuote.resolved(in: holding.currency)
+                        else {
+                            result.failedCrypto.append("\(holding.symbol): no CoinGecko price for \(coinID)")
+                            continue
+                        }
+                        // Always express the live price in the holding's own currency,
+                        // converting only if the provider couldn't return that currency.
+                        let priceInHoldingCurrency = settings.convert(resolved.price, from: resolved.currency, to: holding.currency)
+                        cryptoQuotes[holding.id] = (coinID, priceInHoldingCurrency, coinQuote.asOf)
+                    }
+                } catch {
+                    result.failedCrypto = data.crypto
+                        .filter { lookups[$0.id] != nil }
+                        .map { "\($0.symbol): \(Self.errorMessage(error))" }
+                }
+            }
+        } else if !data.crypto.isEmpty {
             result.skippedCrypto = data.crypto.map { "\($0.symbol): CoinGecko key missing" }
         }
 
-        let cryptoLookups: [UUID: String]
-        if hasCoinGeckoKey {
-            cryptoLookups = Dictionary(uniqueKeysWithValues: data.crypto.compactMap { holding -> (UUID, String)? in
-                guard let coinID = holding.coinGeckoID else { return nil }
-                return (holding.id, coinID)
-            })
-            let skippedCryptoIDs = Set(data.crypto.map(\.id)).subtracting(cryptoLookups.keys)
-            result.skippedCrypto = data.crypto
-                .filter { skippedCryptoIDs.contains($0.id) }
-                .map { "\($0.symbol): CoinGecko ID missing" }
-        } else {
-            cryptoLookups = [:]
-        }
-
-        if let trimmedCoinGeckoKey, hasCoinGeckoKey, !cryptoLookups.isEmpty {
-            do {
-                // Request every distinct holding currency in one batched call.
-                let neededCurrencies = Array(Set(data.crypto.compactMap { cryptoLookups[$0.id] != nil ? $0.currency : nil }))
-                let client = CoinGeckoPriceClient(apiKey: trimmedCoinGeckoKey, currencies: neededCurrencies)
-                let table = try await client.priceTable(for: Array(cryptoLookups.values))
-                for holding in data.crypto {
-                    guard let coinID = cryptoLookups[holding.id] else { continue }
-                    guard
-                        let coinQuote = table[coinID],
-                        let resolved = coinQuote.resolved(in: holding.currency)
-                    else {
-                        result.failedCrypto.append("\(holding.symbol): no CoinGecko price for \(coinID)")
-                        continue
-                    }
-                    // Always express the live price in the holding's own currency,
-                    // converting only if the provider couldn't return that currency.
-                    let priceInHoldingCurrency = settings.convert(resolved.price, from: resolved.currency, to: holding.currency)
-                    cryptoQuotes[holding.id] = (coinID, priceInHoldingCurrency, coinQuote.asOf)
-                }
-            } catch {
-                result.failedCrypto = data.crypto
-                    .filter { cryptoLookups[$0.id] != nil }
-                    .map { "\($0.symbol): \(Self.errorMessage(error))" }
-            }
-        }
+        // "Last updated" must reflect when the user refreshed, not the quote's market timestamp.
+        // Assigning the market `asOf` here made the row show the previous market close (e.g. an
+        // old date after a weekend refresh) and skewed `shouldAutoRefreshMarketPrices` staleness.
+        // Date() matches every other store mutation and the dialog's "Last refresh" line; one
+        // timestamp for the whole pass so all touched holdings and `result.refreshedAt` agree.
+        let refreshedAt = Date()
 
         for index in data.investments.indices {
             guard let quote = investmentQuotes[data.investments[index].id] else { continue }
             // Network prices are Double; cross to Decimal at the storage boundary and drop a
             // non-finite quote rather than corrupting stored money (WC-A1 / WC-H1).
             guard let price = Decimal(finite: quote.price) else { continue }
-            data.investments[index].currentPrice = price
-            data.investments[index].currentValue = data.investments[index].quantity * price
-            data.investments[index].updatedAt = quote.asOf
+            // Only write (and bump updatedAt → re-sync) when the price actually moved, so a refresh
+            // that re-confirms an unchanged price doesn't churn CloudKit (I1). The count still
+            // reflects every holding we re-priced.
+            if data.investments[index].currentPrice != price {
+                data.investments[index].currentPrice = price
+                data.investments[index].currentValue = data.investments[index].quantity * price
+                data.investments[index].updatedAt = refreshedAt
+            }
             result.updatedInvestments += 1
         }
 
         for index in data.crypto.indices {
             guard let update = cryptoQuotes[data.crypto[index].id] else { continue }
             guard let price = Decimal(finite: update.price) else { continue }
-            data.crypto[index].currentPrice = price
-            // Note: holding.currency is intentionally NOT overwritten here (H2) — the
-            // price above is already expressed in the holding's existing currency.
-            if data.crypto[index].coinId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                data.crypto[index].coinId = update.id
+            let coinIDWasEmpty = data.crypto[index].coinId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            // Bump updatedAt only on a real content change — a new price or a first-time coinId
+            // backfill — so unchanged holdings don't re-sync every refresh (I1).
+            if data.crypto[index].currentPrice != price || coinIDWasEmpty {
+                data.crypto[index].currentPrice = price
+                // Note: holding.currency is intentionally NOT overwritten here (H2) — the
+                // price above is already expressed in the holding's existing currency.
+                if coinIDWasEmpty {
+                    data.crypto[index].coinId = update.id
+                }
+                data.crypto[index].updatedAt = refreshedAt
             }
-            data.crypto[index].updatedAt = update.asOf
             result.updatedCrypto += 1
         }
 
@@ -656,7 +700,7 @@ final class FinanceStore: ObservableObject {
             save()
         }
 
-        result.refreshedAt = Date()
+        result.refreshedAt = refreshedAt
         return result
     }
 
