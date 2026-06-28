@@ -1472,6 +1472,16 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     /// pending upload is dropped, which is what stops a second already-populated device
     /// from re-inserting records that already exist remotely (#8). Pure and `static`
     /// so the collision-avoidance logic stays unit-testable without a live CKSyncEngine.
+    ///
+    /// The recency comparison uses the **domain** `updatedAt` (a field both the local entity and the
+    /// remote record carry), NOT CloudKit's server `modificationDate`. That is deliberate: the local
+    /// side is a *pending* change not yet on the server, so it has no fresh server timestamp —
+    /// comparing the remote's server date against the local's stale/absent one would make the remote
+    /// win almost every time and systematically lose local edits. For an exact `updatedAt` tie on
+    /// non-deliberate records the payload-hash comparison is the tie-break: arbitrary but total and
+    /// **convergent** — each device computes `local.hash > remote.hash` over its mirror-image of the
+    /// (local, remote) pair and therefore independently selects the *same* winner, with no server
+    /// round-trip and no ping-pong (see `testBootstrapDecisionTieBreakIsConvergentAcrossDevices`).
     static func bootstrapDecision(
         pending: CloudSyncPendingMutation?,
         local: CloudSyncRecordSnapshot?,

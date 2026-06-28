@@ -389,6 +389,31 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: inventoryPending(), local: remote, remote: local), expectedSwapped)
     }
 
+    /// Convergence — the *property*, asserted directly rather than by re-deriving the hash formula.
+    /// For a genuine timestamp tie between two independently-edited versions of one record, BOTH
+    /// devices must end up holding the SAME payload, or they ping-pong forever. Checks several
+    /// payload pairs so both hash orderings are exercised, and that a real difference never reports
+    /// `.identical`. (Why client `updatedAt` and not server `modificationDate` is documented on
+    /// `bootstrapDecision`; this tie-break is the convergent fallback, not a correctness hole.)
+    func testBootstrapDecisionTieBreakIsConvergentAcrossDevices() {
+        let when = Date(timeIntervalSince1970: 5_000)
+        let payloadPairs = [("alpha", "omega"), ("aaa", "zzz"), ("record-A", "record-B"), ("one", "two")]
+        for (p1, p2) in payloadPairs {
+            let a = bootstrapSnapshot(payload: p1, updatedAt: when)
+            let b = bootstrapSnapshot(payload: p2, updatedAt: when)
+            XCTAssertNotEqual(a.payloadHash, b.payloadHash, "pair (\(p1), \(p2)) needs distinct payloads")
+
+            // Device A sees (local: a, remote: b); device B sees the mirror image.
+            let decisionOnA = CloudKitSyncService.bootstrapDecision(pending: inventoryPending(), local: a, remote: b)
+            let decisionOnB = CloudKitSyncService.bootstrapDecision(pending: inventoryPending(), local: b, remote: a)
+
+            let winnerHashOnA = (decisionOnA == .local) ? a.payloadHash : b.payloadHash
+            let winnerHashOnB = (decisionOnB == .local) ? b.payloadHash : a.payloadHash
+            XCTAssertEqual(winnerHashOnA, winnerHashOnB, "devices diverged for (\(p1), \(p2))")
+            XCTAssertNotEqual(decisionOnA, .identical, "distinct payloads must not resolve identical")
+        }
+    }
+
     /// #15 step 2: resolution for a non-deleted save conflict. The headline property is
     /// the safety boundary — a deliberate local edit or delete must NEVER be overwritten
     /// by the server (never `.applyServer`); the server is only adopted for records with

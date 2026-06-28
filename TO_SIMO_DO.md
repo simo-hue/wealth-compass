@@ -12,6 +12,9 @@ This document tracks manual actions and considerations for you to address.
   - **"Last updated" now moves**: refresh prices and confirm the per-row date on the investments page updates to today (the bug you reported). Note: with the sync-churn guard (I1), a row whose price *didn't* change won't move its date — that's intended.
   - **Crypto "S" resolves**: the `S` holding that previously showed "CoinGecko ID missing" should now price via CoinGecko `/search` (confirm the live `/search` actually returns the coin you hold for the ticker `S` — verify it picked the right coin, since tickers collide).
   - **Keyless Yahoo (I3)**: temporarily clear the Finnhub key and confirm investments still update via Yahoo (instead of all being skipped).
+- [ ] **Verify the professional-hardening batch on Xcode** (same build constraint). 
+  - Run the full sync suite: `xcodebuild test -scheme WealthCompassMobile -only-testing:WealthCompassTests/CloudSyncCoreTests -destination 'platform=iOS Simulator,name=iPhone 16'` (includes the new `testBootstrapDecisionTieBreakIsConvergentAcrossDevices`), plus `MarketDataServiceTests`.
+  - **Currency unification — no regression**: confirm a USD holding priced by Finnhub and a EUR holding priced by Yahoo both still show correct values after a refresh (the conversion now runs through one `storedPrice` boundary; `nil`/same-currency must be a no-op). Standalone Swift verified the rule (11/11), but confirm against live data.
 - [ ] *(Optional, improves accuracy)* Set VWCE's ISIN to `IE00BK5BQT80` in the investment editor. Not required — the bare-symbol search already resolves it — but the ISIN makes the listing lookup exact. Likewise, for any crypto whose ticker is ambiguous, setting an explicit Coin ID avoids the `/search` guess.
 
 
