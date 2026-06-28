@@ -612,6 +612,12 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
 
     private var engine: CKSyncEngine?
     private var isSynchronizing = false
+    /// Depth of in-flight engine-driven (automatic) fetch/send cycles, tracked from CKSyncEngine's
+    /// will/did delegate events. Lets the opportunistic foreground sync (`requestSync`) stand down
+    /// when the engine is already syncing on its own, instead of piling on a redundant fetch+send
+    /// (#13). `isSynchronizing` only covers the manual `synchronize()` path; this covers the
+    /// automatic one. Reset to 0 on engine teardown so it can never wedge `requestSync` shut.
+    private var engineSyncActivity = 0
     private var isStarting = false
     // CloudKit awaits and CKSyncEngine callbacks can resume after a user toggles sync.
     private var syncRequested = false
@@ -754,6 +760,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         let existingEngine = engine
         engine = nil
         isSynchronizing = false
+        engineSyncActivity = 0
         if let existingEngine {
             await existingEngine.cancelOperations()
         }
@@ -832,8 +839,29 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     /// foreground transitions don't each trigger a full fetch+send (#7).
     func requestSync() async {
         guard syncRequested, let engine else { return }
-        guard Date().timeIntervalSince(lastSyncStartedAt) >= foregroundSyncMinimumInterval else { return }
+        // Stand down unless nothing is already syncing — manual (`isSynchronizing`) or engine-driven
+        // (`engineSyncActivity`) — and the debounce window has elapsed, so returning to the
+        // foreground doesn't duplicate an in-flight automatic sync (#13). Force Sync
+        // (`synchronize()`) is intentionally not gated by this: the user asked for an immediate sync.
+        guard Self.shouldRunOpportunisticSync(
+            isSynchronizing: isSynchronizing,
+            engineSyncActivity: engineSyncActivity,
+            secondsSinceLastSync: Date().timeIntervalSince(lastSyncStartedAt),
+            minimumInterval: foregroundSyncMinimumInterval
+        ) else { return }
         await synchronize(generation: lifecycleGeneration, using: engine)
+    }
+
+    /// Whether an opportunistic foreground sync should run: only when nothing is already syncing
+    /// (manual or engine-driven) and the debounce window has elapsed (#13 / #7). Pure + `static` so
+    /// the gate is unit-testable without a live engine — whose `Event`s have no public initializer.
+    static func shouldRunOpportunisticSync(
+        isSynchronizing: Bool,
+        engineSyncActivity: Int,
+        secondsSinceLastSync: TimeInterval,
+        minimumInterval: TimeInterval
+    ) -> Bool {
+        !isSynchronizing && engineSyncActivity == 0 && secondsSinceLastSync >= minimumInterval
     }
 
     private func synchronize(generation: Int, using engine: CKSyncEngine) async {
@@ -926,13 +954,22 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 try await handleSentRecordZoneChanges(event, syncEngine: syncEngine)
 
             case .didFetchChanges:
+                engineSyncActivity = max(0, engineSyncActivity - 1)
                 if !metadataStore.read().bootstrapCompleted {
                     try metadataStore.update { $0.bootstrapCompleted = true }
                     enqueuePendingRecordChanges(on: syncEngine)
                 }
 
-            case .willFetchChanges, .willFetchRecordZoneChanges, .didFetchRecordZoneChanges,
-                 .willSendChanges, .didSendChanges:
+            case .willFetchChanges, .willSendChanges:
+                // Track engine-driven (automatic) sync cycles so the opportunistic foreground sync
+                // (`requestSync`) can stand down while the engine is already syncing, instead of
+                // overlapping it with a redundant fetch+send (#13).
+                engineSyncActivity += 1
+
+            case .didSendChanges:
+                engineSyncActivity = max(0, engineSyncActivity - 1)
+
+            case .willFetchRecordZoneChanges, .didFetchRecordZoneChanges:
                 break
 
             @unknown default:
@@ -1735,6 +1772,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             await disableHandler()
         }
         isSynchronizing = false
+        engineSyncActivity = 0
         if let existingEngine {
             // This teardown runs from `handleEvent(_:syncEngine:)`'s catch block, i.e. while a
             // CKSyncEngine delegate callback is still on the current task. Awaiting a re-entrant

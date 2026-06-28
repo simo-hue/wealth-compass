@@ -494,6 +494,23 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(pruned.count, 2)
     }
 
+    /// #13: the opportunistic foreground sync runs only when nothing is already syncing — manual
+    /// (`isSynchronizing`) or engine-driven (`engineSyncActivity`) — and the debounce window has
+    /// elapsed, so it never duplicates an in-flight automatic sync.
+    func testOpportunisticSyncGate() {
+        let interval: TimeInterval = 30
+        func gate(_ syncing: Bool, _ activity: Int, _ since: TimeInterval) -> Bool {
+            CloudKitSyncService.shouldRunOpportunisticSync(
+                isSynchronizing: syncing, engineSyncActivity: activity,
+                secondsSinceLastSync: since, minimumInterval: interval
+            )
+        }
+        XCTAssertTrue(gate(false, 0, 31), "idle + debounce elapsed → run")
+        XCTAssertFalse(gate(true, 0, 31), "a manual sync in flight → stand down")
+        XCTAssertFalse(gate(false, 1, 31), "an engine-driven automatic sync in flight → stand down (#13)")
+        XCTAssertFalse(gate(false, 0, 10), "still within the debounce window → stand down")
+    }
+
     /// The anti-mislabel guarantee: an account failure resolves to `.accountUnavailable`
     /// (so Settings reads "iCloud Unavailable"), preserving a custom sign-in message when
     /// present; the not-signed-in CKError falls back to canned copy.

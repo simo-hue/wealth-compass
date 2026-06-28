@@ -79,6 +79,8 @@ These fixes are in the codebase but still need a clean verification run on two i
 
 ### 13. Avoid duplicate manual + automatic CKSyncEngine sync
 
+> ✅ **Done (2026-06-28).** Added an `engineSyncActivity` counter (tracked from CKSyncEngine will/did fetch/send events) so the opportunistic foreground `requestSync()` stands down when the engine is already syncing automatically — gated by the pure, tested `shouldRunOpportunisticSync(...)`. Force Sync stays unconditional; the counter resets on engine teardown. Steps 1+3 covered; step 2 (Force Sync coalescing) intentionally not done — a user "sync now" should always run. (DOCUMENTATION.md 2026-06-28.)
+
 **Problem:** `configuration.automaticallySync = true` **and** `synchronize()` manually calls `fetchChanges` + `sendChanges`. Force sync and foreground refresh may overlap with engine-scheduled sync.
 
 **Steps:**
@@ -187,7 +189,7 @@ Store rolling net-worth history as chunked monthly aggregates locally; sync fewe
 | Item | Effort | Impact | Status |
 |------|--------|--------|--------|
 | 1–3 — Verify recent fixes on two devices | S | Confidence | ⏳ manual (in progress) |
-| 13 — Dedupe manual + automatic sync | S | Less churn | ☐ open |
+| 13 — Dedupe manual + automatic sync | S | Less churn | ✅ done (2026-06-28) |
 | 16 / 17 — Chart NaN guard + remove `withAnimation` on load | S | Robustness | ☐ open |
 | 9 (remaining) — debounce remote apply + one write per batch | M | Fixes lag | 🟡 partial |
 | 11 / 12 — Snapshot amplification + metadata pruning | M | Medium | ✅ done (2026-06-28) |
