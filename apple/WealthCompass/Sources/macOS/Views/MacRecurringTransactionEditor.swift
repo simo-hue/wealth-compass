@@ -124,6 +124,12 @@ struct MacRecurringTransactionEditor: View {
 
                 Section("Category") {
                     Picker("Category", selection: $category) {
+                        // Keep the current value selectable even if it isn't in the type's
+                        // default+custom list (imported/legacy category, or the transient
+                        // state mid type-toggle) so the selection always has a matching tag.
+                        if category != Self.customCategoryTag && !categories.contains(category) {
+                            Text(LocalizedStringKey(category)).tag(category)
+                        }
                         ForEach(categories, id: \.self) { category in
                             // Localize built-in category names; custom user ones fall through verbatim (WC-M10).
                             Text(LocalizedStringKey(category)).tag(category)

@@ -107,6 +107,13 @@ struct TransactionFormView: View {
 
                 Section("Category") {
                     Picker("Category", selection: $category) {
+                        // Keep the current value selectable even if it isn't in the
+                        // type's default+custom list (imported/legacy category, or the
+                        // transient state mid type-toggle) so the Picker selection always
+                        // has a matching tag — no "selection is invalid" warning, no data loss.
+                        if category != Self.customCategoryTag && !categories.contains(category) {
+                            Text(category).tag(category)
+                        }
                         ForEach(categories, id: \.self) { category in
                             Text(category).tag(category)
                         }
@@ -299,6 +306,13 @@ struct RecurringTransactionFormView: View {
 
                 Section("Category") {
                     Picker("Category", selection: $category) {
+                        // Keep the current value selectable even if it isn't in the
+                        // type's default+custom list (imported/legacy category, or the
+                        // transient state mid type-toggle) so the Picker selection always
+                        // has a matching tag — no "selection is invalid" warning, no data loss.
+                        if category != Self.customCategoryTag && !categories.contains(category) {
+                            Text(category).tag(category)
+                        }
                         ForEach(categories, id: \.self) { category in
                             Text(category).tag(category)
                         }

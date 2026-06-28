@@ -83,6 +83,13 @@ private struct MacTransactionEditor: View {
                         }
                     }
                     Picker("Category", selection: $category) {
+                        // Keep the current value selectable even if it isn't in the
+                        // type's default+custom list (imported/legacy category, or the
+                        // transient state mid type-toggle) so the selection always has a
+                        // matching tag — no "selection is invalid" warning, no data loss.
+                        if category != Self.customCategoryTag && !categories.contains(category) {
+                            Text(LocalizedStringKey(category)).tag(category)
+                        }
                         ForEach(categories, id: \.self) {
                             Text(LocalizedStringKey($0)).tag($0)
                         }
