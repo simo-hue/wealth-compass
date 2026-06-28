@@ -150,6 +150,21 @@ struct AnalyticsEngine {
         return result
     }
 
+    /// Padded y-axis domain for the net-worth chart, hardened against non-finite input: a single
+    /// NaN/Inf value would otherwise make `min()`/`max()` yield NaN and constructing the
+    /// `ClosedRange` *trap* (crash), not merely warn (WC-#16). Empty or all-non-finite input falls
+    /// back to a safe default. Pure + `static` so the guard is unit-tested and shared by both
+    /// dashboards instead of duplicated.
+    static func chartYDomain(for points: [NetWorthPoint]) -> ClosedRange<Double> {
+        let values = points.map(\.value).filter(\.isFinite)
+        guard let minimum = values.min(), let maximum = values.max() else {
+            return 0...1
+        }
+        let spread = max(maximum - minimum, max(abs(maximum), 1) * 0.08)
+        let padding = spread * 0.18
+        return (minimum - padding)...(maximum + padding)
+    }
+
     func cashFlowTrend(months: Int = 6) -> [CashFlowMonth] {
         let monthFormatter = DateFormatter()
         monthFormatter.dateFormat = "yyyy-MM"

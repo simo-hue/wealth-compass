@@ -51,6 +51,20 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual(points.map(\.value), [100, 100, 100, 100, 200], "gap days carry the 18th's value forward (flat), not interpolated")
     }
 
+    /// WC-#16: the net-worth chart y-domain never traps on non-finite input (a NaN bound would crash
+    /// the `ClosedRange`), and degrades to a safe default for empty / all-non-finite series.
+    func testChartYDomainIsFiniteSafe() {
+        func pts(_ values: [Double]) -> [NetWorthPoint] { values.map { NetWorthPoint(date: date(2026, 6, 1), value: $0) } }
+
+        XCTAssertEqual(AnalyticsEngine.chartYDomain(for: []), 0...1, "empty → safe default")
+        XCTAssertEqual(AnalyticsEngine.chartYDomain(for: pts([.nan, .infinity])), 0...1, "all non-finite → safe default")
+
+        let domain = AnalyticsEngine.chartYDomain(for: pts([100, .nan, 200, .infinity]))
+        XCTAssertTrue(domain.lowerBound.isFinite && domain.upperBound.isFinite, "non-finite values filtered → finite bounds")
+        XCTAssertLessThan(domain.lowerBound, 100, "padded below the finite min")
+        XCTAssertGreaterThan(domain.upperBound, 200, "padded above the finite max")
+    }
+
     func testCalculateTotalsConvertsTransactionsByOwnCurrency() {
         // WC-M1: each transaction converts from its own currency to the display currency
         // before summing into cash/liquidity.
