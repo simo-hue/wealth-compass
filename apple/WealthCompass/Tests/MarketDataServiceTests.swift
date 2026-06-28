@@ -98,4 +98,38 @@ final class MarketDataServiceTests: XCTestCase {
         XCTAssertGreaterThan(strong, none)
         XCTAssertEqual(none, 0, accuracy: 0.0001)
     }
+
+    // MARK: - CoinGecko symbol resolution (I2)
+
+    func testCoinGeckoSearchDecodeAndResolveMostProminent() throws {
+        let coins = try CoinGeckoPriceClient.decodeSearch(json(#"""
+        {"coins":[
+         {"id":"sonic-3","name":"Sonic","symbol":"S","market_cap_rank":50},
+         {"id":"some-other-s","name":"Some Other S","symbol":"S","market_cap_rank":1200},
+         {"id":"sui","name":"Sui","symbol":"SUI","market_cap_rank":15}
+        ]}
+        """#))
+        XCTAssertEqual(coins.count, 3)
+        XCTAssertEqual(coins.first { $0.id == "sonic-3" }?.marketCapRank, 50) // snake_case decoded
+        // Ticker "S" collides; pick the highest-ranked (lowest number), case-insensitively.
+        XCTAssertEqual(CoinGeckoPriceClient.bestCoinID(coins, symbol: "s", name: "Sonic"), "sonic-3")
+        XCTAssertNil(CoinGeckoPriceClient.bestCoinID(coins, symbol: "ZZZ", name: ""))
+    }
+
+    func testCoinGeckoResolutionFallsBackToUniqueName() {
+        let coins = [
+            CoinGeckoSearchCoin(id: "unique-coin", symbol: "UQ", name: "Unique Coin", marketCapRank: 900),
+            CoinGeckoSearchCoin(id: "other", symbol: "OT", name: "Other", marketCapRank: nil)
+        ]
+        XCTAssertEqual(CoinGeckoPriceClient.bestCoinID(coins, symbol: "NOPE", name: "Unique Coin"), "unique-coin")
+    }
+
+    func testCoinGeckoResolutionRefusesAmbiguousName() {
+        // Two coins share the name → don't guess; return nil so the holding is skipped, not mispriced.
+        let coins = [
+            CoinGeckoSearchCoin(id: "a", symbol: "AAA", name: "Token", marketCapRank: nil),
+            CoinGeckoSearchCoin(id: "b", symbol: "BBB", name: "Token", marketCapRank: nil)
+        ]
+        XCTAssertNil(CoinGeckoPriceClient.bestCoinID(coins, symbol: "NOPE", name: "Token"))
+    }
 }
