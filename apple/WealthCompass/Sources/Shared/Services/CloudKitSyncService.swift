@@ -338,7 +338,7 @@ enum CloudSyncPendingMutation: Codable, Equatable, Sendable {
     }
 }
 
-private struct CloudSyncRecordState: Codable, Sendable {
+struct CloudSyncRecordState: Codable, Sendable {
     var systemFields: Data?
     var pending: CloudSyncPendingMutation?
     var isTombstone = false
@@ -408,6 +408,12 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
             dataLock.unlock()
             throw error
         }
+        // Compact fully-settled tombstones so the metadata file doesn't accumulate dead per-record
+        // entries (#12) — safe because entity ids are one-shot UUIDs (a pruned id never returns).
+        updated.records = CloudKitSyncService.pruningSettledTombstones(
+            from: updated.records,
+            knownLocalHashes: updated.knownLocalHashes
+        )
         cached = updated
         // Hand-over-hand: take `writeLock` before releasing `dataLock` so concurrent updates
         // persist in the same order they committed in memory, then release `dataLock` so the
@@ -516,7 +522,9 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
             at: url.deletingLastPathComponent(),
             withIntermediateDirectories: true
         )
-        let data = try FinanceJSONCoding.encode(metadata, prettyPrinted: true)
+        // No pretty-printing in production: the metadata file is rewritten on many events, so the
+        // whitespace was pure I/O overhead (#12).
+        let data = try FinanceJSONCoding.encode(metadata, prettyPrinted: false)
         try data.write(to: url, options: [.atomic, .completeFileProtectionUnlessOpen])
     }
 }
@@ -1760,6 +1768,20 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         case rateLimited            // CloudKit throttled the request; it retries automatically
         case zoneMissing            // the sync zone isn't there yet / was removed
         case unknown                // anything else — fall back to the system description
+    }
+
+    /// Drops fully-settled tombstone states — deleted, acknowledged (no pending work), and no longer
+    /// locally present — so the metadata file doesn't accumulate dead per-record entries (#12). Safe
+    /// because every entity id is a one-shot UUID: a pruned id is never re-created, so its tombstone
+    /// can never be needed to suppress a resurrection. Pure + `static` so it stays unit-testable.
+    static func pruningSettledTombstones(
+        from records: [String: CloudSyncRecordState],
+        knownLocalHashes: [String: String]
+    ) -> [String: CloudSyncRecordState] {
+        records.filter { key, state in
+            let settled = state.isTombstone && state.pending == nil && knownLocalHashes[key] == nil
+            return !settled
+        }
     }
 
     static func failureCategory(for error: Error) -> SyncFailureCategory {

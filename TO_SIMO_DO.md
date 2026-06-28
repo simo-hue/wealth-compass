@@ -20,6 +20,10 @@ This document tracks manual actions and considerations for you to address.
   - Build both schemes; run `xcodebuild test -scheme WealthCompassMobile -only-testing:WealthCompassTests/CloudSyncCoreTests -destination 'platform=iOS Simulator,name=iPhone 16'` (new `testSyncStatusRoutesEachCategoryToTheRightToneAndSeverity` + extended `testFailureCategoryMapsCKErrorCodes`).
   - **Visual check** in Settings on both platforms: the status row now shows an SF Symbol + severity color. Confirm the layout is fine with the new `Label`/`LabeledContent` shape. Best smoke test: turn on Airplane Mode with sync enabled → the status should read a calm grey **"Waiting to Sync" / "You're offline…"**, NOT a red "Sync Error".
   - **Localize new strings** in `Sources/Shared/Resources/Localizable.xcstrings` (~40 languages): `"Waiting to Sync"`, `"Action Needed"`, and the new `.waiting`/`.actionNeeded` message copy (offline / connection-lost / temporarily-unavailable / busy / preparing / storage-full / restricted). Until translated they fall back to English.
+- [ ] **Verify the sync write-hygiene batch on Xcode** (#11 snapshot amplification + #12 metadata compaction).
+  - Run `xcodebuild test -scheme WealthCompassMobile -only-testing:WealthCompassTests/SnapshotEngineTests -only-testing:WealthCompassTests/AnalyticsEngineTests -only-testing:WealthCompassTests/CloudSyncCoreTests -destination 'platform=iOS Simulator,name=iPhone 16'`.
+  - **Eyeball the net-worth chart** (Dashboard, all ranges, both platforms): it must still be **continuous and flat across inactivity** — the carry-forward now happens at render instead of from stored rows. A gap longer than ~60 days now renders flat (previously it sloped); confirm that reads correctly. Existing users keep their already-stored backfill rows (harmless duplicates on flat runs); only new gaps are render-filled.
+  - *(Optional)* Note the metadata file (`wealth-compass-cloud-sync.json`) is now minified and self-compacts settled tombstones on each write — its size should stop growing with churn.
 
 
 ---

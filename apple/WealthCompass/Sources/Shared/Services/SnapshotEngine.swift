@@ -9,56 +9,17 @@ import Foundation
 struct SnapshotEngine {
     var calendar: Calendar = .current
 
-    /// Maximum number of missing days to carry-forward-backfill, matching the
-    /// recurring catch-up window (H7) so the two engines stay consistent.
-    static let maxBackfillDays = 60
-
-    /// Upserts a snapshot for `now` and carry-forward-backfills any missing days
-    /// since the last snapshot (capped at `maxBackfillDays`). Returned array is sorted ascending.
+    /// Upserts a snapshot for `now`, replacing an existing same-day snapshot. No-activity days are
+    /// **not** materialized here: a long absence used to spawn up to 60 carry-forward rows, each its
+    /// own CloudKit record (WC-#11). The chart fills those flat gaps at render time instead
+    /// (`AnalyticsEngine.snapshotsForChart`), so net-worth history stays continuous without storing —
+    /// or syncing — a row per inactive day. Returned array is sorted ascending.
     func appendingSnapshot(
         to snapshots: [NetWorthSnapshot],
         totals: FinanceTotals,
         now: Date = Date()
     ) -> [NetWorthSnapshot] {
         var snapshots = snapshots
-        let today = calendar.startOfDay(for: now)
-
-        if let lastSnapshot = snapshots.last {
-            let lastSnapshotDate = calendar.startOfDay(for: lastSnapshot.date)
-            if lastSnapshotDate < today {
-                let components = calendar.dateComponents([.day], from: lastSnapshotDate, to: today)
-                if let daysMissing = components.day, daysMissing > 0 {
-                    let backfillDays = min(daysMissing, Self.maxBackfillDays)
-                    // Carry-forward the most recent `backfillDays` days *before today* (WC-L9).
-                    // On a gap longer than the cap, the recent run is what the chart needs
-                    // filled — the previous code filled the oldest days right after the last
-                    // snapshot and left the recent gap empty.
-                    for dayOffset in 1...backfillDays {
-                        if let backfillDate = calendar.date(byAdding: .day, value: -dayOffset, to: today),
-                           backfillDate > lastSnapshotDate {
-                            // End-of-day timestamp represents the closing balance.
-                            var components = calendar.dateComponents([.year, .month, .day], from: backfillDate)
-                            components.hour = 23
-                            components.minute = 59
-                            components.second = 59
-                            let finalBackfillDate = calendar.date(from: components) ?? backfillDate
-                            snapshots.append(
-                                NetWorthSnapshot(
-                                    date: finalBackfillDate,
-                                    totalAssets: lastSnapshot.totalAssets,
-                                    totalLiabilities: lastSnapshot.totalLiabilities,
-                                    netWorth: lastSnapshot.netWorth,
-                                    liquidity: lastSnapshot.liquidity,
-                                    investments: lastSnapshot.investments,
-                                    crypto: lastSnapshot.crypto
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
         let snapshot = NetWorthSnapshot(
             date: now,
             totalAssets: totals.totalAssets,

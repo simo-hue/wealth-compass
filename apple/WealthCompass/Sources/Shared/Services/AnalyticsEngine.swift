@@ -113,16 +113,41 @@ struct AnalyticsEngine {
 
         var points = latestByDay.values.sorted { $0.date < $1.date }
 
-        guard currentNetWorth.isFinite else { return points }
-
-        if let lastIndex = points.indices.last,
-           calendar.isDate(points[lastIndex].date, inSameDayAs: now) {
-            points[lastIndex] = NetWorthPoint(date: now, value: currentNetWorth)
-        } else {
-            points.append(NetWorthPoint(date: now, value: currentNetWorth))
+        if currentNetWorth.isFinite {
+            if let lastIndex = points.indices.last,
+               calendar.isDate(points[lastIndex].date, inSameDayAs: now) {
+                points[lastIndex] = NetWorthPoint(date: now, value: currentNetWorth)
+            } else {
+                points.append(NetWorthPoint(date: now, value: currentNetWorth))
+            }
         }
 
-        return points
+        return carryingForwardDailyGaps(points)
+    }
+
+    /// Fills missing calendar days between the first and last point by carrying the previous day's
+    /// value forward — reproducing the flat-during-inactivity net-worth line that materialized
+    /// carry-forward snapshots used to give, but computed at render time instead of stored + synced
+    /// (WC-#11). A line connecting only the real points would instead slope across a gap, implying a
+    /// gradual change that never happened.
+    private func carryingForwardDailyGaps(_ points: [NetWorthPoint]) -> [NetWorthPoint] {
+        guard points.count > 1, let first = points.first, let last = points.last else { return points }
+        let byDay = Dictionary(points.map { (calendar.startOfDay(for: $0.date), $0) }, uniquingKeysWith: { $1 })
+        var result: [NetWorthPoint] = []
+        var cursor = calendar.startOfDay(for: first.date)
+        let endDay = calendar.startOfDay(for: last.date)
+        var lastValue = first.value
+        while cursor <= endDay {
+            if let real = byDay[cursor] {
+                result.append(real)
+                lastValue = real.value
+            } else {
+                result.append(NetWorthPoint(date: cursor, value: lastValue))
+            }
+            guard let next = calendar.date(byAdding: .day, value: 1, to: cursor) else { break }
+            cursor = next
+        }
+        return result
     }
 
     func cashFlowTrend(months: Int = 6) -> [CashFlowMonth] {
