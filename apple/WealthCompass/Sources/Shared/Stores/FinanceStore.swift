@@ -512,9 +512,10 @@ final class FinanceStore: ObservableObject {
         let hasCoinGeckoKey = trimmedCoinGeckoKey?.isEmpty == false
         var result = MarketPriceRefreshResult()
         var investmentQuotes: [UUID: MarketPriceQuote] = [:]
-        // Price is resolved into each holding's own currency at fetch time, so a
-        // refresh never re-bases a holding's cost-basis currency (H2).
-        var cryptoQuotes: [UUID: (id: String, price: Double, asOf: Date)] = [:]
+        // Each provider yields a price in its own (native) currency; the single conversion to the
+        // holding's currency happens once at the apply loop below. H2 (never re-base a holding's
+        // currency) holds because that conversion is a no-op when source == holding currency.
+        var cryptoQuotes: [UUID: (id: String, price: Double, currency: Currency, asOf: Date)] = [:]
 
         if data.investments.isEmpty {
             result.skippedInvestments = []
@@ -530,26 +531,15 @@ final class FinanceStore: ObservableObject {
             }
             let yahooClient = YahooQuoteClient()
 
-            // Resolves a holding via Yahoo and re-expresses the price in the holding's own currency
-            // (mirrors the crypto path), so a EUR ETF on a EUR listing stores 1:1 and a cross-listing
-            // converts via FX.
+            // Resolves a holding via Yahoo to a quote in the listing's native currency; the single
+            // conversion to the holding's currency happens at the apply loop. `preferredCurrency`
+            // still steers disambiguation toward the holding-currency listing (avoids an FX hop).
             func yahooQuote(for investment: Investment) async throws -> MarketPriceQuote {
-                let nativeQuote = try await yahooClient.resolvedQuote(
+                try await yahooClient.resolvedQuote(
                     symbol: investment.symbol,
                     isin: investment.isin,
                     name: investment.name,
                     preferredCurrency: investment.currency
-                )
-                let priceInHoldingCurrency = settings.convert(
-                    nativeQuote.price,
-                    from: nativeQuote.currency,
-                    to: investment.currency
-                )
-                return MarketPriceQuote(
-                    price: priceInHoldingCurrency,
-                    currency: investment.currency,
-                    asOf: nativeQuote.asOf,
-                    provider: nativeQuote.provider
                 )
             }
 
@@ -639,10 +629,9 @@ final class FinanceStore: ObservableObject {
                             result.failedCrypto.append("\(holding.symbol): no CoinGecko price for \(coinID)")
                             continue
                         }
-                        // Always express the live price in the holding's own currency,
-                        // converting only if the provider couldn't return that currency.
-                        let priceInHoldingCurrency = settings.convert(resolved.price, from: resolved.currency, to: holding.currency)
-                        cryptoQuotes[holding.id] = (coinID, priceInHoldingCurrency, coinQuote.asOf)
+                        // Store the native price + its currency; the apply loop converts once. H2:
+                        // resolved.currency is the holding's own unless CoinGecko lacked it.
+                        cryptoQuotes[holding.id] = (coinID, resolved.price, resolved.currency, coinQuote.asOf)
                     }
                 } catch {
                     result.failedCrypto = data.crypto
@@ -663,9 +652,10 @@ final class FinanceStore: ObservableObject {
 
         for index in data.investments.indices {
             guard let quote = investmentQuotes[data.investments[index].id] else { continue }
-            // Network prices are Double; cross to Decimal at the storage boundary and drop a
-            // non-finite quote rather than corrupting stored money (WC-A1 / WC-H1).
-            guard let price = Decimal(finite: quote.price) else { continue }
+            // Convert into the holding's currency at the single storage boundary (an unknown source
+            // currency — Finnhub — is assumed to be the holding's), dropping a non-finite quote
+            // rather than corrupting stored money (WC-A1 / WC-H1).
+            guard let price = storedPrice(quote.price, from: quote.currency, to: data.investments[index].currency, settings: settings) else { continue }
             // Only write (and bump updatedAt → re-sync) when the price actually moved, so a refresh
             // that re-confirms an unchanged price doesn't churn CloudKit (I1). The count still
             // reflects every holding we re-priced.
@@ -679,14 +669,13 @@ final class FinanceStore: ObservableObject {
 
         for index in data.crypto.indices {
             guard let update = cryptoQuotes[data.crypto[index].id] else { continue }
-            guard let price = Decimal(finite: update.price) else { continue }
+            // Same single conversion boundary as investments (H2: a no-op when already in-currency).
+            guard let price = storedPrice(update.price, from: update.currency, to: data.crypto[index].currency, settings: settings) else { continue }
             let coinIDWasEmpty = data.crypto[index].coinId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             // Bump updatedAt only on a real content change — a new price or a first-time coinId
             // backfill — so unchanged holdings don't re-sync every refresh (I1).
             if data.crypto[index].currentPrice != price || coinIDWasEmpty {
                 data.crypto[index].currentPrice = price
-                // Note: holding.currency is intentionally NOT overwritten here (H2) — the
-                // price above is already expressed in the holding's existing currency.
                 if coinIDWasEmpty {
                     data.crypto[index].coinId = update.id
                 }
@@ -702,6 +691,21 @@ final class FinanceStore: ObservableObject {
 
         result.refreshedAt = refreshedAt
         return result
+    }
+
+    /// Single conversion boundary for a freshly fetched market price: converts a `Double` price in
+    /// `sourceCurrency` — or the holding's own currency when the source is unknown (Finnhub) — into
+    /// `holdingCurrency`, crossing to `Decimal` at the money boundary. Returns nil for a non-finite
+    /// quote so a bad value is dropped, not stored (WC-A1 / WC-H1). The convert is a no-op when
+    /// source == holding currency, so H2 (never re-base a holding's currency) holds.
+    private func storedPrice(
+        _ price: Double,
+        from sourceCurrency: Currency?,
+        to holdingCurrency: Currency,
+        settings: AppSettings
+    ) -> Decimal? {
+        let converted = settings.convert(price, from: sourceCurrency ?? holdingCurrency, to: holdingCurrency)
+        return Decimal(finite: converted)
     }
 
     private let snapshotEngine = SnapshotEngine()

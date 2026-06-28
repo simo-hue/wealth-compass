@@ -4,7 +4,10 @@ import SwiftUI
 
 struct MarketPriceQuote: Equatable {
     let price: Double
-    let currency: Currency
+    /// The currency `price` is quoted in, or `nil` when the source doesn't report one (Finnhub's
+    /// `/quote`). The refresh pipeline maps a `nil` currency to the holding's own currency at its
+    /// single conversion point, so an unknown currency never causes a wrong FX hop.
+    let currency: Currency?
     let asOf: Date
     let provider: String
 }
@@ -308,7 +311,10 @@ struct FinnhubQuoteClient {
             asOf = Date()
         }
 
-        return MarketPriceQuote(price: price, currency: .usd, asOf: asOf, provider: "Finnhub")
+        // Finnhub's /quote doesn't report a currency, so we don't assert one — the caller maps a
+        // nil source currency to the holding's own at the single conversion point (previously this
+        // hardcoded .usd, which was inert for investments but a misleading tag).
+        return MarketPriceQuote(price: price, currency: nil, asOf: asOf, provider: "Finnhub")
     }
 
     private static func validate(response: URLResponse, provider: String) throws {
