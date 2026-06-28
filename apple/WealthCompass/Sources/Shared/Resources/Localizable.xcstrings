@@ -1257,6 +1257,7 @@
       }
     },
     "%@\n\n%@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9318,6 +9319,7 @@
       }
     },
     "%lld due transaction%@ added to Cash Flow." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -106721,6 +106723,9 @@
           }
         }
       }
+    },
+    "Turn off app protection for Wealth Compass." : {
+
     },
     "Turn off Privacy Mode to reveal values and movement." : {
       "extractionState" : "manual",
