@@ -1,5 +1,7 @@
 # Manual Actions Required
 
+- [ ] 
+
 > **⚠️ Items 1–2 below are OBSOLETE as of the P1 fix H1 (2026-06-22).** The app no
 > longer uses the Cloudflare Worker proxy — `ExchangeRateService`/`MarketDataService`
 > now call Frankfurter/Finnhub/CoinGecko directly. You do **not** need to deploy or
@@ -15,26 +17,7 @@
    - Replace the `proxyBaseURL` value with the URL you copied from step 1.
    - Build and test the app to ensure data still loads correctly.
 
-## P0 audit fixes (2026-06-22) — follow-ups
-
-3. **Build both schemes in Xcode (could not be done in the agent environment — no Xcode, CommandLineTools only).**
-   - `xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMac -destination 'platform=macOS' build`
-   - `xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile -destination 'generic/platform=iOS Simulator' build`
-   - Source edits passed `swiftc -parse` and plists passed `plutil -lint`, but a full type-checked build still needs confirming before shipping.
-
-4. **Review and commit the staged changes.** The P0 work is left uncommitted: the `build/` untrack (6,646 staged deletions) plus modified Swift/plist/pbxproj files. Review `git status` / `git diff --cached`, then commit (consider branching off `main` first).
-
-5. **Provisioning (C4):** the `aps-environment` (Push) entitlement was removed from both targets. With automatic signing this is seamless; if you use **manual** provisioning profiles, regenerate them without the Push Notifications capability. (CloudKit/iCloud is unchanged.)
-
-6. **Optional cleanup:** the on-disk `apple/WealthCompass/build/` folder is now untracked + gitignored; you can delete it to reclaim space (`rm -rf apple/WealthCompass/build`).
-
 ## P1 audit fixes (2026-06-22) — follow-ups
-
-7. **Retire the Cloudflare Worker proxy (`../proxy/`) — optional, your call.** H1 made the
-   app call providers directly, so the worker is now unused by the Apple apps. I did **not**
-   delete it (it's shared infra outside `apple/`, and deletion is hard to reverse). If nothing
-   else depends on it, you can `npx wrangler delete` it and remove `../proxy/`. The
-   `CLAUDE.md` note about "update both if you change `proxyBaseURL`" no longer applies.
 
 8. **Build both schemes in Xcode — I could NOT run a full build (no Xcode here, CommandLineTools only).**
    - `xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMac -destination 'platform=macOS' build`
@@ -46,18 +29,6 @@
    message). Open the project in Xcode once and build so the string catalog
    (`Sources/Shared/Resources/Localizable.xcstrings`) auto-extracts them, then translate. They work
    untranslated (English shows as the fallback) but won't be localized until added to ~40 languages.
-
-10. **Finnhub stock currency is still assumed to match the user's selection.** Finnhub `/quote`
-    doesn't return a currency, so an investment's live price is interpreted in whatever currency the
-    user picked in the investment form (the form already has a currency picker — the user controls it).
-    If you want automatic detection later, add a `/stock/profile2` lookup (one extra call per symbol —
-    weigh against the existing rate-limit/perf concerns in M7). Documented, not changed, under H3.
-
-11. **Review and commit the P1 changes.** Left uncommitted on `main`. Files touched:
-    `Shared/Models/FinanceModels.swift`, `Shared/Services/{APIConfiguration,ExchangeRateService,MarketDataService}.swift`,
-    `Shared/Stores/FinanceStore.swift`, `Shared/UI/DesignSystem.swift`,
-    `iOS/{ContentView,Views/Forms,Views/OnboardingView}.swift`,
-    `macOS/{MacRootView,Views/MacEditorSheet,Views/MacOnboardingView}.swift`. Consider branching off `main` first.
 
 ## P2 audit fixes (2026-06-22) — partial, follow-ups
 
@@ -197,31 +168,3 @@
     - `xcodebuild test -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile -destination 'platform=iOS Simulator,name=iPhone 16'`
     - New/changed tests (all in `Tests/CloudSyncCoreTests.swift`, no `project.pbxproj` change — no new files): `testApplyCloudSyncMutationsQuarantinesBadRecordsAndAppliesTheRest`, `testApplyCloudSyncMutationsWithAllBadRecordsAppliesNothing` (H3), `testMakeRecordsEncodesSnapshotOncePerBatch` (H4), `testPartialFailureIsBenignOnlyWhenEveryItemIsRetryableOrConflict` (L29). The existing `testRemoteUpsertAndDeleteRoundTrip` was updated (its `applyCloudSyncMutations` calls dropped `try` — the function no longer throws).
     - If the cross-file type-check surfaces anything (e.g. the new `FinancialData.RemoteMutationOutcome` return, the `makeRecords` signature, or the two-lock store), paste the errors back.
-
-29. **Runtime sync verification — the real test. Use TWO devices (or two app versions with
-    different schemas) signed into the SAME iCloud account, sync ON.** A green build does not
-    prove any of these; each fix changes behavior only observable at runtime.
-    - **WC-H3 (quarantine, not teardown):** get a forward-incompatible / corrupt record into the
-      zone — easiest is a build with an extra **required** field on one model (e.g. `Transaction`)
-      on device A, create that record, then fetch it on device B running the shipping schema (or
-      hand-edit one record's `payload` to invalid bytes in the CloudKit console). Expect: device B
-      logs `Skipped undecodable remote record …` (OSLog subsystem `com.wealthcompass.persistence`),
-      the **rest of the batch still applies**, and sync **stays enabled and keeps working**. Toggle
-      sync off/on — it must NOT re-disable on the same record. Critically, confirm device B does
-      **not** delete that record from the server (no tombstone): device A must still have it after
-      B syncs.
-    - **WC-H4 (no main-thread stall):** on a device with a **large** dataset (thousands of records),
-      make a change that triggers a send batch. Expect no multi-second UI freeze / no watchdog kill.
-      In Instruments → Time Profiler, `cloudSyncRecords()` should appear **once per send batch**,
-      not once per record.
-    - **WC-M2 (transient error isn't fatal):** simulate a metadata-write failure during sync (e.g.
-      fill the disk, or background the app so the file-protected `…cloud-sync.json` can't be written
-      while locked). Expect sync to show an error status but **NOT permanently disable** — a later
-      sync (disk free / device unlocked) recovers on its own, no user re-enable.
-    - **WC-M3 (lock off the disk write):** drive heavy concurrent local edits while a sync is in
-      flight; confirm no UI hitch attributable to sync-metadata writes, and that `…cloud-sync.json`
-      stays internally consistent (decodes, last write wins).
-    - **WC-L29 (rejections surface):** induce a non-retryable batch rejection (e.g. fill iCloud
-      quota, then save). Expect the status to show the error — **not** "Up to Date." Conversely, a
-      first multi-device sync that only collides on `serverRecordChanged` must still settle to
-      "Up to Date."

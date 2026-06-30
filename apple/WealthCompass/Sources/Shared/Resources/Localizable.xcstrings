@@ -9533,6 +9533,9 @@
         }
       }
     },
+    "%lld due transactions were added to Cash Flow." : {
+
+    },
     "%lld holdings" : {
       "localizations" : {
         "ar" : {
@@ -12034,6 +12037,9 @@
           }
         }
       }
+    },
+    "1 due transaction was added to Cash Flow." : {
+
     },
     "1 holding" : {
       "localizations" : {
@@ -14551,6 +14557,9 @@
           }
         }
       }
+    },
+    "Action Needed" : {
+
     },
     "Add" : {
       "localizations" : {
@@ -38829,6 +38838,9 @@
         }
       }
     },
+    "Diagnostics Exported" : {
+
+    },
     "Dividends" : {
       "localizations" : {
         "ar" : {
@@ -48070,6 +48082,9 @@
         }
       }
     },
+    "Export Sync Diagnostics..." : {
+
+    },
     "Face ID" : {
       "localizations" : {
         "ar" : {
@@ -56052,9 +56067,6 @@
       }
     },
     "iCloud is still preparing your sync data. This usually resolves on the next sync." : {
-
-    },
-    "iCloud is temporarily limiting sync requests. Sync will resume automatically in a moment." : {
 
     },
     "iCloud Sync" : {
@@ -83733,6 +83745,9 @@
         }
       }
     },
+    "Preferences like currency, categories, and language are set per device and don't sync." : {
+
+    },
     "Prepare Backup" : {
       "localizations" : {
         "ar" : {
@@ -100462,9 +100477,6 @@
         }
       }
     },
-    "The connection to iCloud was lost. Your changes are saved and will sync automatically when it is restored." : {
-
-    },
     "The end date cannot be before the first occurrence." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -101344,6 +101356,7 @@
       }
     },
     "The iCloud account does not have enough available storage." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -101755,6 +101768,7 @@
       }
     },
     "The network is unavailable. Local changes are saved and will retry automatically." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -111105,6 +111119,9 @@
           }
         }
       }
+    },
+    "Waiting to Sync" : {
+
     },
     "We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers." : {
       "extractionState" : "stale",

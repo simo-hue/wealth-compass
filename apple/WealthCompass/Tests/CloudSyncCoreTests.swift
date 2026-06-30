@@ -576,6 +576,14 @@ final class CloudSyncCoreTests: XCTestCase {
             partialFailure(items: [.networkUnavailable, .serverRecordChanged, .zoneNotFound, .batchRequestFailed])
         ))
 
+        // Record-gone codes (unknownItem, serverRejectedRequest) are also benign.
+        XCTAssertTrue(CloudKitSyncService.partialFailureIsBenign(
+            partialFailure(items: [.unknownItem])
+        ))
+        XCTAssertTrue(CloudKitSyncService.partialFailureIsBenign(
+            partialFailure(items: [.serverRejectedRequest, .networkUnavailable])
+        ))
+
         // A single genuine rejection makes the whole partial failure non-benign.
         XCTAssertFalse(CloudKitSyncService.partialFailureIsBenign(
             partialFailure(items: [.serverRecordChanged, .quotaExceeded])
@@ -656,6 +664,13 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(resolve(.networkUnavailable, retryable: true), .retryableRequeue)
         XCTAssertEqual(resolve(.quotaExceeded, retryable: false), .fatal)
         XCTAssertEqual(resolve(.permissionFailure, retryable: false), .fatal)
+
+        // Record gone (stale changeTag for a server-deleted record) → clear systemFields, re-create.
+        XCTAssertEqual(resolve(.unknownItem), .recordGone)
+        XCTAssertEqual(resolve(.serverRejectedRequest), .recordGone)
+        // Stale-revision check still takes precedence over recordGone.
+        XCTAssertEqual(resolve(.unknownItem, failed: UUID(), current: rev), .staleRequeue)
+        XCTAssertEqual(resolve(.serverRejectedRequest, failed: UUID(), current: rev), .staleRequeue)
     }
 
     /// The retryable-error set the sent-side classifier trusts (`errorIsRetryable`) and that
@@ -669,7 +684,8 @@ final class CloudSyncCoreTests: XCTestCase {
             XCTAssertTrue(CloudKitSyncService.isRetryable(ckError(code)), "\(code) should retry")
         }
         for code in [CKError.Code.notAuthenticated, .quotaExceeded, .permissionFailure,
-                     .serverRecordChanged, .zoneNotFound, .internalError, .serverRejectedRequest] {
+                     .serverRecordChanged, .zoneNotFound, .internalError, .serverRejectedRequest,
+                     .unknownItem] {
             XCTAssertFalse(CloudKitSyncService.isRetryable(ckError(code)), "\(code) must not retry")
         }
     }
