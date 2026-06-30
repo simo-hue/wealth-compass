@@ -202,3 +202,7 @@
     - **Tests** — `CloudSyncCoreTests` (offline, no live CloudKit): H3 batch-skip (one undecodable + one id-mismatch skipped, rest applied, no throw) + an all-bad batch; H4 `makeRecords` invokes the provider exactly once per batch (added a `ThreadSafeCounter` helper); L29 `partialFailureIsBenign` true for an all-benign partial failure, false for a `.quotaExceeded`/`.permissionFailure`/empty one. Updated `testRemoteUpsertAndDeleteRoundTrip` for the now-non-throwing `applyCloudSyncMutations`. M2/M3 are concurrency/semantics changes with no deterministic offline test — covered by the runtime checklist.
     - **Verification** — **NOT built or run here (no Xcode).** Build both schemes + run the suite, then the two-device runtime checklist — `TO_SIMO_DO.md` #28–29.
     - **Files touched** — `Shared/Services/CloudKitSyncService.swift` (all five), `Shared/Stores/FinanceStore.swift` (H3 applied-keys + skip logging, H4 snapshot cache), `Tests/CloudSyncCoreTests.swift`; docs `IOS_MACOS_AUDIT_PROGRESS.md`, `TO_SIMO_DO.md`. No `project.pbxproj` change.
+
+- [2026-06-30]: Bump Build Version
+  - *Details*: Bumped `CURRENT_PROJECT_VERSION` (CFBundleVersion) from 9 to 10 to fix App Store Connect validation error 90061.
+  - *Tech Notes*: Ran `agvtool next-version -all` to increment the build number in `project.pbxproj` and `Info.plist`.

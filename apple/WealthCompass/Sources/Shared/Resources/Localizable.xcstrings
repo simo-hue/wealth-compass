@@ -48082,6 +48082,9 @@
         }
       }
     },
+    "Export Sync Diagnostics" : {
+
+    },
     "Export Sync Diagnostics..." : {
 
     },
@@ -94770,6 +94773,9 @@
           }
         }
       }
+    },
+    "Share Sync Diagnostics" : {
+
     },
     "Shopping" : {
       "localizations" : {

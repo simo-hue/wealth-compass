@@ -7,16 +7,6 @@
 > now call Frankfurter/Finnhub/CoinGecko directly. You do **not** need to deploy or
 > point at the proxy anymore. See the P1 section (item 7) for the optional proxy retirement.
 
-1. ~~**Deploy the Cloudflare Worker**~~ *(obsolete — proxy removed in H1)*:
-   - Open your terminal and navigate to `/Users/simo/Developer/wealth-compass/proxy`
-   - Run `npx wrangler deploy`
-   - Copy the URL provided in the terminal output (e.g., `https://wealthcompass-api-proxy.YOUR_USERNAME.workers.dev`).
-
-2. ~~**Update the Swift App Configuration**~~ *(obsolete — proxy removed in H1)*:
-   - Open `/Users/simo/Developer/wealth-compass/apple/WealthCompass/Sources/Shared/Services/APIConfiguration.swift`.
-   - Replace the `proxyBaseURL` value with the URL you copied from step 1.
-   - Build and test the app to ensure data still loads correctly.
-
 ## P1 audit fixes (2026-06-22) — follow-ups
 
 8. **Build both schemes in Xcode — I could NOT run a full build (no Xcode here, CommandLineTools only).**
@@ -168,3 +158,6 @@
     - `xcodebuild test -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile -destination 'platform=iOS Simulator,name=iPhone 16'`
     - New/changed tests (all in `Tests/CloudSyncCoreTests.swift`, no `project.pbxproj` change — no new files): `testApplyCloudSyncMutationsQuarantinesBadRecordsAndAppliesTheRest`, `testApplyCloudSyncMutationsWithAllBadRecordsAppliesNothing` (H3), `testMakeRecordsEncodesSnapshotOncePerBatch` (H4), `testPartialFailureIsBenignOnlyWhenEveryItemIsRetryableOrConflict` (L29). The existing `testRemoteUpsertAndDeleteRoundTrip` was updated (its `applyCloudSyncMutations` calls dropped `try` — the function no longer throws).
     - If the cross-file type-check surfaces anything (e.g. the new `FinancialData.RemoteMutationOutcome` return, the `makeRecords` signature, or the two-lock store), paste the errors back.
+### [2026-06-30] Manual App Store Connect Upload
+- **Action:** Run `fastlane ios release` from the `apple/WealthCompass` directory.
+- **Reason:** The background upload process failed because it requires an app-specific password (`FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD`) or interactive 2FA, which cannot be provided automatically by the background agent.
