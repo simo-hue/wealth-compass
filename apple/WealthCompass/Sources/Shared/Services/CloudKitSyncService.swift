@@ -518,6 +518,9 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
     }
 
     private func persist(_ metadata: CloudSyncMetadata) throws {
+        let interval = SyncSignpost.sync.begin("metadata")
+        let start = DispatchTime.now()
+        defer { SyncSignpost.sync.end("metadata", interval) }
         try fileManager.createDirectory(
             at: url.deletingLastPathComponent(),
             withIntermediateDirectories: true
@@ -526,6 +529,7 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
         // whitespace was pure I/O overhead (#12).
         let data = try FinanceJSONCoding.encode(metadata, prettyPrinted: false)
         try data.write(to: url, options: [.atomic, .completeFileProtectionUnlessOpen])
+        SyncSignpost.sync.emit("metadata records=\(metadata.records.count) bytes=\(data.count) ms=\(SyncSignpost.sync.ms(since: start))")
     }
 }
 
@@ -868,8 +872,15 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         guard isCurrent(generation, engine: engine), !isSynchronizing else { return }
         isSynchronizing = true
         lastSyncStartedAt = Date()
+        let interval = SyncSignpost.sync.begin("synchronize")
+        let start = DispatchTime.now()
+        var result = "ok"
         await statusHandler(.syncing)
-        defer { finishSynchronizing(generation: generation, engine: engine) }
+        defer {
+            SyncSignpost.sync.emit("synchronize ms=\(SyncSignpost.sync.ms(since: start)) result=\(result)")
+            SyncSignpost.sync.end("synchronize", interval)
+            finishSynchronizing(generation: generation, engine: engine)
+        }
         guard isCurrent(generation, engine: engine) else { return }
 
         do {
@@ -906,6 +917,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 try? metadataStore.update { $0.lastSyncAt = date }
                 await statusHandler(.upToDate(date))
             } else {
+                result = "failed"
                 await report(error)
             }
         }
@@ -986,6 +998,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             // condition (which, with WC-H3, it was far too eager to do).
             if Self.failureCategory(for: error) == .accountChanged {
                 Self.logger.error("CloudKit event handling hit a fatal account change: \(error.localizedDescription, privacy: .public)")
+                SyncDiagnosticsLog.shared.record("ERROR account changed — sync disabled: \(error.localizedDescription)")
                 await stopAfterFatalError(error)
             } else {
                 Self.logger.error("CloudKit event handling failed (non-fatal, will retry): \(error.localizedDescription, privacy: .public)")
@@ -1124,6 +1137,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         _ event: CKSyncEngine.Event.FetchedRecordZoneChanges,
         syncEngine: CKSyncEngine
     ) async throws {
+        SyncSignpost.sync.emit("fetched mods=\(event.modifications.count) dels=\(event.deletions.count)")
         // The full local snapshot is only required during the initial bootstrap
         // merge (to compare local vs. remote). Once bootstrap is complete, remote
         // changes win directly, so we avoid re-encoding the entire dataset + SHA256
@@ -1321,6 +1335,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         _ event: CKSyncEngine.Event.SentRecordZoneChanges,
         syncEngine: CKSyncEngine
     ) async throws {
+        SyncSignpost.sync.emit("sent saved=\(event.savedRecords.count) failed=\(event.failedRecordSaves.count)")
         var pendingToRequeue = Set<CloudSyncRecordKey>()
         try metadataStore.update { metadata in
             for record in event.savedRecords where record.recordID.zoneID == zoneID {
@@ -1358,25 +1373,29 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         for failure in event.failedRecordSaves where failure.record.recordID.zoneID == zoneID {
             guard let key = CloudSyncRecordKey(recordName: failure.record.recordID.recordName) else { continue }
             let currentRevision = metadataStore.pendingRevision(for: key)
-            if let failedRevision = recordRevision(failure.record), currentRevision != failedRevision {
-                simpleRequeue.insert(key)
-                continue
-            }
+            let serverRecord = failure.error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord
+            let serverIsDeleted = (serverRecord?["isDeleted"] as? NSNumber)?.boolValue ?? false
 
-            if failure.error.code == .serverRecordChanged,
-               let serverRecord = failure.error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord {
-                let serverIsDeleted = (serverRecord["isDeleted"] as? NSNumber)?.boolValue ?? false
-                if serverIsDeleted {
-                    deletedServerConflicts.append((key, currentRevision, serverRecord))
-                } else {
-                    nonDeletedConflicts.append((key, serverRecord))
-                }
-            } else if failure.error.code == .zoneNotFound {
+            // The per-record decision is the pure `sentRecordFailureResolution`; this loop only
+            // performs the side effects for each outcome (conflicts are batched below by kind).
+            switch Self.sentRecordFailureResolution(
+                errorCode: failure.error.code,
+                errorIsRetryable: Self.isRetryable(failure.error),
+                hasServerRecord: serverRecord != nil,
+                serverRecordIsDeleted: serverIsDeleted,
+                failedRevision: recordRevision(failure.record),
+                currentRevision: currentRevision
+            ) {
+            case .staleRequeue, .retryableRequeue:
+                simpleRequeue.insert(key)
+            case .zoneRecreation:
                 needsZoneRecreation = true
                 simpleRequeue.insert(key)
-            } else if Self.isRetryable(failure.error) {
-                simpleRequeue.insert(key)
-            } else {
+            case .nonDeletedConflict:
+                if let serverRecord { nonDeletedConflicts.append((key, serverRecord)) }
+            case .deletedConflict:
+                if let serverRecord { deletedServerConflicts.append((key, currentRevision, serverRecord)) }
+            case .fatal:
                 throw failure.error
             }
         }
@@ -1754,6 +1773,50 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         }
     }
 
+    /// What `handleSentRecordZoneChanges` should do with a single failed record save. Extracted
+    /// as a pure decision so the sent-side failure classification can be unit-tested directly:
+    /// `CKSyncEngine.Event` has no public initializer (TO_IMPROVE #22), so the surrounding
+    /// engine flow can't be exercised in tests, but this per-record routing — the part that
+    /// decides which failures retry, conflict, recreate the zone, or surface — can. The caller
+    /// performs the side effects (metadata writes, enqueue, throw) for each case.
+    enum SentRecordFailureResolution: Equatable {
+        case staleRequeue       // the failed upload's revision is no longer the pending one → re-send the latest
+        case retryableRequeue   // a transient transport/throttle blip → re-enqueue and try again
+        case zoneRecreation     // the zone is gone → mark it for recreation, then re-enqueue
+        case nonDeletedConflict // server holds a different live copy → resolve via `conflictAction`
+        case deletedConflict    // server copy is a tombstone → resolve via `resolveServerConflict`
+        case fatal              // a genuine rejection (quota / permission / server-rejected / …) → throw, surfacing it
+    }
+
+    /// Pure per-record routing for a sent-batch save failure. Kept in lock-step with
+    /// `partialFailureIsBenign` (the non-throw set must agree): a stale-revision failure or a
+    /// retryable blip re-enqueues, `zoneNotFound` recreates the zone, a `serverRecordChanged`
+    /// that carries a server record routes by the server's deleted flag, and everything else is
+    /// fatal. Note a `serverRecordChanged` with NO attached server record has nothing to merge,
+    /// so it falls through to the retryable/fatal decision (and is not retryable → fatal),
+    /// exactly as the original inline ladder did.
+    static func sentRecordFailureResolution(
+        errorCode: CKError.Code,
+        errorIsRetryable: Bool,
+        hasServerRecord: Bool,
+        serverRecordIsDeleted: Bool,
+        failedRevision: UUID?,
+        currentRevision: UUID?
+    ) -> SentRecordFailureResolution {
+        // A failure whose revision no longer matches the current pending one is stale: the local
+        // value moved on after this upload was sent, so just re-enqueue to send the latest.
+        if let failedRevision, currentRevision != failedRevision {
+            return .staleRequeue
+        }
+        if errorCode == .serverRecordChanged, hasServerRecord {
+            return serverRecordIsDeleted ? .deletedConflict : .nonDeletedConflict
+        }
+        if errorCode == .zoneNotFound {
+            return .zoneRecreation
+        }
+        return errorIsRetryable ? .retryableRequeue : .fatal
+    }
+
     private func handleStartFailure(_ error: Error) async {
         if case CloudSyncError.accountChanged = error {
             await disableHandler()
@@ -1878,6 +1941,111 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
 
     private func report(_ error: Error) async {
         Self.logger.error("CloudKit sync error: \(error.localizedDescription, privacy: .public)")
+        SyncDiagnosticsLog.shared.record("ERROR synchronize: \(error.localizedDescription)")
         await statusHandler(Self.syncStatus(for: error))
+    }
+}
+
+// MARK: - #23 Production-safe sync telemetry
+
+/// A small, thread-safe, capped in-memory ring of recent sync/persistence telemetry + error
+/// lines, kept so the "Export Sync Diagnostics" support action has something to share — the
+/// `.debug` summary lines (see `SyncSignpost`) aren't persisted to the unified log by design,
+/// so `OSLogStore` can't retrieve them after the fact. Only ever holds the app's own controlled
+/// lines (counts / bytes / ms / error descriptions), never payloads or amounts, so the export is
+/// PII-clean by construction.
+///
+/// Lock-guarded (deliberately NOT an `actor`) so `record(_:)` is synchronous and callable from
+/// any context — including `PersistenceCoordinator`, whose actor methods contain no suspension
+/// points by design (an `await` just to log would break that invariant).
+final class SyncDiagnosticsLog: @unchecked Sendable {
+    static let shared = SyncDiagnosticsLog()
+
+    private let lock = NSLock()
+    private let capacity: Int
+    private var lines: [String] = []
+
+    init(capacity: Int = 500) {
+        self.capacity = max(1, capacity)
+        lines.reserveCapacity(self.capacity)
+    }
+
+    /// Appends one line (a `HH:mm:ss.SSS` timestamp is prepended here). Evicts the oldest lines
+    /// once `capacity` is exceeded, so memory stays bounded regardless of how long the app runs.
+    func record(_ message: String) {
+        let line = "\(Self.timestamp()) \(message)"
+        lock.withLock {
+            lines.append(line)
+            if lines.count > capacity {
+                lines.removeFirst(lines.count - capacity)
+            }
+        }
+    }
+
+    /// A point-in-time copy of the buffered lines, oldest first.
+    func snapshot() -> [String] {
+        lock.withLock { lines }
+    }
+
+    /// Drops all buffered lines. Used by tests; not surfaced in the UI.
+    func clear() {
+        lock.withLock { lines.removeAll(keepingCapacity: true) }
+    }
+
+    private static let timestampFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "HH:mm:ss.SSS"
+        return formatter
+    }()
+
+    private static func timestamp() -> String {
+        timestampFormatter.string(from: Date())
+    }
+}
+
+/// Production-safe sync telemetry (#23). Wraps an `OSSignposter` interval (so the operation shows
+/// as a timed lane in Instruments) and emits a `.debug` summary line that is both streamable live
+/// (`log stream --predicate 'category == "Telemetry"'`) and copied into `SyncDiagnosticsLog` for
+/// the export. Counts / bytes / ms only — never payloads or amounts; all interpolations are
+/// `.public` so the (non-sensitive) numbers aren't redacted in the live stream.
+///
+/// `.debug` is chosen for zero production footprint: not persisted to the log store, materialized
+/// only when actively streamed. The two shared instances are split by layer subsystem; both use a
+/// dedicated `Telemetry` category so the whole pipeline filters with one predicate while staying
+/// out of the existing `.error` categories. A reference type marked `@unchecked Sendable` so the
+/// shared singletons can be touched from any actor (it only holds thread-safe OS logging types).
+final class SyncSignpost: @unchecked Sendable {
+    static let sync = SyncSignpost(subsystem: "com.wealthcompass.sync")
+    static let persistence = SyncSignpost(subsystem: "com.wealthcompass.persistence")
+
+    private let signposter: OSSignposter
+    private let logger: Logger
+
+    private init(subsystem: String) {
+        self.signposter = OSSignposter(subsystem: subsystem, category: "Telemetry")
+        self.logger = Logger(subsystem: subsystem, category: "Telemetry")
+    }
+
+    /// Begins a uniquely-identified signpost interval (unique id so nested/overlapping intervals
+    /// of the same name don't collide). Pair with `end(_:_:)`, ideally via `defer`.
+    func begin(_ name: StaticString) -> OSSignpostIntervalState {
+        signposter.beginInterval(name, id: signposter.makeSignpostID())
+    }
+
+    func end(_ name: StaticString, _ state: OSSignpostIntervalState) {
+        signposter.endInterval(name, state)
+    }
+
+    /// Whole milliseconds elapsed since `start`, using a monotonic clock (safe across wall-clock
+    /// changes).
+    func ms(since start: DispatchTime) -> Int {
+        Int((DispatchTime.now().uptimeNanoseconds &- start.uptimeNanoseconds) / 1_000_000)
+    }
+
+    /// Logs one telemetry line live (`.debug`, public) and copies it into the export buffer.
+    func emit(_ message: String) {
+        logger.debug("\(message, privacy: .public)")
+        SyncDiagnosticsLog.shared.record(message)
     }
 }

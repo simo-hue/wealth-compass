@@ -421,6 +421,9 @@ struct MacSettingsView: View {
                     Button("Export JSON...", action: exportBackup)
                 }
                 .padding(.top, 8)
+
+                Button("Export Sync Diagnostics...", action: exportSyncDiagnostics)
+                    .padding(.top, 4)
             }
 
             SettingsSection(title: "Local Storage") {
@@ -472,6 +475,11 @@ struct MacSettingsView: View {
                             }
                         }
                 }
+
+                Text("Preferences like currency, categories, and language are set per device and don't sync.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Divider().background(WCColor.border)
 
@@ -760,6 +768,27 @@ struct MacSettingsView: View {
             try Data(contentsOf: temporaryURL).write(to: destination, options: .atomic)
             settingsAlert = MacSettingsAlert(
                 title: settings.localized("Backup Exported"),
+                message: destination.path
+            )
+        } catch {
+            settingsAlert = MacSettingsAlert(
+                title: settings.localized("Export Failed"),
+                message: Self.errorMessage(error)
+            )
+        }
+    }
+
+    private func exportSyncDiagnostics() {
+        do {
+            let temporaryURL = try finance.exportSyncDiagnosticsURL()
+            let panel = NSSavePanel()
+            panel.allowedContentTypes = [.plainText]
+            panel.nameFieldStringValue = temporaryURL.lastPathComponent
+
+            guard panel.runModal() == .OK, let destination = panel.url else { return }
+            try Data(contentsOf: temporaryURL).write(to: destination, options: .atomic)
+            settingsAlert = MacSettingsAlert(
+                title: settings.localized("Diagnostics Exported"),
                 message: destination.path
             )
         } catch {
