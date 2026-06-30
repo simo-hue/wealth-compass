@@ -1,5 +1,13 @@
 # Documentation
 
+- [2026-06-30 21:17]: CloudKit Sync Deadlock Fix — "recordChangeTag specified, but record not found"
+  - *Details*: Fixed a permanent sync deadlock where a record with stale `systemFields` (containing a `recordChangeTag` for a server-deleted record) would cause the sync engine to fail fatally on every attempt. The new `recordGone` resolution clears the stale `systemFields` so the next attempt creates a fresh record insert instead of a doomed update.
+  - *Tech Notes*:
+    - **New enum case**: `SentRecordFailureResolution.recordGone` in `CloudKitSyncService.swift` — routes `.unknownItem` and `.serverRejectedRequest` CKError codes to a recovery path instead of `.fatal`.
+    - **Recovery logic**: `handleSentRecordZoneChanges` clears `state.systemFields` for affected records, logs a warning via `SyncDiagnosticsLog`, and requeues for re-send. The next attempt re-creates the record as a fresh insert (no `recordChangeTag`).
+    - **Benign partial failure**: `partialFailureIsBenign` updated to include `.unknownItem` and `.serverRejectedRequest`, preventing these codes from being mislabeled as genuine sync failures in `synchronize()`.
+    - **Tests**: Added cases to `testSentRecordFailureResolutionRoutesEachFailureKind`, `testPartialFailureIsBenignOnlyWhenEveryItemIsRetryableOrConflict`, and `testIsRetryableCoversTransientErrorsOnly`.
+
 - [2026-06-12 08:14]: Cloudflare Worker BFF Proxy Integration
   - *Details*: Abstracted the hardcoded external API URLs for Frankfurter, Finnhub, and CoinGecko into a Cloudflare Worker Proxy backend.
   - *Tech Notes*:

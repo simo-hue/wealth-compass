@@ -1395,6 +1395,18 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 if let serverRecord { nonDeletedConflicts.append((key, serverRecord)) }
             case .deletedConflict:
                 if let serverRecord { deletedServerConflicts.append((key, currentRevision, serverRecord)) }
+            case .recordGone:
+                // The server says this record no longer exists — the local systemFields carry
+                // a stale recordChangeTag that turns every save into an "update" the server
+                // rejects. Clear systemFields so the next attempt creates a fresh record.
+                Self.logger.warning("Record \(key.storageKey, privacy: .public) gone from server — clearing systemFields for re-creation.")
+                SyncDiagnosticsLog.shared.record("RECORD GONE \(key.storageKey) — clearing systemFields")
+                try metadataStore.update { metadata in
+                    var state = metadata.records[key.storageKey] ?? CloudSyncRecordState()
+                    state.systemFields = nil
+                    metadata.records[key.storageKey] = state
+                }
+                simpleRequeue.insert(key)
             case .fatal:
                 throw failure.error
             }
@@ -1770,6 +1782,8 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             return isRetryable(ckError)
                 || ckError.code == .serverRecordChanged
                 || ckError.code == .zoneNotFound
+                || ckError.code == .unknownItem
+                || ckError.code == .serverRejectedRequest
         }
     }
 
@@ -1785,16 +1799,18 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         case zoneRecreation     // the zone is gone → mark it for recreation, then re-enqueue
         case nonDeletedConflict // server holds a different live copy → resolve via `conflictAction`
         case deletedConflict    // server copy is a tombstone → resolve via `resolveServerConflict`
+        case recordGone         // record doesn't exist on server (stale changeTag) → clear systemFields, re-create as new
         case fatal              // a genuine rejection (quota / permission / server-rejected / …) → throw, surfacing it
     }
 
     /// Pure per-record routing for a sent-batch save failure. Kept in lock-step with
     /// `partialFailureIsBenign` (the non-throw set must agree): a stale-revision failure or a
     /// retryable blip re-enqueues, `zoneNotFound` recreates the zone, a `serverRecordChanged`
-    /// that carries a server record routes by the server's deleted flag, and everything else is
-    /// fatal. Note a `serverRecordChanged` with NO attached server record has nothing to merge,
-    /// so it falls through to the retryable/fatal decision (and is not retryable → fatal),
-    /// exactly as the original inline ladder did.
+    /// that carries a server record routes by the server's deleted flag, `.unknownItem` /
+    /// `.serverRejectedRequest` clear stale systemFields for a fresh re-creation, and
+    /// everything else is fatal. Note a `serverRecordChanged` with NO attached server record
+    /// has nothing to merge, so it falls through to the retryable/fatal decision (and is not
+    /// retryable → fatal), exactly as the original inline ladder did.
     static func sentRecordFailureResolution(
         errorCode: CKError.Code,
         errorIsRetryable: Bool,
@@ -1813,6 +1829,12 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         }
         if errorCode == .zoneNotFound {
             return .zoneRecreation
+        }
+        // "recordChangeTag specified, but record not found" — the local systemFields carry a
+        // stale changeTag for a record the server no longer has (deleted out-of-band, zone
+        // reset, etc.). Clearing systemFields lets the next attempt create a fresh record.
+        if errorCode == .unknownItem || errorCode == .serverRejectedRequest {
+            return .recordGone
         }
         return errorIsRetryable ? .retryableRequeue : .fatal
     }

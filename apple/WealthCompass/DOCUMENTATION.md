@@ -309,3 +309,7 @@
 - [2026-06-24]: Net Worth Chart Rendering Fix
   - *Details*: Fixed folded-fill/sunburst artifacts on the dashboard net-worth chart and aligned the chart's right edge with the live header total.
   - *Tech Notes*: `AnalyticsEngine.snapshotsForChart` deduplicates to one point per day, filters non-finite values, and overrides today with `calculateTotals()`. iOS/macOS dashboards use `.linear` interpolation and a precomputed `yDomain`. Tests in `AnalyticsEngineTests`.
+
+- [2026-06-30T21:20:00Z]: Version Bump
+  - *Details*: Updated the marketing version to 1.0.9 for both macOS and iOS.
+  - *Tech Notes*: Updated `MARKETING_VERSION` to `1.0.9` in `project.pbxproj`, `Info.plist`, and the fastlane `Fastfile` comment.
