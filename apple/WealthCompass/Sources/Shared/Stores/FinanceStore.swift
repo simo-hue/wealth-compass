@@ -865,6 +865,44 @@ final class FinanceStore: ObservableObject {
         return url
     }
 
+    /// Writes the recent in-memory sync/persistence telemetry (counts / bytes / ms + errors —
+    /// never payloads or amounts; see `SyncDiagnosticsLog`) to a temp `.txt` for the "Export Sync
+    /// Diagnostics" support action, and returns its URL. A small non-identifying header (app
+    /// version, platform, OS, whether sync is on) precedes the lines. Contains no iCloud account
+    /// info and no financial data (#23).
+    func exportSyncDiagnosticsURL() throws -> URL {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd-HHmmss"
+        let stamp = formatter.string(from: Date())
+
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        #if os(macOS)
+        let platform = "macOS"
+        #else
+        let platform = "iOS"
+        #endif
+        let os = ProcessInfo.processInfo.operatingSystemVersionString
+
+        var lines = [
+            "Wealth Compass sync diagnostics",
+            "version \(version) (\(build)) · \(platform) · \(os)",
+            "iCloud sync: \(isICloudSyncEnabledResolved ? "on" : "off")",
+            "generated \(stamp)",
+            "(counts/bytes/ms + errors only — no financial data, no account info)",
+            ""
+        ]
+        lines.append(contentsOf: SyncDiagnosticsLog.shared.snapshot())
+        let text = lines.joined(separator: "\n") + "\n"
+
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("wealth-compass-sync-diagnostics-\(stamp).txt")
+        try text.write(to: url, atomically: true, encoding: .utf8)
+        return url
+    }
+
     @discardableResult
     func importBackup(from url: URL, mode: FinanceImportMode, settings: AppSettings) throws -> FinanceImportResult {
         let didAccessResource = url.startAccessingSecurityScopedResource()
@@ -998,6 +1036,7 @@ final class FinanceStore: ObservableObject {
             // app, and in release the failure was only visible in Settings. Log it and
             // publish an app-wide error so the user learns their change didn't persist.
             Self.logger.error("Failed to save local finance data: \(error.localizedDescription, privacy: .public)")
+            SyncDiagnosticsLog.shared.record("ERROR save failed: \(error.localizedDescription)")
             iCloudSyncError = error.localizedDescription
             persistenceError = AppLocalization.string(
                 "Your latest change could not be saved to this device. \(error.localizedDescription)",
@@ -1094,19 +1133,33 @@ final class FinanceStore: ObservableObject {
             )
         }
 
+        let interval = SyncSignpost.persistence.begin("applyRemote")
+        let start = DispatchTime.now()
+        let incoming = mutations.count
+        var applicable = 0
+        var applied = 0
+        var skipped = 0
+        defer {
+            SyncSignpost.persistence.emit("applyRemote muts=\(incoming) applicable=\(applicable) applied=\(applied) skipped=\(skipped) ms=\(SyncSignpost.persistence.ms(since: start))")
+            SyncSignpost.persistence.end("applyRemote", interval)
+        }
+
         let applicableMutations = mutations.filter {
             syncMetadataStore.pendingRevision(for: $0.key) == $0.expectedPendingRevision
         }
+        applicable = applicableMutations.count
         guard !applicableMutations.isEmpty else { return [] }
 
         var updatedData = data
         let outcome = updatedData.applyCloudSyncMutations(applicableMutations)
+        skipped = outcome.skipped.count
         for skip in outcome.skipped {
             // WC-H3: a single undecodable / forward-incompatible record is quarantined here
             // (logged, not thrown) so it can't propagate to handleEvent's catch and disable
             // the whole engine. It's reported as not-applied below, so its metadata
             // (knownLocalHashes) is never advanced and no spurious tombstone is enqueued.
             Self.logger.error("Skipped undecodable remote record \(skip.key.recordName, privacy: .public) (type \(skip.key.type.rawValue, privacy: .public)): \(skip.error.localizedDescription, privacy: .public)")
+            SyncDiagnosticsLog.shared.record("ERROR skipped remote record \(skip.key.recordName) (type \(skip.key.type.rawValue)): \(skip.error.localizedDescription)")
         }
         // Nothing decoded — don't persist or advance the baseline; report none-applied so
         // every key is treated as not-applied by the caller.
@@ -1122,6 +1175,7 @@ final class FinanceStore: ObservableObject {
         // Route the disk write through the coordinator so local + remote writes serialize
         // and never interleave, and so the diff baseline advances to the applied records.
         try await coordinator.applyRemote(updatedData)
+        applied = outcome.appliedKeys.count
         return outcome.appliedKeys
     }
 
@@ -1235,11 +1289,15 @@ actor PersistenceCoordinator {
     /// Encodes the snapshot, diffs it against the baseline, writes it to disk, records the
     /// changeset for CloudKit, then advances the baseline. All off the main actor.
     func save(_ snapshot: FinancialData) throws -> SaveOutcome {
+        let interval = SyncSignpost.persistence.begin("save")
+        let start = DispatchTime.now()
+        defer { SyncSignpost.persistence.end("save", interval) }
         let newRecords = try snapshot.cloudSyncRecords()
         let changes = CloudSyncChangeSet.difference(from: lastSavedRecords, to: newRecords)
         try persistence.save(snapshot)
         try metadataStore.recordLocalChanges(changes, currentRecords: newRecords)
         lastSavedRecords = newRecords
+        SyncSignpost.persistence.emit("save records=\(newRecords.count) changed=\(changes.changed.count) deleted=\(changes.deleted.count) ms=\(SyncSignpost.persistence.ms(since: start))")
         return SaveOutcome(didChange: !changes.isEmpty)
     }
 

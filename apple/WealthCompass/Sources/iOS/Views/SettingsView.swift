@@ -6,6 +6,7 @@ struct SettingsView: View {
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appLock: AppLockStore
     @State private var backupURL: URL?
+    @State private var diagnosticsURL: URL?
     @State private var backupError: String?
     @State private var importMode: FinanceImportMode = .merge
     @State private var showingImportOptions = false
@@ -94,6 +95,10 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
 
+                    Text("Preferences like currency, categories, and language are set per device and don't sync.")
+                        .font(.caption)
+                        .foregroundStyle(WCColor.textSecondary)
+
                     LabeledContent("Status") {
                         Label {
                             Text(finance.cloudSyncStatus.localizedTitle(appLanguage: settings.appLanguage))
@@ -159,6 +164,23 @@ struct SettingsView: View {
                         Text(backupError)
                             .font(.caption)
                             .foregroundStyle(WCColor.destructive)
+                    }
+
+                    Button {
+                        do {
+                            diagnosticsURL = try finance.exportSyncDiagnosticsURL()
+                            backupError = nil
+                        } catch {
+                            backupError = error.localizedDescription
+                        }
+                    } label: {
+                        Label("Export Sync Diagnostics", systemImage: "stethoscope")
+                    }
+
+                    if let diagnosticsURL {
+                        ShareLink(item: diagnosticsURL) {
+                            Label("Share Sync Diagnostics", systemImage: "square.and.arrow.up")
+                        }
                     }
 
                     Button(role: .destructive) {
