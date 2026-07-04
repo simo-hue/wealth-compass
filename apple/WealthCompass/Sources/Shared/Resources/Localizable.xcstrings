@@ -9533,6 +9533,9 @@
         }
       }
     },
+    "%lld due transactions were added to Cash Flow." : {
+
+    },
     "%lld holdings" : {
       "localizations" : {
         "ar" : {
@@ -12034,6 +12037,9 @@
           }
         }
       }
+    },
+    "1 due transaction was added to Cash Flow." : {
+
     },
     "1 holding" : {
       "localizations" : {

@@ -43,8 +43,8 @@ final class CurrencyConverterTests: XCTestCase {
 
     func testNonFiniteValueReturnsUnchanged() {
         let converter = CurrencyConverter(snapshot: snapshot(["USD": 1.1]))
-        XCTAssertTrue(converter.convert(.nan, from: .eur, to: .usd).isNaN)
-        XCTAssertEqual(converter.convert(.infinity, from: .eur, to: .usd), .infinity)
+        XCTAssertTrue(converter.convert(Double.nan, from: .eur, to: .usd).isNaN)
+        XCTAssertEqual(converter.convert(Double.infinity, from: .eur, to: .usd), Double.infinity)
     }
 
     func testFallsBackToOfflineSeedWithoutSnapshot() {
