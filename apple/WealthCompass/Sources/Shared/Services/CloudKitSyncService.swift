@@ -9,8 +9,10 @@ enum CloudSyncStatus: Equatable, Sendable {
     case starting
     case syncing
     case upToDate(Date?)
-    case accountUnavailable(String)
-    case error(String)
+    case waiting(String)          // transient & self-resolving (offline, throttled, preparing)
+    case accountUnavailable(String) // not signed in to iCloud
+    case actionNeeded(String)     // persistent, the user must act (storage full, restricted, account changed)
+    case error(String)            // unexpected failure
 
     var title: LocalizedStringKey {
         switch self {
@@ -22,8 +24,12 @@ enum CloudSyncStatus: Equatable, Sendable {
             "Syncing"
         case .upToDate:
             "Up to Date"
+        case .waiting:
+            "Waiting to Sync"
         case .accountUnavailable:
             "iCloud Unavailable"
+        case .actionNeeded:
+            "Action Needed"
         case .error:
             "Sync Error"
         }
@@ -39,8 +45,12 @@ enum CloudSyncStatus: Equatable, Sendable {
             AppLocalization.string("Syncing", appLanguage: appLanguage)
         case .upToDate:
             AppLocalization.string("Up to Date", appLanguage: appLanguage)
+        case .waiting:
+            AppLocalization.string("Waiting to Sync", appLanguage: appLanguage)
         case .accountUnavailable:
             AppLocalization.string("iCloud Unavailable", appLanguage: appLanguage)
+        case .actionNeeded:
+            AppLocalization.string("Action Needed", appLanguage: appLanguage)
         case .error:
             AppLocalization.string("Sync Error", appLanguage: appLanguage)
         }
@@ -62,13 +72,47 @@ enum CloudSyncStatus: Equatable, Sendable {
             date.map {
                 AppLocalization.string("Last synced \($0.formatted(date: .abbreviated, time: .shortened)).", appLanguage: appLanguage)
             } ?? AppLocalization.string("Local data is ready to sync.", appLanguage: appLanguage)
-        case .accountUnavailable(let message), .error(let message):
+        case .waiting(let message), .accountUnavailable(let message), .actionNeeded(let message), .error(let message):
             AppLocalization.string(String.LocalizationValue(message), appLanguage: appLanguage)
         }
     }
 
     var isBusy: Bool {
         self == .starting || self == .syncing
+    }
+
+    enum Severity: Equatable, Sendable { case ok, info, attention, error }
+
+    /// Visual severity for color + icon. Transient states (`.waiting`) are `.info` — calm and
+    /// neutral, never red: being offline or throttled is normal operation, not a failure.
+    var severity: Severity {
+        switch self {
+        case .disabled, .upToDate: .ok
+        case .starting, .syncing, .waiting: .info
+        case .accountUnavailable, .actionNeeded: .attention
+        case .error: .error
+        }
+    }
+
+    /// Tint for the status row's icon / title / detail, derived from `severity`.
+    var tint: Color {
+        switch severity {
+        case .ok, .info: WCColor.textSecondary
+        case .attention: WCColor.warning
+        case .error: WCColor.destructive
+        }
+    }
+
+    /// SF Symbol for the status row.
+    var symbolName: String {
+        switch self {
+        case .disabled: "icloud.slash"
+        case .starting, .syncing: "arrow.triangle.2.circlepath.icloud"
+        case .upToDate: "checkmark.icloud"
+        case .waiting: "icloud"
+        case .accountUnavailable, .actionNeeded: "exclamationmark.icloud"
+        case .error: "xmark.icloud"
+        }
     }
 }
 
@@ -294,7 +338,7 @@ enum CloudSyncPendingMutation: Codable, Equatable, Sendable {
     }
 }
 
-private struct CloudSyncRecordState: Codable, Sendable {
+struct CloudSyncRecordState: Codable, Sendable {
     var systemFields: Data?
     var pending: CloudSyncPendingMutation?
     var isTombstone = false
@@ -364,6 +408,12 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
             dataLock.unlock()
             throw error
         }
+        // Compact fully-settled tombstones so the metadata file doesn't accumulate dead per-record
+        // entries (#12) — safe because entity ids are one-shot UUIDs (a pruned id never returns).
+        updated.records = CloudKitSyncService.pruningSettledTombstones(
+            from: updated.records,
+            knownLocalHashes: updated.knownLocalHashes
+        )
         cached = updated
         // Hand-over-hand: take `writeLock` before releasing `dataLock` so concurrent updates
         // persist in the same order they committed in memory, then release `dataLock` so the
@@ -468,12 +518,18 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
     }
 
     private func persist(_ metadata: CloudSyncMetadata) throws {
+        let interval = SyncSignpost.sync.begin("metadata")
+        let start = DispatchTime.now()
+        defer { SyncSignpost.sync.end("metadata", interval) }
         try fileManager.createDirectory(
             at: url.deletingLastPathComponent(),
             withIntermediateDirectories: true
         )
-        let data = try FinanceJSONCoding.encode(metadata, prettyPrinted: true)
+        // No pretty-printing in production: the metadata file is rewritten on many events, so the
+        // whitespace was pure I/O overhead (#12).
+        let data = try FinanceJSONCoding.encode(metadata, prettyPrinted: false)
         try data.write(to: url, options: [.atomic, .completeFileProtectionUnlessOpen])
+        SyncSignpost.sync.emit("metadata records=\(metadata.records.count) bytes=\(data.count) ms=\(SyncSignpost.sync.ms(since: start))")
     }
 }
 
@@ -560,6 +616,12 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
 
     private var engine: CKSyncEngine?
     private var isSynchronizing = false
+    /// Depth of in-flight engine-driven (automatic) fetch/send cycles, tracked from CKSyncEngine's
+    /// will/did delegate events. Lets the opportunistic foreground sync (`requestSync`) stand down
+    /// when the engine is already syncing on its own, instead of piling on a redundant fetch+send
+    /// (#13). `isSynchronizing` only covers the manual `synchronize()` path; this covers the
+    /// automatic one. Reset to 0 on engine teardown so it can never wedge `requestSync` shut.
+    private var engineSyncActivity = 0
     private var isStarting = false
     // CloudKit awaits and CKSyncEngine callbacks can resume after a user toggles sync.
     private var syncRequested = false
@@ -702,6 +764,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         let existingEngine = engine
         engine = nil
         isSynchronizing = false
+        engineSyncActivity = 0
         if let existingEngine {
             await existingEngine.cancelOperations()
         }
@@ -780,16 +843,44 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     /// foreground transitions don't each trigger a full fetch+send (#7).
     func requestSync() async {
         guard syncRequested, let engine else { return }
-        guard Date().timeIntervalSince(lastSyncStartedAt) >= foregroundSyncMinimumInterval else { return }
+        // Stand down unless nothing is already syncing — manual (`isSynchronizing`) or engine-driven
+        // (`engineSyncActivity`) — and the debounce window has elapsed, so returning to the
+        // foreground doesn't duplicate an in-flight automatic sync (#13). Force Sync
+        // (`synchronize()`) is intentionally not gated by this: the user asked for an immediate sync.
+        guard Self.shouldRunOpportunisticSync(
+            isSynchronizing: isSynchronizing,
+            engineSyncActivity: engineSyncActivity,
+            secondsSinceLastSync: Date().timeIntervalSince(lastSyncStartedAt),
+            minimumInterval: foregroundSyncMinimumInterval
+        ) else { return }
         await synchronize(generation: lifecycleGeneration, using: engine)
+    }
+
+    /// Whether an opportunistic foreground sync should run: only when nothing is already syncing
+    /// (manual or engine-driven) and the debounce window has elapsed (#13 / #7). Pure + `static` so
+    /// the gate is unit-testable without a live engine — whose `Event`s have no public initializer.
+    static func shouldRunOpportunisticSync(
+        isSynchronizing: Bool,
+        engineSyncActivity: Int,
+        secondsSinceLastSync: TimeInterval,
+        minimumInterval: TimeInterval
+    ) -> Bool {
+        !isSynchronizing && engineSyncActivity == 0 && secondsSinceLastSync >= minimumInterval
     }
 
     private func synchronize(generation: Int, using engine: CKSyncEngine) async {
         guard isCurrent(generation, engine: engine), !isSynchronizing else { return }
         isSynchronizing = true
         lastSyncStartedAt = Date()
+        let interval = SyncSignpost.sync.begin("synchronize")
+        let start = DispatchTime.now()
+        var result = "ok"
         await statusHandler(.syncing)
-        defer { finishSynchronizing(generation: generation, engine: engine) }
+        defer {
+            SyncSignpost.sync.emit("synchronize ms=\(SyncSignpost.sync.ms(since: start)) result=\(result)")
+            SyncSignpost.sync.end("synchronize", interval)
+            finishSynchronizing(generation: generation, engine: engine)
+        }
         guard isCurrent(generation, engine: engine) else { return }
 
         do {
@@ -826,6 +917,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 try? metadataStore.update { $0.lastSyncAt = date }
                 await statusHandler(.upToDate(date))
             } else {
+                result = "failed"
                 await report(error)
             }
         }
@@ -874,13 +966,22 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 try await handleSentRecordZoneChanges(event, syncEngine: syncEngine)
 
             case .didFetchChanges:
+                engineSyncActivity = max(0, engineSyncActivity - 1)
                 if !metadataStore.read().bootstrapCompleted {
                     try metadataStore.update { $0.bootstrapCompleted = true }
                     enqueuePendingRecordChanges(on: syncEngine)
                 }
 
-            case .willFetchChanges, .willFetchRecordZoneChanges, .didFetchRecordZoneChanges,
-                 .willSendChanges, .didSendChanges:
+            case .willFetchChanges, .willSendChanges:
+                // Track engine-driven (automatic) sync cycles so the opportunistic foreground sync
+                // (`requestSync`) can stand down while the engine is already syncing, instead of
+                // overlapping it with a redundant fetch+send (#13).
+                engineSyncActivity += 1
+
+            case .didSendChanges:
+                engineSyncActivity = max(0, engineSyncActivity - 1)
+
+            case .willFetchRecordZoneChanges, .didFetchRecordZoneChanges:
                 break
 
             @unknown default:
@@ -897,6 +998,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             // condition (which, with WC-H3, it was far too eager to do).
             if Self.failureCategory(for: error) == .accountChanged {
                 Self.logger.error("CloudKit event handling hit a fatal account change: \(error.localizedDescription, privacy: .public)")
+                SyncDiagnosticsLog.shared.record("ERROR account changed — sync disabled: \(error.localizedDescription)")
                 await stopAfterFatalError(error)
             } else {
                 Self.logger.error("CloudKit event handling failed (non-fatal, will retry): \(error.localizedDescription, privacy: .public)")
@@ -1035,6 +1137,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         _ event: CKSyncEngine.Event.FetchedRecordZoneChanges,
         syncEngine: CKSyncEngine
     ) async throws {
+        SyncSignpost.sync.emit("fetched mods=\(event.modifications.count) dels=\(event.deletions.count)")
         // The full local snapshot is only required during the initial bootstrap
         // merge (to compare local vs. remote). Once bootstrap is complete, remote
         // changes win directly, so we avoid re-encoding the entire dataset + SHA256
@@ -1232,6 +1335,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         _ event: CKSyncEngine.Event.SentRecordZoneChanges,
         syncEngine: CKSyncEngine
     ) async throws {
+        SyncSignpost.sync.emit("sent saved=\(event.savedRecords.count) failed=\(event.failedRecordSaves.count)")
         var pendingToRequeue = Set<CloudSyncRecordKey>()
         try metadataStore.update { metadata in
             for record in event.savedRecords where record.recordID.zoneID == zoneID {
@@ -1269,25 +1373,41 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         for failure in event.failedRecordSaves where failure.record.recordID.zoneID == zoneID {
             guard let key = CloudSyncRecordKey(recordName: failure.record.recordID.recordName) else { continue }
             let currentRevision = metadataStore.pendingRevision(for: key)
-            if let failedRevision = recordRevision(failure.record), currentRevision != failedRevision {
-                simpleRequeue.insert(key)
-                continue
-            }
+            let serverRecord = failure.error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord
+            let serverIsDeleted = (serverRecord?["isDeleted"] as? NSNumber)?.boolValue ?? false
 
-            if failure.error.code == .serverRecordChanged,
-               let serverRecord = failure.error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord {
-                let serverIsDeleted = (serverRecord["isDeleted"] as? NSNumber)?.boolValue ?? false
-                if serverIsDeleted {
-                    deletedServerConflicts.append((key, currentRevision, serverRecord))
-                } else {
-                    nonDeletedConflicts.append((key, serverRecord))
-                }
-            } else if failure.error.code == .zoneNotFound {
+            // The per-record decision is the pure `sentRecordFailureResolution`; this loop only
+            // performs the side effects for each outcome (conflicts are batched below by kind).
+            switch Self.sentRecordFailureResolution(
+                errorCode: failure.error.code,
+                errorIsRetryable: Self.isRetryable(failure.error),
+                hasServerRecord: serverRecord != nil,
+                serverRecordIsDeleted: serverIsDeleted,
+                failedRevision: recordRevision(failure.record),
+                currentRevision: currentRevision
+            ) {
+            case .staleRequeue, .retryableRequeue:
+                simpleRequeue.insert(key)
+            case .zoneRecreation:
                 needsZoneRecreation = true
                 simpleRequeue.insert(key)
-            } else if Self.isRetryable(failure.error) {
+            case .nonDeletedConflict:
+                if let serverRecord { nonDeletedConflicts.append((key, serverRecord)) }
+            case .deletedConflict:
+                if let serverRecord { deletedServerConflicts.append((key, currentRevision, serverRecord)) }
+            case .recordGone:
+                // The server says this record no longer exists — the local systemFields carry
+                // a stale recordChangeTag that turns every save into an "update" the server
+                // rejects. Clear systemFields so the next attempt creates a fresh record.
+                Self.logger.warning("Record \(key.storageKey, privacy: .public) gone from server — clearing systemFields for re-creation.")
+                SyncDiagnosticsLog.shared.record("RECORD GONE \(key.storageKey) — clearing systemFields")
+                try metadataStore.update { metadata in
+                    var state = metadata.records[key.storageKey] ?? CloudSyncRecordState()
+                    state.systemFields = nil
+                    metadata.records[key.storageKey] = state
+                }
                 simpleRequeue.insert(key)
-            } else {
+            case .fatal:
                 throw failure.error
             }
         }
@@ -1662,7 +1782,61 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             return isRetryable(ckError)
                 || ckError.code == .serverRecordChanged
                 || ckError.code == .zoneNotFound
+                || ckError.code == .unknownItem
+                || ckError.code == .serverRejectedRequest
         }
+    }
+
+    /// What `handleSentRecordZoneChanges` should do with a single failed record save. Extracted
+    /// as a pure decision so the sent-side failure classification can be unit-tested directly:
+    /// `CKSyncEngine.Event` has no public initializer (TO_IMPROVE #22), so the surrounding
+    /// engine flow can't be exercised in tests, but this per-record routing — the part that
+    /// decides which failures retry, conflict, recreate the zone, or surface — can. The caller
+    /// performs the side effects (metadata writes, enqueue, throw) for each case.
+    enum SentRecordFailureResolution: Equatable {
+        case staleRequeue       // the failed upload's revision is no longer the pending one → re-send the latest
+        case retryableRequeue   // a transient transport/throttle blip → re-enqueue and try again
+        case zoneRecreation     // the zone is gone → mark it for recreation, then re-enqueue
+        case nonDeletedConflict // server holds a different live copy → resolve via `conflictAction`
+        case deletedConflict    // server copy is a tombstone → resolve via `resolveServerConflict`
+        case recordGone         // record doesn't exist on server (stale changeTag) → clear systemFields, re-create as new
+        case fatal              // a genuine rejection (quota / permission / server-rejected / …) → throw, surfacing it
+    }
+
+    /// Pure per-record routing for a sent-batch save failure. Kept in lock-step with
+    /// `partialFailureIsBenign` (the non-throw set must agree): a stale-revision failure or a
+    /// retryable blip re-enqueues, `zoneNotFound` recreates the zone, a `serverRecordChanged`
+    /// that carries a server record routes by the server's deleted flag, `.unknownItem` /
+    /// `.serverRejectedRequest` clear stale systemFields for a fresh re-creation, and
+    /// everything else is fatal. Note a `serverRecordChanged` with NO attached server record
+    /// has nothing to merge, so it falls through to the retryable/fatal decision (and is not
+    /// retryable → fatal), exactly as the original inline ladder did.
+    static func sentRecordFailureResolution(
+        errorCode: CKError.Code,
+        errorIsRetryable: Bool,
+        hasServerRecord: Bool,
+        serverRecordIsDeleted: Bool,
+        failedRevision: UUID?,
+        currentRevision: UUID?
+    ) -> SentRecordFailureResolution {
+        // A failure whose revision no longer matches the current pending one is stale: the local
+        // value moved on after this upload was sent, so just re-enqueue to send the latest.
+        if let failedRevision, currentRevision != failedRevision {
+            return .staleRequeue
+        }
+        if errorCode == .serverRecordChanged, hasServerRecord {
+            return serverRecordIsDeleted ? .deletedConflict : .nonDeletedConflict
+        }
+        if errorCode == .zoneNotFound {
+            return .zoneRecreation
+        }
+        // "recordChangeTag specified, but record not found" — the local systemFields carry a
+        // stale changeTag for a record the server no longer has (deleted out-of-band, zone
+        // reset, etc.). Clearing systemFields lets the next attempt create a fresh record.
+        if errorCode == .unknownItem || errorCode == .serverRejectedRequest {
+            return .recordGone
+        }
+        return errorIsRetryable ? .retryableRequeue : .fatal
     }
 
     private func handleStartFailure(_ error: Error) async {
@@ -1683,6 +1857,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             await disableHandler()
         }
         isSynchronizing = false
+        engineSyncActivity = 0
         if let existingEngine {
             // This teardown runs from `handleEvent(_:syncEngine:)`'s catch block, i.e. while a
             // CKSyncEngine delegate callback is still on the current task. Awaiting a re-entrant
@@ -1706,24 +1881,42 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     /// container, and so account / network / quota / throttling failures are no longer
     /// collapsed into one generic status (#14).
     enum SyncFailureCategory: Equatable, Sendable {
-        case notSignedIn        // not signed in to iCloud — surfaced as "iCloud Unavailable"
-        case accountChanged     // the iCloud user changed; sync was disabled to protect data
-        case networkUnavailable // offline / no usable connection
-        case connectionLost     // the request reached iCloud but the response was lost
-        case quotaExceeded      // the iCloud account is out of storage
-        case rateLimited        // CloudKit throttled the request; it retries automatically
-        case zoneMissing        // the sync zone isn't there yet / was removed
-        case unknown            // anything else — fall back to the system description
+        case notSignedIn            // not signed in to iCloud — surfaced as "iCloud Unavailable"
+        case accountChanged         // the iCloud user changed; sync was disabled to protect data
+        case restricted             // CloudKit blocked by device management / Screen Time
+        case networkUnavailable     // offline / no usable connection
+        case connectionLost         // the request reached iCloud but the response was lost
+        case temporarilyUnavailable // iCloud / the account is briefly unavailable (booting, blip)
+        case quotaExceeded          // the iCloud account is out of storage
+        case rateLimited            // CloudKit throttled the request; it retries automatically
+        case zoneMissing            // the sync zone isn't there yet / was removed
+        case unknown                // anything else — fall back to the system description
+    }
+
+    /// Drops fully-settled tombstone states — deleted, acknowledged (no pending work), and no longer
+    /// locally present — so the metadata file doesn't accumulate dead per-record entries (#12). Safe
+    /// because every entity id is a one-shot UUID: a pruned id is never re-created, so its tombstone
+    /// can never be needed to suppress a resurrection. Pure + `static` so it stays unit-testable.
+    static func pruningSettledTombstones(
+        from records: [String: CloudSyncRecordState],
+        knownLocalHashes: [String: String]
+    ) -> [String: CloudSyncRecordState] {
+        records.filter { key, state in
+            let settled = state.isTombstone && state.pending == nil && knownLocalHashes[key] == nil
+            return !settled
+        }
     }
 
     static func failureCategory(for error: Error) -> SyncFailureCategory {
         if let cloudError = error as? CKError {
             switch cloudError.code {
             case .notAuthenticated: return .notSignedIn
+            case .managedAccountRestricted: return .restricted
             case .networkUnavailable, .networkFailure: return .networkUnavailable
             case .serverResponseLost: return .connectionLost
+            case .serviceUnavailable, .accountTemporarilyUnavailable: return .temporarilyUnavailable
             case .quotaExceeded: return .quotaExceeded
-            case .requestRateLimited: return .rateLimited
+            case .requestRateLimited, .zoneBusy: return .rateLimited
             case .zoneNotFound: return .zoneMissing
             default: return .unknown
             }
@@ -1747,17 +1940,22 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             }
             return .accountUnavailable("Sign in to iCloud to continue syncing.")
         case .accountChanged:
-            return .error(CloudSyncError.accountChanged.localizedDescription(appLanguage: nil))
-        case .networkUnavailable:
-            return .error("The network is unavailable. Local changes are saved and will retry automatically.")
-        case .connectionLost:
-            return .error("The connection to iCloud was lost. Your changes are saved and will sync automatically when it is restored.")
+            return .actionNeeded(CloudSyncError.accountChanged.localizedDescription(appLanguage: nil))
+        case .restricted:
+            return .actionNeeded("iCloud is restricted on this device. Allow it in Screen Time or device-management settings to keep syncing.")
         case .quotaExceeded:
-            return .error("The iCloud account does not have enough available storage.")
+            return .actionNeeded("Your iCloud storage is full. Free up space or upgrade iCloud+ to keep syncing.")
+        // Transient & self-resolving — calm "waiting", never a red error.
+        case .networkUnavailable:
+            return .waiting("You're offline. Changes are saved and will sync automatically when you reconnect.")
+        case .connectionLost:
+            return .waiting("The connection to iCloud was lost. Your changes are saved and will sync automatically when it's restored.")
+        case .temporarilyUnavailable:
+            return .waiting("iCloud is temporarily unavailable. Sync will resume automatically in a moment.")
         case .rateLimited:
-            return .error("iCloud is temporarily limiting sync requests. Sync will resume automatically in a moment.")
+            return .waiting("iCloud is busy right now. Sync will resume automatically in a moment.")
         case .zoneMissing:
-            return .error("iCloud is still preparing your sync data. This usually resolves on the next sync.")
+            return .waiting("iCloud is still preparing your sync data. This usually resolves on the next sync.")
         case .unknown:
             return .error(error.localizedDescription)
         }
@@ -1765,6 +1963,111 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
 
     private func report(_ error: Error) async {
         Self.logger.error("CloudKit sync error: \(error.localizedDescription, privacy: .public)")
+        SyncDiagnosticsLog.shared.record("ERROR synchronize: \(error.localizedDescription)")
         await statusHandler(Self.syncStatus(for: error))
+    }
+}
+
+// MARK: - #23 Production-safe sync telemetry
+
+/// A small, thread-safe, capped in-memory ring of recent sync/persistence telemetry + error
+/// lines, kept so the "Export Sync Diagnostics" support action has something to share — the
+/// `.debug` summary lines (see `SyncSignpost`) aren't persisted to the unified log by design,
+/// so `OSLogStore` can't retrieve them after the fact. Only ever holds the app's own controlled
+/// lines (counts / bytes / ms / error descriptions), never payloads or amounts, so the export is
+/// PII-clean by construction.
+///
+/// Lock-guarded (deliberately NOT an `actor`) so `record(_:)` is synchronous and callable from
+/// any context — including `PersistenceCoordinator`, whose actor methods contain no suspension
+/// points by design (an `await` just to log would break that invariant).
+final class SyncDiagnosticsLog: @unchecked Sendable {
+    static let shared = SyncDiagnosticsLog()
+
+    private let lock = NSLock()
+    private let capacity: Int
+    private var lines: [String] = []
+
+    init(capacity: Int = 500) {
+        self.capacity = max(1, capacity)
+        lines.reserveCapacity(self.capacity)
+    }
+
+    /// Appends one line (a `HH:mm:ss.SSS` timestamp is prepended here). Evicts the oldest lines
+    /// once `capacity` is exceeded, so memory stays bounded regardless of how long the app runs.
+    func record(_ message: String) {
+        let line = "\(Self.timestamp()) \(message)"
+        lock.withLock {
+            lines.append(line)
+            if lines.count > capacity {
+                lines.removeFirst(lines.count - capacity)
+            }
+        }
+    }
+
+    /// A point-in-time copy of the buffered lines, oldest first.
+    func snapshot() -> [String] {
+        lock.withLock { lines }
+    }
+
+    /// Drops all buffered lines. Used by tests; not surfaced in the UI.
+    func clear() {
+        lock.withLock { lines.removeAll(keepingCapacity: true) }
+    }
+
+    private static let timestampFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "HH:mm:ss.SSS"
+        return formatter
+    }()
+
+    private static func timestamp() -> String {
+        timestampFormatter.string(from: Date())
+    }
+}
+
+/// Production-safe sync telemetry (#23). Wraps an `OSSignposter` interval (so the operation shows
+/// as a timed lane in Instruments) and emits a `.debug` summary line that is both streamable live
+/// (`log stream --predicate 'category == "Telemetry"'`) and copied into `SyncDiagnosticsLog` for
+/// the export. Counts / bytes / ms only — never payloads or amounts; all interpolations are
+/// `.public` so the (non-sensitive) numbers aren't redacted in the live stream.
+///
+/// `.debug` is chosen for zero production footprint: not persisted to the log store, materialized
+/// only when actively streamed. The two shared instances are split by layer subsystem; both use a
+/// dedicated `Telemetry` category so the whole pipeline filters with one predicate while staying
+/// out of the existing `.error` categories. A reference type marked `@unchecked Sendable` so the
+/// shared singletons can be touched from any actor (it only holds thread-safe OS logging types).
+final class SyncSignpost: @unchecked Sendable {
+    static let sync = SyncSignpost(subsystem: "com.wealthcompass.sync")
+    static let persistence = SyncSignpost(subsystem: "com.wealthcompass.persistence")
+
+    private let signposter: OSSignposter
+    private let logger: Logger
+
+    private init(subsystem: String) {
+        self.signposter = OSSignposter(subsystem: subsystem, category: "Telemetry")
+        self.logger = Logger(subsystem: subsystem, category: "Telemetry")
+    }
+
+    /// Begins a uniquely-identified signpost interval (unique id so nested/overlapping intervals
+    /// of the same name don't collide). Pair with `end(_:_:)`, ideally via `defer`.
+    func begin(_ name: StaticString) -> OSSignpostIntervalState {
+        signposter.beginInterval(name, id: signposter.makeSignpostID())
+    }
+
+    func end(_ name: StaticString, _ state: OSSignpostIntervalState) {
+        signposter.endInterval(name, state)
+    }
+
+    /// Whole milliseconds elapsed since `start`, using a monotonic clock (safe across wall-clock
+    /// changes).
+    func ms(since start: DispatchTime) -> Int {
+        Int((DispatchTime.now().uptimeNanoseconds &- start.uptimeNanoseconds) / 1_000_000)
+    }
+
+    /// Logs one telemetry line live (`.debug`, public) and copies it into the export buffer.
+    func emit(_ message: String) {
+        logger.debug("\(message, privacy: .public)")
+        SyncDiagnosticsLog.shared.record(message)
     }
 }

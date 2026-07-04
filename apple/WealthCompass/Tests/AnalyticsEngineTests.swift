@@ -36,6 +36,35 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual(totals.netWorth, 650)
     }
 
+    /// WC-#11: backfill snapshots are no longer stored; the chart carries the prior value forward to
+    /// fill no-activity days, so two real snapshots 4 days apart still render a continuous flat line
+    /// (not a slope), without a row per gap day in storage/iCloud.
+    func testSnapshotsForChartCarriesForwardGapDays() {
+        let snaps = [
+            NetWorthSnapshot(date: date(2026, 6, 18), totalAssets: 100, totalLiabilities: 0, netWorth: 100, liquidity: 100, investments: 0, crypto: 0),
+            NetWorthSnapshot(date: date(2026, 6, 22), totalAssets: 200, totalLiabilities: 0, netWorth: 200, liquidity: 200, investments: 0, crypto: 0)
+        ]
+        let points = engine(FinancialData(snapshots: snaps), now: date(2026, 6, 22))
+            .snapshotsForChart(range: .all, currentNetWorth: 200)
+
+        XCTAssertEqual(points.count, 5, "one point per day 18→22 inclusive")
+        XCTAssertEqual(points.map(\.value), [100, 100, 100, 100, 200], "gap days carry the 18th's value forward (flat), not interpolated")
+    }
+
+    /// WC-#16: the net-worth chart y-domain never traps on non-finite input (a NaN bound would crash
+    /// the `ClosedRange`), and degrades to a safe default for empty / all-non-finite series.
+    func testChartYDomainIsFiniteSafe() {
+        func pts(_ values: [Double]) -> [NetWorthPoint] { values.map { NetWorthPoint(date: date(2026, 6, 1), value: $0) } }
+
+        XCTAssertEqual(AnalyticsEngine.chartYDomain(for: []), 0...1, "empty → safe default")
+        XCTAssertEqual(AnalyticsEngine.chartYDomain(for: pts([.nan, .infinity])), 0...1, "all non-finite → safe default")
+
+        let domain = AnalyticsEngine.chartYDomain(for: pts([100, .nan, 200, .infinity]))
+        XCTAssertTrue(domain.lowerBound.isFinite && domain.upperBound.isFinite, "non-finite values filtered → finite bounds")
+        XCTAssertLessThan(domain.lowerBound, 100, "padded below the finite min")
+        XCTAssertGreaterThan(domain.upperBound, 200, "padded above the finite max")
+    }
+
     func testCalculateTotalsConvertsTransactionsByOwnCurrency() {
         // WC-M1: each transaction converts from its own currency to the display currency
         // before summing into cash/liquidity.
@@ -157,5 +186,141 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual(points.count, 5, "18, 19, 20, 21, 22")
         XCTAssertEqual(Set(points.map { utc.startOfDay(for: $0.date) }).count, 5)
         XCTAssertEqual(points.last?.value, 827_000)
+    }
+
+    // MARK: - Previously-untested pure methods (foreign-currency exposure, monthly cash flow,
+    //         raw snapshots(range:), and the four allocation breakdowns).
+
+    private func investment(
+        currentValue: Double = 100,
+        currency: Currency = .eur,
+        type: InvestmentType = .stock,
+        geography: String = "US",
+        sector: String = "Tech"
+    ) -> Investment {
+        Investment(
+            type: type, symbol: "SYM", name: "Name", quantity: 1, costBasis: 0,
+            currentValue: Decimal(currentValue), currentPrice: Decimal(currentValue),
+            currency: currency, geography: geography, sector: sector, isin: "", fees: 0
+        )
+    }
+
+    private func crypto(symbol: String = "BTC", currentValue: Double = 100, currency: Currency = .eur) -> CryptoHolding {
+        // currentValue is computed (quantity * currentPrice).
+        CryptoHolding(symbol: symbol, name: symbol, quantity: 1, avgBuyPrice: 0, currentPrice: Decimal(currentValue), currency: currency, fees: 0, coinId: "")
+    }
+
+    /// Foreign exposure is true if ANY investment / crypto / liability is held in a non-base
+    /// currency; false only when everything is in the base currency (or there's nothing).
+    func testHasForeignCurrencyExposureDetectsAnyNonBaseHolding() {
+        let allEUR = FinancialData(
+            investments: [investment(currency: .eur)],
+            crypto: [crypto(currency: .eur)],
+            liabilities: [Liability(name: "L", currentBalance: 100, currency: .eur)]
+        )
+        XCTAssertFalse(engine(allEUR, now: date(2026, 6, 22)).hasForeignCurrencyExposure(relativeTo: .eur))
+        XCTAssertFalse(engine(FinancialData(), now: date(2026, 6, 22)).hasForeignCurrencyExposure(relativeTo: .eur), "empty → no exposure")
+
+        // A single non-base holding in any bucket flips it to true.
+        XCTAssertTrue(engine(FinancialData(investments: [investment(currency: .usd)]), now: date(2026, 6, 22)).hasForeignCurrencyExposure(relativeTo: .eur))
+        XCTAssertTrue(engine(FinancialData(crypto: [crypto(currency: .usd)]), now: date(2026, 6, 22)).hasForeignCurrencyExposure(relativeTo: .eur))
+        XCTAssertTrue(engine(FinancialData(liabilities: [Liability(name: "L", currentBalance: 1, currency: .usd)]), now: date(2026, 6, 22)).hasForeignCurrencyExposure(relativeTo: .eur))
+    }
+
+    /// `monthlyCashFlow` sums only the requested calendar month, split by type; prior/next-month
+    /// transactions are excluded.
+    func testMonthlyCashFlowSumsOnlyTheGivenMonthByType() {
+        let data = FinancialData(transactions: [
+            tx(.income, 1000, "Salary", date(2026, 6, 1)),
+            tx(.income, 200, "Bonus", date(2026, 6, 28)),
+            tx(.expense, 300, "Food", date(2026, 6, 15)),
+            tx(.expense, 999, "Rent", date(2026, 5, 31)),   // previous month — excluded
+            tx(.income, 500, "X", date(2026, 7, 1))          // next month — excluded
+        ])
+        let flow = engine(data, now: date(2026, 6, 22)).monthlyCashFlow(for: date(2026, 6, 10))
+        XCTAssertEqual(flow.monthlyIncome, 1200)
+        XCTAssertEqual(flow.monthlyExpenses, 300)
+        XCTAssertEqual(flow.netSavings, 900)
+    }
+
+    /// `snapshots(range:)` keeps snapshots on/after the range cutoff (relative to `now`), sorts
+    /// ascending, and maps each to its net-worth value.
+    func testSnapshotsFiltersByRangeSortsAscendingAndMapsNetWorth() {
+        let now = date(2026, 6, 22)
+        let data = FinancialData(snapshots: [
+            snapshot(2026, 6, 21, netWorth: 200),  // within a week
+            snapshot(2026, 6, 10, netWorth: 150),  // within a month, outside a week
+            snapshot(2026, 1, 1, netWorth: 100)    // outside a month
+        ])
+        XCTAssertEqual(engine(data, now: now).snapshots(range: .oneWeek).map(\.value), [200])
+        XCTAssertEqual(engine(data, now: now).snapshots(range: .oneMonth).map(\.value), [150, 200], "ascending, week+month windows")
+        XCTAssertEqual(engine(data, now: now).snapshots(range: .all).map(\.value), [100, 150, 200])
+    }
+
+    /// `investmentAllocation` groups by sector, sums (converted) value per sector, sorts descending.
+    func testInvestmentAllocationGroupsBySectorSumsAndSortsDescending() {
+        let data = FinancialData(investments: [
+            investment(currentValue: 100, sector: "Tech"),
+            investment(currentValue: 50, sector: "Tech"),
+            investment(currentValue: 200, sector: "Energy")
+        ])
+        let slices = engine(data, now: date(2026, 6, 22)).investmentAllocation()
+        XCTAssertEqual(slices.map(\.name), ["Energy", "Tech"], "sorted desc: Energy 200 > Tech 150")
+        XCTAssertEqual(slices.map(\.value), [200, 150])
+    }
+
+    /// `investmentTypeAllocation` groups by type, sums, sorts descending, and labels each slice
+    /// with the type's localized title.
+    func testInvestmentTypeAllocationGroupsByTypeSumsAndLocalizesNames() {
+        let data = FinancialData(investments: [
+            investment(currentValue: 300, type: .etf),
+            investment(currentValue: 100, type: .stock),
+            investment(currentValue: 50, type: .stock)
+        ])
+        let slices = engine(data, now: date(2026, 6, 22)).investmentTypeAllocation()
+        XCTAssertEqual(slices.map(\.value), [300, 150], "ETF 300 > Stock 150")
+        XCTAssertEqual(slices.first?.name, InvestmentType.etf.localizedTitle(appLanguage: nil))
+        XCTAssertEqual(slices.last?.name, InvestmentType.stock.localizedTitle(appLanguage: nil))
+    }
+
+    /// `investmentGeographyAllocation` groups by geography, sums, sorts descending.
+    func testInvestmentGeographyAllocationGroupsByGeographySumsAndSorts() {
+        let data = FinancialData(investments: [
+            investment(currentValue: 100, geography: "US"),
+            investment(currentValue: 250, geography: "EU"),
+            investment(currentValue: 100, geography: "US")
+        ])
+        let slices = engine(data, now: date(2026, 6, 22)).investmentGeographyAllocation()
+        XCTAssertEqual(slices.map(\.name), ["EU", "US"], "EU 250 > US 200")
+        XCTAssertEqual(slices.map(\.value), [250, 200])
+    }
+
+    /// `cryptoAllocation` emits one slice per holding (by symbol), drops zero-value holdings, sorts
+    /// descending.
+    func testCryptoAllocationSlicesPerHoldingFiltersZeroAndSortsDescending() {
+        let data = FinancialData(crypto: [
+            crypto(symbol: "BTC", currentValue: 500),
+            crypto(symbol: "ETH", currentValue: 800),
+            crypto(symbol: "DOGE", currentValue: 0)  // zero → filtered out
+        ])
+        let slices = engine(data, now: date(2026, 6, 22)).cryptoAllocation()
+        XCTAssertEqual(slices.map(\.name), ["ETH", "BTC"], "sorted desc; zero-value DOGE filtered")
+        XCTAssertEqual(slices.map(\.value), [800, 500])
+    }
+
+    /// Allocation values are expressed in the display currency: a USD holding is converted via FX.
+    func testCryptoAllocationConvertsToDisplayCurrency() {
+        let converter = CurrencyConverter(snapshot: ExchangeRateSnapshot(
+            baseCurrency: .eur,
+            rates: ["USD": 1.25],
+            effectiveDate: Date(timeIntervalSince1970: 1_700_000_000),
+            fetchedAt: Date(timeIntervalSince1970: 1_700_000_000),
+            provider: "test"
+        ))
+        let data = FinancialData(crypto: [crypto(symbol: "BTC", currentValue: 125, currency: .usd)])
+        let slices = AnalyticsEngine(
+            data: data, converter: converter, displayCurrency: .eur, calendar: utc, now: date(2026, 6, 22)
+        ).cryptoAllocation()
+        XCTAssertEqual(slices.first?.value ?? 0, 100, accuracy: 0.01, "125 USD ÷ 1.25 = 100 EUR")
     }
 }

@@ -1,5 +1,13 @@
 # Documentation
 
+- [2026-06-30 21:17]: CloudKit Sync Deadlock Fix — "recordChangeTag specified, but record not found"
+  - *Details*: Fixed a permanent sync deadlock where a record with stale `systemFields` (containing a `recordChangeTag` for a server-deleted record) would cause the sync engine to fail fatally on every attempt. The new `recordGone` resolution clears the stale `systemFields` so the next attempt creates a fresh record insert instead of a doomed update.
+  - *Tech Notes*:
+    - **New enum case**: `SentRecordFailureResolution.recordGone` in `CloudKitSyncService.swift` — routes `.unknownItem` and `.serverRejectedRequest` CKError codes to a recovery path instead of `.fatal`.
+    - **Recovery logic**: `handleSentRecordZoneChanges` clears `state.systemFields` for affected records, logs a warning via `SyncDiagnosticsLog`, and requeues for re-send. The next attempt re-creates the record as a fresh insert (no `recordChangeTag`).
+    - **Benign partial failure**: `partialFailureIsBenign` updated to include `.unknownItem` and `.serverRejectedRequest`, preventing these codes from being mislabeled as genuine sync failures in `synchronize()`.
+    - **Tests**: Added cases to `testSentRecordFailureResolutionRoutesEachFailureKind`, `testPartialFailureIsBenignOnlyWhenEveryItemIsRetryableOrConflict`, and `testIsRetryableCoversTransientErrorsOnly`.
+
 - [2026-06-12 08:14]: Cloudflare Worker BFF Proxy Integration
   - *Details*: Abstracted the hardcoded external API URLs for Frankfurter, Finnhub, and CoinGecko into a Cloudflare Worker Proxy backend.
   - *Tech Notes*:
@@ -194,3 +202,7 @@
     - **Tests** — `CloudSyncCoreTests` (offline, no live CloudKit): H3 batch-skip (one undecodable + one id-mismatch skipped, rest applied, no throw) + an all-bad batch; H4 `makeRecords` invokes the provider exactly once per batch (added a `ThreadSafeCounter` helper); L29 `partialFailureIsBenign` true for an all-benign partial failure, false for a `.quotaExceeded`/`.permissionFailure`/empty one. Updated `testRemoteUpsertAndDeleteRoundTrip` for the now-non-throwing `applyCloudSyncMutations`. M2/M3 are concurrency/semantics changes with no deterministic offline test — covered by the runtime checklist.
     - **Verification** — **NOT built or run here (no Xcode).** Build both schemes + run the suite, then the two-device runtime checklist — `TO_SIMO_DO.md` #28–29.
     - **Files touched** — `Shared/Services/CloudKitSyncService.swift` (all five), `Shared/Stores/FinanceStore.swift` (H3 applied-keys + skip logging, H4 snapshot cache), `Tests/CloudSyncCoreTests.swift`; docs `IOS_MACOS_AUDIT_PROGRESS.md`, `TO_SIMO_DO.md`. No `project.pbxproj` change.
+
+- [2026-06-30]: Bump Build Version
+  - *Details*: Bumped `CURRENT_PROJECT_VERSION` (CFBundleVersion) from 9 to 10 to fix App Store Connect validation error 90061.
+  - *Tech Notes*: Ran `agvtool next-version -all` to increment the build number in `project.pbxproj` and `Info.plist`.

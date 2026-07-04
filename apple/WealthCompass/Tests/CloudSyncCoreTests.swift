@@ -456,11 +456,15 @@ final class CloudSyncCoreTests: XCTestCase {
 
     func testFailureCategoryMapsCKErrorCodes() {
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.notAuthenticated)), .notSignedIn)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.managedAccountRestricted)), .restricted)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.networkUnavailable)), .networkUnavailable)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.networkFailure)), .networkUnavailable)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.serverResponseLost)), .connectionLost)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.serviceUnavailable)), .temporarilyUnavailable)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.accountTemporarilyUnavailable)), .temporarilyUnavailable)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.quotaExceeded)), .quotaExceeded)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.requestRateLimited)), .rateLimited)
+        XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.zoneBusy)), .rateLimited)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.zoneNotFound)), .zoneMissing)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: ckError(.internalError)), .unknown)
     }
@@ -470,6 +474,41 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: CloudSyncError.accountChanged), .accountChanged)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: CloudSyncError.invalidRecord("x")), .unknown)
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: CloudSyncError.notRunning), .unknown)
+    }
+
+    /// #12 metadata compaction: a fully-settled tombstone (deleted, acknowledged, and gone from
+    /// knownLocalHashes) is dropped; a live record or a still-in-flight delete is kept.
+    func testPruningDropsOnlySettledTombstones() {
+        let records: [String: CloudSyncRecordState] = [
+            "live": CloudSyncRecordState(systemFields: nil, pending: nil, isTombstone: false, deletedAt: nil),
+            "settled": CloudSyncRecordState(systemFields: nil, pending: nil, isTombstone: true, deletedAt: fixedDate),
+            "pendingDelete": CloudSyncRecordState(systemFields: nil, pending: deletePending(), isTombstone: true, deletedAt: fixedDate)
+        ]
+        let knownHashes = ["live": "hash"] // settled + pendingDelete are no longer locally present
+
+        let pruned = CloudKitSyncService.pruningSettledTombstones(from: records, knownLocalHashes: knownHashes)
+
+        XCTAssertNotNil(pruned["live"], "a live record is kept")
+        XCTAssertNotNil(pruned["pendingDelete"], "a tombstone whose delete is still in flight is kept")
+        XCTAssertNil(pruned["settled"], "a fully-settled tombstone is compacted away")
+        XCTAssertEqual(pruned.count, 2)
+    }
+
+    /// #13: the opportunistic foreground sync runs only when nothing is already syncing — manual
+    /// (`isSynchronizing`) or engine-driven (`engineSyncActivity`) — and the debounce window has
+    /// elapsed, so it never duplicates an in-flight automatic sync.
+    func testOpportunisticSyncGate() {
+        let interval: TimeInterval = 30
+        func gate(_ syncing: Bool, _ activity: Int, _ since: TimeInterval) -> Bool {
+            CloudKitSyncService.shouldRunOpportunisticSync(
+                isSynchronizing: syncing, engineSyncActivity: activity,
+                secondsSinceLastSync: since, minimumInterval: interval
+            )
+        }
+        XCTAssertTrue(gate(false, 0, 31), "idle + debounce elapsed → run")
+        XCTAssertFalse(gate(true, 0, 31), "a manual sync in flight → stand down")
+        XCTAssertFalse(gate(false, 1, 31), "an engine-driven automatic sync in flight → stand down (#13)")
+        XCTAssertFalse(gate(false, 0, 10), "still within the debounce window → stand down")
     }
 
     /// The anti-mislabel guarantee: an account failure resolves to `.accountUnavailable`
@@ -486,20 +525,44 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertFalse(message.isEmpty)
     }
 
-    /// Network / quota / throttling / zone failures each become `.error` (never
-    /// `.accountUnavailable`) with their own non-empty copy — the old behavior gave them
-    /// all one indistinct message.
-    func testSyncStatusGivesDistinctErrorCopyPerCategory() {
-        let codes: [CKError.Code] = [.networkUnavailable, .serverResponseLost, .quotaExceeded, .requestRateLimited, .zoneNotFound]
+    /// Each common failure now maps to the right *tone*: transient conditions become `.waiting`
+    /// (info severity — never a red error), persistent user-actionable ones become `.actionNeeded`
+    /// (attention), and only the genuinely unexpected stays `.error`. Distinct, non-empty copy per
+    /// category (the old behaviour collapsed several into one message — and showed offline as red).
+    func testSyncStatusRoutesEachCategoryToTheRightToneAndSeverity() {
+        // Transient & self-resolving → calm `.waiting` / `.info` (one representative code per category).
+        let transient: [CKError.Code] = [.networkUnavailable, .serverResponseLost, .serviceUnavailable, .requestRateLimited, .zoneNotFound]
         var messages: [String] = []
-        for code in codes {
-            guard case .error(let message) = CloudKitSyncService.syncStatus(for: ckError(code)) else {
-                return XCTFail("\(code) must map to .error, not .accountUnavailable.")
+        for code in transient {
+            let status = CloudKitSyncService.syncStatus(for: ckError(code))
+            guard case .waiting(let message) = status else {
+                return XCTFail("\(code) must be a calm .waiting status, not an error.")
             }
             XCTAssertFalse(message.isEmpty, "Empty message for \(code).")
+            XCTAssertEqual(status.severity, .info, "\(code) must read as info severity, never error/red.")
             messages.append(message)
         }
-        XCTAssertEqual(Set(messages).count, messages.count, "Each classified CKError code must produce distinct copy.")
+        XCTAssertEqual(Set(messages).count, messages.count, "Each transient category must produce distinct copy.")
+
+        // Persistent — the user must act → `.actionNeeded` / `.attention`.
+        for code in [CKError.Code.quotaExceeded, .managedAccountRestricted] {
+            let status = CloudKitSyncService.syncStatus(for: ckError(code))
+            guard case .actionNeeded(let message) = status, !message.isEmpty else {
+                return XCTFail("\(code) must be a non-empty .actionNeeded status.")
+            }
+            XCTAssertEqual(status.severity, .attention)
+        }
+        XCTAssertEqual(CloudKitSyncService.syncStatus(for: CloudSyncError.accountChanged).severity, .attention)
+
+        // Codes that share a category share their copy/tone (no spurious distinct messages).
+        XCTAssertEqual(CloudKitSyncService.syncStatus(for: ckError(.networkFailure)),
+                       CloudKitSyncService.syncStatus(for: ckError(.networkUnavailable)))
+        XCTAssertEqual(CloudKitSyncService.syncStatus(for: ckError(.zoneBusy)),
+                       CloudKitSyncService.syncStatus(for: ckError(.requestRateLimited)))
+
+        // Sign-in stays its own actionable status; anything unexpected stays a real error.
+        XCTAssertEqual(CloudKitSyncService.syncStatus(for: ckError(.notAuthenticated)).severity, .attention)
+        XCTAssertEqual(CloudKitSyncService.syncStatus(for: ckError(.internalError)).severity, .error)
     }
 
     /// WC-L29: `synchronize` may report `.upToDate` on a `CKError.partialFailure` only when
@@ -511,6 +574,14 @@ final class CloudSyncCoreTests: XCTestCase {
         // Every item benign: retryable blip + first-sync conflict + zone recreation.
         XCTAssertTrue(CloudKitSyncService.partialFailureIsBenign(
             partialFailure(items: [.networkUnavailable, .serverRecordChanged, .zoneNotFound, .batchRequestFailed])
+        ))
+
+        // Record-gone codes (unknownItem, serverRejectedRequest) are also benign.
+        XCTAssertTrue(CloudKitSyncService.partialFailureIsBenign(
+            partialFailure(items: [.unknownItem])
+        ))
+        XCTAssertTrue(CloudKitSyncService.partialFailureIsBenign(
+            partialFailure(items: [.serverRejectedRequest, .networkUnavailable])
         ))
 
         // A single genuine rejection makes the whole partial failure non-benign.
@@ -538,6 +609,163 @@ final class CloudSyncCoreTests: XCTestCase {
             code: CKError.Code.partialFailure.rawValue,
             userInfo: byItem.isEmpty ? [:] : [CKPartialErrorsByItemIDKey: byItem]
         ))
+    }
+
+    // MARK: - #22 step 1: sent-side per-record failure routing
+    //
+    // `CKSyncEngine.Event.SentRecordZoneChanges` has no public initializer, so the engine-level
+    // flow in `handleSentRecordZoneChanges` can't be unit-tested. The per-record decision was
+    // therefore extracted into the pure `sentRecordFailureResolution`, which IS testable here —
+    // the caller just performs the side effects (requeue / recreate zone / conflict / throw) the
+    // routing selects. These lock in the exact branch behaviour of the original inline ladder,
+    // including the easy-to-regress edges (stale-revision precedence; `serverRecordChanged`
+    // without an attached server record is fatal, not a conflict).
+
+    func testSentRecordFailureResolutionRoutesEachFailureKind() {
+        let rev = UUID()
+        typealias Resolution = CloudKitSyncService.SentRecordFailureResolution
+
+        func resolve(
+            _ code: CKError.Code,
+            retryable: Bool = false,
+            hasServer: Bool = false,
+            serverDeleted: Bool = false,
+            failed: UUID? = rev,
+            current: UUID? = rev
+        ) -> Resolution {
+            CloudKitSyncService.sentRecordFailureResolution(
+                errorCode: code,
+                errorIsRetryable: retryable,
+                hasServerRecord: hasServer,
+                serverRecordIsDeleted: serverDeleted,
+                failedRevision: failed,
+                currentRevision: current
+            )
+        }
+
+        // Stale failure (the pending revision moved on) → re-send the latest, whatever the error.
+        XCTAssertEqual(resolve(.serverRecordChanged, hasServer: true, failed: UUID(), current: rev), .staleRequeue)
+        XCTAssertEqual(resolve(.zoneNotFound, failed: UUID(), current: rev), .staleRequeue,
+                       "the stale check takes precedence over the zone-recreation path")
+        XCTAssertEqual(resolve(.permissionFailure, failed: UUID(), current: rev), .staleRequeue)
+
+        // `serverRecordChanged` WITH a server record routes by the server's deleted flag.
+        XCTAssertEqual(resolve(.serverRecordChanged, hasServer: true, serverDeleted: false), .nonDeletedConflict)
+        XCTAssertEqual(resolve(.serverRecordChanged, hasServer: true, serverDeleted: true), .deletedConflict)
+
+        // `serverRecordChanged` WITHOUT a server record has nothing to merge → not retryable → fatal.
+        XCTAssertEqual(resolve(.serverRecordChanged, hasServer: false), .fatal)
+
+        // Zone gone → recreate it (and a nil failed revision skips the stale check entirely).
+        XCTAssertEqual(resolve(.zoneNotFound), .zoneRecreation)
+        XCTAssertEqual(resolve(.zoneNotFound, failed: nil, current: rev), .zoneRecreation)
+
+        // A retryable blip re-enqueues; a genuine rejection throws (fatal).
+        XCTAssertEqual(resolve(.networkUnavailable, retryable: true), .retryableRequeue)
+        XCTAssertEqual(resolve(.quotaExceeded, retryable: false), .fatal)
+        XCTAssertEqual(resolve(.permissionFailure, retryable: false), .fatal)
+
+        // Record gone (stale changeTag for a server-deleted record) → clear systemFields, re-create.
+        XCTAssertEqual(resolve(.unknownItem), .recordGone)
+        XCTAssertEqual(resolve(.serverRejectedRequest), .recordGone)
+        // Stale-revision check still takes precedence over recordGone.
+        XCTAssertEqual(resolve(.unknownItem, failed: UUID(), current: rev), .staleRequeue)
+        XCTAssertEqual(resolve(.serverRejectedRequest, failed: UUID(), current: rev), .staleRequeue)
+    }
+
+    /// The retryable-error set the sent-side classifier trusts (`errorIsRetryable`) and that
+    /// `partialFailureIsBenign` mirrors: transient transport/throttle blips retry; anything
+    /// definitive does not. In particular `serverRecordChanged` and `zoneNotFound` are NOT
+    /// retryable — they're routed explicitly *before* the retryable check, so this pins down
+    /// that they'd otherwise fall to fatal/their own branch rather than being silently retried.
+    func testIsRetryableCoversTransientErrorsOnly() {
+        for code in [CKError.Code.networkUnavailable, .networkFailure, .serviceUnavailable,
+                     .requestRateLimited, .zoneBusy, .resultsTruncated, .batchRequestFailed] {
+            XCTAssertTrue(CloudKitSyncService.isRetryable(ckError(code)), "\(code) should retry")
+        }
+        for code in [CKError.Code.notAuthenticated, .quotaExceeded, .permissionFailure,
+                     .serverRecordChanged, .zoneNotFound, .internalError, .serverRejectedRequest,
+                     .unknownItem] {
+            XCTAssertFalse(CloudKitSyncService.isRetryable(ckError(code)), "\(code) must not retry")
+        }
+    }
+
+    /// #22 step 2 (after #12): on a realistic metadata set the prune drives `records.count` down
+    /// toward `knownLocalHashes.count`. Mirrors the original report's numbers — recordsCount 317
+    /// vs knownHashesCount 238 — and asserts the ~80 settled tombstones compact away while every
+    /// live record (each tracked in knownLocalHashes) is kept.
+    func testPruningConvergesRecordCountTowardKnownHashes() {
+        var records: [String: CloudSyncRecordState] = [:]
+        var knownHashes: [String: String] = [:]
+        for i in 0..<238 {
+            let k = "live-\(i)"
+            records[k] = CloudSyncRecordState(systemFields: nil, pending: nil, isTombstone: false, deletedAt: nil)
+            knownHashes[k] = "hash-\(i)"
+        }
+        for i in 0..<79 {
+            records["dead-\(i)"] = CloudSyncRecordState(systemFields: nil, pending: nil, isTombstone: true, deletedAt: fixedDate)
+        }
+        XCTAssertEqual(records.count, 317)
+
+        let pruned = CloudKitSyncService.pruningSettledTombstones(from: records, knownLocalHashes: knownHashes)
+
+        XCTAssertEqual(pruned.count, knownHashes.count,
+                       "settled tombstones compact away; record count converges to the live hash count")
+        XCTAssertEqual(pruned.count, 238)
+        XCTAssertTrue(pruned.keys.allSatisfy { $0.hasPrefix("live-") }, "only live records remain")
+    }
+
+    // MARK: - #23 sync diagnostics export buffer
+    //
+    // `SyncDiagnosticsLog` is the in-memory source for the "Export Sync Diagnostics" action (the
+    // live `.debug` telemetry lines aren't persisted, so OSLogStore can't retrieve them). Tests
+    // use fresh instances (not `.shared`) to stay hermetic.
+
+    /// Keeps only the most recent `capacity` lines, evicting the oldest (FIFO), so memory stays
+    /// bounded however long the app runs.
+    func testSyncDiagnosticsLogEvictsOldestBeyondCapacity() {
+        let log = SyncDiagnosticsLog(capacity: 3)
+        for i in 1...5 { log.record("line\(i)") }
+        let snapshot = log.snapshot()
+        XCTAssertEqual(snapshot.count, 3, "must not exceed capacity")
+        XCTAssertTrue(snapshot[0].hasSuffix("line3"), "oldest two evicted")
+        XCTAssertTrue(snapshot[1].hasSuffix("line4"))
+        XCTAssertTrue(snapshot[2].hasSuffix("line5"), "newest retained, in order")
+    }
+
+    /// Each line is prefixed with an `HH:mm:ss.SSS` timestamp and preserves the message verbatim.
+    func testSyncDiagnosticsLogPrependsTimestampAndPreservesMessage() throws {
+        let log = SyncDiagnosticsLog(capacity: 10)
+        log.record("save records=238 changed=2 deleted=0 ms=41")
+        let line = try XCTUnwrap(log.snapshot().first)
+        XCTAssertTrue(line.hasSuffix("save records=238 changed=2 deleted=0 ms=41"), "message preserved")
+        let stamp = String(line.prefix(12))  // "HH:mm:ss.SSS"
+        XCTAssertEqual(stamp.count, 12)
+        XCTAssertEqual(stamp.filter { $0 == ":" }.count, 2, "timestamp has two colons")
+        XCTAssertEqual(stamp.filter { $0 == "." }.count, 1, "timestamp has one decimal point")
+    }
+
+    /// `clear()` empties the buffer.
+    func testSyncDiagnosticsLogClearEmptiesBuffer() {
+        let log = SyncDiagnosticsLog(capacity: 10)
+        log.record("a")
+        log.record("b")
+        XCTAssertEqual(log.snapshot().count, 2)
+        log.clear()
+        XCTAssertTrue(log.snapshot().isEmpty)
+    }
+
+    /// The buffer is the one telemetry piece touched from multiple actors (coordinator, store,
+    /// sync service), so its lock must hold under contention: concurrent appends stay capped and
+    /// never crash / corrupt the array.
+    func testSyncDiagnosticsLogIsThreadSafeUnderConcurrentAppends() {
+        let log = SyncDiagnosticsLog(capacity: 100)
+        DispatchQueue.concurrentPerform(iterations: 1_000) { i in
+            log.record("line\(i)")
+        }
+        let snapshot = log.snapshot()
+        XCTAssertEqual(snapshot.count, 100, "stays capped under concurrency")
+        XCTAssertTrue(snapshot.allSatisfy { $0.contains("line") }, "no torn writes")
     }
 
     private func makeTransaction(id: UUID, amount: Double) -> Transaction {
