@@ -101,7 +101,12 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
         }
 
         try createStorageDirectoryIfNeeded()
-        try fileManager.copyItem(at: legacyURL, to: storageURL)
+        // Read + protected write instead of `copyItem` (deep-audit M14): `copyItem` inherits the
+        // legacy Documents-container file's weaker protection class, whereas every other write here
+        // applies `.completeFileProtectionUnlessOpen`. The finance DB is a small JSON blob, so
+        // reading it into memory to re-write with protection is cheap.
+        let legacyData = try Data(contentsOf: legacyURL)
+        try legacyData.write(to: storageURL, options: [.atomic, .completeFileProtectionUnlessOpen])
     }
 
     private func createMigrationBackupIfNeeded(_ sourceData: Data) throws {

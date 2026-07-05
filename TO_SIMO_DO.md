@@ -85,4 +85,22 @@ M28 needs a corrupt local DB to trigger). The rest are worth an eyeball:_
   wallets). In the allocation donut, hovering/tapping one BTC wedge must highlight **only that
   wedge** (not both), and the legend must show both rows with no console duplicate-id warnings.
 
+### Batch M5 (security) — landed on `main`, not yet built
+- [ ] **M02** (macOS, needs the app-lock enabled) — Lock the app, then click to another app and back
+  **repeatedly**. The Touch ID / passcode sheet must **not** re-present unsolicited on every focus
+  regain (at most one auto-prompt per lock episode). While a prompt is up, the **Unlock** button is
+  disabled (no double-prompt). Same check on iOS after backgrounding/foregrounding.
+- [ ] **M17** (device, needs the app-lock enabled) — With the lock on, go to system Settings and
+  **add a fingerprint** (or re-enroll Face ID), then return to Wealth Compass and unlock. It must show
+  **"Biometric enrollment changed. Unlock again to confirm it's you."** and **not** unlock on that
+  first attempt; a second unlock then succeeds. A normal unlock (no enrollment change) is unaffected.
+- [ ] **M14** — _Not manually verifiable without a forensic/attribute check._ Covered by build. (The
+  migrated legacy DB now gets `.completeFileProtectionUnlessOpen` instead of the copied file's weaker
+  class — only relevant if you migrate from a very old build.)
+
+### Optional follow-up (localization)
+- [ ] The M17 warning string ("Biometric enrollment changed. Unlock again to confirm it's you.") is a
+  **new** catalog entry; Xcode extracts it on build and it shows in English until translated in
+  `Localizable.xcstrings`. Not blocking — add translations when convenient.
+
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->

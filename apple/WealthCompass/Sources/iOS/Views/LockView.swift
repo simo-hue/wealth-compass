@@ -4,6 +4,8 @@ struct LockView: View {
     @EnvironmentObject private var appLock: AppLockStore
     @EnvironmentObject private var settings: AppSettings
     @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 30
+    /// One auto-prompt per lock episode (M02): re-arms only after the app locks again.
+    @State private var hasAutoPrompted = false
 
     var body: some View {
         ZStack {
@@ -50,6 +52,7 @@ struct LockView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(WCColor.primary)
+                    .disabled(appLock.isAuthenticating)
 
                     if let error = appLock.lastError {
                         Text(error)
@@ -65,7 +68,13 @@ struct LockView: View {
             .padding(24)
         }
         .task {
+            guard !hasAutoPrompted else { return }
+            hasAutoPrompted = true
             await appLock.unlock(appLanguage: settings.appLanguage)
+        }
+        .onChange(of: appLock.isUnlocked) { _, unlocked in
+            // Re-arm the one-shot auto-prompt for the next lock episode.
+            if !unlocked { hasAutoPrompted = false }
         }
     }
 }
