@@ -231,6 +231,9 @@ private struct MacInvestmentEditor: View {
     private var parsedQuantity: Decimal { parse(quantity) }
     private var parsedAveragePrice: Decimal { parse(averagePrice) }
     private var parsedCurrentPrice: Decimal { parse(currentPrice) }
+    // M09: a blank/zero current price falls back to the entered average price on save, so the holding
+    // shows at cost until a market refresh instead of silently contributing 0 to net worth.
+    private var effectiveCurrentPrice: Decimal { parsedCurrentPrice > 0 ? parsedCurrentPrice : parsedAveragePrice }
     private var parsedFeeValue: Decimal { parse(feeValue) }
     private var calculatedFee: Decimal {
         feeMode == .fixed
@@ -240,6 +243,9 @@ private struct MacInvestmentEditor: View {
 
     private var isSaveDisabled: Bool {
         symbol.trimmed.isEmpty || name.trimmed.isEmpty || parsedQuantity <= 0
+            // M09: block a holding with no price at all (both current and average blank), which would
+            // otherwise save with a zero current value.
+            || (parsedCurrentPrice <= 0 && parsedAveragePrice <= 0)
     }
 
     var body: some View {
@@ -327,8 +333,8 @@ private struct MacInvestmentEditor: View {
             name: name,
             quantity: parsedQuantity,
             costBasis: costBasis,
-            currentValue: parsedQuantity * parsedCurrentPrice,
-            currentPrice: parsedCurrentPrice,
+            currentValue: parsedQuantity * effectiveCurrentPrice,
+            currentPrice: effectiveCurrentPrice,
             currency: currency,
             geography: geography,
             sector: sector,
@@ -340,8 +346,8 @@ private struct MacInvestmentEditor: View {
         value.name = name.trimmed
         value.quantity = parsedQuantity
         value.costBasis = costBasis
-        value.currentValue = parsedQuantity * parsedCurrentPrice
-        value.currentPrice = parsedCurrentPrice
+        value.currentValue = parsedQuantity * effectiveCurrentPrice
+        value.currentPrice = effectiveCurrentPrice
         value.currency = currency
         value.geography = geography.trimmed
         value.sector = sector.trimmed
@@ -397,6 +403,9 @@ private struct MacCryptoEditor: View {
     private var parsedQuantity: Decimal { parse(quantity) }
     private var parsedAveragePrice: Decimal { parse(averagePrice) }
     private var parsedCurrentPrice: Decimal { parse(currentPrice) }
+    // M09: a blank/zero current price falls back to the entered average price on save, so the holding
+    // shows at cost until a market refresh instead of silently contributing 0 to net worth.
+    private var effectiveCurrentPrice: Decimal { parsedCurrentPrice > 0 ? parsedCurrentPrice : parsedAveragePrice }
     private var parsedFeeValue: Decimal { parse(feeValue) }
     private var calculatedFee: Decimal {
         feeMode == .fixed
@@ -406,6 +415,9 @@ private struct MacCryptoEditor: View {
 
     private var isSaveDisabled: Bool {
         symbol.trimmed.isEmpty || name.trimmed.isEmpty || parsedQuantity <= 0
+            // M09: block a holding with no price at all (both current and average blank), which would
+            // otherwise save with a zero current value.
+            || (parsedCurrentPrice <= 0 && parsedAveragePrice <= 0)
     }
 
     var body: some View {
@@ -478,7 +490,7 @@ private struct MacCryptoEditor: View {
             name: name,
             quantity: parsedQuantity,
             avgBuyPrice: effectiveAverage,
-            currentPrice: parsedCurrentPrice,
+            currentPrice: effectiveCurrentPrice,
             fees: calculatedFee,
             coinId: coinID
         )
@@ -487,7 +499,7 @@ private struct MacCryptoEditor: View {
         value.coinId = coinID.trimmed.lowercased()
         value.quantity = parsedQuantity
         value.avgBuyPrice = effectiveAverage
-        value.currentPrice = parsedCurrentPrice
+        value.currentPrice = effectiveCurrentPrice
         value.fees = calculatedFee
         value.currency = currency
         value.updatedAt = Date()

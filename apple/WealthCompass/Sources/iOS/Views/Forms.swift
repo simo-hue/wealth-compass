@@ -471,6 +471,9 @@ struct InvestmentFormView: View {
     private var parsedQuantity: Decimal { parse(quantity) }
     private var parsedAverage: Decimal { parse(avgBuyPrice) }
     private var parsedCurrentPrice: Decimal { parse(currentPrice) }
+    // M09: a blank/zero current price falls back to the entered average price on save, so the holding
+    // shows at cost until a market refresh instead of silently contributing 0 to net worth.
+    private var effectiveCurrentPrice: Decimal { parsedCurrentPrice > 0 ? parsedCurrentPrice : parsedAverage }
     private var parsedFeeValue: Decimal { parse(feeValue) }
     private var calculatedFee: Decimal {
         feeMode == .fixed ? parsedFeeValue : (parsedQuantity * parsedAverage) * (parsedFeeValue / 100)
@@ -550,7 +553,8 @@ struct InvestmentFormView: View {
                         save()
                         dismiss()
                     }
-                    .disabled(symbol.trimmingCharacters(in: .whitespaces).isEmpty || name.trimmingCharacters(in: .whitespaces).isEmpty || parsedQuantity <= 0)
+                    // M09: also block a holding with no price at all (both current and average blank).
+                    .disabled(symbol.trimmingCharacters(in: .whitespaces).isEmpty || name.trimmingCharacters(in: .whitespaces).isEmpty || parsedQuantity <= 0 || (parsedCurrentPrice <= 0 && parsedAverage <= 0))
                 }
             }
         }
@@ -559,7 +563,7 @@ struct InvestmentFormView: View {
 
     private func save() {
         let costBasis = (parsedQuantity * parsedAverage) + calculatedFee
-        let value = parsedQuantity * parsedCurrentPrice
+        let value = parsedQuantity * effectiveCurrentPrice
         var item = investment ?? Investment(
             type: type,
             symbol: symbol,
@@ -567,7 +571,7 @@ struct InvestmentFormView: View {
             quantity: parsedQuantity,
             costBasis: costBasis,
             currentValue: value,
-            currentPrice: parsedCurrentPrice,
+            currentPrice: effectiveCurrentPrice,
             currency: currency,
             geography: geography,
             sector: sector,
@@ -580,7 +584,7 @@ struct InvestmentFormView: View {
         item.quantity = parsedQuantity
         item.costBasis = costBasis
         item.currentValue = value
-        item.currentPrice = parsedCurrentPrice
+        item.currentPrice = effectiveCurrentPrice
         item.currency = currency
         item.geography = geography
         item.sector = sector
@@ -637,6 +641,9 @@ struct CryptoFormView: View {
     private var parsedQuantity: Decimal { parse(quantity) }
     private var parsedAverage: Decimal { parse(avgBuyPrice) }
     private var parsedCurrentPrice: Decimal { parse(currentPrice) }
+    // M09: a blank/zero current price falls back to the entered average price on save, so the holding
+    // shows at cost until a market refresh instead of silently contributing 0 to net worth.
+    private var effectiveCurrentPrice: Decimal { parsedCurrentPrice > 0 ? parsedCurrentPrice : parsedAverage }
     private var parsedFeeValue: Decimal { parse(feeValue) }
     private var calculatedFee: Decimal {
         feeMode == .fixed ? parsedFeeValue : (parsedQuantity * parsedAverage) * (parsedFeeValue / 100)
@@ -703,7 +710,8 @@ struct CryptoFormView: View {
                         save()
                         dismiss()
                     }
-                    .disabled(symbol.trimmingCharacters(in: .whitespaces).isEmpty || name.trimmingCharacters(in: .whitespaces).isEmpty || parsedQuantity <= 0)
+                    // M09: also block a holding with no price at all (both current and average blank).
+                    .disabled(symbol.trimmingCharacters(in: .whitespaces).isEmpty || name.trimmingCharacters(in: .whitespaces).isEmpty || parsedQuantity <= 0 || (parsedCurrentPrice <= 0 && parsedAverage <= 0))
                 }
             }
         }
@@ -718,7 +726,7 @@ struct CryptoFormView: View {
             name: name,
             quantity: parsedQuantity,
             avgBuyPrice: effectiveAverage,
-            currentPrice: parsedCurrentPrice,
+            currentPrice: effectiveCurrentPrice,
             fees: calculatedFee,
             coinId: coinId
         )
@@ -727,7 +735,7 @@ struct CryptoFormView: View {
         item.coinId = coinId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         item.quantity = parsedQuantity
         item.avgBuyPrice = effectiveAverage
-        item.currentPrice = parsedCurrentPrice
+        item.currentPrice = effectiveCurrentPrice
         item.fees = calculatedFee
         item.currency = currency
         item.updatedAt = Date()
