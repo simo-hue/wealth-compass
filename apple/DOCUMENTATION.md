@@ -1,5 +1,13 @@
 # Documentation
 
+- [2026-07-05]: Deep-audit High-severity — Batch 3 (Lock / privacy) — ⏳ pending on-device build/test
+  - *Details*: Implemented the 4 lock/privacy High findings (H01–H04) on branch `fix/high-severity-lock` (off clean `main`). Stops finance data being mutated/synced while locked, stops an editor sheet sitting over the lock screen, and stops macOS re-locking on every focus loss. UI/lifecycle changes — verified manually on device (no unit tests).
+  - *Tech Notes*:
+    - **H01 (recurring-while-locked, iOS + macOS)** — added `guard appLock.isUnlocked else { return }` at the top of `processRecurringTransactions()` in both `ContentView` and `MacRootView`. The `.recurringTransactionNotificationReceived` / `.macRecurringTransactionNotificationReceived` handlers call it without a lock guard (unlike the timers); guarding the single funnel point covers every path. `handleAppBecameActive` re-runs it on unlock (via `onChange(appLock.isUnlocked)`), so due occurrences are still generated right after auth. (Filed as iOS-only; macOS shared the defect.)
+    - **H02 (editor over lock, macOS)** — `MacRootView.onChange(of: appLock.isUnlocked)` now clears `appModel.editor = nil` when the app locks, so a pre-filled transaction/investment/crypto editor sheet can't remain presented over `MacLockView`.
+    - **H03 + H04 (macOS over-aggressive re-lock)** — `onChange(of: scenePhase)` now hard-locks **only** on `.background` (Cmd-H / minimize) instead of on any non-active phase. Transient `.inactive` (another app frontmost, Mission Control, occlusion) no longer forces a re-auth. Added a `MacPrivacyShield` overlay shown whenever `scenePhase != .active` (opaque cover, `lock.shield.fill`) so data still isn't exposed during app switching. This mirrors the existing iOS behavior (WC-L26 shield + lock-on-.background) and also closes the macOS privacy-shield gap.
+    - *Note:* the SwiftUI overlay shield sits below a presented `.sheet` in the z-order; the H02 dismiss-on-lock is what protects the editor case. A window-level (NSWindow) shield that also covers sheets is deeper work (tracked as a Medium finding).
+
 - [2026-07-05]: Deep-audit High-severity — Batch 2 (Decode / data-loss) — ⏳ pending on-device build/test
   - *Details*: Implemented the 3 decode/data-loss High findings (H08, H10, H12) on branch `fix/high-severity-decode` (off clean `main`). These stop a single bad record from zeroing the whole local dataset, stop an explicit-`null` date from failing the whole-file decode, and stop the first-sync merge from deleting a newer local edit.
   - *Tech Notes*:

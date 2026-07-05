@@ -125,6 +125,11 @@ struct ContentView: View {
     }
 
     private func processRecurringTransactions() async {
+        // Deep-audit H01: never generate/sync recurring transactions or surface their alert while the
+        // lock screen is up. The `.recurringTransactionNotificationReceived` handler calls this
+        // without a lock guard (unlike the timers), so guard here — the single point every path
+        // funnels through. `handleAppBecameActive` re-runs this right after unlock, so nothing is lost.
+        guard appLock.isUnlocked else { return }
         let insertedCount = finance.processDueRecurringTransactions(settings: settings)
         // WC-L1: only re-sync notifications when occurrences were actually generated. Schedule
         // edits are handled by the .onChange(recurringTransactions) observer, so the 30s timer

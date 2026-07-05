@@ -62,6 +62,14 @@ struct MacRootView: View {
             }
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: finance.persistenceError)
+        .overlay {
+            // Deep-audit H03/H04 + privacy: an opaque cover shown whenever the window isn't active,
+            // so financial data isn't exposed during app switching / Mission Control without forcing a
+            // re-authentication. Pairs with the lock-only-on-.background policy below; mirrors iOS.
+            if scenePhase != .active {
+                MacPrivacyShield()
+            }
+        }
         .sheet(item: $appModel.editor) { editor in
             MacEditorSheet(editor: editor)
                 .environmentObject(finance)
@@ -72,15 +80,25 @@ struct MacRootView: View {
             await handleAppBecameActive()
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active {
-                Task { await handleAppBecameActive() }
-            } else {
+            // Deep-audit H03/H04: hard-lock only on .background (the app hidden via Cmd-H or all
+            // windows minimized). Transient .inactive (another app frontmost, Mission Control, screen
+            // occlusion) is covered by the privacy shield above instead, so simply switching apps no
+            // longer forces a re-authentication. Mirrors the iOS behavior (WC-L26).
+            if phase == .background {
                 appLock.lock()
+            } else if phase == .active {
+                Task { await handleAppBecameActive() }
             }
         }
         .onChange(of: appLock.isUnlocked) { _, isUnlocked in
-            // WC-M6: became-active work is guarded out while locked, so run it once the user unlocks.
-            if isUnlocked { Task { await handleAppBecameActive() } }
+            if isUnlocked {
+                // WC-M6: became-active work is guarded out while locked, so run it once the user unlocks.
+                Task { await handleAppBecameActive() }
+            } else {
+                // Deep-audit H02: dismiss any presented editor sheet when the app locks, so a
+                // pre-filled financial form can't remain visible over the lock screen.
+                appModel.editor = nil
+            }
         }
         .onReceive(recurringCheckTimer) { _ in
             guard scenePhase == .active, appLock.isUnlocked else { return }
@@ -188,6 +206,11 @@ struct MacRootView: View {
     }
 
     private func processRecurringTransactions() async {
+        // Deep-audit H01: never generate/sync recurring transactions or surface their alert while the
+        // lock screen is up. The `.macRecurringTransactionNotificationReceived` handler calls this
+        // without a lock guard (unlike the timers), so guard here — the single point every path
+        // funnels through. `handleAppBecameActive` re-runs this right after unlock, so nothing is lost.
+        guard appLock.isUnlocked else { return }
         let insertedCount = finance.processDueRecurringTransactions(settings: settings)
         // WC-L1: only re-sync notifications when occurrences were generated (schedule edits are
         // handled by the .onChange observers), so the 30s timer doesn't churn notifications.
@@ -217,4 +240,19 @@ private struct MacRootAlert: Identifiable {
     let id = UUID()
     let title: String
     let message: String
+}
+
+/// An opaque cover shown whenever the window isn't active, so financial data isn't exposed during
+/// app switching / Mission Control without forcing a re-auth. Opaque (not a blur) so nothing leaks.
+/// Mirrors the iOS `PrivacyShield` (WC-L26).
+private struct MacPrivacyShield: View {
+    var body: some View {
+        ZStack {
+            WCColor.background
+            Image(systemName: "lock.shield.fill")
+                .font(.system(size: 56))
+                .foregroundStyle(WCColor.primary.opacity(0.5))
+        }
+        .ignoresSafeArea()
+    }
 }
