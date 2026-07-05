@@ -89,8 +89,11 @@ struct TransactionFormView: View {
                     if !settings.transactionCategories(for: newValue).contains(category) && !isCustomCategorySelected {
                         category = settings.transactionCategories(for: newValue).first ?? ""
                     }
-                    customCategory = ""
-                    isCustomCategoryFocused = false
+                    // M08: preserve an in-progress custom category name across a type toggle.
+                    if !isCustomCategorySelected {
+                        customCategory = ""
+                        isCustomCategoryFocused = false
+                    }
                 }
 
                 Section("Details") {
@@ -289,8 +292,11 @@ struct RecurringTransactionFormView: View {
                     if !settings.transactionCategories(for: newValue).contains(category) && !isCustomCategorySelected {
                         category = settings.transactionCategories(for: newValue).first ?? ""
                     }
-                    customCategory = ""
-                    isCustomCategoryFocused = false
+                    // M08: preserve an in-progress custom category name across a type toggle.
+                    if !isCustomCategorySelected {
+                        customCategory = ""
+                        isCustomCategoryFocused = false
+                    }
                 }
 
                 Section("Transaction") {

@@ -72,8 +72,12 @@ private struct MacTransactionEditor: View {
                         if !settings.transactionCategories(for: newType).contains(category) && !isCustomCategorySelected {
                             category = settings.transactionCategories(for: newType).first ?? ""
                         }
-                        customCategory = ""
-                        isCustomCategoryFocused = false
+                        // M08: preserve an in-progress custom category name across a type toggle — a
+                        // custom category isn't tied to income vs expense, so don't wipe it.
+                        if !isCustomCategorySelected {
+                            customCategory = ""
+                            isCustomCategoryFocused = false
+                        }
                     }
 
                     TextField("Amount", text: $amount)

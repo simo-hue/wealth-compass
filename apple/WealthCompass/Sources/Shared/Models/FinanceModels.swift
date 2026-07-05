@@ -383,7 +383,9 @@ struct Investment: Identifiable, Codable, Equatable {
 
     var gainLoss: Decimal { currentValue - costBasis }
     var gainLossPercent: Double {
-        costBasis > 0 ? (gainLoss.doubleValue / costBasis.doubleValue) * 100 : 0
+        // M10: guard only against a zero denominator, and divide by the cost-basis magnitude so a
+        // negative cost basis keeps the correct sign (a gain stays positive) instead of returning 0%.
+        costBasis != 0 ? (gainLoss.doubleValue / abs(costBasis.doubleValue)) * 100 : 0
     }
 }
 
@@ -404,7 +406,9 @@ struct CryptoHolding: Identifiable, Codable, Equatable {
     var currentValue: Decimal { quantity * currentPrice }
     var gainLoss: Decimal { currentValue - costBasis }
     var gainLossPercent: Double {
-        costBasis > 0 ? (gainLoss.doubleValue / costBasis.doubleValue) * 100 : 0
+        // M10: guard only against a zero denominator, and divide by the cost-basis magnitude so a
+        // negative cost basis keeps the correct sign (a gain stays positive) instead of returning 0%.
+        costBasis != 0 ? (gainLoss.doubleValue / abs(costBasis.doubleValue)) * 100 : 0
     }
 }
 

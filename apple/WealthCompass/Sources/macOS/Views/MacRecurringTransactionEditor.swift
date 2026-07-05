@@ -109,8 +109,11 @@ struct MacRecurringTransactionEditor: View {
                         if !settings.transactionCategories(for: newType).contains(category) && !isCustomCategorySelected {
                             category = settings.transactionCategories(for: newType).first ?? ""
                         }
-                        customCategory = ""
-                        isCustomCategoryFocused = false
+                        // M08: preserve an in-progress custom category name across a type toggle.
+                        if !isCustomCategorySelected {
+                            customCategory = ""
+                            isCustomCategoryFocused = false
+                        }
                     }
 
                     TextField("Amount (\(currency.rawValue))", text: $amount)
