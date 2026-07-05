@@ -38,6 +38,7 @@ actor RecurringNotificationService {
 
     func sync(
         schedules: [RecurringTransaction],
+        convertedAmounts: [UUID: Decimal],
         currencyCode: String,
         showAmounts: Bool,
         now: Date = Date()
@@ -69,8 +70,11 @@ actor RecurringNotificationService {
             let content = UNMutableNotificationContent()
             content.title = AppLocalization.string("Recurring \(schedule.type.localizedTitle(appLanguage: appLanguage)) due", appLanguage: appLanguage)
             if showAmounts {
-                // `schedule.amount` is Decimal (WC-A1); use the Decimal currency format style.
-                let amount = schedule.amount.formatted(
+                // `schedule.amount` is Decimal (WC-A1) in the schedule's OWN currency. The caller
+                // pre-converts it to the display currency on the @MainActor (deep-audit M20), so the
+                // number and the currency code agree; fall back to the raw amount if absent.
+                let displayAmount = convertedAmounts[schedule.id] ?? schedule.amount
+                let amount = displayAmount.formatted(
                     .currency(code: currencyCode)
                 )
                 content.body = AppLocalization.string("\(schedule.category): \(amount). Wealth Compass records it automatically when the app is active.", appLanguage: appLanguage)

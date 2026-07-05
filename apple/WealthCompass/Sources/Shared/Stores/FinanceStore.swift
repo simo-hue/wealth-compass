@@ -72,6 +72,7 @@ enum FinanceImportError: LocalizedError {
     case emptyFile
     case invalidJSON(String)
     case noSupportedRecords
+    case localPersistenceError
 
     var errorDescription: String? {
         localizedDescription(appLanguage: nil)
@@ -85,6 +86,8 @@ enum FinanceImportError: LocalizedError {
             AppLocalization.string("The selected file is not a valid Wealth Compass JSON backup. \(details)", appLanguage: appLanguage)
         case .noSupportedRecords:
             AppLocalization.string("No supported finance records were found in the selected JSON file.", appLanguage: appLanguage)
+        case .localPersistenceError:
+            AppLocalization.string("Changes cannot be saved until the local database load error is resolved.", appLanguage: appLanguage)
         }
     }
 }
@@ -248,7 +251,7 @@ final class FinanceStore: ObservableObject {
         // Snapshots store liquidity in the display currency, so convert the transaction's
         // own-currency delta before adjusting history (WC-M1; no-op when currency == base).
         let delta: Decimal = type == .income ? amount : -amount
-        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: settings.convert(delta, from: currency))
+        adjustHistoricalSnapshots(from: transaction.date, transactionCurrency: currency, displayCurrency: settings.currency, liquidityDelta: settings.convert(delta, from: currency))
 
         data.transactions.append(transaction)
         appendSnapshot(settings: settings)
@@ -258,7 +261,7 @@ final class FinanceStore: ObservableObject {
     func deleteTransaction(_ transaction: Transaction, settings: AppSettings) {
         let delta: Decimal = transaction.type == .income ? -transaction.amount : transaction.amount
         let txCurrency = transaction.currency ?? settings.currency
-        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: settings.convert(delta, from: txCurrency))
+        adjustHistoricalSnapshots(from: transaction.date, transactionCurrency: txCurrency, displayCurrency: settings.currency, liquidityDelta: settings.convert(delta, from: txCurrency))
 
         data.transactions.removeAll { $0.id == transaction.id }
         appendSnapshot(settings: settings)
@@ -270,11 +273,11 @@ final class FinanceStore: ObservableObject {
 
         let oldDelta: Decimal = transaction.type == .income ? -transaction.amount : transaction.amount
         let oldCurrency = transaction.currency ?? settings.currency
-        adjustHistoricalSnapshots(from: transaction.date, liquidityDelta: settings.convert(oldDelta, from: oldCurrency))
+        adjustHistoricalSnapshots(from: transaction.date, transactionCurrency: oldCurrency, displayCurrency: settings.currency, liquidityDelta: settings.convert(oldDelta, from: oldCurrency))
 
         let newDate = Calendar.current.startOfDay(for: date)
         let newDelta: Decimal = type == .income ? amount : -amount
-        adjustHistoricalSnapshots(from: newDate, liquidityDelta: settings.convert(newDelta, from: currency))
+        adjustHistoricalSnapshots(from: newDate, transactionCurrency: currency, displayCurrency: settings.currency, liquidityDelta: settings.convert(newDelta, from: currency))
 
         data.transactions[index].type = type
         data.transactions[index].amount = amount
@@ -393,7 +396,11 @@ final class FinanceStore: ObservableObject {
                     else {
                         return false
                     }
-                    return abs(generatedDate.timeIntervalSince(occurrence)) < 1
+                    // Match by calendar day, not a 1-second window: a lossy/cross-source import
+                    // reparses `recurringOccurrenceDate` with a different time-of-day, which used to
+                    // slip past the dedupe and double-generate the occurrence (deep-audit M24). All
+                    // current frequencies are ≥1-day-granular, so same-day matching is exact.
+                    return calendar.isDate(generatedDate, inSameDayAs: occurrence)
                 }
 
                 if !alreadyGenerated {
@@ -402,6 +409,8 @@ final class FinanceStore: ObservableObject {
                     let delta: Decimal = schedule.type == .income ? schedule.amount : -schedule.amount
                     adjustHistoricalSnapshots(
                         from: occurrenceStartOfDay,
+                        transactionCurrency: scheduleCurrency,
+                        displayCurrency: settings.currency,
                         liquidityDelta: settings.convert(delta, from: scheduleCurrency)
                     )
 
@@ -772,8 +781,8 @@ final class FinanceStore: ObservableObject {
         data.snapshots = snapshotEngine.appendingSnapshot(to: data.snapshots, totals: totals, currency: settings.currency)
     }
 
-    private func adjustHistoricalSnapshots(from date: Date, liquidityDelta: Decimal) {
-        data.snapshots = snapshotEngine.adjustingHistoricalSnapshots(data.snapshots, from: date, liquidityDelta: liquidityDelta)
+    private func adjustHistoricalSnapshots(from date: Date, transactionCurrency: Currency, displayCurrency: Currency, liquidityDelta: Decimal) {
+        data.snapshots = snapshotEngine.adjustingHistoricalSnapshots(data.snapshots, from: date, transactionCurrency: transactionCurrency, displayCurrency: displayCurrency, liquidityDelta: liquidityDelta)
     }
 
     func monthlyCashFlow(for month: Date, settings: AppSettings) -> MonthlyCashFlow {
@@ -928,6 +937,13 @@ final class FinanceStore: ObservableObject {
 
     @discardableResult
     func importBackup(from url: URL, mode: FinanceImportMode, settings: AppSettings) throws -> FinanceImportResult {
+        // Fail loudly if the local DB failed to load: save() is a no-op while `localPersistenceError`
+        // is set, so mutating in-memory `data` and reporting success would silently discard the import
+        // (deep-audit M28). Mirrors the guards in setICloudSyncEnabled / applyRemoteMutations.
+        guard localPersistenceError == nil else {
+            throw FinanceImportError.localPersistenceError
+        }
+
         let didAccessResource = url.startAccessingSecurityScopedResource()
         defer {
             if didAccessResource {

@@ -214,9 +214,9 @@ struct AnalyticsEngine {
     func assetAllocation() -> [AllocationSlice] {
         let totals = calculateTotals()
         return [
-            AllocationSlice(name: localized("Investments"), value: totals.totalInvestments.doubleValue, color: .blue),
-            AllocationSlice(name: localized("Crypto"), value: totals.totalCrypto.doubleValue, color: .orange),
-            AllocationSlice(name: localized("Cash"), value: totals.totalLiquidity.doubleValue, color: .green)
+            AllocationSlice(id: "asset-investments", name: localized("Investments"), value: totals.totalInvestments.doubleValue, color: .blue),
+            AllocationSlice(id: "asset-crypto", name: localized("Crypto"), value: totals.totalCrypto.doubleValue, color: .orange),
+            AllocationSlice(id: "asset-cash", name: localized("Cash"), value: totals.totalLiquidity.doubleValue, color: .green)
         ].filter { $0.value > 0 }
     }
 
@@ -232,7 +232,7 @@ struct AnalyticsEngine {
             .sorted { $0.value > $1.value }
             .enumerated()
             .map { index, item in
-                AllocationSlice(name: item.name, value: item.value.doubleValue, color: ColorPalette.chart[index % ColorPalette.chart.count])
+                AllocationSlice(id: item.name, name: item.name, value: item.value.doubleValue, color: ColorPalette.chart[index % ColorPalette.chart.count])
             }
     }
 
@@ -250,6 +250,7 @@ struct AnalyticsEngine {
             .map { index, item in
                 let type = InvestmentType(rawValue: item.name) ?? .other
                 return AllocationSlice(
+                    id: item.name,
                     name: type.localizedTitle(appLanguage: appLanguage),
                     value: item.value.doubleValue,
                     color: ColorPalette.chartType[index % ColorPalette.chartType.count]
@@ -269,13 +270,14 @@ struct AnalyticsEngine {
             .sorted { $0.value > $1.value }
             .enumerated()
             .map { index, item in
-                AllocationSlice(name: item.name, value: item.value.doubleValue, color: ColorPalette.chartGeography[index % ColorPalette.chartGeography.count])
+                AllocationSlice(id: item.name, name: item.name, value: item.value.doubleValue, color: ColorPalette.chartGeography[index % ColorPalette.chartGeography.count])
             }
     }
 
     func cryptoAllocation() -> [AllocationSlice] {
         data.crypto.enumerated().map { index, holding in
             AllocationSlice(
+                id: holding.id.uuidString,
                 name: holding.symbol,
                 value: convert(holding.currentValue, from: holding.currency).doubleValue,
                 color: ColorPalette.chart[index % ColorPalette.chart.count]

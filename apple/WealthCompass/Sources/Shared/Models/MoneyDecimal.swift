@@ -90,7 +90,12 @@ extension AmountInputFormatter {
         formatter.numberStyle = .decimal
         formatter.usesGroupingSeparator = false
         formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 8
+        // Derive the cap from the value's own scale so a high-precision quantity (crypto up to
+        // 18 decimals) round-trips losslessly instead of being truncated to 8 digits on a no-op
+        // editor save (deep-audit M1/M13). Keep a floor of 8 for ordinary money and a ceiling of
+        // 20 to guard against a pathological scale.
+        let fractionDigits = value.exponent < 0 ? -value.exponent : 0
+        formatter.maximumFractionDigits = min(max(8, fractionDigits), 20)
         return formatter.string(from: value as NSDecimalNumber) ?? "0"
     }
 }

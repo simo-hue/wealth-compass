@@ -520,7 +520,10 @@ struct CategoryTotal: Identifiable, Equatable {
 }
 
 struct AllocationSlice: Identifiable, Equatable {
-    var id: String { name }
+    /// Stable, unique identity independent of the display `name` (deep-audit M29). Two holdings
+    /// that share a symbol (e.g. BTC in two wallets) must not collide in the chart's hover
+    /// highlight or the legend `ForEach`, so callers key this on the source entity id / group key.
+    var id: String
     var name: String
     var value: Double
     var color: Color

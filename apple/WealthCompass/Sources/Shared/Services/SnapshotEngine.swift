@@ -44,14 +44,30 @@ struct SnapshotEngine {
     }
 
     /// Applies a liquidity delta to every snapshot on/after `date` (retroactive edit).
+    ///
+    /// Same-currency deltas only (deep-audit M22/M23): the delta is expressed in `displayCurrency`
+    /// and is an exact (no-op) conversion only when the transaction was already in that currency, so
+    /// it is applied only when `transactionCurrency == displayCurrency` and the target snapshot is
+    /// itself in the display currency. Stored snapshots are frozen at their capture-time base
+    /// currency and carry no per-day FX rate, so folding a foreign, today-rate delta into them would
+    /// mix rate epochs. A foreign-currency edit is skipped here and left to the render-time
+    /// reconversion each `NetWorthSnapshot.currency` enables (deep-audit H11).
     func adjustingHistoricalSnapshots(
         _ snapshots: [NetWorthSnapshot],
         from date: Date,
+        transactionCurrency: Currency,
+        displayCurrency: Currency,
         liquidityDelta: Decimal
     ) -> [NetWorthSnapshot] {
+        // Foreign-currency edit: the converted delta doesn't belong in history frozen at other
+        // rates, so skip the retroactive mutation entirely (render-time reconversion handles it).
+        guard transactionCurrency == displayCurrency else { return snapshots }
         let startOfDay = calendar.startOfDay(for: date)
         var snapshots = snapshots
         for index in snapshots.indices where snapshots[index].date >= startOfDay {
+            // A row captured in a different base currency (after a base-currency change) can't take a
+            // display-currency delta without mixing epochs; `nil` = a legacy row, read as display.
+            guard (snapshots[index].currency ?? displayCurrency) == displayCurrency else { continue }
             snapshots[index].liquidity += liquidityDelta
             snapshots[index].totalAssets += liquidityDelta
             snapshots[index].netWorth += liquidityDelta

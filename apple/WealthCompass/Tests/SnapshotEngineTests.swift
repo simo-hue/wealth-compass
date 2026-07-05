@@ -61,10 +61,22 @@ final class SnapshotEngineTests: XCTestCase {
             NetWorthSnapshot(date: date(2026, 6, 18), totalAssets: 100, totalLiabilities: 0, netWorth: 100, liquidity: 100, investments: 0, crypto: 0),
             NetWorthSnapshot(date: date(2026, 6, 20), totalAssets: 100, totalLiabilities: 0, netWorth: 100, liquidity: 100, investments: 0, crypto: 0)
         ]
-        let result = engine.adjustingHistoricalSnapshots(snaps, from: date(2026, 6, 19), liquidityDelta: 50)
+        let result = engine.adjustingHistoricalSnapshots(snaps, from: date(2026, 6, 19), transactionCurrency: .usd, displayCurrency: .usd, liquidityDelta: 50)
         XCTAssertEqual(result[0].netWorth, 100, "before the cutoff is untouched")
         XCTAssertEqual(result[1].liquidity, 150)
         XCTAssertEqual(result[1].totalAssets, 150)
         XCTAssertEqual(result[1].netWorth, 150)
+    }
+
+    func testSkipsForeignCurrencyDeltaToAvoidMixingRateEpochs() {
+        // A foreign-currency (converted, today-rate) delta must NOT be folded into history frozen at
+        // other capture-time rates (deep-audit M22/M23); the retroactive mutation is skipped entirely
+        // and the render-time reconversion handles display instead.
+        let snaps = [
+            NetWorthSnapshot(date: date(2026, 6, 20), totalAssets: 100, totalLiabilities: 0, netWorth: 100, liquidity: 100, investments: 0, crypto: 0)
+        ]
+        let result = engine.adjustingHistoricalSnapshots(snaps, from: date(2026, 6, 19), transactionCurrency: .usd, displayCurrency: .eur, liquidityDelta: 50)
+        XCTAssertEqual(result[0].netWorth, 100, "foreign-currency delta is skipped, history unchanged")
+        XCTAssertEqual(result[0].liquidity, 100)
     }
 }

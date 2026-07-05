@@ -47,10 +47,14 @@ enum RecurringScheduleBuilder {
         var saved = seed
         if saved.isCompleted {
             saved.isActive = false
-        } else if !scheduleChanged, let existing {
+        } else if !scheduleChanged, let existing, existing.isActive {
             saved.nextDueDate = existing.nextDueDate
         } else if let nextDueDate = seed.firstOccurrence(onOrAfter: now) {
             saved.nextDueDate = nextDueDate
+            // Reactivate a lapsed (auto-deactivated) schedule when a fresh future occurrence
+            // exists — e.g. the user extended the endDate without touching frequency/startDate
+            // (deep-audit M21). The endDate guard below can still turn it back off.
+            saved.isActive = true
         } else {
             saved.isActive = false
         }

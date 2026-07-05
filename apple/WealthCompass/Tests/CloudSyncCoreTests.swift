@@ -679,11 +679,15 @@ final class CloudSyncCoreTests: XCTestCase {
             partialFailure(items: [.networkUnavailable, .serverRecordChanged, .zoneNotFound, .batchRequestFailed])
         ))
 
-        // Record-gone codes (unknownItem, serverRejectedRequest) are also benign.
+        // .unknownItem (record-gone) is benign.
         XCTAssertTrue(CloudKitSyncService.partialFailureIsBenign(
             partialFailure(items: [.unknownItem])
         ))
-        XCTAssertTrue(CloudKitSyncService.partialFailureIsBenign(
+        // .serverRejectedRequest is NOT benign — a persistent rejection must surface (deep-audit M18).
+        XCTAssertFalse(CloudKitSyncService.partialFailureIsBenign(
+            partialFailure(items: [.serverRejectedRequest])
+        ))
+        XCTAssertFalse(CloudKitSyncService.partialFailureIsBenign(
             partialFailure(items: [.serverRejectedRequest, .networkUnavailable])
         ))
 
@@ -770,8 +774,9 @@ final class CloudSyncCoreTests: XCTestCase {
 
         // Record gone (stale changeTag for a server-deleted record) → clear systemFields, re-create.
         XCTAssertEqual(resolve(.unknownItem), .recordGone)
-        XCTAssertEqual(resolve(.serverRejectedRequest), .recordGone)
-        // Stale-revision check still takes precedence over recordGone.
+        // A persistent server rejection is fatal, not recordGone, so it surfaces (deep-audit M18).
+        XCTAssertEqual(resolve(.serverRejectedRequest), .fatal)
+        // Stale-revision check still takes precedence over recordGone/fatal.
         XCTAssertEqual(resolve(.unknownItem, failed: UUID(), current: rev), .staleRequeue)
         XCTAssertEqual(resolve(.serverRejectedRequest, failed: UUID(), current: rev), .staleRequeue)
     }

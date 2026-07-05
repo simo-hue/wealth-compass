@@ -145,8 +145,14 @@ struct ContentView: View {
     }
 
     private func syncRecurringNotifications() async {
+        let schedules = finance.data.recurringTransactions
+        let convertedAmounts = Dictionary(
+            schedules.map { ($0.id, settings.convert($0.amount, from: $0.currency)) },
+            uniquingKeysWith: { first, _ in first }
+        )
         await RecurringTransactionNotificationService.shared.sync(
-            schedules: finance.data.recurringTransactions,
+            schedules: schedules,
+            convertedAmounts: convertedAmounts,
             currencyCode: settings.currency.rawValue,
             showAmounts: !settings.isPrivacyMode
         )

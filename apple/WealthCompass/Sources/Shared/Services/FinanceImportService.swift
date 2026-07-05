@@ -68,8 +68,8 @@ private struct ImportedFinancialData: Decodable {
         let importedIncome = income.elements.compactMap { $0.transaction() }
         let importedExpenses = expenses.elements.compactMap { $0.transaction() }
         let importedLiquidity = liquidity.elements.compactMap { $0.transaction(settings: settings) }
-        let importedInvestments = investments.elements.compactMap { $0.model() }
-        let importedCrypto = crypto.elements.compactMap { $0.model() }
+        let importedInvestments = investments.elements.compactMap { $0.model(defaultCurrency: settings.currency) }
+        let importedCrypto = crypto.elements.compactMap { $0.model(defaultCurrency: settings.currency) }
         let importedLiabilities = liabilities.elements.compactMap { $0.model(defaultCurrency: settings.currency) }
         let importedSnapshots = snapshots.elements.compactMap { $0.model() }
 
@@ -130,6 +130,7 @@ private struct ImportedTransaction: Decodable {
     let description: String?
     let date: String?
     let createdAt: String?
+    let updatedAt: String?
     let recurringTransactionID: UUID?
     let recurringOccurrenceDate: String?
 
@@ -141,6 +142,7 @@ private struct ImportedTransaction: Decodable {
         case description
         case date
         case createdAt
+        case updatedAt
         case recurringTransactionID
         case recurringOccurrenceDate
     }
@@ -154,6 +156,7 @@ private struct ImportedTransaction: Decodable {
         description = container.decodeImportedStringIfPresent(forKey: .description)
         date = container.decodeImportedStringIfPresent(forKey: .date)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
+        updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
         recurringTransactionID = container.decodeUUIDIfPresent(forKey: .recurringTransactionID)
         recurringOccurrenceDate = container.decodeImportedStringIfPresent(forKey: .recurringOccurrenceDate)
     }
@@ -176,6 +179,7 @@ private struct ImportedTransaction: Decodable {
             description: description ?? "",
             date: date,
             createdAt: ImportDateParser.parse(createdAt) ?? date,
+            updatedAt: ImportDateParser.parse(updatedAt) ?? ImportDateParser.parse(createdAt) ?? date,
             recurringTransactionID: recurringTransactionID,
             recurringOccurrenceDate: ImportDateParser.parse(recurringOccurrenceDate)
         )
@@ -276,6 +280,7 @@ private struct ImportedIncomeEntry: Decodable {
     let description: String?
     let date: String?
     let createdAt: String?
+    let updatedAt: String?
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -284,6 +289,7 @@ private struct ImportedIncomeEntry: Decodable {
         case description
         case date
         case createdAt
+        case updatedAt
     }
 
     init(from decoder: Decoder) throws {
@@ -294,6 +300,7 @@ private struct ImportedIncomeEntry: Decodable {
         description = container.decodeImportedStringIfPresent(forKey: .description)
         date = container.decodeImportedStringIfPresent(forKey: .date)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
+        updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
     }
 
     func transaction() -> Transaction? {
@@ -311,7 +318,8 @@ private struct ImportedIncomeEntry: Decodable {
             amount: Decimal(amount),
             description: description ?? "",
             date: date,
-            createdAt: ImportDateParser.parse(createdAt) ?? date
+            createdAt: ImportDateParser.parse(createdAt) ?? date,
+            updatedAt: ImportDateParser.parse(updatedAt) ?? ImportDateParser.parse(createdAt) ?? date
         )
     }
 
@@ -334,6 +342,7 @@ private struct ImportedExpenseEntry: Decodable {
     let description: String?
     let date: String?
     let createdAt: String?
+    let updatedAt: String?
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -342,6 +351,7 @@ private struct ImportedExpenseEntry: Decodable {
         case description
         case date
         case createdAt
+        case updatedAt
     }
 
     init(from decoder: Decoder) throws {
@@ -352,6 +362,7 @@ private struct ImportedExpenseEntry: Decodable {
         description = container.decodeImportedStringIfPresent(forKey: .description)
         date = container.decodeImportedStringIfPresent(forKey: .date)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
+        updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
     }
 
     func transaction() -> Transaction? {
@@ -369,7 +380,8 @@ private struct ImportedExpenseEntry: Decodable {
             amount: Decimal(amount),
             description: description ?? "",
             date: date,
-            createdAt: ImportDateParser.parse(createdAt) ?? date
+            createdAt: ImportDateParser.parse(createdAt) ?? date,
+            updatedAt: ImportDateParser.parse(updatedAt) ?? ImportDateParser.parse(createdAt) ?? date
         )
     }
 }
@@ -423,7 +435,8 @@ private struct ImportedLiquidityAccount: Decodable {
             amount: convertedAmount,
             description: "Imported liquidity account: \(accountName)",
             date: Calendar.current.startOfDay(for: importedDate),
-            createdAt: ImportDateParser.parse(createdAt) ?? importedDate
+            createdAt: ImportDateParser.parse(createdAt) ?? importedDate,
+            updatedAt: importedDate
         )
     }
 }
@@ -485,7 +498,7 @@ private struct ImportedInvestment: Decodable {
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
     }
 
-    func model() -> Investment? {
+    func model(defaultCurrency: Currency) -> Investment? {
         guard
             let symbol,
             let name,
@@ -510,7 +523,7 @@ private struct ImportedInvestment: Decodable {
             costBasis: Decimal(costBasis),
             currentValue: Decimal(currentValue),
             currentPrice: Decimal(currentPrice),
-            currency: Currency.imported(currency, default: .usd),
+            currency: Currency.imported(currency, default: defaultCurrency),
             geography: geography ?? "Other",
             sector: sector ?? "Other",
             isin: isin?.uppercased() ?? "",
@@ -566,7 +579,7 @@ private struct ImportedCryptoHolding: Decodable {
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
     }
 
-    func model() -> CryptoHolding? {
+    func model(defaultCurrency: Currency) -> CryptoHolding? {
         guard
             let symbol,
             let name,
@@ -584,7 +597,7 @@ private struct ImportedCryptoHolding: Decodable {
             quantity: Decimal(quantity),
             avgBuyPrice: Decimal(avgBuyPrice?.nonNegativeImportedAmount ?? 0),
             currentPrice: Decimal(currentPrice?.nonNegativeImportedAmount ?? 0),
-            currency: Currency.imported(currency, default: .usd),
+            currency: Currency.imported(currency, default: defaultCurrency),
             fees: Decimal(fees?.nonNegativeImportedAmount ?? 0),
             coinId: coinId?.lowercased() ?? "",
             updatedAt: importedUpdatedAt,
