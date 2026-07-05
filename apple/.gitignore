@@ -15,3 +15,9 @@ xcuserdata/
 # Swift Package Manager (none used today, but guard against accidental adds)
 .build/
 .swiftpm/
+
+# Xcode test-run artifacts — never commit (xcresult bundles are 10s–100s of MB).
+# Anchored `/TESTS/` matches apple/TESTS only, NOT the real source dir apple/WealthCompass/Tests.
+*.xcresult
+*.xcresult.zip
+/TESTS/

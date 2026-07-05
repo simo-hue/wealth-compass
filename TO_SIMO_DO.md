@@ -17,5 +17,9 @@ This document tracks manual actions and considerations for you to address.
   - **Currency unification — no regression**: confirm a USD holding priced by Finnhub and a EUR holding priced by Yahoo both still show correct values after a refresh (the conversion now runs through one `storedPrice` boundary; `nil`/same-currency must be a no-op). Standalone Swift verified the rule (11/11), but confirm against live data.
 - [ ] *(Optional, improves accuracy)* Set VWCE's ISIN to `IE00BK5BQT80` in the investment editor. Not required — the bare-symbol search already resolves it — but the ISIN makes the listing lookup exact. Likewise, for any crypto whose ticker is ambiguous, setting an explicit Coin ID avoids the `/search` guess.
 
-
 ---
+
+cd apple
+xcodebuild test -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile \
+  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -only-testing:WealthCompassTests/AnalyticsEngineTests
