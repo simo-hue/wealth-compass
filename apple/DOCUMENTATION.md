@@ -1,5 +1,13 @@
 # Documentation
 
+- [2026-07-05]: Deep-audit Medium — Batch M1 (accessibility + privacy) — ⏳ pending on-device build
+  - *Details*: First Medium-tier batch (DA-M05, DA-M07, DA-M30) on branch `fix/medium-a11y-privacy` off clean `main`. Mechanical UI fixes — manual verification (no unit tests).
+  - *Tech Notes*:
+    - **M05** — the macOS Cash Flow transaction card's whole-card tap-to-edit is now exposed to VoiceOver / Switch Control (`.accessibilityElement(children:.combine)` + `.isButton` + `.accessibilityAction`), mirroring iOS WC-L24. Was `onTapGesture` only (unsurfaced).
+    - **M07** — `DashboardSegmentedPicker` segments are now `.plain` `Button`s instead of `Text` + `onTapGesture`, giving native VoiceOver (announced as a button) and keyboard focus/activation, plus an `.isSelected` trait on the active segment. The custom capsule look is preserved.
+    - **M30** — the `AllocationChart` center-overlay share % is now redacted in Privacy Mode (matching the amount's existing redaction), so composition isn't leaked.
+  - *Verification note*: 2 Medium findings were already resolved by the High batches and need no work — **M03** (macOS privacy shield → Batch 3) and **M12** (`Decimal(finite:)` NaN → H09).
+
 - [2026-07-05]: Deep-audit High-severity — Batch 3 (Lock / privacy) — ⏳ pending on-device build/test
   - *Details*: Implemented the 4 lock/privacy High findings (H01–H04) on branch `fix/high-severity-lock` (off clean `main`). Stops finance data being mutated/synced while locked, stops an editor sheet sitting over the lock screen, and stops macOS re-locking on every focus loss. UI/lifecycle changes — verified manually on device (no unit tests).
   - *Tech Notes*:

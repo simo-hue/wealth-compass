@@ -300,7 +300,9 @@ struct AllocationChart: View {
                                             .foregroundStyle(.white)
                                             .lineLimit(1)
                                             .minimumScaleFactor(0.68)
-                                        Text(percentage(hoveredSlice.value, total: total))
+                                        // M30: the share % also reveals portfolio composition, so
+                                        // redact it in Privacy Mode like the amount above it.
+                                        Text(settings.isPrivacyMode ? settings.redactionToken : percentage(hoveredSlice.value, total: total))
                                             .font(.caption2.monospacedDigit())
                                             .foregroundStyle(WCColor.textTertiary) // WC-L20: was raw .white.opacity(0.6)
                                     } else {

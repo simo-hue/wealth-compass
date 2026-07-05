@@ -729,9 +729,15 @@ struct MacCashFlowView: View {
                 } else {
                     ForEach(filteredTransactions) { transaction in
                         transactionCard(for: transaction)
+                            .contentShape(Rectangle())
                             .onTapGesture {
                                 editor = .transaction(transaction)
                             }
+                            // M05: expose the whole-card tap-to-edit to VoiceOver / Switch Control as
+                            // one activatable button (onTapGesture alone isn't surfaced). Mirrors iOS WC-L24.
+                            .accessibilityElement(children: .combine)
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityAction { editor = .transaction(transaction) }
                     }
                 }
             }

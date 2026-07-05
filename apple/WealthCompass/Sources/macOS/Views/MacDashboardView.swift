@@ -1099,25 +1099,31 @@ struct DashboardSegmentedPicker<SelectionValue: Hashable & Identifiable>: View {
         HStack(spacing: 0) {
             ForEach(items) { item in
                 let isSelected = selection == item
-                Text(labelProvider(item))
-                    .font(.caption.weight(isSelected ? .bold : .medium))
-                    .foregroundStyle(isSelected ? Color.white : Color.white.opacity(0.6))
-                    .frame(minWidth: 44)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background {
-                        if isSelected {
-                            Capsule()
-                                .fill(Color.white.opacity(0.15))
-                                .matchedGeometryEffect(id: "selection", in: namespace)
-                        }
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        selection = item
                     }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            selection = item
+                } label: {
+                    Text(labelProvider(item))
+                        .font(.caption.weight(isSelected ? .bold : .medium))
+                        .foregroundStyle(isSelected ? Color.white : Color.white.opacity(0.6))
+                        .frame(minWidth: 44)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background {
+                            if isSelected {
+                                Capsule()
+                                    .fill(Color.white.opacity(0.15))
+                                    .matchedGeometryEffect(id: "selection", in: namespace)
+                            }
                         }
-                    }
+                        .contentShape(Rectangle())
+                }
+                // M07: a plain Button gives native VoiceOver (announced as a button) and keyboard
+                // focus/activation, which the previous Text + onTapGesture did not expose. The
+                // `.plain` style keeps the custom capsule look; the selected state is surfaced too.
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(isSelected ? .isSelected : [])
             }
         }
         .padding(4)
