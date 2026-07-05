@@ -106,6 +106,10 @@ final class FinanceStore: ObservableObject {
     /// conflict path). `dataVersion` bumps on every `data` mutation, so a version match is
     /// always current; a mismatch recomputes.
     private var cachedCloudSyncSnapshot: (version: Int, records: [CloudSyncRecordKey: CloudSyncRecordSnapshot])?
+    /// Memoized date-sorted transactions (M6), keyed by `dataVersion`. `transactions` is read
+    /// several times per render (list rows, counts, per-keystroke filters) and the sort is
+    /// O(n log n) each time; caching collapses that to one sort per data mutation.
+    private var cachedSortedTransactions: (version: Int, value: [Transaction])?
     @Published private(set) var isRefreshingMarketPrices = false
     /// Per-item progress of the (serial, rate-limited) Finnhub refresh, for an "x of N"
     /// UI indicator (M7). Nil when not refreshing investments.
@@ -209,10 +213,13 @@ final class FinanceStore: ObservableObject {
     }
 
     var transactions: [Transaction] {
-        data.transactions.sorted { lhs, rhs in
+        if let cache = cachedSortedTransactions, cache.version == dataVersion { return cache.value }
+        let sorted = data.transactions.sorted { lhs, rhs in
             if lhs.date == rhs.date { return lhs.createdAt > rhs.createdAt }
             return lhs.date > rhs.date
         }
+        cachedSortedTransactions = (dataVersion, sorted)
+        return sorted
     }
 
     var recurringTransactions: [RecurringTransaction] {
@@ -613,6 +620,10 @@ final class FinanceStore: ObservableObject {
                 if let resolved = try? await searchClient.searchCoinID(symbol: holding.symbol, name: holding.name) {
                     lookups[holding.id] = resolved
                 }
+                // M25: pace /search so a first-time refresh with several new coins doesn't burst past
+                // CoinGecko's demo-tier rate limit. Resolved ids are persisted (the coinId backfill in
+                // the apply loop below), so search runs once per new coin, not on every refresh.
+                try? await Task.sleep(nanoseconds: 500_000_000)
             }
 
             let unresolvedIDs = Set(data.crypto.map(\.id)).subtracting(lookups.keys)
@@ -655,6 +666,9 @@ final class FinanceStore: ObservableObject {
         // Date() matches every other store mutation and the dialog's "Last refresh" line; one
         // timestamp for the whole pass so all touched holdings and `result.refreshedAt` agree.
         let refreshedAt = Date()
+        // M26: only append a snapshot + persist/sync when a price actually changed, not merely because
+        // a holding was re-priced with the same value (updatedRecordCount counts every re-priced holding).
+        var didChangeData = false
 
         for index in data.investments.indices {
             guard let quote = investmentQuotes[data.investments[index].id] else { continue }
@@ -669,6 +683,7 @@ final class FinanceStore: ObservableObject {
                 data.investments[index].currentPrice = price
                 data.investments[index].currentValue = data.investments[index].quantity * price
                 data.investments[index].updatedAt = refreshedAt
+                didChangeData = true
             }
             result.updatedInvestments += 1
         }
@@ -686,11 +701,12 @@ final class FinanceStore: ObservableObject {
                     data.crypto[index].coinId = update.id
                 }
                 data.crypto[index].updatedAt = refreshedAt
+                didChangeData = true
             }
             result.updatedCrypto += 1
         }
 
-        if result.updatedRecordCount > 0 {
+        if didChangeData {
             appendSnapshot(settings: settings)
             save()
         }
