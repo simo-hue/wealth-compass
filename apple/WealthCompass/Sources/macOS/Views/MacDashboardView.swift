@@ -788,7 +788,8 @@ struct MacDashboardView: View {
     private func signedAmount(for transaction: Transaction) -> String {
         guard !settings.isPrivacyMode else { return settings.redactionToken }
         let prefix = transaction.type == .income ? "+" : "−"
-        return prefix + settings.formatCurrency(transaction.amount)
+        // Show each row in its own currency (deep-audit H5); totals stay converted.
+        return prefix + settings.formatSourceCurrency(transaction.amount, currency: transaction.currency ?? settings.currency)
     }
 
     private func freshnessText(_ date: Date) -> String {

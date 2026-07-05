@@ -602,7 +602,7 @@ struct MacCashFlowView: View {
             Spacer()
 
             let prefix = schedule.type == .income ? "+" : "−"
-            Text("\(prefix)\(settings.privateCurrency(schedule.amount))")
+            Text("\(prefix)\(settings.privateSourceCurrency(schedule.amount, currency: schedule.currency ?? settings.currency))")
                 .font(.headline.monospacedDigit())
                 .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
                 .frame(minWidth: 140, alignment: .trailing)
@@ -770,7 +770,7 @@ struct MacCashFlowView: View {
                     Spacer()
                     
                     let prefix = transaction.type == .income ? "+" : "−"
-                    Text("\(prefix)\(settings.privateCurrency(transaction.amount))")
+                    Text("\(prefix)\(settings.privateSourceCurrency(transaction.amount, currency: transaction.currency ?? settings.currency))")
                         .font(.headline.monospacedDigit())
                         .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
                 }
@@ -888,7 +888,8 @@ struct MacCashFlowView: View {
     private func signedAmount(for transaction: Transaction) -> String {
         guard !settings.isPrivacyMode else { return settings.redactionToken }
         let prefix = transaction.type == .income ? "+" : "−"
-        return prefix + settings.privateCurrency(transaction.amount)
+        // Show each row in its own currency (deep-audit H5); totals stay converted.
+        return prefix + settings.formatSourceCurrency(transaction.amount, currency: transaction.currency ?? settings.currency)
     }
 
     private func saveRecurringTransaction(_ schedule: RecurringTransaction) {

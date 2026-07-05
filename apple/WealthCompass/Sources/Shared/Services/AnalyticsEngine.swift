@@ -91,7 +91,15 @@ struct AnalyticsEngine {
         let filtered = data.snapshots
             .filter { $0.date >= cutoff }
             .sorted { $0.date < $1.date }
-        return filtered.map { NetWorthPoint(date: $0.date, value: $0.netWorth.doubleValue) }
+        // Reconvert each stored value from the base currency it was captured in into the current
+        // display currency (deep-audit H11). A legacy row with no captured currency is treated as
+        // already in the display currency — mirroring `displayAmount` for transactions — so it is a
+        // no-op until the load migration stamps it. Without this, changing the base currency left
+        // the whole history at the old scale while today's live point jumped to the new one.
+        return filtered.map { snapshot in
+            let value = converter.convert(snapshot.netWorth, from: snapshot.currency ?? displayCurrency, to: displayCurrency)
+            return NetWorthPoint(date: snapshot.date, value: value.doubleValue)
+        }
     }
 
     /// Display-ready net-worth series: finite values only, one point per calendar day,

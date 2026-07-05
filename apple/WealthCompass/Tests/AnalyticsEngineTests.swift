@@ -85,6 +85,106 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual(totals.totalLiquidity.doubleValue, 200, accuracy: 0.01)
     }
 
+    // MARK: - Snapshot history reconversion + backfill (deep-audit H11)
+
+    private func usdRateConverter() -> CurrencyConverter {
+        CurrencyConverter(snapshot: ExchangeRateSnapshot(
+            baseCurrency: .eur,
+            rates: ["USD": 1.25],
+            effectiveDate: Date(timeIntervalSince1970: 1_700_000_000),
+            fetchedAt: Date(timeIntervalSince1970: 1_700_000_000),
+            provider: "test"
+        ))
+    }
+
+    func testSnapshotsReconvertFromCapturedCurrencyToDisplay() {
+        // A history row captured while the base was USD (netWorth = 125 USD) must render as 100 EUR
+        // when the display currency is EUR — before the fix it was read at the raw 125 scale.
+        let usdSnap = NetWorthSnapshot(
+            date: date(2026, 6, 1), totalAssets: 125, totalLiabilities: 0,
+            netWorth: 125, liquidity: 125, investments: 0, crypto: 0, currency: .usd
+        )
+        let engine = AnalyticsEngine(
+            data: FinancialData(snapshots: [usdSnap]),
+            converter: usdRateConverter(), displayCurrency: .eur, calendar: utc, now: date(2026, 6, 22)
+        )
+        XCTAssertEqual(engine.snapshots(range: .all).first?.value ?? 0, 100, accuracy: 0.01)
+    }
+
+    func testLegacySnapshotWithoutCurrencyIsReadAsDisplayCurrency() {
+        // No captured currency → treated as already in the display currency (no conversion),
+        // mirroring `displayAmount` for legacy transactions.
+        let legacy = NetWorthSnapshot(
+            date: date(2026, 6, 1), totalAssets: 200, totalLiabilities: 0,
+            netWorth: 200, liquidity: 200, investments: 0, crypto: 0
+        )
+        XCTAssertNil(legacy.currency)
+        let engine = AnalyticsEngine(
+            data: FinancialData(snapshots: [legacy]),
+            converter: usdRateConverter(), displayCurrency: .eur, calendar: utc, now: date(2026, 6, 22)
+        )
+        XCTAssertEqual(engine.snapshots(range: .all).first?.value ?? 0, 200, accuracy: 0.01)
+    }
+
+    func testBackfillStampsLegacySnapshotsWithBaseCurrency() {
+        let legacy = NetWorthSnapshot(
+            date: date(2026, 6, 1), totalAssets: 100, totalLiabilities: 0,
+            netWorth: 100, liquidity: 100, investments: 0, crypto: 0
+        )
+        let tagged = NetWorthSnapshot(
+            date: date(2026, 6, 2), totalAssets: 100, totalLiabilities: 0,
+            netWorth: 100, liquidity: 100, investments: 0, crypto: 0, currency: .eur
+        )
+        let (migrated, changed) = FinancialData(snapshots: [legacy, tagged]).backfillingCurrencies(base: .usd)
+        XCTAssertTrue(changed)
+        XCTAssertEqual(migrated.snapshots.first(where: { $0.id == legacy.id })?.currency, .usd, "legacy row stamped with base")
+        XCTAssertEqual(migrated.snapshots.first(where: { $0.id == tagged.id })?.currency, .eur, "already-tagged row untouched")
+    }
+
+    // MARK: - Same-day snapshot collapse (deep-audit H14)
+
+    func testCollapsedByCalendarDayKeepsLatestPerDay() {
+        let older = NetWorthSnapshot(
+            date: date(2026, 6, 1), totalAssets: 100, totalLiabilities: 0,
+            netWorth: 100, liquidity: 100, investments: 0, crypto: 0, currency: .eur,
+            updatedAt: Date(timeIntervalSince1970: 1_000)
+        )
+        let newer = NetWorthSnapshot(
+            date: date(2026, 6, 1), totalAssets: 200, totalLiabilities: 0,
+            netWorth: 200, liquidity: 200, investments: 0, crypto: 0, currency: .eur,
+            updatedAt: Date(timeIntervalSince1970: 2_000)
+        )
+        let otherDay = NetWorthSnapshot(
+            date: date(2026, 6, 2), totalAssets: 300, totalLiabilities: 0,
+            netWorth: 300, liquidity: 300, investments: 0, crypto: 0, currency: .eur
+        )
+        let collapsed = [older, newer, otherDay].collapsedByCalendarDay(calendar: utc)
+        XCTAssertEqual(collapsed.count, 2, "two 6/1 rows collapse to one; 6/2 stays")
+        XCTAssertEqual(collapsed.first?.netWorth, 200, "the newer updatedAt wins for 6/1")
+        XCTAssertEqual(collapsed.last?.netWorth, 300)
+    }
+
+    func testCollapseIsDeterministicRegardlessOfInputOrder() {
+        // Two devices may hold the duplicate pair in different array orders; both must pick the same
+        // survivor (id tie-break on equal updatedAt) so they don't ping-pong on every sync.
+        let a = NetWorthSnapshot(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
+            date: date(2026, 6, 1), totalAssets: 1, totalLiabilities: 0,
+            netWorth: 1, liquidity: 1, investments: 0, crypto: 0,
+            updatedAt: Date(timeIntervalSince1970: 5_000)
+        )
+        let b = NetWorthSnapshot(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!,
+            date: date(2026, 6, 1), totalAssets: 2, totalLiabilities: 0,
+            netWorth: 2, liquidity: 2, investments: 0, crypto: 0,
+            updatedAt: Date(timeIntervalSince1970: 5_000)
+        )
+        let forward = [a, b].collapsedByCalendarDay(calendar: utc)
+        let reversed = [b, a].collapsedByCalendarDay(calendar: utc)
+        XCTAssertEqual(forward.first?.id, reversed.first?.id, "same survivor regardless of order")
+        XCTAssertEqual(forward.first?.id, b.id, "equal updatedAt → greatest id wins")
+    }
+
     func testExpensesByCategoryGroupsRanksAndExcludesIncome() {
         let now = date(2026, 6, 22)
         let data = FinancialData(transactions: [
@@ -139,16 +239,19 @@ final class AnalyticsEngineTests: XCTestCase {
     }
 
     func testSnapshotsForChartCollapsesSameDayToLatest() {
-        let now = date(2026, 6, 22)
+        // `now` is the day AFTER the same-day pair so the collapsed value (the latest, 500) is
+        // observable rather than being overwritten by the live "today" point. Gap day 6/21 carries
+        // the prior value forward (WC-#11 render-time gap fill) and 6/23 aligns with the live total.
+        let now = date(2026, 6, 23)
         let data = FinancialData(snapshots: [
             snapshot(2026, 6, 20, hour: 9, netWorth: 100),
             snapshot(2026, 6, 22, hour: 8, netWorth: 200),
             snapshot(2026, 6, 22, hour: 18, netWorth: 500)
         ])
         let points = engine(data, now: now).snapshotsForChart(range: .oneMonth, currentNetWorth: 999)
-        XCTAssertEqual(points.count, 2)
+        // 6/22's two snapshots collapse to the latest (500); 6/21 carries 6/20 forward; 6/23 = live.
+        XCTAssertEqual(points.map(\.value), [100, 100, 500, 999])
         XCTAssertEqual(points.last?.value, 999, "today aligns with live total")
-        XCTAssertEqual(points[0].value, 100)
     }
 
     func testSnapshotsForChartFiltersNonFiniteValues() {
@@ -168,7 +271,9 @@ final class AnalyticsEngineTests: XCTestCase {
             )
         ])
         let points = engine(data, now: now).snapshotsForChart(range: .oneMonth, currentNetWorth: 150)
-        XCTAssertEqual(points.map(\.value), [100, 150])
+        // The 6/21 NaN row is filtered out; the resulting gap day carries 6/20's value (100) forward
+        // (WC-#11), and 6/22 is the live total — so the non-finite value never reaches the chart.
+        XCTAssertEqual(points.map(\.value), [100, 100, 150])
     }
 
     func testSnapshotsForChartBackfillLikeSeriesHasOnePointPerDay() {

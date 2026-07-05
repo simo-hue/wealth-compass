@@ -426,6 +426,13 @@ struct NetWorthSnapshot: Identifiable, Codable, Equatable {
     var liquidity: Decimal
     var investments: Decimal
     var crypto: Decimal
+    /// The base currency the stored amounts are expressed in (deep-audit H11). `nil` = a legacy
+    /// row captured before this field existed; read as the display currency (no conversion) until
+    /// `FinanceStore.backfillingCurrencies` stamps it, at first launch after the update, with the
+    /// base currency then in effect. Kept optional with an explicit `nil` default (matching
+    /// `Transaction`/`RecurringTransaction`) so existing rows/records decode unchanged and the
+    /// memberwise init stays source-compatible with every current construction site.
+    var currency: Currency? = nil
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
 }
@@ -545,6 +552,38 @@ extension Array where Element: MergeableRecord {
             }
         }
         return merged
+    }
+}
+
+extension Array where Element == NetWorthSnapshot {
+    /// Collapses to at most one snapshot per calendar day (deep-audit H14). The app keeps a single
+    /// snapshot per day (`SnapshotEngine.appendingSnapshot` upserts same-day), so two same-day rows
+    /// with different ids only arise from a merge-import or cross-device sync — and leaving both makes
+    /// `adjustHistoricalSnapshots` apply its liquidity delta twice, double-correcting that day. The
+    /// survivor is chosen deterministically (latest `updatedAt`, then latest `date`, then greatest id)
+    /// so two devices independently collapse to the *same* row and don't ping-pong. Sorted ascending.
+    func collapsedByCalendarDay(calendar: Calendar = .current) -> [NetWorthSnapshot] {
+        var byDay: [Date: NetWorthSnapshot] = [:]
+        for snapshot in self {
+            let day = calendar.startOfDay(for: snapshot.date)
+            guard let existing = byDay[day] else {
+                byDay[day] = snapshot
+                continue
+            }
+            if snapshot.supersedesForCollapse(existing) {
+                byDay[day] = snapshot
+            }
+        }
+        return byDay.values.sorted { $0.date < $1.date }
+    }
+}
+
+private extension NetWorthSnapshot {
+    /// Total, deterministic ordering used to pick the surviving row when two share a calendar day.
+    func supersedesForCollapse(_ other: NetWorthSnapshot) -> Bool {
+        if updatedAt != other.updatedAt { return updatedAt > other.updatedAt }
+        if date != other.date { return date > other.date }
+        return id.uuidString > other.id.uuidString
     }
 }
 

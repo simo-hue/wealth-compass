@@ -551,7 +551,11 @@ final class FinanceStore: ObservableObject {
             // retries an individual 429 with backoff (M8); this spaces out the queue.
             var interRequestDelay: UInt64 = 300_000_000 // 0.3s
             for investment in data.investments {
-                if let finnhubClient {
+                // Finnhub's free tier only prices US/USD listings and its /quote reports no currency,
+                // so route only USD holdings to it (deep-audit H13). A non-USD holding goes straight
+                // to Yahoo, which returns the listing's real currency — eliminating the "assume the
+                // holding's currency" path that silently stored a USD price as e.g. EUR.
+                if let finnhubClient, investment.currency == .usd {
                     do {
                         investmentQuotes[investment.id] = try await finnhubClient.quote(for: investment.symbol)
                     } catch let marketError as MarketDataError {
@@ -576,7 +580,9 @@ final class FinanceStore: ObservableObject {
                         result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error))")
                     }
                 } else {
-                    // No Finnhub key — Yahoo (keyless) is the only source.
+                    // No Finnhub key, or a non-USD holding (deep-audit H13): Yahoo (keyless) reports
+                    // the listing's native currency, so the apply loop stores the price in the
+                    // holding's currency without assuming USD.
                     do {
                         investmentQuotes[investment.id] = try await yahooQuote(for: investment)
                     } catch {
@@ -746,7 +752,8 @@ final class FinanceStore: ObservableObject {
 
     private func appendSnapshot(settings: AppSettings) {
         let totals = calculateTotals(settings: settings)
-        data.snapshots = snapshotEngine.appendingSnapshot(to: data.snapshots, totals: totals)
+        // Tag the row with the base currency the totals are in (deep-audit H11).
+        data.snapshots = snapshotEngine.appendingSnapshot(to: data.snapshots, totals: totals, currency: settings.currency)
     }
 
     private func adjustHistoricalSnapshots(from date: Date, liquidityDelta: Decimal) {
@@ -1221,10 +1228,12 @@ extension FinancialData {
             || !crypto.isEmpty || !liabilities.isEmpty || !snapshots.isEmpty
     }
 
-    /// One-time WC-M1 migration: stamps legacy transactions/recurring schedules that predate
-    /// the per-record `currency` field (so their `currency` is `nil`) with `base`. This freezes
-    /// pre-existing cash at the base currency in effect at first launch after the update,
-    /// instead of letting it silently re-value when the user later changes their base currency.
+    /// One-time WC-M1 / deep-audit H11 migration: stamps legacy transactions, recurring schedules,
+    /// and net-worth snapshots that predate the per-record `currency` field (so their `currency` is
+    /// `nil`) with `base`. This freezes pre-existing cash **and stored history** at the base currency
+    /// in effect at first launch after the update, instead of letting them silently re-value when the
+    /// user later changes their base currency. Stamped snapshots then reconvert correctly on a base
+    /// change (`AnalyticsEngine.snapshots`) rather than being read at the wrong scale.
     func backfillingCurrencies(base: Currency) -> (data: FinancialData, didChange: Bool) {
         var copy = self
         var changed = false
@@ -1234,6 +1243,10 @@ extension FinancialData {
         }
         for index in copy.recurringTransactions.indices where copy.recurringTransactions[index].currency == nil {
             copy.recurringTransactions[index].currency = base
+            changed = true
+        }
+        for index in copy.snapshots.indices where copy.snapshots[index].currency == nil {
+            copy.snapshots[index].currency = base
             changed = true
         }
         return (copy, changed)
@@ -1253,7 +1266,11 @@ extension FinancialData {
             investments: investments.sorted { $0.currentValue > $1.currentValue },
             crypto: crypto.sorted { $0.currentValue > $1.currentValue },
             liabilities: liabilities.sorted { $0.updatedAt > $1.updatedAt },
-            snapshots: snapshots.sorted { $0.date < $1.date }
+            // Collapse any duplicate same-day snapshots (deep-audit H14) before storing. This is the
+            // shared chokepoint for replace-import, merge-import, and the remote-apply path, so a
+            // cross-device or imported duplicate can't survive to be double-corrected. Already
+            // returns rows sorted ascending by date.
+            snapshots: snapshots.collapsedByCalendarDay()
         )
     }
 }

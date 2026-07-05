@@ -20,9 +20,16 @@ extension Decimal {
 
     /// Builds a finite `Decimal` from a `Double`, rejecting NaN/Inf (WC-H1). Used when a
     /// `Double` from the network (a market price) or a parsed field must become stored money.
+    ///
+    /// The `Double` being finite is necessary but **not** sufficient: `Decimal(Double)` can itself
+    /// produce a non-finite `Decimal` (`NSDecimalNumber.notANumber`) for finite `Double`s whose
+    /// magnitude overflows `Decimal` (e.g. `1e300`). Guard the *result* too, so a huge finite quote
+    /// is rejected instead of poisoning stored/synced money (deep-audit H9).
     init?(finite value: Double) {
         guard value.isFinite else { return nil }
-        self = Decimal(value)
+        let decimal = Decimal(value)
+        guard decimal.isFinite else { return nil }
+        self = decimal
     }
 }
 
@@ -68,10 +75,18 @@ enum MoneyParser {
 extension AmountInputFormatter {
     /// `Decimal` seed string for editor fields (WC-A1). Formats the `Decimal` directly (no
     /// `Double` round-trip) so a precise stored value isn't truncated when pre-filling an editor.
-    static func string(_ value: Decimal) -> String {
+    ///
+    /// Seeds in the **user's locale** (deep-audit H7): the field is later read back by
+    /// `MoneyParser.decimal(from:)`, which parses `Locale.current`-first. Seeding with a POSIX `.`
+    /// decimal separator meant that in a comma-decimal locale (it_IT, de_DE, …) an unedited value
+    /// like `0.125` was re-parsed as `125` — a 1000× corruption on the first save of an untouched
+    /// editor. Formatting in `Locale.current` (grouping disabled to keep the parse unambiguous)
+    /// makes the seed round-trip exactly through the parser and also shows the number in the format
+    /// the user expects.
+    static func string(_ value: Decimal, locale: Locale = .current) -> String {
         guard value.isFinite, value != 0 else { return "0" }
         let formatter = NumberFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.locale = locale
         formatter.numberStyle = .decimal
         formatter.usesGroupingSeparator = false
         formatter.minimumFractionDigits = 0

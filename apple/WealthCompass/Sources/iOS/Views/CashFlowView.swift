@@ -326,7 +326,7 @@ struct CashFlowView: View {
 
                 VStack(alignment: .trailing, spacing: 9) {
                     let prefix = schedule.type == .income ? "+" : "-"
-                    Text("\(prefix)\(settings.privateCurrency(schedule.amount))")
+                    Text("\(prefix)\(settings.privateSourceCurrency(schedule.amount, currency: schedule.currency ?? settings.currency))")
                         .font(.subheadline.monospacedDigit().weight(.bold))
                         .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
 
@@ -538,7 +538,7 @@ struct CashFlowView: View {
                 Spacer()
 
                 let prefix = transaction.type == .income ? "+" : "-"
-                Text("\(prefix)\(settings.privateCurrency(transaction.amount))")
+                Text("\(prefix)\(settings.privateSourceCurrency(transaction.amount, currency: transaction.currency ?? settings.currency))")
                     .font(.subheadline.monospacedDigit().weight(.bold))
                     .foregroundStyle(transaction.type == .income ? WCColor.primary : WCColor.destructive)
             }

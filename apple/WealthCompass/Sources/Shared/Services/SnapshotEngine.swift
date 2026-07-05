@@ -17,6 +17,7 @@ struct SnapshotEngine {
     func appendingSnapshot(
         to snapshots: [NetWorthSnapshot],
         totals: FinanceTotals,
+        currency: Currency? = nil,
         now: Date = Date()
     ) -> [NetWorthSnapshot] {
         var snapshots = snapshots
@@ -27,7 +28,10 @@ struct SnapshotEngine {
             netWorth: totals.netWorth,
             liquidity: totals.totalLiquidity,
             investments: totals.totalInvestments,
-            crypto: totals.totalCrypto
+            crypto: totals.totalCrypto,
+            // Stamp the base currency the totals were converted into (deep-audit H11), so a later
+            // base-currency change reconverts this row instead of leaving it mis-scaled.
+            currency: currency
         )
 
         if let lastIndex = snapshots.indices.last, calendar.isDate(snapshots[lastIndex].date, inSameDayAs: now) {

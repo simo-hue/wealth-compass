@@ -338,6 +338,15 @@ final class AppSettings: ObservableObject {
         isPrivacyMode ? redactionToken : formatCurrency(value, sourceCurrency: sourceCurrency)
     }
 
+    /// Formats a single record's amount in **its own** currency without converting to the display
+    /// currency (deep-audit H5), redacting under privacy mode. Transaction and recurring rows use
+    /// this so a non-display-currency record shows its true amount + symbol (e.g. `$100` for a USD
+    /// row while the base is EUR) instead of the raw number wearing the display symbol (`€100`).
+    /// Aggregate totals stay converted; only per-row displays switch to source-currency formatting.
+    func privateSourceCurrency(_ value: Decimal, currency sourceCurrency: Currency) -> String {
+        isPrivacyMode ? redactionToken : formatSourceCurrency(value, currency: sourceCurrency)
+    }
+
     func privateNumber(_ value: Decimal, fractionDigits: Int = 2) -> String {
         guard !isPrivacyMode else { return redactionToken }
         return value.formatted(.number.precision(.fractionLength(0...fractionDigits)))
