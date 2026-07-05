@@ -130,7 +130,7 @@ struct AnalyticsEngine {
             }
         }
 
-        return carryingForwardDailyGaps(points)
+        return downsampled(carryingForwardDailyGaps(points))
     }
 
     /// Fills missing calendar days between the first and last point by carrying the previous day's
@@ -154,6 +154,28 @@ struct AnalyticsEngine {
             }
             guard let next = calendar.date(byAdding: .day, value: 1, to: cursor) else { break }
             cursor = next
+        }
+        return result
+    }
+
+    /// Caps the plotted point count so a multi-year `.all` range doesn't hand Swift Charts thousands
+    /// of marks (deep-audit M15/M16). A series already at/under `maxPoints` is returned unchanged so
+    /// day-level detail is kept for the short ranges; a longer span is strided, always keeping the
+    /// first and last points so the line still starts at account history and ends at today. Striding
+    /// a mostly-flat carry-forward series barely shifts the step positions, so the shape is preserved.
+    private func downsampled(_ points: [NetWorthPoint], maxPoints: Int = 365) -> [NetWorthPoint] {
+        guard points.count > maxPoints else { return points }
+        let step = Int((Double(points.count) / Double(maxPoints)).rounded(.up))
+        guard step > 1 else { return points }
+        var result: [NetWorthPoint] = []
+        result.reserveCapacity(points.count / step + 2)
+        var index = 0
+        while index < points.count {
+            result.append(points[index])
+            index += step
+        }
+        if let last = points.last, result.last?.date != last.date {
+            result.append(last)
         }
         return result
     }

@@ -14,18 +14,20 @@ problem/impact/fix detail lives in `IOS_MACOS_DEEP_AUDIT.md` (IDs `DA-H##`, `DA-
   - `fix(apple): deep-audit High money-correctness batch (H05,H07,H09,H11,H13,H14)`
   - `fix(apple): deep-audit High decode/data-loss batch (H08,H10,H12)`
   - `fix(apple): deep-audit High lock/privacy batch (H01,H02,H03,H04)`
-- **Medium tier (31 findings):** 24 implemented (Batches M1 + M4 + M5) + 2 already-fixed by the High work = **26/31**; **5 remain** — M04, M15, M16, M27 (Batch M3-rest) + M31 (deferred). Remaining ≈ **4 to implement**.
+- **Medium tier (31 findings): ✅ implementation COMPLETE** — 28 implemented (Batches M1 + M4 + M5 + M3-rest) + 2 already-fixed by the High work = **30/31**; the only remainder is **M31** (deferred feature — §5). **0 left to implement.**
 - **Low tier (62 findings):** not started; all documented as `DA-L01…L62` in `IOS_MACOS_DEEP_AUDIT.md`. Future work.
 
-### Medium — done (24), merged to `main` (⚠️ NOT yet verified on a real build)
+### Medium — done (28), merged to `main` (⚠️ NOT yet verified on a real build)
 All on `main`/`origin/main` but written on a CommandLineTools-only box — **not yet compiled/tested on
-real Xcode**. Batches M4 and M5 were adversarially compile/logic-reviewed by parallel agents. The human
-runs the build + smoke checks in root `TO_SIMO_DO.md` **asynchronously**; we do not block on them.
+real Xcode**. Batches M4, M5, and M3-rest were each adversarially compile/logic-reviewed by parallel
+agents. The human runs the build + smoke checks in root `TO_SIMO_DO.md` **asynchronously**; we do not
+block on them.
 | Batch (commit) | Findings |
 |---|---|
 | M1 (`09e7c48`,`da41371`,`a95e920`,`1855d0a`) | **M05**, **M06**, **M07**, **M08**, **M09**, **M10**, **M25**, **M26**, **M30** |
 | M4 (`d00a45e`) — money/import/correctness | **M01**, **M11**, **M13**, **M18**, **M19**, **M20**, **M21**, **M22**, **M23**, **M24**, **M28**, **M29** |
-| M5 (security) | **M02**, **M14**, **M17** |
+| M5 (`ec25a90`) — security | **M02**, **M14**, **M17** |
+| M3-rest — perf/charts | **M04**, **M15**, **M16**, **M27** |
 
 ### Medium — already fixed by the High batches (no work)
 - **M03** (macOS privacy shield) → done by Batch 3 (`MacPrivacyShield` + lock-only-on-`.background`).
@@ -35,11 +37,12 @@ runs the build + smoke checks in root `TO_SIMO_DO.md` **asynchronously**; we do 
 
 ## 2. ⚠️ IMMEDIATE NEXT ACTION
 
-Batches M1, M4, M5 are all merged to `main`/`origin/main` but **unverified on real Xcode** (built on a
-CommandLineTools-only box; M4/M5 were adversarially compile/logic-reviewed by parallel agents). The human
-runs the build + smoke checks accumulated in root `TO_SIMO_DO.md` **asynchronously** — we do **not** block.
-1. **Next implementation batch: Batch M3-rest** (§6) — M04, M15, M16, M27 (charts / perf). Fresh feature branch off `main`, same verify-then-land flow (§3), append its smoke steps to `TO_SIMO_DO.md`.
-2. After M3-rest, only **M31** remains (deferred feature — see §5).
+**All implementable Medium findings are done and merged** to `main`/`origin/main` (Batches M1, M4, M5,
+M3-rest) — **unverified on real Xcode** (built on a CommandLineTools-only box; M4/M5/M3-rest were each
+adversarially compile/logic-reviewed). The human runs the build + smoke checks accumulated in root
+`TO_SIMO_DO.md` **asynchronously**.
+1. **Nothing left to implement in the Medium tier.** The only remaining Medium item is **M31** (CloudKit push sync), intentionally **deferred** — it needs a provisioning-profile change; do it as its own focused effort (§5) and note the manual step in `TO_SIMO_DO.md`.
+2. Otherwise, the next body of work is the **Low tier** (62 findings `DA-L01…L62`), batched by theme like the Medium work (§6 tail / §"After Medium → Low tier").
 3. If the human reports a red build for any landed batch, fix on a branch off `main` and fast-forward it back (§3).
 
 ---

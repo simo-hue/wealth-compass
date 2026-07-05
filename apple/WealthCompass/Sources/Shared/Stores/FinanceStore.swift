@@ -113,6 +113,19 @@ final class FinanceStore: ObservableObject {
     /// several times per render (list rows, counts, per-keystroke filters) and the sort is
     /// O(n log n) each time; caching collapses that to one sort per data mutation.
     private var cachedSortedTransactions: (version: Int, value: [Transaction])?
+    /// Memoized chart net-worth series (deep-audit M15/M16): keyed like `cachedTotals` plus the range
+    /// and the current day (the series cutoff + today's point move at midnight). The stored value is
+    /// already downsampled for long spans.
+    private var cachedSnapshotsForChart: (version: Int, currency: Currency, rateStamp: Date?, range: TimeRange, dayStamp: Date, value: [NetWorthPoint])?
+    /// Memoized cash-flow analytics (deep-audit M27): each keyed like `cachedTotals` plus its own time
+    /// window (the month itself / the current month / the current day) so the hover/resize hot path
+    /// reuses them instead of re-filtering + re-grouping every frame.
+    private var cachedMonthlyCashFlow: (version: Int, currency: Currency, rateStamp: Date?, month: Date, value: MonthlyCashFlow)?
+    private var cachedCashFlowTrend: (version: Int, currency: Currency, rateStamp: Date?, months: Int, monthStamp: Date, value: [CashFlowMonth])?
+    private var cachedExpensesByCategory: (version: Int, currency: Currency, rateStamp: Date?, period: AnalyticsPeriod, dayStamp: Date, value: [CategoryTotal])?
+    /// Memoized monthly transaction count (deep-audit M27) — keyed by data version + month; avoids the
+    /// O(n) filter re-running on every macOS cash-flow body/resize pass (and the sorted accessor).
+    private var cachedMonthlyTransactionCount: (version: Int, month: Date, value: Int)?
     @Published private(set) var isRefreshingMarketPrices = false
     /// Per-item progress of the (serial, rate-limited) Finnhub refresh, for an "x of N"
     /// UI indicator (M7). Nil when not refreshing investments.
@@ -786,7 +799,34 @@ final class FinanceStore: ObservableObject {
     }
 
     func monthlyCashFlow(for month: Date, settings: AppSettings) -> MonthlyCashFlow {
-        analytics(settings).monthlyCashFlow(for: month)
+        let rateStamp = settings.exchangeRateSnapshot?.fetchedAt
+        let calendar = Calendar.current
+        // Normalize the key to the month itself: callers pass `Date()`, which would otherwise never
+        // hit the cache; `monthlyCashFlow` groups by `.month` so any date in the month is equivalent.
+        let monthKey = calendar.date(from: calendar.dateComponents([.year, .month], from: month)) ?? month
+        if let cache = cachedMonthlyCashFlow,
+           cache.version == dataVersion,
+           cache.currency == settings.currency,
+           cache.rateStamp == rateStamp,
+           cache.month == monthKey {
+            return cache.value
+        }
+        let result = analytics(settings).monthlyCashFlow(for: month)
+        cachedMonthlyCashFlow = (dataVersion, settings.currency, rateStamp, monthKey, result)
+        return result
+    }
+
+    func monthlyTransactionCount(for month: Date) -> Int {
+        let calendar = Calendar.current
+        let monthKey = calendar.date(from: calendar.dateComponents([.year, .month], from: month)) ?? month
+        if let cache = cachedMonthlyTransactionCount, cache.version == dataVersion, cache.month == monthKey {
+            return cache.value
+        }
+        // Filter `data.transactions` directly (not the sorted `transactions` accessor) — a count
+        // needs no ordering, so this avoids the O(n log n) sort on every cash-flow body pass (M27).
+        let count = data.transactions.filter { calendar.isDate($0.date, equalTo: month, toGranularity: .month) }.count
+        cachedMonthlyTransactionCount = (dataVersion, monthKey, count)
+        return count
     }
 
     func snapshots(range: TimeRange) -> [NetWorthPoint] {
@@ -794,16 +834,57 @@ final class FinanceStore: ObservableObject {
     }
 
     func snapshotsForChart(range: TimeRange, settings: AppSettings) -> [NetWorthPoint] {
+        let rateStamp = settings.exchangeRateSnapshot?.fetchedAt
+        // The series' range cutoff and today's live point move at midnight, so key on the day too.
+        let dayStamp = Calendar.current.startOfDay(for: Date())
+        if let cache = cachedSnapshotsForChart,
+           cache.version == dataVersion,
+           cache.currency == settings.currency,
+           cache.rateStamp == rateStamp,
+           cache.range == range,
+           cache.dayStamp == dayStamp {
+            return cache.value
+        }
         let totals = calculateTotals(settings: settings)
-        return analytics(settings).snapshotsForChart(range: range, currentNetWorth: totals.netWorth.doubleValue)
+        let result = analytics(settings).snapshotsForChart(range: range, currentNetWorth: totals.netWorth.doubleValue)
+        cachedSnapshotsForChart = (dataVersion, settings.currency, rateStamp, range, dayStamp, result)
+        return result
     }
 
     func cashFlowTrend(months: Int = 6, settings: AppSettings) -> [CashFlowMonth] {
-        analytics(settings).cashFlowTrend(months: months)
+        let rateStamp = settings.exchangeRateSnapshot?.fetchedAt
+        let calendar = Calendar.current
+        // The rolling window ends at the current month, so include it in the key (data changes within
+        // the month already bump dataVersion; this catches a month rollover with no data change).
+        let monthStamp = calendar.date(from: calendar.dateComponents([.year, .month], from: Date())) ?? Date()
+        if let cache = cachedCashFlowTrend,
+           cache.version == dataVersion,
+           cache.currency == settings.currency,
+           cache.rateStamp == rateStamp,
+           cache.months == months,
+           cache.monthStamp == monthStamp {
+            return cache.value
+        }
+        let result = analytics(settings).cashFlowTrend(months: months)
+        cachedCashFlowTrend = (dataVersion, settings.currency, rateStamp, months, monthStamp, result)
+        return result
     }
 
     func expensesByCategory(period: AnalyticsPeriod, settings: AppSettings) -> [CategoryTotal] {
-        analytics(settings).expensesByCategory(period: period)
+        let rateStamp = settings.exchangeRateSnapshot?.fetchedAt
+        // The period windows (last 7/30 days, YTD…) are relative to today, so include the day.
+        let dayStamp = Calendar.current.startOfDay(for: Date())
+        if let cache = cachedExpensesByCategory,
+           cache.version == dataVersion,
+           cache.currency == settings.currency,
+           cache.rateStamp == rateStamp,
+           cache.period == period,
+           cache.dayStamp == dayStamp {
+            return cache.value
+        }
+        let result = analytics(settings).expensesByCategory(period: period)
+        cachedExpensesByCategory = (dataVersion, settings.currency, rateStamp, period, dayStamp, result)
+        return result
     }
 
     func assetAllocation(settings: AppSettings) -> [AllocationSlice] {

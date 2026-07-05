@@ -212,7 +212,7 @@ struct MacCashFlowView: View {
     private var summaryCards: some View {
         let cashFlow = finance.monthlyCashFlow(for: Date(), settings: settings)
         let totals = finance.calculateTotals(settings: settings)
-        let monthlyTransactionsCount = finance.transactions.filter { Calendar.current.isDate($0.date, equalTo: Date(), toGranularity: .month) }.count
+        let monthlyTransactionsCount = finance.monthlyTransactionCount(for: Date())
 
         return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
             MetricCard(
@@ -283,7 +283,7 @@ struct MacCashFlowView: View {
                 } else {
                     Chart(trend) { month in
                         BarMark(
-                            x: .value("Month", month.monthLabel),
+                            x: .value("Month", month.monthKey),
                             y: .value("Amount", month.income)
                         )
                         .foregroundStyle(WCColor.primary.gradient)
@@ -294,7 +294,7 @@ struct MacCashFlowView: View {
                         .accessibilityValue(Text(settings.privateCurrency(month.income)))
 
                         BarMark(
-                            x: .value("Month", month.monthLabel),
+                            x: .value("Month", month.monthKey),
                             y: .value("Amount", month.expense)
                         )
                         .foregroundStyle(WCColor.destructive.opacity(0.78).gradient)
@@ -305,6 +305,19 @@ struct MacCashFlowView: View {
                         .accessibilityValue(Text(settings.privateCurrency(month.expense)))
                     }
                     .chartLegend(.hidden)
+                    .chartXAxis {
+                        // Bars are keyed on the unique monthKey ("yyyy-MM") so same-month-different-year
+                        // columns stay distinct on the 12M range (deep-audit M04); map back to the short
+                        // "MMM" label for the visible axis.
+                        AxisMarks { value in
+                            AxisValueLabel {
+                                if let key = value.as(String.self),
+                                   let month = trend.first(where: { $0.monthKey == key }) {
+                                    Text(month.monthLabel)
+                                }
+                            }
+                        }
+                    }
                     .chartOverlay { proxy in
                         GeometryReader { geometry in
                             Rectangle().fill(.clear).contentShape(Rectangle())
@@ -315,9 +328,9 @@ struct MacCashFlowView: View {
                                         if let plotFrame = proxy.plotFrame {
                                             let frame = geometry[plotFrame]
                                             let x = location.x - frame.origin.x
-                                            if let monthLabel: String = proxy.value(atX: x) {
+                                            if let monthKey: String = proxy.value(atX: x) {
                                                 withAnimation(.easeInOut(duration: 0.15)) {
-                                                    hoveredCashFlowMonth = trend.first { $0.monthLabel == monthLabel }
+                                                    hoveredCashFlowMonth = trend.first { $0.monthKey == monthKey }
                                                 }
                                             }
                                         }

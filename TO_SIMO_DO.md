@@ -103,4 +103,16 @@ M28 needs a corrupt local DB to trigger). The rest are worth an eyeball:_
   **new** catalog entry; Xcode extracts it on build and it shows in English until translated in
   `Localizable.xcstrings`. Not blocking — add translations when convenient.
 
+### Batch M3-rest (perf / charts) — landed on `main`, not yet built
+- [ ] **M04** (macOS, the visible one) — On the Cash Flow tab set the range to **12 months** during a
+  month when the window straddles two years (i.e. any month except December). Bars for the two
+  same-named months (e.g. two "Jul") must be **distinct columns**, hovering each must show **that**
+  month's income/expense/net (not the other year's), and the x-axis must still read "Jul", "Aug", …
+- [ ] **M15/M16** (perf, both platforms) — With a **multi-year** account (import old snapshots), open
+  the dashboard net-worth chart at range **All**. It should render/scroll smoothly (no jank) and not
+  rebuild on every interaction. Shorter ranges (1W…1Y) still show daily detail.
+- [ ] **M27** (perf, both platforms) — Hover/drag across the expenses pie and (macOS) resize the
+  window: no stutter. Then add a transaction and confirm the cash-flow numbers update (cache
+  invalidates on data change). _Perf-only; correctness is covered by the build + tests._
+
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->

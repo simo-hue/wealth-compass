@@ -51,6 +51,24 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual(points.map(\.value), [100, 100, 100, 100, 200], "gap days carry the 18th's value forward (flat), not interpolated")
     }
 
+    /// deep-audit M15/M16: a multi-year span must be downsampled so Swift Charts isn't handed
+    /// thousands of daily marks, while the first (history start) and last (today) points survive.
+    func testSnapshotsForChartDownsamplesLongSpans() {
+        let start = date(2023, 1, 1)
+        let end = date(2026, 1, 1) // ~1096 calendar days → >365 gap-filled points
+        let snaps = [
+            NetWorthSnapshot(date: start, totalAssets: 100, totalLiabilities: 0, netWorth: 100, liquidity: 100, investments: 0, crypto: 0),
+            NetWorthSnapshot(date: end, totalAssets: 500, totalLiabilities: 0, netWorth: 500, liquidity: 500, investments: 0, crypto: 0)
+        ]
+        let points = engine(FinancialData(snapshots: snaps), now: end)
+            .snapshotsForChart(range: .all, currentNetWorth: 500)
+
+        XCTAssertGreaterThan(points.count, 1)
+        XCTAssertLessThanOrEqual(points.count, 366, "long spans are strided down to ~365 points")
+        XCTAssertEqual(points.first?.value, 100, "history start preserved")
+        XCTAssertEqual(points.last?.value, 500, "today preserved")
+    }
+
     /// WC-#16: the net-worth chart y-domain never traps on non-finite input (a NaN bound would crash
     /// the `ClosedRange`), and degrades to a safe default for empty / all-non-finite series.
     func testChartYDomainIsFiniteSafe() {
