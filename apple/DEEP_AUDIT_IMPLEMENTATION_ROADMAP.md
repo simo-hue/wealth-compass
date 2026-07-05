@@ -17,8 +17,10 @@ problem/impact/fix detail lives in `IOS_MACOS_DEEP_AUDIT.md` (IDs `DA-H##`, `DA-
 - **Medium tier (31 findings):** 9 implemented + 2 already-fixed by the High work = **11/31**; **20 remain** (one of which, M31, is deferred). Remaining ≈ **19 to implement**.
 - **Low tier (62 findings):** not started; all documented as `DA-L01…L62` in `IOS_MACOS_DEEP_AUDIT.md`. Future work.
 
-### Medium — done (9), on branch `fix/medium-a11y-privacy` (NOT yet built or merged)
-Branch has 4 commits off `main`, **not pushed to origin**, **not yet verified on a real build**:
+### Medium — done (9), merged to `main` (⚠️ NOT yet verified on a real build)
+These 9 Medium fixes are on `main`/`origin/main` but were written on a CommandLineTools-only box and
+**have not been compiled or tested on real Xcode yet** — building `main` and fixing any compile errors
+is the very first task (see §2):
 | Commit | Findings |
 |---|---|
 | `09e7c48` | **M05** (macOS card VoiceOver), **M07** (segmented-picker a11y+keyboard), **M30** (privacy-mode share-% redaction) |
@@ -34,10 +36,11 @@ Branch has 4 commits off `main`, **not pushed to origin**, **not yet verified on
 
 ## 2. ⚠️ IMMEDIATE NEXT ACTION
 
-The 9 Medium fixes on `fix/medium-a11y-privacy` are **implemented but unverified**. First:
-1. Check out `fix/medium-a11y-privacy` and **build both schemes + run the test suite** (commands in §4). Fix any compile errors (these were written on a CommandLineTools-only box — see §4).
-2. Smoke-test the UI-affecting ones (M05/M07 VoiceOver, M30 Privacy Mode, M08/M09 editors).
-3. When green, **land the branch on `main`** using the clean flow in §3, then continue with the next batch (§6, start with **M4**).
+The 9 Medium fixes are already merged to `main` but are **unverified** (written without a real build). First:
+1. On `main`, **build both schemes + run the test suite** (commands in §4). These fixes were written on a CommandLineTools-only box — expect the possibility of a compile error.
+2. If anything fails to build, fix it on a branch off `main` (`fix/medium-build`), get a green build/test, then land it back on `main` (§3). If it builds clean, no action needed.
+3. Smoke-test the UI-affecting ones (M05/M07 VoiceOver, M30 Privacy Mode, M08/M09 editors).
+4. Then continue with the next batch on a fresh feature branch (§6, start with **M4**).
 
 ---
 
