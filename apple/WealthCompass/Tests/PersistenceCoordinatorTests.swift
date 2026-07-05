@@ -218,9 +218,9 @@ private final class InMemoryPersistence: FinancePersistence, @unchecked Sendable
         return stored
     }
 
-    func load() throws -> FinancialData? {
+    func load() throws -> FinancePersistenceLoad? {
         lock.lock(); defer { lock.unlock() }
-        return stored
+        return stored.map { FinancePersistenceLoad(data: $0) }
     }
 
     func save(_ data: FinancialData) throws {
@@ -253,9 +253,9 @@ private final class ControllablePersistence: FinancePersistence, @unchecked Send
         return stored
     }
 
-    func load() throws -> FinancialData? {
+    func load() throws -> FinancePersistenceLoad? {
         lock.lock(); defer { lock.unlock() }
-        return stored
+        return stored.map { FinancePersistenceLoad(data: $0) }
     }
 
     func save(_ data: FinancialData) throws {

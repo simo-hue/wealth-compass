@@ -1,9 +1,22 @@
 import Foundation
 
+/// Result of loading the local DB. Carries the decoded data plus any record keys that were present
+/// in the file but couldn't be decoded and were skipped (deep-audit H08), so the sync layer can
+/// keep those records out of the delete/tombstone path instead of losing them everywhere.
+struct FinancePersistenceLoad: Sendable {
+    let data: FinancialData
+    let skippedRecordKeys: [CloudSyncRecordKey]
+
+    init(data: FinancialData, skippedRecordKeys: [CloudSyncRecordKey] = []) {
+        self.data = data
+        self.skippedRecordKeys = skippedRecordKeys
+    }
+}
+
 protocol FinancePersistence: Sendable {
     var locationDescription: String { get }
 
-    func load() throws -> FinancialData?
+    func load() throws -> FinancePersistenceLoad?
     func save(_ data: FinancialData) throws
     func clear() throws
 }
@@ -42,16 +55,20 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
 
     }
 
-    func load() throws -> FinancialData? {
+    func load() throws -> FinancePersistenceLoad? {
         try migrateLegacyFileIfNeeded()
         guard fileManager.fileExists(atPath: storageURL.path) else { return nil }
         let sourceData = try Data(contentsOf: storageURL)
         let decoded = try FinanceJSONCoding.decodeFinancialData(from: sourceData)
-        if decoded.wasMigrated {
+        // Only rewrite the file for a legacy migration when nothing was skipped (H08): the lossy
+        // decode drops undecodable records from `decoded.data`, so persisting it here would erase
+        // those records from disk. Leaving the file untouched preserves them for a future app
+        // version that can read them; the harmless date-healing migration just re-runs next load.
+        if decoded.wasMigrated && decoded.skippedRecordKeys.isEmpty {
             try createMigrationBackupIfNeeded(sourceData)
             try write(decoded.data)
         }
-        return decoded.data
+        return FinancePersistenceLoad(data: decoded.data, skippedRecordKeys: decoded.skippedRecordKeys)
     }
 
     func save(_ data: FinancialData) throws {

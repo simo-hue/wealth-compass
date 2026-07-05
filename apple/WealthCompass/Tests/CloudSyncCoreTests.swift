@@ -148,6 +148,55 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(decoded.data.transactions.first?.updatedAt, fixedDate)
     }
 
+    // deep-audit H10: an explicit JSON `null` (not just an absent key) on a non-optional Date field
+    // used to fail the whole-file decode; the migration must heal it like an absent value.
+    func testLegacyJSONMigrationHealsExplicitNullUpdatedAt() throws {
+        let transaction = makeTransaction(
+            id: UUID(uuidString: "41000000-0000-0000-0000-000000000041")!,
+            amount: 75
+        )
+        let encoded = try FinanceJSONCoding.encode(FinancialData(transactions: [transaction]))
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        var transactions = try XCTUnwrap(root["transactions"] as? [[String: Any]])
+        transactions[0]["updatedAt"] = NSNull()  // explicit null, not a missing key
+        root["transactions"] = transactions
+        let legacyData = try JSONSerialization.data(withJSONObject: root)
+
+        let decoded = try FinanceJSONCoding.decodeFinancialData(from: legacyData)
+
+        XCTAssertTrue(decoded.wasMigrated)
+        XCTAssertEqual(decoded.data.transactions.count, 1, "the null-updatedAt row must not fail the whole decode")
+        XCTAssertEqual(decoded.data.transactions.first?.updatedAt, fixedDate)
+    }
+
+    // deep-audit H08: one undecodable record (an unknown enum value here) must not zero the whole
+    // dataset — it is skipped, the rest load, and its key is reported so the sync layer can preserve it.
+    func testLossyDecodeSkipsUndecodableRecordAndReportsKey() throws {
+        let goodID = UUID(uuidString: "42000000-0000-0000-0000-000000000042")!
+        let badID = UUID(uuidString: "43000000-0000-0000-0000-000000000043")!
+        let encoded = try FinanceJSONCoding.encode(FinancialData(transactions: [
+            makeTransaction(id: goodID, amount: 10),
+            makeTransaction(id: badID, amount: 20)
+        ]))
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        var transactions = try XCTUnwrap(root["transactions"] as? [[String: Any]])
+        let badIndex = try XCTUnwrap(transactions.firstIndex {
+            ($0["id"] as? String)?.lowercased() == badID.uuidString.lowercased()
+        })
+        transactions[badIndex]["type"] = "teleportation"  // unknown TransactionType → element decode fails
+        root["transactions"] = transactions
+        let corruptData = try JSONSerialization.data(withJSONObject: root)
+
+        let decoded = try FinanceJSONCoding.decodeFinancialData(from: corruptData)
+
+        XCTAssertEqual(decoded.data.transactions.map(\.id), [goodID], "the good record still loads")
+        XCTAssertEqual(
+            decoded.skippedRecordKeys,
+            [CloudSyncRecordKey(type: .transaction, id: badID)],
+            "the undecodable record's key is reported for sync-preservation"
+        )
+    }
+
     @MainActor
     func testStopDuringPendingCloudSyncStartPreventsLateEngineCreation() async {
         let accountStatusGate = AccountStatusGate()
@@ -412,6 +461,60 @@ final class CloudSyncCoreTests: XCTestCase {
             XCTAssertEqual(winnerHashOnA, winnerHashOnB, "devices diverged for (\(p1), \(p2))")
             XCTAssertNotEqual(decisionOnA, .identical, "distinct payloads must not resolve identical")
         }
+    }
+
+    // MARK: - deep-audit H12: bootstrap tombstone vs local edit
+
+    private func resurrectionPending() -> CloudSyncPendingMutation {
+        .save(modifiedAt: Date(), revision: UUID(), origin: .localChange, allowsResurrection: true)
+    }
+
+    /// A local edit made AFTER the remote deletion is a later write and must survive (resurrect).
+    func testTombstoneKeepsLocalEditNewerThanDeletion() {
+        let deletedAt = Date(timeIntervalSince1970: 1_000)
+        let newerLocal = bootstrapSnapshot(payload: "local", updatedAt: Date(timeIntervalSince1970: 2_000))
+        XCTAssertEqual(
+            CloudKitSyncService.tombstoneBootstrapDecision(pending: nil, local: newerLocal, remoteDeletedAt: deletedAt),
+            .keepLocal
+        )
+    }
+
+    /// A deletion newer than the local record wins.
+    func testTombstoneAppliesWhenDeletionNewerThanLocal() {
+        let deletedAt = Date(timeIntervalSince1970: 2_000)
+        let olderLocal = bootstrapSnapshot(payload: "local", updatedAt: Date(timeIntervalSince1970: 1_000))
+        XCTAssertEqual(
+            CloudKitSyncService.tombstoneBootstrapDecision(pending: nil, local: olderLocal, remoteDeletedAt: deletedAt),
+            .applyDelete
+        )
+    }
+
+    /// A pending save that opted into resurrection wins even when older than the deletion (existing behaviour).
+    func testTombstoneResurrectionPendingAlwaysKeepsLocal() {
+        let deletedAt = Date(timeIntervalSince1970: 5_000)
+        let olderLocal = bootstrapSnapshot(payload: "local", updatedAt: Date(timeIntervalSince1970: 1_000))
+        XCTAssertEqual(
+            CloudKitSyncService.tombstoneBootstrapDecision(pending: resurrectionPending(), local: olderLocal, remoteDeletedAt: deletedAt),
+            .keepLocal
+        )
+    }
+
+    /// Post-bootstrap there is no local snapshot, so remote deletions stay authoritative.
+    func testTombstoneAppliesWhenNoLocalRecord() {
+        XCTAssertEqual(
+            CloudKitSyncService.tombstoneBootstrapDecision(pending: nil, local: nil, remoteDeletedAt: Date()),
+            .applyDelete
+        )
+    }
+
+    /// A tie (local.updatedAt == deletedAt) is not strictly newer → the deletion applies (deterministic).
+    func testTombstoneEqualTimestampAppliesDelete() {
+        let when = Date(timeIntervalSince1970: 3_000)
+        let local = bootstrapSnapshot(payload: "local", updatedAt: when)
+        XCTAssertEqual(
+            CloudKitSyncService.tombstoneBootstrapDecision(pending: nil, local: local, remoteDeletedAt: when),
+            .applyDelete
+        )
     }
 
     /// #15 step 2: resolution for a non-deleted save conflict. The headline property is

@@ -963,7 +963,11 @@ final class FinanceStore: ObservableObject {
     @discardableResult
     private func load() -> [CloudSyncRecordKey: CloudSyncRecordSnapshot] {
         do {
-            let loadedData = try persistence.load() ?? FinancialData()
+            let loaded = try persistence.load()
+            let loadedData = loaded?.data ?? FinancialData()
+            // Deep-audit H08: keys the decode had to skip (undecodable records) — passed to the
+            // inventory reconcile below so they're preserved on the server, not tombstoned.
+            let skippedRecordKeys = loaded?.skippedRecordKeys ?? []
             // WC-M1 one-time migration: stamp legacy currency-less transactions/schedules with
             // the base currency so old cash stays anchored to it instead of floating when the
             // user later changes their base currency. Records below are taken from the original
@@ -979,7 +983,7 @@ final class FinanceStore: ObservableObject {
 
             do {
                 let records = try loadedData.cloudSyncRecords()
-                try syncMetadataStore.reconcileLocalInventory(records)
+                try syncMetadataStore.reconcileLocalInventory(records, skipped: skippedRecordKeys)
                 return records
             } catch {
                 iCloudSyncError = AppLocalization.string(

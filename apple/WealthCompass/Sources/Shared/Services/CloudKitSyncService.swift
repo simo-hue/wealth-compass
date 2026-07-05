@@ -448,9 +448,21 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
         read().records[key.storageKey]?.pending?.revision
     }
 
-    func reconcileLocalInventory(_ records: [CloudSyncRecordKey: CloudSyncRecordSnapshot]) throws {
+    func reconcileLocalInventory(
+        _ records: [CloudSyncRecordKey: CloudSyncRecordSnapshot],
+        skipped skippedRecordKeys: [CloudSyncRecordKey] = []
+    ) throws {
         try update { metadata in
-            let hashes = Dictionary(uniqueKeysWithValues: records.map { ($0.key.storageKey, $0.value.payloadHash) })
+            var hashes = Dictionary(uniqueKeysWithValues: records.map { ($0.key.storageKey, $0.value.payloadHash) })
+            // Deep-audit H08: records the local decode had to skip are absent from `records`, but the
+            // record still exists on the server. Carry their previously-known hashes forward so they
+            // stay in `knownLocalHashes` — this keeps them out of the "known locally but gone now →
+            // delete" loop below, so a locally-unreadable record is never tombstoned for every device.
+            for key in skippedRecordKeys {
+                if let existing = metadata.knownLocalHashes[key.storageKey] {
+                    hashes[key.storageKey] = existing
+                }
+            }
             let now = Date()
 
             for record in records.values {
@@ -1169,20 +1181,36 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             let localSnapshot = localRecords[key]
 
             if remoteIsDeleted {
-                let shouldKeepLocalSave: Bool
-                if case .save(_, _, _, let allowsResurrection)? = state.pending {
-                    shouldKeepLocalSave = allowsResurrection
-                } else {
-                    shouldKeepLocalSave = false
-                }
+                let remoteDeletedAt = record["deletedAt"] as? Date ?? record.modificationDate ?? Date()
+                let resolution = Self.tombstoneBootstrapDecision(
+                    pending: state.pending,
+                    local: localSnapshot,
+                    remoteDeletedAt: remoteDeletedAt
+                )
 
-                if shouldKeepLocalSave {
+                switch resolution {
+                case .keepLocal:
+                    // Local state wins — a pending resurrection save, or (deep-audit H12) a local
+                    // edit newer than the deletion. Clear the tombstone and make sure a save is
+                    // queued so the survivor re-uploads and clears the server tombstone.
                     state.isTombstone = false
+                    state.deletedAt = nil
+                    if state.pending == nil, let localSnapshot {
+                        // Recency-only resurrection: no pending mutation existed, so synthesize one —
+                        // otherwise the record would be kept only in local metadata and never re-sent.
+                        state.pending = .save(
+                            modifiedAt: localSnapshot.updatedAt,
+                            revision: UUID(),
+                            origin: .localChange,
+                            allowsResurrection: true
+                        )
+                        metadata.knownLocalHashes[key.storageKey] = localSnapshot.payloadHash
+                    }
                     pendingToRequeue.insert(key)
-                } else {
+                case .applyDelete:
                     state.pending = nil
                     state.isTombstone = true
-                    state.deletedAt = record["deletedAt"] as? Date ?? record.modificationDate ?? Date()
+                    state.deletedAt = remoteDeletedAt
                     metadata.knownLocalHashes.removeValue(forKey: key.storageKey)
                     mutations.append(
                         CloudSyncRemoteMutation(
@@ -1623,6 +1651,33 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             }
             return local.payloadHash > remote.payloadHash ? .local : .remote
         }
+    }
+
+    enum TombstoneResolution: Equatable {
+        case applyDelete  // the remote deletion wins — remove the record locally
+        case keepLocal    // local state wins — clear the tombstone and re-upload the record
+    }
+
+    /// Resolves a fetched remote deletion (tombstone) against local state during the bootstrap
+    /// merge (deep-audit H12). Previously a remote tombstone unconditionally deleted the local
+    /// record unless a pending save opted into resurrection — silently dropping a local edit made
+    /// after the deletion. This mirrors `bootstrapDecision`'s last-writer-wins: a local record
+    /// whose `updatedAt` is strictly newer than the remote `deletedAt` is a later write and
+    /// survives; everything else applies the deletion. `local` is `nil` post-bootstrap (local
+    /// records aren't loaded then), so this reduces to `.applyDelete` and remote deletions stay
+    /// authoritative once the first merge is done.
+    static func tombstoneBootstrapDecision(
+        pending: CloudSyncPendingMutation?,
+        local: CloudSyncRecordSnapshot?,
+        remoteDeletedAt: Date
+    ) -> TombstoneResolution {
+        if case .save(_, _, _, let allowsResurrection)? = pending, allowsResurrection {
+            return .keepLocal
+        }
+        if let local, local.updatedAt > remoteDeletedAt {
+            return .keepLocal
+        }
+        return .applyDelete
     }
 
     enum ConflictAction: Equatable {
