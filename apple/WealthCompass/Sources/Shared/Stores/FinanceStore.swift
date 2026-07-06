@@ -604,17 +604,17 @@ final class FinanceStore: ObservableObject {
                                 investmentQuotes[investment.id] = try await yahooQuote(for: investment)
                             } catch {
                                 result.failedInvestments.append(
-                                    "\(investment.symbol): \(Self.errorMessage(marketError)) \(Self.errorMessage(error))"
+                                    "\(investment.symbol): \(Self.errorMessage(marketError, appLanguage: settings.appLanguage)) \(Self.errorMessage(error, appLanguage: settings.appLanguage))"
                                 )
                             }
                         case .rateLimited:
-                            result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError))")
+                            result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError, appLanguage: settings.appLanguage))")
                             interRequestDelay = min(interRequestDelay * 3, 3_000_000_000) // cap 3s
                         default:
-                            result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError))")
+                            result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError, appLanguage: settings.appLanguage))")
                         }
                     } catch {
-                        result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error))")
+                        result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error, appLanguage: settings.appLanguage))")
                     }
                 } else {
                     // No Finnhub key, or a non-USD holding (deep-audit H13): Yahoo (keyless) reports
@@ -623,7 +623,7 @@ final class FinanceStore: ObservableObject {
                     do {
                         investmentQuotes[investment.id] = try await yahooQuote(for: investment)
                     } catch {
-                        result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error))")
+                        result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error, appLanguage: settings.appLanguage))")
                     }
                 }
                 completed += 1
@@ -683,7 +683,7 @@ final class FinanceStore: ObservableObject {
                 } catch {
                     result.failedCrypto = data.crypto
                         .filter { lookups[$0.id] != nil }
-                        .map { "\($0.symbol): \(Self.errorMessage(error))" }
+                        .map { "\($0.symbol): \(Self.errorMessage(error, appLanguage: settings.appLanguage))" }
                 }
             }
         } else if !data.crypto.isEmpty {
@@ -1328,8 +1328,14 @@ final class FinanceStore: ObservableObject {
         }
     }
 
-    private static func errorMessage(_ error: Error) -> String {
-        (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+    // L26: resolve app-defined errors through their appLanguage-aware description so market-refresh
+    // failure summaries follow the in-app language instead of the system locale.
+    private static func errorMessage(_ error: Error, appLanguage: String?) -> String {
+        if let error = error as? MarketDataError { return error.localizedDescription(appLanguage: appLanguage) }
+        if let error = error as? ExchangeRateError { return error.localizedDescription(appLanguage: appLanguage) }
+        if let error = error as? FinanceImportError { return error.localizedDescription(appLanguage: appLanguage) }
+        if let error = error as? CloudSyncError { return error.localizedDescription(appLanguage: appLanguage) }
+        return (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
     }
 
     private func registerImportedCategories(from importedData: FinancialData, settings: AppSettings) -> Int {

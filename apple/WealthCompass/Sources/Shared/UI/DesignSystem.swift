@@ -172,11 +172,29 @@ struct PageHeader<Trailing: View>: View {
 }
 
 struct MetricCard: View {
-    let title: LocalizedStringKey
+    private let titleText: Text
     let value: String
     let systemImage: String
     var accent: Color = WCColor.primary
     var detail: LocalizedStringKey? = nil
+
+    init(title: LocalizedStringKey, value: String, systemImage: String, accent: Color = WCColor.primary, detail: LocalizedStringKey? = nil) {
+        self.titleText = Text(title)
+        self.value = value
+        self.systemImage = systemImage
+        self.accent = accent
+        self.detail = detail
+    }
+
+    // L19: verbatim-title initializer for already-resolved strings (e.g. `settings.localized(...)`),
+    // so SwiftUI's `Text` doesn't perform a *second* catalog lookup on an already-translated string.
+    init(verbatimTitle: String, value: String, systemImage: String, accent: Color = WCColor.primary, detail: LocalizedStringKey? = nil) {
+        self.titleText = Text(verbatim: verbatimTitle)
+        self.value = value
+        self.systemImage = systemImage
+        self.accent = accent
+        self.detail = detail
+    }
 
     var body: some View {
         FinanceCard {
@@ -194,7 +212,7 @@ struct MetricCard: View {
                         .shadow(color: accent.opacity(0.65), radius: 4)
                 }
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
+                    titleText
                         .font(.caption.weight(.medium))
                         .foregroundStyle(WCColor.textTertiary)
                     Text(value)

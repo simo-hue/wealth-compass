@@ -184,4 +184,29 @@ _Batch 5 (concurrency / cleanup) — logic/latent, covered by build:_
 - [ ] _New catalog strings: "Change Currency", "Convert Amounts", "Keep Numbers", "Convert the entered
   amounts from %@ to %@ at today's exchange rate…"._
 
+### Batch T2-2 (localization: L19, L21, L26, L41, L49) — landed, not yet built
+_Mostly logic/localization; verify with an **in-app language different from the system language**
+(Settings → set app language to e.g. Italian on an English device):_
+- [ ] **L26** — Trigger an **import failure** (import a non-backup file) with app language ≠ system language:
+  the alert **title and body must both be in the app language** (previously the body was system-locale English).
+- [ ] **L49** — With app language set to a locale using different separators (e.g. Italian: "1.234,56"),
+  a recurring-transaction **notification** amount must use those separators/symbol placement, matching the sentence.
+- [ ] **L19** (macOS) — Crypto + Investments overview "Status • N Coins/Sectors" cards still render correctly
+  (no change expected; this removed a redundant double-localization). Also check no `Text` shows a raw key.
+- [ ] **L41** — Force an **exchange-rate refresh failure** (airplane mode + stale rates): the failure message
+  reads as one coherent sentence (the "…continue using the last cached rates." clause is no longer half-English
+  in non-English locales). _New English-fallback keys until translated._
+- [ ] **L21** — In a non-English app language, the "future <income/expense> transactions" / "No custom
+  <type> categories yet." hints lowercase correctly (Turkish especially). _Known residual: German-style noun
+  capitalization isn't fixed by this (would need full-sentence templates + translations) — CHECKPOINT QUESTION below._
+
+**⚑ Checkpoint decision (L21):** fully fixing noun capitalization (e.g. German "Einkommen" mid-sentence)
+needs per-type/per-frequency **full-sentence catalog keys + ~40-language translations**, and would regress the
+currently-translated `%@`-frame strings to English until re-translated. I did the safe, no-regression
+locale-aware-casing fix. **Want the full-template version too?** (It's a translation-content investment.)
+
+**⚑ Translation follow-up:** new English-fallback strings added this push (need translation when convenient):
+L13 (Unsaved API Key / Save & Continue / Discard / message), L23 (Change Currency / Convert Amounts /
+Keep Numbers / message), L41 (the two "…continue using …" full sentences). M17's earlier warning string too.
+
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->

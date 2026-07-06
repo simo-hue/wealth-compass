@@ -61,10 +61,12 @@ struct ExchangeRateRefreshResult: Equatable {
         }
 
         if let errorMessage {
-            let activeRates = snapshot == nil
-                ? AppLocalization.string("the built-in offline fallback rates", appLanguage: appLanguage)
-                : AppLocalization.string("the last cached rates", appLanguage: appLanguage)
-            return AppLocalization.string("\(errorMessage)\n\nWealth Compass will continue using \(activeRates).", appLanguage: appLanguage)
+            // L41: keep the fallback clause inside the format string as one coherent translation unit,
+            // instead of splicing a separately-localized fragment into a localized frame (the fragment
+            // was translated in only 6 locales, leaving a half-English sentence in 28 others).
+            return snapshot == nil
+                ? AppLocalization.string("\(errorMessage)\n\nWealth Compass will continue using the built-in offline fallback rates.", appLanguage: appLanguage)
+                : AppLocalization.string("\(errorMessage)\n\nWealth Compass will continue using the last cached rates.", appLanguage: appLanguage)
         }
 
         if let snapshot {

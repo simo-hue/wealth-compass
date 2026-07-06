@@ -117,7 +117,8 @@ struct MacCryptoView: View {
             let latestUpdate = finance.data.crypto.map(\.updatedAt).max()
             let uniqueCryptoCount = Set(finance.data.crypto.map(\.symbol).filter(isNonEmpty)).count
             MetricCard(
-                title: LocalizedStringKey(settings.localized("Status • \(privateCount(uniqueCryptoCount)) Coins")),
+                // L19: already resolved by settings.localized — pass verbatim so Text doesn't re-localize.
+                verbatimTitle: settings.localized("Status • \(privateCount(uniqueCryptoCount)) Coins"),
                 value: latestUpdate.map(formattedUpdate) ?? settings.localized("Never"),
                 systemImage: "checkmark.circle"
             )

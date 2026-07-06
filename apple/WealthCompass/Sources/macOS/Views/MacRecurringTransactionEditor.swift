@@ -157,7 +157,7 @@ struct MacRecurringTransactionEditor: View {
                         TextField("Custom category name", text: $customCategory)
                             .focused($isCustomCategoryFocused)
 
-                        Text(settings.localized("The category will be saved for future \(type.localizedTitle(appLanguage: settings.appLanguage).lowercased()) transactions."))
+                        Text(settings.localized("The category will be saved for future \(type.localizedTitle(appLanguage: settings.appLanguage).lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))) transactions."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

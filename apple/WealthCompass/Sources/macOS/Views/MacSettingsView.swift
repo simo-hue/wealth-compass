@@ -557,7 +557,7 @@ struct MacSettingsView: View {
                 .font(.headline)
 
             if categories.isEmpty {
-                Text(settings.localized("No custom \(type.localizedTitle(appLanguage: settings.appLanguage).lowercased()) categories yet."))
+                Text(settings.localized("No custom \(type.localizedTitle(appLanguage: settings.appLanguage).lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))) categories yet."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {
@@ -648,7 +648,7 @@ struct MacSettingsView: View {
         } catch {
             credentialEditorAlert = MacSettingsAlert(
                 title: settings.localized("\(credential.localizedTitle(appLanguage: settings.appLanguage)) Failed"),
-                message: Self.errorMessage(error)
+                message: Self.errorMessage(error, appLanguage: settings.appLanguage)
             )
         }
     }
@@ -677,7 +677,7 @@ struct MacSettingsView: View {
         } catch {
             credentialEditorAlert = MacSettingsAlert(
                 title: settings.localized("Unable to Remove \(credential.localizedTitle(appLanguage: settings.appLanguage))"),
-                message: Self.errorMessage(error)
+                message: Self.errorMessage(error, appLanguage: settings.appLanguage)
             )
         }
     }
@@ -708,7 +708,7 @@ struct MacSettingsView: View {
             refreshMarketDataKeyStatus()
             settingsAlert = MacSettingsAlert(
                 title: settings.localized("Unable to Refresh Market Data"),
-                message: Self.errorMessage(error)
+                message: Self.errorMessage(error, appLanguage: settings.appLanguage)
             )
         }
     }
@@ -752,7 +752,7 @@ struct MacSettingsView: View {
         } catch {
             settingsAlert = MacSettingsAlert(
                 title: settings.localized("Import Failed"),
-                message: Self.errorMessage(error)
+                message: Self.errorMessage(error, appLanguage: settings.appLanguage)
             )
         }
     }
@@ -773,7 +773,7 @@ struct MacSettingsView: View {
         } catch {
             settingsAlert = MacSettingsAlert(
                 title: settings.localized("Export Failed"),
-                message: Self.errorMessage(error)
+                message: Self.errorMessage(error, appLanguage: settings.appLanguage)
             )
         }
     }
@@ -794,7 +794,7 @@ struct MacSettingsView: View {
         } catch {
             settingsAlert = MacSettingsAlert(
                 title: settings.localized("Export Failed"),
-                message: Self.errorMessage(error)
+                message: Self.errorMessage(error, appLanguage: settings.appLanguage)
             )
         }
     }
@@ -841,8 +841,14 @@ struct MacSettingsView: View {
         )
     }
 
-    private static func errorMessage(_ error: Error) -> String {
-        (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+    // L26: resolve app-defined errors through their appLanguage-aware description so the alert BODY
+    // matches the appLanguage-localized title, instead of the system-locale `errorDescription`.
+    private static func errorMessage(_ error: Error, appLanguage: String?) -> String {
+        if let error = error as? FinanceImportError { return error.localizedDescription(appLanguage: appLanguage) }
+        if let error = error as? CloudSyncError { return error.localizedDescription(appLanguage: appLanguage) }
+        if let error = error as? ExchangeRateError { return error.localizedDescription(appLanguage: appLanguage) }
+        if let error = error as? MarketDataError { return error.localizedDescription(appLanguage: appLanguage) }
+        return (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
     }
 }
 

@@ -504,7 +504,8 @@ struct SettingsView: View {
                 .foregroundStyle(.white)
 
             if categories.isEmpty {
-                Text("No custom \(title.lowercased()) categories yet.")
+                // L21: locale-aware lowercasing (root-locale .lowercased() mis-cases Turkish I/İ, etc.).
+                Text("No custom \(title.lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))) categories yet.")
                     .font(.caption)
                     .foregroundStyle(WCColor.textSecondary)
             } else {
@@ -564,7 +565,7 @@ struct SettingsView: View {
             } catch {
                 settingsAlert = SettingsAlertState(
                     title: settings.localized("Import Failed"),
-                    message: (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                    message: Self.errorMessage(error, appLanguage: settings.appLanguage)
                 )
             }
         case .failure(let error):
@@ -615,7 +616,7 @@ struct SettingsView: View {
         } catch {
             credentialEditorAlert = SettingsAlertState(
                 title: settings.localized("\(credential.localizedTitle(appLanguage: settings.appLanguage)) Failed"),
-                message: SettingsView.errorMessage(error)
+                message: SettingsView.errorMessage(error, appLanguage: settings.appLanguage)
             )
         }
     }
@@ -668,8 +669,14 @@ struct SettingsView: View {
         }
     }
 
-    private static func errorMessage(_ error: Error) -> String {
-        (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+    // L26: resolve app-defined errors through their appLanguage-aware description so the alert BODY
+    // matches the appLanguage-localized title, instead of the system-locale `errorDescription`.
+    private static func errorMessage(_ error: Error, appLanguage: String?) -> String {
+        if let error = error as? FinanceImportError { return error.localizedDescription(appLanguage: appLanguage) }
+        if let error = error as? CloudSyncError { return error.localizedDescription(appLanguage: appLanguage) }
+        if let error = error as? ExchangeRateError { return error.localizedDescription(appLanguage: appLanguage) }
+        if let error = error as? MarketDataError { return error.localizedDescription(appLanguage: appLanguage) }
+        return (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
     }
 }
 

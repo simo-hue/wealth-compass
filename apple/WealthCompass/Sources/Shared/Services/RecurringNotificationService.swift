@@ -74,8 +74,11 @@ actor RecurringNotificationService {
                 // pre-converts it to the display currency on the @MainActor (deep-audit M20), so the
                 // number and the currency code agree; fall back to the raw amount if absent.
                 let displayAmount = convertedAmounts[schedule.id] ?? schedule.amount
+                // L49: format the amount in the in-app language's locale too, so its separators and
+                // symbol placement match the surrounding sentence (not the system locale).
                 let amount = displayAmount.formatted(
                     .currency(code: currencyCode)
+                        .locale(AppLocalization.effectiveLocale(appLanguage: appLanguage))
                 )
                 content.body = AppLocalization.string("\(schedule.category): \(amount). Wealth Compass records it automatically when the app is active.", appLanguage: appLanguage)
             } else {

@@ -1,5 +1,15 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 2 batch 2 (localization) — ⏳ pending on-device build/test
+  - *Details*: On `low-t2-localization` off `main`. Adversarially reviewed (no local Xcode).
+  - *Tech Notes*:
+    - **L19** — `MetricCard` gained a `verbatimTitle:` initializer (stores the title as `Text(verbatim:)`) so already-resolved strings aren't re-localized by a second `Text` catalog lookup. The two double-localized status cards (`MacCryptoView`, `MacInvestmentsView`) now use it. The existing `title: LocalizedStringKey` init is preserved, so the other ~34 call sites are unchanged.
+    - **L26** — `errorMessage(_:)` in `MacSettingsView` **and** `SettingsView` (iOS) is now `errorMessage(_:appLanguage:)` and resolves app-defined errors (`FinanceImportError`/`CloudSyncError`/`ExchangeRateError`/`MarketDataError`) through their appLanguage-aware descriptions, so alert bodies match the appLanguage-localized titles instead of falling back to the system locale. Threaded `settings.appLanguage` through all call sites (6 macOS, 2 iOS). Extended the identical fix to `FinanceStore.errorMessage` (market-refresh failure summaries) for consistency.
+    - **L41** — `ExchangeRateService.localizedMessage` no longer splices a separately-localized fragment ("the last cached rates" / "the built-in offline fallback rates") into a localized frame; it now selects between two full-sentence keys so the whole message is one coherent translation unit. (The two new keys are English-fallback until translated; the old fragment keys are now orphaned — harmless.)
+    - **L49** — the recurring-notification amount now formats with `.locale(AppLocalization.effectiveLocale(appLanguage:))`, so its separators/symbol placement match the (appLanguage-localized) surrounding sentence instead of the system locale.
+    - **L21** — the five macOS + one iOS "future <type>/<frequency> …" hints now lowercase with `.lowercased(with: effectiveLocale)` instead of the root-locale `.lowercased()`, fixing locale-specific casing (Turkish I/İ). Residual: fully correct noun capitalization for languages like German would need per-type/per-frequency full-sentence templates + 40-language translations — deliberately NOT done here to avoid regressing existing `%@`-frame translations to English; flagged for the checkpoint.
+    - *New catalog keys (English fallback):* the two L41 full sentences.
+
 - [2026-07-06]: Deep-audit Low — Tier 2 batch 1b (persist fee mode + currency convert prompt) — ⏳ pending on-device build/test
   - *Details*: On `low-t2-fees-currency` off `main`. Touches the shared models + all 4 position editors (iOS `Forms.swift` Investment/Crypto; macOS `MacEditorSheet.swift` Investment/Crypto). Adversarially reviewed incl. Codable/decode-safety + sync-payload analysis (no local Xcode).
   - *Tech Notes*:

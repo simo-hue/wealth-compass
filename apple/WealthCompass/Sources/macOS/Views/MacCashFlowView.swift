@@ -972,7 +972,7 @@ struct MacCashFlowView: View {
         case .deleteRecurringTransaction(let schedule):
             return Alert(
                 title: Text("Delete Recurring Transaction?"),
-                message: Text(settings.localized("Future \(schedule.frequency.localizedTitle(appLanguage: settings.appLanguage).lowercased()) occurrences for \(schedule.category) will no longer be created.")),
+                message: Text(settings.localized("Future \(schedule.frequency.localizedTitle(appLanguage: settings.appLanguage).lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))) occurrences for \(schedule.category) will no longer be created.")),
                 primaryButton: .destructive(Text("Delete")) {
                     finance.deleteRecurringTransaction(schedule)
                     Task {
@@ -1118,7 +1118,7 @@ private struct MacCashFlowTransactionEditor: View {
                         TextField("Custom category name", text: $customCategory)
                             .focused($isCustomCategoryFocused)
 
-                        Text(settings.localized("The category will be saved for future \(type.localizedTitle(appLanguage: settings.appLanguage).lowercased()) transactions."))
+                        Text(settings.localized("The category will be saved for future \(type.localizedTitle(appLanguage: settings.appLanguage).lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))) transactions."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

@@ -170,7 +170,10 @@ private struct MacTransactionEditor: View {
     }
 
     private var customCategoryHint: String {
-        let typeName = type.localizedTitle(appLanguage: settings.appLanguage).lowercased()
+        // L21: locale-aware lowercasing so casing follows the in-app language (root-locale
+        // .lowercased() mis-cases Turkish I/İ). Full noun-capitalization (e.g. German) would need
+        // per-type full-sentence templates — tracked as a translation follow-up.
+        let typeName = type.localizedTitle(appLanguage: settings.appLanguage).lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))
         if trimmedCustomCategory.isEmpty {
             return settings.localized("Enter a category name. It will be saved for future \(typeName) transactions.")
         }
