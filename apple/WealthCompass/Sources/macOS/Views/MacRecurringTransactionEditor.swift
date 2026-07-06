@@ -74,7 +74,10 @@ struct MacRecurringTransactionEditor: View {
     private var isSaveDisabled: Bool {
         guard let parsedAmount, parsedAmount > 0 else { return true }
         return currentCategoryName.isEmpty
-            || (existingSchedule == nil && startDate <= Date())
+            // Allow same-day scheduling (deep-audit L09): compare by calendar day, not instant — the
+            // builder forward-clamps a same-day past time to the next occurrence, so only a genuinely
+            // past calendar day should block Save.
+            || (existingSchedule == nil && Calendar.current.startOfDay(for: startDate) < Calendar.current.startOfDay(for: Date()))
             || (normalizedEndDate.map { $0 < startDate } ?? false)
     }
 
@@ -85,7 +88,7 @@ struct MacRecurringTransactionEditor: View {
         if isCustomCategorySelected, trimmedCustomCategory.isEmpty {
             return settings.localized("Enter a custom category name.")
         }
-        if existingSchedule == nil, startDate <= Date() {
+        if existingSchedule == nil, Calendar.current.startOfDay(for: startDate) < Calendar.current.startOfDay(for: Date()) {
             return settings.localized("The first occurrence must be in the future.")
         }
         if normalizedEndDate.map({ $0 < startDate }) ?? false {
@@ -223,6 +226,10 @@ struct MacRecurringTransactionEditor: View {
 
     private func saveSchedule() {
         guard let parsedAmount, parsedAmount > 0 else { return }
+        // Re-validate the advertised preconditions at save time (deep-audit L25) so a stale render
+        // (e.g. the calendar day rolled over while the editor was open) can't persist a schedule the
+        // disabled state would have blocked.
+        guard !isSaveDisabled else { return }
 
         let selectedCategory: String
         if isCustomCategorySelected {

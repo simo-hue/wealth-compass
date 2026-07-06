@@ -131,6 +131,12 @@ _Batch 2 (dates / timezone / import):_
   timed startDate: the schedule must import (not be silently dropped) and keep its final occurrence.
 - [ ] _L32 (cash-flow month bucketing) and L43 (import parse safety) are logic-only — covered by build + tests._
 
+_Batch 3 (recurring editor):_
+- [ ] **L09** — In the recurring-transaction editor (iOS + macOS), set the start date to **today** at a
+  time earlier than now. Save must be **enabled** (not silently stuck disabled), and the saved schedule's
+  first occurrence clamps forward. A genuinely **past day** still blocks Save with the validation message.
+- [ ] _L25 (save-time re-validation) is logic-only — covered by build. (L10 was already fixed by M09.)_
+
 **Deferred — need your input (not blocking):**
 - [ ] **L33** — The asset-allocation pie drops negative cash, so its total ≠ the net-worth header. Pick a
   fix: (a) clamp cash to 0 + a footnote, (b) relabel the ring "Assets", or (c) leave it.

@@ -1,5 +1,12 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 1 batch 3 (recurring-editor correctness) — ⏳ pending on-device build/test
+  - *Details*: On `fix/low-t1b3-recurring` off `main` (Low tier, checkpoint-1 work). Adversarially reviewed (no local Xcode).
+  - *Tech Notes*:
+    - **L09** — the recurring editor's future-only Save guard (both `RecurringTransactionFormView` and `MacRecurringTransactionEditor`) now compares by **calendar day** (`startOfDay(startDate) < startOfDay(now)`) instead of raw instant, so choosing a same-day time no longer silently keeps Save disabled — `RecurringScheduleBuilder.firstOccurrence(onOrAfter: now)` forward-clamps a same-day-past time to the next occurrence. The macOS `validationMessage` guard was matched.
+    - **L25** — `saveSchedule()` in both editors now re-checks `guard !isSaveDisabled` at save time (single source of truth), so a stale render (e.g. the calendar day rolling over while the editor is open) can't persist a schedule the disabled state advertised as blocked. Consistent with L09's relaxed guard.
+    - *Skipped — already done:* **L10** (zero/garbage-price save already blocked by M09 across all four position editors).
+
 - [2026-07-06]: Deep-audit Low — Tier 1 batch 2 (dates / timezone / import correctness) — ⏳ pending on-device build/test
   - *Details*: On `fix/low-t1b2-dates` off `main` (Low tier, checkpoint-1 work). Adversarially compile/test-reviewed (no local Xcode).
   - *Tech Notes*:
