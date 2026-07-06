@@ -145,23 +145,28 @@ _Batch 5 (concurrency / cleanup) — logic/latent, covered by build:_
 - [ ] _L50 (backoff counter clamped in storage), L61 (masonry layout guards a non-finite width — latent),
   L54 (market-price refresh throttle now survives relaunch). L06 assessed and left (safe fire-and-forget)._
 
-**Deferred — need your input (not blocking):**
-- [ ] **L33** — The asset-allocation pie drops negative cash, so its total ≠ the net-worth header. Pick a
-  fix: (a) clamp cash to 0 + a footnote, (b) relabel the ring "Assets", or (c) leave it.
-- [ ] **L23** — Changing the currency picker on an **existing** investment/crypto holding: should it
-  **convert** the value to the new currency (preserve worth) or **re-denominate** (keep the number, fix the
-  label)? Both are plausible user intents; tell me which and I'll wire it into all 4 editors.
-- [ ] **L40** — A held currency missing from an otherwise-fresh rate snapshot silently uses its offline
-  seed. A clean fix is a per-currency "rates may be incomplete" indicator (a small feature). Want it?
-- [ ] **L44** — `parseDateOnly` takes the UTC day for ISO datetimes (documented-intentional for the web
-  app's UTC wire format). Left as-is; only matters for a non-UTC offset-bearing source. Say if you want it changed.
-- [ ] **L39** — Possible sync tombstone race; the audit marks it "confirm at runtime before fixing." If
-  you can reproduce a lost/duplicated delete during concurrent sync, tell me and I'll fix it.
-- [ ] **L37** — Sync-metadata persist commits in-memory *before* the disk write; a persist failure can
-  lose an in-flight advance (redundant re-upload next launch — self-correcting, not data loss). The fix
-  reorders persist-before-commit + rollback under the sync locks; I'd rather land it when you can verify
-  sync on-device. Say the word and I'll do it (carefully).
-- [ ] **L52** — An init-time "enable sync" task could race a factory reset (very narrow window). A robust
-  fix needs cancellation-aware handling in the sync-enable path. Low priority; tell me if you want it.
+**Deferred bucket — RESOLVED (decisions made 2026-07-06), now being implemented this push:**
+- **L33** → clamp negative cash to 0 in the asset donut + conditional footnote quantifying the excluded liability.
+- **L23** → on a currency change on an existing holding, prompt **Convert (default) / Keep numbers** across all 4 editors.
+- **L40** → minimal seed-rate indicator: Settings → Exchange Rates row naming affected held currencies + subtle dashboard caption.
+- **L37 / L52 / L39** → all three fixed (L39 grounded in a careful tombstone read), each with a unit test. **Still needs on-device sync smoke afterward.**
+- **L44 / L06** → documented only, no behavior change (changing L44 would desync web-app UTC import).
+- **M31** → deferred to its own next prompt (needs your provisioning-profile / entitlement change first).
+
+---
+
+## 4. Low Tier 2/3 smoke tests (landing batch-by-batch on `main`)
+
+### Batch T2-1a (editors: L13, L20) — landed, not yet built
+- [ ] **L13** (iOS + macOS) — On the onboarding API-key page, type a key into Finnhub or CoinGecko, then tap
+  **Skip for now**. It must now show a confirm ("Unsaved API Key — Save & Continue / Discard / Cancel"),
+  **not** silently drop the key. "Save & Continue" validates + stores it; "Discard" proceeds without it.
+  With **both** fields empty, Skip proceeds immediately (no dialog).
+- [ ] **L20** (iOS + macOS) — In the transaction, investment, and crypto editors, the Amount / Average Buy
+  Price / Current Price field labels now show the active **currency code** (e.g. "Amount (USD)"), matching
+  the recurring editor. Changing the Currency picker updates the code in the labels.
+- [ ] _New catalog strings (English fallback until translated): "Unsaved API Key", "Save & Continue",
+  "Discard", "You entered an API key but haven't saved it…", plus the interpolated
+  "Average Buy Price (%@)" / "Current Price (%@)" labels._
 
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->

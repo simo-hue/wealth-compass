@@ -97,7 +97,8 @@ struct TransactionFormView: View {
                 }
 
                 Section("Details") {
-                    TextField("Amount", text: $amount)
+                    // L20: show the active currency code in the label, matching the recurring editor.
+                    TextField("Amount (\(currency.rawValue))", text: $amount)
                         .keyboardType(.decimalPad)
                     Picker("Currency", selection: $currency) {
                         ForEach(Currency.allCases) { currencyOption in
@@ -518,9 +519,9 @@ struct InvestmentFormView: View {
                 Section {
                     TextField("Quantity", text: $quantity)
                         .keyboardType(.decimalPad)
-                    TextField("Average Buy Price", text: $avgBuyPrice)
+                    TextField("Average Buy Price (\(currency.rawValue))", text: $avgBuyPrice)
                         .keyboardType(.decimalPad)
-                    TextField("Current Price", text: $currentPrice)
+                    TextField("Current Price (\(currency.rawValue))", text: $currentPrice)
                         .keyboardType(.decimalPad)
                 }
 
@@ -674,9 +675,9 @@ struct CryptoFormView: View {
                     }
                     TextField("Quantity", text: $quantity)
                         .keyboardType(.decimalPad)
-                    TextField("Average Buy Price", text: $avgBuyPrice)
+                    TextField("Average Buy Price (\(currency.rawValue))", text: $avgBuyPrice)
                         .keyboardType(.decimalPad)
-                    TextField("Current Price", text: $currentPrice)
+                    TextField("Current Price (\(currency.rawValue))", text: $currentPrice)
                         .keyboardType(.decimalPad)
                 }
 

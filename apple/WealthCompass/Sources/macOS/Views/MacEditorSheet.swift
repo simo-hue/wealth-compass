@@ -80,7 +80,8 @@ private struct MacTransactionEditor: View {
                         }
                     }
 
-                    TextField("Amount", text: $amount)
+                    // L20: show the active currency code in the label, matching the recurring editor.
+                    TextField("Amount (\(currency.rawValue))", text: $amount)
                     Picker("Currency", selection: $currency) {
                         ForEach(Currency.allCases) { currencyOption in
                             (Text(currencyOption.displayName) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
@@ -280,8 +281,8 @@ private struct MacInvestmentEditor: View {
 
                 Section("Position") {
                     TextField("Quantity", text: $quantity)
-                    TextField("Average Buy Price", text: $averagePrice)
-                    TextField("Current Price", text: $currentPrice)
+                    TextField("Average Buy Price (\(currency.rawValue))", text: $averagePrice)
+                    TextField("Current Price (\(currency.rawValue))", text: $currentPrice)
                 }
 
                 Section("Investment Transaction Fee") {
@@ -436,8 +437,8 @@ private struct MacCryptoEditor: View {
                         }
                     }
                     TextField("Quantity", text: $quantity)
-                    TextField("Average Buy Price", text: $averagePrice)
-                    TextField("Current Price", text: $currentPrice)
+                    TextField("Average Buy Price (\(currency.rawValue))", text: $averagePrice)
+                    TextField("Current Price (\(currency.rawValue))", text: $currentPrice)
                 }
 
                 Section("Transaction Fee") {

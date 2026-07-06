@@ -1,5 +1,13 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 2 batch 1a (onboarding + editor labels) — ⏳ pending on-device build/test
+  - *Details*: On `low-t2-editors` off `main`. First batch of the "finish everything" push (all remaining Low Tier 2/3 + the resolved deferred bucket; M31 stays a separate next prompt). Product rulings were gathered via `/grill-me` first. Adversarially reviewed (no local Xcode).
+  - *Tech Notes*:
+    - **L13** — Onboarding "Skip for now" (iOS `OnboardingView` + macOS `MacOnboardingView`) no longer silently discards a typed-but-unsaved API key: `skipOnboarding()` checks the trimmed Finnhub/CoinGecko fields and, if either is non-empty, presents an "Unsaved API Key" confirm (Save & Continue → `viewModel.submit`; Discard → complete; Cancel). Both fields empty → skip proceeds immediately as before.
+    - **L20** — The transaction / investment / crypto editors on **both** platforms now embed the active currency code in their Amount / Average Buy Price / Current Price field labels (e.g. "Amount (USD)"), matching `MacRecurringTransactionEditor`. Display-only; no `save()` logic changed. (Audit scoped it to macOS; extended to the iOS editors for the same cross-platform consistency the finding is about.)
+    - **L08** — Skipped, already fixed by **M08** (the type-toggle custom-category guard `if !isCustomCategorySelected` is already present in both iOS transaction + recurring editors).
+    - *New catalog keys (English fallback until translated):* "Unsaved API Key", "Save & Continue", "Discard", "You entered an API key but haven't saved it…", and interpolated "Average Buy Price (%@)" / "Current Price (%@)".
+
 - [2026-07-06]: Deep-audit Low — Tier 1 batch 5 (concurrency / cleanup) — ⏳ pending on-device build/test — **completes Tier 1's clean work**
   - *Details*: On `fix/low-t1b5-cleanup` off `main`. Adversarially reviewed (no local Xcode).
   - *Tech Notes*:

@@ -4,6 +4,7 @@ struct OnboardingView: View {
     @EnvironmentObject private var settings: AppSettings
     @State private var currentTab = 0
     @State private var showingErrorAlert = false
+    @State private var showingSkipConfirmation = false
     @StateObject private var viewModel = OnboardingViewModel()
     @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 28
     
@@ -57,6 +58,23 @@ struct OnboardingView: View {
             } else {
                 Text("Invalid API Key")
             }
+        }
+        // L13: tapping "Skip for now" with a typed-but-unsaved key used to discard it
+        // silently. Confirm first, offering to save & validate it instead.
+        .alert("Unsaved API Key", isPresented: $showingSkipConfirmation) {
+            Button("Save & Continue") {
+                Task {
+                    if await viewModel.submit(appLanguage: settings.appLanguage) {
+                        completeOnboarding()
+                    } else {
+                        showingErrorAlert = true
+                    }
+                }
+            }
+            Button("Discard", role: .destructive) { completeOnboarding() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("You entered an API key but haven't saved it. Save and validate it now, or discard it and continue?")
         }
     }
     
@@ -355,7 +373,14 @@ struct OnboardingView: View {
     }
 
     private func skipOnboarding() {
-        completeOnboarding()
+        // L13: guard against silently dropping a just-typed (but unsaved) API key.
+        let hasUnsavedKey = !viewModel.finnhubKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || !viewModel.coinGeckoKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        if hasUnsavedKey {
+            showingSkipConfirmation = true
+        } else {
+            completeOnboarding()
+        }
     }
     
     private func completeOnboarding() {
