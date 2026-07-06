@@ -10,7 +10,10 @@ final class FinanceImportServiceTests: XCTestCase {
     }
 
     private func parse(_ json: String) throws -> NormalizedFinanceImport {
-        try FinanceImportService.parse(Data(json.utf8), settings: settings())
+        // L55: parse now takes a value-type context instead of `AppSettings`.
+        let settings = settings()
+        let context = FinanceImportContext(displayCurrency: settings.currency, snapshot: settings.exchangeRateSnapshot)
+        return try FinanceImportService.parse(Data(json.utf8), context: context)
     }
 
     func testModernTransactionsShape() throws {

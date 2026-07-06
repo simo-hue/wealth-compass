@@ -744,11 +744,12 @@ struct MacSettingsView: View {
         panel.canChooseDirectories = false
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
-        do {
-            let result = try finance.importBackup(from: url, mode: importMode, settings: settings)
-            let insertedCount = finance.processDueRecurringTransactions(settings: settings)
-
-            Task {
+        // L55: importBackup is now async (parses off the MainActor). The open panel above stays on the
+        // main thread; the async import + summary run in a Task.
+        Task {
+            do {
+                let result = try await finance.importBackup(from: url, mode: importMode, settings: settings)
+                let insertedCount = finance.processDueRecurringTransactions(settings: settings)
                 await syncRecurringNotifications()
 
                 // Reuse the existing localized lines (trimmed of their paragraph spacing)
@@ -763,33 +764,37 @@ struct MacSettingsView: View {
                     importSummaryNote = nil
                 }
                 importSummary = result
+            } catch {
+                settingsAlert = MacSettingsAlert(
+                    title: settings.localized("Import Failed"),
+                    message: Self.errorMessage(error, appLanguage: settings.appLanguage)
+                )
             }
-        } catch {
-            settingsAlert = MacSettingsAlert(
-                title: settings.localized("Import Failed"),
-                message: Self.errorMessage(error, appLanguage: settings.appLanguage)
-            )
         }
     }
 
     private func exportBackup() {
-        do {
-            let temporaryURL = try finance.exportBackupURL()
-            let panel = NSSavePanel()
-            panel.allowedContentTypes = [.json]
-            panel.nameFieldStringValue = temporaryURL.lastPathComponent
+        // L55: exportBackupURL is now async (encodes off the MainActor). The save panel + the small
+        // temp→destination copy run on the main thread inside the Task.
+        Task {
+            do {
+                let temporaryURL = try await finance.exportBackupURL()
+                let panel = NSSavePanel()
+                panel.allowedContentTypes = [.json]
+                panel.nameFieldStringValue = temporaryURL.lastPathComponent
 
-            guard panel.runModal() == .OK, let destination = panel.url else { return }
-            try Data(contentsOf: temporaryURL).write(to: destination, options: .atomic)
-            settingsAlert = MacSettingsAlert(
-                title: settings.localized("Backup Exported"),
-                message: destination.path
-            )
-        } catch {
-            settingsAlert = MacSettingsAlert(
-                title: settings.localized("Export Failed"),
-                message: Self.errorMessage(error, appLanguage: settings.appLanguage)
-            )
+                guard panel.runModal() == .OK, let destination = panel.url else { return }
+                try Data(contentsOf: temporaryURL).write(to: destination, options: .atomic)
+                settingsAlert = MacSettingsAlert(
+                    title: settings.localized("Backup Exported"),
+                    message: destination.path
+                )
+            } catch {
+                settingsAlert = MacSettingsAlert(
+                    title: settings.localized("Export Failed"),
+                    message: Self.errorMessage(error, appLanguage: settings.appLanguage)
+                )
+            }
         }
     }
 

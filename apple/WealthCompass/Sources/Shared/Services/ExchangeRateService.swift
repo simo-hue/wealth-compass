@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct ExchangeRateSnapshot: Codable, Equatable {
+struct ExchangeRateSnapshot: Codable, Equatable, Sendable {
     let baseCurrency: Currency
     let rates: [String: Double]
     let effectiveDate: Date

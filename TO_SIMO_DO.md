@@ -302,11 +302,10 @@ _These are the "verify sync on a real device" items you agreed to. Two devices o
     refresh, the rest of the USD holdings should fall back to Yahoo instead of each retrying Finnhub 3×
     (fewer requests, faster give-up). Hard to trigger deliberately; mainly a code-efficiency fix.
 
-**⚑ One Tier-3 item DEFERRED (needs your call): L55** — moving the manual **Backup export / Import** off
-the main thread (they currently encode/parse the whole dataset synchronously, so a very large DB briefly
-freezes the UI on Prepare Backup / Import). I did **not** do it: the import parse takes the `@MainActor`
-settings, so an off-main hop has real Swift-concurrency (Sendable) friction, and it's a rare manual op on
-the data-critical import path — not worth the regression risk at the tail of this push. **Want it?** I'll
-do it carefully as a focused follow-up (it's the last remaining audit item).
+### Batch: L55 async backup export/import (was deferred — now DONE) — landed, not yet built
+- [ ] **L55** — Prepare a **Backup** and **Import** one on a reasonably large DB: both should work exactly as
+  before (same file, same imported records) but **without freezing the UI** — the encode (export) and
+  parse (import) now run off the main thread. The exported JSON is now **compact** (no pretty-printing),
+  which is expected (it's machine-read). _Behavior-preserving; mainly a build + a quick eyeball._
 
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->

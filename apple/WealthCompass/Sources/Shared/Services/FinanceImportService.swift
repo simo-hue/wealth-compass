@@ -5,18 +5,32 @@ import Foundation
 /// Decodes the interchange backup format (incl. legacy web shapes such as
 /// `income`/`expenses`/`liquidity`, comma decimals, multiple date formats and
 /// stringly-typed numbers) into a normalized `FinancialData`, counting skipped
-/// records. `FinanceStore.importBackup` calls `parse(_:settings:)`; everything else
-/// here is file-private. `normalized()` is `@MainActor` because it reads `AppSettings`.
+/// records. `FinanceStore.importBackup` calls `parse(_:context:)` off the MainActor; everything else
+/// here is file-private and nonisolated.
+/// L55: value-type import context so `parse`/`normalize` can run OFF the MainActor. The import only
+/// needs the display currency + the FX converter, both value types — so we snapshot them on the
+/// MainActor and pass them into the detached parse (rather than the `@MainActor AppSettings`).
+struct FinanceImportContext: Sendable {
+    let displayCurrency: Currency
+    let snapshot: ExchangeRateSnapshot?
+
+    /// Converts an amount from `source` into the display currency, matching `AppSettings.convert`.
+    func convert(_ value: Decimal, from source: Currency) -> Decimal {
+        CurrencyConverter(snapshot: snapshot).convert(value, from: source, to: displayCurrency)
+    }
+}
+
 enum FinanceImportService {
-    @MainActor
-    static func parse(_ payload: Data, settings: AppSettings) throws -> NormalizedFinanceImport {
+    /// Nonisolated so a caller can run it off the MainActor (L55). Build a `FinanceImportContext`
+    /// on the MainActor first (see `FinanceStore.importBackup`).
+    static func parse(_ payload: Data, context: FinanceImportContext) throws -> NormalizedFinanceImport {
         let imported: ImportedFinancialData
         do {
             imported = try JSONDecoder().decode(ImportedFinancialData.self, from: payload)
         } catch {
             throw FinanceImportError.invalidJSON(error.localizedDescription)
         }
-        return imported.normalized(settings: settings)
+        return imported.normalized(context: context)
     }
 }
 
@@ -61,16 +75,15 @@ private struct ImportedFinancialData: Decodable {
         snapshots = container.decodeLossyArrayIfPresent(ImportedSnapshot.self, forKey: .snapshots)
     }
 
-    @MainActor
-    func normalized(settings: AppSettings) -> NormalizedFinanceImport {
+    func normalized(context: FinanceImportContext) -> NormalizedFinanceImport {
         let importedTransactions = transactions.elements.compactMap { $0.model() }
         let importedRecurringTransactions = recurringTransactions.elements.compactMap { $0.model() }
         let importedIncome = income.elements.compactMap { $0.transaction() }
         let importedExpenses = expenses.elements.compactMap { $0.transaction() }
-        let importedLiquidity = liquidity.elements.compactMap { $0.transaction(settings: settings) }
-        let importedInvestments = investments.elements.compactMap { $0.model(defaultCurrency: settings.currency) }
-        let importedCrypto = crypto.elements.compactMap { $0.model(defaultCurrency: settings.currency) }
-        let importedLiabilities = liabilities.elements.compactMap { $0.model(defaultCurrency: settings.currency) }
+        let importedLiquidity = liquidity.elements.compactMap { $0.transaction(context: context) }
+        let importedInvestments = investments.elements.compactMap { $0.model(defaultCurrency: context.displayCurrency) }
+        let importedCrypto = crypto.elements.compactMap { $0.model(defaultCurrency: context.displayCurrency) }
+        let importedLiabilities = liabilities.elements.compactMap { $0.model(defaultCurrency: context.displayCurrency) }
         let importedSnapshots = snapshots.elements.compactMap { $0.model() }
 
         let skippedTransactions = transactions.skippedCount + max(0, transactions.elements.count - importedTransactions.count)
@@ -422,12 +435,11 @@ private struct ImportedLiquidityAccount: Decodable {
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
     }
 
-    @MainActor
-    func transaction(settings: AppSettings) -> Transaction? {
+    func transaction(context: FinanceImportContext) -> Transaction? {
         guard let balance, balance.isFinite, balance != 0 else { return nil }
 
-        let sourceCurrency = Currency.imported(currency, default: settings.currency)
-        let convertedAmount = settings.convert(Decimal(abs(balance)), from: sourceCurrency)
+        let sourceCurrency = Currency.imported(currency, default: context.displayCurrency)
+        let convertedAmount = context.convert(Decimal(abs(balance)), from: sourceCurrency)
         guard convertedAmount > 0, convertedAmount.isFinite else { return nil }
 
         let accountName = name ?? type?.importTitleCased ?? "Liquidity Account"

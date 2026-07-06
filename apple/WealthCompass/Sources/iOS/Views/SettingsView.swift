@@ -138,11 +138,14 @@ struct SettingsView: View {
 
                 Section("Data") {
                     Button {
-                        do {
-                            backupURL = try finance.exportBackupURL()
-                            backupError = nil
-                        } catch {
-                            backupError = error.localizedDescription
+                        // L55: exportBackupURL is now async (encodes off the MainActor).
+                        Task {
+                            do {
+                                backupURL = try await finance.exportBackupURL()
+                                backupError = nil
+                            } catch {
+                                backupError = error.localizedDescription
+                            }
                         }
                     } label: {
                         Label("Prepare Backup", systemImage: "doc.badge.arrow.up")
@@ -573,16 +576,19 @@ struct SettingsView: View {
     private func handleImportSelection(_ result: Result<URL, Error>) {
         switch result {
         case .success(let url):
-            do {
-                let result = try finance.importBackup(from: url, mode: importMode, settings: settings)
-                backupURL = nil
-                backupError = nil
-                importSummary = result
-            } catch {
-                settingsAlert = SettingsAlertState(
-                    title: settings.localized("Import Failed"),
-                    message: Self.errorMessage(error, appLanguage: settings.appLanguage)
-                )
+            // L55: importBackup is now async (parses off the MainActor).
+            Task {
+                do {
+                    let result = try await finance.importBackup(from: url, mode: importMode, settings: settings)
+                    backupURL = nil
+                    backupError = nil
+                    importSummary = result
+                } catch {
+                    settingsAlert = SettingsAlertState(
+                        title: settings.localized("Import Failed"),
+                        message: Self.errorMessage(error, appLanguage: settings.appLanguage)
+                    )
+                }
             }
         case .failure(let error):
             settingsAlert = SettingsAlertState(

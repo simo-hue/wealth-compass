@@ -1,5 +1,13 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit — L55 async backup export/import (un-deferred, now DONE) — ⏳ pending on-device build/test
+  - *Details*: On `feature-l55-async-io` off `main`. The Tier-3 L55 that was previously deferred; the user ruled "do it properly". Adversarially reviewed.
+  - *Tech Notes*:
+    - Introduced a value-type `FinanceImportContext: Sendable { displayCurrency, snapshot }` so the import parse can run off the MainActor (the only settings it needs are the display currency + FX converter). `ExchangeRateSnapshot` gained explicit `Sendable`.
+    - `FinanceImportService.parse` / `ImportedFinancialData.normalized` / `ImportedLiquidityAccount.transaction` are no longer `@MainActor` and take the context; `context.convert` is numerically identical to the old `AppSettings.convert(_:from:)` (same converter + display-currency target).
+    - `FinanceStore.exportBackupURL()` / `importBackup(...)` are now `async`: export captures a `FinancialData` copy (it's `Sendable`) and encodes+writes in a `Task.detached` (compact JSON — dropped the pretty-printing since the backup is machine-read); import reads+parses in a `Task.detached` (security-scoped access is process-wide, so it covers the detached read), keeping the `@Published data`/`appendSnapshot`/`save()` mutations on the MainActor. Removed the now-unused pretty `encoder` property.
+    - The 4 call sites (iOS `SettingsView`, macOS `MacSettingsView`) wrap the calls in a `Task { try await … }`; macOS keeps the `NSOpenPanel`/`NSSavePanel` modal on the main thread. Updated `FinanceImportServiceTests` to build a context.
+
 - [2026-07-06]: Deep-audit — M31 CloudKit push sync — ⏳ **BLOCKED on manual provisioning** (build won't sign until Push is enabled on the App ID + profile regenerated — see TO_SIMO_DO §1)
   - *Details*: On `feature-m31-push-sync` off `main`. Wires silent-push delivery into the existing CKSyncEngine so remote changes propagate in near-real-time / in the background, not just on foreground. Push-only scope (BGTask deferred, per the grill). Adversarially reviewed — no code issues.
   - *Tech Notes*:

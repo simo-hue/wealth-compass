@@ -139,7 +139,6 @@ final class FinanceStore: ObservableObject {
     private static let logger = Logger(subsystem: "com.wealthcompass.persistence", category: "FinanceStore")
 
     private let persistence: FinancePersistence
-    private let encoder: JSONEncoder
     private let syncMetadataStore: CloudSyncMetadataStore
     private weak var settings: AppSettings?
     /// Owns the off-main-actor save pipeline: JSON encoding, the SHA-256 diff baseline,
@@ -216,7 +215,6 @@ final class FinanceStore: ObservableObject {
             persistence: persistence,
             metadataStore: syncMetadataStore
         )
-        encoder = FinanceJSONCoding.makeEncoder(prettyPrinted: true)
         // Restore the persisted market-price refresh throttle (deep-audit L54) so it survives a cold
         // launch — otherwise a failed refresh would retry on every relaunch with no throttle window,
         // mirroring how AppSettings persists its exchange-rate retry state.
@@ -1052,13 +1050,18 @@ final class FinanceStore: ObservableObject {
         marketRefreshProgress = nil
     }
 
-    func exportBackupURL() throws -> URL {
+    func exportBackupURL() async throws -> URL {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         let fileName = "wealth-compass-backup-\(formatter.string(from: Date())).json"
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
-        let payload = try encoder.encode(data)
-        try payload.write(to: url, options: .atomic)
+        // L55: encode the whole dataset + write off the MainActor so a large DB doesn't freeze the UI.
+        // The backup is machine-read, so drop pretty-printing (FinanceJSONCoding.encode defaults to compact).
+        let dataCopy = data
+        try await Task.detached {
+            let payload = try FinanceJSONCoding.encode(dataCopy)
+            try payload.write(to: url, options: .atomic)
+        }.value
         return url
     }
 
@@ -1101,7 +1104,7 @@ final class FinanceStore: ObservableObject {
     }
 
     @discardableResult
-    func importBackup(from url: URL, mode: FinanceImportMode, settings: AppSettings) throws -> FinanceImportResult {
+    func importBackup(from url: URL, mode: FinanceImportMode, settings: AppSettings) async throws -> FinanceImportResult {
         // Fail loudly if the local DB failed to load: save() is a no-op while `localPersistenceError`
         // is set, so mutating in-memory `data` and reporting success would silently discard the import
         // (deep-audit M28). Mirrors the guards in setICloudSyncEnabled / applyRemoteMutations.
@@ -1116,10 +1119,17 @@ final class FinanceStore: ObservableObject {
             }
         }
 
-        let payload = try Data(contentsOf: url)
-        guard !payload.isEmpty else { throw FinanceImportError.emptyFile }
+        // L55: read + parse/normalize off the MainActor (the heavy JSON work that used to freeze the UI
+        // on a large file). Security-scoped access is process-wide, so it covers the detached read; the
+        // value-type `FinanceImportContext` carries the only settings the parser needs. The @Published
+        // mutations below stay on the MainActor.
+        let context = FinanceImportContext(displayCurrency: settings.currency, snapshot: settings.exchangeRateSnapshot)
+        let normalized = try await Task.detached {
+            let payload = try Data(contentsOf: url)
+            guard !payload.isEmpty else { throw FinanceImportError.emptyFile }
+            return try FinanceImportService.parse(payload, context: context)
+        }.value
 
-        let normalized = try FinanceImportService.parse(payload, settings: settings)
         guard normalized.data.hasImportableContent else {
             throw FinanceImportError.noSupportedRecords
         }
