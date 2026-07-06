@@ -548,6 +548,11 @@ struct CashFlowView: View {
     private func saveRecurringTransaction(_ schedule: RecurringTransaction) {
         finance.upsertRecurringTransaction(schedule)
 
+        // Deep-audit L06 (assessed, intentionally left as fire-and-forget): these `Task {}`s in the
+        // recurring-schedule handlers are one-shot notification-sync side effects. They inherit this
+        // View's `@MainActor` isolation, so their post-`await` writes (`activeAlert`, store mutations)
+        // are main-actor-safe, and SwiftUI simply drops `@State` writes if the view is gone — so there's
+        // no torn-state hazard and nothing to cancel. Kept unstructured deliberately; do not "fix".
         Task {
             if schedule.notificationsEnabled {
                 let authorized = await RecurringTransactionNotificationService.shared.requestAuthorization()

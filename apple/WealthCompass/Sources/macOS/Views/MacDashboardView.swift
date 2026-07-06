@@ -172,6 +172,8 @@ struct MacDashboardView: View {
         let selectedPoint = selectedPoint(in: points)
         let rangeChange = netWorthChange(in: points)
         let yDomain = chartDomain(for: points)
+        // L40: computed once here to flag a total built partly on seed rates (details in Settings).
+        let hasIncompleteRates = !finance.heldCurrenciesUsingSeedRate(settings: settings).isEmpty
 
         return DashboardGlassCard(padding: 0) {
             ZStack {
@@ -205,6 +207,14 @@ struct MacDashboardView: View {
                                 Text("Add another snapshot to see movement over time")
                                     .font(.subheadline)
                                     .foregroundStyle(WCColor.textTertiary)
+                            }
+
+                            // L40: subtle cue that the total mixes an approximate offline rate for a
+                            // held currency missing from the latest update (details in Settings).
+                            if hasIncompleteRates {
+                                Label("Rates may be incomplete", systemImage: "exclamationmark.triangle.fill")
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(WCColor.warning)
                             }
                         }
 
@@ -471,6 +481,15 @@ struct MacDashboardView: View {
                                 }
                             }
                         }
+                    }
+
+                    if let excludedCash = finance.assetAllocationExcludedCash(settings: settings) {
+                        // L33: cash is net-negative and dropped from the ring (no negative wedge), so the
+                        // ring total exceeds the net-worth header — explain the gap.
+                        Text(settings.localized("Chart shows gross assets; \(settings.privateCurrency(excludedCash)) in net cash liabilities is excluded."))
+                            .font(.caption2)
+                            .foregroundStyle(WCColor.textFaint)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
             }

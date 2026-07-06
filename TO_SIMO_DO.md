@@ -232,4 +232,15 @@ _Needs the app-lock enabled; iOS + macOS:_
   WealthCompass ▸ Settings… (the native window). Confirm the sidebar shows only Dashboard/Cash Flow/Investments/Crypto,
   and **⌘R Refresh Data** works on all of them.
 
+### Batch: Deferred bucket (L33 asset-pie, L40 seed-rate, L44/L06 doc-only) — landed, not yet built
+- [ ] **L33** (iOS + macOS) — Make **Cash net-negative** (record more cash liabilities than assets, or an
+  overdraft). On the dashboard **Asset Allocation** ring, a footnote must appear: "Chart shows gross assets;
+  <amount> in net cash liabilities is excluded." (amount redacted in Privacy Mode). With non-negative cash,
+  no footnote.
+- [ ] **L40** (iOS + macOS) — Hold a position in a currency the rate provider doesn't return (rare; or simulate
+  by editing a holding to an exotic currency). Settings → **Exchange Rates** shows "Rates may be incomplete: <codes>…",
+  and the dashboard net-worth hero shows a subtle "Rates may be incomplete" ⚠︎ caption. With all held currencies
+  covered, neither appears. _New English-fallback strings until translated._
+- [ ] _L44 (parseDateOnly UTC comment) and L06 (fire-and-forget Task comment) are **doc-only** — no behavior change._
+
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->

@@ -1,5 +1,14 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit — Deferred bucket (asset-pie clamp+footnote, seed-rate indicator, doc-only) — ⏳ pending on-device build/test
+  - *Details*: On `low-deferred-features` off `main`. Implements the product-ruled deferred items (rulings gathered via `/grill-me`). Adversarially reviewed (no local Xcode).
+  - *Tech Notes*:
+    - **L33** (ruling: clamp cash to 0 + footnote) — the asset-allocation ring already drops net-negative cash (a donut can't draw a negative wedge; `AnalyticsEngine.assetAllocation`'s `> 0` filter). Added `FinanceStore.assetAllocationExcludedCash(settings:)` (magnitude of negative cash, else nil) and an optional `AllocationChart.footnote: String?`; both dashboards now show "Chart shows gross assets; <X> in net cash liabilities is excluded." when cash < 0, so the ring total's gap to the signed net-worth header is explained rather than silent. `<X>` respects Privacy Mode via `privateCurrency`.
+    - **L40** (ruling: minimal single indicator) — added `FinanceStore.heldCurrenciesUsingSeedRate(settings:)`, which lists held currencies (investments + crypto + transaction cash + display currency) that are **absent from an otherwise-present snapshot** and so convert via their offline seed rate (`snapshot.unitsPerBaseCurrency(for:) == nil`); empty when no snapshot exists yet. Surfaced as (1) a warning row in the Exchange Rates section of both Settings screens naming the affected currencies, and (2) a subtle "Rates may be incomplete" caption in both dashboards' net-worth hero (computed once per hero render). No forced-refresh loop (the rejected agent plan).
+    - **L44** (ruling: document, don't change) — strengthened the `ImportDateParser.parseDateOnly` comment to spell out that taking the UTC day is deliberate for the web app's UTC wire format, and that the only "wrong" case is a hypothetical third-party non-UTC offset-bearing datetime — not something our import path emits.
+    - **L06** (ruling: document, don't change) — added a comment to the cash-flow recurring-schedule handlers explaining the fire-and-forget `Task {}`s are main-actor-safe one-shots (SwiftUI drops `@State` writes on a gone view), so there's no torn-state hazard and nothing to cancel.
+    - *New catalog keys (English fallback):* the L33 footnote and the L40 "Rates may be incomplete: …" notice + the dashboard "Rates may be incomplete" label.
+
 - [2026-07-06]: Deep-audit Low — Tier 2 batch 3b (chart domain / cash-flow filter / layout / Mac Settings) — ⏳ pending on-device build/test
   - *Details*: On `low-t2-uxperf` off `main`. Adversarially reviewed (no local Xcode).
   - *Tech Notes*:

@@ -259,7 +259,12 @@ struct AnalyticsEngine {
             AllocationSlice(id: "asset-investments", name: localized("Investments"), value: totals.totalInvestments.doubleValue, color: .blue),
             AllocationSlice(id: "asset-crypto", name: localized("Crypto"), value: totals.totalCrypto.doubleValue, color: .orange),
             AllocationSlice(id: "asset-cash", name: localized("Cash"), value: totals.totalLiquidity.doubleValue, color: .green)
-        ].filter { $0.value > 0 }
+        ]
+        // L33: a pie can't render a negative wedge, so net-negative cash is clamped out here. The
+        // dashboards surface a footnote quantifying the excluded liability (see
+        // `FinanceStore.assetAllocationExcludedCash`) so the ring total's gap to the net-worth header
+        // is explained rather than silent.
+        .filter { $0.value > 0 }
     }
 
     func investmentAllocation() -> [AllocationSlice] {

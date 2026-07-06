@@ -903,6 +903,30 @@ final class FinanceStore: ObservableObject {
         analytics(settings).assetAllocation()
     }
 
+    /// L33: the magnitude of net cash liabilities excluded from the asset-allocation ring (a donut
+    /// can't render a negative wedge), or `nil` when cash is non-negative. Lets the ring show a
+    /// footnote explaining why its total is higher than the signed net-worth header.
+    func assetAllocationExcludedCash(settings: AppSettings) -> Decimal? {
+        let liquidity = calculateTotals(settings: settings).totalLiquidity
+        return liquidity < 0 ? -liquidity : nil
+    }
+
+    /// L40: held currencies that are absent from an otherwise-present exchange-rate snapshot and so
+    /// silently convert through their approximate offline seed rate. Returns `[]` when there is no
+    /// snapshot yet (a separate "rates not fetched" state) or when every held currency is covered, so
+    /// callers can show a "rates may be incomplete" indicator only when it genuinely applies. Sorted
+    /// by code for a stable display.
+    func heldCurrenciesUsingSeedRate(settings: AppSettings) -> [Currency] {
+        guard let snapshot = settings.exchangeRateSnapshot else { return [] }
+        var held: Set<Currency> = [settings.currency] // the display currency converts too
+        for investment in data.investments { held.insert(investment.currency) }
+        for holding in data.crypto { held.insert(holding.currency) }
+        for transaction in data.transactions { if let currency = transaction.currency { held.insert(currency) } }
+        return held
+            .filter { snapshot.unitsPerBaseCurrency(for: $0) == nil }
+            .sorted { $0.rawValue < $1.rawValue }
+    }
+
     func investmentAllocation(settings: AppSettings) -> [AllocationSlice] {
         analytics(settings).investmentAllocation()
     }

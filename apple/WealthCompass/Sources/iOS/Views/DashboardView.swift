@@ -44,7 +44,12 @@ struct DashboardView: View {
                 AllocationChart(
                     title: "Asset Allocation",
                     slices: finance.assetAllocation(settings: settings),
-                    settings: settings
+                    settings: settings,
+                    // L33: when cash is net-negative it's dropped from the ring (no negative wedge), so
+                    // the ring total exceeds the net-worth header — explain the gap.
+                    footnote: finance.assetAllocationExcludedCash(settings: settings).map {
+                        settings.localized("Chart shows gross assets; \(settings.privateCurrency($0)) in net cash liabilities is excluded.")
+                    }
                 )
                 topExpenses
                 recentActivity
@@ -118,6 +123,8 @@ struct DashboardView: View {
         let points = finance.snapshotsForChart(range: timeRange, settings: settings).filter { $0.value.isFinite }
         let rangeChange = netWorthChange(in: points)
         let yDomain = chartDomain(for: points)
+        // L40: computed once here (not per body sub-view) to flag a total built partly on seed rates.
+        let hasIncompleteRates = !finance.heldCurrenciesUsingSeedRate(settings: settings).isEmpty
 
         return FinanceCard {
             ZStack {
@@ -152,6 +159,14 @@ struct DashboardView: View {
                                 Text("Add another snapshot to see movement")
                                     .font(.caption)
                                     .foregroundStyle(WCColor.textTertiary)
+                            }
+
+                            // L40: a subtle cue that the total mixes an approximate offline rate for a
+                            // held currency missing from the latest update (details in Settings).
+                            if hasIncompleteRates {
+                                Label("Rates may be incomplete", systemImage: "exclamationmark.triangle.fill")
+                                    .font(.caption2.weight(.medium))
+                                    .foregroundStyle(WCColor.warning)
                             }
                         }
 

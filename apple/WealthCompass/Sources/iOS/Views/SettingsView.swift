@@ -430,7 +430,23 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(WCColor.textSecondary)
             }
+
+            // L40: warn when a currency the user actually holds is missing from the fresh snapshot and
+            // is therefore converting via its approximate offline seed rate.
+            if let seedRateNotice {
+                Text(seedRateNotice)
+                    .font(.caption)
+                    .foregroundStyle(WCColor.warning)
+            }
         }
+    }
+
+    /// L40: a caption naming held currencies that fall back to their offline seed rate, or nil.
+    private var seedRateNotice: String? {
+        let currencies = finance.heldCurrenciesUsingSeedRate(settings: settings)
+        guard !currencies.isEmpty else { return nil }
+        let list = currencies.map(\.rawValue).joined(separator: ", ")
+        return settings.localized("Rates may be incomplete: \(list) aren't in the latest update and use an approximate offline rate.")
     }
 
     private var marketDataSection: some View {

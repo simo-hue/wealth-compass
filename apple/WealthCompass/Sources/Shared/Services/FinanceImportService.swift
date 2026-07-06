@@ -839,6 +839,12 @@ private enum ImportDateParser {
         // that carry a time component (contain "T"), take the calendar day in UTC — the wire
         // format the web app emits. Pure "yyyy-MM-dd" values are already tz-stable, so they keep
         // the local startOfDay behavior unchanged.
+        //
+        // Deep-audit L44 (intentional, left as-is): taking the *UTC* day is deliberate for round-
+        // tripping the web app's UTC wire format. The only case this is "wrong" is a hypothetical
+        // third-party source that emits a non-UTC offset-bearing datetime (e.g. `...T23:30:00+09:00`),
+        // where the intended local day and the UTC day differ — not something our own import path
+        // produces, so we keep UTC for web-interop consistency rather than parse the offset.
         if rawValue?.trimmedForImport?.contains("T") == true {
             var utc = Calendar(identifier: .gregorian)
             utc.timeZone = TimeZone(identifier: "UTC") ?? .current

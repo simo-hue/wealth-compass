@@ -277,6 +277,10 @@ struct AllocationChart: View {
     let slices: [AllocationSlice]
     let settings: AppSettings
     var showLegend: Bool = true
+    /// L33: optional caption shown under the ring — used by the asset-allocation ring to explain
+    /// why its total differs from the net-worth header when net cash liabilities are excluded (a
+    /// donut can't render a negative wedge). Already-resolved String, so it renders verbatim.
+    var footnote: String? = nil
 
     @State private var hoveredSlice: AllocationSlice?
 
@@ -402,6 +406,13 @@ struct AllocationChart: View {
                                 }
                             }
                         }
+                    }
+
+                    if let footnote {
+                        Text(footnote)
+                            .font(.caption2)
+                            .foregroundStyle(WCColor.textFaint)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
             }
