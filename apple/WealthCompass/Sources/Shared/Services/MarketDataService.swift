@@ -1,6 +1,21 @@
 import Foundation
+import os
 import Security
 import SwiftUI
+
+/// L45: one shared, unconfigured `JSONDecoder` reused across the market-data response types instead of
+/// allocating a fresh one per decode (once per holding on a large refresh). An unconfigured decoder is
+/// never mutated after construction, so it's safe to share across concurrent decodes. Mirrors
+/// `FinanceJSONCoding`'s centralization; each response type still carries its own `CodingKeys`.
+private enum MarketDataJSON {
+    static let decoder = JSONDecoder()
+}
+
+/// L46: diagnostics for market-data decode drift, via the unified logging system (NOT the removed
+/// cleartext localhost logging — this is `os.Logger`, App-Store-safe).
+private enum MarketDataLog {
+    static let logger = Logger(subsystem: "com.wealthcompass.mobile", category: "MarketData")
+}
 
 struct MarketPriceQuote: Equatable {
     let price: Double
@@ -299,7 +314,7 @@ struct FinnhubQuoteClient {
         let (data, response) = try await NetworkRetry.data(for: request, session: session)
         try Self.validate(response: response, provider: "Finnhub")
 
-        let quote = try JSONDecoder().decode(FinnhubQuoteResponse.self, from: data)
+        let quote = try MarketDataJSON.decoder.decode(FinnhubQuoteResponse.self, from: data)
         guard let price = quote.currentPrice, price > 0, price.isFinite else {
             throw MarketDataError.noQuote(provider: "Finnhub", symbol: normalizedSymbol)
         }
@@ -432,7 +447,7 @@ struct CoinGeckoPriceClient {
         let (data, response) = try await NetworkRetry.data(for: request, session: session)
         try Self.validate(response: response, provider: "CoinGecko")
 
-        let payload = try JSONDecoder().decode([String: CoinGeckoSimplePriceResponse].self, from: data)
+        let payload = try MarketDataJSON.decoder.decode([String: CoinGeckoSimplePriceResponse].self, from: data)
         return payload.compactMapValues { value in
             var resolved: [Currency: Double] = [:]
             for currency in requested {
@@ -493,7 +508,7 @@ struct CoinGeckoPriceClient {
     }
 
     static func decodeSearch(_ data: Data) throws -> [CoinGeckoSearchCoin] {
-        let payload = try JSONDecoder().decode(CoinGeckoSearchResponse.self, from: data)
+        let payload = try MarketDataJSON.decoder.decode(CoinGeckoSearchResponse.self, from: data)
         return payload.coins?.compactMap { $0.asCoin } ?? []
     }
 
@@ -683,7 +698,7 @@ struct YahooQuoteClient {
     }
 
     static func decodeChart(_ data: Data, requestedSymbol: String) throws -> MarketPriceQuote {
-        let payload = try JSONDecoder().decode(YahooChartResponse.self, from: data)
+        let payload = try MarketDataJSON.decoder.decode(YahooChartResponse.self, from: data)
         guard
             let result = payload.chart.result?.first,
             let rawPrice = result.meta.regularMarketPrice, rawPrice > 0, rawPrice.isFinite,
@@ -713,7 +728,7 @@ struct YahooQuoteClient {
     }
 
     static func decodeSearch(_ data: Data) throws -> [YahooSearchCandidate] {
-        let payload = try JSONDecoder().decode(YahooSearchResponse.self, from: data)
+        let payload = try MarketDataJSON.decoder.decode(YahooSearchResponse.self, from: data)
         return payload.quotes?.compactMap { $0.asCandidate } ?? []
     }
 
@@ -835,8 +850,16 @@ private struct CoinGeckoSimplePriceResponse: Decodable {
         for key in container.allKeys {
             if key.stringValue == "last_updated_at" {
                 updatedAt = try? container.decode(TimeInterval.self, forKey: key)
-            } else if let value = try? container.decode(Double.self, forKey: key) {
-                collected[key.stringValue] = value
+            } else {
+                do {
+                    collected[key.stringValue] = try container.decode(Double.self, forKey: key)
+                } catch {
+                    // L46: the key is present (it came from `allKeys`), so a decode failure means the
+                    // value is present-but-wrong-type — a provider format drift, not a merely-absent
+                    // currency. Log it (still tolerating it: the currency is dropped, not fatal) so a
+                    // mass "no price" outage from a payload change is diagnosable instead of silent.
+                    MarketDataLog.logger.warning("CoinGecko /simple/price value for \(key.stringValue, privacy: .public) was present but not a Double: \(String(describing: error), privacy: .public)")
+                }
             }
         }
         prices = collected

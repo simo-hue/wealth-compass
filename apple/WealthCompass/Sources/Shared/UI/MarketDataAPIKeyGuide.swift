@@ -106,7 +106,8 @@ private struct MarketDataAPIProviderGuideCard: View {
 
                         Text(step)
                             .font(.caption)
-                            .foregroundStyle(.white.opacity(0.74))
+                            // L62: use the centralized text token instead of a raw white literal.
+                            .foregroundStyle(WCColor.textSecondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }

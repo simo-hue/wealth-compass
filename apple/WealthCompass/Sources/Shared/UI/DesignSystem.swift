@@ -45,19 +45,25 @@ enum ColorPalette {
         WCColor.accent
     ]
     
+    // L56: span distinct, colorblind-safer hue families (one warm accent, cool anchors) instead of a
+    // warm-only ramp with two adjacent oranges + two reds — consecutive entries differ in hue AND
+    // lightness so the two largest geographies don't render as confusable near-identical wedges.
     static let chartGeography: [Color] = [
-        WCColor.warning,
-        .orange,
-        WCColor.destructive,
-        .pink,
-        .red,
+        .orange,             // single warm accent
+        .cyan,
+        .green,
+        .indigo,
         .yellow,
-        .brown
+        WCColor.destructive, // single red
+        .purple
     ]
 }
 
 struct ScreenBackground: View {
     @State private var isAnimating = false
+    // L57: pause the perpetual decorative animation when the app isn't active / this background is
+    // off-screen, so it doesn't keep SwiftUI's render loop alive behind every screen.
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         GeometryReader { proxy in
@@ -93,9 +99,26 @@ struct ScreenBackground: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            withAnimation(.easeInOut(duration: 5.0).repeatForever(autoreverses: true)) {
-                isAnimating = true
-            }
+            if scenePhase == .active { startAnimating() }
+        }
+        .onDisappear(perform: stopAnimating)
+        .onChange(of: scenePhase) { _, phase in
+            // L57: resume only when active; stop when backgrounded/inactive so the repeatForever
+            // animation doesn't run behind a hidden app.
+            phase == .active ? startAnimating() : stopAnimating()
+        }
+    }
+
+    private func startAnimating() {
+        withAnimation(.easeInOut(duration: 5.0).repeatForever(autoreverses: true)) {
+            isAnimating = true
+        }
+    }
+
+    private func stopAnimating() {
+        // Settle to the static state with a finite animation, which ends the repeatForever loop.
+        withAnimation(.easeInOut(duration: 0.3)) {
+            isAnimating = false
         }
     }
 }
@@ -385,27 +408,10 @@ struct AllocationChart: View {
                     .accessibilityLabel(Text(title))
 
                     if showLegend {
-                        VStack(spacing: 12) {
-                            ForEach(slices) { slice in
-                                HStack(spacing: 10) {
-                                    RoundedRectangle(cornerRadius: 3)
-                                        .fill(slice.color.gradient)
-                                        .frame(width: 10, height: 10)
-                                    Text(slice.name)
-                                        .font(.subheadline.weight(.medium))
-                                        .foregroundStyle(WCColor.textSecondary) // WC-L20: was raw .white.opacity(0.76)
-                                    Spacer()
-                                    VStack(alignment: .trailing, spacing: 2) {
-                                        Text(settings.privateCurrency(slice.value))
-                                            .font(.subheadline.monospacedDigit().weight(.semibold))
-                                            .foregroundStyle(.white)
-                                        Text(settings.isPrivacyMode ? settings.redactionToken : percentage(slice.value, total: total))
-                                            .font(.caption2.monospacedDigit())
-                                            .foregroundStyle(WCColor.textFaint)
-                                    }
-                                }
-                            }
-                        }
+                        // L58: the legend is a separate view whose inputs (slices/total/settings) don't
+                        // change during a hover, so SwiftUI skips re-rendering it on every hover tick
+                        // (only the center overlay + slice opacities, which depend on `hoveredSlice`, do).
+                        AllocationLegend(slices: slices, total: total, settings: settings)
                     }
 
                     if let footnote {
@@ -434,6 +440,42 @@ struct AllocationChart: View {
     private func accessibilityValue(for slice: AllocationSlice, total: Double) -> String {
         guard !settings.isPrivacyMode else { return settings.redactionToken }
         return "\(settings.privateCurrency(slice.value)), \(percentage(slice.value, total: total))"
+    }
+}
+
+/// L58: the allocation legend as its own view. Its inputs don't change during a hover, so SwiftUI
+/// doesn't re-render it on every hover tick (only the hover-dependent chart overlay re-runs).
+/// L59: hidden from VoiceOver — the donut's per-slice `SectorMark` labels already convey the same data.
+private struct AllocationLegend: View {
+    let slices: [AllocationSlice]
+    let total: Double
+    let settings: AppSettings
+
+    var body: some View {
+        VStack(spacing: 12) {
+            ForEach(slices) { slice in
+                HStack(spacing: 10) {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(slice.color.gradient)
+                        .frame(width: 10, height: 10)
+                    Text(slice.name)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(WCColor.textSecondary)
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(settings.privateCurrency(slice.value))
+                            .font(.subheadline.monospacedDigit().weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text(settings.isPrivacyMode
+                            ? settings.redactionToken
+                            : "\((total > 0 ? slice.value / total * 100 : 0).formatted(.number.precision(.fractionLength(1))))%")
+                            .font(.caption2.monospacedDigit())
+                            .foregroundStyle(WCColor.textFaint)
+                    }
+                }
+            }
+        }
+        .accessibilityHidden(true)
     }
 }
 
@@ -630,7 +672,9 @@ struct MacSelectorIsland<Tab: MacSelectorTab>: View {
                 if index < cases.count - 1 {
                     Divider()
                         .frame(height: 14)
-                        .background(Color.white.opacity(0.2))
+                        // L60: .overlay recolors the Divider's own hairline; .background only sat behind
+                        // it, so the tint had no visible effect (the line stayed the system separator color).
+                        .overlay(Color.white.opacity(0.2))
                         .padding(.horizontal, 6)
                 }
             }

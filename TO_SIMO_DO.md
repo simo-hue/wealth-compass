@@ -256,4 +256,16 @@ _These are the "verify sync on a real device" items you agreed to. Two devices o
 - [ ] _L39 is defensive against a concurrent tombstone race the audit marked "confirm at runtime." If during
   heavy two-device concurrent editing you ever see a deleted record reappear, tell me — but the fix should prevent it._
 
+### Batch: Tier 3 part 1 (cosmetic / a11y / perf: L01,L45,L46,L56,L57,L58,L59,L60,L62) — landed, not yet built
+- [ ] **L56** (iOS + macOS) — Investments Overview → "Allocation by Geography": the wedges/legend should now
+  use **distinct colors** (no two near-identical oranges), readable for the two largest regions.
+- [ ] **L59** (iOS + macOS, VoiceOver) — On an allocation donut, VoiceOver should announce each slice **once**
+  (from the chart), not twice (the legend is now hidden from VoiceOver).
+- [ ] **L60** (macOS) — The dividers between the segmented-selector tabs render as a subtle light hairline
+  (not the default system separator color).
+- [ ] **L62** — API-key onboarding/guide step text renders normally (token cleanup; ~no visible change).
+- [ ] _Logic/perf (covered by build): **L45** (shared JSON decoder), **L46** (adds a diagnostic log for a
+  CoinGecko format drift — only visible in Console.app), **L57** (background animation pauses off-screen),
+  **L58** (allocation legend no longer re-renders on hover), **L01** (explicit ATS plist stance)._
+
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->

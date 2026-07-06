@@ -1,5 +1,18 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 3 part 1 (cosmetic / a11y / small perf) — ⏳ pending on-device build/test
+  - *Details*: On `low-t3-cosmetic` off `main`. Adversarially reviewed (no local Xcode).
+  - *Tech Notes*:
+    - **L01** — added an explicit `NSAppTransportSecurity` dict to the iOS `Info.plist` (`NSAllowsArbitraryLoads`/`…InWebContent` = false) + a comment: an auditable statement of the strict-TLS default all finance API hosts already use, with a "do not add exceptions without review" note. No behavior change.
+    - **L45** — one shared `MarketDataJSON.decoder` reused across the 5 market-data decode sites instead of allocating a fresh `JSONDecoder` per decode.
+    - **L46** (diagnostics-only) — the CoinGecko `/simple/price` dynamic-key decoder now logs (via `os.Logger`, App-Store-safe — NOT the removed localhost logging) when a currency value is *present-but-wrong-type*, so a provider format drift that mass-drops prices is diagnosable instead of silent. Still tolerant (the currency is dropped, not fatal).
+    - **L56** — reworked `chartGeography` from a warm-only ramp with two adjacent oranges + two reds into distinct, colorblind-safer hue families (`[.orange, .cyan, .green, .indigo, .yellow, WCColor.destructive, .purple]`).
+    - **L57** — `ScreenBackground`'s perpetual `repeatForever` animation now pauses via `@Environment(\.scenePhase)` + `.onDisappear`, so it doesn't keep the render loop alive when the app is backgrounded/inactive or the background is off-screen.
+    - **L58** — extracted the allocation legend into a private `AllocationLegend` view whose inputs don't change during a hover, so SwiftUI no longer re-renders the whole legend on every hover tick (only the hover-dependent center overlay + slice opacities re-run).
+    - **L59** — the `AllocationLegend` is `.accessibilityHidden(true)` — the donut's per-slice `SectorMark` labels already announce name+amount+% to VoiceOver, so this removes the duplicate, fragmented legend read.
+    - **L60** — the `MacSelectorIsland` divider tint uses `.overlay` instead of `.background` (which sat behind the hairline and had no visible effect).
+    - **L62** — the API-key guide step text uses `WCColor.textSecondary` instead of a raw `.white.opacity(0.74)` literal (token consistency).
+
 - [2026-07-06]: Deep-audit — Sync trio (L37, L39, L52) — ⏳ pending **on-device sync verification** (two devices / one iCloud account)
   - *Details*: On `low-sync-trio` off `main`. Deep CloudKit-actor concurrency work; adversarially reviewed. These are the "confirm on-device" items — no local Xcode, and the concurrency/init-timing paths aren't cleanly unit-testable without a live `CKSyncEngine`.
   - *Tech Notes*:

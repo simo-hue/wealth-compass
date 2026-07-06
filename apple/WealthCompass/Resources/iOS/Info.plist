@@ -26,6 +26,18 @@
 	<string>public.app-category.finance</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- L01: explicit, auditable App Transport Security stance. All finance API hosts are HTTPS
+	     (finnhub.io, api.coingecko.com, api.frankfurter.dev, query1.finance.yahoo.com) and carry the
+	     user's API keys, so keep the strict default: no arbitrary loads, no per-domain exceptions
+	     (an exception would merely restate the secure default and could weaken it as providers move
+	     to TLS 1.3-only). Do NOT add NSAllowsArbitraryLoads or NSExceptionDomains without security review. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<false/>
+	</dict>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Use Face ID to unlock your local Wealth Compass data.</string>
 	<key>UIApplicationSceneManifest</key>
