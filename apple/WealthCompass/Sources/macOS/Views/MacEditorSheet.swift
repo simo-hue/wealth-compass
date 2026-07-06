@@ -201,8 +201,12 @@ private struct MacInvestmentEditor: View {
     @State private var quantity: String
     @State private var averagePrice: String
     @State private var currentPrice: String
-    @State private var feeMode: FeeMode = .fixed
+    @State private var feeMode: FeeMode
     @State private var feeValue: String
+    // L23: prompt whether to convert or relabel when the currency of an existing holding changes.
+    @State private var showingCurrencyConversion = false
+    @State private var pendingConversionFrom: Currency?
+    @State private var isProgrammaticCurrencyChange = false
 
     private let sectors = [
         "Technology", "Finance", "Real Estate", "Healthcare",
@@ -226,7 +230,10 @@ private struct MacInvestmentEditor: View {
         let average = investment.map { $0.quantity > 0 ? max(0, ($0.costBasis - $0.fees) / $0.quantity) : 0 } ?? 0
         _averagePrice = State(initialValue: investment.map { _ in Self.input(average) } ?? "")
         _currentPrice = State(initialValue: investment.map { Self.input($0.currentPrice) } ?? "")
-        _feeValue = State(initialValue: investment.map { Self.input($0.fees) } ?? "0")
+        // L22: seed from the persisted fee mode + raw input; legacy rows fall back to the absolute
+        // stored `fees` in fixed mode.
+        _feeMode = State(initialValue: investment?.feeMode ?? .fixed)
+        _feeValue = State(initialValue: investment.map { Self.input($0.feeInput ?? $0.fees) } ?? "0")
     }
 
     private var parsedQuantity: Decimal { parse(quantity) }
@@ -323,7 +330,40 @@ private struct MacInvestmentEditor: View {
                 }
             }
         }
+        // L23: on an existing holding, ask whether to convert the entered figures or just relabel.
+        .onChange(of: currency) { oldValue, newValue in
+            guard investment != nil, !isProgrammaticCurrencyChange, oldValue != newValue else {
+                isProgrammaticCurrencyChange = false
+                return
+            }
+            pendingConversionFrom = oldValue
+            showingCurrencyConversion = true
+        }
+        .alert("Change Currency", isPresented: $showingCurrencyConversion) {
+            Button("Convert Amounts") {
+                if let from = pendingConversionFrom { convertAmounts(from: from, to: currency) }
+            }
+            Button("Keep Numbers") {}
+            Button("Cancel", role: .cancel) {
+                if let from = pendingConversionFrom {
+                    isProgrammaticCurrencyChange = true
+                    currency = from
+                }
+            }
+        } message: {
+            Text("Convert the entered amounts from \(pendingConversionFrom?.rawValue ?? "") to \(currency.rawValue) at today's exchange rate, or keep the numbers and just relabel them?")
+        }
         .frame(minWidth: 500, idealWidth: 580, minHeight: 580, idealHeight: 700)
+    }
+
+    // L23: convert the money fields between currencies (percentage fee is currency-agnostic).
+    private func convertAmounts(from: Currency, to: Currency) {
+        guard from != to else { return }
+        averagePrice = Self.input(settings.convert(parsedAveragePrice, from: from, to: to))
+        currentPrice = Self.input(settings.convert(parsedCurrentPrice, from: from, to: to))
+        if feeMode == .fixed {
+            feeValue = Self.input(settings.convert(parsedFeeValue, from: from, to: to))
+        }
     }
 
     private func save() {
@@ -354,6 +394,9 @@ private struct MacInvestmentEditor: View {
         value.sector = sector.trimmed
         value.isin = isin.trimmed.uppercased()
         value.fees = calculatedFee
+        // L22: persist the raw fee mode + input alongside the computed absolute `fees`.
+        value.feeMode = feeMode
+        value.feeInput = parsedFeeValue
         value.updatedAt = Date()
         finance.upsertInvestment(value, settings: settings)
         dismiss()
@@ -381,10 +424,14 @@ private struct MacCryptoEditor: View {
     @State private var quantity: String
     @State private var averagePrice: String
     @State private var currentPrice: String
-    @State private var feeMode: FeeMode = .fixed
+    @State private var feeMode: FeeMode
     @State private var feeValue: String
     @State private var currency: Currency
     @State private var hasInitializedCurrency = false
+    // L23: prompt whether to convert or relabel when the currency of an existing holding changes.
+    @State private var showingCurrencyConversion = false
+    @State private var pendingConversionFrom: Currency?
+    @State private var isProgrammaticCurrencyChange = false
 
     init(holding: CryptoHolding?) {
         self.holding = holding
@@ -395,7 +442,10 @@ private struct MacCryptoEditor: View {
         let average = holding.map { $0.quantity > 0 ? max(0, $0.avgBuyPrice - ($0.fees / $0.quantity)) : 0 } ?? 0
         _averagePrice = State(initialValue: holding.map { _ in Self.input(average) } ?? "")
         _currentPrice = State(initialValue: holding.map { Self.input($0.currentPrice) } ?? "")
-        _feeValue = State(initialValue: holding.map { Self.input($0.fees) } ?? "0")
+        // L22: seed from the persisted fee mode + raw input; legacy rows fall back to the absolute
+        // stored `fees` in fixed mode.
+        _feeMode = State(initialValue: holding?.feeMode ?? .fixed)
+        _feeValue = State(initialValue: holding.map { Self.input($0.feeInput ?? $0.fees) } ?? "0")
         // Placeholder; a new holding adopts the app's display currency in onAppear
         // (the environment isn't available during init).
         _currency = State(initialValue: holding?.currency ?? .eur)
@@ -480,7 +530,40 @@ private struct MacCryptoEditor: View {
                 }
             }
         }
+        // L23: on an existing holding, ask whether to convert the entered figures or just relabel.
+        .onChange(of: currency) { oldValue, newValue in
+            guard holding != nil, !isProgrammaticCurrencyChange, oldValue != newValue else {
+                isProgrammaticCurrencyChange = false
+                return
+            }
+            pendingConversionFrom = oldValue
+            showingCurrencyConversion = true
+        }
+        .alert("Change Currency", isPresented: $showingCurrencyConversion) {
+            Button("Convert Amounts") {
+                if let from = pendingConversionFrom { convertAmounts(from: from, to: currency) }
+            }
+            Button("Keep Numbers") {}
+            Button("Cancel", role: .cancel) {
+                if let from = pendingConversionFrom {
+                    isProgrammaticCurrencyChange = true
+                    currency = from
+                }
+            }
+        } message: {
+            Text("Convert the entered amounts from \(pendingConversionFrom?.rawValue ?? "") to \(currency.rawValue) at today's exchange rate, or keep the numbers and just relabel them?")
+        }
         .frame(minWidth: 480, idealWidth: 560, minHeight: 440, idealHeight: 560)
+    }
+
+    // L23: convert the money fields between currencies (percentage fee is currency-agnostic).
+    private func convertAmounts(from: Currency, to: Currency) {
+        guard from != to else { return }
+        averagePrice = Self.input(settings.convert(parsedAveragePrice, from: from, to: to))
+        currentPrice = Self.input(settings.convert(parsedCurrentPrice, from: from, to: to))
+        if feeMode == .fixed {
+            feeValue = Self.input(settings.convert(parsedFeeValue, from: from, to: to))
+        }
     }
 
     private func save() {
@@ -502,6 +585,9 @@ private struct MacCryptoEditor: View {
         value.avgBuyPrice = effectiveAverage
         value.currentPrice = effectiveCurrentPrice
         value.fees = calculatedFee
+        // L22: persist the raw fee mode + input alongside the computed absolute `fees`.
+        value.feeMode = feeMode
+        value.feeInput = parsedFeeValue
         value.currency = currency
         value.updatedAt = Date()
         finance.upsertCrypto(value, settings: settings)

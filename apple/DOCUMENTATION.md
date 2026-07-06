@@ -1,5 +1,12 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 2 batch 1b (persist fee mode + currency convert prompt) — ⏳ pending on-device build/test
+  - *Details*: On `low-t2-fees-currency` off `main`. Touches the shared models + all 4 position editors (iOS `Forms.swift` Investment/Crypto; macOS `MacEditorSheet.swift` Investment/Crypto). Adversarially reviewed incl. Codable/decode-safety + sync-payload analysis (no local Xcode).
+  - *Tech Notes*:
+    - **L22** — `Investment` and `CryptoHolding` now persist the entry-time fee mode + raw input: added `Codable` to `FeeMode` and **Optional** `feeMode: FeeMode? = nil` / `feeInput: Decimal? = nil` to both models. Optional is deliberate — the sync/persistence layer encodes each entity as a JSON `payload` blob and SHA256-diffs it (`FinancialData.cloudSyncRecords`), and the synthesized decoder throws on a missing *non-optional* key (the migration only heals `createdAt`/`updatedAt`). Optional → `decodeIfPresent` (legacy rows decode) + `encodeIfPresent` (nil omitted → byte-identical JSON → **no spurious sync changeset** until a holding is actually edited). All 4 editors seed `feeMode`/`feeValue` from the persisted fields (`?? .fixed` / `feeInput ?? fees`) and write both on save, so a percent fee reopens as percent and re-scales with position size. Legacy rows behave exactly as before (fixed + absolute fees).
+    - **L23** — Changing the Currency picker on an **existing** holding now prompts (all 4 editors): "Change Currency — Convert Amounts (default) / Keep Numbers / Cancel". Convert routes avg/current price (and a fixed fee) through `settings.convert(_:from:to:)` at today's rate (percent fee is currency-agnostic, left as-is; zero/non-finite rate → no-op via the existing convert guards); Keep Numbers relabels only; Cancel reverts the picker. New holdings never prompt. A programmatic-revert guard (`isProgrammaticCurrencyChange`) stops Cancel's revert from re-triggering the prompt.
+    - *New catalog keys (English fallback):* "Change Currency", "Convert Amounts", "Keep Numbers", and the two-arg "Convert the entered amounts from %@ to %@ …" message.
+
 - [2026-07-06]: Deep-audit Low — Tier 2 batch 1a (onboarding + editor labels) — ⏳ pending on-device build/test
   - *Details*: On `low-t2-editors` off `main`. First batch of the "finish everything" push (all remaining Low Tier 2/3 + the resolved deferred bucket; M31 stays a separate next prompt). Product rulings were gathered via `/grill-me` first. Adversarially reviewed (no local Xcode).
   - *Tech Notes*:

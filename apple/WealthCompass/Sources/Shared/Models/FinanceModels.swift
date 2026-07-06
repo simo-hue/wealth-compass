@@ -205,7 +205,7 @@ enum AnalyticsPeriod: String, CaseIterable, Identifiable {
     }
 }
 
-enum FeeMode: String, CaseIterable, Identifiable {
+enum FeeMode: String, CaseIterable, Identifiable, Codable {
     case fixed
     case percent
 
@@ -378,6 +378,12 @@ struct Investment: Identifiable, Codable, Equatable {
     var sector: String
     var isin: String
     var fees: Decimal
+    // L22: persist the entry-time fee mode + raw input so a percent fee round-trips (reopens as
+    // percent and keeps scaling with position size) instead of freezing as a fixed amount.
+    // Optional so legacy rows lacking the keys decode cleanly and re-encode byte-identically
+    // (nil is omitted by the synthesized encoder) — no spurious sync changeset until edited.
+    var feeMode: FeeMode? = nil
+    var feeInput: Decimal? = nil
     var updatedAt: Date = Date()
     var createdAt: Date = Date()
 
@@ -398,6 +404,10 @@ struct CryptoHolding: Identifiable, Codable, Equatable {
     var currentPrice: Decimal
     var currency: Currency = .usd
     var fees: Decimal
+    // L22: persist the entry-time fee mode + raw input (see Investment.feeMode). Optional so
+    // legacy rows decode and re-encode unchanged.
+    var feeMode: FeeMode? = nil
+    var feeInput: Decimal? = nil
     var coinId: String
     var updatedAt: Date = Date()
     var createdAt: Date = Date()

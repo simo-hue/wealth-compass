@@ -453,8 +453,12 @@ struct InvestmentFormView: View {
     @State private var quantity: String
     @State private var avgBuyPrice: String
     @State private var currentPrice: String
-    @State private var feeMode: FeeMode = .fixed
+    @State private var feeMode: FeeMode
     @State private var feeValue: String
+    // L23: prompt whether to convert or relabel when the currency of an existing holding changes.
+    @State private var showingCurrencyConversion = false
+    @State private var pendingConversionFrom: Currency?
+    @State private var isProgrammaticCurrencyChange = false
 
     private let sectors = ["Technology", "Finance", "Real Estate", "Healthcare", "Energy", "Consumer", "All World", "Other"]
     private let geographies = ["US", "Europe", "UK", "Switzerland", "Global", "Emerging Markets", "Other"]
@@ -473,7 +477,10 @@ struct InvestmentFormView: View {
         let rawAverage = investment.map { $0.quantity > 0 ? max(0, ($0.costBasis - $0.fees) / $0.quantity) : 0 } ?? 0
         _avgBuyPrice = State(initialValue: investment == nil ? "" : Self.formatInput(rawAverage))
         _currentPrice = State(initialValue: investment.map { Self.formatInput($0.currentPrice) } ?? "")
-        _feeValue = State(initialValue: investment.map { Self.formatInput($0.fees) } ?? "0")
+        // L22: seed the fee editor from the persisted mode + raw input when present, so a percent
+        // fee reopens as percent; legacy rows fall back to the absolute stored `fees` in fixed mode.
+        _feeMode = State(initialValue: investment?.feeMode ?? .fixed)
+        _feeValue = State(initialValue: investment.map { Self.formatInput($0.feeInput ?? $0.fees) } ?? "0")
     }
 
     private var parsedQuantity: Decimal { parse(quantity) }
@@ -566,7 +573,43 @@ struct InvestmentFormView: View {
                 }
             }
         }
+        // L23: on an existing holding, a currency change is ambiguous — convert the entered
+        // figures or just relabel? Ask instead of silently re-tagging the numbers.
+        .onChange(of: currency) { oldValue, newValue in
+            guard investment != nil, !isProgrammaticCurrencyChange, oldValue != newValue else {
+                isProgrammaticCurrencyChange = false
+                return
+            }
+            pendingConversionFrom = oldValue
+            showingCurrencyConversion = true
+        }
+        .alert("Change Currency", isPresented: $showingCurrencyConversion) {
+            Button("Convert Amounts") {
+                if let from = pendingConversionFrom { convertAmounts(from: from, to: currency) }
+            }
+            Button("Keep Numbers") {}
+            Button("Cancel", role: .cancel) {
+                if let from = pendingConversionFrom {
+                    isProgrammaticCurrencyChange = true
+                    currency = from
+                }
+            }
+        } message: {
+            Text("Convert the entered amounts from \(pendingConversionFrom?.rawValue ?? "") to \(currency.rawValue) at today's exchange rate, or keep the numbers and just relabel them?")
+        }
         .preferredColorScheme(.dark)
+    }
+
+    // L23: convert the money fields from one currency to another; a percentage fee is
+    // currency-agnostic so it's left untouched. Falls back to no-op if no rate is available
+    // (settings.convert guards zero/non-finite rates).
+    private func convertAmounts(from: Currency, to: Currency) {
+        guard from != to else { return }
+        avgBuyPrice = Self.formatInput(settings.convert(parsedAverage, from: from, to: to))
+        currentPrice = Self.formatInput(settings.convert(parsedCurrentPrice, from: from, to: to))
+        if feeMode == .fixed {
+            feeValue = Self.formatInput(settings.convert(parsedFeeValue, from: from, to: to))
+        }
     }
 
     private func save() {
@@ -598,6 +641,9 @@ struct InvestmentFormView: View {
         item.sector = sector
         item.isin = isin.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         item.fees = calculatedFee
+        // L22: persist the raw fee mode + input alongside the computed absolute `fees`.
+        item.feeMode = feeMode
+        item.feeInput = parsedFeeValue
         item.updatedAt = Date()
         onSave(item)
     }
@@ -625,10 +671,14 @@ struct CryptoFormView: View {
     @State private var quantity: String
     @State private var avgBuyPrice: String
     @State private var currentPrice: String
-    @State private var feeMode: FeeMode = .fixed
+    @State private var feeMode: FeeMode
     @State private var feeValue: String
     @State private var currency: Currency
     @State private var hasInitializedCurrency = false
+    // L23: prompt whether to convert or relabel when the currency of an existing holding changes.
+    @State private var showingCurrencyConversion = false
+    @State private var pendingConversionFrom: Currency?
+    @State private var isProgrammaticCurrencyChange = false
 
     init(holding: CryptoHolding?, onSave: @escaping (CryptoHolding) -> Void) {
         self.holding = holding
@@ -640,7 +690,10 @@ struct CryptoFormView: View {
         let rawAverage = holding.map { $0.quantity > 0 ? max(0, (($0.avgBuyPrice * $0.quantity) - $0.fees) / $0.quantity) : 0 } ?? 0
         _avgBuyPrice = State(initialValue: holding == nil ? "" : Self.formatInput(rawAverage))
         _currentPrice = State(initialValue: holding.map { Self.formatInput($0.currentPrice) } ?? "")
-        _feeValue = State(initialValue: holding.map { Self.formatInput($0.fees) } ?? "0")
+        // L22: seed the fee editor from the persisted mode + raw input; legacy rows fall back to
+        // the absolute stored `fees` in fixed mode.
+        _feeMode = State(initialValue: holding?.feeMode ?? .fixed)
+        _feeValue = State(initialValue: holding.map { Self.formatInput($0.feeInput ?? $0.fees) } ?? "0")
         // Placeholder; a new holding adopts the app's display currency in onAppear
         // (the environment isn't available during init).
         _currency = State(initialValue: holding?.currency ?? .eur)
@@ -723,7 +776,40 @@ struct CryptoFormView: View {
                 }
             }
         }
+        // L23: convert-or-relabel prompt when an existing holding's currency changes.
+        .onChange(of: currency) { oldValue, newValue in
+            guard holding != nil, !isProgrammaticCurrencyChange, oldValue != newValue else {
+                isProgrammaticCurrencyChange = false
+                return
+            }
+            pendingConversionFrom = oldValue
+            showingCurrencyConversion = true
+        }
+        .alert("Change Currency", isPresented: $showingCurrencyConversion) {
+            Button("Convert Amounts") {
+                if let from = pendingConversionFrom { convertAmounts(from: from, to: currency) }
+            }
+            Button("Keep Numbers") {}
+            Button("Cancel", role: .cancel) {
+                if let from = pendingConversionFrom {
+                    isProgrammaticCurrencyChange = true
+                    currency = from
+                }
+            }
+        } message: {
+            Text("Convert the entered amounts from \(pendingConversionFrom?.rawValue ?? "") to \(currency.rawValue) at today's exchange rate, or keep the numbers and just relabel them?")
+        }
         .preferredColorScheme(.dark)
+    }
+
+    // L23: convert the money fields between currencies (percentage fee is currency-agnostic).
+    private func convertAmounts(from: Currency, to: Currency) {
+        guard from != to else { return }
+        avgBuyPrice = Self.formatInput(settings.convert(parsedAverage, from: from, to: to))
+        currentPrice = Self.formatInput(settings.convert(parsedCurrentPrice, from: from, to: to))
+        if feeMode == .fixed {
+            feeValue = Self.formatInput(settings.convert(parsedFeeValue, from: from, to: to))
+        }
     }
 
     private func save() {
@@ -745,6 +831,9 @@ struct CryptoFormView: View {
         item.avgBuyPrice = effectiveAverage
         item.currentPrice = effectiveCurrentPrice
         item.fees = calculatedFee
+        // L22: persist the raw fee mode + input alongside the computed absolute `fees`.
+        item.feeMode = feeMode
+        item.feeInput = parsedFeeValue
         item.currency = currency
         item.updatedAt = Date()
         onSave(item)

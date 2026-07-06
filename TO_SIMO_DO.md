@@ -169,4 +169,19 @@ _Batch 5 (concurrency / cleanup) — logic/latent, covered by build:_
   "Discard", "You entered an API key but haven't saved it…", plus the interpolated
   "Average Buy Price (%@)" / "Current Price (%@)" labels._
 
+### Batch T2-1b (persist fee mode L22 + currency convert prompt L23) — landed, not yet built
+- [ ] **L22** (iOS + macOS, investment + crypto editors) — Add a holding with **Fee Type = Percent** (e.g. 0.5%),
+  save. Reopen it: the editor must reopen in **Percent** mode showing 0.5 (not Fixed with an absolute amount).
+  Now **double the quantity** and save: the fee (and cost basis) must **scale** with the larger position.
+  Legacy holdings (added before this build) still open in **Fixed** mode showing their absolute fee.
+- [ ] **L22 (no-churn check)** — A pre-existing holding you *don't* edit must not spontaneously re-sync
+  (the new fields are omitted from its JSON until you actually edit it). Nothing to see; just confirming no
+  surprise iCloud activity.
+- [ ] **L23** (iOS + macOS, investment + crypto editors) — Open an **existing** holding priced in, say, USD.
+  Change the **Currency** picker to EUR: a prompt appears — **Convert Amounts** (default) converts the
+  avg/current price (+ a fixed fee) at today's rate; **Keep Numbers** leaves the digits and just relabels;
+  **Cancel** reverts the picker to USD. A **new** holding shows **no** prompt when you pick a currency.
+- [ ] _New catalog strings: "Change Currency", "Convert Amounts", "Keep Numbers", "Convert the entered
+  amounts from %@ to %@ at today's exchange rate…"._
+
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->
