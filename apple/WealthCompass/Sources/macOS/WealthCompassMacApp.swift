@@ -69,10 +69,7 @@ struct WealthCompassMacApp: App {
                 }
                 .keyboardShortcut("4", modifiers: .command)
 
-                Button(AppLocalization.string("Settings", appLanguage: settings.appLanguage)) {
-                    appModel.selection = .settings
-                }
-                .keyboardShortcut("5", modifiers: .command)
+                // L15: Settings is reached via the native ⌘, scene below, not a sidebar destination.
             }
 
             SidebarCommands()

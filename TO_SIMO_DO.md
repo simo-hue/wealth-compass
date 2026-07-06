@@ -219,4 +219,17 @@ _Needs the app-lock enabled; iOS + macOS:_
   correct biometry name + icon (Face ID / Touch ID). No functional change expected (this just caches the
   biometry type instead of re-probing on every render).
 
+### Batch T2-3b (chart domain / cash-flow filter / layout / Mac Settings: L31, L17, L24, L15) — landed, not yet built
+- [ ] **L31** — On a brand-new account (net worth 0) or one near break-even, the dashboard net-worth chart
+  shows a **readable y-axis** (roughly -1…1), not an absurd sub-penny scale (-0.01, 0, 0.01). Also covered by a unit test.
+- [ ] **L17** (macOS) — Add a **future-dated** transaction (e.g. rent next week). With Period = **Year to Date**
+  (or All) it must appear in the cash-flow **table**; under rolling windows (7/30/90 days) it's correctly absent
+  (it's not in the "last N days"). The chart/totals still don't count it until it's realized.
+- [ ] **L24** (macOS) — On the Investments **Overview**, drag the sidebar to make the detail pane **narrow**:
+  the three allocation charts must **reflow** (wrap to fewer columns / stack) with readable legends, not squeeze
+  into three skinny truncated columns.
+- [ ] **L15** (macOS) — **Settings** is no longer in the sidebar (⌘5 removed). Open it via **⌘,** or
+  WealthCompass ▸ Settings… (the native window). Confirm the sidebar shows only Dashboard/Cash Flow/Investments/Crypto,
+  and **⌘R Refresh Data** works on all of them.
+
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->

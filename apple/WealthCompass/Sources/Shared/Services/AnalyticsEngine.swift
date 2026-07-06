@@ -199,7 +199,15 @@ struct AnalyticsEngine {
         }
         let spread = max(maximum - minimum, max(abs(maximum), 1) * 0.08)
         let padding = spread * 0.18
-        return (minimum - padding)...(maximum + padding)
+        let lower = minimum - padding
+        let upper = maximum + padding
+        // L31: guarantee a minimum readable domain height so an all-zero series (new user) or a
+        // near-zero net worth doesn't over-zoom into a sub-penny hairline axis (e.g. -0.01…0.01).
+        // Normal series (height already ≥ minHeight) are returned unchanged.
+        let minHeight = 2.0
+        guard upper - lower < minHeight else { return lower...upper }
+        let center = (lower + upper) / 2
+        return (center - minHeight / 2)...(center + minHeight / 2)
     }
 
     func cashFlowTrend(months: Int = 6) -> [CashFlowMonth] {

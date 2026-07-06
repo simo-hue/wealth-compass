@@ -37,7 +37,14 @@ struct MacInvestmentsView: View {
                     VStack(alignment: .leading, spacing: 24) {
                         summaryCards
                         
-                        HStack(spacing: 24) {
+                        // L24: reflow the three charts into fewer columns on a narrow detail pane
+                        // (an adaptive grid) instead of squeezing all three into a fixed HStack, which
+                        // collapsed each to ~140pt and truncated the legends.
+                        LazyVGrid(
+                            columns: [GridItem(.adaptive(minimum: 240), spacing: 24)],
+                            alignment: .leading,
+                            spacing: 24
+                        ) {
                             AllocationChart(
                                 title: LocalizedStringKey("Allocation by Sector"),
                                 slices: finance.investmentAllocation(settings: settings),

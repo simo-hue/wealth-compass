@@ -1,12 +1,13 @@
 import Foundation
 import SwiftUI
 
+// L15: Settings is intentionally NOT a sidebar destination — the native macOS Settings scene (⌘,)
+// is the single canonical Settings surface, so the two instances can't diverge in transient UI state.
 enum MacDestination: String, CaseIterable, Identifiable {
     case dashboard
     case cashFlow
     case investments
     case crypto
-    case settings
 
     var id: String { rawValue }
 
@@ -16,7 +17,6 @@ enum MacDestination: String, CaseIterable, Identifiable {
         case .cashFlow: "Cash Flow"
         case .investments: "Investments"
         case .crypto: "Crypto"
-        case .settings: "Settings"
         }
     }
 
@@ -26,7 +26,6 @@ enum MacDestination: String, CaseIterable, Identifiable {
         case .cashFlow: "arrow.left.arrow.right"
         case .investments: "chart.line.uptrend.xyaxis"
         case .crypto: "bitcoinsign.circle"
-        case .settings: "gearshape"
         }
     }
 }
@@ -59,7 +58,7 @@ final class MacAppModel: ObservableObject {
             editor = .investment(nil)
         case .crypto:
             editor = .crypto(nil)
-        case .dashboard, .cashFlow, .settings, nil:
+        case .dashboard, .cashFlow, nil:
             editor = .transaction
         }
     }

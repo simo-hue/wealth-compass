@@ -95,6 +95,24 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertGreaterThan(domain.upperBound, 200, "padded above the finite max")
     }
 
+    /// L31: a zero or near-zero net-worth series yields a readable band, not a sub-penny hairline axis.
+    func testChartYDomainFloorsNearZeroSeries() {
+        func pts(_ values: [Double]) -> [NetWorthPoint] { values.map { NetWorthPoint(date: date(2026, 6, 1), value: $0) } }
+
+        let zero = AnalyticsEngine.chartYDomain(for: pts([0, 0, 0]))
+        XCTAssertGreaterThanOrEqual(zero.upperBound - zero.lowerBound, 2, "all-zero series spans at least ~2 units")
+        XCTAssertEqual((zero.lowerBound + zero.upperBound) / 2, 0, accuracy: 0.0001, "all-zero band is centred on 0")
+
+        let negative = AnalyticsEngine.chartYDomain(for: pts([-0.5]))
+        XCTAssertLessThan(negative.lowerBound, -1, "near-zero-negative net worth widens below -1, not a hairline")
+
+        // A normal, wide series keeps its real scale (the floor doesn't kick in).
+        let wide = AnalyticsEngine.chartYDomain(for: pts([1000, 5000]))
+        XCTAssertLessThan(wide.lowerBound, 1000, "wide series padded below the min")
+        XCTAssertGreaterThan(wide.upperBound, 5000, "wide series padded above the max")
+        XCTAssertGreaterThan(wide.upperBound - wide.lowerBound, 4000, "wide series keeps its real scale, not the 2-unit floor")
+    }
+
     func testCalculateTotalsConvertsTransactionsByOwnCurrency() {
         // WC-M1: each transaction converts from its own currency to the display currency
         // before summing into cash/liquidity.

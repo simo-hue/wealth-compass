@@ -855,10 +855,13 @@ struct MacCashFlowView: View {
     }
 
     private var filteredTransactions: [Transaction] {
-        finance.transactions.filter { transaction in
+        // Hoist the period bounds out of the per-row closure (both were recomputed per transaction).
+        let startDate = transactionStartDate
+        let endDate = transactionEndDate
+        return finance.transactions.filter { transaction in
             let matchesType = transactionTypeFilter.transactionType.map { $0 == transaction.type } ?? true
-            let matchesPeriod = transactionStartDate.map {
-                transaction.date >= $0 && transaction.date <= Date()
+            let matchesPeriod = startDate.map { start in
+                transaction.date >= start && (endDate.map { transaction.date <= $0 } ?? true)
             } ?? true
             let matchesSearch = searchText.isEmpty
                 || transaction.category.localizedCaseInsensitiveContains(searchText)
@@ -881,6 +884,26 @@ struct MacCashFlowView: View {
             return calendar.date(byAdding: .month, value: -3, to: now)
         case .yearToDate:
             return calendar.date(from: calendar.dateComponents([.year], from: now))
+        case .all:
+            return nil
+        }
+    }
+
+    /// L17: the upper bound of the period window. Rolling windows (7/30/90 days) end at *now* — a
+    /// post-dated transaction genuinely isn't in the "last N days". Year-to-date spans the whole
+    /// calendar year, so a future-this-year entry stays visible in the table instead of silently
+    /// vanishing until 'All'. (The chart/totals still exclude unrealized future flow via
+    /// AnalyticsEngine's own `<= now` clamp; the table lists what has been entered.)
+    private var transactionEndDate: Date? {
+        let calendar = Calendar.current
+        let now = Date()
+
+        switch transactionPeriod {
+        case .sevenDays, .thirtyDays, .threeMonths:
+            return now
+        case .yearToDate:
+            return calendar.date(from: calendar.dateComponents([.year], from: now))
+                .flatMap { calendar.date(byAdding: DateComponents(year: 1, second: -1), to: $0) }
         case .all:
             return nil
         }

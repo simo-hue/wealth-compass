@@ -1,5 +1,13 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 2 batch 3b (chart domain / cash-flow filter / layout / Mac Settings) — ⏳ pending on-device build/test
+  - *Details*: On `low-t2-uxperf` off `main`. Adversarially reviewed (no local Xcode).
+  - *Tech Notes*:
+    - **L31** — `AnalyticsEngine.chartYDomain` now floors the domain at a **2-unit minimum height** (centred on the data) so an all-zero series (new user) or a near-zero net worth renders a readable band (~-1…1) instead of a sub-penny hairline axis. Normal series (already ≥ 2 units tall) are returned byte-identically — the `spread`/`padding` math is unchanged; only a post-hoc min-height guard was added. (The audit's suggested formula only widened the *padding* to ±0.18, not its claimed ±1.18; the guard achieves the intended readable band.) New unit test `testChartYDomainFloorsNearZeroSeries` pins zero-centred span ≥ 2, near-zero-negative lowerBound < -1, and that a wide series keeps its real scale.
+    - **L17** (macOS) — `MacCashFlowView.filteredTransactions` gained a period-appropriate upper bound: rolling windows (7/30/90 days) still end at *now*, but **year-to-date** now spans the whole calendar year, so a future-this-year transaction stays visible in the table instead of silently vanishing until 'All'. AnalyticsEngine's `<= now` clamp on the chart/totals is intentionally left (table = entered ledger; chart = realized flow). Also hoisted both period bounds out of the per-row filter closure (they were recomputed per transaction).
+    - **L24** (macOS) — the three investment `AllocationChart`s moved from a fixed `HStack` into an adaptive `LazyVGrid` (`GridItem(.adaptive(minimum: 240))`), so on a narrow detail pane they reflow to fewer columns instead of squeezing to ~140pt and truncating legends.
+    - **L15** (macOS) — removed the duplicate **sidebar** Settings destination so the native **⌘, Settings scene** is the single canonical Settings surface (the two instances could otherwise diverge in transient UI state). Dropped `MacDestination.settings` (+ its title/icon/`presentNewItem` arms), the `case .settings` detail arm, and the ⌘5 command; the refresh toolbar (⌘R) is now unconditional since every remaining destination wants it. Settings is reached via ⌘, / the app menu.
+
 - [2026-07-06]: Deep-audit Low — Tier 2 batch 3a (biometric lock) — ⏳ pending on-device build/test
   - *Details*: On `low-t2-biometric` off `main`. All in `BiometricLockStore.swift` (shared iOS+macOS); view call sites unchanged. Adversarially reviewed (no local Xcode).
   - *Tech Notes*:

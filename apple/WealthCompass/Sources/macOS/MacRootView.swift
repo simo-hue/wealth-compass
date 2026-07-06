@@ -34,17 +34,15 @@ struct MacRootView: View {
                         .frame(minWidth: 520, minHeight: 400)
                         .toolbar {
                             ToolbarItemGroup(placement: .primaryAction) {
-                                // WC-M12: "Refresh Data" is meaningless on the Settings page —
-                                // hide it (and its ⌘R) there. Settings stays a sidebar destination.
-                                if appModel.selection != .settings {
-                                    Button {
-                                        Task { await refreshData() }
-                                    } label: {
-                                        Label(refreshDataLabel, systemImage: "arrow.clockwise")
-                                    }
-                                    .disabled(isRefreshing)
-                                    .keyboardShortcut("r", modifiers: .command)
+                                // L15: Settings is no longer a sidebar destination (it's the native ⌘,
+                                // scene), so every remaining detail page wants "Refresh Data" (⌘R).
+                                Button {
+                                    Task { await refreshData() }
+                                } label: {
+                                    Label(refreshDataLabel, systemImage: "arrow.clockwise")
                                 }
+                                .disabled(isRefreshing)
+                                .keyboardShortcut("r", modifiers: .command)
                             }
                         }
                 }
@@ -147,8 +145,6 @@ struct MacRootView: View {
             MacInvestmentsView()
         case .crypto:
             MacCryptoView()
-        case .settings:
-            MacSettingsView()
         }
     }
 
