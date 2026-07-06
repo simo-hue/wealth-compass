@@ -35,12 +35,19 @@ struct AnalyticsEngine {
     }
 
     func calculateTotals() -> FinanceTotals {
-        let totalLiquidity = data.transactions.reduce(Decimal(0)) { result, transaction in
-            switch transaction.type {
-            case .income:  return result + displayAmount(transaction)
-            case .expense: return result - displayAmount(transaction)
+        // Exclude future-dated transactions from the live total (deep-audit L51): a transaction dated
+        // ahead of today would otherwise inflate today's net worth (and its snapshot), while
+        // adjustHistoricalSnapshots only shifts snapshots on/after that future date — an inconsistency.
+        // Future-dating stays allowed; the amount lands in the total once its day arrives.
+        let startOfToday = calendar.startOfDay(for: now)
+        let totalLiquidity = data.transactions
+            .filter { calendar.startOfDay(for: $0.date) <= startOfToday }
+            .reduce(Decimal(0)) { result, transaction in
+                switch transaction.type {
+                case .income:  return result + displayAmount(transaction)
+                case .expense: return result - displayAmount(transaction)
+                }
             }
-        }
         let totalInvestments = data.investments.reduce(Decimal(0)) {
             $0 + convert($1.currentValue, from: $1.currency)
         }
@@ -256,6 +263,7 @@ struct AnalyticsEngine {
             .map { index, item in
                 AllocationSlice(id: item.name, name: item.name, value: item.value.doubleValue, color: ColorPalette.chart[index % ColorPalette.chart.count])
             }
+            .filter { $0.value > 0 }
     }
 
     func investmentTypeAllocation() -> [AllocationSlice] {
@@ -278,6 +286,7 @@ struct AnalyticsEngine {
                     color: ColorPalette.chartType[index % ColorPalette.chartType.count]
                 )
             }
+            .filter { $0.value > 0 }
     }
 
     func investmentGeographyAllocation() -> [AllocationSlice] {
@@ -294,6 +303,7 @@ struct AnalyticsEngine {
             .map { index, item in
                 AllocationSlice(id: item.name, name: item.name, value: item.value.doubleValue, color: ColorPalette.chartGeography[index % ColorPalette.chartGeography.count])
             }
+            .filter { $0.value > 0 }
     }
 
     func cryptoAllocation() -> [AllocationSlice] {

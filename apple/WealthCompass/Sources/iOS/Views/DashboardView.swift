@@ -521,7 +521,7 @@ struct DashboardView: View {
             return nil
         }
         let change = last.value - first.value
-        let percentage = first.value != 0 ? change / abs(first.value) * 100 : 0
+        let percentage = abs(first.value) > 1 ? change / abs(first.value) * 100 : 0
         return (change, percentage)
     }
 

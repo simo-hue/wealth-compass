@@ -1,5 +1,14 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 1 batch 1 (analytics / allocation correctness) — ⏳ pending on-device build/test
+  - *Details*: First Low-tier batch on `fix/low-t1b1-analytics` off `main` (Low tier runs in 3 risk-priority checkpoints; this is checkpoint-1 work). Adversarially compile/logic-reviewed (no local Xcode).
+  - *Tech Notes*:
+    - **L07** — `netWorthChange` (iOS `DashboardView` + `MacDashboardView`) guards `abs(first.value) > 1` instead of `!= 0`, so a near-zero range baseline (a debt↔solvency crossover) no longer yields an absurd percentage (e.g. 50000%); sub-unit baselines show 0%.
+    - **L34** — `investmentAllocation` / `investmentTypeAllocation` / `investmentGeographyAllocation` now append `.filter { $0.value > 0 }` (matching `cryptoAllocation`/`assetAllocation`), removing phantom zero-value legend rows. Colors are assigned by `enumerated()` index *before* the filter, so surviving slices keep stable colors.
+    - **L51** (scoped) — `AnalyticsEngine.calculateTotals` excludes future-dated transactions from `totalLiquidity` (`calendar.startOfDay(for: $0.date) <= startOfToday`), so a transaction dated ahead of today no longer inflates today's net worth / snapshot while `adjustHistoricalSnapshots` only shifts snapshots on/after that date. `FinanceStore.cachedTotals` gained a `dayStamp` (invalidates at midnight, like `cachedSnapshotsForChart`). Future-dating stays allowed — the amount lands once its day arrives. **Skipped** the audit's DatePicker-lockout (would remove future-dating, conflicting with L17). New test `testCalculateTotalsExcludesFutureDatedTransactions`.
+    - *Skipped — already done:* **L28** (`gainLossPercent` already uses `abs(costBasis)` + `!= 0` via M10).
+    - *Deferred:* **L33** (asset pie drops negative cash → total ≠ net-worth header — needs a UX ruling) and **L39** (sync tombstone race — audit says "confirm at runtime before fixing"). Both flagged in root `TO_SIMO_DO.md`.
+
 - [2026-07-05]: Deep-audit Medium — Batch M3-rest (perf / charts) — ⏳ pending on-device build/test
   - *Details*: 4 findings (M04, M15, M16, M27) on branch `fix/medium-m3rest-perf-charts` off `main`. **Completes the implementable Medium tier** — only the deferred M31 (push sync) remains. Adversarially compile/cache-reviewed by parallel agents (no local Xcode).
   - *Tech Notes*:

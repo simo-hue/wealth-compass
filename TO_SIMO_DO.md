@@ -115,4 +115,19 @@ M28 needs a corrupt local DB to trigger). The rest are worth an eyeball:_
   window: no stutter. Then add a transaction and confirm the cash-flow numbers update (cache
   invalidates on data change). _Perf-only; correctness is covered by the build + tests._
 
+### Low Tier 1 (correctness / data-loss) — landing batch-by-batch on `main`, verify at the Tier-1 checkpoint
+_I'll tell you when all Tier-1 batches have landed; then build + run these. Batch 1 (analytics):_
+- [ ] **L07** — On a dashboard where net worth crosses ~0 within the selected range (e.g. -100 → +50),
+  the change badge shows the absolute change with a sane / 0 %, not a huge percentage.
+- [ ] **L34** — With an investment whose bucket nets to 0, the investment allocation legend shows no
+  empty/phantom row.
+- [ ] **L51** — Add a transaction dated in the **future** (e.g. next week). Today's net-worth total must
+  **not** include it yet; it appears once that day arrives. (Also covered by a unit test.)
+
+**Deferred — need your input (not blocking):**
+- [ ] **L33** — The asset-allocation pie drops negative cash, so its total ≠ the net-worth header. Pick a
+  fix and tell me: (a) clamp cash to 0 + a footnote, (b) relabel the ring "Assets", or (c) leave it.
+- [ ] **L39** — Possible sync tombstone race; the audit marks it "confirm at runtime before fixing." If
+  you can reproduce a lost/duplicated delete during concurrent sync, tell me and I'll fix it.
+
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->

@@ -36,6 +36,18 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual(totals.netWorth, 650)
     }
 
+    func testCalculateTotalsExcludesFutureDatedTransactions() {
+        // deep-audit L51: a transaction dated after today must not inflate today's total (it counts
+        // once its day arrives), matching adjustHistoricalSnapshots' on/after-date behavior.
+        let data = FinancialData(transactions: [
+            tx(.income, 1000, "Salary", date(2026, 6, 10)),
+            tx(.income, 5000, "Future paycheck", date(2026, 6, 20))
+        ])
+        let totals = engine(data, now: date(2026, 6, 15)).calculateTotals()
+        XCTAssertEqual(totals.totalLiquidity, 1000, "the 6/20 income is in the future and excluded")
+        XCTAssertEqual(totals.netWorth, 1000)
+    }
+
     /// WC-#11: backfill snapshots are no longer stored; the chart carries the prior value forward to
     /// fill no-activity days, so two real snapshots 4 days apart still render a continuous flat line
     /// (not a slope), without a row per gap day in storage/iCloud.

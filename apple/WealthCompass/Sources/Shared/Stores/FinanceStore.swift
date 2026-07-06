@@ -102,7 +102,7 @@ final class FinanceStore: ObservableObject {
     /// Memoized totals (M3). The key is the full set of inputs to `calculateTotals`
     /// — data version + display currency + rate-snapshot timestamp — so it can never
     /// return a stale result after a data, currency, or exchange-rate change.
-    private var cachedTotals: (version: Int, currency: Currency, rateStamp: Date?, value: FinanceTotals)?
+    private var cachedTotals: (version: Int, currency: Currency, rateStamp: Date?, dayStamp: Date, value: FinanceTotals)?
     /// Cache of the encoded per-entity CloudKit sync snapshot, keyed by `dataVersion` (H4).
     /// `cloudSyncRecords()` is a full-dataset JSON-encode + SHA-256 and the snapshot provider
     /// can be invoked several times within one sync pass (send batch, bootstrap merge,
@@ -766,14 +766,18 @@ final class FinanceStore: ObservableObject {
 
     func calculateTotals(settings: AppSettings) -> FinanceTotals {
         let rateStamp = settings.exchangeRateSnapshot?.fetchedAt
+        // Totals now exclude future-dated transactions (deep-audit L51), so the cache must invalidate
+        // at midnight — mirror `cachedSnapshotsForChart`'s day stamp.
+        let dayStamp = Calendar.current.startOfDay(for: Date())
         if let cache = cachedTotals,
            cache.version == dataVersion,
            cache.currency == settings.currency,
-           cache.rateStamp == rateStamp {
+           cache.rateStamp == rateStamp,
+           cache.dayStamp == dayStamp {
             return cache.value
         }
         let totals = analytics(settings).calculateTotals()
-        cachedTotals = (dataVersion, settings.currency, rateStamp, totals)
+        cachedTotals = (dataVersion, settings.currency, rateStamp, dayStamp, totals)
         return totals
     }
 
