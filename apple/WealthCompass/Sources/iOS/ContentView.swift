@@ -53,6 +53,10 @@ struct ContentView: View {
             // actually unlocks — otherwise sync/recurring would be skipped until the next foreground.
             if isUnlocked { Task { await handleAppBecameActive() } }
         }
+        .onChange(of: settings.isICloudSyncEnabled) { _, enabled in
+            // M31: register for push the moment sync is enabled, so it works without a foreground round-trip.
+            if enabled { UIApplication.shared.registerForRemoteNotifications() }
+        }
         .task {
             await handleAppBecameActive()
         }
@@ -114,6 +118,11 @@ struct ContentView: View {
         // lock screen is up; the .onChange(isUnlocked) handler re-runs this right after unlock.
         guard appLock.isUnlocked else { return }
         await finance.ensureICloudSyncRunning()
+        // M31: register for silent CloudKit pushes so remote changes propagate in near-real-time /
+        // in the background, instead of only on the next foreground. Idempotent; only when sync is on.
+        if settings.isICloudSyncEnabled {
+            UIApplication.shared.registerForRemoteNotifications()
+        }
         await finance.requestICloudSync()
         await processRecurringTransactions()
         await refreshRemoteDataIfNeeded()

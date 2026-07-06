@@ -9,6 +9,31 @@ you run the checks below whenever you're at a real Mac and report anything red.
 ## 1. Manual product / provisioning actions
 - [ ] Onboarding tutorial for inserting the API KEY for the tracking of the assets (both macOS and iOS).
 
+### ⚑ M31 CloudKit push — REQUIRED provisioning before the app will build/sign
+The M31 code is landed (entitlements now declare `aps-environment`), so **signing will fail until you
+enable Push on the App ID and regenerate the profile.** Steps:
+
+**Apple Developer portal** (developer.apple.com → Certificates, Identifiers & Profiles):
+- [ ] Identifiers → App ID `com.wealthcompass.mobile` → enable **Push Notifications** (keep iCloud/CloudKit on) → Save.
+  _(Both targets share this bundle id per `apple/CLAUDE.md`; if the Mac app ever gets its own App ID, enable Push there too.)_
+- [ ] Regenerate the provisioning profile(s) — or just let Xcode's automatic signing do it (next step).
+
+**Xcode** (open `WealthCompass.xcodeproj`):
+- [ ] **WealthCompassMobile** + **WealthCompassMac** targets → Signing & Capabilities → **+ Capability → Push Notifications**
+  (Xcode picks up the `aps-environment` entitlement I added).
+- [ ] **WealthCompassMobile** → **+ Capability → Background Modes** → tick **Remote notifications**
+  (matches the `UIBackgroundModes` I added to `Resources/iOS/Info.plist`).
+- [ ] With **Automatically manage signing** on, Xcode regenerates the profile including Push → clean build.
+  For an App Store archive, Xcode auto-remaps `aps-environment` `development` → `production`.
+
+**Smoke test (needs 2 devices on the same iCloud account, sync ON):**
+- [ ] Add/edit a transaction on device A while device B is **backgrounded** (not force-quit). Within a
+  minute or so (CloudKit push latency), B should reflect the change **without** being foregrounded/force-synced.
+  Check Console.app for the `CloudKitPush` category log lines ("Registered for remote notifications",
+  "Received remote notification — triggering CloudKit sync").
+- [ ] _Note: a push that wakes the app from a **force-quit** state may not sync until next foreground
+  (documented edge); CKSyncEngine catches up then. Backgrounded (not terminated) is the real-time path._
+
 ---
 
 ## 2. Build & test (run from `apple/`, after pulling latest `main`)

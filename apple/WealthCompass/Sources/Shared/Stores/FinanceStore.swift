@@ -155,6 +155,12 @@ final class FinanceStore: ObservableObject {
     /// L52: handle to the init-time "restore sync-enabled state" task, so a factory reset can cancel
     /// it before it (re)starts the CloudKit engine after the wipe cleared the sync flag.
     private var initialSyncEnableTask: Task<Void, Never>?
+
+    /// M31: weak bridge to the single live store so an app-delegate remote-notification handler — which
+    /// has no environment injection — can drive a push-triggered sync (`handleRemoteCloudKitPush`). The
+    /// app constructs exactly one `FinanceStore`; a background CloudKit push must reach it directly (not
+    /// via a view that may not be alive when the app is woken).
+    static weak var current: FinanceStore?
     /// Generation bookkeeping (main-actor only) used to know when the save pipeline is
     /// idle — both for correctness reasoning and for deterministic tests.
     private var lastEnqueuedSaveGeneration = 0
@@ -215,6 +221,9 @@ final class FinanceStore: ObservableObject {
         // launch — otherwise a failed refresh would retry on every relaunch with no throttle window,
         // mirroring how AppSettings persists its exchange-rate retry state.
         lastMarketPriceRefreshAttemptAt = UserDefaults.standard.object(forKey: FinanceStore.marketPriceRefreshAttemptKey) as? Date
+
+        // M31: register as the single live store so a background CloudKit push can reach us.
+        Self.current = self
 
         let seedRecords = load()
         startSaveConsumer(seedRecords: seedRecords)
@@ -1327,6 +1336,21 @@ final class FinanceStore: ObservableObject {
     func requestICloudSync() async {
         guard isICloudSyncEnabledResolved else { return }
         await cloudSyncService.requestSync()
+    }
+
+    /// M31: a CloudKit silent push means a remote device changed the zone. Ensure the engine is up and
+    /// fetch/send promptly — bypassing the foreground opportunistic-sync debounce, since a push already
+    /// means "there is a change now". No-op when sync is disabled.
+    func syncForRemotePush() async {
+        guard isICloudSyncEnabledResolved else { return }
+        await cloudSyncService.start(allowAccountReplacement: false) // idempotent; ensures the engine is up
+        await cloudSyncService.synchronize()
+    }
+
+    /// M31: entry point for the app-delegate remote-notification handlers, which have no environment
+    /// injection — routes a received CloudKit push to the single live store's push sync.
+    static func handleRemoteCloudKitPush() async {
+        await current?.syncForRemotePush()
     }
 
     private func applyRemoteMutations(

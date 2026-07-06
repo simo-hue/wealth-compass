@@ -10,6 +10,10 @@
 	<array>
 		<string>CloudKit</string>
 	</array>
+	<!-- M31: CloudKit push delivery (see the iOS entitlements note). Requires Push Notifications on the
+	     App ID + a regenerated provisioning profile. A sandboxed macOS app still receives CloudKit pushes. -->
+	<key>aps-environment</key>
+	<string>development</string>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
 	<key>com.apple.security.files.user-selected.read-write</key>

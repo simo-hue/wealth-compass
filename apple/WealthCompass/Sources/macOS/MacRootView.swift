@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct MacRootView: View {
@@ -98,6 +99,10 @@ struct MacRootView: View {
                 appModel.editor = nil
             }
         }
+        .onChange(of: settings.isICloudSyncEnabled) { _, enabled in
+            // M31: register for push the moment sync is enabled, so it works without a foreground round-trip.
+            if enabled { NSApplication.shared.registerForRemoteNotifications() }
+        }
         .onReceive(recurringCheckTimer) { _ in
             guard scenePhase == .active, appLock.isUnlocked else { return }
             Task { await processRecurringTransactions() }
@@ -153,6 +158,11 @@ struct MacRootView: View {
         // lock screen is up; the .onChange(isUnlocked) handler re-runs this right after unlock.
         guard appLock.isUnlocked else { return }
         await finance.ensureICloudSyncRunning()
+        // M31: register for silent CloudKit pushes so remote changes propagate in near-real-time /
+        // in the background, instead of only on the next foreground. Idempotent; only when sync is on.
+        if settings.isICloudSyncEnabled {
+            NSApplication.shared.registerForRemoteNotifications()
+        }
         await finance.requestICloudSync()
         await processRecurringTransactions()
 

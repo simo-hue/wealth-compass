@@ -1,4 +1,5 @@
 import Foundation
+import os
 import UIKit
 import UserNotifications
 
@@ -7,6 +8,9 @@ extension Notification.Name {
         "wealthCompass.recurringTransactionNotificationReceived"
     )
 }
+
+/// M31: diagnostics for the CloudKit push channel, via the unified log (App-Store-safe).
+private let cloudKitPushLog = Logger(subsystem: "com.wealthcompass.mobile", category: "CloudKitPush")
 
 final class AppNotificationDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(
@@ -55,6 +59,35 @@ final class AppNotificationDelegate: NSObject, UIApplicationDelegate, UNUserNoti
     ) {
         NotificationCenter.default.post(name: .recurringTransactionNotificationReceived, object: nil)
         completionHandler()
+    }
+
+    // MARK: - M31: CloudKit push (remote notifications)
+
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        // The token isn't sent anywhere — CloudKit owns the APNs channel server-side. Registration
+        // succeeding is what matters; log it for diagnostics.
+        cloudKitPushLog.info("Registered for remote notifications (\(deviceToken.count) byte token).")
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+        cloudKitPushLog.error("Failed to register for remote notifications: \(error.localizedDescription, privacy: .public)")
+    }
+
+    func application(
+        _ application: UIApplication,
+        didReceiveRemoteNotification userInfo: [AnyHashable: Any]
+    ) async -> UIBackgroundFetchResult {
+        // A silent CloudKit push: a remote device changed the zone. Drive a fetch, then report new data
+        // so the system keeps waking us for future pushes. `handleRemoteCloudKitPush` no-ops if sync is off.
+        cloudKitPushLog.info("Received remote notification — triggering CloudKit sync.")
+        await FinanceStore.handleRemoteCloudKitPush()
+        return .newData
     }
 }
 

@@ -1,5 +1,15 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit — M31 CloudKit push sync — ⏳ **BLOCKED on manual provisioning** (build won't sign until Push is enabled on the App ID + profile regenerated — see TO_SIMO_DO §1)
+  - *Details*: On `feature-m31-push-sync` off `main`. Wires silent-push delivery into the existing CKSyncEngine so remote changes propagate in near-real-time / in the background, not just on foreground. Push-only scope (BGTask deferred, per the grill). Adversarially reviewed — no code issues.
+  - *Tech Notes*:
+    - **Entitlements** — added `aps-environment` = `development` to both `WealthCompassMobile.entitlements` and `Resources/macOS/WealthCompassMac.entitlements` (Xcode's managed signing remaps to `production` on App Store archive).
+    - **iOS Info.plist** — added `UIBackgroundModes` → `remote-notification`.
+    - **Delegates** — `AppNotificationDelegate` (iOS) + `MacAppDelegate` (macOS) gained `didRegisterForRemoteNotificationsWithDeviceToken` / `didFailToRegister…` (os.Logger diagnostics) and a `didReceiveRemoteNotification` handler (iOS: async → `.newData`; macOS: `Task {}`) that calls `FinanceStore.handleRemoteCloudKitPush()`.
+    - **FinanceStore bridge** — `static weak var current` (set in init) lets the delegate reach the single live store even for a background wake; `syncForRemotePush()` ensures the engine is up and runs a non-debounced `synchronize()`; `handleRemoteCloudKitPush()` no-ops when sync is off.
+    - **Registration** — `registerForRemoteNotifications()` is called (iOS `UIApplication` / macOS `NSApplication`) from the become-active handlers and an `onChange(isICloudSyncEnabled)`, gated on sync being on. Added `import AppKit` to `MacRootView` to make the new AppKit dependency explicit.
+    - *Known edge (non-blocking):* a silent push that wakes the app from a fully-terminated state before SwiftUI realizes the `StateObject` finds `current == nil` and no-ops (returns `.newData`); CKSyncEngine reconciles on the next foreground regardless — degrades to the pre-M31 behavior, no data loss.
+
 - [2026-07-06]: Deep-audit Low — Tier 3 part 2 (refresh/recurring perf; L55 deferred) — ⏳ pending on-device build/test
   - *Details*: On `low-t3-perf` off `main`. Adversarially reviewed (no local Xcode).
   - *Tech Notes*:
