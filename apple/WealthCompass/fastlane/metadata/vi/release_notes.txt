@@ -1,1 +1,1 @@
-UI improvements
+Cải thiện tính năng tự làm mới dữ liệu thị trường với hỗ trợ cổ phiếu quốc tế. Nâng cao độ ổn định đồng bộ và sửa nhiều lỗi khác nhau.

@@ -1,6 +1,6 @@
-Wealth Compass és un tauler de finançament personal privat i local que us ajuda a entendre el vostre valor net, flux d'efectiu, inversions, actius criptogràfics i passius en un sol lloc.
+Wealth Compass és un tauler de finançament personal privat i local que us ajuda a entendre el vostre patrimoni net, flux d'efectiu, inversions, actius criptogràfics i passius en un sol lloc.
 
-Feu una imatge clara de les vostres finances:
+Construeix una imatge clara de les teves finances:
 
 - Vegeu el valor net, el saldo d'efectiu, les inversions i la criptografia d'un cop d'ull
 - Feu un seguiment dels ingressos i les despeses amb categories i tendències visuals

@@ -410,3 +410,7 @@
 - [2026-06-30]: Bump Build Version
   - *Details*: Bumped `CURRENT_PROJECT_VERSION` (CFBundleVersion) from 9 to 10 to fix App Store Connect validation error 90061.
   - *Tech Notes*: Ran `agvtool next-version -all` to increment the build number in `project.pbxproj` and `Info.plist`.
+
+- [2026-07-06]: Bump App Version
+  - *Details*: Upgraded app version from 1.0.9 to 1.0.10 and build number from 10 to 11 in WealthCompass.xcodeproj/project.pbxproj.
+  - *Tech Notes*: This update affects both the iOS and macOS targets to prepare for an App Store Connect submission.

@@ -1,1 +1,1 @@
-UI improvements
+Vylepšené automatické aktualizace tržních dat s podporou mezinárodních akcií. Zlepšená stabilita synchronizace a různé opravy chyb.

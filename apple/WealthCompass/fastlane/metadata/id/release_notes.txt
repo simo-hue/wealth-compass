@@ -1,1 +1,1 @@
-UI improvements
+Pembaruan otomatis data pasar yang ditingkatkan dengan dukungan saham internasional. Peningkatan stabilitas sinkronisasi dan berbagai perbaikan bug.

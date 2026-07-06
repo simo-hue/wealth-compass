@@ -1,1 +1,1 @@
-UI improvements
+Millora de l'actualització automàtica de dades de mercat amb suport per a accions internacionals. Estabilitat de sincronització millorada i diverses correccions d'errors.

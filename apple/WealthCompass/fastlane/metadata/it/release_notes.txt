@@ -1,1 +1,1 @@
-UI improvements
+Aggiornamento automatico dei dati di mercato migliorato con supporto per azioni internazionali. Migliorata la stabilità della sincronizzazione e risolti vari bug.
