@@ -313,3 +313,7 @@
 - [2026-06-30T21:20:00Z]: Version Bump
   - *Details*: Updated the marketing version to 1.0.9 for both macOS and iOS.
   - *Tech Notes*: Updated `MARKETING_VERSION` to `1.0.9` in `project.pbxproj`, `Info.plist`, and the fastlane `Fastfile` comment.
+
+- [2026-07-06T21:12:00+02:00]: Import Summary Sheet Height Fix
+  - *Details*: Fixed the import summary sheet opening at half-screen height (truncating content) after importing external data. It now opens at full height, showing all category tiles and the Done button immediately.
+  - *Tech Notes*: Changed `.presentationDetents([.medium, .large])` to `.presentationDetents([.large])` in `SettingsView.swift` line 294.

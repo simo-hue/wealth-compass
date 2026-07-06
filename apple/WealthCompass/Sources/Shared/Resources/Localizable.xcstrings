@@ -1680,6 +1680,7 @@
       }
     },
     "%@\n\nWealth Compass will continue using %@." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1892,6 +1893,12 @@
           }
         }
       }
+    },
+    "%@\n\nWealth Compass will continue using the built-in offline fallback rates." : {
+
+    },
+    "%@\n\nWealth Compass will continue using the last cached rates." : {
+
     },
     "%@ (%@)" : {
       "extractionState" : "stale",
@@ -20853,6 +20860,7 @@
       }
     },
     "Average Buy Price" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21059,6 +21067,9 @@
           }
         }
       }
+    },
+    "Average Buy Price (%@)" : {
+
     },
     "Back" : {
 
@@ -22325,6 +22336,9 @@
           }
         }
       }
+    },
+    "Biometric enrollment changed. Unlock again to confirm it's you." : {
+
     },
     "Biometrics" : {
       "localizations" : {
@@ -25247,6 +25261,9 @@
         }
       }
     },
+    "Change Currency" : {
+
+    },
     "Change the search, type, or period filters." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -25669,6 +25686,9 @@
           }
         }
       }
+    },
+    "Chart shows gross assets; %@ in net cash liabilities is excluded." : {
+
     },
     "Checking the iCloud account and preparing CloudKit." : {
       "localizations" : {
@@ -29651,6 +29671,19 @@
         }
       }
     },
+    "Convert Amounts" : {
+
+    },
+    "Convert the entered amounts from %@ to %@ at today's exchange rate, or keep the numbers and just relabel them?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Convert the entered amounts from %1$@ to %2$@ at today's exchange rate, or keep the numbers and just relabel them?"
+          }
+        }
+      }
+    },
     "Copy your API key and paste it below." : {
       "localizations" : {
         "ar" : {
@@ -32993,6 +33026,9 @@
           }
         }
       }
+    },
+    "Current Price (%@)" : {
+
     },
     "Custom Categories" : {
       "localizations" : {
@@ -38839,6 +38875,9 @@
       }
     },
     "Diagnostics Exported" : {
+
+    },
+    "Discard" : {
 
     },
     "Dividends" : {
@@ -61320,6 +61359,9 @@
           }
         }
       }
+    },
+    "Keep Numbers" : {
+
     },
     "Keychain Error" : {
 
@@ -86046,6 +86088,12 @@
         }
       }
     },
+    "Rates may be incomplete" : {
+
+    },
+    "Rates may be incomplete: %@ aren't in the latest update and use an approximate offline rate." : {
+
+    },
     "Real Estate" : {
       "localizations" : {
         "ar" : {
@@ -92267,6 +92315,9 @@
           }
         }
       }
+    },
+    "Save & Continue" : {
+
     },
     "Save Failed" : {
 
@@ -100021,6 +100072,7 @@
       }
     },
     "the built-in offline fallback rates" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -101614,6 +101666,7 @@
       }
     },
     "the last cached rates" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -108479,6 +108532,9 @@
         }
       }
     },
+    "Unsaved API Key" : {
+
+    },
     "Up to Date" : {
       "localizations" : {
         "ar" : {
@@ -113687,6 +113743,9 @@
           }
         }
       }
+    },
+    "You entered an API key but haven't saved it. Save and validate it now, or discard it and continue?" : {
+
     },
     "You're not signed in to iCloud, so there's no iCloud copy to delete." : {
       "extractionState" : "manual"

@@ -291,7 +291,7 @@ struct SettingsView: View {
                 ImportSummaryView(result: summary, appLanguage: settings.appLanguage) {
                     importSummary = nil
                 }
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
             }
             .alert(item: $settingsAlert) { alert in
