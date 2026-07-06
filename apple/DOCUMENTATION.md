@@ -1,5 +1,13 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 1 batch 5 (concurrency / cleanup) — ⏳ pending on-device build/test — **completes Tier 1's clean work**
+  - *Details*: On `fix/low-t1b5-cleanup` off `main`. Adversarially reviewed (no local Xcode).
+  - *Tech Notes*:
+    - **L50** — `AppSettings` clamps the persisted `consecutiveExchangeRateFailures` at the increment site to a new `maxExchangeRateBackoffExponent = 4` (the same ceiling the read site already used), so the stored value can't drift unbounded. Backoff behavior is unchanged (still caps ~4h at 2^4).
+    - **L61** — `DynamicMasonryLayout.sizeThatFits` no longer collapses a `nil`/non-finite proposed width to 0 (a zero-width single column); it falls back to the widest subview's ideal width (or `minColumnWidth`), computed lazily only when the proposal is unusable. No behavior change for the current call sites (all in vertical `ScrollView`s proposing finite width) — a defensive fix for a latent case. `placeSubviews` (uses `bounds.width`) was already safe.
+    - **L54** — `FinanceStore` persists `lastMarketPriceRefreshAttemptAt` to UserDefaults and restores it in `init`, so the market-price refresh throttle survives a cold launch (a failed refresh no longer retries on every relaunch with no window), mirroring `AppSettings`' exchange-rate retry state.
+    - *Assessed & left:* **L06** (fire-and-forget `Task`s in the cash-flow views) — the post-`await` mutations are MainActor-safe and SwiftUI ignores writes to a torn-down `@State`, so these are safe one-shots; the audit's own verdict is "code clarity, not a concrete failure," so a 12-edit restructure of fragile view code wasn't warranted.
+
 - [2026-07-06]: Deep-audit Low — Tier 1 batch 4 (persistence / metadata error-handling) — ⏳ pending on-device build/test
   - *Details*: On `fix/low-t1b4-persistence` off `main` (Low tier, checkpoint-1 work). Adversarially reviewed incl. deadlock + test analysis (no local Xcode).
   - *Tech Notes*:

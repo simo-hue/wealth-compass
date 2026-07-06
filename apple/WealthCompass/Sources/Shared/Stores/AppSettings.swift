@@ -4,6 +4,9 @@ import Foundation
 final class AppSettings: ObservableObject {
     private static let defaultIncomeCategoryKeys = ["Salary", "Freelance", "Dividends", "Other"]
     private static let defaultExpenseCategoryKeys = ["Housing", "Food", "Transport", "Utilities", "Fuel", "Entertainment", "Shopping", "Health", "Other"]
+    /// Ceiling for the exchange-rate retry-backoff exponent (deep-audit L50): both the read site and
+    /// the persisted increment clamp to this, so the stored failure count can't drift unbounded.
+    private static let maxExchangeRateBackoffExponent = 4
 
     var defaultIncomeCategories: [String] { Self.defaultIncomeCategoryKeys }
     var defaultExpenseCategories: [String] { Self.defaultExpenseCategoryKeys }
@@ -216,7 +219,7 @@ final class AppSettings: ObservableObject {
         now: Date = Date()
     ) -> Bool {
         // Exponential backoff: 15min × 2^min(failures, 4) → caps at ~4 hours
-        let backoffMultiplier = pow(2.0, Double(min(consecutiveExchangeRateFailures, 4)))
+        let backoffMultiplier = pow(2.0, Double(min(consecutiveExchangeRateFailures, Self.maxExchangeRateBackoffExponent)))
         let retryAfter = baseRetryAfter * backoffMultiplier
 
         if let lastExchangeRateRefreshAttemptAt,
@@ -264,8 +267,9 @@ final class AppSettings: ObservableObject {
             let message = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
             exchangeRateError = message
 
-            // Increment backoff counter on failure
-            consecutiveExchangeRateFailures += 1
+            // Increment the backoff counter on failure, clamped to the backoff domain (deep-audit
+            // L50) so the persisted value never drifts past the ceiling the read site uses.
+            consecutiveExchangeRateFailures = min(consecutiveExchangeRateFailures + 1, Self.maxExchangeRateBackoffExponent)
             userDefaults.set(consecutiveExchangeRateFailures, forKey: Keys.consecutiveExchangeRateFailures)
 
             return ExchangeRateRefreshResult(

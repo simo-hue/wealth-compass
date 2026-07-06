@@ -159,6 +159,8 @@ final class FinanceStore: ObservableObject {
     private var saveIdleWaiters: [CheckedContinuation<Void, Never>] = []
     private var localPersistenceError: Error?
     private var lastMarketPriceRefreshAttemptAt: Date?
+    /// UserDefaults key persisting the market-price refresh throttle across launches (deep-audit L54).
+    private static let marketPriceRefreshAttemptKey = "wc_mobile_last_market_price_refresh_attempt"
     /// Set by `load()` when the one-time WC-M1 currency backfill stamped legacy rows, so
     /// `init` can persist the migration once the save pipeline is up.
     private var needsCurrencyBackfillSave = false
@@ -206,6 +208,10 @@ final class FinanceStore: ObservableObject {
             metadataStore: syncMetadataStore
         )
         encoder = FinanceJSONCoding.makeEncoder(prettyPrinted: true)
+        // Restore the persisted market-price refresh throttle (deep-audit L54) so it survives a cold
+        // launch — otherwise a failed refresh would retry on every relaunch with no throttle window,
+        // mirroring how AppSettings persists its exchange-rate retry state.
+        lastMarketPriceRefreshAttemptAt = UserDefaults.standard.object(forKey: FinanceStore.marketPriceRefreshAttemptKey) as? Date
 
         let seedRecords = load()
         startSaveConsumer(seedRecords: seedRecords)
@@ -529,7 +535,9 @@ final class FinanceStore: ObservableObject {
         }
 
         isRefreshingMarketPrices = true
-        lastMarketPriceRefreshAttemptAt = Date()
+        let attemptedAt = Date()
+        lastMarketPriceRefreshAttemptAt = attemptedAt
+        UserDefaults.standard.set(attemptedAt, forKey: FinanceStore.marketPriceRefreshAttemptKey)
         defer {
             isRefreshingMarketPrices = false
             marketRefreshProgress = nil

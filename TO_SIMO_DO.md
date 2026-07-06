@@ -141,6 +141,10 @@ _Batch 4 (persistence / metadata error-handling) — all error-path/robustness, 
 - [ ] _L29 (clear a corrupt exchange-rate cache), L30 (migration backup is best-effort, won't abort load),
   L38 (metadata reset writes empty file instead of deleting). Hard to smoke manually; rely on build._
 
+_Batch 5 (concurrency / cleanup) — logic/latent, covered by build:_
+- [ ] _L50 (backoff counter clamped in storage), L61 (masonry layout guards a non-finite width — latent),
+  L54 (market-price refresh throttle now survives relaunch). L06 assessed and left (safe fire-and-forget)._
+
 **Deferred — need your input (not blocking):**
 - [ ] **L33** — The asset-allocation pie drops negative cash, so its total ≠ the net-worth header. Pick a
   fix: (a) clamp cash to 0 + a footnote, (b) relabel the ring "Assets", or (c) leave it.
