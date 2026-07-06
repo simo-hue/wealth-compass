@@ -1,5 +1,11 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 2 batch 3a (biometric lock) — ⏳ pending on-device build/test
+  - *Details*: On `low-t2-biometric` off `main`. All in `BiometricLockStore.swift` (shared iOS+macOS); view call sites unchanged. Adversarially reviewed (no local Xcode).
+  - *Tech Notes*:
+    - **L11 / L35** — biometry type is now resolved once into a `lazy var cachedBiometryType: LABiometryType` (a single `LAContext` + `canEvaluatePolicy` probe) instead of allocating a fresh `LAContext` and re-probing LocalAuthentication on every SwiftUI body pass that reads `biometryName`/`biometrySymbolName`. `@MainActor`-isolated so the lazy is safe; `authenticate` still uses its own fresh context for the actual evaluation.
+    - **L14 / L36** — `authenticate`'s completion no longer stores benign cancels (`LAError.userCancel`/`.systemCancel`/`.appCancel`/`.userFallback`) into `lastError`, so a deliberate dismissal of the Face/Touch ID sheet stops painting a persistent red error under the Settings Security section and the lock screen. Also clears `lastError` at the start of every `authenticate` attempt and in `lock()`, so a stale message can't linger across retries/sessions. Real errors still surface. All surfaces (iOS `SettingsView`/`LockView`, macOS `MacSettingsView`/`MacLockView`) fixed at the source since they just render `appLock.lastError`.
+
 - [2026-07-06]: Deep-audit Low — Tier 2 batch 2 (localization) — ⏳ pending on-device build/test
   - *Details*: On `low-t2-localization` off `main`. Adversarially reviewed (no local Xcode).
   - *Tech Notes*:

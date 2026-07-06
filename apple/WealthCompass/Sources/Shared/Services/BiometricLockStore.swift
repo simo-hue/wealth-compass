@@ -20,6 +20,16 @@ class BiometricLockStore: ObservableObject {
     /// Namespaced under `defaultsKey` so iOS and macOS keep independent enrollment baselines (M17).
     private var domainStateKey: String { "\(defaultsKey).biometryDomainState" }
 
+    /// L11/L35: the device's biometry type is fixed for the process lifetime, so resolve it once
+    /// (a fresh `LAContext` + `canEvaluatePolicy` probe) and cache it, instead of re-probing
+    /// LocalAuthentication on every SwiftUI body pass that reads `biometryName`/`biometrySymbolName`.
+    /// `@MainActor`-isolated, so the `lazy` is safe. `authenticate` keeps its own fresh context.
+    private lazy var cachedBiometryType: LABiometryType = {
+        let context = LAContext()
+        _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+        return context.biometryType
+    }()
+
     init(defaultsKey: String) {
         self.defaultsKey = defaultsKey
         let enabled = UserDefaults.standard.bool(forKey: defaultsKey)
@@ -28,9 +38,7 @@ class BiometricLockStore: ObservableObject {
     }
 
     func biometryName(appLanguage: String?) -> String {
-        let context = LAContext()
-        _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
-        switch context.biometryType {
+        switch cachedBiometryType {
         case .faceID:
             return AppLocalization.string("Face ID", appLanguage: appLanguage)
         case .touchID:
@@ -44,9 +52,7 @@ class BiometricLockStore: ObservableObject {
 
     /// SF Symbol matching the device's biometry, so the lock UI doesn't hardcode "faceid" (L3).
     func biometrySymbolName() -> String {
-        let context = LAContext()
-        _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
-        switch context.biometryType {
+        switch cachedBiometryType {
         case .faceID:
             return "faceid"
         case .touchID:
@@ -104,6 +110,9 @@ class BiometricLockStore: ObservableObject {
     func lock() {
         guard isLockEnabled else { return }
         isUnlocked = false
+        // L36: drop any stale error (e.g. a benign cancel from a prior session) so the fresh lock
+        // screen doesn't open with a red message.
+        lastError = nil
     }
 
     func unlock(appLanguage: String?) async {
@@ -144,6 +153,9 @@ class BiometricLockStore: ObservableObject {
         guard !isAuthenticating else { return AuthResult(success: false, domainState: nil) }
         isAuthenticating = true
         defer { isAuthenticating = false }
+        // L36: clear any prior error at the start of a fresh attempt so a stale/benign message from a
+        // previous try doesn't linger under the prompt.
+        lastError = nil
 
         // WC-L2: `.deviceOwnerAuthentication` is biometrics WITH an automatic device-passcode
         // fallback, so a Face/Touch ID lockout can't strand the user out of the app. We no
@@ -161,7 +173,14 @@ class BiometricLockStore: ObservableObject {
             context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, authenticationError in
                 Task { @MainActor in
                     if let authenticationError {
-                        self.lastError = authenticationError.localizedDescription
+                        // L14/L36: a deliberate cancel / passcode-fallback tap is not a failure — don't
+                        // surface a red error for it (it would otherwise persist across retries).
+                        let code = (authenticationError as NSError).code
+                        let benign = code == LAError.userCancel.rawValue
+                            || code == LAError.systemCancel.rawValue
+                            || code == LAError.appCancel.rawValue
+                            || code == LAError.userFallback.rawValue
+                        self.lastError = benign ? nil : authenticationError.localizedDescription
                     }
                     continuation.resume(returning: success)
                 }

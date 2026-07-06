@@ -209,4 +209,14 @@ locale-aware-casing fix. **Want the full-template version too?** (It's a transla
 L13 (Unsaved API Key / Save & Continue / Discard / message), L23 (Change Currency / Convert Amounts /
 Keep Numbers / message), L41 (the two "…continue using …" full sentences). M17's earlier warning string too.
 
+### Batch T2-3a (biometric lock: L11/L35, L14/L36) — landed, not yet built
+_Needs the app-lock enabled; iOS + macOS:_
+- [ ] **L14/L36** — With the lock on, open the lock screen (or the Settings → Security section) and
+  **deliberately cancel** the Face ID / Touch ID sheet. There must be **no persistent red error**
+  ("Canceled by user/system") left on screen; a genuine failure (e.g. too many wrong attempts) still shows.
+  Re-locking / retrying clears any prior message.
+- [ ] **L11/L35** — Perf/behavior sanity: the lock screen and Settings Security section still show the
+  correct biometry name + icon (Face ID / Touch ID). No functional change expected (this just caches the
+  biometry type instead of re-probing on every render).
+
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->
