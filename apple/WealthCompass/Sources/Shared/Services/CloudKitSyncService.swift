@@ -434,14 +434,17 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
     func reset() throws {
         dataLock.lock()
         cached = CloudSyncMetadata()
-        // Same hand-over-hand discipline as `update`: wipe the in-memory value under
-        // `dataLock`, then remove the file under `writeLock` (serialized with persists) so a
-        // concurrent write can't race the removal, all without holding `dataLock` across I/O.
+        // Same hand-over-hand discipline as `update`: wipe the in-memory value under `dataLock`,
+        // then rewrite the file under `writeLock` (serialized with persists) so a concurrent write
+        // can't race it, all without holding `dataLock` across I/O.
         writeLock.lock()
         dataLock.unlock()
         defer { writeLock.unlock() }
-        guard fileManager.fileExists(atPath: url.path) else { return }
-        try fileManager.removeItem(at: url)
+        // Overwrite with empty metadata rather than deleting (deep-audit L38): a failed removeItem
+        // used to leave the stale file behind to resurrect old state on the next launch; an atomic
+        // write of an empty document leaves a valid clean slate instead. `persist` takes no lock, so
+        // calling it while holding `writeLock` is safe.
+        try persist(CloudSyncMetadata())
     }
 
     func pendingRevision(for key: CloudSyncRecordKey) -> UUID? {

@@ -34,9 +34,16 @@ struct LocalExchangeRatePersistence: ExchangeRatePersistence {
         migrateFromUserDefaultsIfNeeded()
 
         guard fileManager.fileExists(atPath: storageURL.path) else { return nil }
-        guard let data = try? Data(contentsOf: storageURL) else { return nil }
-        guard let snapshot = try? decoder.decode(ExchangeRateSnapshot.self, from: data),
-              snapshot.isValid else { return nil }
+        guard let data = try? Data(contentsOf: storageURL),
+              let snapshot = try? decoder.decode(ExchangeRateSnapshot.self, from: data),
+              snapshot.isValid else {
+            // A present-but-unreadable/invalid cache blocks the legacy migration (gated on
+            // `!fileExists`) and would fail every load until a network fetch overwrites it. Clear it
+            // proactively so the next launch can migrate / re-fetch cleanly (deep-audit L29).
+            Self.logger.error("Discarding unreadable or invalid cached exchange rates")
+            clear()
+            return nil
+        }
         return snapshot
     }
 

@@ -65,7 +65,9 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
         // those records from disk. Leaving the file untouched preserves them for a future app
         // version that can read them; the harmless date-healing migration just re-runs next load.
         if decoded.wasMigrated && decoded.skippedRecordKeys.isEmpty {
-            try createMigrationBackupIfNeeded(sourceData)
+            // Best-effort: a failed pre-CloudKit backup must not abort an otherwise-successful load
+            // (deep-audit L30). The migrated-data write below stays fatal — that one must succeed.
+            try? createMigrationBackupIfNeeded(sourceData)
             try write(decoded.data)
         }
         return FinancePersistenceLoad(data: decoded.data, skippedRecordKeys: decoded.skippedRecordKeys)

@@ -1,5 +1,13 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 1 batch 4 (persistence / metadata error-handling) — ⏳ pending on-device build/test
+  - *Details*: On `fix/low-t1b4-persistence` off `main` (Low tier, checkpoint-1 work). Adversarially reviewed incl. deadlock + test analysis (no local Xcode).
+  - *Tech Notes*:
+    - **L29** — `ExchangeRatePersistence.load()` now clears a present-but-unreadable/invalid rate cache (log + `clear()`) instead of leaving it, so it can't wedge the legacy-UserDefaults migration (gated on `!fileExists`) or fail every load until a network fetch overwrites the file.
+    - **L30** — `FinancePersistence.load()` makes the pre-CloudKit migration backup best-effort (`try?`), so a backup-write failure no longer aborts an otherwise-successful load (the migrated-data `write` stays fatal).
+    - **L38** — `CloudSyncMetadataStore.reset()` overwrites the metadata file with an empty document (`try persist(CloudSyncMetadata())`) instead of `removeItem`, so a failed delete can't leave stale metadata to resurrect old sync state on the next launch. `persist` takes no lock (same as `update()`'s call under `writeLock`), so it's deadlock-free.
+    - *Deferred:* **L37** (sync-metadata mutate/persist ordering — reorder persist-before-commit + rollback under the hand-over-hand `dataLock`/`writeLock`; harm is bounded + self-correcting but the concurrent sync path needs on-device verification) and **L52** (init-time sync-enable Task can race a factory reset — Low confidence, and cancelling a suspended `await` may not interrupt it, so a naive fix is incomplete). Both flagged in root `TO_SIMO_DO.md`.
+
 - [2026-07-06]: Deep-audit Low — Tier 1 batch 3 (recurring-editor correctness) — ⏳ pending on-device build/test
   - *Details*: On `fix/low-t1b3-recurring` off `main` (Low tier, checkpoint-1 work). Adversarially reviewed (no local Xcode).
   - *Tech Notes*:

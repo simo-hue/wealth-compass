@@ -137,6 +137,10 @@ _Batch 3 (recurring editor):_
   first occurrence clamps forward. A genuinely **past day** still blocks Save with the validation message.
 - [ ] _L25 (save-time re-validation) is logic-only — covered by build. (L10 was already fixed by M09.)_
 
+_Batch 4 (persistence / metadata error-handling) — all error-path/robustness, covered by build:_
+- [ ] _L29 (clear a corrupt exchange-rate cache), L30 (migration backup is best-effort, won't abort load),
+  L38 (metadata reset writes empty file instead of deleting). Hard to smoke manually; rely on build._
+
 **Deferred — need your input (not blocking):**
 - [ ] **L33** — The asset-allocation pie drops negative cash, so its total ≠ the net-worth header. Pick a
   fix: (a) clamp cash to 0 + a footnote, (b) relabel the ring "Assets", or (c) leave it.
@@ -149,5 +153,11 @@ _Batch 3 (recurring editor):_
   app's UTC wire format). Left as-is; only matters for a non-UTC offset-bearing source. Say if you want it changed.
 - [ ] **L39** — Possible sync tombstone race; the audit marks it "confirm at runtime before fixing." If
   you can reproduce a lost/duplicated delete during concurrent sync, tell me and I'll fix it.
+- [ ] **L37** — Sync-metadata persist commits in-memory *before* the disk write; a persist failure can
+  lose an in-flight advance (redundant re-upload next launch — self-correcting, not data loss). The fix
+  reorders persist-before-commit + rollback under the sync locks; I'd rather land it when you can verify
+  sync on-device. Say the word and I'll do it (carefully).
+- [ ] **L52** — An init-time "enable sync" task could race a factory reset (very narrow window). A robust
+  fix needs cancellation-aware handling in the sync-enable path. Low priority; tell me if you want it.
 
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->
