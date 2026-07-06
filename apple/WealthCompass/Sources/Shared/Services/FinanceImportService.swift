@@ -250,8 +250,14 @@ private struct ImportedRecurringTransaction: Decodable {
             return nil
         }
 
-        let parsedEndDate = ImportDateParser.parse(endDate)
+        var parsedEndDate = ImportDateParser.parse(endDate)
         let parsedCompletedAt = ImportDateParser.parse(completedAt)
+        // Normalize a date-only endDate to end-of-day (deep-audit L42): "2024-06-15" parses to local
+        // midnight, so a same-calendar-day timed startDate ("…T09:00:00Z") would be > endDate and the
+        // whole schedule would be dropped. End-of-day keeps its final occurrence inside the window.
+        if let parsed = parsedEndDate, endDate?.trimmedForImport?.contains("T") == false {
+            parsedEndDate = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: parsed)
+        }
         guard parsedEndDate.map({ $0 >= startDate }) ?? true else { return nil }
 
         return RecurringTransaction(
@@ -833,7 +839,7 @@ private enum ImportDateParser {
         // that carry a time component (contain "T"), take the calendar day in UTC — the wire
         // format the web app emits. Pure "yyyy-MM-dd" values are already tz-stable, so they keep
         // the local startOfDay behavior unchanged.
-        if rawValue?.trimmedForImport!.contains("T") == true {
+        if rawValue?.trimmedForImport?.contains("T") == true {
             var utc = Calendar(identifier: .gregorian)
             utc.timeZone = TimeZone(identifier: "UTC") ?? .current
             return utc.startOfDay(for: date)

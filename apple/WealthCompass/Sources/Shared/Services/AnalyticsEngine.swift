@@ -205,8 +205,13 @@ struct AnalyticsEngine {
     func cashFlowTrend(months: Int = 6) -> [CashFlowMonth] {
         let monthFormatter = DateFormatter()
         monthFormatter.dateFormat = "yyyy-MM"
+        // Bucket in the engine's own time zone (deep-audit L32) so a boundary-dated transaction lands
+        // in the same month here as it does in monthlyCashFlow's calendar-granularity comparison; an
+        // unpinned formatter defaults to the system zone and diverges under an injected calendar.
+        monthFormatter.timeZone = calendar.timeZone
         let labelFormatter = DateFormatter()
         labelFormatter.dateFormat = "MMM"
+        labelFormatter.timeZone = calendar.timeZone
 
         return stride(from: months - 1, through: 0, by: -1).compactMap { offset in
             guard let date = calendar.date(byAdding: .month, value: -offset, to: now) else { return nil }
@@ -328,6 +333,15 @@ struct AnalyticsEngine {
         case .yearToDate: start = calendar.date(from: calendar.dateComponents([.year], from: now)) ?? .distantPast
         case .all:        return data.transactions
         }
-        return data.transactions.filter { $0.date >= start && $0.date <= now }
+        // Compare at calendar-day granularity in the engine's own calendar (deep-audit L05): the
+        // boundaries and the startOfDay-stored transaction dates then stay aligned even after a
+        // timezone/DST shift, instead of dropping day-boundary items when a raw-instant boundary
+        // lands mid-day.
+        let startOfDay = calendar.startOfDay(for: start)
+        let endOfDay = calendar.startOfDay(for: now)
+        return data.transactions.filter {
+            let day = calendar.startOfDay(for: $0.date)
+            return day >= startOfDay && day <= endOfDay
+        }
     }
 }

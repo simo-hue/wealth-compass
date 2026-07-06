@@ -124,9 +124,23 @@ _I'll tell you when all Tier-1 batches have landed; then build + run these. Batc
 - [ ] **L51** — Add a transaction dated in the **future** (e.g. next week). Today's net-worth total must
   **not** include it yet; it appears once that day arrives. (Also covered by a unit test.)
 
+_Batch 2 (dates / timezone / import):_
+- [ ] **L05** — Change the device timezone, reopen the app, check a period filter (7-day / 30-day / YTD):
+  transactions right at the range's day boundary must not drop.
+- [ ] **L42** — Import a backup whose recurring schedule has a **date-only endDate on the same day** as a
+  timed startDate: the schedule must import (not be silently dropped) and keep its final occurrence.
+- [ ] _L32 (cash-flow month bucketing) and L43 (import parse safety) are logic-only — covered by build + tests._
+
 **Deferred — need your input (not blocking):**
 - [ ] **L33** — The asset-allocation pie drops negative cash, so its total ≠ the net-worth header. Pick a
-  fix and tell me: (a) clamp cash to 0 + a footnote, (b) relabel the ring "Assets", or (c) leave it.
+  fix: (a) clamp cash to 0 + a footnote, (b) relabel the ring "Assets", or (c) leave it.
+- [ ] **L23** — Changing the currency picker on an **existing** investment/crypto holding: should it
+  **convert** the value to the new currency (preserve worth) or **re-denominate** (keep the number, fix the
+  label)? Both are plausible user intents; tell me which and I'll wire it into all 4 editors.
+- [ ] **L40** — A held currency missing from an otherwise-fresh rate snapshot silently uses its offline
+  seed. A clean fix is a per-currency "rates may be incomplete" indicator (a small feature). Want it?
+- [ ] **L44** — `parseDateOnly` takes the UTC day for ISO datetimes (documented-intentional for the web
+  app's UTC wire format). Left as-is; only matters for a non-UTC offset-bearing source. Say if you want it changed.
 - [ ] **L39** — Possible sync tombstone race; the audit marks it "confirm at runtime before fixing." If
   you can reproduce a lost/duplicated delete during concurrent sync, tell me and I'll fix it.
 

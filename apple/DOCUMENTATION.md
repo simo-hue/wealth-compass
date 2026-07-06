@@ -1,5 +1,14 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 1 batch 2 (dates / timezone / import correctness) — ⏳ pending on-device build/test
+  - *Details*: On `fix/low-t1b2-dates` off `main` (Low tier, checkpoint-1 work). Adversarially compile/test-reviewed (no local Xcode).
+  - *Tech Notes*:
+    - **L32** — `AnalyticsEngine.cashFlowTrend` pins both `DateFormatter`s to `calendar.timeZone`, so its `yyyy-MM` month bucketing matches `monthlyCashFlow`'s calendar-granularity bucketing under an injected / non-system calendar (a boundary-dated transaction no longer lands in different months across the two paths).
+    - **L05** — `filteredTransactions(period:)` now compares at calendar-day granularity in the engine's own `calendar` (`startOfDay(date)` vs `startOfDay(boundary)`), so a day-boundary transaction isn't dropped from a 7/30/90-day or YTD range after a timezone/DST shift.
+    - **L42** — `ImportedRecurringTransaction.model()` normalizes a **date-only** `endDate` to end-of-day before the `endDate >= startDate` guard, so an imported schedule whose date-only end date falls on the same calendar day as a timed start date is no longer silently dropped (and keeps its final occurrence in the notification window). Only that case changes.
+    - **L43** — `ImportDateParser.parseDateOnly` replaces a `trimmedForImport!` force-unwrap with optional chaining (nil-safety; no behavior change).
+    - *Left / deferred:* **L44** (parseDateOnly UTC day is documented-intentional for the web app's UTC wire format — left as-is), **L40** (missing-currency staleness — needs a per-currency indicator feature), **L23** (currency-picker convert-vs-redenominate — needs a UX ruling). All flagged in root `TO_SIMO_DO.md`.
+
 - [2026-07-06]: Deep-audit Low — Tier 1 batch 1 (analytics / allocation correctness) — ⏳ pending on-device build/test
   - *Details*: First Low-tier batch on `fix/low-t1b1-analytics` off `main` (Low tier runs in 3 risk-priority checkpoints; this is checkpoint-1 work). Adversarially compile/logic-reviewed (no local Xcode).
   - *Tech Notes*:
