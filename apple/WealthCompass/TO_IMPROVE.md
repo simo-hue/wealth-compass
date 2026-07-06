@@ -29,7 +29,14 @@ These fixes are in the codebase but still need a clean verification run on two i
 
 ### 5. Wire CloudKit silent push notifications (iOS + macOS)
 
-> ⏸️ **Deferred (CODE_AUDIT C4).** The unused `aps-environment` entitlement + `UIBackgroundModes` were removed. Re-implementing real background sync means re-adding the APS entitlement (→ provisioning) plus the push/BGTask handlers below. This is the single biggest functional gap for a "syncs in the background" claim.
+> ✅ **Done (M31, 2026-07-06).** Re-added `aps-environment` on both targets + iOS `remote-notification`
+> background mode; `AppNotificationDelegate` (iOS) and `MacAppDelegate` (macOS) now
+> `registerForRemoteNotifications()` once sync is enabled, log the device-token register/failure, and
+> forward `didReceiveRemoteNotification` to `FinanceStore.handleRemoteCloudKitPush()` (which starts the
+> engine and `synchronize()`s). Push-only (no BGTask) per the agreed ruling. **Manual step remaining:**
+> enable Push Notifications on the App ID + add the capability in Xcode (provisioning) — see
+> `TO_SIMO_DO.md`; the app won't sign until that's done. On-device 2-device propagation smoke test still
+> pending.
 
 **Problem:** `CKSyncEngine` is configured with `subscriptionID`, iOS has `UIBackgroundModes` → `remote-notification`, and entitlements include APS — but there is **no** `registerForRemoteNotifications` and **no** `application(_:didReceiveRemoteNotification:fetchCompletionHandler:)` (or macOS equivalent). Sync only runs when the app is foregrounded or the user taps "Force Sync".
 
@@ -208,7 +215,7 @@ Store rolling net-worth history as chunked monthly aggregates locally; sync fewe
 | 22 — More sync tests | S | Stability | 🟢 steps 1+2 done (2026-06-30) |
 | 23 — OSLog signposts + diagnostics export | M | Observability | ✅ done (2026-06-30) |
 | 24 — CI CloudKit schema check | S | Stability | ✅ done (2026-06-30) |
-| 5 — CloudKit push wiring (background sync) | M–L | High (needs APS entitlement → provisioning) | ⏸️ deferred |
+| 5 — CloudKit push wiring (background sync) | M–L | High | ✅ done (M31, 2026-07-06; needs Xcode capability + provisioning) |
 | 26 / 27 — Incremental persistence, snapshot model redesign | L | Scale | ☐ open |
 
 Non-code follow-ups live in `TO_SIMO_DO.md` (translate new strings, manual provisioning if not auto-signed, optional proxy retirement, optional Finnhub stock-currency auto-detect) and the **SwiftLint** tooling note in `CODE_AUDIT.md`.
