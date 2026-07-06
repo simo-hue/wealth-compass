@@ -1,6 +1,0 @@
-name = "wealthcompass-api-proxy"
-main = "src/index.js"
-compatibility_date = "2024-03-20"
-
-# You can configure custom domains or routes here if you have them, 
-# otherwise Cloudflare will assign a default workers.dev domain.
