@@ -152,6 +152,9 @@ final class FinanceStore: ObservableObject {
     /// coalescing) even when mutations fire in bursts.
     private var saveContinuation: AsyncStream<Int>.Continuation?
     private var saveConsumerTask: Task<Void, Never>?
+    /// L52: handle to the init-time "restore sync-enabled state" task, so a factory reset can cancel
+    /// it before it (re)starts the CloudKit engine after the wipe cleared the sync flag.
+    private var initialSyncEnableTask: Task<Void, Never>?
     /// Generation bookkeeping (main-actor only) used to know when the save pipeline is
     /// idle — both for correctness reasoning and for deterministic tests.
     private var lastEnqueuedSaveGeneration = 0
@@ -223,7 +226,10 @@ final class FinanceStore: ObservableObject {
         let isSyncEnabled = settings?.isICloudSyncEnabled
             ?? UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
         if isSyncEnabled {
-            Task { [weak self] in
+            // L52: keep a handle so a factory reset mid-launch can cancel this before it restarts the
+            // engine after the wipe cleared the flag (see wipeLocalState + the automatic-path guard in
+            // setICloudSyncEnabled).
+            initialSyncEnableTask = Task { [weak self] in
                 await self?.setICloudSyncEnabled(true, userInitiated: false)
             }
         }
@@ -232,6 +238,7 @@ final class FinanceStore: ObservableObject {
     deinit {
         saveContinuation?.finish()
         saveConsumerTask?.cancel()
+        initialSyncEnableTask?.cancel()
     }
 
     var transactions: [Transaction] {
@@ -981,6 +988,10 @@ final class FinanceStore: ObservableObject {
     /// the same long-lived `FinanceStore` instance keeps working after the user re-onboards.
     /// Best-effort throughout: a single failing step must not strand the erase half-done.
     private func wipeLocalState() async {
+        // L52: cancel any still-pending init-time sync-enable task first, so it can't resume after the
+        // stop() below and re-start the engine against the just-erased state.
+        initialSyncEnableTask?.cancel()
+        initialSyncEnableTask = nil
         await waitForPendingSaves()
         // Ensure the engine is down before we reset metadata, on every path (the no-account
         // and escape-hatch paths never went through `purgeCloudData`'s own `stop()`).
@@ -1263,6 +1274,12 @@ final class FinanceStore: ObservableObject {
     func setICloudSyncEnabled(_ isEnabled: Bool, userInitiated: Bool = true) async {
         if isEnabled {
             guard localPersistenceError == nil else { return }
+            // L52: an automatic (init-time restore) enable must re-check the resolved flag right before
+            // starting — a factory reset that cleared it between scheduling and running this must not
+            // resurrect the engine. A user-initiated enable is itself the source of truth for the flag.
+            if !userInitiated {
+                guard isICloudSyncEnabledResolved else { return }
+            }
             await cloudSyncService.start(allowAccountReplacement: userInitiated)
         } else {
             await cloudSyncService.stop()

@@ -420,6 +420,18 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
         // disk write happens outside its critical section (WC-M3). A persist failure throws
         // (surfaced by WC-M2 as a transient, non-fatal error); the in-memory value is already
         // committed and the next successful update re-persists it.
+        //
+        // Deep-audit L37 — DO NOT reorder to "persist, then commit `cached`": `update()` runs
+        // concurrently (the actor's sync handlers AND the MainActor via `reconcileLocalInventory`/
+        // `recordLocalChanges`), and both this and `reset()` acquire the locks in dataLock→writeLock
+        // order. Committing after the persist forces one of two broken shapes: (a) re-acquiring
+        // `dataLock` while still holding `writeLock` — an AB↔BA inversion that DEADLOCKS against
+        // `reset()`/a concurrent `update()`; or (b) releasing `dataLock` before committing — which lets
+        // a concurrent `update()` read the pre-commit value and clobber this one (a lost update).
+        // Committing before the persist is therefore the deadlock-safe, lost-update-safe choice. The
+        // only residual cost is that a persist failure immediately followed by a process kill leaves
+        // disk one advance behind memory — bounded, idempotent, self-correcting (redundant re-sync on
+        // next launch), never finance-data loss.
         writeLock.lock()
         dataLock.unlock()
         defer { writeLock.unlock() }
@@ -1324,7 +1336,17 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 let currentRevision = currentMetadata.records[storageKey]?.pending?.revision
                 let mutationWasApplied = !mutationKeys.contains(key) || appliedMutationKeys.contains(key)
 
-                guard currentRevision == expectedRevision, mutationWasApplied else {
+                // L39: the pending-revision check alone can be `nil == nil` for a record with no
+                // pending state, which would let the stale pre-await `plannedState` (isTombstone=false)
+                // overwrite a tombstone that a reentrant fetched batch applied during the `await`,
+                // resurrecting a just-deleted record. Also require the tombstone state to be unchanged
+                // since the plan was built; if it changed, fall into the safe re-queue branch instead
+                // of blindly writing the stale plan. (Strictly defensive — a differing state only ever
+                // routes to the conservative branch, never resurrects.)
+                let originalTombstone = originalMetadata.records[storageKey]?.isTombstone ?? false
+                let currentTombstone = currentMetadata.records[storageKey]?.isTombstone ?? false
+
+                guard currentRevision == expectedRevision, mutationWasApplied, currentTombstone == originalTombstone else {
                     var currentState = currentMetadata.records[storageKey] ?? CloudSyncRecordState()
                     currentState.systemFields = plannedState.systemFields
                     currentMetadata.records[storageKey] = currentState

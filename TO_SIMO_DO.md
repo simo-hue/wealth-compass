@@ -243,4 +243,17 @@ _Needs the app-lock enabled; iOS + macOS:_
   covered, neither appears. _New English-fallback strings until translated._
 - [ ] _L44 (parseDateOnly UTC comment) and L06 (fire-and-forget Task comment) are **doc-only** — no behavior change._
 
+### Batch: Sync trio (L37, L39, L52) — landed, needs **ON-DEVICE SYNC** verification (not just a build)
+_These are the "verify sync on a real device" items you agreed to. Two devices on one iCloud account:_
+- [ ] **General sync sanity** — Add/edit/delete transactions/holdings on device A → they appear on device B, and
+  vice-versa; deletes propagate (no zombie records reappearing). This exercises L39's tombstone-reconcile path.
+- [ ] **L52** — With iCloud sync ON, immediately after a cold launch do **Settings → Erase Everything** (factory
+  reset). Afterwards the CloudKit engine must be **off** and `isICloudSyncEnabled` false — the wipe must not be
+  "undone" by a late init task restarting sync. (Very narrow timing window; hard to hit manually — mainly a
+  code-correctness fix. If you can, background/relaunch right at erase time.)
+- [ ] **L37** — No behavior change (comment only): the metadata persist ordering was investigated and left as-is
+  (reordering would deadlock). Nothing to test; noted for completeness.
+- [ ] _L39 is defensive against a concurrent tombstone race the audit marked "confirm at runtime." If during
+  heavy two-device concurrent editing you ever see a deleted record reappear, tell me — but the fix should prevent it._
+
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->
