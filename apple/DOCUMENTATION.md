@@ -1,5 +1,12 @@
 # Documentation
 
+- [2026-07-06]: Deep-audit Low — Tier 3 part 2 (refresh/recurring perf; L55 deferred) — ⏳ pending on-device build/test
+  - *Details*: On `low-t3-perf` off `main`. Adversarially reviewed (no local Xcode).
+  - *Tech Notes*:
+    - **L53** — `processDueRecurringTransactions` now precomputes a `Set<GeneratedOccurrenceKey>` (scheduleID + calendar day) from existing transactions once, so the per-occurrence dedup is an O(1) lookup instead of an O(transactions) linear scan inside the nested catch-up loop. Behavior-equivalent to the old `isDate(_:inSameDayAs:)` match (same-day keys under the same calendar), and the set is updated after each generate so intra-run duplicates are still prevented — preserving M24's cross-source same-day dedup.
+    - **L47** — a Finnhub `.rateLimited` (429) now trips a `finnhubRateLimited` cooldown for the rest of the refresh: every remaining USD holding skips Finnhub and goes straight to the keyless Yahoo fallback, instead of each independently re-running NetworkRetry's 3 attempts against an already-limited provider (~3×N requests → ~N). The rate-limited holding itself now also falls back to Yahoo rather than hard-failing.
+    - **L55 — DEFERRED (documented decision).** The audit's "move export/import off the MainActor" is a real UI-block on a large manual backup/import, but `FinanceImportService.parse` takes the `@MainActor` `AppSettings` (for imported-currency defaults), so a clean `Task.detached` hop has Sendable/isolation friction, and this is a rare manual op on the data-critical import path. Judged not worth the regression risk at the end of the push — flagged in `TO_SIMO_DO.md` for a ruling. (The rest of Tier 3 is done.)
+
 - [2026-07-06]: Deep-audit Low — Tier 3 part 1 (cosmetic / a11y / small perf) — ⏳ pending on-device build/test
   - *Details*: On `low-t3-cosmetic` off `main`. Adversarially reviewed (no local Xcode).
   - *Tech Notes*:

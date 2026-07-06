@@ -368,6 +368,12 @@ final class FinanceStore: ObservableObject {
         save()
     }
 
+    /// L53: dedup key for an already-generated recurring occurrence — one (schedule, calendar-day) pair.
+    private struct GeneratedOccurrenceKey: Hashable {
+        let scheduleID: UUID
+        let day: Date
+    }
+
     @discardableResult
     func processDueRecurringTransactions(settings: AppSettings, now: Date = Date()) -> Int {
         guard !data.recurringTransactions.isEmpty else { return 0 }
@@ -382,6 +388,16 @@ final class FinanceStore: ObservableObject {
         let catchUpFloor = calendar.date(byAdding: .day, value: -maxCatchUpDays, to: now) ?? now
         var generatedCount = 0
         var schedulesChanged = false
+
+        // L53: index every already-generated occurrence by (schedule, day) once, so the per-occurrence
+        // dedup check below is an O(1) set lookup instead of an O(transactions) linear scan on every
+        // iteration of the nested catch-up loop.
+        var generatedOccurrences = Set<GeneratedOccurrenceKey>()
+        for transaction in data.transactions {
+            guard let id = transaction.recurringTransactionID,
+                  let date = transaction.recurringOccurrenceDate else { continue }
+            generatedOccurrences.insert(GeneratedOccurrenceKey(scheduleID: id, day: calendar.startOfDay(for: date)))
+        }
 
         for index in data.recurringTransactions.indices {
             var schedule = data.recurringTransactions[index]
@@ -415,22 +431,17 @@ final class FinanceStore: ObservableObject {
                     break
                 }
 
-                let alreadyGenerated = data.transactions.contains { transaction in
-                    guard
-                        transaction.recurringTransactionID == schedule.id,
-                        let generatedDate = transaction.recurringOccurrenceDate
-                    else {
-                        return false
-                    }
-                    // Match by calendar day, not a 1-second window: a lossy/cross-source import
-                    // reparses `recurringOccurrenceDate` with a different time-of-day, which used to
-                    // slip past the dedupe and double-generate the occurrence (deep-audit M24). All
-                    // current frequencies are ≥1-day-granular, so same-day matching is exact.
-                    return calendar.isDate(generatedDate, inSameDayAs: occurrence)
-                }
+                // L53: O(1) dedup via the prebuilt set, keyed by calendar day — preserving M24's
+                // same-day matching (a lossy/cross-source import reparses `recurringOccurrenceDate` with
+                // a different time-of-day, and all current frequencies are ≥1-day-granular, so same-day
+                // matching is exact).
+                let occurrenceDay = calendar.startOfDay(for: occurrence)
+                let alreadyGenerated = generatedOccurrences.contains(
+                    GeneratedOccurrenceKey(scheduleID: schedule.id, day: occurrenceDay)
+                )
 
                 if !alreadyGenerated {
-                    let occurrenceStartOfDay = calendar.startOfDay(for: occurrence)
+                    let occurrenceStartOfDay = occurrenceDay
                     let scheduleCurrency = schedule.currency ?? settings.currency
                     let delta: Decimal = schedule.type == .income ? schedule.amount : -schedule.amount
                     adjustHistoricalSnapshots(
@@ -453,6 +464,9 @@ final class FinanceStore: ObservableObject {
                         )
                     )
                     generatedCount += 1
+                    // L53: keep the set current so a later occurrence (or another schedule) can't
+                    // re-generate this same (schedule, day) within this run.
+                    generatedOccurrences.insert(GeneratedOccurrenceKey(scheduleID: schedule.id, day: occurrenceDay))
                 }
 
                 guard let next = schedule.frequency.nextDate(
@@ -594,12 +608,16 @@ final class FinanceStore: ObservableObject {
             // back off only if we actually get rate-limited (M7). NetworkRetry already
             // retries an individual 429 with backoff (M8); this spaces out the queue.
             var interRequestDelay: UInt64 = 300_000_000 // 0.3s
+            // L47: once Finnhub returns a 429, trip a cooldown for the rest of this refresh so each
+            // remaining USD holding doesn't independently re-run NetworkRetry's 3 attempts against an
+            // already-rate-limited provider — route them to the keyless Yahoo fallback instead.
+            var finnhubRateLimited = false
             for investment in data.investments {
                 // Finnhub's free tier only prices US/USD listings and its /quote reports no currency,
                 // so route only USD holdings to it (deep-audit H13). A non-USD holding goes straight
                 // to Yahoo, which returns the listing's real currency — eliminating the "assume the
                 // holding's currency" path that silently stored a USD price as e.g. EUR.
-                if let finnhubClient, investment.currency == .usd {
+                if let finnhubClient, investment.currency == .usd, !finnhubRateLimited {
                     do {
                         investmentQuotes[investment.id] = try await finnhubClient.quote(for: investment.symbol)
                     } catch let marketError as MarketDataError {
@@ -615,8 +633,18 @@ final class FinanceStore: ObservableObject {
                                 )
                             }
                         case .rateLimited:
-                            result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError, appLanguage: settings.appLanguage))")
+                            // L47: trip the cooldown and fall back to keyless Yahoo for this holding too,
+                            // so a rate limit degrades to the other provider instead of a hard failure
+                            // (and every remaining USD holding skips Finnhub via the guard above).
+                            finnhubRateLimited = true
                             interRequestDelay = min(interRequestDelay * 3, 3_000_000_000) // cap 3s
+                            do {
+                                investmentQuotes[investment.id] = try await yahooQuote(for: investment)
+                            } catch {
+                                result.failedInvestments.append(
+                                    "\(investment.symbol): \(Self.errorMessage(marketError, appLanguage: settings.appLanguage)) \(Self.errorMessage(error, appLanguage: settings.appLanguage))"
+                                )
+                            }
                         default:
                             result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(marketError, appLanguage: settings.appLanguage))")
                         }

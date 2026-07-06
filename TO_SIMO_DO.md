@@ -268,4 +268,20 @@ _These are the "verify sync on a real device" items you agreed to. Two devices o
   CoinGecko format drift — only visible in Console.app), **L57** (background animation pauses off-screen),
   **L58** (allocation legend no longer re-renders on hover), **L01** (explicit ATS plist stance)._
 
+### Batch: Tier 3 part 2 (refresh/recurring perf: L47, L53) — landed, not yet built
+- [ ] _Both logic/perf, covered by build — behavior-preserving:_
+  - **L53** — recurring-transaction catch-up no longer does an O(n) scan per occurrence (Set dedup); the
+    same-day dedup behavior (M24) is preserved. Optional check: import a backup with recurring schedules +
+    their past occurrences → no duplicate ledger rows on next foreground (same as M24's test).
+  - **L47** — with a **Finnhub** key and many US holdings, if Finnhub rate-limits (429) during a price
+    refresh, the rest of the USD holdings should fall back to Yahoo instead of each retrying Finnhub 3×
+    (fewer requests, faster give-up). Hard to trigger deliberately; mainly a code-efficiency fix.
+
+**⚑ One Tier-3 item DEFERRED (needs your call): L55** — moving the manual **Backup export / Import** off
+the main thread (they currently encode/parse the whole dataset synchronously, so a very large DB briefly
+freezes the UI on Prepare Backup / Import). I did **not** do it: the import parse takes the `@MainActor`
+settings, so an off-main hop has real Swift-concurrency (Sendable) friction, and it's a rare manual op on
+the data-critical import path — not worth the regression risk at the tail of this push. **Want it?** I'll
+do it carefully as a focused follow-up (it's the last remaining audit item).
+
 <!-- BATCH SMOKE TESTS APPENDED BELOW AS EACH BATCH LANDS -->
