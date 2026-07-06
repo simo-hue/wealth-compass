@@ -470,7 +470,7 @@ struct MacCashFlowView: View {
                                             switch phase {
                                             case .active(let location):
                                                 withAnimation(.easeInOut(duration: 0.15)) {
-                                                    hoveredExpenseCategory = categorySlice(at: location, in: frame, total: totalExpenses, categories: categories)
+                                                    hoveredExpenseCategory = categorySlice(at: location, in: frame, categories: categories)
                                                 }
                                             case .ended:
                                                 withAnimation(.easeInOut(duration: 0.15)) {
@@ -1026,7 +1026,8 @@ struct MacCashFlowView: View {
         }
     }
 
-    private func categorySlice(at location: CGPoint, in rect: CGRect, total: Double, categories: [CategoryTotal]) -> CategoryTotal? {
+    private func categorySlice(at location: CGPoint, in rect: CGRect, categories: [CategoryTotal]) -> CategoryTotal? {
+        // WC-L15: `total` was dead — `PieSliceHitTester.sliceIndex` derives the total from `values`.
         return PieSliceHitTester.sliceIndex(at: location, in: rect, values: categories.map(\.value))
             .map { categories[$0] }
     }

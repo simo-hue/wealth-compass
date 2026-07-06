@@ -64,8 +64,9 @@ actor RecurringNotificationService {
             .sorted { $0.nextDueDate < $1.nextDueDate }
             .prefix(60)
 
-        // Read the in-app language once, not once per schedule (WC-L31).
-        let appLanguage = UserDefaults.standard.string(forKey: "wc_mobile_app_language")
+        // Read the in-app language once, not once per schedule, and source the key from the single
+        // source of truth on AppSettings rather than a brittle literal (WC-L31).
+        let appLanguage = UserDefaults.standard.string(forKey: AppSettings.appLanguageDefaultsKey)
         for schedule in upcoming {
             let content = UNMutableNotificationContent()
             content.title = AppLocalization.string("Recurring \(schedule.type.localizedTitle(appLanguage: appLanguage)) due", appLanguage: appLanguage)

@@ -376,7 +376,7 @@ struct AllocationChart: View {
                                         switch phase {
                                         case .active(let location):
                                             withAnimation(.easeInOut(duration: 0.15)) {
-                                                hoveredSlice = slice(at: location, in: frame, total: total)
+                                                hoveredSlice = slice(at: location, in: frame)
                                             }
                                         case .ended:
                                             withAnimation(.easeInOut(duration: 0.15)) {
@@ -389,7 +389,7 @@ struct AllocationChart: View {
                                         DragGesture(minimumDistance: 0)
                                             .onChanged { value in
                                                 withAnimation(.easeInOut(duration: 0.15)) {
-                                                    hoveredSlice = slice(at: value.location, in: frame, total: total)
+                                                    hoveredSlice = slice(at: value.location, in: frame)
                                                 }
                                             }
                                             .onEnded { _ in
@@ -426,7 +426,8 @@ struct AllocationChart: View {
         }
     }
 
-    private func slice(at location: CGPoint, in rect: CGRect, total: Double) -> AllocationSlice? {
+    private func slice(at location: CGPoint, in rect: CGRect) -> AllocationSlice? {
+        // WC-L15: `total` was dead — `PieSliceHitTester.sliceIndex` derives the total from `values`.
         PieSliceHitTester.sliceIndex(at: location, in: rect, values: slices.map(\.value), innerRadiusRatio: 0.72)
             .map { slices[$0] }
     }

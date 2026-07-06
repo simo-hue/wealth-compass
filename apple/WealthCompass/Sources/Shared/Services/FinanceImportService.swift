@@ -166,7 +166,7 @@ private struct ImportedTransaction: Decodable {
         type = container.decodeImportedStringIfPresent(forKey: .type)
         category = container.decodeImportedStringIfPresent(forKey: .category)
         amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
-        description = container.decodeImportedStringIfPresent(forKey: .description)
+        description = container.decodeImportedTextIfPresent(forKey: .description)
         date = container.decodeImportedStringIfPresent(forKey: .date)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
         updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
@@ -238,7 +238,7 @@ private struct ImportedRecurringTransaction: Decodable {
         type = container.decodeImportedStringIfPresent(forKey: .type)
         category = container.decodeImportedStringIfPresent(forKey: .category)
         amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
-        description = container.decodeImportedStringIfPresent(forKey: .description)
+        description = container.decodeImportedTextIfPresent(forKey: .description)
         startDate = container.decodeImportedStringIfPresent(forKey: .startDate)
         frequency = container.decodeImportedStringIfPresent(forKey: .frequency)
         nextDueDate = container.decodeImportedStringIfPresent(forKey: .nextDueDate)
@@ -316,7 +316,7 @@ private struct ImportedIncomeEntry: Decodable {
         id = container.decodeUUIDIfPresent(forKey: .id)
         type = container.decodeImportedStringIfPresent(forKey: .type)
         amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
-        description = container.decodeImportedStringIfPresent(forKey: .description)
+        description = container.decodeImportedTextIfPresent(forKey: .description)
         date = container.decodeImportedStringIfPresent(forKey: .date)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
         updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
@@ -378,7 +378,7 @@ private struct ImportedExpenseEntry: Decodable {
         id = container.decodeUUIDIfPresent(forKey: .id)
         category = container.decodeImportedStringIfPresent(forKey: .category)
         amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
-        description = container.decodeImportedStringIfPresent(forKey: .description)
+        description = container.decodeImportedTextIfPresent(forKey: .description)
         date = container.decodeImportedStringIfPresent(forKey: .date)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
         updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
@@ -428,7 +428,7 @@ private struct ImportedLiquidityAccount: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = container.decodeUUIDIfPresent(forKey: .id)
         type = container.decodeImportedStringIfPresent(forKey: .type)
-        name = container.decodeImportedStringIfPresent(forKey: .name)
+        name = container.decodeImportedTextIfPresent(forKey: .name)
         balance = container.decodeImportedDoubleIfPresent(forKey: .balance)
         currency = container.decodeImportedStringIfPresent(forKey: .currency)
         updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
@@ -501,7 +501,7 @@ private struct ImportedInvestment: Decodable {
         id = container.decodeUUIDIfPresent(forKey: .id)
         type = container.decodeImportedStringIfPresent(forKey: .type)
         symbol = container.decodeImportedStringIfPresent(forKey: .symbol)
-        name = container.decodeImportedStringIfPresent(forKey: .name)
+        name = container.decodeImportedTextIfPresent(forKey: .name)
         quantity = container.decodeImportedDoubleIfPresent(forKey: .quantity)
         costBasis = container.decodeImportedDoubleIfPresent(forKey: .costBasis)
         currentValue = container.decodeImportedDoubleIfPresent(forKey: .currentValue)
@@ -585,7 +585,7 @@ private struct ImportedCryptoHolding: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = container.decodeUUIDIfPresent(forKey: .id)
         symbol = container.decodeImportedStringIfPresent(forKey: .symbol)
-        name = container.decodeImportedStringIfPresent(forKey: .name)
+        name = container.decodeImportedTextIfPresent(forKey: .name)
         quantity = container.decodeImportedDoubleIfPresent(forKey: .quantity)
         avgBuyPrice = container.decodeImportedDoubleIfPresent(forKey: .avgBuyPrice)
         currentPrice = container.decodeImportedDoubleIfPresent(forKey: .currentPrice)
@@ -649,7 +649,7 @@ private struct ImportedLiability: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = container.decodeUUIDIfPresent(forKey: .id)
         type = container.decodeImportedStringIfPresent(forKey: .type)
-        name = container.decodeImportedStringIfPresent(forKey: .name)
+        name = container.decodeImportedTextIfPresent(forKey: .name)
         principal = container.decodeImportedDoubleIfPresent(forKey: .principal)
         currentBalance = container.decodeImportedDoubleIfPresent(forKey: .currentBalance)
         currency = container.decodeImportedStringIfPresent(forKey: .currency)
@@ -885,6 +885,14 @@ private extension KeyedDecodingContainer {
         }
 
         return nil
+    }
+
+    /// Free-text variant of `decodeImportedStringIfPresent` for human-readable fields (`name`,
+    /// `description`). WC-L8: the permissive helper coerces JSON numbers/bools into strings, which is
+    /// fine for id/currency/enum-like fields but turns a numeric `name`/`description` into `"123.0"`
+    /// or `"true"`. For free text we only accept an actual JSON string. (Import stays lossy elsewhere.)
+    func decodeImportedTextIfPresent(forKey key: Key) -> String? {
+        (try? decode(String.self, forKey: key))?.trimmedForImport
     }
 
     func decodeImportedDoubleIfPresent(forKey key: Key) -> Double? {

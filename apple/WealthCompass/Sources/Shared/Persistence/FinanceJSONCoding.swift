@@ -29,12 +29,21 @@ enum FinanceJSONCoding {
         return decoder
     }
 
+    // WC-M4: reuse configured coders instead of building a fresh one per call. `JSONEncoder` /
+    // `JSONDecoder` are safe to share across concurrent encode/decode once configured, and the
+    // custom date strategies close over the cached, thread-safe ISO-8601 formatters below — so a
+    // dataset encode no longer allocates O(entities) coders (which compounded with sync send batches).
+    // Two encoders are cached because `makeEncoder` is parameterized by `prettyPrinted`.
+    private static let compactEncoder = makeEncoder(prettyPrinted: false)
+    private static let prettyEncoder = makeEncoder(prettyPrinted: true)
+    private static let sharedDecoder = makeDecoder()
+
     static func encode<T: Encodable>(_ value: T, prettyPrinted: Bool = false) throws -> Data {
-        try makeEncoder(prettyPrinted: prettyPrinted).encode(value)
+        try (prettyPrinted ? prettyEncoder : compactEncoder).encode(value)
     }
 
     static func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
-        try makeDecoder().decode(type, from: data)
+        try sharedDecoder.decode(type, from: data)
     }
 
     static func decodeFinancialData(
@@ -67,7 +76,7 @@ enum FinanceJSONCoding {
             // Not even a JSON object: nothing to salvage — surface the original strict-decode error.
             return (try decode(FinancialData.self, from: data), wasMigrated, [])
         }
-        let decoder = makeDecoder()
+        let decoder = sharedDecoder  // WC-M4: reuse the cached decoder
         var skipped: [CloudSyncRecordKey] = []
 
         func decodeCollection<T: Decodable>(

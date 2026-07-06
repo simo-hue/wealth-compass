@@ -67,6 +67,11 @@ final class AppSettings: ObservableObject {
         static let consecutiveExchangeRateFailures = "wc_mobile_consecutive_exchange_rate_failures"
     }
 
+    /// The single source of truth for the in-app language `UserDefaults` key, exposed for the few
+    /// off-`AppSettings` readers that can't hold an instance (WC-L31: `RecurringNotificationService`
+    /// reads it directly). Kept in sync with the private `Keys.appLanguage`.
+    static let appLanguageDefaultsKey = Keys.appLanguage
+
     init(
         userDefaults: UserDefaults = .standard,
         exchangeRatePersistence: ExchangeRatePersistence = LocalExchangeRatePersistence()

@@ -270,6 +270,13 @@ struct MacInvestmentsView: View {
         .onTapGesture(count: 2) {
             appModel.editor = .investment(investment)
         }
+        // WC-L24: the double-click-to-edit affordance is invisible to VoiceOver/keyboard, so expose the
+        // card as one activatable button whose default action opens the editor (mirrors the Cash Flow card).
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction {
+            appModel.editor = .investment(investment)
+        }
         .contextMenu {
             Button {
                 appModel.editor = .investment(investment)

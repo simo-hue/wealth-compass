@@ -472,7 +472,10 @@ struct InvestmentFormView: View {
         _type = State(initialValue: investment?.type ?? .stock)
         _sector = State(initialValue: investment?.sector ?? "Technology")
         _geography = State(initialValue: investment?.geography ?? "US")
-        _currency = State(initialValue: investment?.currency ?? .usd)
+        // WC-A2: default a new holding to EUR, consistent with the transaction, recurring, and crypto
+        // editors (all `?? .eur`) — the previous `.usd` was an outlier. (`settings.currency` isn't
+        // reachable from a `@State` initializer, which is why every editor uses a base-currency literal.)
+        _currency = State(initialValue: investment?.currency ?? .eur)
         _quantity = State(initialValue: investment.map { Self.formatInput($0.quantity) } ?? "")
         let rawAverage = investment.map { $0.quantity > 0 ? max(0, ($0.costBasis - $0.fees) / $0.quantity) : 0 } ?? 0
         _avgBuyPrice = State(initialValue: investment == nil ? "" : Self.formatInput(rawAverage))

@@ -322,6 +322,13 @@ struct MacCryptoView: View {
         .onTapGesture(count: 2) {
             appModel.editor = .crypto(holding)
         }
+        // WC-L24: the double-click-to-edit affordance is invisible to VoiceOver/keyboard, so expose the
+        // card as one activatable button whose default action opens the editor (mirrors the Cash Flow card).
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction {
+            appModel.editor = .crypto(holding)
+        }
         .contextMenu {
             Button {
                 appModel.editor = .crypto(holding)
