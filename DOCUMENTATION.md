@@ -487,3 +487,11 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-07-06T20:34:19+02:00]: App Version Bump & Metadata Translation for App Store Connect Release
   - *Details*: Incremented the app version numbers across the codebase and generated localized release notes across 38 languages to prepare for the App Store release.
   - *Tech Notes*: Bumped `MARKETING_VERSION` to `1.0.10` and `CURRENT_PROJECT_VERSION` to `11` in `project.pbxproj`. Updated `CFBundleShortVersionString` and `CFBundleVersion` in `Info.plist`. Bumped root `package.json` version to `1.0.10` and updated the tracking comment in `fastlane/Fastfile`. Ran automated scripts to translate the new App Store Connect `release_notes.txt` to all supported languages.
+
+- [2026-07-06T23:04:00+0200]: Fix Catalan App Store Metadata Limits
+  - *Details*: Shortened the Catalan App Store Connect promotional text and keywords to conform to Apple's length limits. The upload previously failed due to these limits, triggering a false positive fastlane needs an update message.
+  - *Tech Notes*: Edited apple/WealthCompass/fastlane/metadata/ca/keywords.txt and promotional_text.txt to be under 100 and 170 characters respectively. Reran fastlane ios metadata.
+
+- [2026-07-06T23:04:58+0200]: Fix Catalan App Store Metadata Name Limit
+  - *Details*: Shortened the Catalan App Store Connect app name to conform to Apple's 30 character length limit. The second upload failed due to this remaining long string.
+  - *Tech Notes*: Edited apple/WealthCompass/fastlane/metadata/ca/name.txt to Brúixola de la Riquesa. Reran fastlane ios metadata.
