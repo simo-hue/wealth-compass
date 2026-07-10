@@ -1,5 +1,9 @@
 # Documentation
 
+- [2026-07-10]: Bugfix — macOS Dashboard window toolbar ("grey bar") was invisible — ⏳ pending on-device build/test
+  - *Details*: The Dashboard was the only page whose top window toolbar didn't render. Its body is `GeometryReader { ScrollView { … } }`, so the scroll view meets the toolbar directly over the very-dark `MacDashboardBackdrop`; the translucent macOS window toolbar samples that near-black backdrop and blends away. Every other page has a non-scrolling header (the `MacSelectorIsland` tab row) under the toolbar, so their toolbar keeps its grey material. **Fix**: `MacDashboardView` now sets `.toolbarBackground(.visible, for: .windowToolbar)` so its toolbar material stays visible like the others (targeted to Dashboard only — the working pages are untouched). Hypothesis-based (no Xcode here); verify on-device. Implemented on `main`.
+  - *Tech Notes*: one line in `Sources/macOS/Views/MacDashboardView.swift` after `.background(MacDashboardBackdrop())`. No new strings, no test changes.
+
 - [2026-07-10]: Refinement — macOS page-switcher moved into the toolbar; redundant title hidden — ⏳ pending on-device build/test
   - *Details*: Fixes two issues with the collapsible-sidebar feature (from a screenshot): the *floating* page-switcher pill overlapped each page's own top Overview/Transactions selector, and the grey toolbar's center was empty. The pill now lives in the toolbar's centered `.principal` slot (only when the sidebar is collapsed) — which fills the empty bar **and** removes the overlap (nothing floats over the content, so each page's own selector sits cleanly below the toolbar). The window title is now blank when collapsed (the switcher already names the page) and shows the page name when expanded. Implemented on `main`; **not built here** — verify per root `TO_SIMO_DO.md`.
   - *Tech Notes*:

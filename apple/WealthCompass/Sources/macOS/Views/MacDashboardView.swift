@@ -77,6 +77,10 @@ struct MacDashboardView: View {
             }
         }
         .background(MacDashboardBackdrop())
+        // The Dashboard's scroll view meets the toolbar directly over a near-black backdrop, which makes
+        // the translucent window toolbar blend away. Force its material visible so the grey top bar shows
+        // like every other page (which have a non-scrolling header under the toolbar).
+        .toolbarBackground(.visible, for: .windowToolbar)
         // navigationTitle centralized in MacRootView (collapse-aware) — see the page-switcher change.
         .onChange(of: timeRange) {
             selectedNetWorthDate = nil
