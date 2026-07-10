@@ -32,55 +32,60 @@ struct MacDashboardView: View {
     }
 
     var body: some View {
-        GeometryReader { proxy in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    dashboardHeader
-
-                    if isCompletelyEmpty {
-                        onboardingCard
-                    }
-
-                    netWorthHero
-                    keyMetrics(width: proxy.size.width)
-
-                    if proxy.size.width >= 1_090 {
-                        HStack(alignment: .top, spacing: 20) {
-                            allocationCard
-                                .frame(width: max(340, proxy.size.width * 0.34))
-                            cashFlowCard
-                        }
-                    } else {
-                        VStack(spacing: 20) {
-                            cashFlowCard
-                            allocationCard
-                        }
-                    }
-
-                    if proxy.size.width >= 1_020 {
-                        HStack(alignment: .top, spacing: 20) {
-                            topExpensesCard
-                            recentActivityCard
-                        }
-                    } else {
-                        VStack(spacing: 20) {
-                            topExpensesCard
-                            recentActivityCard
-                        }
-                    }
-                }
+        VStack(spacing: 0) {
+            // A non-scrolling element must sit directly under the window toolbar (every other page has
+            // its MacSelectorIsland row here). Otherwise the scroll view meets the toolbar over the
+            // near-black backdrop and macOS renders the toolbar seamlessly — which is why the Dashboard
+            // was the only page with no visible top "grey bar". So the header is a fixed row, not scrolled.
+            dashboardHeader
                 .padding(.horizontal, 24)
-                .scenePadding(.minimum, edges: .horizontal)
                 .padding(.top, 24)
-                .padding(.bottom, 36)
-                .frame(maxWidth: .infinity)
+                .padding(.bottom, 16)
+
+            GeometryReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        if isCompletelyEmpty {
+                            onboardingCard
+                        }
+
+                        netWorthHero
+                        keyMetrics(width: proxy.size.width)
+
+                        if proxy.size.width >= 1_090 {
+                            HStack(alignment: .top, spacing: 20) {
+                                allocationCard
+                                    .frame(width: max(340, proxy.size.width * 0.34))
+                                cashFlowCard
+                            }
+                        } else {
+                            VStack(spacing: 20) {
+                                cashFlowCard
+                                allocationCard
+                            }
+                        }
+
+                        if proxy.size.width >= 1_020 {
+                            HStack(alignment: .top, spacing: 20) {
+                                topExpensesCard
+                                recentActivityCard
+                            }
+                        } else {
+                            VStack(spacing: 20) {
+                                topExpensesCard
+                                recentActivityCard
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .scenePadding(.minimum, edges: .horizontal)
+                    .padding(.top, 4)
+                    .padding(.bottom, 36)
+                    .frame(maxWidth: .infinity)
+                }
             }
         }
         .background(MacDashboardBackdrop())
-        // The Dashboard's scroll view meets the toolbar directly over a near-black backdrop, which makes
-        // the translucent window toolbar blend away. Force its material visible so the grey top bar shows
-        // like every other page (which have a non-scrolling header under the toolbar).
-        .toolbarBackground(.visible, for: .windowToolbar)
         // navigationTitle centralized in MacRootView (collapse-aware) — see the page-switcher change.
         .onChange(of: timeRange) {
             selectedNetWorthDate = nil
