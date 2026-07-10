@@ -355,6 +355,76 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(built.count, recordIDs.count, "Every pending record should be built from the single snapshot.")
     }
 
+    // MARK: - Local-inventory drift guard (token-ahead-of-data self-heal)
+    //
+    // `reconcileLocalInventory` runs at every sync start. A record still tracked in
+    // `knownLocalHashes` but missing from the local snapshot means the local finance DB changed
+    // out of band (lost / reset / rolled back / corrupted) while this sync-metadata file survived —
+    // the persisted change token is now ahead of the data it claims to have delivered. This MUST
+    // re-fetch, never delete: a server tombstone would propagate one device's local loss to every
+    // device. A genuine delete can't reach this path — `recordLocalChanges` prunes its hash at
+    // delete time — which the second test pins down.
+
+    /// Drift (a known-synced record vanished from local data with no recorded delete) discards the
+    /// change token and re-arms bootstrap so the next sync re-pulls, and queues NO server delete for
+    /// the missing record.
+    func testReconcileLocalInventoryReFetchesOnDriftInsteadOfDeleting() throws {
+        let store = CloudSyncMetadataStore(directoryName: "WealthCompassTests-\(UUID().uuidString)")
+        let txID = UUID(uuidString: "CCCCCCCC-0000-0000-0000-000000000003")!
+        let key = CloudSyncRecordKey(type: .transaction, id: txID)
+        let records = try FinancialData(transactions: [makeTransaction(id: txID, amount: 42)]).cloudSyncRecords()
+
+        // The record is synced and tracked locally (present in knownLocalHashes).
+        try store.recordLocalChanges(
+            CloudSyncChangeSet(changed: Array(records.values), deleted: [], changedAt: fixedDate),
+            currentRecords: records
+        )
+        XCTAssertNotNil(store.pendingRevision(for: key))
+
+        // The local finance DB vanished out of band while THIS metadata file survived.
+        let result = try store.reconcileLocalInventory([:])
+
+        XCTAssertTrue(result.didDiscardToken, "Drift must discard the change token to force a full re-fetch.")
+        XCTAssertEqual(result.driftedRecordKeys, [key])
+        XCTAssertNil(
+            store.pendingRevision(for: key),
+            "Drift must NOT enqueue a server delete (tombstone) for the missing record — that would wipe every device."
+        )
+    }
+
+    /// A properly recorded delete is NOT misclassified as drift: `recordLocalChanges` prunes its
+    /// hash at delete time, so the next inventory reconcile leaves the token intact and keeps the
+    /// pending tombstone queued (the delete still propagates to other devices).
+    func testReconcileLocalInventoryKeepsRecordedDeleteAndDoesNotTreatItAsDrift() throws {
+        let store = CloudSyncMetadataStore(directoryName: "WealthCompassTests-\(UUID().uuidString)")
+        let txAID = UUID(uuidString: "AAAAAAAA-0000-0000-0000-000000000001")!
+        let txBID = UUID(uuidString: "BBBBBBBB-0000-0000-0000-000000000002")!
+        let keyB = CloudSyncRecordKey(type: .transaction, id: txBID)
+        let both = try FinancialData(
+            transactions: [makeTransaction(id: txAID, amount: 1), makeTransaction(id: txBID, amount: 2)]
+        ).cloudSyncRecords()
+        let onlyA = try FinancialData(transactions: [makeTransaction(id: txAID, amount: 1)]).cloudSyncRecords()
+
+        try store.recordLocalChanges(
+            CloudSyncChangeSet(changed: Array(both.values), deleted: [], changedAt: fixedDate),
+            currentRecords: both
+        )
+        // User deletes B: recorded through the normal delete path, which prunes B's hash.
+        try store.recordLocalChanges(
+            CloudSyncChangeSet(changed: [], deleted: [keyB], changedAt: fixedDate),
+            currentRecords: onlyA
+        )
+
+        let result = try store.reconcileLocalInventory(onlyA)
+
+        XCTAssertFalse(result.didDiscardToken, "A recorded delete must not trip the drift self-heal.")
+        XCTAssertTrue(result.driftedRecordKeys.isEmpty)
+        XCTAssertNotNil(
+            store.pendingRevision(for: keyB),
+            "The recorded delete must stay queued so it still propagates to other devices."
+        )
+    }
+
     // MARK: - #8 fetch-first bootstrap: per-record merge decision
     //
     // `bootstrapDecision` is the collision-avoidance heart of the first-sync merge: the
