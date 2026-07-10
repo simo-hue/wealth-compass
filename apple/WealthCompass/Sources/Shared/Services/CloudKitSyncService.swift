@@ -356,6 +356,24 @@ private struct CloudSyncMetadata: Codable, Sendable {
     var lastSyncAt: Date?
 }
 
+/// Outcome of reconciling the persisted sync inventory against the current local finance data.
+///
+/// `driftedRecordKeys` are records CloudKit sync had already applied locally (they are tracked in
+/// `knownLocalHashes`) but that have since vanished from the local data snapshot **without a recorded
+/// delete**. A genuine delete — single, bulk, or import-replace — is captured by `recordLocalChanges`,
+/// which prunes the hash at delete time, so it can never surface here. The only remaining cause is the
+/// local finance DB changing out of band (lost / reset / rolled back / corrupted) while this sync-metadata
+/// file survived — i.e. the persisted change token is now *ahead* of the data it claims to have delivered.
+/// When this set is non-empty, `reconcileLocalInventory` has discarded the token and re-armed the
+/// fetch-first bootstrap so the next sync re-pulls the server's copy, rather than deleting the
+/// "missing" records account-wide.
+struct LocalInventoryReconciliation: Equatable, Sendable {
+    var driftedRecordKeys: Set<CloudSyncRecordKey>
+
+    /// True when drift was detected and the change token was discarded to force a full re-fetch.
+    var didDiscardToken: Bool { !driftedRecordKeys.isEmpty }
+}
+
 final class CloudSyncMetadataStore: @unchecked Sendable {
     /// Guards the in-memory `cached` value only. Held briefly for reads and for the in-memory
     /// portion of an update — never across a disk write (WC-M3), so `read()` (called on the
@@ -463,11 +481,12 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
         read().records[key.storageKey]?.pending?.revision
     }
 
+    @discardableResult
     func reconcileLocalInventory(
         _ records: [CloudSyncRecordKey: CloudSyncRecordSnapshot],
         skipped skippedRecordKeys: [CloudSyncRecordKey] = []
-    ) throws {
-        try update { metadata in
+    ) throws -> LocalInventoryReconciliation {
+        return try update { metadata in
             var hashes = Dictionary(uniqueKeysWithValues: records.map { ($0.key.storageKey, $0.value.payloadHash) })
             // Deep-audit H08: records the local decode had to skip are absent from `records`, but the
             // record still exists on the server. Carry their previously-known hashes forward so they
@@ -497,15 +516,34 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
                 metadata.records[storageKey] = state
             }
 
-            for storageKey in metadata.knownLocalHashes.keys where hashes[storageKey] == nil {
-                guard let key = CloudSyncRecordKey(recordName: storageKey) else { continue }
-                var state = metadata.records[storageKey] ?? CloudSyncRecordState()
-                state.pending = .delete(deletedAt: now, revision: UUID())
-                state.isTombstone = true
-                state.deletedAt = now
-                metadata.records[key.storageKey] = state
+            // A record still tracked in `knownLocalHashes` but now ABSENT from the local snapshot is
+            // NOT a user delete: a genuine delete (single, bulk, or import-replace) is recorded through
+            // `recordLocalChanges`, which prunes the hash the moment it happens, so a real delete can
+            // never linger here. The only cause is the local finance DB changing out of band — lost,
+            // reset, rolled back, or corrupted — while THIS sync-metadata file survived, which leaves the
+            // persisted change token *ahead* of the data it claims to have delivered. The previous
+            // behaviour enqueued a server tombstone for each such record, which propagated a single
+            // device's local loss to EVERY device (a silent, account-wide wipe — the general case of the
+            // WC-H3 "delete a record it merely couldn't decode" hazard). Instead, distrust the token:
+            // discard it and re-arm the fetch-first bootstrap so the next sync re-pulls the server's copy.
+            // Re-fetching is always safe (an idempotent re-apply); deleting from the server is not — so on
+            // this ambiguity we always take the non-destructive direction.
+            let driftedRecordKeys = Set(
+                metadata.knownLocalHashes.keys
+                    .filter { hashes[$0] == nil }
+                    .compactMap { CloudSyncRecordKey(recordName: $0) }
+            )
+            if !driftedRecordKeys.isEmpty {
+                for key in driftedRecordKeys {
+                    // Drop the stale per-record state so nothing is ever uploaded or deleted for a record
+                    // that isn't in local data; the bootstrap re-fetch re-establishes it from the server.
+                    metadata.records.removeValue(forKey: key.storageKey)
+                }
+                metadata.engineState = nil
+                metadata.bootstrapCompleted = false
             }
             metadata.knownLocalHashes = hashes
+            return LocalInventoryReconciliation(driftedRecordKeys: driftedRecordKeys)
         }
     }
 
@@ -751,7 +789,12 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             if metadata.accountRecordName != userRecordID.recordName {
                 try resetMetadata(for: userRecordID.recordName)
             }
-            try metadataStore.reconcileLocalInventory(currentRecords)
+            let inventoryReconciliation = try metadataStore.reconcileLocalInventory(currentRecords)
+            if inventoryReconciliation.didDiscardToken {
+                let count = inventoryReconciliation.driftedRecordKeys.count
+                Self.logger.error("Local finance data drifted from the persisted CloudKit change token: \(count, privacy: .public) record(s) tracked as synced are missing locally. Discarded the token and re-armed bootstrap to re-fetch from iCloud instead of deleting them.")
+                SyncDiagnosticsLog.shared.record("WARN token/data drift — \(count) record(s) missing locally; discarded token + re-fetching from iCloud (no server delete)")
+            }
             let preparedMetadata = metadataStore.read()
             let stateSerialization = preparedMetadata.engineState.flatMap {
                 try? FinanceJSONCoding.decode(CKSyncEngine.State.Serialization.self, from: $0)

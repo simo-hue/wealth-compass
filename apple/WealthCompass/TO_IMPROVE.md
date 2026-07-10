@@ -23,6 +23,10 @@ These fixes are in the codebase but still need a clean verification run on two i
    - On a test account, enable sync on two devices that already share the same local data.
    - Confirm iOS no longer freezes for minutes and macOS metadata writes are not one ~900 KB rewrite per conflicting record. (#15 now also prevents re-uploading identical records and adopts a newer server copy for un-edited records.)
 
+4. **Verify token/data drift self-heal (2026-07-10)**
+   - Get two devices in sync, then on ONE device force a token-ahead-of-data state: quit the app and clear only the local finance JSON (`Application Support/Wealth Compass/wealth-compass-local-data.json`) while leaving `wealth-compass-cloud-sync.json` (the token) intact; relaunch.
+   - Expected: that device logs the self-heal (Console: "Local finance data drifted from the persisted CloudKit change token …" / `SyncDiagnosticsLog` "WARN token/data drift"), discards the token, re-fetches, and its records REAPPEAR — while the OTHER device is unaffected (no account-wide delete). A normal single delete must still propagate. Full steps in root `TO_SIMO_DO.md`; implementation record in `DOCUMENTATION.md` (2026-07-10).
+
 ---
 
 ## P0 — Critical bugs & reliability
