@@ -10,6 +10,8 @@ struct MacRootView: View {
     @EnvironmentObject private var appLock: MacAppLockStore
     @State private var isRefreshing = false
     @State private var alert: MacRootAlert?
+    // Persisted sidebar-collapse state; when collapsed, a floating page-switcher (MacGlobalNavBar) appears.
+    @AppStorage("wc_mac_sidebar_collapsed") private var sidebarCollapsed = false
 
     private let recurringCheckTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
     private let exchangeRateRefreshTimer = Timer.publish(every: 5 * 60 * 60, on: .main, in: .common).autoconnect()
@@ -23,34 +25,7 @@ struct MacRootView: View {
                 MacOnboardingView()
                     .frame(minWidth: 700, minHeight: 500)
             } else {
-                NavigationSplitView {
-                    List(MacDestination.allCases, selection: $appModel.selection) { destination in
-                        Label(destination.title, systemImage: destination.systemImage)
-                            .tag(destination)
-                    }
-                    .navigationTitle("Wealth Compass")
-                    .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 280)
-                } detail: {
-                    detail
-                        .frame(minWidth: 520, minHeight: 400)
-                        .toolbar {
-                            ToolbarItemGroup(placement: .primaryAction) {
-                                // L15: Settings is no longer a sidebar destination (it's the native ⌘,
-                                // scene), so every remaining detail page wants "Refresh Data" (⌘R).
-                                Button {
-                                    Task { await refreshData() }
-                                } label: {
-                                    Label(refreshDataLabel, systemImage: "arrow.clockwise")
-                                }
-                                .disabled(isRefreshing)
-                                .keyboardShortcut("r", modifiers: .command)
-                            }
-                        }
-                }
-                .navigationSplitViewStyle(.balanced)
-                // WC-M5: force the language re-render here (post-onboarding) instead of at the
-                // app root, so changing language never resets the onboarding flow.
-                .id(settings.appLanguage ?? "system")
+                mainSplitView
             }
         }
         .overlay(alignment: .top) {
@@ -132,6 +107,58 @@ struct MacRootView: View {
         }
     }
 
+    // Post-onboarding main UI: the sidebar + detail split. Extracted from `body` so each view
+    // expression stays small enough for the Swift type-checker.
+    private var mainSplitView: some View {
+        NavigationSplitView(columnVisibility: sidebarVisibility) {
+            List(MacDestination.allCases, selection: $appModel.selection) { destination in
+                Label(destination.title, systemImage: destination.systemImage)
+                    .tag(destination)
+            }
+            .navigationTitle("Wealth Compass")
+            .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 280)
+        } detail: {
+            detail
+                .frame(minWidth: 520, minHeight: 400)
+                // Floating page-switcher: shown only when the sidebar is collapsed, so every page
+                // (incl. Settings) stays reachable without the sidebar. Top-center over the content.
+                .overlay(alignment: .top) {
+                    if sidebarCollapsed {
+                        MacGlobalNavBar(selection: $appModel.selection)
+                            .padding(.top, 10)
+                    }
+                }
+                .toolbar {
+                    ToolbarItemGroup(placement: .primaryAction) {
+                        // Refresh Data (⌘R) — hidden on the Settings page, which has its own
+                        // market-data / exchange-rate refresh controls.
+                        if (appModel.selection ?? .dashboard) != .settings {
+                            Button {
+                                Task { await refreshData() }
+                            } label: {
+                                Label(refreshDataLabel, systemImage: "arrow.clockwise")
+                            }
+                            .disabled(isRefreshing)
+                            .keyboardShortcut("r", modifiers: .command)
+                        }
+                    }
+                }
+        }
+        .navigationSplitViewStyle(.balanced)
+        // WC-M5: force the language re-render here (post-onboarding) instead of at the
+        // app root, so changing language never resets the onboarding flow.
+        .id(settings.appLanguage ?? "system")
+    }
+
+    // Maps the persisted collapse flag to the NavigationSplitView column visibility (and back, so the
+    // native sidebar toggle / drag keeps the flag — and the floating bar's visibility — in sync).
+    private var sidebarVisibility: Binding<NavigationSplitViewVisibility> {
+        Binding(
+            get: { sidebarCollapsed ? .detailOnly : .all },
+            set: { sidebarCollapsed = ($0 == .detailOnly) }
+        )
+    }
+
     private var refreshDataLabel: String {
         if let progress = finance.marketRefreshProgress, progress.total > 0 {
             return settings.localized("Updating \(progress.done) of \(progress.total)")
@@ -150,6 +177,8 @@ struct MacRootView: View {
             MacInvestmentsView()
         case .crypto:
             MacCryptoView()
+        case .settings:
+            MacSettingsView()
         }
     }
 
@@ -252,6 +281,49 @@ private struct MacRootAlert: Identifiable {
     let id = UUID()
     let title: String
     let message: String
+}
+
+/// Floating global page-switcher shown when the NavigationSplitView sidebar is collapsed — an
+/// icon+label pill (mirrors the MacSelectorIsland aesthetic) that reaches every page, incl. Settings.
+private struct MacGlobalNavBar: View {
+    @Binding var selection: MacDestination?
+    @Namespace private var namespace
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(MacDestination.allCases) { destination in
+                let isSelected = selection == destination
+                Button {
+                    selection = destination
+                } label: {
+                    Label(destination.title, systemImage: destination.systemImage)
+                        .labelStyle(.titleAndIcon)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(isSelected ? .white : .white.opacity(0.75))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background {
+                            if isSelected {
+                                Capsule()
+                                    .fill(Color.white.opacity(0.18))
+                                    .matchedGeometryEffect(id: "mac_global_nav", in: namespace)
+                            }
+                        }
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .help(destination.title)
+            }
+        }
+        .padding(4)
+        .background(
+            Capsule()
+                .fill(Color(white: 0.13))
+                .overlay(Capsule().stroke(Color.white.opacity(0.12), lineWidth: 1))
+        )
+        .shadow(color: .black.opacity(0.28), radius: 10, y: 4)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selection)
+    }
 }
 
 /// An opaque cover shown whenever the window isn't active, so financial data isn't exposed during

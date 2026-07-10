@@ -69,20 +69,23 @@ struct WealthCompassMacApp: App {
                 }
                 .keyboardShortcut("4", modifiers: .command)
 
-                // L15: Settings is reached via the native ⌘, scene below, not a sidebar destination.
+                Button(AppLocalization.string("Settings", appLanguage: settings.appLanguage)) {
+                    appModel.selection = .settings
+                }
+                .keyboardShortcut("5", modifiers: .command)
+            }
+
+            // ⌘, now selects the in-window Settings page instead of opening a separate Preferences
+            // window (the `Settings { }` scene was removed so there's a single MacSettingsView surface).
+            // Keeps the standard App ▸ Settings menu item working.
+            CommandGroup(replacing: .appSettings) {
+                Button(AppLocalization.string("Settings", appLanguage: settings.appLanguage)) {
+                    appModel.selection = .settings
+                }
+                .keyboardShortcut(",", modifiers: .command)
             }
 
             SidebarCommands()
-        }
-
-        Settings {
-            MacSettingsView()
-                .environmentObject(finance)
-                .environmentObject(settings)
-                .environmentObject(appLock)
-                .preferredColorScheme(.dark)
-                .appLanguage(settings.appLanguage)
-                .id(settings.appLanguage ?? "system")
         }
     }
 }
