@@ -64,6 +64,24 @@ struct InvestmentsView: View {
                 accent: gain >= 0 ? WCColor.primary : WCColor.destructive,
                 detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(percent.formatted(.number.precision(.fractionLength(1))))% performance")
             )
+
+            // VIEW-07: Performance % + Status (last-update recency + distinct-sector count) cards, matching macOS.
+            if !settings.isPrivacyMode {
+                MetricCard(
+                    title: LocalizedStringKey("Performance"),
+                    value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
+                    systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
+                    accent: percent >= 0 ? WCColor.primary : WCColor.destructive
+                )
+            }
+            let latestUpdate = finance.data.investments.map(\.updatedAt).max()
+            let sectorCount = Set(finance.data.investments.map(\.sector).filter { !$0.isEmpty }).count
+            let sectorCountLabel = settings.isPrivacyMode ? settings.redactionToken : "\(sectorCount)"
+            MetricCard(
+                verbatimTitle: settings.localized("Status • \(sectorCountLabel) Sectors"),
+                value: latestUpdate.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? settings.localized("Never"),
+                systemImage: "checkmark.circle"
+            )
         }
     }
 
@@ -129,7 +147,7 @@ struct InvestmentsView: View {
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)
                         .truncationMode(.tail)
-                    Text("\(settings.privateNumber(investment.quantity, fractionDigits: 4)) • \(investment.sector)")
+                    Text("\(settings.privateNumber(investment.quantity, fractionDigits: QuantityPrecision.investment)) • \(investment.sector)")
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)

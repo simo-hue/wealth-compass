@@ -1,5 +1,18 @@
 # Documentation
 
+- [2026-07-10]: iOS↔macOS parity — Batch D (VIEW-03, VIEW-04, VIEW-05, VIEW-06, VIEW-07, VIEW-10, VIEW-15) — ⏳ pending on-device build/test
+  - *Details*: Fourth batch from `IOS_MACOS_DIVERGENCE_REPORT.md` — "selectable ranges & summaries" (the larger view work). Five iOS items brought up to macOS; VIEW-10 (macOS holdings sort) + VIEW-15 (shared precision) close the last two. Each mirrors the shipping sibling; all user-visible strings reuse existing catalog keys. Implemented on `main`; **NOT built/run here (CommandLineTools only)** — verify per root `TO_SIMO_DO.md` §5. Only single-file cross-module SourceKit false positives were seen (incl. a "Failed to produce diagnostic for expression" internal SourceKit error on the mac views — an analysis artifact, not a code error). Brace-balance verified on all 7 changed files.
+  - *Tech Notes*:
+    - **Shared** — hoisted `enum CashFlowTimeframe` from `MacDashboardView` to `Shared/Models/FinanceModels.swift` (VIEW-03) so both targets use one definition; added `enum QuantityPrecision { crypto = 8, investment = 6 }` (VIEW-15).
+    - **VIEW-03** (`Sources/iOS/Views/DashboardView.swift`) — cash-flow trend uses `cashFlowRange.rawValue` with a 3M/6M/12M segmented Picker in the header; the "N NET" label + a11y label are now dynamic (was fixed 6 months).
+    - **VIEW-04** (`Sources/iOS/Views/DashboardView.swift`) — top-expenses uses a selectable `expensePeriod` (7d/30d/3m/YTD/All) via a menu Picker; subtitle/empty-state made period-agnostic (was fixed 30 days).
+    - **VIEW-05** (`Sources/iOS/Views/DashboardView.swift`) — net-worth chart gained a selected-point `PointMark` and a dated X-axis (`AxisMarks`, desiredCount 4) replacing `.chartXAxis(.hidden)`. **NOTE:** the X-axis on the compact iPhone chart is a design-judgment call the report flagged — eyeball it; trivial to revert if it clutters.
+    - **VIEW-06** (`Sources/iOS/Views/CryptoView.swift`) — added a Top Performer / Biggest Loser leaderboard (`performanceSection`/`performanceCard`), shown only when a positive best and/or negative worst exists. Mirrors macOS.
+    - **VIEW-07** (`Sources/iOS/Views/CryptoView.swift` + `InvestmentsView.swift`) — summary grids gained a Performance % card (hidden in Privacy Mode) and a Status card (last-update recency + distinct coin/sector count). Reuses the "Status • N Coins/Sectors" keys.
+    - **VIEW-10** (`Sources/macOS/Views/MacCryptoView.swift` + `MacInvestmentsView.swift`) — Holdings/Positions tables now `.sorted { $0.currentValue > $1.currentValue }` (were insertion order), matching iOS + the Overview grids.
+    - **VIEW-15** (all 4 list rows) — quantity precision routed through `QuantityPrecision` (crypto 8, investment 6); iOS was 6/4, so iOS crypto/investment rows now show the same decimals as macOS.
+    - No new tests (view-layer; the XCTest suite is logic-only). Verify via the smoke checks in root `TO_SIMO_DO.md` §5.
+
 - [2026-07-10]: iOS↔macOS parity — Batch C (SET-03, SET-04, EDIT-04, EDIT-05, EDIT-08, VIEW-08, VIEW-09) — ⏳ pending on-device build/test
   - *Details*: Third remediation batch from `IOS_MACOS_DIVERGENCE_REPORT.md` — the "surfaced-vs-silent + i18n" tier. Six iOS items brought up to macOS, one macOS item (SET-04) up to iOS. Each mirrors the shipping sibling; **all strings reuse existing catalog keys (no new strings)**. Implemented on `main`; **NOT built/run here (CommandLineTools only)** — verify per root `TO_SIMO_DO.md` §4. Only the known single-file cross-module SourceKit false positives were seen, including the pre-existing `SettingsView.swift:42` type-check-timeout (unchanged by these edits — they live in methods outside the view body).
   - *Tech Notes*:

@@ -191,7 +191,8 @@ struct MacInvestmentsView: View {
                     )
                     .padding(.top, 40)
                 } else {
-                    ForEach(finance.data.investments) { investment in
+                    // VIEW-10: value-ranked to match iOS + the Overview grid (was insertion order).
+                    ForEach(finance.data.investments.sorted { $0.currentValue > $1.currentValue }) { investment in
                         investmentCard(for: investment)
                     }
                 }
@@ -241,7 +242,7 @@ struct MacInvestmentsView: View {
                         Text("Quantity")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        Text(settings.privateNumber(investment.quantity, fractionDigits: 6))
+                        Text(settings.privateNumber(investment.quantity, fractionDigits: QuantityPrecision.investment))
                             .font(.subheadline.monospacedDigit())
                             .foregroundStyle(.white)
                     }

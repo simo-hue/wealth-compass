@@ -1117,28 +1117,7 @@ private struct MacDashboardBackdrop: View {
     }
 }
 
-enum CashFlowTimeframe: Int, CaseIterable, Identifiable {
-    case threeMonths = 3
-    case sixMonths = 6
-    case twelveMonths = 12
-    
-    var id: Int { rawValue }
-    var label: LocalizedStringKey {
-        switch self {
-        case .threeMonths: "3M"
-        case .sixMonths: "6M"
-        case .twelveMonths: "12M"
-        }
-    }
-
-    func localizedTitle(appLanguage: String?) -> String {
-        switch self {
-        case .threeMonths: AppLocalization.string("3M", appLanguage: appLanguage)
-        case .sixMonths: AppLocalization.string("6M", appLanguage: appLanguage)
-        case .twelveMonths: AppLocalization.string("12M", appLanguage: appLanguage)
-        }
-    }
-}
+// CashFlowTimeframe moved to Shared/Models/FinanceModels.swift (VIEW-03) so iOS can reuse it.
 
 struct DashboardSegmentedPicker<SelectionValue: Hashable & Identifiable>: View {
     @Binding var selection: SelectionValue

@@ -46,3 +46,14 @@ you run the checks below whenever you're at a real Mac and report anything red.
    - Same `SettingsView.swift:42` single-file type-check-timeout note as §3 applies (assessed false positive; SET-03 edits are outside the view body, so unchanged — watch the real Xcode build).
 
    Report anything red and I'll fix-forward on `main`.
+
+5. **Verify iOS↔macOS parity — Batch D** (VIEW-03/04/05/06/07/10/15) — from `apple/IOS_MACOS_DIVERGENCE_REPORT.md`. Implemented on `main`, **not built here** — this is the **largest** batch (7 files, 187 insertions), so build both schemes carefully. All user-visible strings reuse existing catalog keys. Same commands as §2. Smoke checks:
+   - **VIEW-03 (iOS):** the Dashboard cash-flow card has a 3M/6M/12M segmented control that redraws the chart + the "N NET" figure.
+   - **VIEW-04 (iOS):** "Top Expense Categories" has a period menu (7d / 30d / 3m / YTD / All) that re-filters the list.
+   - **VIEW-05 (iOS):** the net-worth chart shows date labels along the bottom and an emphasized dot when you scrub to a point. ⚠️ **If the X-axis looks cluttered on the phone, tell me and I'll revert just that part** — the report flagged it as possibly an intentional iPhone space trade-off (the PointMark dot is uncontroversial; only the axis is the judgment call).
+   - **VIEW-06 (iOS):** the Crypto tab shows a Top Performer / Biggest Loser card (only when you hold a gaining and/or losing asset).
+   - **VIEW-07 (iOS):** the Crypto + Investments summaries show a Performance % card and a "Status • N Coins/Sectors" card (Performance hides in Privacy Mode).
+   - **VIEW-10 (macOS):** the Crypto/Investments Holdings tables list largest-value-first.
+   - **VIEW-15 (both):** a high-precision crypto quantity shows up to 8 decimals and an investment quantity up to 6 — the same on iPhone and Mac (iOS was previously 6 / 4).
+
+   Report anything red and I'll fix-forward on `main`.
