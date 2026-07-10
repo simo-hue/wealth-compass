@@ -25,6 +25,22 @@ private enum TransactionListTypeFilter: String, CaseIterable, Identifiable {
     }
 }
 
+/// Overview / Transactions split for the Cash Flow tab, mirroring the macOS selector island so iOS
+/// gets a dedicated, searchable, uncapped transactions view.
+private enum CashFlowTab: String, CaseIterable, Identifiable {
+    case overview
+    case transactions
+
+    var id: String { rawValue }
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .overview: "Overview"
+        case .transactions: "Transactions"
+        }
+    }
+}
+
 struct CashFlowView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
@@ -34,10 +50,10 @@ struct CashFlowView: View {
     @State private var period: AnalyticsPeriod = .thirtyDays
     @State private var transactionPeriod: AnalyticsPeriod = .thirtyDays
     @State private var transactionTypeFilter: TransactionListTypeFilter = .all
+    @State private var transactionSearch = ""
+    @State private var selectedTab: CashFlowTab = .overview
     @State private var activeAlert: CashFlowAlert?
     @State private var hoveredExpenseCategory: CategoryTotal?
-
-    private let transactionDisplayLimit = 40
 
     var body: some View {
         ScrollView {
@@ -67,10 +83,15 @@ struct CashFlowView: View {
                     .buttonStyle(.plain)
                 }
 
-                summaryCards
-                recurringTransactions
-                analytics
-                transactions
+                cashFlowTabPicker
+
+                if selectedTab == .overview {
+                    summaryCards
+                    recurringTransactions
+                    analytics
+                } else {
+                    transactions
+                }
             }
             .padding(16)
         }
@@ -112,6 +133,15 @@ struct CashFlowView: View {
             }
         }
         .alert(item: $activeAlert, content: alert(for:))
+    }
+
+    private var cashFlowTabPicker: some View {
+        Picker("Cash flow view", selection: $selectedTab) {
+            ForEach(CashFlowTab.allCases) { tab in
+                Text(tab.title).tag(tab)
+            }
+        }
+        .pickerStyle(.segmented)
     }
 
     private var summaryCards: some View {
@@ -374,26 +404,25 @@ struct CashFlowView: View {
     }
 
     private var transactions: some View {
-        // WC-M13: derive the sorted/filtered/visible lists once per render. `finance.transactions`
-        // re-sorts on every access and `filteredTransactions` re-filters, so the header, list and
-        // hidden-count previously re-ran the O(n log n) sort and the filter several times per frame.
+        // WC-M13: derive the filtered list once per render. `finance.transactions` is cached-sorted,
+        // and `filteredTransactions` runs the type/period/search filter a single time here.
         // `finance.data.transactions` is the unsorted backing array, so the emptiness check is free.
         let hasAnyTransactions = !finance.data.transactions.isEmpty
         let filtered = filteredTransactions
-        let visible = Array(filtered.prefix(transactionDisplayLimit))
-        let hiddenCount = max(0, filtered.count - visible.count)
         return FinanceCard {
             VStack(alignment: .leading, spacing: 14) {
-                transactionHeader(visibleCount: visible.count, totalCount: filtered.count)
+                transactionHeader(shownCount: filtered.count, totalCount: finance.transactions.count)
                 transactionFilters
+                transactionSearchField
 
                 if !hasAnyTransactions {
                     EmptyState(title: "No transactions found", systemImage: "tray")
                 } else if filtered.isEmpty {
                     EmptyState(title: "No transactions match these filters", systemImage: "line.3.horizontal.decrease.circle")
                 } else {
-                    VStack(spacing: 12) {
-                        ForEach(visible) { transaction in
+                    // LazyVStack so the full (uncapped) list only renders the rows on screen.
+                    LazyVStack(spacing: 12) {
+                        ForEach(filtered) { transaction in
                             transactionRow(transaction)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
@@ -419,33 +448,49 @@ struct CashFlowView: View {
                                 }
                         }
                     }
-
-                    if hiddenCount > 0 {
-                        Text("\(hiddenCount) more transactions hidden by this view.")
-                            .font(.caption)
-                            .foregroundStyle(WCColor.textSecondary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.top, 2)
-                    }
                 }
             }
         }
     }
 
-    private func transactionHeader(visibleCount: Int, totalCount: Int) -> some View {
+    private func transactionHeader(shownCount: Int, totalCount: Int) -> some View {
         HStack(alignment: .firstTextBaseline) {
-            Text("Recent Transactions")
+            Text("Transactions")
                 .font(.headline)
                 .foregroundStyle(.white)
 
             Spacer()
 
             if totalCount > 0 {
-                Text("Showing \(visibleCount) of \(totalCount)")
+                Text("Showing \(shownCount) of \(totalCount)")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(WCColor.textSecondary)
             }
         }
+    }
+
+    private var transactionSearchField: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(WCColor.textSecondary)
+            TextField("Search", text: $transactionSearch)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .foregroundStyle(.white)
+            if !transactionSearch.isEmpty {
+                Button {
+                    transactionSearch = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(WCColor.textSecondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear search")
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 9)
+        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
     }
 
     private var transactionFilters: some View {
@@ -476,10 +521,15 @@ struct CashFlowView: View {
     }
 
     private var filteredTransactions: [Transaction] {
-        finance.transactions.filter { transaction in
+        let query = transactionSearch.trimmingCharacters(in: .whitespacesAndNewlines)
+        return finance.transactions.filter { transaction in
             let matchesType = transactionTypeFilter.transactionType.map { $0 == transaction.type } ?? true
             let matchesPeriod = transactionStartDate.map { transaction.date >= $0 && transaction.date <= Date() } ?? true
-            return matchesType && matchesPeriod
+            // Search matches category or description (case/diacritic-insensitive), like macOS.
+            let matchesSearch = query.isEmpty
+                || transaction.category.localizedCaseInsensitiveContains(query)
+                || transaction.description.localizedCaseInsensitiveContains(query)
+            return matchesType && matchesPeriod && matchesSearch
         }
     }
 
