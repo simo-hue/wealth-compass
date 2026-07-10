@@ -99608,6 +99608,9 @@
         }
       }
     },
+    "The API key was removed from Keychain." : {
+
+    },
     "The API key was removed from the macOS Keychain." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -102201,6 +102204,9 @@
           }
         }
       }
+    },
+    "The stored credential will be deleted from Keychain." : {
+
     },
     "The stored credential will be deleted from the macOS Keychain." : {
       "localizations" : {
