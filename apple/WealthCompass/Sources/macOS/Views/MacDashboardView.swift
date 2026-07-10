@@ -20,6 +20,9 @@ struct MacDashboardView: View {
         finance.calculateTotals(settings: settings)
     }
 
+    private var currentMonthCashFlow: MonthlyCashFlow {
+        finance.monthlyCashFlow(for: Date(), settings: settings)
+    }
 
     private var isCompletelyEmpty: Bool {
         finance.data.transactions.isEmpty
@@ -39,6 +42,7 @@ struct MacDashboardView: View {
                     }
 
                     netWorthHero
+                    keyMetrics
 
                     if proxy.size.width >= 1_090 {
                         HStack(alignment: .top, spacing: 20) {
@@ -77,6 +81,34 @@ struct MacDashboardView: View {
         .navigationTitle("Dashboard")
         .onChange(of: timeRange) {
             selectedNetWorthDate = nil
+        }
+    }
+
+    // VIEW-01: surface the two figures the allocation ring + net-worth hero don't already cover —
+    // total Liabilities and the current month's Net Savings — mirroring the iOS dashboard's Position
+    // grid (Cash / Investments / Crypto / Total Assets are already represented on this screen).
+    private var keyMetrics: some View {
+        LazyVGrid(
+            columns: [GridItem(.adaptive(minimum: 240), spacing: 16)],
+            alignment: .leading,
+            spacing: 16
+        ) {
+            MetricCard(
+                title: "Liabilities",
+                value: settings.privateCurrency(totals.totalLiabilities),
+                systemImage: "creditcard.fill",
+                accent: WCColor.destructive,
+                detail: finance.data.liabilities.count == 1 ? LocalizedStringKey("1 liability") : LocalizedStringKey("\(finance.data.liabilities.count) liabilities")
+            )
+            MetricCard(
+                title: "Net Savings",
+                value: settings.privateCurrency(currentMonthCashFlow.netSavings),
+                systemImage: currentMonthCashFlow.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
+                accent: currentMonthCashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive,
+                // WC-L4: `.formatted` ignores the SwiftUI environment locale, so pass the effective
+                // (in-app language) locale explicitly; the result is already-localized data.
+                detail: LocalizedStringKey(Date().formatted(.dateTime.month(.wide).locale(AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))))
+            )
         }
     }
 

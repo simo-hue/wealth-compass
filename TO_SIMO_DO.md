@@ -24,3 +24,13 @@ you run the checks below whenever you're at a real Mac and report anything red.
    - **EDIT-06 (macOS):** add a new investment → the currency picker must default to EUR (before: USD).
 
    Report anything red (build error, warning, or a failed smoke check) and it gets fixed forward on `main`.
+
+3. **Verify iOS↔macOS parity — Batch B** (VIEW-01, VIEW-02, SET-01, SET-02) — from `apple/IOS_MACOS_DIVERGENCE_REPORT.md`. Implemented on `main`, **not built here**. Same build/test commands as §2. Smoke checks:
+   - **VIEW-01 (macOS):** the Dashboard now shows a Liabilities card + a current-month Net Savings card just below the net-worth chart.
+   - **VIEW-02 (iOS):** the Investments tab now shows three allocation charts — Sector, Type, and Geography.
+   - **SET-01 (iOS):** Settings → tap a market-data API key → when a key is configured, a red "Remove Key" appears; tapping it and confirming clears the key (status returns to "Not Set").
+   - **SET-02 (iOS):** import a backup containing a recurring schedule whose next-due date is in the past → the due transaction(s) land in Cash Flow and the import summary shows an "N due recurring transaction(s) were added" note.
+   - ⚠️ **One diagnostic to watch:** single-file analysis here reported `SettingsView.swift:42 "unable to type-check this expression in reasonable time."` Assessed as a false positive — it's an unedited pre-existing line and co-occurs with the cross-module `cannot find WCColor/Currency/AppSettings` cascade that makes the local type-checker give up. **If the real Xcode build reports the same timeout on `SettingsView`, tell me** — the fix is to extract the "Region & Language"/"Privacy" sections into computed subviews (fix-forward). If the build is green, ignore it.
+   - Note: SET-01 adds two new English strings ("…removed from Keychain." / "…deleted from Keychain."); they render in English until the string catalog is regenerated on a build.
+
+   Report anything red and I'll fix-forward on `main`.

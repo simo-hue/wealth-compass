@@ -19,6 +19,10 @@ struct InvestmentsView: View {
 
                 summary
                 AllocationChart(title: LocalizedStringKey("Allocation by Sector"), slices: finance.investmentAllocation(settings: settings), settings: settings)
+                // VIEW-02: match macOS, which also breaks the portfolio down by type and geography
+                // (both store methods already exist and feed the macOS charts). Single-column on iPhone.
+                AllocationChart(title: LocalizedStringKey("Allocation by Type"), slices: finance.investmentTypeAllocation(settings: settings), settings: settings)
+                AllocationChart(title: LocalizedStringKey("Allocation by Geography"), slices: finance.investmentGeographyAllocation(settings: settings), settings: settings)
                 investmentList
             }
             .padding(16)

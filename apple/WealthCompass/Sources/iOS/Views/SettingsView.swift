@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var showingImportOptions = false
     @State private var showingFileImporter = false
     @State private var importSummary: FinanceImportResult?
+    @State private var importSummaryNote: String?
     @State private var settingsAlert: SettingsAlertState?
     @State private var credentialEditorAlert: SettingsAlertState?
     @State private var activeCredentialEditor: MarketDataCredentialKind?
@@ -274,8 +275,10 @@ struct SettingsView: View {
             .sheet(item: $activeCredentialEditor) { credential in
                 MarketDataCredentialEditor(
                     credential: credential,
+                    appLanguage: settings.appLanguage,
                     apiKey: $credentialDraft,
                     alert: $credentialEditorAlert,
+                    isConfigured: KeychainCredentialStore.shared.contains(credential.keychainCredential),
                     isSaving: isSavingMarketDataCredential,
                     onCancel: {
                         credentialDraft = ""
@@ -284,12 +287,16 @@ struct SettingsView: View {
                     },
                     onSave: {
                         Task { await saveAndTestMarketDataCredential(credential) }
+                    },
+                    onRemove: {
+                        removeMarketDataCredential(credential)
                     }
                 )
             }
             .sheet(item: $importSummary) { summary in
-                ImportSummaryView(result: summary, appLanguage: settings.appLanguage) {
+                ImportSummaryView(result: summary, appLanguage: settings.appLanguage, additionalNote: importSummaryNote) {
                     importSummary = nil
+                    importSummaryNote = nil
                 }
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
@@ -580,6 +587,19 @@ struct SettingsView: View {
             Task {
                 do {
                     let result = try await finance.importBackup(from: url, mode: importMode, settings: settings)
+                    // SET-02: match macOS — materialize any now-due recurring transactions the backup
+                    // brought in, reschedule notifications, and note the count in the import summary.
+                    let insertedCount = finance.processDueRecurringTransactions(settings: settings)
+                    await syncRecurringNotifications()
+                    if insertedCount == 1 {
+                        importSummaryNote = settings.localized("\n\n1 due recurring transaction was added to Cash Flow.")
+                            .trimmingCharacters(in: .whitespacesAndNewlines)
+                    } else if insertedCount > 1 {
+                        importSummaryNote = settings.localized("\n\n\(insertedCount) due recurring transactions were added to Cash Flow.")
+                            .trimmingCharacters(in: .whitespacesAndNewlines)
+                    } else {
+                        importSummaryNote = nil
+                    }
                     backupURL = nil
                     backupError = nil
                     importSummary = result
@@ -596,6 +616,20 @@ struct SettingsView: View {
                 message: error.localizedDescription
             )
         }
+    }
+
+    private func syncRecurringNotifications() async {
+        let schedules = finance.data.recurringTransactions
+        let convertedAmounts = Dictionary(
+            schedules.map { ($0.id, settings.convert($0.amount, from: $0.currency)) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        await RecurringTransactionNotificationService.shared.sync(
+            schedules: schedules,
+            convertedAmounts: convertedAmounts,
+            currencyCode: settings.currency.rawValue,
+            showAmounts: !settings.isPrivacyMode
+        )
     }
 
     private func refreshMarketDataKeyStatus() {
@@ -638,6 +672,25 @@ struct SettingsView: View {
         } catch {
             credentialEditorAlert = SettingsAlertState(
                 title: settings.localized("\(credential.localizedTitle(appLanguage: settings.appLanguage)) Failed"),
+                message: SettingsView.errorMessage(error, appLanguage: settings.appLanguage)
+            )
+        }
+    }
+
+    private func removeMarketDataCredential(_ credential: MarketDataCredentialKind) {
+        do {
+            try KeychainCredentialStore.shared.delete(credential.keychainCredential)
+            credentialDraft = ""
+            credentialEditorAlert = nil
+            activeCredentialEditor = nil
+            refreshMarketDataKeyStatus()
+            settingsAlert = SettingsAlertState(
+                title: settings.localized("\(credential.localizedTitle(appLanguage: settings.appLanguage)) Removed"),
+                message: settings.localized("The API key was removed from Keychain.")
+            )
+        } catch {
+            credentialEditorAlert = SettingsAlertState(
+                title: settings.localized("Unable to Remove \(credential.localizedTitle(appLanguage: settings.appLanguage))"),
                 message: SettingsView.errorMessage(error, appLanguage: settings.appLanguage)
             )
         }
@@ -762,11 +815,15 @@ private enum MarketDataCredentialKind: String, Identifiable {
 
 private struct MarketDataCredentialEditor: View {
     let credential: MarketDataCredentialKind
+    let appLanguage: String?
     @Binding var apiKey: String
     @Binding var alert: SettingsAlertState?
+    let isConfigured: Bool
     let isSaving: Bool
     let onCancel: () -> Void
     let onSave: () -> Void
+    let onRemove: () -> Void
+    @State private var showingRemoveConfirmation = false
 
     private var canSave: Bool {
         !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isSaving
@@ -794,6 +851,17 @@ private struct MarketDataCredentialEditor: View {
                         }
                     }
                 }
+
+                // SET-01: allow clearing a stored key (parity with the macOS "Remove Key"). Only
+                // shown when a key is actually configured; confirmed before deleting from Keychain.
+                if isConfigured {
+                    Section {
+                        Button("Remove Key", role: .destructive) {
+                            showingRemoveConfirmation = true
+                        }
+                        .disabled(isSaving)
+                    }
+                }
             }
             .navigationTitle(credential.title)
             .navigationBarTitleDisplayMode(.inline)
@@ -816,6 +884,15 @@ private struct MarketDataCredentialEditor: View {
                     message: Text(alert.message),
                     dismissButton: .default(Text("OK"))
                 )
+            }
+            .confirmationDialog(
+                "Remove \(credential.localizedTitle(appLanguage: appLanguage))?",
+                isPresented: $showingRemoveConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Remove Key", role: .destructive, action: onRemove)
+            } message: {
+                Text("The stored credential will be deleted from Keychain.")
             }
         }
     }
