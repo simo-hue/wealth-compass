@@ -247,7 +247,8 @@ struct MacCryptoView: View {
                     )
                     .padding(.top, 40)
                 } else {
-                    ForEach(finance.data.crypto) { holding in
+                    // VIEW-10: value-ranked to match iOS + the Overview grid (was insertion order).
+                    ForEach(finance.data.crypto.sorted { $0.currentValue > $1.currentValue }) { holding in
                         holdingCard(for: holding)
                     }
                 }
@@ -293,7 +294,7 @@ struct MacCryptoView: View {
                         Text("Quantity")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        Text(settings.privateNumber(holding.quantity, fractionDigits: 8))
+                        Text(settings.privateNumber(holding.quantity, fractionDigits: QuantityPrecision.crypto))
                             .font(.subheadline.monospacedDigit())
                             .foregroundStyle(.white)
                     }

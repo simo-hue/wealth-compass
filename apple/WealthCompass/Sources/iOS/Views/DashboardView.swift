@@ -7,6 +7,9 @@ struct DashboardView: View {
     @State private var timeRange: TimeRange = .oneYear
     @State private var showingAddTransaction = false
     @State private var selectedNetWorthDate: Date?
+    // VIEW-03 / VIEW-04: selectable ranges to match macOS (were hard-wired to 6 months / 30 days).
+    @State private var cashFlowRange: CashFlowTimeframe = .sixMonths
+    @State private var expensePeriod: AnalyticsPeriod = .thirtyDays
     @ScaledMetric(relativeTo: .largeTitle) private var netWorthSize: CGFloat = 35
 
     private let columns = [
@@ -216,6 +219,15 @@ struct DashboardView: View {
                                         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                                         .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(WCColor.border, lineWidth: 1))
                                     }
+
+                                // VIEW-05: emphasize the selected point with a dot (matches macOS).
+                                PointMark(
+                                    x: .value("Selected date", selectedPoint.date),
+                                    y: .value("Selected net worth", selectedPoint.value)
+                                )
+                                .foregroundStyle(WCColor.primary)
+                                .symbolSize(64)
+                                .accessibilityHidden(true)
                             }
 
                             ForEach(points) { point in
@@ -249,7 +261,15 @@ struct DashboardView: View {
                         }
                         .chartYScale(domain: yDomain)
                         .chartXSelection(value: $selectedNetWorthDate)
-                        .chartXAxis(.hidden)
+                        // VIEW-05: show dated gridlines like macOS (fewer ticks for the narrow iPhone width).
+                        .chartXAxis {
+                            AxisMarks(values: .automatic(desiredCount: 4)) { _ in
+                                AxisGridLine()
+                                    .foregroundStyle(.white.opacity(0.06))
+                                AxisValueLabel()
+                                    .foregroundStyle(WCColor.textTertiary)
+                            }
+                        }
                         .chartYAxis(.hidden)
                         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: points)
                         .frame(height: 205)
@@ -342,14 +362,24 @@ struct DashboardView: View {
     }
 
     private var cashFlowTrend: some View {
-        let trend = finance.cashFlowTrend(months: 6, settings: settings)
+        let trend = finance.cashFlowTrend(months: cashFlowRange.rawValue, settings: settings)
         let hasCashFlow = trend.contains { $0.income != 0 || $0.expense != 0 }
         let totalIncome = trend.reduce(0) { $0 + $1.income }
         let totalExpense = trend.reduce(0) { $0 + $1.expense }
 
         return FinanceCard {
             VStack(alignment: .leading, spacing: 18) {
-                SectionHeading("Six-Month Cash Flow", subtitle: "Income and expenses by month")
+                HStack(alignment: .top, spacing: 12) {
+                    SectionHeading("Cash Flow", subtitle: "Income and expenses by month")
+                    Spacer(minLength: 0)
+                    // VIEW-03: 3M/6M/12M selector matching macOS (iOS was fixed at 6 months).
+                    Picker("Cash-flow range", selection: $cashFlowRange) {
+                        ForEach(CashFlowTimeframe.allCases) { Text($0.label).tag($0) }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.segmented)
+                    .fixedSize()
+                }
 
                 if !hasCashFlow {
                     EmptyState(title: "No recent cash flow", systemImage: "chart.bar.xaxis")
@@ -393,7 +423,7 @@ struct DashboardView: View {
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: trend)
                     .frame(height: 210)
                     .accessibilityElement(children: .contain)
-                    .accessibilityLabel(Text("Six-Month Cash Flow"))
+                    .accessibilityLabel(Text("Cash Flow"))
                 }
 
                 HStack(spacing: 18) {
@@ -401,7 +431,7 @@ struct DashboardView: View {
                     cashFlowLegend(title: settings.localized("Expenses"), value: totalExpense, color: WCColor.destructive)
                     Spacer(minLength: 0)
                     VStack(alignment: .trailing, spacing: 3) {
-                        Text("6M NET")
+                        Text(settings.localized("\(cashFlowRange.localizedTitle(appLanguage: settings.appLanguage)) NET"))
                             .font(.caption2.weight(.bold))
                             .tracking(1)
                             .foregroundStyle(WCColor.textFaint)
@@ -431,17 +461,26 @@ struct DashboardView: View {
     }
 
     private var topExpenses: some View {
-        let expenses = Array(finance.expensesByCategory(period: .thirtyDays, settings: settings).prefix(5))
+        let expenses = Array(finance.expensesByCategory(period: expensePeriod, settings: settings).prefix(5))
 
         return FinanceCard {
             VStack(alignment: .leading, spacing: 18) {
-                SectionHeading(
-                    "Top Expense Categories",
-                    subtitle: "Where spending was concentrated in the last 30 days"
-                )
+                HStack(alignment: .top, spacing: 12) {
+                    SectionHeading(
+                        "Top Expense Categories",
+                        subtitle: "Where recorded spending is concentrated"
+                    )
+                    Spacer(minLength: 0)
+                    // VIEW-04: period selector matching macOS (iOS was fixed at 30 days).
+                    Picker("Expense period", selection: $expensePeriod) {
+                        ForEach(AnalyticsPeriod.allCases) { Text($0.title).tag($0) }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                }
 
                 if expenses.isEmpty {
-                    EmptyState(title: "No expenses in the last 30 days", systemImage: "list.bullet.rectangle")
+                    EmptyState(title: "No expenses for this period", systemImage: "list.bullet.rectangle")
                 } else {
                     VStack(spacing: 15) {
                         ForEach(Array(expenses.enumerated()), id: \.element.id) { index, item in

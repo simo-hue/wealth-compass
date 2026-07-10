@@ -205,6 +205,38 @@ enum AnalyticsPeriod: String, CaseIterable, Identifiable {
     }
 }
 
+/// Selectable window for the dashboard / cash-flow trend chart. Hoisted to Shared (was macOS-only in
+/// MacDashboardView) so iOS can offer the same 3M/6M/12M selector (VIEW-03).
+enum CashFlowTimeframe: Int, CaseIterable, Identifiable {
+    case threeMonths = 3
+    case sixMonths = 6
+    case twelveMonths = 12
+
+    var id: Int { rawValue }
+    var label: LocalizedStringKey {
+        switch self {
+        case .threeMonths: "3M"
+        case .sixMonths: "6M"
+        case .twelveMonths: "12M"
+        }
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        switch self {
+        case .threeMonths: AppLocalization.string("3M", appLanguage: appLanguage)
+        case .sixMonths: AppLocalization.string("6M", appLanguage: appLanguage)
+        case .twelveMonths: AppLocalization.string("12M", appLanguage: appLanguage)
+        }
+    }
+}
+
+/// VIEW-15: canonical display precision (fraction digits) for holding quantities, shared so iOS and
+/// macOS list rows don't drift — crypto needs satoshi precision, investments fewer places.
+enum QuantityPrecision {
+    static let crypto = 8
+    static let investment = 6
+}
+
 enum FeeMode: String, CaseIterable, Identifiable, Codable {
     case fixed
     case percent

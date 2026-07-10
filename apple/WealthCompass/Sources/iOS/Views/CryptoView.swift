@@ -18,6 +18,7 @@ struct CryptoView: View {
                 }
 
                 summary
+                performanceSection
                 AllocationChart(title: LocalizedStringKey("Crypto Allocation"), slices: finance.cryptoAllocation(settings: settings), settings: settings)
                 holdingsList
             }
@@ -60,7 +61,84 @@ struct CryptoView: View {
                 accent: gain >= 0 ? WCColor.primary : WCColor.destructive,
                 detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(percent.formatted(.number.precision(.fractionLength(1))))% performance")
             )
+
+            // VIEW-07: Performance % + Status (last-update recency + distinct-coin count) cards, matching macOS.
+            if !settings.isPrivacyMode {
+                MetricCard(
+                    title: LocalizedStringKey("Performance"),
+                    value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
+                    systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
+                    accent: percent >= 0 ? WCColor.primary : WCColor.destructive
+                )
+            }
+            let latestUpdate = finance.data.crypto.map(\.updatedAt).max()
+            let coinCount = Set(finance.data.crypto.map(\.symbol).filter { !$0.isEmpty }).count
+            let coinCountLabel = settings.isPrivacyMode ? settings.redactionToken : "\(coinCount)"
+            MetricCard(
+                verbatimTitle: settings.localized("Status • \(coinCountLabel) Coins"),
+                value: latestUpdate.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? settings.localized("Never"),
+                systemImage: "checkmark.circle"
+            )
         }
+    }
+
+    // VIEW-06: Top Performer / Biggest Loser leaderboard, matching macOS (shown only when a positive
+    // best and/or negative worst exists). Values redact in Privacy Mode via privateCurrency/ValueDelta.
+    @ViewBuilder
+    private var performanceSection: some View {
+        let cryptos = finance.data.crypto
+        let best = cryptos.max(by: { $0.gainLossPercent < $1.gainLossPercent })
+        let worst = cryptos.min(by: { $0.gainLossPercent < $1.gainLossPercent })
+        let hasBest = best != nil && best!.gainLossPercent > 0
+        let hasWorst = worst != nil && worst!.gainLossPercent < 0
+
+        if hasBest || hasWorst {
+            FinanceCard {
+                VStack(spacing: 16) {
+                    if let best, best.gainLossPercent > 0 {
+                        performanceCard(title: LocalizedStringKey("Top Performer"), holding: best)
+                    }
+                    if hasBest && hasWorst {
+                        Divider().background(WCColor.border)
+                    }
+                    if let worst, worst.gainLossPercent < 0 {
+                        performanceCard(title: LocalizedStringKey("Biggest Loser"), holding: worst)
+                    }
+                }
+            }
+        }
+    }
+
+    private func performanceCard(title: LocalizedStringKey, holding: CryptoHolding) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.white)
+            HStack(spacing: 12) {
+                CryptoIconView(symbol: holding.symbol)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(holding.name)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                    Text(holding.symbol)
+                        .font(.caption)
+                        .foregroundStyle(WCColor.textSecondary)
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text(settings.privateCurrency(holding.currentValue, sourceCurrency: holding.currency))
+                        .font(.subheadline.monospacedDigit().weight(.semibold))
+                        .foregroundStyle(.white)
+                    ValueDelta(
+                        value: holding.gainLoss.doubleValue,
+                        formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
+                        percent: holding.gainLossPercent
+                    )
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var holdingsList: some View {
@@ -113,7 +191,7 @@ struct CryptoView: View {
                             .lineLimit(1)
                             .truncationMode(.tail)
                     }
-                    Text("\(settings.privateNumber(holding.quantity, fractionDigits: 6)) units")
+                    Text("\(settings.privateNumber(holding.quantity, fractionDigits: QuantityPrecision.crypto)) units")
                         .font(.caption)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)
