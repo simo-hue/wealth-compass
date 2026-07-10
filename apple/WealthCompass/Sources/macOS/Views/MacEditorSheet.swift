@@ -226,7 +226,9 @@ private struct MacInvestmentEditor: View {
         _name = State(initialValue: investment?.name ?? "")
         _isin = State(initialValue: investment?.isin ?? "")
         _type = State(initialValue: investment?.type ?? .stock)
-        _currency = State(initialValue: investment?.currency ?? .usd)
+        // WC-A2: default a new holding to EUR, consistent with the transaction, recurring, and crypto
+        // editors (all `?? .eur`) and with iOS — the previous `.usd` was an outlier.
+        _currency = State(initialValue: investment?.currency ?? .eur)
         _sector = State(initialValue: investment?.sector ?? "Technology")
         _geography = State(initialValue: investment?.geography ?? "US")
         _quantity = State(initialValue: investment.map { Self.input($0.quantity) } ?? "")

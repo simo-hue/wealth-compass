@@ -1105,8 +1105,13 @@ private struct MacCashFlowTransactionEditor: View {
                         if !settings.transactionCategories(for: newType).contains(category) && !isCustomCategorySelected {
                             category = settings.transactionCategories(for: newType).first ?? ""
                         }
-                        customCategory = ""
-                        isCustomCategoryFocused = false
+                        // M08: preserve an in-progress custom category name across a type toggle — a
+                        // custom category isn't tied to income vs expense, so don't wipe it (mirrors
+                        // MacTransactionEditor in MacEditorSheet; the sibling editor already had this).
+                        if !isCustomCategorySelected {
+                            customCategory = ""
+                            isCustomCategoryFocused = false
+                        }
                     }
 
                     TextField("Amount (\(currency.rawValue))", text: $amount)
@@ -1121,6 +1126,13 @@ private struct MacCashFlowTransactionEditor: View {
 
                 Section("Category") {
                     Picker("Category", selection: $category) {
+                        // DA-H06: keep the current value selectable even if it isn't in the type's
+                        // default+custom list (imported/legacy category, or the transient state mid
+                        // type-toggle) so the selection always has a matching tag — no "selection is
+                        // invalid" warning, no silent category rewrite on save (mirrors MacTransactionEditor).
+                        if category != Self.customCategoryTag && !categories.contains(category) {
+                            Text(LocalizedStringKey(category)).tag(category)
+                        }
                         ForEach(categories, id: \.self) { category in
                             // Localize built-in category names; custom user ones fall through verbatim (WC-M10).
                             Text(LocalizedStringKey(category)).tag(category)

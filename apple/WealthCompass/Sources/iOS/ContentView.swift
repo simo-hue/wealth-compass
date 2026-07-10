@@ -74,6 +74,18 @@ struct ContentView: View {
         .onChange(of: finance.data.recurringTransactions) { _, _ in
             Task { await syncRecurringNotifications() }
         }
+        .onChange(of: settings.currency) { _, _ in
+            // SYNC-01: rebuild already-scheduled recurring notifications when the display currency
+            // changes, so pending reminders show the new currency/amount instead of the stale one
+            // (mirrors macOS MacRootView; iOS previously only re-synced on recurringTransactions).
+            Task { await syncRecurringNotifications() }
+        }
+        .onChange(of: settings.isPrivacyMode) { _, _ in
+            // SYNC-01: rebuild already-scheduled recurring notifications when Privacy Mode toggles,
+            // so a pending reminder's amount is hidden/shown per the new setting rather than leaking
+            // the previously-scheduled amount on the lock screen (mirrors macOS MacRootView).
+            Task { await syncRecurringNotifications() }
+        }
         .alert(item: $recurringInsertionAlert) { alert in
             Alert(
                 title: Text("Recurring Transactions Added"),
