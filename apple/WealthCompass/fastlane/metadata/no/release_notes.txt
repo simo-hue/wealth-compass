@@ -1,1 +1,1 @@
-Forbedret automatisk oppdatering av markedsdata med støtte for internasjonale aksjer. Forbedret synkroniseringsstabilitet og diverse feilrettinger.
+Nye funksjoner og feilretting

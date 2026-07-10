@@ -471,3 +471,7 @@
 - [2026-07-06]: Bump App Version
   - *Details*: Upgraded app version from 1.0.9 to 1.0.10 and build number from 10 to 11 in WealthCompass.xcodeproj/project.pbxproj.
   - *Tech Notes*: This update affects both the iOS and macOS targets to prepare for an App Store Connect submission.
+
+- [2026-07-10T21:00:00+02:00]: App Version Bump (1.1.0) & Metadata Translation
+  - *Details*: Incremented the app version across the codebase to 1.1.0 for an App Store release and updated the release notes.
+  - *Tech Notes*: Bumped `MARKETING_VERSION` to `1.1.0` in `project.pbxproj`. Updated `CFBundleShortVersionString` to `1.1.0` in `Info.plist`. Bumped root `package.json` version to `1.1.0`. Added a `:metadata` lane for macOS in the `Fastfile` and ran automated scripts to translate the new App Store Connect `release_notes.txt` to all supported languages.

@@ -1,1 +1,1 @@
-Îmbunătățirea reîmprospătării automate a datelor de piață cu suport pentru acțiuni internaționale. Stabilitate sporită a sincronizării și diverse corecții de erori.
+Caracteristici noi și remediere erori

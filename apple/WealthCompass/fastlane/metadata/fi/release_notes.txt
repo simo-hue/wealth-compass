@@ -1,1 +1,1 @@
-Parannettu markkinatietojen automaattinen päivitys kansainvälisten osakkeiden tuella. Parannettu synkronoinnin vakaus ja erilaisia virhekorjauksia.
+Uusia ominaisuuksia ja virheenkorjauksia

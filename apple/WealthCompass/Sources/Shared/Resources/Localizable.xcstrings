@@ -10168,6 +10168,7 @@
       }
     },
     "%lld more transactions hidden by this view." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13311,6 +13312,7 @@
       }
     },
     "6M NET" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24838,6 +24840,9 @@
         }
       }
     },
+    "Cash flow view" : {
+
+    },
     "Cash-flow chart concealed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -25052,6 +25057,9 @@
           }
         }
       }
+    },
+    "Cash-flow range" : {
+
     },
     "Category" : {
       "localizations" : {
@@ -26528,6 +26536,9 @@
           }
         }
       }
+    },
+    "Clear search" : {
+
     },
     "CloudKit record %@ has no payload." : {
       "extractionState" : "stale",
@@ -73320,6 +73331,7 @@
       }
     },
     "No expenses in the last 30 days" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -86511,6 +86523,7 @@
       }
     },
     "Recent Transactions" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -95546,6 +95559,7 @@
       }
     },
     "Six-Month Cash Flow" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -113087,6 +113101,7 @@
       }
     },
     "Where spending was concentrated in the last 30 days" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

@@ -1,1 +1,1 @@
-Fejlesztett piaci adatok automatikus frissítése nemzetközi részvénypiaci támogatással. Javított szinkronizációs stabilitás és különböző hibajavítások.
+Új funkciók és hibajavítás

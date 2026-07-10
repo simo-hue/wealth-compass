@@ -1,1 +1,1 @@
-Förbättrad automatisk uppdatering av marknadsdata med stöd för internationella aktier. Förbättrad synkroniseringsstabilitet och olika buggfixar.
+Nya funktioner och felkorrigering

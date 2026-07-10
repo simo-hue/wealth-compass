@@ -7,7 +7,7 @@
 #     fastlane ios release         # build + upload binary & metadata (no auto-submit)
 #
 # Versions are managed by hand in project.pbxproj (per CLAUDE.md) — these lanes do NOT
-# bump them. Currently MARKETING_VERSION 1.0.10 / build 11.
+# bump them. Currently MARKETING_VERSION 1.1.0 / build 11.
 #
 # Signing uses Xcode automatic signing (DEVELOPMENT_TEAM 8528AN28A3). Sign in with the
 # Apple ID in the Appfile; you'll handle 2FA interactively (or set an app-specific
@@ -70,6 +70,18 @@ end
 # Optional macOS lanes. Only use these if you ship the Mac app to the Mac App Store under
 # the same app record (universal purchase). Run with: `fastlane mac beta` / `fastlane mac release`.
 platform :mac do
+  desc "Upload macOS text metadata only (no binary, no submit)"
+  lane :metadata do
+    upload_to_app_store(
+      platform: "osx",
+      app_version: get_version_number(xcodeproj: PROJECT, target: MAC_SCHEME),
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      run_precheck_before_submit: false,
+      force: true
+    )
+  end
+
   desc "Build and upload a macOS build to TestFlight"
   lane :beta do
     build_app(

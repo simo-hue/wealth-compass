@@ -1,1 +1,1 @@
-Verbeterde automatische verversing van marktgegevens met ondersteuning voor internationale aandelen. Verbeterde synchronisatiestabiliteit en diverse bugfixes.
+Nieuwe functies en bugfixing

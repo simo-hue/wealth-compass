@@ -1,1 +1,1 @@
-Vylepšené automatické obnovenie trhových dát s podporou medzinárodných akcií. Zlepšená stabilita synchronizácie a rôzne opravy chýb.
+Nové funkcie a oprava chýb

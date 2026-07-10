@@ -1,1 +1,1 @@
-Ulepszony automatyczny odświeżanie danych rynkowych z obsługą akcji międzynarodowych. Zwiększona stabilność synchronizacji i różne poprawki błędów.
+Nowe funkcje i naprawianie błędów

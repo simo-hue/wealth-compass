@@ -1,1 +1,1 @@
-Verbesserte automatische Aktualisierung der Marktdaten mit Unterstützung für internationale Aktien. Verbesserte Synchronisationsstabilität und verschiedene Fehlerbehebungen.
+Neue Funktionen und Fehlerbehebung

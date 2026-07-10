@@ -1,1 +1,1 @@
-Uluslararası hisse senedi desteği ile geliştirilmiş piyasa verisi otomatik yenileme. Artırılmış senkronizasyon kararlılığı ve çeşitli hata düzeltmeleri.
+Yeni özellikler ve Hata düzeltme

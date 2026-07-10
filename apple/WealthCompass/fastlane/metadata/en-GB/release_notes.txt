@@ -1,1 +1,1 @@
-Improved market data auto-refresh with international stock support. Enhanced synchronization stability and various bug fixes.
+New features & Bug fixing

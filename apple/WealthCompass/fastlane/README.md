@@ -44,6 +44,14 @@ Build and upload iOS binary + metadata to App Store Connect (no auto-submit)
 
 ## Mac
 
+### mac metadata
+
+```sh
+[bundle exec] fastlane mac metadata
+```
+
+Upload macOS text metadata only (no binary, no submit)
+
 ### mac beta
 
 ```sh

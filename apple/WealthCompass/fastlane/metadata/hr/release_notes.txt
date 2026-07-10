@@ -1,1 +1,1 @@
-Poboljšano automatsko osvježavanje tržišnih podataka s podrškom za međunarodne dionice. Poboljšana stabilnost sinkronizacije i razna ispravke pogrešaka.
+Nove značajke i ispravljanje grešaka
