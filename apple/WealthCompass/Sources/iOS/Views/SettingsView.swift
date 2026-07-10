@@ -643,13 +643,13 @@ struct SettingsView: View {
         activeCredentialEditor = credential
     }
 
-    private func currentStoredAPIKey(for credential: KeychainCredential) -> String {
-        do {
-            return (try KeychainCredentialStore.shared.string(for: credential) ?? "")
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-        } catch {
-            return ""
-        }
+    // SET-03: throw on a Keychain read failure instead of masking it as "no key" (mirrors macOS
+    // storedAPIKey), so refreshMarketPrices can surface a real error rather than silently going keyless.
+    private func currentStoredAPIKey(for credential: KeychainCredential) throws -> String? {
+        let value = try KeychainCredentialStore.shared.string(for: credential)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let value, !value.isEmpty else { return nil }
+        return value
     }
 
     private func saveAndTestMarketDataCredential(_ credential: MarketDataCredentialKind) async {
@@ -719,20 +719,25 @@ struct SettingsView: View {
         isRefreshingPrices = true
         defer { isRefreshingPrices = false }
 
-        let currentKey = currentStoredAPIKey(for: .finnhubAPIKey)
-        let finnhubKey = currentKey.isEmpty ? nil : currentKey
-        let currentCoinGeckoKey = currentStoredAPIKey(for: .coingeckoAPIKey)
-        let coingeckoKey = currentCoinGeckoKey.isEmpty ? nil : currentCoinGeckoKey
-        let result = await finance.refreshMarketPrices(
-            finnhubAPIKey: finnhubKey,
-            coingeckoAPIKey: coingeckoKey,
-            settings: settings
-        )
-        refreshMarketDataKeyStatus()
-        settingsAlert = SettingsAlertState(
-            title: result.localizedTitle(appLanguage: settings.appLanguage),
-            message: result.localizedMessage(appLanguage: settings.appLanguage)
-        )
+        // SET-03: surface a Keychain read failure as an alert instead of silently refreshing keyless.
+        do {
+            let result = await finance.refreshMarketPrices(
+                finnhubAPIKey: try currentStoredAPIKey(for: .finnhubAPIKey),
+                coingeckoAPIKey: try currentStoredAPIKey(for: .coingeckoAPIKey),
+                settings: settings
+            )
+            refreshMarketDataKeyStatus()
+            settingsAlert = SettingsAlertState(
+                title: result.localizedTitle(appLanguage: settings.appLanguage),
+                message: result.localizedMessage(appLanguage: settings.appLanguage)
+            )
+        } catch {
+            refreshMarketDataKeyStatus()
+            settingsAlert = SettingsAlertState(
+                title: settings.localized("Unable to Refresh Market Data"),
+                message: SettingsView.errorMessage(error, appLanguage: settings.appLanguage)
+            )
+        }
     }
 
     private func refreshExchangeRates() async {

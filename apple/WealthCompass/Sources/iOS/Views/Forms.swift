@@ -116,10 +116,10 @@ struct TransactionFormView: View {
                         // transient state mid type-toggle) so the Picker selection always
                         // has a matching tag — no "selection is invalid" warning, no data loss.
                         if category != Self.customCategoryTag && !categories.contains(category) {
-                            Text(category).tag(category)
+                            Text(LocalizedStringKey(category)).tag(category)
                         }
                         ForEach(categories, id: \.self) { category in
-                            Text(category).tag(category)
+                            Text(LocalizedStringKey(category)).tag(category)
                         }
                         Text("Custom...").tag(Self.customCategoryTag)
                     }
@@ -272,6 +272,24 @@ struct RecurringTransactionFormView: View {
         return Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: endDate)
     }
 
+    // EDIT-08: explain why Save is disabled (parity with macOS MacRecurringTransactionEditor). The
+    // amount case only fires once the field is non-empty, so a fresh form isn't nagged prematurely.
+    private var validationMessage: String? {
+        if !amount.isEmpty, (parsedAmount ?? 0) <= 0 {
+            return settings.localized("Enter an amount greater than zero.")
+        }
+        if isCustomCategorySelected, trimmedCustomCategory.isEmpty {
+            return settings.localized("Enter a custom category name.")
+        }
+        if existingSchedule == nil, Calendar.current.startOfDay(for: startDate) < Calendar.current.startOfDay(for: Date()) {
+            return settings.localized("The first occurrence must be in the future.")
+        }
+        if normalizedEndDate.map({ $0 < startDate }) ?? false {
+            return settings.localized("The end date cannot be before the first occurrence.")
+        }
+        return nil
+    }
+
     private var isSaveDisabled: Bool {
         guard let amount = parsedAmount, amount > 0 else { return true }
         return currentCategoryName.isEmpty
@@ -321,10 +339,10 @@ struct RecurringTransactionFormView: View {
                         // transient state mid type-toggle) so the Picker selection always
                         // has a matching tag — no "selection is invalid" warning, no data loss.
                         if category != Self.customCategoryTag && !categories.contains(category) {
-                            Text(category).tag(category)
+                            Text(LocalizedStringKey(category)).tag(category)
                         }
                         ForEach(categories, id: \.self) { category in
-                            Text(category).tag(category)
+                            Text(LocalizedStringKey(category)).tag(category)
                         }
                         Text("Custom...").tag(Self.customCategoryTag)
                     }
@@ -380,6 +398,15 @@ struct RecurringTransactionFormView: View {
                     Text("Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.")
                     .font(.caption)
                     .foregroundStyle(WCColor.textSecondary)
+                }
+
+                // EDIT-08: surface the reason Save is disabled, matching macOS.
+                if let validationMessage {
+                    Section {
+                        Label(validationMessage, systemImage: "exclamationmark.triangle.fill")
+                            .font(.caption)
+                            .foregroundStyle(WCColor.warning)
+                    }
                 }
             }
             .navigationTitle(existingSchedule == nil ? "New Recurring Transaction" : "Edit Recurring Transaction")
@@ -519,10 +546,10 @@ struct InvestmentFormView: View {
                         }
                     }
                     Picker("Sector", selection: $sector) {
-                        ForEach(sectors, id: \.self) { Text($0).tag($0) }
+                        ForEach(sectors, id: \.self) { Text(LocalizedStringKey($0)).tag($0) }
                     }
                     Picker("Geography", selection: $geography) {
-                        ForEach(geographies, id: \.self) { Text($0).tag($0) }
+                        ForEach(geographies, id: \.self) { Text(LocalizedStringKey($0)).tag($0) }
                     }
                 }
 

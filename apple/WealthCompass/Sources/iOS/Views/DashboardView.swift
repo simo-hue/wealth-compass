@@ -459,6 +459,12 @@ struct DashboardView: View {
                                     Text(settings.privateCurrency(item.value))
                                         .font(.subheadline.monospacedDigit().weight(.semibold))
                                         .foregroundStyle(.white)
+                                    // VIEW-08: show the category's share of spending, matching macOS
+                                    // (the bar already encodes it; iOS previously omitted the number).
+                                    Text(privatePercent(item.percentage))
+                                        .font(.caption.monospacedDigit().weight(.medium))
+                                        .foregroundStyle(WCColor.textTertiary)
+                                        .frame(width: 44, alignment: .trailing)
                                 }
 
                                 GeometryReader { geometry in
@@ -513,15 +519,24 @@ struct DashboardView: View {
                                             .font(.subheadline.weight(.medium))
                                             .foregroundStyle(.white.opacity(0.84))
                                             .lineLimit(1)
+                                        // VIEW-09: surface the transaction's own note (fallback to its
+                                        // type) so same-category, same-day rows are distinguishable; the
+                                        // date moves to the trailing column (matches macOS ActivityRow).
+                                        Text(transaction.description.isEmpty ? transaction.type.localizedTitle(appLanguage: settings.appLanguage) : transaction.description)
+                                            .font(.caption2)
+                                            .foregroundStyle(WCColor.textFaint)
+                                            .lineLimit(1)
+                                    }
+
+                                    Spacer(minLength: 8)
+                                    VStack(alignment: .trailing, spacing: 3) {
+                                        Text(signedAmount(for: transaction))
+                                            .font(.subheadline.monospacedDigit().weight(.semibold))
+                                            .foregroundStyle(transaction.type == .income ? WCColor.primary : .white.opacity(0.82))
                                         Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
                                             .font(.caption2)
                                             .foregroundStyle(WCColor.textFaint)
                                     }
-
-                                    Spacer(minLength: 8)
-                                    Text(signedAmount(for: transaction))
-                                        .font(.subheadline.monospacedDigit().weight(.semibold))
-                                        .foregroundStyle(transaction.type == .income ? WCColor.primary : .white.opacity(0.82))
                                 }
                             }
                         }

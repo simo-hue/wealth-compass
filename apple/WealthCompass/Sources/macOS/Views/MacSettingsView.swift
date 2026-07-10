@@ -500,7 +500,9 @@ struct MacSettingsView: View {
 
                 SettingsRow(title: "Status") {
                     Label {
-                        Text(finance.cloudSyncStatus.title)
+                        // SET-04: resolve via appLanguage so the title honors the in-app language
+                        // override (matches the detail line below and iOS), not the environment locale.
+                        Text(finance.cloudSyncStatus.localizedTitle(appLanguage: settings.appLanguage))
                     } icon: {
                         Image(systemName: finance.cloudSyncStatus.symbolName)
                     }

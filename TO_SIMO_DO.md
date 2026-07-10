@@ -34,3 +34,15 @@ you run the checks below whenever you're at a real Mac and report anything red.
    - Note: SET-01 adds two new English strings ("…removed from Keychain." / "…deleted from Keychain."); they render in English until the string catalog is regenerated on a build.
 
    Report anything red and I'll fix-forward on `main`.
+
+4. **Verify iOS↔macOS parity — Batch C** (SET-03, SET-04, EDIT-04, EDIT-05, EDIT-08, VIEW-08, VIEW-09) — from `apple/IOS_MACOS_DIVERGENCE_REPORT.md`. Implemented on `main`, **not built here**. Same build/test commands as §2. All strings reuse existing catalog keys (no new strings). Smoke checks:
+   - **SET-03 (iOS):** the normal market-data refresh still succeeds with a valid key; a Keychain read failure now shows an "Unable to Refresh Market Data" alert instead of a silent keyless refresh (hard to force by hand — mainly confirm the happy path still works).
+   - **SET-04 (macOS):** set an in-app language different from the system language → the iCloud "Status" title (e.g. "Up to Date") renders in the chosen language, matching the detail line below it.
+   - **EDIT-04 (iOS):** in the transaction + recurring editors, the built-in category names in the picker appear in the in-app language (not English).
+   - **EDIT-05 (iOS):** in the investment editor, the Sector/Geography picker values appear localized.
+   - **EDIT-08 (iOS):** in the recurring editor, set an end date before the start date (or a past first occurrence) → a yellow warning row now explains why Save is disabled.
+   - **VIEW-08 (iOS):** Dashboard "Top Expense Categories" rows now show a percentage next to each amount.
+   - **VIEW-09 (iOS):** Dashboard "Recent Activity" rows now show the transaction's note (or its type) under the category, with the date under the amount.
+   - Same `SettingsView.swift:42` single-file type-check-timeout note as §3 applies (assessed false positive; SET-03 edits are outside the view body, so unchanged — watch the real Xcode build).
+
+   Report anything red and I'll fix-forward on `main`.

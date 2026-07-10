@@ -1,5 +1,17 @@
 # Documentation
 
+- [2026-07-10]: iOS↔macOS parity — Batch C (SET-03, SET-04, EDIT-04, EDIT-05, EDIT-08, VIEW-08, VIEW-09) — ⏳ pending on-device build/test
+  - *Details*: Third remediation batch from `IOS_MACOS_DIVERGENCE_REPORT.md` — the "surfaced-vs-silent + i18n" tier. Six iOS items brought up to macOS, one macOS item (SET-04) up to iOS. Each mirrors the shipping sibling; **all strings reuse existing catalog keys (no new strings)**. Implemented on `main`; **NOT built/run here (CommandLineTools only)** — verify per root `TO_SIMO_DO.md` §4. Only the known single-file cross-module SourceKit false positives were seen, including the pre-existing `SettingsView.swift:42` type-check-timeout (unchanged by these edits — they live in methods outside the view body).
+  - *Tech Notes*:
+    - **SET-03** (`Sources/iOS/Views/SettingsView.swift`) — `currentStoredAPIKey(for:)` is now `throws -> String?` (was swallowing errors → `""`); `refreshMarketPrices()` wraps the read in do/catch and shows an "Unable to Refresh Market Data" alert on a Keychain failure instead of silently refreshing keyless. Mirrors macOS `storedAPIKey`/`refreshMarketPrices`.
+    - **SET-04** (`Sources/macOS/Views/MacSettingsView.swift:503`) — cloud-sync status title now via `cloudSyncStatus.localizedTitle(appLanguage:)` (was `.title` LocalizedStringKey), so it honors the in-app language override and matches the detail line + iOS.
+    - **EDIT-04** (`Sources/iOS/Views/Forms.swift`) — the transaction + recurring category Pickers render built-in category names via `Text(LocalizedStringKey(category))` (4 sites); custom names still fall through verbatim. Matches macOS.
+    - **EDIT-05** (`Sources/iOS/Views/Forms.swift`) — investment Sector/Geography Pickers now use `Text(LocalizedStringKey($0))`. Matches macOS.
+    - **EDIT-08** (`Sources/iOS/Views/Forms.swift`) — `RecurringTransactionFormView` gained a `validationMessage` computed prop + a warning `Section` (shown when non-nil) explaining why Save is disabled. Ported verbatim from `MacRecurringTransactionEditor` (all referenced symbols already existed on iOS; the 4 messages reuse the macOS keys).
+    - **VIEW-08** (`Sources/iOS/Views/DashboardView.swift`) — Top Expense rows now show `privatePercent(item.percentage)` next to the amount (redacts in Privacy Mode). Matches macOS.
+    - **VIEW-09** (`Sources/iOS/Views/DashboardView.swift`) — Recent Activity rows now show the transaction description (fallback to its type) on the left and move the date under the amount on the right, matching macOS `ActivityRow`, so same-category/same-day rows are distinguishable.
+    - No new tests (all view-layer; the XCTest suite is logic-only). Verify via the smoke checks in root `TO_SIMO_DO.md` §4.
+
 - [2026-07-10]: iOS↔macOS parity — Batch B (VIEW-01, VIEW-02, SET-01, SET-02) — ⏳ pending on-device build/test
   - *Details*: Second remediation batch from `IOS_MACOS_DIVERGENCE_REPORT.md` — the "a whole data view / affordance exists on one platform only" tier. Three items bring iOS up to macOS; VIEW-01 brings macOS up to iOS. Each mirrors the shipping sibling implementation. Implemented on `main`; **NOT built/run here (CommandLineTools only)** — verify per root `TO_SIMO_DO.md` §3. Only the known single-file cross-module SourceKit false positives were observed, none at an edited line.
   - *Tech Notes*:
