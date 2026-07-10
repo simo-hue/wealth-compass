@@ -1,5 +1,13 @@
 # Documentation
 
+- [2026-07-10]: Feature — macOS responsive full-width dashboard + allocation layout — ⏳ pending on-device build/test
+  - *Details*: Makes the three macOS data pages fill the full window width on large external monitors (they previously capped content and left dead space), and grows the Dashboard metric row from 2 cards to a responsive 5. Implemented by a subagent to my spec; I reviewed the full diff (brace/paren balanced on all 3 files, symbols in scope, caps removed, no new strings). Implemented on `main`; **not built here** (CommandLineTools only) — verify per root `TO_SIMO_DO.md` §"New features".
+  - *Tech Notes*:
+    - `Sources/macOS/Views/MacDashboardView.swift`: `keyMetrics` converted from a computed var to `func keyMetrics(width: CGFloat)`; renders **5 cards — Monthly Income, Monthly Expenses, Net Savings, Savings Rate, Liabilities** (same formatting as iOS `CashFlowView.summaryCards` + the existing Liabilities card) in **flexible** columns whose count is width-driven (`>=1080 → 5`, `>=820 → 3`, `>=560 → 2`, else 1) so they fill the row; each card `.frame(maxWidth: .infinity)`. Removed the `.frame(maxWidth: 1_520, alignment: .leading)` cap.
+    - `Sources/macOS/Views/MacInvestmentsView.swift`: the overview is now wrapped in a `GeometryReader`; the 3 allocation charts (Sector/Type/Geography) use flexible columns (`>=960 → 3`, `>=620 → 2`, else 1) that fill the width, each `.frame(maxWidth: .infinity)` (replaces the fixed `adaptive(minimum: 240)` grid). Removed both `.frame(maxWidth: 1440, alignment: .leading)` caps (overview + table).
+    - `Sources/macOS/Views/MacCryptoView.swift`: removed both `.frame(maxWidth: 1440, alignment: .leading)` caps (overview + table) so it fills wide screens too.
+    - Zero new user-facing strings (the 5 card titles/details reuse existing keys). No new tests (view-layer). Verify per root `TO_SIMO_DO.md` §"New features".
+
 - [2026-07-10]: Feature — iOS Cash Flow Overview/Transactions view (searchable, uncapped) — ⏳ pending on-device build/test
   - *Details*: Brings the macOS Cash Flow "Transactions" experience to iOS. The Cash Flow tab now has an **Overview | Transactions** segmented control (mirrors the macOS selector island). Overview keeps the summary cards + recurring + spending analytics; Transactions is a dedicated, filterable, **searchable**, **full (uncapped)** transaction list. Closes parity gaps XCUT-02 (iOS was capped at 40 rows) and the missing search (was macOS-only). Implemented on `main`; **not built here** (CommandLineTools only) — verify per root `TO_SIMO_DO.md` §6.
   - *Tech Notes*:

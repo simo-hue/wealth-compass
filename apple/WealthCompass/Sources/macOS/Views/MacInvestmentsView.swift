@@ -33,39 +33,45 @@ struct MacInvestmentsView: View {
             .padding(.vertical, 16)
 
             if selectedTab == .overview {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        summaryCards
-                        
-                        // L24: reflow the three charts into fewer columns on a narrow detail pane
-                        // (an adaptive grid) instead of squeezing all three into a fixed HStack, which
-                        // collapsed each to ~140pt and truncated the legends.
-                        LazyVGrid(
-                            columns: [GridItem(.adaptive(minimum: 240), spacing: 24)],
-                            alignment: .leading,
-                            spacing: 24
-                        ) {
-                            AllocationChart(
-                                title: LocalizedStringKey("Allocation by Sector"),
-                                slices: finance.investmentAllocation(settings: settings),
-                                settings: settings
-                            )
-                            AllocationChart(
-                                title: LocalizedStringKey("Allocation by Type"),
-                                slices: finance.investmentTypeAllocation(settings: settings),
-                                settings: settings
-                            )
-                            AllocationChart(
-                                title: LocalizedStringKey("Allocation by Geography"),
-                                slices: finance.investmentGeographyAllocation(settings: settings),
-                                settings: settings
-                            )
+                GeometryReader { proxy in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 24) {
+                            summaryCards
+
+                            // L24: reflow the three allocation charts into fewer columns as the detail
+                            // pane narrows — flexible columns (3 / 2 / 1 by width) that fill the width,
+                            // instead of a fixed HStack that collapsed each to ~140pt and truncated legends.
+                            LazyVGrid(
+                                columns: Array(
+                                    repeating: GridItem(.flexible(), spacing: 24),
+                                    count: proxy.size.width >= 960 ? 3 : (proxy.size.width >= 620 ? 2 : 1)
+                                ),
+                                spacing: 24
+                            ) {
+                                AllocationChart(
+                                    title: LocalizedStringKey("Allocation by Sector"),
+                                    slices: finance.investmentAllocation(settings: settings),
+                                    settings: settings
+                                )
+                                .frame(maxWidth: .infinity)
+                                AllocationChart(
+                                    title: LocalizedStringKey("Allocation by Type"),
+                                    slices: finance.investmentTypeAllocation(settings: settings),
+                                    settings: settings
+                                )
+                                .frame(maxWidth: .infinity)
+                                AllocationChart(
+                                    title: LocalizedStringKey("Allocation by Geography"),
+                                    slices: finance.investmentGeographyAllocation(settings: settings),
+                                    settings: settings
+                                )
+                                .frame(maxWidth: .infinity)
+                            }
+
+                            topHoldingsSection
                         }
-                        
-                        topHoldingsSection
+                        .padding(24)
                     }
-                    .padding(24)
-                    .frame(maxWidth: 1440, alignment: .leading)
                 }
             } else {
                 investmentTable
@@ -198,7 +204,6 @@ struct MacInvestmentsView: View {
                 }
             }
             .padding(32)
-            .frame(maxWidth: 1440, alignment: .leading)
             .frame(maxWidth: .infinity)
         }
     }

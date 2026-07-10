@@ -144,7 +144,6 @@ struct MacCryptoView: View {
             topHoldingsSection
         }
         .padding(24)
-        .frame(maxWidth: 1440, alignment: .leading)
     }
 
     @ViewBuilder
@@ -254,7 +253,6 @@ struct MacCryptoView: View {
                 }
             }
             .padding(32)
-            .frame(maxWidth: 1440, alignment: .leading)
             .frame(maxWidth: .infinity)
         }
     }

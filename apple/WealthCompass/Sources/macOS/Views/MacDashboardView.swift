@@ -42,7 +42,7 @@ struct MacDashboardView: View {
                     }
 
                     netWorthHero
-                    keyMetrics
+                    keyMetrics(width: proxy.size.width)
 
                     if proxy.size.width >= 1_090 {
                         HStack(alignment: .top, spacing: 20) {
@@ -73,7 +73,6 @@ struct MacDashboardView: View {
                 .scenePadding(.minimum, edges: .horizontal)
                 .padding(.top, 24)
                 .padding(.bottom, 36)
-                .frame(maxWidth: 1_520, alignment: .leading)
                 .frame(maxWidth: .infinity)
             }
         }
@@ -84,15 +83,45 @@ struct MacDashboardView: View {
         }
     }
 
-    // VIEW-01: surface the two figures the allocation ring + net-worth hero don't already cover —
-    // total Liabilities and the current month's Net Savings — mirroring the iOS dashboard's Position
-    // grid (Cash / Investments / Crypto / Total Assets are already represented on this screen).
-    private var keyMetrics: some View {
-        LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: 240), spacing: 16)],
-            alignment: .leading,
-            spacing: 16
-        ) {
+    // VIEW-01: a responsive cash-flow row — Monthly Income / Expenses / Net Savings / Savings Rate
+    // (this month) plus total Liabilities — that fills the window width, splitting evenly into
+    // 5 / 3 / 2 / 1 flexible columns as the pane narrows.
+    private func keyMetrics(width: CGFloat) -> some View {
+        let cf = currentMonthCashFlow
+        let count = width >= 1_080 ? 5 : (width >= 820 ? 3 : (width >= 560 ? 2 : 1))
+        let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: count)
+        return LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
+            MetricCard(
+                title: "Monthly Income",
+                value: settings.privateCurrency(cf.monthlyIncome),
+                systemImage: "arrow.down.left",
+                accent: WCColor.primary,
+                detail: "This month"
+            )
+            .frame(maxWidth: .infinity)
+            MetricCard(
+                title: "Monthly Expenses",
+                value: settings.privateCurrency(cf.monthlyExpenses),
+                systemImage: "arrow.up.right",
+                accent: WCColor.destructive,
+                detail: "This month"
+            )
+            .frame(maxWidth: .infinity)
+            MetricCard(
+                title: "Net Savings",
+                value: settings.privateCurrency(cf.netSavings),
+                systemImage: cf.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
+                accent: cf.netSavings >= 0 ? WCColor.primary : WCColor.destructive,
+                detail: "Income less expenses"
+            )
+            .frame(maxWidth: .infinity)
+            MetricCard(
+                title: "Savings Rate",
+                value: settings.isPrivacyMode ? settings.redactionToken : "\(cf.savingsRate.formatted(.number.precision(.fractionLength(1))))%",
+                systemImage: "percent",
+                detail: "Of monthly income"
+            )
+            .frame(maxWidth: .infinity)
             MetricCard(
                 title: "Liabilities",
                 value: settings.privateCurrency(totals.totalLiabilities),
@@ -100,15 +129,7 @@ struct MacDashboardView: View {
                 accent: WCColor.destructive,
                 detail: finance.data.liabilities.count == 1 ? LocalizedStringKey("1 liability") : LocalizedStringKey("\(finance.data.liabilities.count) liabilities")
             )
-            MetricCard(
-                title: "Net Savings",
-                value: settings.privateCurrency(currentMonthCashFlow.netSavings),
-                systemImage: currentMonthCashFlow.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
-                accent: currentMonthCashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive,
-                // WC-L4: `.formatted` ignores the SwiftUI environment locale, so pass the effective
-                // (in-app language) locale explicitly; the result is already-localized data.
-                detail: LocalizedStringKey(Date().formatted(.dateTime.month(.wide).locale(AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))))
-            )
+            .frame(maxWidth: .infinity)
         }
     }
 
