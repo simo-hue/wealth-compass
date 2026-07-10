@@ -10,7 +10,8 @@ struct MacRootView: View {
     @EnvironmentObject private var appLock: MacAppLockStore
     @State private var isRefreshing = false
     @State private var alert: MacRootAlert?
-    // Persisted sidebar-collapse state; when collapsed, a floating page-switcher (MacGlobalNavBar) appears.
+    // Persisted sidebar-collapse state; when collapsed, the page-switcher (MacGlobalNavBar) moves into
+    // the toolbar's center and the window title is blanked.
     @AppStorage("wc_mac_sidebar_collapsed") private var sidebarCollapsed = false
 
     private let recurringCheckTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
@@ -120,15 +121,18 @@ struct MacRootView: View {
         } detail: {
             detail
                 .frame(minWidth: 520, minHeight: 400)
-                // Floating page-switcher: shown only when the sidebar is collapsed, so every page
-                // (incl. Settings) stays reachable without the sidebar. Top-center over the content.
-                .overlay(alignment: .top) {
-                    if sidebarCollapsed {
-                        MacGlobalNavBar(selection: $appModel.selection)
-                            .padding(.top, 10)
-                    }
-                }
+                // When the sidebar is collapsed, the page-switcher lives in the toolbar (below) and its
+                // highlighted segment already names the current page, so blank the window title then;
+                // when expanded, the sidebar does the navigating, so show the page name as the title.
+                .navigationTitle(sidebarCollapsed ? "" : (appModel.selection ?? .dashboard).title)
                 .toolbar {
+                    // Collapsed-only global page-switcher, centered in the toolbar — it fills the
+                    // otherwise-empty title bar and no longer overlaps each page's own top selector.
+                    if sidebarCollapsed {
+                        ToolbarItem(placement: .principal) {
+                            MacGlobalNavBar(selection: $appModel.selection)
+                        }
+                    }
                     ToolbarItemGroup(placement: .primaryAction) {
                         // Refresh Data (⌘R) — hidden on the Settings page, which has its own
                         // market-data / exchange-rate refresh controls.
@@ -321,7 +325,8 @@ private struct MacGlobalNavBar: View {
                 .fill(Color(white: 0.13))
                 .overlay(Capsule().stroke(Color.white.opacity(0.12), lineWidth: 1))
         )
-        .shadow(color: .black.opacity(0.28), radius: 10, y: 4)
+        // Subtle shadow — the pill now sits inside the toolbar rather than floating over content.
+        .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selection)
     }
 }

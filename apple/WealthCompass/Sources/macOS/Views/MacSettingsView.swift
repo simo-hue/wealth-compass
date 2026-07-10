@@ -152,7 +152,7 @@ struct MacSettingsView: View {
             }
         }
         .background(ScreenBackground())
-        .navigationTitle("Settings")
+        // navigationTitle centralized in MacRootView (collapse-aware).
         .onAppear(perform: refreshMarketDataKeyStatus)
         .sheet(item: $activeCredentialEditor) { credential in
             MacMarketDataCredentialEditor(

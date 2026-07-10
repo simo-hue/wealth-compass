@@ -1,5 +1,12 @@
 # Documentation
 
+- [2026-07-10]: Refinement — macOS page-switcher moved into the toolbar; redundant title hidden — ⏳ pending on-device build/test
+  - *Details*: Fixes two issues with the collapsible-sidebar feature (from a screenshot): the *floating* page-switcher pill overlapped each page's own top Overview/Transactions selector, and the grey toolbar's center was empty. The pill now lives in the toolbar's centered `.principal` slot (only when the sidebar is collapsed) — which fills the empty bar **and** removes the overlap (nothing floats over the content, so each page's own selector sits cleanly below the toolbar). The window title is now blank when collapsed (the switcher already names the page) and shows the page name when expanded. Implemented on `main`; **not built here** — verify per root `TO_SIMO_DO.md`.
+  - *Tech Notes*:
+    - `Sources/macOS/MacRootView.swift`: removed the floating `.overlay` page-switcher; added `ToolbarItem(placement: .principal) { MacGlobalNavBar(...) }` guarded by `sidebarCollapsed`; `detail.navigationTitle(sidebarCollapsed ? "" : (appModel.selection ?? .dashboard).title)` now owns the window title (collapse-gated); toned down `MacGlobalNavBar`'s shadow (it's inside the toolbar now, not floating).
+    - Removed the per-page `.navigationTitle(...)` from `MacDashboardView` / `MacCashFlowView` / `MacInvestmentsView` / `MacCryptoView` / `MacSettingsView` — the title is centralized in `MacRootView` so it can react to the collapse state.
+    - No new strings. No new tests (view-layer).
+
 - [2026-07-10]: Feature — macOS collapsible sidebar + floating page-switcher (Settings now in-window) — ⏳ pending on-device build/test
   - *Details*: The macOS sidebar can now be collapsed (native `NavigationSplitView` toggle / ⌃⌘S), and when collapsed a floating icon+label "page-switcher" pill appears top-center over the content, reaching every page. **Settings is now a first-class in-window destination** (sidebar + floating bar), replacing the separate ⌘, Preferences window — ⌘, and ⌘5 both select the Settings page. Implemented on `main`; **not built here** (CommandLineTools only) — verify per root `TO_SIMO_DO.md`.
   - *Tech Notes*:

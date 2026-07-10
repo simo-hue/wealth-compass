@@ -79,7 +79,7 @@ struct MacInvestmentsView: View {
             }
         }
         .background(ScreenBackground())
-        .navigationTitle("Investments")
+        // navigationTitle centralized in MacRootView (collapse-aware).
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button {

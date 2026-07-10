@@ -20,6 +20,11 @@ Build both schemes (as before), then:
 - **Investments**: the three allocation charts (Sector / Type / Geography) now **fill the full width** (3 across on a wide window, reflowing to 2 → 1).
 - **Full-screen fill**: on a **large external monitor**, Dashboard, Investments, and Crypto content now stretches edge-to-edge (no dead space on the right — the old ~1440/1520 caps were removed). Sanity-check the big net-worth / cash-flow charts still look OK when very wide; if any single chart looks too stretched, tell me and I'll cap just that one.
 
+### macOS — collapsible sidebar + toolbar page-switcher (refined)
+- **Collapse the sidebar**: click the native **sidebar-toggle button** in the toolbar (or **View ▸ Hide Sidebar / ⌃⌘S**). The **icon+label page-switcher pill** now appears **in the centre of the grey toolbar** (not floating over the content) listing all 5 pages — Dashboard, Cash Flow, Investments, Crypto, **Settings**; clicking a segment switches page. Confirm it **no longer overlaps** each page's own top selector (Cash Flow's Overview/Transactions etc.), and that the toolbar's empty centre is now filled. Expand the sidebar again → the pill disappears and the page-name title returns in the toolbar. When collapsed, the toolbar title is intentionally blank (the switcher names the page).
+- The collapsed/expanded state **persists** across relaunch.
+- **Settings is a page** (not a separate window): it shows in the sidebar and the toolbar pill; **⌘,** (App ▸ Settings) *and* **⌘5** both jump to it; the "Refresh Data" toolbar button is hidden while on Settings. Confirm Settings still works fully inline (currency, language, biometric lock, iCloud, API keys, import/export).
+
 ---
 
 ## iCloud sync — token/data drift self-heal (implemented on `main`, not built here)

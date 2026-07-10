@@ -77,7 +77,7 @@ struct MacDashboardView: View {
             }
         }
         .background(MacDashboardBackdrop())
-        .navigationTitle("Dashboard")
+        // navigationTitle centralized in MacRootView (collapse-aware) — see the page-switcher change.
         .onChange(of: timeRange) {
             selectedNetWorthDate = nil
         }

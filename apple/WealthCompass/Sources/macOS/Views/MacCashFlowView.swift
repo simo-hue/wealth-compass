@@ -151,7 +151,7 @@ struct MacCashFlowView: View {
             }
         }
         .background(ScreenBackground())
-        .navigationTitle("Cash Flow")
+        // navigationTitle centralized in MacRootView (collapse-aware).
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Menu {

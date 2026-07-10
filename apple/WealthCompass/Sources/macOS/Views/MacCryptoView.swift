@@ -45,7 +45,7 @@ struct MacCryptoView: View {
             }
         }
         .background(ScreenBackground())
-        .navigationTitle("Crypto")
+        // navigationTitle centralized in MacRootView (collapse-aware).
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button {
