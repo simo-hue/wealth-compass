@@ -17,7 +17,7 @@ The application is a modern web application built with **React**, **Vite**, **Ty
 -   **Utilities**: date-fns
 
 ### Project Structure
--   **Pages**: `Dashboard`, `Index`, `NotFound`
+-   **Pages**: App — `Dashboard`, `Investments`, `Crypto`, `CashFlow`, `Calculations`, `Settings`, `Login`, `NotFound`; Marketing — `Home` (landing), `Features`, `Founder`, `FAQ`, `Tutorial`, `PrivacyPolicy`, `TermsOfService`, `Support`
 -   **Components**: Organized into `ui` (generic) and `dashboard` (feature-specific).
 -   **Routing**: React Router DOM
 

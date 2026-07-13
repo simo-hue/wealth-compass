@@ -47,13 +47,13 @@ Leave blank. This is optional. The app has no user accounts or developer-hosted 
 
 | Field | Value |
 |---|---|
-| Version | `1.0` |
-| Build | `1` |
+| Version | `1.1.0` |
+| Build | `12` |
 | Minimum OS | iOS 17.0 |
 | Device family | iPhone |
 | Orientation | Portrait |
 
-This is the intended first public build. If build `1` is uploaded and rejected during processing, Apple may allow reuse; otherwise increment the build number before uploading another binary.
+The Xcode project is at version `1.1.0`, build `12` (`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.pbxproj`). If a build is uploaded and rejected during processing, Apple may allow reuse; otherwise increment the build number before uploading another binary.
 
 ## 4. App Store Product Page
 
@@ -178,7 +178,7 @@ The published privacy policy should explicitly state:
 - The app does not require registration or create user accounts.
 - Financial information entered by the user is stored locally on the user's device.
 - The developer does not receive or store transaction, investment, crypto, liability, or net-worth data.
-- The app makes network requests to Frankfurter/ECB for exchange rates and, when configured by the user, Finnhub and CoinGecko for market prices.
+- The app makes network requests to Frankfurter/ECB for exchange rates, to Yahoo Finance for stock and ETF prices (keyless, contacted without any user-supplied credentials), and, when the user provides API keys, to Finnhub (stocks/ETFs) and CoinGecko (crypto) for market prices.
 - Provider requests may expose ordinary network information such as IP address and may be governed by each provider's privacy policy.
 - User-provided API keys remain on device in the iOS Keychain but are transmitted to the applicable provider to authenticate requests.
 - The app uses optional local notifications for recurring transactions.
@@ -248,7 +248,7 @@ Paste the following:
 >
 > Exchange rates refresh automatically from ECB reference-rate data through Frankfurter. The app includes offline fallback rates if the service is unavailable.
 >
-> Market-price refreshes are optional and require the user to provide their own Finnhub key for stocks/ETFs or CoinGecko key for crypto. These credentials are not required to review the core app. Prices can also be entered manually.
+> Market-price refreshes are optional. Stock and ETF prices update automatically through a keyless provider (Yahoo Finance) with no API key required; providing a Finnhub key is optional and improves US/USD coverage. Live crypto prices require a user-provided CoinGecko key. None of these credentials are required to review the core app, and prices can also be entered manually.
 >
 > All finance data is stored locally. Settings includes JSON backup export/import and a Delete All Data action.
 
@@ -369,7 +369,7 @@ Notification permission is requested in context when the user enables reminders.
 | Analytics | None |
 | Tracking | None |
 | Social features | None |
-| Cloud sync | None |
+| Cloud sync | Optional opt-in iCloud sync via CloudKit (off by default; user's private iCloud database only) |
 | Third-party SDKs | None visible in the current source |
 
 ## 16. Items That Must Be Prepared Outside App Store Connect
@@ -390,7 +390,7 @@ Notification permission is requested in context when the user enables reminders.
 - [ ] Replace every **REQUIRED - REPLACE** value in this document.
 - [ ] Confirm the app name is available.
 - [ ] Confirm Bundle ID `com.wealthcompass.mobile`.
-- [ ] Confirm version `1.0` and increment build number if build `1` was already successfully uploaded.
+- [ ] Confirm version `1.1.0` and increment the build number (currently `12`) if that build was already successfully uploaded.
 - [ ] Test the Release build on a physical iPhone running iOS 17 or later.
 - [ ] Test launch with no network connection.
 - [ ] Test add, edit, and delete flows for every financial record type.

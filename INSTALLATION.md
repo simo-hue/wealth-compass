@@ -29,8 +29,8 @@ npm install
 ### 3. Configure Supabase
 
 1. Create a new project in your Supabase dashboard.
-2. Go to the **SQL Editor** in Supabase and run the following queries to set up the database schema (if you have a schema file, verify it, otherwise ensure tables `transactions`, `investments`, `crypto`, `liabilities`, `liquidity_accounts`, `snapshots` exist).
-3. Enable **Authentication** (Email/Password or Magic Link) in Supabase.
+2. Go to the **SQL Editor** in Supabase and run the following queries to set up the database schema (if you have a schema file, verify it, otherwise ensure tables `assets`, `liabilities`, `liquidity_accounts`, `portfolio_snapshots`, `transactions`, and `profiles` exist).
+3. Enable **Authentication** (Email/Password) in Supabase. The app signs in with email + password only; there is no Magic Link / OTP flow.
 
 ### 4. Environment Variables
 
@@ -71,4 +71,4 @@ To create a production build:
 npm run build
 ```
 
-The output will be in the `dist` directory, ready to be deployed to Vercel, Netlify, or your preferred host.
+The output will be in the `dist` directory. This project is configured to deploy to **GitHub Pages** under the `/wealth-compass/` sub-path — run `npm run deploy` (it builds and publishes `dist` via `gh-pages`). The Vite `base` (`vite.config.ts`) and the React Router `basename` (`src/App.tsx`) are both hard-set to `/wealth-compass/`; any alternative host (Vercel, Netlify, etc.) must serve the app from that same sub-path, or you must update both values to match your host's root first.

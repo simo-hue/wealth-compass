@@ -5,7 +5,7 @@ The Apple implementation is one Xcode project with two independent native applic
 - `WealthCompassMobile`: SwiftUI for iPhone, iOS 17+
 - `WealthCompassMac`: native SwiftUI for macOS 14+
 
-Neither target uses Mac Catalyst. The macOS application is built against the macOS SDK and uses desktop navigation, tables, menus, keyboard shortcuts, AppKit file panels, a Settings scene, sandbox entitlements, and Mac icon assets.
+Neither target uses Mac Catalyst. The macOS application is built against the macOS SDK and uses desktop navigation, tables, menus, keyboard shortcuts, AppKit file panels, an in-window Settings page, sandbox entitlements, and Mac icon assets.
 
 ## Project Layout
 
@@ -38,7 +38,7 @@ Application Support/Wealth Compass/wealth-compass-local-data.json
 
 The iPhone app automatically copies the previous Documents-based database into this location the first time the new version starts.
 
-The storage implementation is behind `FinancePersistence`. This is the boundary used by the current local store and the future CloudKit synchronization layer.
+The storage implementation is behind `FinancePersistence`. This is the boundary used by the current local store and the CloudKit synchronization layer.
 
 ## Build
 
@@ -58,4 +58,4 @@ xcodebuild \
   build
 ```
 
-For the iCloud implementation plan, see [`ICLOUD_SYNC.md`](./ICLOUD_SYNC.md).
+For the iCloud sync design notes and remaining work, see [`WealthCompass/TO_IMPROVE.md`](./WealthCompass/TO_IMPROVE.md).

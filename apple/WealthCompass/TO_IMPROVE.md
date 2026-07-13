@@ -17,7 +17,7 @@ These fixes are in the codebase but still need a clean verification run on two i
 
 2. **Verify post-bootstrap fetch performance**
    - With bootstrap already complete, trigger a remote change from the other device.
-   - Confirm macOS debug logs show `localRecordsEncoded: 0` in `handleFetchedRecordZoneChanges` (no full-dataset re-encode per batch).
+   - Confirm no full-dataset re-encode happens per batch once bootstrap is complete: `handleFetchedRecordZoneChanges` short-circuits `localRecords` to `[:]` when bootstrap is done (`CloudKitSyncService.swift`), so the per-batch SHA256 re-encode is skipped. Observe via the OSLog `Telemetry` signpost (`fetched mods=… dels=…`). *(The old `localRecordsEncoded` debug field was removed with the localhost-HTTP instrumentation — see `CLAUDE.md` gotcha C1 / Item #23.)*
 
 3. **Verify first-sync collision batching**
    - On a test account, enable sync on two devices that already share the same local data.

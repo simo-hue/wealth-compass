@@ -14,7 +14,7 @@ problem/impact/fix detail lives in `IOS_MACOS_DEEP_AUDIT.md` (IDs `DA-H##`, `DA-
   - `fix(apple): deep-audit High money-correctness batch (H05,H07,H09,H11,H13,H14)`
   - `fix(apple): deep-audit High decode/data-loss batch (H08,H10,H12)`
   - `fix(apple): deep-audit High lock/privacy batch (H01,H02,H03,H04)`
-- **Medium tier (31 findings): ✅ implementation COMPLETE** — 28 implemented (Batches M1 + M4 + M5 + M3-rest) + 2 already-fixed by the High work = **30/31**; the only remainder is **M31** (deferred feature — §5). **0 left to implement.**
+- **Medium tier (31 findings): ✅ implementation COMPLETE (31/31 in code)** — 28 implemented (Batches M1 + M4 + M5 + M3-rest) + 2 already-fixed by the High work + **M31** (CloudKit push sync) landed in commit `31c0dea`. **0 left to implement in code**; M31 still needs a one-time manual Push Notifications provisioning-profile step (entitlements currently ship `aps-environment=development` — see §5 and `TO_SIMO_DO.md`).
 - **Low tier (62 findings):** not started; all documented as `DA-L01…L62` in `IOS_MACOS_DEEP_AUDIT.md`. Future work.
 
 ### Medium — done (28), merged to `main` (⚠️ NOT yet verified on a real build)
@@ -41,7 +41,7 @@ block on them.
 M3-rest) — **unverified on real Xcode** (built on a CommandLineTools-only box; M4/M5/M3-rest were each
 adversarially compile/logic-reviewed). The human runs the build + smoke checks accumulated in root
 `TO_SIMO_DO.md` **asynchronously**.
-1. **Nothing left to implement in the Medium tier.** The only remaining Medium item is **M31** (CloudKit push sync), intentionally **deferred** — it needs a provisioning-profile change; do it as its own focused effort (§5) and note the manual step in `TO_SIMO_DO.md`.
+1. **Nothing left to implement in the Medium tier.** **M31** (CloudKit push sync) has since landed in code (commit `31c0dea`: `aps-environment` entitlement, `remote-notification` background mode, `registerForRemoteNotifications` + `didReceiveRemoteNotification` → `CKSyncEngine`). The only remaining piece is the one-time manual **Push Notifications provisioning-profile** step (entitlements currently ship `aps-environment=development`) — track it in `TO_SIMO_DO.md`.
 2. Otherwise, the next body of work is the **Low tier** (62 findings `DA-L01…L62`), batched by theme like the Medium work (§6 tail / §"After Medium → Low tier").
 3. If the human reports a red build for any landed batch, fix on a branch off `main` and fast-forward it back (§3).
 
@@ -87,7 +87,7 @@ adversarially compile/logic-reviewed). The human runs the build + smoke checks a
 
 ## 5. Decisions already locked (do NOT re-litigate)
 
-- **M31 (CloudKit push sync): DEFERRED** — it's a feature (re-add `aps-environment` entitlement → provisioning-profile change, `remote-notification` background mode, `registerForRemoteNotifications` + `didReceiveRemoteNotification` → `CKSyncEngine`, BGTask refresh). Do it as its own focused effort, not in a bug-fix batch. Sync works on foreground/manual today.
+- **M31 (CloudKit push sync): ✅ IMPLEMENTED** (commit `31c0dea`) — was deferred as a standalone feature, now landed: `aps-environment` entitlement (both targets), `remote-notification` background mode, `registerForRemoteNotifications` + `didReceiveRemoteNotification` → `CKSyncEngine`. Foreground/manual sync still works as before; push now delivers silently in the background. **Remaining:** a one-time manual production Push Notifications provisioning-profile step (entitlements currently ship `aps-environment=development`; production needs the capability on the App ID + a regenerated profile) — see `TO_SIMO_DO.md`.
 - **M22/M23 (retroactive snapshot FX): "same-currency deltas only"** — apply `adjustHistoricalSnapshots` deltas only when the transaction currency equals the snapshot's captured base currency (no-op FX case). For a genuine foreign-currency back-dated edit, **skip the historical mutation** and let H11's render-time reconversion (each `NetWorthSnapshot` now carries a `currency`) handle display.
 - **M17 (biometric enrollment change): "require passcode re-confirm"** — on unlock, if `evaluatedPolicyDomainState` differs from the stored baseline, require the device passcode / app password once, then re-baseline.
 - **Minor defaults (confirmed):** M01/M13 → derive `maximumFractionDigits` from the value's own scale (cap ~18–20); M11/M20 → convert using the record's own currency; M15/M16 → memoize + downsample long ranges to ~365 pts; M25 → mirror the investments-loop pacing (done); M29 → stable unique slice id, keep per-holding wedges.
@@ -130,8 +130,8 @@ line numbers drift.
 - **M15 / M16** `Sources/Shared/Services/AnalyticsEngine.swift:~140` (`carryingForwardDailyGaps`) — materializes one point per calendar day over *full* history on every dashboard render for range `.all` (uncapped, uncached). **Fix:** cap/downsample long spans (e.g. > ~365 days → weekly/monthly buckets or stride to ~365 points) **and** memoize `snapshotsForChart` on `FinanceStore` keyed by `(dataVersion, currency, rateStamp, range)` (mirror `cachedTotals`).
 - **M27** `FinanceStore.swift:~756` — `monthlyCashFlow` / `expensesByCategory` / `cashFlowTrend` are recomputed on every hover/resize (uncached). **Fix:** memoize each on `FinanceStore` keyed by `(dataVersion, currency, rateStamp, period/month)` like `cachedTotals`. (M06 already cached the transaction sort, which partially helps.)
 
-### Deferred — feature
-- **M31** — CloudKit push sync. See §5. Its own effort; needs a provisioning-profile change (note in `TO_SIMO_DO.md` when tackled).
+### M31 — implemented (code); manual provisioning step remains
+- **M31** — CloudKit push sync: ✅ landed in code (commit `31c0dea`). See §5. Remaining: the one-time manual production Push Notifications provisioning-profile step (noted in `TO_SIMO_DO.md`).
 
 ### After Medium → Low tier
 62 findings `DA-L01…L62` in `IOS_MACOS_DEEP_AUDIT.md` (polish, latent traps, minor localization/a11y, dead code). Batch by theme the same way; most are mechanical.

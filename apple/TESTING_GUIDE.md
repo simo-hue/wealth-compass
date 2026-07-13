@@ -108,9 +108,11 @@ Run on **both iOS and macOS** unless noted. For each: do the steps, confirm the 
   *Expect:* selection still maps to the correct slice (all 4 charts use the shared `PieSliceHitTester` now).
 - **[M2] Recurring create/edit (the dedup'd builder).** Create and then edit a recurring transaction on
   **both** platforms. *Expect:* next-due date is computed correctly and saving works (logic is now shared).
-- **[M6] macOS Settings is ⌘, only.** On macOS: the sidebar shows **Dashboard / Cash Flow / Investments /
-  Crypto** with **no Settings row**. Press **⌘,** (or "Wealth Compass ▸ Settings…") → Settings opens.
-  *Expect:* exactly one Settings surface; ⌘1–⌘4 still switch sidebar sections.
+- **[M6] macOS Settings is an in-window page (sidebar + ⌘,).** On macOS: the sidebar shows **Dashboard /
+  Cash Flow / Investments / Crypto / Settings**. Open Settings either by clicking the **Settings** sidebar
+  row or by pressing **⌘,** (or "Wealth Compass ▸ Settings…") — both select the same in-window Settings
+  page (no separate Preferences window).
+  *Expect:* exactly one Settings surface; ⌘1–⌘5 switch sidebar sections (⌘5 = Settings).
 - **[M7] Refresh progress.** With several investments + a Finnhub key, tap Refresh.
   *Expect:* the refresh button shows **"Updating x of N"** counting up as it fetches each stock (the crypto
   call is batched). It should feel snappier than before (0.3s spacing vs the old fixed 1s), and only slow down

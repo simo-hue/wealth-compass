@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This directory (`apple/`) is the **native Apple implementation** of Wealth Compass, a personal net-worth / finance tracker. It is one Xcode project with two independent native app targets plus a test target:
 
 - `WealthCompassMobile` — SwiftUI, iPhone, iOS 17+
-- `WealthCompassMac` — native SwiftUI for macOS 14+ (no Mac Catalyst; built against the macOS SDK with sidebar navigation, tables, menus, keyboard shortcuts, a Settings scene, and sandbox entitlements)
+- `WealthCompassMac` — native SwiftUI for macOS 14+ (no Mac Catalyst; built against the macOS SDK with sidebar navigation, tables, menus, keyboard shortcuts, an in-window Settings page, and sandbox entitlements)
 - `WealthCompassTests` — XCTest unit tests
 
 The **parent directory** (`../`) is a separate React + Vite + Supabase web app that shares the product but no code; its `.github/workflows/deploy.yml` only builds/deploys that web app. The JSON backup format is the interchange point between the web and Apple apps (see the import path in `FinanceStore`).
@@ -47,7 +47,7 @@ Signing uses `DEVELOPMENT_TEAM = 8528AN28A3`. Version numbers live in `project.p
 
 - `Sources/Shared/` — the brain: `Models/`, `Persistence/`, `Services/`, `Stores/`, `UI/`. All finance calculations, persistence, sync, networking, and reusable views live here and compile into both apps.
 - `Sources/iOS/` — mobile lifecycle + `TabView` UI.
-- `Sources/macOS/` — desktop lifecycle + sidebar/table/menu UI, `MacAppModel` navigation, and `MacSettingsView` (the Settings scene).
+- `Sources/macOS/` — desktop lifecycle + sidebar/table/menu UI, `MacAppModel` navigation, and `MacSettingsView` (an in-window Settings destination, not a separate Settings scene).
 
 ## Architecture (the parts that span multiple files)
 
@@ -63,7 +63,7 @@ Each app's `@main` App constructs `AppSettings` first, then `FinanceStore(settin
 - Net-worth history: `appendSnapshot` carry-forward-backfills missing days (capped at 60) and `adjustHistoricalSnapshots` retroactively rewrites past snapshots when a transaction's amount/date changes.
 
 ### CloudKit sync (opt-in)
-`CloudKitSyncService` is an `actor` implementing `CKSyncEngineDelegate`: one CloudKit record per entity (record types `WCTransaction`, `WCInvestment`, … in custom zone `WealthCompassZone`), tombstones for deletes, a bootstrap merge with deterministic conflict resolution (`bootstrapDecision`), and account-change protection that disables sync if the iCloud user changes. Sync metadata persists in `wealth-compass-cloud-sync.json`. Toggled by `AppSettings.isICloudSyncEnabled`; remote mutations are applied back through a `@MainActor` handler on `FinanceStore`. Design notes and remaining work are in `ICLOUD_SYNC.md` and `WealthCompass/TO_IMPROVE.md`.
+`CloudKitSyncService` is an `actor` implementing `CKSyncEngineDelegate`: one CloudKit record per entity (record types `WCTransaction`, `WCInvestment`, … in custom zone `WealthCompassZone`), tombstones for deletes, a bootstrap merge with deterministic conflict resolution (`bootstrapDecision`), and account-change protection that disables sync if the iCloud user changes. Sync metadata persists in `wealth-compass-cloud-sync.json`. Toggled by `AppSettings.isICloudSyncEnabled`; remote mutations are applied back through a `@MainActor` handler on `FinanceStore`. Design notes and remaining work are in `WealthCompass/TO_IMPROVE.md`.
 
 ### External data is fetched directly from the providers
 `ExchangeRateService` and `MarketDataService` call Frankfurter (`/v2/rates`, base EUR), Finnhub (`/quote`), and CoinGecko (`/simple/price`) **directly** from the device — see `APIConfiguration` for the endpoints. There is no intermediary proxy. Finnhub/CoinGecko keys are user-entered and stored in the Keychain via `KeychainCredentialStore` (service `com.wealthcompass.mobile.marketdata`) — they are **never** synced to iCloud and travel only as request headers over HTTPS to the issuing provider. Exchange rates auto-refresh on a 12h staleness window with exponential backoff, persisted via `ExchangeRatePersistence`. (The old `../proxy/` Cloudflare Worker is retired and no longer used by the app.)

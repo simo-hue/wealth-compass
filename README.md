@@ -35,7 +35,7 @@ See [`apple/README.md`](./apple/README.md) for architecture and build details.
 ### 📊 Interactive Dashboard
 - **Net Worth Tracking**: Visual history of your net worth over time.
 - **Asset Allocation**: Breakdown of your portfolio by sector and asset class.
-- **Key Metrics**: Instant view of total liquidity, investments, and unnecessary expenses.
+- **Key Metrics**: Instant view of net worth, cash balance, investments, and crypto.
 
 ### 💰 Cash Flow Management
 - **Transaction Tracking**: Easy entry for income and expenses.

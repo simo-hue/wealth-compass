@@ -1493,6 +1493,8 @@ and use it at both line 303 and line 378 (and reuse in accessibilityValue at lin
 
 ### DA-M31 — CloudKit push entitlement (aps-environment) and remote-notification background mode missing — CKSyncEngine subscription pushes are never delivered
 
+> **✅ RESOLVED (2026-07-13, commit `31c0dea`).** Push sync has since landed — see roadmap §5. `aps-environment` is now present in both entitlements, `remote-notification` is in `Resources/iOS/Info.plist`, and `registerForRemoteNotifications()` (iOS `ContentView.swift`, macOS `MacRootView.swift`) plus `didReceiveRemoteNotification` handlers route pushes into `CKSyncEngine` via `FinanceStore.syncForRemotePush()`. The "Current code" snapshot below is the pre-fix state at audit time. (Remaining: a one-time manual production Push Notifications provisioning-profile step — entitlements currently ship `aps-environment=development`.)
+
 - **Medium** · Architecture · iOS+macOS · confidence: Medium
 - **Location:** `WealthCompassMobile.entitlements:9`
 
@@ -1948,6 +1950,8 @@ if let authenticationError {
 ---
 
 ### DA-L15 — Settings is reachable via both a sidebar destination and the native Settings scene, so the two MacSettingsView instances keep divergent local UI state
+
+> **✅ RESOLVED (2026-07-13).** The native `Settings { }` scene was removed from `WealthCompassMacApp.swift`; ⌘, is now remapped via `CommandGroup(replacing: .appSettings)` to select the single in-window `MacSettingsView` sidebar destination, so only one instance exists. The "Current code" snapshot below is the pre-fix state at audit time.
 
 - **Low** · Architecture · macOS · confidence: Medium
 - **Location:** `Sources/macOS/MacRootView.swift:132`
@@ -3250,7 +3254,7 @@ Text(step)
 
 ## Appendix — test-coverage gaps (complementary note)
 
-The XCTest suite (hosted by `WealthCompassMobile`, ~101 tests across 8 files) covers `AnalyticsEngine`, the CloudSync core, `CurrencyConverter`, `FinanceImportService`, `MarketDataService`, `PersistenceCoordinator`, `RecurringScheduleBuilder`, and `SnapshotEngine`. There is **no dedicated test file** for several high-risk units that many findings above touch:
+The XCTest suite (hosted by `WealthCompassMobile`, ~101 tests across 8 files *as of the 2026-07-05 audit; since grown to 147 tests across 9 files, adding `BrokerStatementImportServiceTests`*) covers `AnalyticsEngine`, the CloudSync core, `CurrencyConverter`, `FinanceImportService`, `MarketDataService`, `PersistenceCoordinator`, `RecurringScheduleBuilder`, and `SnapshotEngine`. There is **no dedicated test file** for several high-risk units that many findings above touch:
 
 - **`FinanceStore`** — the single mutation hub and the `save()`→sync pipeline (only exercised indirectly via `PersistenceCoordinatorTests`). Add tests for snapshot backfill / `adjustHistoricalSnapshots`, changeset diffing, and per-transaction currency handling.
 - **`AppSettings`** — currency conversion guards, 12h staleness + exponential-backoff refresh state machine.

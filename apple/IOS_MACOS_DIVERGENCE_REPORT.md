@@ -103,8 +103,9 @@ Verified identical / shared this pass:
 
 Confirmed deliberate and platform-correct; changing them would be wrong:
 
-1. **Navigation shell** — iOS 5-tab `TabView`; macOS 4-item `NavigationSplitView` sidebar + Settings as the
-   native ⌘, scene. Same 5 sections reachable on both.
+1. **Navigation shell** — iOS 5-tab `TabView`; macOS 5-item `NavigationSplitView` sidebar that includes
+   Settings (the separate `Settings {}` scene was removed; ⌘, is remapped via `CommandGroup(replacing: .appSettings)`
+   to select the in-window Settings page). Same 5 sections reachable on both.
 2. **Remote-push handler shape** — iOS `didReceiveRemoteNotification … async -> UIBackgroundFetchResult`
    returns `.newData`; macOS fires `Task { … }` (AppKit has no background-fetch result). Same shared sync.
 3. **Notification identifier prefixes** — `wealth-compass-recurring-` (iOS) vs `wealth-compass-mac-recurring-`

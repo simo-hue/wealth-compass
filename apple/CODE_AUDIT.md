@@ -288,5 +288,5 @@ legacy migration, sync lifecycle). High-value pure logic is **untested**:
 ## Notes / process
 
 - `TO_IMPROVE.md` already tracks C1 (debug removal) and C4 (push wiring) — fold this audit into it or replace it.
-- `DOCUMENTATION.md` is stale (references `MARKETING_VERSION 1.0.4`; project is now `1.0.6` / build `7`).
+- Version tracking is current: project is `MARKETING_VERSION 1.1.0` / build `12` (`project.pbxproj`), and `apple/DOCUMENTATION.md` reflects the 1.1.0 bump. *(This note originally flagged a `1.0.4` ↔ `1.0.6` drift, since resolved.)*
 - Consider a SwiftLint config to catch force-unwraps (H4), `print`/debug logging (C1), and fixed-size fonts (A1) going forward.
