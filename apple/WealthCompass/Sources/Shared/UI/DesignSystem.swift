@@ -822,6 +822,13 @@ struct ImportSummaryView: View {
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
+                if let detectedSource = result.detectedSource {
+                    // Name the auto-detected format so the user sees what the file was read as.
+                    Text(verbatim: detectedSource)
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(WCColor.primary)
+                        .lineLimit(1)
+                }
             }
         }
         .accessibilityElement(children: .combine)

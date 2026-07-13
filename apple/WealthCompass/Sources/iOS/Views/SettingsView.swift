@@ -155,7 +155,7 @@ struct SettingsView: View {
                     Button {
                         showingImportOptions = true
                     } label: {
-                        Label("Import JSON Backup", systemImage: "doc.badge.plus")
+                        Label("Import Data", systemImage: "doc.badge.plus")
                     }
 
                     if let backupURL {
@@ -254,7 +254,7 @@ struct SettingsView: View {
             .onAppear {
                 refreshMarketDataKeyStatus()
             }
-            .alert("Import JSON Backup", isPresented: $showingImportOptions) {
+            .alert("Import Data", isPresented: $showingImportOptions) {
                 Button("Merge With Existing Data") {
                     importMode = .merge
                     showingFileImporter = true
@@ -269,7 +269,7 @@ struct SettingsView: View {
             } message: {
                 Text("Merge adds new records and updates matching IDs. Replace clears current local finance data before importing.")
             }
-            .fileImporter(isPresented: $showingFileImporter, allowedContentTypes: [.json]) { result in
+            .fileImporter(isPresented: $showingFileImporter, allowedContentTypes: [.json, .commaSeparatedText, .plainText]) { result in
                 handleImportSelection(result)
             }
             .sheet(item: $activeCredentialEditor) { credential in
@@ -586,7 +586,7 @@ struct SettingsView: View {
             // L55: importBackup is now async (parses off the MainActor).
             Task {
                 do {
-                    let result = try await finance.importBackup(from: url, mode: importMode, settings: settings)
+                    let result = try await finance.importFile(from: url, mode: importMode, settings: settings)
                     // SET-02: match macOS — materialize any now-due recurring transactions the backup
                     // brought in, reschedule notifications, and note the count in the import summary.
                     let insertedCount = finance.processDueRecurringTransactions(settings: settings)

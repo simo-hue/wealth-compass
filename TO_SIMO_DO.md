@@ -48,3 +48,23 @@ Then the 2-device drift smoke test (two devices on the SAME iCloud account, sync
 5. **Regression:** a normal delete still works — delete a transaction on A, confirm it disappears on B.
 
 Report anything red.
+
+---
+
+## [2026-07-13] Broker CSV Import (Revolut + Trade Republic) — manual follow-ups
+
+**1. Build + test on a machine with Xcode (required — this environment only has Command Line Tools, so `xcodebuild` couldn't run).** The parser logic was verified standalone with `swiftc` against your two real sample CSVs and against the synthetic test fixtures (all green), but the full app build + XCTest still need Xcode:
+```bash
+cd apple
+xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMac -destination 'platform=macOS' build
+xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile -destination 'generic/platform=iOS Simulator' build
+xcodebuild test -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile \
+  -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:WealthCompassTests/BrokerStatementImportServiceTests
+```
+Then smoke-test: Settings → **Import Data…** → pick a Revolut/Trade Republic CSV on both iPhone and Mac; confirm the summary names the detected format and the counts look right.
+
+**2. Localize the new UI strings.** New strings ("Import Data", the detected-format names, "Detected format: …", the two new import errors, and the imported cash-flow category names Investments/Shopping/Transfer/Interest/Dividends/Rewards/Taxes) currently fall back to **English** for all locales. Open `Localizable.xcstrings` in Xcode to let the catalog extract them, then translate (or run your existing translation script). Nothing breaks until then — they just display in English.
+
+**3. Trade Republic provenance — confirm against a real TR export.** Per your instruction I treated `Transaction export.csv` as the Trade Republic format and built + labeled the parser accordingly. Heads-up: that file's row contents read like a **Revolut** trading export (they literally contain "Sent from Revolut", `STOCKPERK`, `TAX_OPTIMIZATION`). The parser is driven by the header signature (`datetime,account_type,asset_class,…`), so it works on files of that exact shape. **If your actual everyday Trade Republic CSV has different columns, the auto-detector won't recognize it** — send me one real TR export and I'll add its signature + mapping (a few minutes of work).
+
+**4. Don't commit `IMPORT_TEMPLATE/`.** It holds real financial PII (IBANs, full merchant history) and is now in `.gitignore`. It was never committed (untracked), so nothing to scrub — just leave it ignored.

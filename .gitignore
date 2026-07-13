@@ -1,1 +1,5 @@
 node_modules
+
+# Real broker/bank statement samples used to build the CSV importer — contain personal
+# financial data (IBANs, merchant history) and must never be committed. Tests use synthetic fixtures.
+IMPORT_TEMPLATE/

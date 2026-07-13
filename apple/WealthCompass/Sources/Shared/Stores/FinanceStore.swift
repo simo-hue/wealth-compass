@@ -2,6 +2,24 @@ import Foundation
 import OSLog
 import SwiftUI
 
+/// Fast, allocation-free check for whether a file is a native JSON backup (vs. a broker CSV), used by
+/// `FinanceStore.importFile`'s detached parse. Trusts a `.json` extension, otherwise peeks at the first
+/// non-whitespace byte for a JSON opener. Free function so it stays nonisolated (callable off the MainActor).
+fileprivate func financeImportLooksLikeJSON(_ data: Data, fileName: String) -> Bool {
+    if fileName.lowercased().hasSuffix(".json") { return true }
+    for byte in data.prefix(64) {
+        switch byte {
+        case 0x20, 0x09, 0x0A, 0x0D:
+            continue // leading whitespace
+        case UInt8(ascii: "{"), UInt8(ascii: "["):
+            return true
+        default:
+            return false
+        }
+    }
+    return false
+}
+
 enum FinanceImportMode: String, Identifiable {
     case merge
     case replace
@@ -37,6 +55,9 @@ struct FinanceImportResult: Identifiable {
     let generatedSnapshots: Int
     let categoriesAdded: Int
     let skippedRecords: Int
+    /// Human-readable name of the detected non-native source (e.g. "Revolut consolidated statement").
+    /// `nil` for a native Wealth Compass JSON backup. Shown as the first summary line when present.
+    var detectedSource: String? = nil
 
     var importedRecordCount: Int {
         transactions + recurringTransactions + investments + crypto + liabilities + snapshots
@@ -64,6 +85,10 @@ struct FinanceImportResult: Identifiable {
             lines.append(AppLocalization.string("\(skippedRecords) malformed or incomplete records were skipped.", appLanguage: appLanguage))
         }
 
+        if let detectedSource {
+            lines.insert(AppLocalization.string("Detected format: \(detectedSource).", appLanguage: appLanguage), at: 0)
+        }
+
         return lines.joined(separator: "\n\n")
     }
 }
@@ -73,6 +98,8 @@ enum FinanceImportError: LocalizedError {
     case invalidJSON(String)
     case noSupportedRecords
     case localPersistenceError
+    case unrecognizedFormat
+    case malformedCSV(String)
 
     var errorDescription: String? {
         localizedDescription(appLanguage: nil)
@@ -85,9 +112,13 @@ enum FinanceImportError: LocalizedError {
         case .invalidJSON(let details):
             AppLocalization.string("The selected file is not a valid Wealth Compass JSON backup. \(details)", appLanguage: appLanguage)
         case .noSupportedRecords:
-            AppLocalization.string("No supported finance records were found in the selected JSON file.", appLanguage: appLanguage)
+            AppLocalization.string("No supported finance records were found in the selected file.", appLanguage: appLanguage)
         case .localPersistenceError:
             AppLocalization.string("Changes cannot be saved until the local database load error is resolved.", appLanguage: appLanguage)
+        case .unrecognizedFormat:
+            AppLocalization.string("This file isn't a Wealth Compass backup or a supported Revolut / Trade Republic statement.", appLanguage: appLanguage)
+        case .malformedCSV(let details):
+            AppLocalization.string("The statement file could not be read. \(details)", appLanguage: appLanguage)
         }
     }
 }
@@ -1104,6 +1135,44 @@ final class FinanceStore: ObservableObject {
     }
 
     @discardableResult
+    /// Unified import entry point: auto-detects a native JSON backup vs. a supported broker/bank CSV
+    /// (Revolut / Trade Republic) by content, parses off the MainActor, then applies via `applyImport`.
+    /// The UI calls this so the user never has to pick a format.
+    func importFile(from url: URL, mode: FinanceImportMode, settings: AppSettings) async throws -> FinanceImportResult {
+        guard localPersistenceError == nil else {
+            throw FinanceImportError.localPersistenceError
+        }
+
+        let didAccessResource = url.startAccessingSecurityScopedResource()
+        defer {
+            if didAccessResource {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        // L55: read + detect + parse off the MainActor; the @Published mutations in applyImport stay on it.
+        let context = FinanceImportContext(displayCurrency: settings.currency, snapshot: settings.exchangeRateSnapshot)
+        let fileName = url.lastPathComponent
+        let parsed = try await Task.detached { () -> (normalized: NormalizedFinanceImport, source: String?) in
+            let payload = try Data(contentsOf: url)
+            guard !payload.isEmpty else { throw FinanceImportError.emptyFile }
+            if financeImportLooksLikeJSON(payload, fileName: fileName) {
+                return (try FinanceImportService.parse(payload, context: context), nil)
+            }
+            let outcome = try BrokerStatementImportService.parse(payload, context: context)
+            return (outcome.normalized, outcome.format.displayName)
+        }.value
+
+        return try applyImport(
+            parsed.normalized,
+            mode: mode,
+            settings: settings,
+            sourceFileName: fileName,
+            detectedSource: parsed.source
+        )
+    }
+
+    /// JSON-backup–only import, retained for existing callers/tests. `importFile` supersedes it for the UI.
     func importBackup(from url: URL, mode: FinanceImportMode, settings: AppSettings) async throws -> FinanceImportResult {
         // Fail loudly if the local DB failed to load: save() is a no-op while `localPersistenceError`
         // is set, so mutating in-memory `data` and reporting success would silently discard the import
@@ -1130,6 +1199,24 @@ final class FinanceStore: ObservableObject {
             return try FinanceImportService.parse(payload, context: context)
         }.value
 
+        return try applyImport(
+            normalized,
+            mode: mode,
+            settings: settings,
+            sourceFileName: url.lastPathComponent,
+            detectedSource: nil
+        )
+    }
+
+    /// Shared tail for every import path: validates, registers categories, merges/replaces, snapshots,
+    /// persists, and builds the summary. Runs on the MainActor (mutates `@Published data`).
+    private func applyImport(
+        _ normalized: NormalizedFinanceImport,
+        mode: FinanceImportMode,
+        settings: AppSettings,
+        sourceFileName: String,
+        detectedSource: String?
+    ) throws -> FinanceImportResult {
         guard normalized.data.hasImportableContent else {
             throw FinanceImportError.noSupportedRecords
         }
@@ -1150,7 +1237,7 @@ final class FinanceStore: ObservableObject {
         save()
 
         return FinanceImportResult(
-            sourceFileName: url.lastPathComponent,
+            sourceFileName: sourceFileName,
             mode: mode,
             transactions: normalized.data.transactions.count,
             recurringTransactions: normalized.data.recurringTransactions.count,
@@ -1160,7 +1247,8 @@ final class FinanceStore: ObservableObject {
             snapshots: normalized.data.snapshots.count,
             generatedSnapshots: shouldGenerateSnapshot ? 1 : 0,
             categoriesAdded: categoriesAdded,
-            skippedRecords: normalized.skippedRecords
+            skippedRecords: normalized.skippedRecords,
+            detectedSource: detectedSource
         )
     }
 

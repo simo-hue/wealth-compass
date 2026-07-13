@@ -432,7 +432,7 @@ struct MacSettingsView: View {
                 Divider().background(WCColor.border)
 
                 HStack(spacing: 16) {
-                    Button("Import JSON...", action: importBackup)
+                    Button("Import Data...", action: importData)
                     Button("Export JSON...", action: exportBackup)
                 }
                 .padding(.top, 8)
@@ -739,18 +739,18 @@ struct MacSettingsView: View {
         }
     }
 
-    private func importBackup() {
+    private func importData() {
         let panel = NSOpenPanel()
-        panel.allowedContentTypes = [.json]
+        panel.allowedContentTypes = [.json, .commaSeparatedText, .plainText]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
-        // L55: importBackup is now async (parses off the MainActor). The open panel above stays on the
+        // L55: import is async (detects + parses off the MainActor). The open panel above stays on the
         // main thread; the async import + summary run in a Task.
         Task {
             do {
-                let result = try await finance.importBackup(from: url, mode: importMode, settings: settings)
+                let result = try await finance.importFile(from: url, mode: importMode, settings: settings)
                 let insertedCount = finance.processDueRecurringTransactions(settings: settings)
                 await syncRecurringNotifications()
 

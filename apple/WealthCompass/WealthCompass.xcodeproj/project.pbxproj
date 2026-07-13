@@ -20,6 +20,9 @@
 		AD00000000000000000000B2 /* SnapshotEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A2 /* SnapshotEngine.swift */; };
 		AD00000000000000000000A3 /* AnalyticsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A3 /* AnalyticsEngine.swift */; };
 		AD00000000000000000000B3 /* AnalyticsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A3 /* AnalyticsEngine.swift */; };
+		AD00000000000000000000AC /* BrokerStatementImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000AC /* BrokerStatementImportService.swift */; };
+		AD00000000000000000000BC /* BrokerStatementImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000AC /* BrokerStatementImportService.swift */; };
+		AD00000000000000000000C8 /* BrokerStatementImportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C8 /* BrokerStatementImportServiceTests.swift */; };
 		AD00000000000000000000A4 /* PieSliceHitTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A4 /* PieSliceHitTester.swift */; };
 		AD00000000000000000000B4 /* PieSliceHitTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A4 /* PieSliceHitTester.swift */; };
 		AD00000000000000000000A5 /* RecurringScheduleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A5 /* RecurringScheduleBuilder.swift */; };
@@ -121,6 +124,7 @@
 		AC0000000000000000000FD0 /* MoneyDecimal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/MoneyDecimal.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A2 /* SnapshotEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SnapshotEngine.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A3 /* AnalyticsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AnalyticsEngine.swift; sourceTree = "<group>"; };
+		AC00000000000000000000AC /* BrokerStatementImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/BrokerStatementImportService.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A4 /* PieSliceHitTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/PieSliceHitTester.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A5 /* RecurringScheduleBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/RecurringScheduleBuilder.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A6 /* NetworkRetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/NetworkRetry.swift; sourceTree = "<group>"; };
@@ -178,6 +182,7 @@
 		AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringScheduleBuilderTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C4 /* AnalyticsEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsEngineTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C5 /* FinanceImportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceImportServiceTests.swift; sourceTree = "<group>"; };
+		AC00000000000000000000C8 /* BrokerStatementImportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerStatementImportServiceTests.swift; sourceTree = "<group>"; };
 		AC0000000000000000000051 /* WealthCompassTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WealthCompassTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1614C7598D89322EDC6DD1C /* DynamicMasonryLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DynamicMasonryLayout.swift; path = Sources/Shared/UI/DynamicMasonryLayout.swift; sourceTree = "<group>"; };
 		C0D3A0010000000000000001 /* MarketDataAPIKeyGuide.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MarketDataAPIKeyGuide.swift; path = ../../../UI/MarketDataAPIKeyGuide.swift; sourceTree = "<group>"; };
@@ -311,6 +316,7 @@
 				AC00000000000000000000A5 /* RecurringScheduleBuilder.swift */,
 				AC00000000000000000000A6 /* NetworkRetry.swift */,
 				AC00000000000000000000A7 /* FinanceImportService.swift */,
+				AC00000000000000000000AC /* BrokerStatementImportService.swift */,
 				AC00000000000000000000A8 /* RecurringNotificationService.swift */,
 				AC00000000000000000000A9 /* BiometricLockStore.swift */,
 				AC00000000000000000000AA /* OnboardingViewModel.swift */,
@@ -416,6 +422,7 @@
 				AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */,
 				AC00000000000000000000C4 /* AnalyticsEngineTests.swift */,
 				AC00000000000000000000C5 /* FinanceImportServiceTests.swift */,
+				AC00000000000000000000C8 /* BrokerStatementImportServiceTests.swift */,
 				AC00000000000000000000C6 /* PersistenceCoordinatorTests.swift */,
 				AC00000000000000000000C7 /* MarketDataServiceTests.swift */,
 			);
@@ -623,6 +630,7 @@
 				AD00000000000000000000A5 /* RecurringScheduleBuilder.swift in Sources */,
 				AD00000000000000000000A6 /* NetworkRetry.swift in Sources */,
 				AD00000000000000000000A7 /* FinanceImportService.swift in Sources */,
+				AD00000000000000000000AC /* BrokerStatementImportService.swift in Sources */,
 				AD00000000000000000000A8 /* RecurringNotificationService.swift in Sources */,
 				AD00000000000000000000A9 /* BiometricLockStore.swift in Sources */,
 				AD00000000000000000000AA /* OnboardingViewModel.swift in Sources */,
@@ -669,6 +677,7 @@
 				AD00000000000000000000B5 /* RecurringScheduleBuilder.swift in Sources */,
 				AD00000000000000000000B6 /* NetworkRetry.swift in Sources */,
 				AD00000000000000000000B7 /* FinanceImportService.swift in Sources */,
+				AD00000000000000000000BC /* BrokerStatementImportService.swift in Sources */,
 				AD00000000000000000000B8 /* RecurringNotificationService.swift in Sources */,
 				AD00000000000000000000B9 /* BiometricLockStore.swift in Sources */,
 				AD00000000000000000000BA /* OnboardingViewModel.swift in Sources */,
@@ -712,6 +721,7 @@
 				AD00000000000000000000C3 /* RecurringScheduleBuilderTests.swift in Sources */,
 				AD00000000000000000000C4 /* AnalyticsEngineTests.swift in Sources */,
 				AD00000000000000000000C5 /* FinanceImportServiceTests.swift in Sources */,
+				AD00000000000000000000C8 /* BrokerStatementImportServiceTests.swift in Sources */,
 				AD00000000000000000000C6 /* PersistenceCoordinatorTests.swift in Sources */,
 				AD00000000000000000000C7 /* MarketDataServiceTests.swift in Sources */,
 			);
