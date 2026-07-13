@@ -115,11 +115,18 @@ enum BrokerStatementImportService {
 /// `""` escaped-quote convention. Returns rows of raw (untrimmed) fields; callers trim as needed.
 enum CSVTokenizer {
     static func rows(from text: String, delimiter: Character = ",") -> [[String]] {
+        // Normalize line endings FIRST: Swift treats a CRLF as a single Character (grapheme cluster), so a
+        // char-by-char scan would never see `\n` as a row terminator in a Windows/CRLF-encoded export and
+        // would collapse the whole file into one row. Collapsing CRLF/CR → LF also covers old-Mac CR endings.
+        // (A CRLF embedded inside a quoted field is normalized to LF — acceptable for statement data.)
+        let normalized = text
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
         var rows: [[String]] = []
         var field = ""
         var record: [String] = []
         var inQuotes = false
-        let chars = Array(text)
+        let chars = Array(normalized)
         var i = 0
 
         func endField() {
@@ -156,8 +163,6 @@ enum CSVTokenizer {
                 case delimiter:
                     endField()
                     i += 1
-                case "\r":
-                    i += 1 // swallow CR; the LF (or next char) ends the record
                 case "\n":
                     endRecord()
                     i += 1
