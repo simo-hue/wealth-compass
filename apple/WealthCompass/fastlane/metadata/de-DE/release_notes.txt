@@ -1,1 +1,2 @@
-Neue Funktionen und Fehlerbehebung
+- Öffentliche 3D- und Revolut-Importe als PDF- und CSV-Dateien implementiert (CSV empfohlen).
+- Verschiedene Fehlerbehebungen und Verbesserungen.

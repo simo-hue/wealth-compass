@@ -76,3 +76,14 @@ Then smoke-test: Settings → **Import Data…** → pick a Revolut/Trade Republ
   - **Manual check**: Settings → Import Data → pick `Account statement.pdf` (expect ~5 transactions) and `Net Worth.pdf` (expect **one net-worth snapshot** — a point on the net-worth history chart dated 13 Jul, €12.480,55 — *not* holdings/cash). Summary should name "Trade Republic account statement (PDF)" / "…net-worth statement (PDF)".
   - The **Revolut PDF is intentionally rejected** with a helpful message ("PDF statements are supported for Trade Republic only — import the CSV instead"); use `consolidated_statement.csv` for Revolut.
   - **No more cash double-count**: after the professional-review pass, the Net Worth PDF imports as a `NetWorthSnapshot` (not holdings + cash), so it composes cleanly with the transaction CSV. Your actual TR holdings (with cost basis) come from `Transaction export.csv`; the Net Worth PDF just adds a net-worth history point. A user who *only* has the Net Worth PDF gets the snapshot but no individual holdings — that's expected.
+
+## Manual Action Required: App Store Connect Upload
+The fastlane deployment process failed because Apple requires an app-specific password or interactive 2FA to upload the binary via Transporter.
+
+Please run the following command manually in your terminal to complete the release:
+```bash
+cd apple/WealthCompass
+export FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD="your-app-specific-password"
+fastlane ios release
+```
+

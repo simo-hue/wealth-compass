@@ -1,1 +1,2 @@
-Nové funkce a opravy chyb
+- Implementováno 3D veřejné a Revolut importy jako soubory PDF a CSV (doporučeno CSV).
+- Různé opravy chyb a vylepšení.

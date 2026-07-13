@@ -1,1 +1,2 @@
-Noves funcions i correcció d'errors
+- S'han implementat importacions públiques 3D i Revolut com a fitxers PDF i CSV (es recomana CSV).
+- Diverses correccions d'errors i millores.

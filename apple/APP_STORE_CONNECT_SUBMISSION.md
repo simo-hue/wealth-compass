@@ -47,13 +47,13 @@ Leave blank. This is optional. The app has no user accounts or developer-hosted 
 
 | Field | Value |
 |---|---|
-| Version | `1.1.0` |
+| Version | `1.2.0` |
 | Build | `12` |
 | Minimum OS | iOS 17.0 |
 | Device family | iPhone |
 | Orientation | Portrait |
 
-The Xcode project is at version `1.1.0`, build `12` (`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.pbxproj`). If a build is uploaded and rejected during processing, Apple may allow reuse; otherwise increment the build number before uploading another binary.
+The Xcode project is at version `1.2.0`, build `12` (`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.pbxproj`). If a build is uploaded and rejected during processing, Apple may allow reuse; otherwise increment the build number before uploading another binary.
 
 ## 4. App Store Product Page
 
@@ -390,7 +390,7 @@ Notification permission is requested in context when the user enables reminders.
 - [ ] Replace every **REQUIRED - REPLACE** value in this document.
 - [ ] Confirm the app name is available.
 - [ ] Confirm Bundle ID `com.wealthcompass.mobile`.
-- [ ] Confirm version `1.1.0` and increment the build number (currently `12`) if that build was already successfully uploaded.
+- [ ] Confirm version `1.2.0` and increment the build number (currently `12`) if that build was already successfully uploaded.
 - [ ] Test the Release build on a physical iPhone running iOS 17 or later.
 - [ ] Test launch with no network connection.
 - [ ] Test add, edit, and delete flows for every financial record type.

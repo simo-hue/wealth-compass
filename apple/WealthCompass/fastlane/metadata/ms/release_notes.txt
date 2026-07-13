@@ -1,1 +1,2 @@
-Ciri baharu & pembetulan pepijat
+- Melaksanakan import awam 3D dan Revolut sebagai fail PDF dan CSV (CSV disyorkan).
+- Pelbagai pembetulan pepijat dan penambahbaikan.

@@ -1,1 +1,2 @@
-Nove značajke i ispravljanje grešaka
+- Implementiran 3D javni i Revolut uvoz kao PDF i CSV datoteke (preporučuje se CSV).
+- Razni ispravci grešaka i poboljšanja.

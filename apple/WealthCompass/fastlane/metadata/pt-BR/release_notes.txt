@@ -1,1 +1,2 @@
-Novos recursos e correção de bugs
+- Implementei importações 3D públicas e Revolut como arquivos PDF e CSV (CSV recomendado).
+- Várias correções de bugs e melhorias.

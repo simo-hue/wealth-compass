@@ -1,1 +1,2 @@
-Caracteristici noi și remediere erori
+- Implementarea importurilor publice 3D și Revolut ca fișiere PDF și CSV (recomandat CSV).
+- Diverse remedieri de erori și îmbunătățiri.

@@ -1,1 +1,2 @@
-Nieuwe functies en bugfixing
+- Implementatie van openbare 3D- en Revolut-importen als PDF- en CSV-bestanden (CSV aanbevolen).
+- Verschillende bugfixes en verbeteringen.

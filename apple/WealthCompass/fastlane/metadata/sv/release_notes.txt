@@ -1,1 +1,2 @@
-Nya funktioner och felkorrigering
+- Implementerade offentliga 3D- och Revolut-importer som PDF- och CSV-filer (CSV rekommenderas).
+- Olika buggfixar och förbättringar.

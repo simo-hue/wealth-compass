@@ -503,3 +503,7 @@
 - [2026-07-10T21:00:00+02:00]: App Version Bump (1.1.0) & Metadata Translation
   - *Details*: Incremented the app version across the codebase to 1.1.0 for an App Store release and updated the release notes.
   - *Tech Notes*: Bumped `MARKETING_VERSION` to `1.1.0` in `project.pbxproj`. Updated `CFBundleShortVersionString` to `1.1.0` in `Info.plist`. Bumped root `package.json` version to `1.1.0`. Added a `:metadata` lane for macOS in the `Fastfile` and ran automated scripts to translate the new App Store Connect `release_notes.txt` to all supported languages.
+
+- [2026-07-13T21:25:51+0200]: App Version Bump (1.2.0) & iOS Release
+  - *Details*: Incremented the app version across the codebase to 1.2.0, adding 3D public and Revolut imports (PDF and CSV).
+  - *Tech Notes*: Bumped `MARKETING_VERSION` to 1.2.0 and `CURRENT_PROJECT_VERSION` to 13 in `project.pbxproj`. Updated root `package.json` version to 1.2.0. Translated release notes for App Store Connect. Initiated `fastlane ios release`.
