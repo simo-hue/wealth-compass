@@ -741,7 +741,7 @@ struct MacSettingsView: View {
 
     private func importData() {
         let panel = NSOpenPanel()
-        panel.allowedContentTypes = [.json, .commaSeparatedText, .plainText]
+        panel.allowedContentTypes = [.json, .commaSeparatedText, .plainText, .pdf]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
 

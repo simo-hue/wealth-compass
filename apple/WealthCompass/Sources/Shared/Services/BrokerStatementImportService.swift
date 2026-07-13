@@ -1,16 +1,18 @@
 import Foundation
 import CryptoKit
+import PDFKit
 
-/// CSV import for third-party broker / bank statements, auto-detected by content signature.
+/// Import for third-party broker / bank statements (CSV + PDF), auto-detected by content signature so
+/// the user never picks a provider or format:
 ///
-/// Two real formats are supported today, each recognized from its header/section markers so the
-/// user never has to pick a provider:
-///
-/// * **Trade Republic** — the flat, one-row-per-transaction `Transaction export.csv`
+/// * **Trade Republic CSV** — the flat, one-row-per-transaction `Transaction export.csv`
 ///   (`datetime,date,account_type,category,type,asset_class,name,symbol,shares,price,amount,fee,tax,
 ///   currency,…`). Carries cash movements *and* securities trades.
-/// * **Revolut** — the multi-section `consolidated_statement.csv` (per-currency account summaries,
+/// * **Revolut CSV** — the multi-section `consolidated_statement.csv` (per-currency account summaries,
 ///   an "End of Year holding statement" for crypto, then per-currency "Transaction statement" tables).
+/// * **Trade Republic PDFs** (via PDFKit text extraction, `parsePDFText`): the Italian "Estratto conto"
+///   account statement → transactions (sign from the running-balance delta), and the "Estratto del
+///   patrimonio netto" → a single `NetWorthSnapshot`. A Revolut PDF is rejected (use its CSV).
 ///
 /// Both emit the same `NormalizedFinanceImport` the JSON backup importer produces, so the rest of the
 /// import pipeline (`FinanceStore.importFile`, merge/replace, the summary sheet) is format-agnostic.
@@ -31,12 +33,16 @@ enum BrokerStatementImportService {
     enum Format {
         case tradeRepublic
         case revolutStatement
+        case tradeRepublicAccountPDF
+        case tradeRepublicNetWorthPDF
 
         /// Human-readable label shown in the import summary ("Detected format: …").
         var displayName: String {
             switch self {
             case .tradeRepublic: "Trade Republic transaction export"
             case .revolutStatement: "Revolut consolidated statement"
+            case .tradeRepublicAccountPDF: "Trade Republic account statement (PDF)"
+            case .tradeRepublicNetWorthPDF: "Trade Republic net-worth statement (PDF)"
             }
         }
     }
@@ -87,8 +93,43 @@ enum BrokerStatementImportService {
             normalized = TradeRepublicCSVParser.parse(rows: rows, context: context)
         case .revolutStatement:
             normalized = RevolutStatementCSVParser.parse(rows: rows, context: context)
+        case .tradeRepublicAccountPDF, .tradeRepublicNetWorthPDF:
+            // `detect` only ever returns the CSV formats; PDFs are routed through `parsePDFText`.
+            throw FinanceImportError.unrecognizedFormat
         }
         return Outcome(format: format, normalized: normalized)
+    }
+
+    // MARK: - PDF
+
+    /// Extracts the full text of a PDF with PDFKit (the app's own engine, on iOS + macOS). Returns nil
+    /// if the file can't be opened as a PDF or yields no text. Used only for Trade Republic statements.
+    static func extractText(fromPDF url: URL) -> String? {
+        guard let document = PDFDocument(url: url) else { return nil }
+        var pages: [String] = []
+        for index in 0..<document.pageCount {
+            if let page = document.page(at: index)?.string {
+                pages.append(page)
+            }
+        }
+        let text = pages.joined(separator: "\n")
+        return text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : text
+    }
+
+    /// Parses already-extracted PDF text. Recognizes the two Trade Republic statements by content and
+    /// throws `unsupportedPDFStatement` for any other PDF — a Revolut PDF is intentionally unsupported
+    /// (its data is identical to the far more reliable Revolut CSV).
+    static func parsePDFText(_ text: String) throws -> Outcome {
+        let upper = text.uppercased()
+        if upper.contains("PATRIMONIO NETTO") {
+            return Outcome(format: .tradeRepublicNetWorthPDF, normalized: TradeRepublicNetWorthPDFParser.parse(text: text))
+        }
+        if upper.contains("TRANSAZIONI SUL CONTO")
+            || (upper.contains("TRADE REPUBLIC") && upper.contains("ESTRATTO CONTO")) {
+            return Outcome(format: .tradeRepublicAccountPDF, normalized: TradeRepublicAccountPDFParser.parse(text: text))
+        }
+        // A PDF that reached here isn't a recognized Trade Republic statement — most likely a Revolut PDF.
+        throw FinanceImportError.unsupportedPDFStatement
     }
 
     // MARK: - Text decoding
@@ -301,6 +342,69 @@ enum BrokerImportParsing {
     static func currency(_ code: String?, default fallback: Currency) -> Currency {
         guard let code = code?.trimmingCharacters(in: .whitespacesAndNewlines), !code.isEmpty else { return fallback }
         return Currency(rawValue: code.uppercased()) ?? fallback
+    }
+
+    // MARK: - Trade Republic PDF helpers (Italian statements)
+
+    private static let italianMonths: [String: Int] = [
+        "gen": 1, "feb": 2, "mar": 3, "apr": 4, "mag": 5, "giu": 6,
+        "lug": 7, "ago": 8, "set": 9, "ott": 10, "nov": 11, "dic": 12
+    ]
+
+    /// Parses an Italian statement date like `01 lug 2026` (day, abbreviated month, year) → start of day.
+    static func italianDate(_ raw: String?) -> Date? {
+        guard let parts = raw?.split(separator: " "), parts.count == 3,
+              let day = Int(parts[0]),
+              let month = italianMonths[parts[1].lowercased()],
+              let year = Int(parts[2]) else { return nil }
+        var components = DateComponents()
+        components.day = day; components.month = month; components.year = year
+        return Calendar(identifier: .gregorian).date(from: components).map { Calendar.current.startOfDay(for: $0) }
+    }
+
+    /// Parses a `dd.MM.yyyy` date (Trade Republic net-worth statement) → start of day.
+    static func dottedDate(_ raw: String?) -> Date? {
+        guard let parts = raw?.split(separator: "."), parts.count == 3,
+              let day = Int(parts[0]), let month = Int(parts[1]), let year = Int(parts[2]) else { return nil }
+        var components = DateComponents()
+        components.day = day; components.month = month; components.year = year
+        return Calendar(identifier: .gregorian).date(from: components).map { Calendar.current.startOfDay(for: $0) }
+    }
+
+    /// Every European-formatted money amount in `text` with its source range, in order (e.g. `5.573,27`,
+    /// `7,13`). Requires a `,dd` decimal group, so a `dd.MM.yyyy` date or a bare integer can never match.
+    static func euroAmountMatches(in text: String) -> [(range: NSRange, value: Decimal)] {
+        guard let regex = try? NSRegularExpression(pattern: "[0-9][0-9.]*,[0-9]{2}") else { return [] }
+        let ns = text as NSString
+        return regex.matches(in: text, range: NSRange(location: 0, length: ns.length)).compactMap { match in
+            flexibleDecimal(ns.substring(with: match.range)).map { (match.range, $0) }
+        }
+    }
+
+    static func euroAmounts(in text: String) -> [Decimal] {
+        euroAmountMatches(in: text).map(\.value)
+    }
+
+    /// The substring strictly between the first `from` and the following `to`, or nil if either is absent.
+    static func between(_ text: String, from: String, to: String) -> String? {
+        guard let start = text.range(of: from) else { return nil }
+        guard let end = text.range(of: to, range: start.upperBound..<text.endIndex) else { return nil }
+        return String(text[start.upperBound..<end.lowerBound])
+    }
+
+    /// The first regex match in `text`, or nil.
+    static func firstMatch(_ text: String, pattern: String) -> String? {
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
+        let ns = text as NSString
+        guard let match = regex.firstMatch(in: text, range: NSRange(location: 0, length: ns.length)) else { return nil }
+        return ns.substring(with: match.range)
+    }
+
+    /// The first money amount appearing after `label` (case-sensitive) — for labeled summary rows like
+    /// `Conto titoli 6.958,80`.
+    static func amountAfter(_ label: String, in text: String) -> Decimal? {
+        guard let range = text.range(of: label) else { return nil }
+        return euroAmounts(in: String(text[range.upperBound...])).first
     }
 }
 
@@ -683,5 +787,147 @@ private enum RevolutStatementCSVParser {
         guard inside.count == 3, inside.allSatisfy({ $0.isLetter && $0.isASCII }) else { return nil }
         if let resolved = Currency(rawValue: inside) { return .known(resolved) }
         return .unsupported
+    }
+}
+
+
+// MARK: - Trade Republic account statement PDF (transactions)
+
+/// Parses the flattened text of a Trade Republic "Estratto conto" PDF. PDFKit drops the table columns, so
+/// each row surfaces as a date + free text + the printed amount + the running balance. The +/- column is
+/// lost, so the SIGN is recovered from the running-balance delta while the MAGNITUDE uses the printed
+/// amount (robust against a number embedded in the description or an off opening balance).
+private enum TradeRepublicAccountPDFParser {
+    static func parse(text: String) -> NormalizedFinanceImport {
+        var transactions: [Transaction] = []
+        var skipped = 0
+
+        let summary = BrokerImportParsing.between(text, from: "ESTRATTO CONTO", to: "TRANSAZIONI SUL CONTO") ?? ""
+        var running: Decimal? = BrokerImportParsing.euroAmounts(in: summary).first
+
+        let block = BrokerImportParsing.between(text, from: "TRANSAZIONI SUL CONTO", to: "PANORAMICA DEL SALDO")
+            ?? BrokerImportParsing.between(text, from: "TRANSAZIONI SUL CONTO", to: "NOTE SULL")
+            ?? ""
+        let flat = block.replacingOccurrences(of: "\n", with: " ")
+
+        for (dateString, rest) in splitAtDates(flat) {
+            guard let date = BrokerImportParsing.italianDate(dateString) else { skipped += 1; continue }
+            // A real row carries BOTH the printed amount and the running balance (≥ 2 amounts). Fewer means
+            // a memo/continuation we can't place — skip it rather than mis-read a lone amount as a balance.
+            let amounts = BrokerImportParsing.euroAmountMatches(in: rest)
+            guard amounts.count >= 2 else { skipped += 1; continue }
+            let shown = amounts[amounts.count - 2].value
+            let balance = amounts[amounts.count - 1].value
+            if shown == 0 { continue }
+
+            let type: TransactionType
+            if let previous = running { type = balance > previous ? .income : .expense } else { type = .expense }
+            running = balance
+
+            // Description = text before the printed amount, so an embedded number stays with the text.
+            let descriptionEnd = amounts[amounts.count - 2].range.location
+            let rawDescription = (rest as NSString).substring(to: descriptionEnd)
+                .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+                .trimmingCharacters(in: .whitespaces)
+            let (tipo, description) = splitTipo(rawDescription)
+
+            transactions.append(Transaction(
+                id: BrokerImportParsing.deterministicUUID("tr-pdf-acct:\(dateString)|\(description)|\(balance)"),
+                type: type,
+                category: category(forTipo: tipo, description: description),
+                amount: shown,
+                description: description.isEmpty ? tipo : description,
+                date: date,
+                currency: .eur,
+                createdAt: date,
+                updatedAt: date
+            ))
+        }
+        return NormalizedFinanceImport(data: FinancialData(transactions: transactions), skippedRecords: skipped)
+    }
+
+    private static let datePattern = "\\d{1,2}\\s+(?i:gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic)\\s+\\d{4}"
+
+    private static func splitAtDates(_ flat: String) -> [(date: String, rest: String)] {
+        guard let regex = try? NSRegularExpression(pattern: datePattern) else { return [] }
+        let ns = flat as NSString
+        let matches = regex.matches(in: flat, range: NSRange(location: 0, length: ns.length))
+        var result: [(String, String)] = []
+        for (i, match) in matches.enumerated() {
+            let dateString = ns.substring(with: match.range)
+                .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+                .trimmingCharacters(in: .whitespaces)
+            let restStart = match.range.location + match.range.length
+            let restEnd = i + 1 < matches.count ? matches[i + 1].range.location : ns.length
+            result.append((dateString, ns.substring(with: NSRange(location: restStart, length: restEnd - restStart))))
+        }
+        return result
+    }
+
+    /// Longest-first so "Transazione con carta" matches before shorter TIPO words.
+    private static let tipoPrefixes = [
+        "Transazione con carta", "Interessi", "Imposte", "Bonifico", "Dividendi", "Commissioni"
+    ]
+
+    private static func splitTipo(_ text: String) -> (tipo: String, description: String) {
+        for tipo in tipoPrefixes where text.hasPrefix(tipo) {
+            return (tipo, String(text.dropFirst(tipo.count)).trimmingCharacters(in: .whitespaces))
+        }
+        return ("", text)
+    }
+
+    private static func category(forTipo tipo: String, description: String) -> String {
+        switch tipo {
+        case "Interessi": return "Interest"
+        case "Imposte": return "Taxes"
+        case "Bonifico": return "Transfer"
+        case "Transazione con carta": return "Shopping"
+        case "Dividendi": return "Dividends"
+        case "Commissioni": return "Fees"
+        default:
+            let lower = description.lowercased()
+            if lower.contains("interest") { return "Interest" }
+            if lower.contains("tax") || lower.contains("duty") { return "Taxes" }
+            if lower.contains("transfer") { return "Transfer" }
+            return "Other"
+        }
+    }
+}
+
+// MARK: - Trade Republic net-worth PDF (net-worth snapshot)
+
+/// A TR "Estratto del patrimonio netto" is a net-worth statement, so it imports as a single
+/// `NetWorthSnapshot` (date + totals) — NOT as holdings/cash. Re-deriving holdings here would overwrite the
+/// accurate cost basis from the transaction export on merge and double-count cash against the transaction
+/// rows, and the PDF's price/value columns extract as a fragile scrambled block. The three labeled summary
+/// totals are robust. Actual holdings come from `Transaction export.csv`.
+private enum TradeRepublicNetWorthPDFParser {
+    static func parse(text: String) -> NormalizedFinanceImport {
+        let dateString = BrokerImportParsing.firstMatch(text, pattern: "\\d{2}\\.\\d{2}\\.\\d{4}") ?? ""
+        let date = BrokerImportParsing.dottedDate(dateString) ?? Date()
+
+        // "PORTAFOGLIO VALORE IN EUR / Conto titoli <inv> / Liquidità <cash> / TOTAL <net> EUR".
+        let summary = BrokerImportParsing.between(text, from: "PORTAFOGLIO", to: "NUMERO DI POSIZIONI") ?? text
+        let investments = BrokerImportParsing.amountAfter("Conto titoli", in: summary) ?? 0
+        let liquidity = BrokerImportParsing.amountAfter("Liquidità", in: summary) ?? 0
+        guard let netWorth = BrokerImportParsing.amountAfter("TOTAL", in: summary)
+            ?? (investments + liquidity > 0 ? investments + liquidity : nil) else {
+            return NormalizedFinanceImport(data: FinancialData(), skippedRecords: 0)
+        }
+
+        let snapshot = NetWorthSnapshot(
+            id: BrokerImportParsing.deterministicUUID("tr-pdf-networth:\(dateString)"),
+            date: date,
+            totalAssets: netWorth,
+            totalLiabilities: 0,
+            netWorth: netWorth,
+            liquidity: liquidity,
+            investments: investments,
+            crypto: 0,
+            currency: .eur,
+            createdAt: date,
+            updatedAt: date
+        )
+        return NormalizedFinanceImport(data: FinancialData(snapshots: [snapshot]), skippedRecords: 0)
     }
 }

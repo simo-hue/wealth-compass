@@ -269,7 +269,7 @@ struct SettingsView: View {
             } message: {
                 Text("Merge adds new records and updates matching IDs. Replace clears current local finance data before importing.")
             }
-            .fileImporter(isPresented: $showingFileImporter, allowedContentTypes: [.json, .commaSeparatedText, .plainText]) { result in
+            .fileImporter(isPresented: $showingFileImporter, allowedContentTypes: [.json, .commaSeparatedText, .plainText, .pdf]) { result in
                 handleImportSelection(result)
             }
             .sheet(item: $activeCredentialEditor) { credential in

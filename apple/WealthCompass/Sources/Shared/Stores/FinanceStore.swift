@@ -20,6 +20,12 @@ fileprivate func financeImportLooksLikeJSON(_ data: Data, fileName: String) -> B
     return false
 }
 
+/// True when the file is a PDF (a `.pdf` name or the `%PDF` magic header) — routed to the PDFKit path.
+fileprivate func financeImportLooksLikePDF(_ data: Data, fileName: String) -> Bool {
+    if fileName.lowercased().hasSuffix(".pdf") { return true }
+    return data.prefix(5).elementsEqual(Array("%PDF-".utf8).prefix(5)) || data.prefix(4).elementsEqual(Array("%PDF".utf8))
+}
+
 enum FinanceImportMode: String, Identifiable {
     case merge
     case replace
@@ -100,6 +106,8 @@ enum FinanceImportError: LocalizedError {
     case localPersistenceError
     case unrecognizedFormat
     case malformedCSV(String)
+    case malformedPDF(String)
+    case unsupportedPDFStatement
 
     var errorDescription: String? {
         localizedDescription(appLanguage: nil)
@@ -119,6 +127,10 @@ enum FinanceImportError: LocalizedError {
             AppLocalization.string("This file isn't a Wealth Compass backup or a supported Revolut / Trade Republic statement.", appLanguage: appLanguage)
         case .malformedCSV(let details):
             AppLocalization.string("The statement file could not be read. \(details)", appLanguage: appLanguage)
+        case .malformedPDF(let details):
+            AppLocalization.string("The PDF statement could not be read. \(details)", appLanguage: appLanguage)
+        case .unsupportedPDFStatement:
+            AppLocalization.string("PDF statements are supported for Trade Republic only. For Revolut, import the CSV statement instead.", appLanguage: appLanguage)
         }
     }
 }
@@ -608,6 +620,9 @@ final class FinanceStore: ObservableObject {
         let hasCoinGeckoKey = trimmedCoinGeckoKey?.isEmpty == false
         var result = MarketPriceRefreshResult()
         var investmentQuotes: [UUID: MarketPriceQuote] = [:]
+        // The exchange-qualified symbol Yahoo actually priced from, per holding — used to backfill the
+        // display ticker of an imported holding still showing its raw ISIN (apply loop below).
+        var resolvedSymbols: [UUID: String] = [:]
         // Each provider yields a price in its own (native) currency; the single conversion to the
         // holding's currency happens once at the apply loop below. H2 (never re-base a holding's
         // currency) holds because that conversion is a no-op when source == holding currency.
@@ -630,7 +645,7 @@ final class FinanceStore: ObservableObject {
             // Resolves a holding via Yahoo to a quote in the listing's native currency; the single
             // conversion to the holding's currency happens at the apply loop. `preferredCurrency`
             // still steers disambiguation toward the holding-currency listing (avoids an FX hop).
-            func yahooQuote(for investment: Investment) async throws -> MarketPriceQuote {
+            func yahooQuote(for investment: Investment) async throws -> (quote: MarketPriceQuote, resolvedSymbol: String) {
                 try await yahooClient.resolvedQuote(
                     symbol: investment.symbol,
                     isin: investment.isin,
@@ -664,7 +679,9 @@ final class FinanceStore: ObservableObject {
                             // Finnhub doesn't carry this listing (the European-ETF case). Fall back
                             // to Yahoo; a second failure names both providers.
                             do {
-                                investmentQuotes[investment.id] = try await yahooQuote(for: investment)
+                                let resolvedYahoo = try await yahooQuote(for: investment)
+                                investmentQuotes[investment.id] = resolvedYahoo.quote
+                                resolvedSymbols[investment.id] = resolvedYahoo.resolvedSymbol
                             } catch {
                                 result.failedInvestments.append(
                                     "\(investment.symbol): \(Self.errorMessage(marketError, appLanguage: settings.appLanguage)) \(Self.errorMessage(error, appLanguage: settings.appLanguage))"
@@ -677,7 +694,9 @@ final class FinanceStore: ObservableObject {
                             finnhubRateLimited = true
                             interRequestDelay = min(interRequestDelay * 3, 3_000_000_000) // cap 3s
                             do {
-                                investmentQuotes[investment.id] = try await yahooQuote(for: investment)
+                                let resolvedYahoo = try await yahooQuote(for: investment)
+                                investmentQuotes[investment.id] = resolvedYahoo.quote
+                                resolvedSymbols[investment.id] = resolvedYahoo.resolvedSymbol
                             } catch {
                                 result.failedInvestments.append(
                                     "\(investment.symbol): \(Self.errorMessage(marketError, appLanguage: settings.appLanguage)) \(Self.errorMessage(error, appLanguage: settings.appLanguage))"
@@ -694,7 +713,9 @@ final class FinanceStore: ObservableObject {
                     // the listing's native currency, so the apply loop stores the price in the
                     // holding's currency without assuming USD.
                     do {
-                        investmentQuotes[investment.id] = try await yahooQuote(for: investment)
+                        let resolvedYahoo = try await yahooQuote(for: investment)
+                        investmentQuotes[investment.id] = resolvedYahoo.quote
+                        resolvedSymbols[investment.id] = resolvedYahoo.resolvedSymbol
                     } catch {
                         result.failedInvestments.append("\(investment.symbol): \(Self.errorMessage(error, appLanguage: settings.appLanguage))")
                     }
@@ -774,17 +795,33 @@ final class FinanceStore: ObservableObject {
         var didChangeData = false
 
         for index in data.investments.indices {
-            guard let quote = investmentQuotes[data.investments[index].id] else { continue }
+            let investmentID = data.investments[index].id
+            guard let quote = investmentQuotes[investmentID] else { continue }
             // Convert into the holding's currency at the single storage boundary (an unknown source
             // currency — Finnhub — is assumed to be the holding's), dropping a non-finite quote
             // rather than corrupting stored money (WC-A1 / WC-H1).
             guard let price = storedPrice(quote.price, from: quote.currency, to: data.investments[index].currency, settings: settings) else { continue }
+            var changed = false
             // Only write (and bump updatedAt → re-sync) when the price actually moved, so a refresh
             // that re-confirms an unchanged price doesn't churn CloudKit (I1). The count still
             // reflects every holding we re-priced.
             if data.investments[index].currentPrice != price {
                 data.investments[index].currentPrice = price
                 data.investments[index].currentValue = data.investments[index].quantity * price
+                changed = true
+            }
+            // Backfill the display ticker the first time we resolve an imported holding still showing its
+            // raw ISIN (mirrors the crypto coinId backfill). Guarded on `symbol == isin` so a
+            // user-entered ticker is never overwritten; runs once, then the symbol is a real ticker.
+            if let resolvedSymbol = resolvedSymbols[investmentID],
+               !resolvedSymbol.isEmpty,
+               !data.investments[index].isin.isEmpty,
+               data.investments[index].symbol == data.investments[index].isin,
+               resolvedSymbol != data.investments[index].symbol {
+                data.investments[index].symbol = resolvedSymbol
+                changed = true
+            }
+            if changed {
                 data.investments[index].updatedAt = refreshedAt
                 didChangeData = true
             }
@@ -1158,6 +1195,13 @@ final class FinanceStore: ObservableObject {
             guard !payload.isEmpty else { throw FinanceImportError.emptyFile }
             if financeImportLooksLikeJSON(payload, fileName: fileName) {
                 return (try FinanceImportService.parse(payload, context: context), nil)
+            }
+            if financeImportLooksLikePDF(payload, fileName: fileName) {
+                guard let text = BrokerStatementImportService.extractText(fromPDF: url) else {
+                    throw FinanceImportError.malformedPDF("It couldn't be read as text.")
+                }
+                let outcome = try BrokerStatementImportService.parsePDFText(text)
+                return (outcome.normalized, outcome.format.displayName)
             }
             let outcome = try BrokerStatementImportService.parse(payload, context: context)
             return (outcome.normalized, outcome.format.displayName)

@@ -1,6 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "The PDF statement could not be read. %@" : {
+      "extractionState" : "manual"
+    },
+    "PDF statements are supported for Trade Republic only. For Revolut, import the CSV statement instead." : {
+      "extractionState" : "manual"
+    },
     "No supported finance records were found in the selected file." : {
       "extractionState" : "manual"
     },

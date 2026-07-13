@@ -580,12 +580,14 @@ struct YahooQuoteClient {
     /// 1. `symbol` already carries an exchange suffix (contains ".") → quote it directly.
     /// 2. else `isin` is set → search by ISIN and pick the best candidate.
     /// 3. else → search by the bare symbol and pick the best candidate.
+    /// Returns the live quote plus the **resolved** exchange-qualified symbol it was priced from, so the
+    /// caller can backfill a holding still showing its raw ISIN (see `FinanceStore` refresh apply loop).
     func resolvedQuote(
         symbol: String,
         isin: String,
         name: String,
         preferredCurrency: Currency
-    ) async throws -> MarketPriceQuote {
+    ) async throws -> (quote: MarketPriceQuote, resolvedSymbol: String) {
         let trimmedSymbol = symbol.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedSymbol.isEmpty else {
             throw MarketDataError.noQuote(provider: Self.provider, symbol: symbol)
@@ -593,7 +595,7 @@ struct YahooQuoteClient {
 
         // (1) Explicit exchange-qualified symbol — trust it, no search needed.
         if trimmedSymbol.contains(".") {
-            return try await quote(forResolvedSymbol: trimmedSymbol)
+            return (try await quote(forResolvedSymbol: trimmedSymbol), trimmedSymbol)
         }
 
         // (2)/(3) Resolve via search, preferring ISIN when present.
@@ -603,7 +605,7 @@ struct YahooQuoteClient {
         guard let best = Self.bestCandidate(candidates, preferredCurrency: preferredCurrency, name: name) else {
             throw MarketDataError.noQuote(provider: Self.provider, symbol: symbol)
         }
-        return try await quote(forResolvedSymbol: best.symbol)
+        return (try await quote(forResolvedSymbol: best.symbol), best.symbol)
     }
 
     /// Fetches the live price for an already-resolved, exchange-qualified symbol.

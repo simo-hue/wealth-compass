@@ -228,6 +228,89 @@ final class BrokerStatementImportServiceTests: XCTestCase {
         XCTAssertNotEqual(BrokerImportParsing.deterministicUUID("seed-x"), BrokerImportParsing.deterministicUUID("seed-y"))
     }
 
+    // MARK: - Trade Republic PDF statements (parsed from extracted text)
+
+    private let trAccountPDFText = """
+    TRADE REPUBLIC BANK GMBH, BRANCH ITALY
+    ESTRATTO CONTO RIASSUNTIVO
+    PRODOTTO SALDO INIZIALE IN ENTRATA IN USCITA SALDO FINALE
+    Conto corrente 1.000,00 € 50,00 € 30,00 € 1.020,00 €
+    TRANSAZIONI SUL CONTO
+    DATA TIPO DESCRIZIONE IN
+    ENTRATA
+    IN
+    USCITA SALDO
+    01 lug
+    2026 Interessi Interest payment 50,00 € 1.050,00 €
+    02 lug
+    2026 Transazione con
+    carta TEST MERCHANT 30,00 € 1.020,00 €
+    PANORAMICA DEL SALDO
+    """
+
+    func testTradeRepublicAccountPDFInfersSignFromBalanceDelta() throws {
+        let out = try BrokerStatementImportService.parsePDFText(trAccountPDFText)
+        XCTAssertEqual(out.format, .tradeRepublicAccountPDF)
+        let data = out.normalized.data
+        XCTAssertEqual(data.transactions.count, 2)
+        // +50 raised the balance → income; -30 lowered it → expense (the +/- column is lost in the PDF).
+        let income = data.transactions.filter { $0.type == .income }.reduce(Decimal(0)) { $0 + $1.amount }
+        let expense = data.transactions.filter { $0.type == .expense }.reduce(Decimal(0)) { $0 + $1.amount }
+        XCTAssertEqual(income.doubleValue, 50, accuracy: 0.01)
+        XCTAssertEqual(expense.doubleValue, 30, accuracy: 0.01)
+        XCTAssertTrue(data.transactions.contains { $0.category == "Shopping" && $0.description == "TEST MERCHANT" })
+        XCTAssertTrue(data.transactions.contains { $0.category == "Interest" && $0.type == .income })
+    }
+
+    private let trNetWorthPDFText = """
+    ESTRATTO DEL PATRIMONIO NETTO
+    al giorno 13.07.2026
+    PORTAFOGLIO VALORE IN EUR
+    Conto titoli 200,00
+    Liquidità 500,00
+    TOTAL 700,00 EUR
+    CONTO TITOLI
+    PZ / NOMINALE NOME DEL TITOLO PREZZO AL PEZZO VALORE IN EUR
+    2,0 pezzi Test ETF Fund
+    ISIN: TESTETF00001
+    1,0 pezzi Acme Corp
+    ISIN: TESTSTOCK001
+    50,00
+    13.07.2026
+    100,00
+    100,00
+    13.07.2026
+    100,00
+    NUMERO DI POSIZIONI: 2 200,00 EUR
+    LIQUIDITÀ
+    Conto corrente 500,00 EUR
+    """
+
+    func testTradeRepublicNetWorthPDFImportsSnapshot() throws {
+        let out = try BrokerStatementImportService.parsePDFText(trNetWorthPDFText)
+        XCTAssertEqual(out.format, .tradeRepublicNetWorthPDF)
+        let data = out.normalized.data
+        // A net-worth statement imports as ONE snapshot — not holdings/cash, which would double-count cash
+        // and clobber cost basis from the transaction export on merge.
+        XCTAssertTrue(data.investments.isEmpty)
+        XCTAssertTrue(data.transactions.isEmpty)
+        XCTAssertEqual(data.snapshots.count, 1)
+        let snapshot = try XCTUnwrap(data.snapshots.first)
+        XCTAssertEqual(snapshot.netWorth.doubleValue, 700, accuracy: 0.01)
+        XCTAssertEqual(snapshot.investments.doubleValue, 200, accuracy: 0.01)
+        XCTAssertEqual(snapshot.liquidity.doubleValue, 500, accuracy: 0.01)
+        XCTAssertEqual(snapshot.currency, .eur)
+    }
+
+    func testRevolutPDFTextIsRejectedWithHelpfulError() {
+        // A Revolut PDF reaches parsePDFText and must be told to use the CSV instead.
+        XCTAssertThrowsError(try BrokerStatementImportService.parsePDFText("Custom Statement — Revolut Bank UAB")) { error in
+            guard case FinanceImportError.unsupportedPDFStatement = error else {
+                return XCTFail("expected unsupportedPDFStatement, got \(error)")
+            }
+        }
+    }
+
     func testStatementMoneyParsing() {
         XCTAssertEqual(BrokerImportParsing.statementDecimal("€1,234.56")?.doubleValue ?? 0, 1234.56, accuracy: 0.001)
         XCTAssertEqual(BrokerImportParsing.statementDecimal("-£3,517.75 (-€4,053.17)")?.doubleValue ?? 0, -3517.75, accuracy: 0.001)
