@@ -1,6 +1,24 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "No supported finance records were found in the selected file." : {
+      "extractionState" : "manual"
+    },
+    "Detected format: %@." : {
+      "extractionState" : "manual"
+    },
+    "Import Data" : {
+      "extractionState" : "manual"
+    },
+    "Import Data..." : {
+      "extractionState" : "manual"
+    },
+    "The statement file could not be read. %@" : {
+      "extractionState" : "manual"
+    },
+    "This file isn't a Wealth Compass backup or a supported Revolut / Trade Republic statement." : {
+      "extractionState" : "manual"
+    },
     "" : {
       "localizations" : {
         "ar" : {

@@ -233,4 +233,27 @@ final class BrokerStatementImportServiceTests: XCTestCase {
         XCTAssertEqual(BrokerImportParsing.statementDecimal("-£3,517.75 (-€4,053.17)")?.doubleValue ?? 0, -3517.75, accuracy: 0.001)
         XCTAssertEqual(BrokerImportParsing.statementDecimal("0.00 AED (€0.00)")?.doubleValue ?? -1, 0, accuracy: 0.001)
     }
+
+    func testFlexibleNumberFormatsEnglishAndEuropean() {
+        func v(_ s: String) -> Double { BrokerImportParsing.flexibleDecimal(s)?.doubleValue ?? .nan }
+        // ISO / Trade Republic
+        XCTAssertEqual(v("5000.000000"), 5000, accuracy: 0.0001)
+        XCTAssertEqual(v("0.43121985"), 0.43121985, accuracy: 1e-8)
+        // English (comma thousands, dot decimal)
+        XCTAssertEqual(v("1,234.56"), 1234.56, accuracy: 0.001)
+        XCTAssertEqual(v("1,234,567"), 1234567, accuracy: 0.001)
+        // European / German (dot thousands, comma decimal)
+        XCTAssertEqual(v("1.234,56"), 1234.56, accuracy: 0.001)
+        XCTAssertEqual(v("123,45"), 123.45, accuracy: 0.001)
+        XCTAssertEqual(v("-6.000,00"), -6000, accuracy: 0.001)
+        XCTAssertEqual(v("1.234.567"), 1234567, accuracy: 0.001)
+    }
+
+    func testGermanFormattedTradeRepublicAmountParses() throws {
+        let header = "\"datetime\",\"date\",\"account_type\",\"category\",\"type\",\"asset_class\",\"name\",\"symbol\",\"shares\",\"price\",\"amount\",\"fee\",\"tax\",\"currency\""
+        let csv = header + "\n"
+            + "\"2026-02-01T10:00:00.000Z\",\"2026-02-01\",\"DEFAULT\",\"CASH\",\"CUSTOMER_INBOUND\",\"\",\"X\",\"\",\"\",\"\",\"1.234,56\",\"\",\"\",\"EUR\""
+        let tx = try XCTUnwrap(try parse(csv).normalized.data.transactions.first)
+        XCTAssertEqual(tx.amount.doubleValue, 1234.56, accuracy: 0.001) // not 1.23456 or 123456
+    }
 }

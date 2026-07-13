@@ -199,29 +199,59 @@ enum BrokerImportParsing {
         return UUID(uuid: uuid)
     }
 
-    /// Parses a plain machine-formatted decimal (dot decimal, optional sign) — the Trade Republic dialect.
-    static func plainDecimal(_ raw: String?) -> Decimal? {
-        guard let trimmed = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty else { return nil }
-        return Decimal(string: trimmed, locale: Locale(identifier: "en_US_POSIX"))
+    /// Parses a numeric string tolerant of BOTH English (`1,234.56`) and European (`1.234,56`) formats,
+    /// stripping currency symbols / letter codes / spaces. Rule: when both `.` and `,` appear, the LATER
+    /// one is the decimal point and the other groups thousands; a lone separator is a decimal point when it
+    /// occurs once and a thousands grouping when it repeats. ISO values like `5000.000000` and `0.43121985`
+    /// are preserved. The one ambiguous case — a single lone-thousands value with no fraction (a bare
+    /// `1.234` meaning 1234) — is read as `1.234`; such values don't occur in Revolut/TR exports, which
+    /// always show a decimal part.
+    static func flexibleDecimal(_ raw: String) -> Decimal? {
+        var s = ""
+        for ch in raw where ch.isNumber || ch == "." || ch == "," || ch == "-" {
+            s.append(ch)
+        }
+        guard !s.isEmpty, s != "-" else { return nil }
+
+        let dotCount = s.reduce(0) { $1 == "." ? $0 + 1 : $0 }
+        let commaCount = s.reduce(0) { $1 == "," ? $0 + 1 : $0 }
+        let normalized: String
+        if dotCount > 0, commaCount > 0 {
+            // Both separators present → the later one is the decimal point.
+            if (s.lastIndex(of: ".") ?? s.startIndex) > (s.lastIndex(of: ",") ?? s.startIndex) {
+                normalized = s.replacingOccurrences(of: ",", with: "")                    // 1,234.56 → 1234.56
+            } else {
+                normalized = s.replacingOccurrences(of: ".", with: "")
+                    .replacingOccurrences(of: ",", with: ".")                             // 1.234,56 → 1234.56
+            }
+        } else if commaCount == 1 {
+            normalized = s.replacingOccurrences(of: ",", with: ".")                        // 123,45 → 123.45
+        } else if commaCount > 1 {
+            normalized = s.replacingOccurrences(of: ",", with: "")                         // 1,234,567 → 1234567
+        } else if dotCount > 1 {
+            normalized = s.replacingOccurrences(of: ".", with: "")                         // 1.234.567 → 1234567
+        } else {
+            normalized = s                                                                 // 5000.000000 / 123.45 / int
+        }
+        return Decimal(string: normalized, locale: Locale(identifier: "en_US_POSIX"))
     }
 
-    /// Parses a Revolut statement money cell — strips the currency symbol/code and thousands separators,
-    /// keeps sign, and drops the "(€…)" home-currency parenthetical. Returns the *native* magnitude+sign.
+    /// Parses a Trade Republic amount (its samples are ISO dot-decimal, but a German export using
+    /// `1.234,56` is handled too). Optional sign preserved.
+    static func plainDecimal(_ raw: String?) -> Decimal? {
+        guard let trimmed = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty else { return nil }
+        return flexibleDecimal(trimmed)
+    }
+
+    /// Parses a Revolut statement money cell — drops the "(€…)" home-currency parenthetical, then parses
+    /// the native leading amount (currency symbol/code stripped, sign kept, locale-tolerant).
     /// Examples: `€699.00` → 699, `-£3,517.75 (-€4,053.17)` → -3517.75, `0.00 AED (€0.00)` → 0,
-    /// `1,980.578113` → 1980.578113.
+    /// `1,980.578113` → 1980.578113, and a European `1.234,56` → 1234.56.
     static func statementDecimal(_ raw: String?) -> Decimal? {
         guard let raw else { return nil }
         // Only the leading token is the native amount; anything in parentheses is the EUR equivalent.
         let head = raw.split(separator: "(", maxSplits: 1, omittingEmptySubsequences: false).first.map(String.init) ?? raw
-        var cleaned = ""
-        for ch in head {
-            if ch.isNumber || ch == "." || ch == "-" {
-                cleaned.append(ch)
-            }
-            // Everything else (currency symbols €£$, letter codes like AED/HUF, commas, spaces) is dropped.
-        }
-        guard !cleaned.isEmpty, cleaned != "-" else { return nil }
-        return Decimal(string: cleaned, locale: Locale(identifier: "en_US_POSIX"))
+        return flexibleDecimal(head)
     }
 
     private static let isoWithFractional: ISO8601DateFormatter = {
