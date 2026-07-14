@@ -85,10 +85,6 @@ struct MacCashFlowView: View {
     @State private var hoveredExpenseCategory: CategoryTotal?
     @State private var hoveredCashFlowMonth: CashFlowMonth?
 
-    private let summaryColumns = [
-        GridItem(.adaptive(minimum: 190, maximum: 320), spacing: 16)
-    ]
-
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -103,8 +99,8 @@ struct MacCashFlowView: View {
                 GeometryReader { proxy in
                     ScrollView {
                         VStack(alignment: .leading, spacing: 20) {
-                            summaryCards
-                            
+                            summaryCards(width: proxy.size.width)
+
                             if proxy.size.width >= 1_090 {
                                 HStack(alignment: .top, spacing: 20) {
                                     cashFlowTrendCard
@@ -134,8 +130,7 @@ struct MacCashFlowView: View {
                             }
                         }
                         .padding(24)
-                        .frame(maxWidth: 1440, alignment: .leading)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
             } else {
@@ -209,12 +204,20 @@ struct MacCashFlowView: View {
         .alert(item: $activeAlert, content: alert(for:))
     }
 
-    private var summaryCards: some View {
+    // The 6 cash-flow summary cards fill the pane width edge-to-edge (matching the Dashboard),
+    // reflowing 6/5/4/3/2/1 by width so a laptop looks unchanged while a wide external display no
+    // longer leaves a dead right margin. `width` is the full pane width; subtract the 24pt
+    // horizontal padding on each side so the fit math sees the real content width.
+    private func summaryCards(width: CGFloat) -> some View {
         let cashFlow = finance.monthlyCashFlow(for: Date(), settings: settings)
         let totals = finance.calculateTotals(settings: settings)
         let monthlyTransactionsCount = finance.monthlyTransactionCount(for: Date())
 
-        return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
+        return LazyVGrid(
+            columns: fillingFlexibleColumns(availableWidth: max(0, width - 48), itemCount: 6),
+            alignment: .leading,
+            spacing: 16
+        ) {
             MetricCard(
                 title: "Monthly Income",
                 value: settings.privateCurrency(cashFlow.monthlyIncome),
@@ -755,8 +758,7 @@ struct MacCashFlowView: View {
                 }
             }
             .padding(24)
-            .frame(maxWidth: 1440, alignment: .leading)
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 

@@ -147,8 +147,7 @@ struct MacSettingsView: View {
                     }
                 }
                 .padding(32)
-                .frame(maxWidth: 1200, alignment: .center)
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             }
         }
         .background(ScreenBackground())
@@ -214,7 +213,7 @@ struct MacSettingsView: View {
     }
 
     private var generalSettings: some View {
-        DynamicMasonryLayout(minColumnWidth: 380, spacing: 32) {
+        DynamicMasonryLayout(minColumnWidth: 460, spacing: 32, maxColumns: 3) {
             SettingsSection(title: "Region & Language") {
                 SettingsRow(title: "Language") {
                     Picker("", selection: $settings.appLanguage) {
@@ -418,7 +417,7 @@ struct MacSettingsView: View {
     }
 
     private var dataSettings: some View {
-        DynamicMasonryLayout(minColumnWidth: 380, spacing: 32) {
+        DynamicMasonryLayout(minColumnWidth: 460, spacing: 32, maxColumns: 3) {
             SettingsSection(title: "Import and Export") {
                 SettingsRow(title: "Import Behavior") {
                     Picker("", selection: $importMode) {
@@ -475,7 +474,7 @@ struct MacSettingsView: View {
     }
 
     private var syncSettings: some View {
-        DynamicMasonryLayout(minColumnWidth: 380, spacing: 32) {
+        DynamicMasonryLayout(minColumnWidth: 460, spacing: 32, maxColumns: 3) {
             SettingsSection(title: "iCloud Sync") {
                 SettingsRow(
                     title: "Sync Data with iCloud",

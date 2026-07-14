@@ -19,10 +19,6 @@ struct MacInvestmentsView: View {
     @State private var investmentPendingDeletion: Investment?
     @State private var selectedTab: MacInvestmentsTab = .overview
 
-    private let summaryColumns = [
-        GridItem(.adaptive(minimum: 190, maximum: 320), spacing: 16)
-    ]
-
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -36,7 +32,7 @@ struct MacInvestmentsView: View {
                 GeometryReader { proxy in
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
-                            summaryCards
+                            summaryCards(width: proxy.size.width)
 
                             // L24: reflow the three allocation charts into fewer columns as the detail
                             // pane narrows — flexible columns (3 / 2 / 1 by width) that fill the width,
@@ -107,7 +103,10 @@ struct MacInvestmentsView: View {
         }
     }
 
-    private var summaryCards: some View {
+    // Summary cards fill the pane width edge-to-edge (matching the Dashboard). Privacy mode hides
+    // the Performance card, so the fill count is 5 or 6; passing the real count keeps the last row
+    // from leaving an empty trailing slot. `width` is the full pane; subtract the 24pt padding.
+    private func summaryCards(width: CGFloat) -> some View {
         let total = finance.calculateTotals(settings: settings).totalInvestments
         let costBasis = finance.data.investments.reduce(Decimal(0)) {
             $0 + settings.convert($1.costBasis, from: $1.currency)
@@ -115,7 +114,14 @@ struct MacInvestmentsView: View {
         let gain = total - costBasis
         let percent = costBasis > 0 ? (gain.doubleValue / costBasis.doubleValue) * 100 : 0
 
-        return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
+        return LazyVGrid(
+            columns: fillingFlexibleColumns(
+                availableWidth: max(0, width - 48),
+                itemCount: settings.isPrivacyMode ? 5 : 6
+            ),
+            alignment: .leading,
+            spacing: 16
+        ) {
             MetricCard(
                 title: LocalizedStringKey("Portfolio Value"),
                 value: settings.privateCurrency(total),

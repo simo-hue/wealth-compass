@@ -259,6 +259,27 @@ struct MetricCard: View {
     }
 }
 
+/// Responsive `.flexible()` columns that stretch to fill the full available width — the same
+/// "use the whole window" behavior the Dashboard's metric row already has. It fits as many columns
+/// as will hold an item at least `minItemWidth` wide, then caps that at `itemCount` so a partly
+/// filled final row never leaves empty trailing slots, and uses `.flexible()` so the items grow
+/// edge-to-edge. This keeps a laptop-sized pane looking just like the old `.adaptive(maximum:)`
+/// grid it replaces, while filling large external displays that the capped grid used to leave with
+/// dead side margins. Pass the width already net of the container's horizontal padding.
+func fillingFlexibleColumns(
+    availableWidth: CGFloat,
+    itemCount: Int,
+    minItemWidth: CGFloat = 190,
+    spacing: CGFloat = 16
+) -> [GridItem] {
+    guard itemCount > 0, availableWidth.isFinite, availableWidth > 0 else {
+        return [GridItem(.flexible(), spacing: spacing)]
+    }
+    let fit = max(1, Int((availableWidth + spacing) / (minItemWidth + spacing)))
+    let count = min(itemCount, fit)
+    return Array(repeating: GridItem(.flexible(), spacing: spacing), count: count)
+}
+
 struct EmptyState: View {
     let title: LocalizedStringKey
     let systemImage: String

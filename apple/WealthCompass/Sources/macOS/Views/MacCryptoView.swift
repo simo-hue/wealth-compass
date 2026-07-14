@@ -19,10 +19,6 @@ struct MacCryptoView: View {
     @State private var holdingPendingDeletion: CryptoHolding?
     @State private var selectedTab: MacCryptoTab = .overview
 
-    private let summaryColumns = [
-        GridItem(.adaptive(minimum: 190, maximum: 320), spacing: 16)
-    ]
-
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -33,10 +29,12 @@ struct MacCryptoView: View {
             .padding(.vertical, 16)
 
             if selectedTab == .overview {
-                ViewThatFits(in: .vertical) {
-                    overviewContent
+                // GeometryReader (not ViewThatFits) so the summary grid can read the pane width and
+                // fill it edge-to-edge, matching the Dashboard / the other pages. The content always
+                // lives in a ScrollView; when it already fits, the scroll view simply doesn't scroll.
+                GeometryReader { proxy in
                     ScrollView {
-                        overviewContent
+                        overviewContent(width: proxy.size.width)
                     }
                 }
             } else {
@@ -73,7 +71,10 @@ struct MacCryptoView: View {
         }
     }
 
-    private var summaryCards: some View {
+    // Summary cards fill the pane width edge-to-edge (matching the Dashboard). Privacy mode hides
+    // the Performance card, so the fill count is 5 or 6; passing the real count keeps the last row
+    // from leaving an empty trailing slot. `width` is the full pane; subtract the 24pt padding.
+    private func summaryCards(width: CGFloat) -> some View {
         let total = finance.calculateTotals(settings: settings).totalCrypto
         let costBasis = finance.data.crypto.reduce(Decimal(0)) {
             $0 + settings.convert($1.costBasis, from: $1.currency)
@@ -81,7 +82,14 @@ struct MacCryptoView: View {
         let gain = total - costBasis
         let percent = costBasis > 0 ? (gain.doubleValue / costBasis.doubleValue) * 100 : 0
 
-        return LazyVGrid(columns: summaryColumns, alignment: .leading, spacing: 16) {
+        return LazyVGrid(
+            columns: fillingFlexibleColumns(
+                availableWidth: max(0, width - 48),
+                itemCount: settings.isPrivacyMode ? 5 : 6
+            ),
+            alignment: .leading,
+            spacing: 16
+        ) {
             MetricCard(
                 title: LocalizedStringKey("Crypto Value"),
                 value: settings.privateCurrency(total),
@@ -125,10 +133,10 @@ struct MacCryptoView: View {
         }
     }
 
-    private var overviewContent: some View {
+    private func overviewContent(width: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            summaryCards
-            
+            summaryCards(width: width)
+
             HStack(spacing: 24) {
                 AllocationChart(
                     title: LocalizedStringKey("Crypto Allocation"),
