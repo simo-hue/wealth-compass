@@ -7,6 +7,7 @@ struct ContentView: View {
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appLock: AppLockStore
     @State private var recurringInsertionAlert: RecurringInsertionAlert?
+    @State private var selectedTab: TabBarLabelResolver.Tab = .dashboard
 
     private let recurringCheckTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
     private let exchangeRateRefreshTimer = Timer.publish(every: 5 * 60 * 60, on: .main, in: .common).autoconnect()
@@ -96,21 +97,26 @@ struct ContentView: View {
     }
 
     private var tabs: some View {
-        TabView {
-            DashboardView()
+        TabView(selection: $selectedTab) {
+            DashboardView(selectedTab: $selectedTab)
                 .tabItem { tabLabel(.dashboard, systemImage: "gauge.with.dots.needle.67percent") }
+                .tag(TabBarLabelResolver.Tab.dashboard)
 
             CashFlowView()
                 .tabItem { tabLabel(.cashFlow, systemImage: "arrow.left.arrow.right") }
+                .tag(TabBarLabelResolver.Tab.cashFlow)
 
             InvestmentsView()
                 .tabItem { tabLabel(.investments, systemImage: "chart.line.uptrend.xyaxis") }
+                .tag(TabBarLabelResolver.Tab.investments)
 
             CryptoView()
                 .tabItem { tabLabel(.crypto, systemImage: "bitcoinsign.circle") }
+                .tag(TabBarLabelResolver.Tab.crypto)
 
             SettingsView()
                 .tabItem { tabLabel(.settings, systemImage: "gearshape") }
+                .tag(TabBarLabelResolver.Tab.settings)
         }
         .tint(WCColor.primary)
         .toolbarColorScheme(.dark, for: .tabBar)

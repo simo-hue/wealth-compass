@@ -4,6 +4,7 @@ import SwiftUI
 struct DashboardView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
+    @Binding var selectedTab: TabBarLabelResolver.Tab
     @State private var timeRange: TimeRange = .oneWeek
     @State private var showingAddTransaction = false
     @State private var selectedNetWorthDate: Date?
@@ -313,26 +314,44 @@ struct DashboardView: View {
             )
 
             LazyVGrid(columns: columns, spacing: 12) {
-                MetricCard(
-                    title: "Recorded Cash",
-                    value: settings.privateCurrency(totals.totalLiquidity),
-                    systemImage: "banknote.fill",
-                    detail: finance.data.transactions.isEmpty ? "No activity yet" : "Income less expenses"
-                )
-                MetricCard(
-                    title: "Investments",
-                    value: settings.privateCurrency(totals.totalInvestments),
-                    systemImage: "chart.line.uptrend.xyaxis",
-                    accent: .cyan,
-                    detail: finance.data.investments.count == 1 ? LocalizedStringKey("1 position") : LocalizedStringKey("\(finance.data.investments.count) positions")
-                )
-                MetricCard(
-                    title: "Crypto",
-                    value: settings.privateCurrency(totals.totalCrypto),
-                    systemImage: "bitcoinsign.circle.fill",
-                    accent: WCColor.warning,
-                    detail: finance.data.crypto.count == 1 ? LocalizedStringKey("1 holding") : LocalizedStringKey("\(finance.data.crypto.count) holdings")
-                )
+                Button {
+                    selectedTab = .cashFlow
+                } label: {
+                    MetricCard(
+                        title: "Recorded Cash",
+                        value: settings.privateCurrency(totals.totalLiquidity),
+                        systemImage: "banknote.fill",
+                        detail: finance.data.transactions.isEmpty ? "No activity yet" : "Income less expenses"
+                    )
+                }
+                .buttonStyle(CardBounceButtonStyle())
+
+                Button {
+                    selectedTab = .investments
+                } label: {
+                    MetricCard(
+                        title: "Investments",
+                        value: settings.privateCurrency(totals.totalInvestments),
+                        systemImage: "chart.line.uptrend.xyaxis",
+                        accent: .cyan,
+                        detail: finance.data.investments.count == 1 ? LocalizedStringKey("1 position") : LocalizedStringKey("\(finance.data.investments.count) positions")
+                    )
+                }
+                .buttonStyle(CardBounceButtonStyle())
+
+                Button {
+                    selectedTab = .crypto
+                } label: {
+                    MetricCard(
+                        title: "Crypto",
+                        value: settings.privateCurrency(totals.totalCrypto),
+                        systemImage: "bitcoinsign.circle.fill",
+                        accent: WCColor.warning,
+                        detail: finance.data.crypto.count == 1 ? LocalizedStringKey("1 holding") : LocalizedStringKey("\(finance.data.crypto.count) holdings")
+                    )
+                }
+                .buttonStyle(CardBounceButtonStyle())
+
                 MetricCard(
                     title: "Total Assets",
                     value: settings.privateCurrency(totals.totalAssets),
@@ -340,6 +359,7 @@ struct DashboardView: View {
                     accent: .indigo,
                     detail: "Across every asset"
                 )
+
                 MetricCard(
                     title: "Liabilities",
                     value: settings.privateCurrency(totals.totalLiabilities),
@@ -347,16 +367,22 @@ struct DashboardView: View {
                     accent: WCColor.destructive,
                     detail: finance.data.liabilities.count == 1 ? LocalizedStringKey("1 liability") : LocalizedStringKey("\(finance.data.liabilities.count) liabilities")
                 )
-                MetricCard(
-                    title: "Net Savings",
-                    value: settings.privateCurrency(currentMonthCashFlow.netSavings),
-                    systemImage: currentMonthCashFlow.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
-                    accent: currentMonthCashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive,
-                    // WC-L4: `.formatted` ignores the SwiftUI environment locale, so pass the
-                    // effective (in-app language) locale explicitly; otherwise the month stayed
-                    // in the system language. The result is already-localized data, rendered verbatim.
-                    detail: LocalizedStringKey(Date().formatted(.dateTime.month(.wide).locale(AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))))
-                )
+
+                Button {
+                    selectedTab = .cashFlow
+                } label: {
+                    MetricCard(
+                        title: "Net Savings",
+                        value: settings.privateCurrency(currentMonthCashFlow.netSavings),
+                        systemImage: currentMonthCashFlow.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
+                        accent: currentMonthCashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive,
+                        // WC-L4: `.formatted` ignores the SwiftUI environment locale, so pass the
+                        // effective (in-app language) locale explicitly; otherwise the month stayed
+                        // in the system language. The result is already-localized data, rendered verbatim.
+                        detail: LocalizedStringKey(Date().formatted(.dateTime.month(.wide).locale(AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))))
+                    )
+                }
+                .buttonStyle(CardBounceButtonStyle())
             }
         }
     }
@@ -672,5 +698,13 @@ private struct MobileHeroScenery: View {
             }
         }
         .allowsHitTesting(false)
+    }
+}
+
+struct CardBounceButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }
 }

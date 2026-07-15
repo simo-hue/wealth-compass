@@ -538,3 +538,10 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-07-16T01:33:48+02:00]: Set Net Worth Graph to Weekly View
   - *Details*: Changed the default timeRange for the net worth chart in iOS DashboardView from .oneYear to .oneWeek.
   - *Tech Notes*: Updated DashboardView.swift @State variable.
+
+- [2026-07-16T01:40:00+02:00]: Make iOS Dashboard Cards Clickable
+  - *Details*: Made the summary cards on the iOS Dashboard interactive. Tapping a card (e.g. Recorded Cash, Investments, Crypto) now cleanly navigates to its corresponding tab with a subtle visual bounce effect. "Total Assets" and "Liabilities" remain unclickable as they serve as high-level summaries without dedicated tabs.
+  - *Tech Notes*: 
+    - Updated `ContentView.swift` to track the active tab using `@State private var selectedTab` and assign tags to `TabView` items.
+    - Modified `DashboardView.swift` to accept a `@Binding var selectedTab`, wrapping supported `MetricCard`s in `Button`s.
+    - Added a custom `CardBounceButtonStyle` at the bottom of `DashboardView.swift` to handle press interactions seamlessly without altering the card's native look.
