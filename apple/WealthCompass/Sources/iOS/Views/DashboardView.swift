@@ -4,7 +4,7 @@ import SwiftUI
 struct DashboardView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
-    @State private var timeRange: TimeRange = .oneYear
+    @State private var timeRange: TimeRange = .oneWeek
     @State private var showingAddTransaction = false
     @State private var selectedNetWorthDate: Date?
     // VIEW-03 / VIEW-04: selectable ranges to match macOS (were hard-wired to 6 months / 30 days).

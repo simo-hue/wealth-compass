@@ -1,11 +1,26 @@
 import SwiftUI
 
+private enum InvestmentsTab: String, CaseIterable, Identifiable {
+    case overview
+    case positions
+
+    var id: String { rawValue }
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .overview: "Overview"
+        case .positions: "Positions"
+        }
+    }
+}
+
 struct InvestmentsView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @State private var showingForm = false
     @State private var editingInvestment: Investment?
     @State private var investmentPendingDeletion: Investment?
+    @State private var selectedTab: InvestmentsTab = .overview
 
     var body: some View {
         ScrollView {
@@ -17,13 +32,18 @@ struct InvestmentsView: View {
                     }
                 }
 
-                summary
-                AllocationChart(title: LocalizedStringKey("Allocation by Sector"), slices: finance.investmentAllocation(settings: settings), settings: settings)
-                // VIEW-02: match macOS, which also breaks the portfolio down by type and geography
-                // (both store methods already exist and feed the macOS charts). Single-column on iPhone.
-                AllocationChart(title: LocalizedStringKey("Allocation by Type"), slices: finance.investmentTypeAllocation(settings: settings), settings: settings)
-                AllocationChart(title: LocalizedStringKey("Allocation by Geography"), slices: finance.investmentGeographyAllocation(settings: settings), settings: settings)
-                investmentList
+                investmentsTabPicker
+
+                if selectedTab == .overview {
+                    summary
+                    AllocationChart(title: LocalizedStringKey("Allocation by Sector"), slices: finance.investmentAllocation(settings: settings), settings: settings)
+                    // VIEW-02: match macOS, which also breaks the portfolio down by type and geography
+                    // (both store methods already exist and feed the macOS charts). Single-column on iPhone.
+                    AllocationChart(title: LocalizedStringKey("Allocation by Type"), slices: finance.investmentTypeAllocation(settings: settings), settings: settings)
+                    AllocationChart(title: LocalizedStringKey("Allocation by Geography"), slices: finance.investmentGeographyAllocation(settings: settings), settings: settings)
+                } else {
+                    investmentList
+                }
             }
             .padding(16)
         }
@@ -43,6 +63,15 @@ struct InvestmentsView: View {
                 secondaryButton: .cancel()
             )
         }
+    }
+
+    private var investmentsTabPicker: some View {
+        Picker("Investments view", selection: $selectedTab) {
+            ForEach(InvestmentsTab.allCases) { tab in
+                Text(tab.title).tag(tab)
+            }
+        }
+        .pickerStyle(.segmented)
     }
 
     private var summary: some View {

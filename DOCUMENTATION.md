@@ -527,3 +527,14 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-07-13T21:25:51+0200]: App Version Bump (1.2.0) & Web/App Release
   - *Details*: Incremented the app version across the codebase to 1.2.0, adding 3D public and Revolut imports (PDF and CSV).
   - *Tech Notes*: Bumped `MARKETING_VERSION` to 1.2.0 and `CURRENT_PROJECT_VERSION` to 13 in `project.pbxproj`. Updated root `package.json` version to 1.2.0. Updated release notes and translated them. Deployed web build and shipped iOS build via Fastlane.
+
+- [2026-07-16T01:30:27+02:00]: Replicate macOS View Selectors on iOS (Investments & Crypto)
+  - *Details*: Updated the iOS `InvestmentsView` and `CryptoView` to use a segmented picker at the top to toggle between tabs, mirroring the macOS implementation and iOS `CashFlowView`. The content in both pages is now split: the "Overview" tab shows summary cards, performance sections, and allocation charts, while the "Positions" (for investments) or "Holdings" (for crypto) tab shows only the list of positions/holdings.
+  - *Tech Notes*:
+    - **InvestmentsView**: Introduced `InvestmentsTab` enum (`.overview`, `.positions`), added `@State private var selectedTab`, and conditionally rendered sections based on selection.
+    - **CryptoView**: Introduced `CryptoTab` enum (`.overview`, `.holdings`), added `@State private var selectedTab`, and applied similar conditional rendering logic.
+    - Used the existing translated strings (`"Overview"`, `"Positions"`, `"Holdings"`) from `Localizable.xcstrings`, avoiding any new unlocalized string keys.
+
+- [2026-07-16T01:33:48+02:00]: Set Net Worth Graph to Weekly View
+  - *Details*: Changed the default timeRange for the net worth chart in iOS DashboardView from .oneYear to .oneWeek.
+  - *Tech Notes*: Updated DashboardView.swift @State variable.

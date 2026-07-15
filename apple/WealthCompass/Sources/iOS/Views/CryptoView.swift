@@ -1,11 +1,26 @@
 import SwiftUI
 
+private enum CryptoTab: String, CaseIterable, Identifiable {
+    case overview
+    case holdings
+
+    var id: String { rawValue }
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .overview: "Overview"
+        case .holdings: "Holdings"
+        }
+    }
+}
+
 struct CryptoView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @State private var showingForm = false
     @State private var editingHolding: CryptoHolding?
     @State private var holdingPendingDeletion: CryptoHolding?
+    @State private var selectedTab: CryptoTab = .overview
 
     var body: some View {
         ScrollView {
@@ -17,10 +32,15 @@ struct CryptoView: View {
                     }
                 }
 
-                summary
-                performanceSection
-                AllocationChart(title: LocalizedStringKey("Crypto Allocation"), slices: finance.cryptoAllocation(settings: settings), settings: settings)
-                holdingsList
+                cryptoTabPicker
+
+                if selectedTab == .overview {
+                    summary
+                    performanceSection
+                    AllocationChart(title: LocalizedStringKey("Crypto Allocation"), slices: finance.cryptoAllocation(settings: settings), settings: settings)
+                } else {
+                    holdingsList
+                }
             }
             .padding(16)
         }
@@ -40,6 +60,15 @@ struct CryptoView: View {
                 secondaryButton: .cancel()
             )
         }
+    }
+
+    private var cryptoTabPicker: some View {
+        Picker("Crypto view", selection: $selectedTab) {
+            ForEach(CryptoTab.allCases) { tab in
+                Text(tab.title).tag(tab)
+            }
+        }
+        .pickerStyle(.segmented)
     }
 
     private var summary: some View {
