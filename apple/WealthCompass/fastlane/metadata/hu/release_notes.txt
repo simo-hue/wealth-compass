@@ -1,2 +1,1 @@
-- Megvalósított 3D nyilvános és Revolut importálás PDF és CSV fájlként (CSV ajánlott).
-- Különféle hibajavítások és fejlesztések.
+Általános fejlesztések

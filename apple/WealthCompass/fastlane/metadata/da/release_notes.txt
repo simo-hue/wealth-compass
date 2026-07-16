@@ -1,2 +1,1 @@
-- Implementeret 3D offentlige og Revolut importer som PDF og CSV filer (CSV anbefales).
-- Forskellige fejlrettelser og forbedringer.
+Generelle forbedringer

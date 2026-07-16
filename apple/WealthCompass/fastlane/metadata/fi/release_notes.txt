@@ -1,2 +1,1 @@
-- Toteutettu 3D-julkinen ja Revolut-tuonti PDF- ja CSV-tiedostoina (CSV-suositus).
-- Erilaisia ​​virheenkorjauksia ja parannuksia.
+Yleisiä parannuksia

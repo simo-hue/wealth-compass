@@ -1,2 +1,1 @@
-- PDF ve CSV dosyaları (CSV önerilir) olarak 3D genel ve Revolut içe aktarmaları uygulandı.
-- Çeşitli hata düzeltmeleri ve iyileştirmeler.
+Genel iyileştirmeler

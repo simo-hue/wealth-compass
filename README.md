@@ -1,13 +1,42 @@
 # Wealth Compass
 
-Wealth Compass is a modern, comprehensive personal finance dashboard designed to give you a complete 360-degree view of your financial health. Built with React, Supabase, and Tailwind CSS, it offers real-time tracking of assets, liabilities, and cash flow in a beautiful, privacy-focused interface.
+<a href="https://apps.apple.com/app/wealth-compass/idYOUR_APP_ID_HERE" target="_blank">
+  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" width="160">
+</a>
+<a href="https://apps.apple.com/app/wealth-compass/idYOUR_APP_ID_HERE" target="_blank">
+  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-mac-app-store.svg" alt="Download on the Mac App Store" width="160">
+</a>
 
-## Repository Layout
+Wealth Compass is a comprehensive, privacy-focused personal finance dashboard designed to give you a complete 360-degree view of your financial health. Available as a native app for **iOS and macOS**, it offers real-time tracking of assets, liabilities, and cash flow in a beautiful, local-first interface.
+
+## 📱 Native Apple Applications
+
+The core of Wealth Compass is a native Apple ecosystem implementation, ensuring secure, local-first tracking on your devices.
+
+- **WealthCompassMobile**: Built with SwiftUI for iPhone, requiring iOS 17 or later.
+- **WealthCompassMac**: Built with native SwiftUI for macOS 14 or later (built directly against the macOS SDK, not Mac Catalyst).
+
+### Core Features
+- 📊 **Interactive Dashboard**: Visual history of your net worth over time, asset allocation breakdowns, and key performance metrics.
+- 💰 **Cash Flow Management**: Track income and expenses with categories, visual trends, and schedule recurring transaction reminders.
+- 📈 **Investment Portfolio**: Real-time stock & ETF price updates via Finnhub and Yahoo Finance. Track cost basis, current value, and profit/loss.
+- ₿ **Crypto Tracker**: Live data fetching from CoinGecko. Track crypto holdings and monitor live valuations.
+- 🔒 **Privacy & Security**: All financial data is strictly stored locally in the app sandbox. Supports Face ID / Touch ID biometric locks and a quick-toggle Privacy Mode to blur sensitive amounts.
+- 🌍 **Localization**: Fully localized in 38 languages via Xcode String Catalogs.
+- 🔄 **Data Portability**: Easily export your data to a JSON backup or import existing backups. Private CloudKit synchronization is available to keep your iPhone and Mac in sync.
+
+### Building the Apple Apps
+
+Open `apple/WealthCompass/WealthCompass.xcodeproj` and select:
+- `WealthCompassMobile` for the iPhone app
+- `WealthCompassMac` for the native macOS app
+
+For architecture and detailed build instructions, see [`apple/README.md`](./apple/README.md).
+
+## 📁 Repository Layout
 
 ```text
 wealth-compass/
-├── src/                         Web application
-├── public/                      Web assets
 ├── apple/
 │   └── WealthCompass/
 │       ├── Sources/Shared/      Shared iPhone and Mac domain code
@@ -16,66 +45,24 @@ wealth-compass/
 │       ├── Resources/iOS/
 │       ├── Resources/macOS/
 │       └── WealthCompass.xcodeproj
+├── src/                         Web application (Legacy/Alternative)
+├── public/                      Web assets
 └── .github/workflows/           Web deployment
 ```
 
-The web app remains at the repository root so its existing Vite and GitHub Pages deployment stays stable. Native Apple applications are managed by one Xcode project with separate iOS and macOS targets.
+---
 
-### Apple Applications
+## 🌐 Web Application (Alternative)
 
-Open `apple/WealthCompass/WealthCompass.xcodeproj` and select:
+In addition to the native Apple apps, the repository root contains the source code for the **Wealth Compass Web App**. 
 
-- `WealthCompassMobile` for the iPhone app
-- `WealthCompassMac` for the native macOS app
+- **Tech Stack**: React, TypeScript, Vite, Tailwind CSS, shadcn/ui.
+- **Backend & Auth**: Supabase (with Row Level Security).
+- **Deployment**: Deployed via GitHub Actions to GitHub Pages.
 
-See [`apple/README.md`](./apple/README.md) for architecture and build details.
+Unlike the local-first native Apple apps, the web app relies on a centralized Supabase backend to persist its data. The web app remains at the repository root so its existing Vite and GitHub Pages deployment stays stable.
 
-## Features
-
-### 📊 Interactive Dashboard
-- **Net Worth Tracking**: Visual history of your net worth over time.
-- **Asset Allocation**: Breakdown of your portfolio by sector and asset class.
-- **Key Metrics**: Instant view of net worth, cash balance, investments, and crypto.
-
-### 💰 Cash Flow Management
-- **Transaction Tracking**: Easy entry for income and expenses.
-- **Analytics**: Monthly savings rate, income vs. expense breakdown.
-- **Export**: Download your transaction history to CSV for external analysis.
-
-### 📈 Investment Portfolio
-- **Stock & ETF Tracking**: Real-time price updates via Finnhub and Yahoo Finance.
-- **Performance Metrics**: Track cost basis, current value, and profit/loss.
-- **Sector Analysis**: Visualize your exposure across different market sectors.
-
-### ₿ Crypto Tracker
-- **Real-time Prices**: Live data fetching from CoinGecko.
-- **Portfolio Overview**: Track holdings, average buy price, and current value.
-- **Privacy Mode**: Blur sensitive values with a single click.
-
-### 🧮 Financial Calculators
-- **Compound Interest**: Project future wealth based on savings and returns.
-- **FIRE Calculator**: Estimate your "Financial Independence, Retire Early" timeline.
-- **Inflation Impact**: Understand how purchasing power changes over time.
-- **Monte Carlo Simulation**: Probability-based stress testing of your portfolio.
-
-### 🔒 Privacy & Security
-- **Supabase Backend**: Secure data persistence with Row Level Security (RLS).
-- **Privacy Mode**: instantly blur all financial figures for discreet viewing in public.
-- **Local Caching**: Smart caching to minimize API calls and improve performance.
-
-## Tech Stack
-
-- **Frontend**: React, TypeScript, Vite
-- **UI Framework**: Tailwind CSS, shadcn/ui
-- **Backend & Auth**: Supabase
-- **Charts**: Recharts
-- **Icons**: Lucide React
-- **Data Providers**: Finnhub (Stocks), CoinGecko (Crypto), Frankfurter (Currency)
-
-## Getting Started
-
-Ready to take control of your finances? Follow the installation guide to set up your own instance of Wealth Compass.
-
+### Web App Installation
 - [**Installation Guide (English)**](./INSTALLATION.md)
 - [**Guida all'Installazione (Italiano)**](./INSTALLATION_IT.md)
 

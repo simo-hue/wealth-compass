@@ -32619,6 +32619,9 @@
         }
       }
     },
+    "Crypto view" : {
+
+    },
     "Currency" : {
       "localizations" : {
         "ar" : {
@@ -61570,6 +61573,9 @@
           }
         }
       }
+    },
+    "Investments view" : {
+
     },
     "ISIN / ID" : {
       "localizations" : {

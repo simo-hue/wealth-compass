@@ -1,2 +1,1 @@
-- Implementé importaciones públicas 3D y Revolut como archivos PDF y CSV (se recomienda CSV).
-- Varias correcciones de errores y mejoras.
+Mejoras generales

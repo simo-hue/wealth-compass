@@ -1,2 +1,1 @@
-- Implemented 3D public and Revolut imports as PDF and CSV files (CSV recommended).
-- Various bug fixes and improvements.
+General improvements

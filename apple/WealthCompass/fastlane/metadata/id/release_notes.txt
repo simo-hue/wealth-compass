@@ -1,2 +1,1 @@
-- Menerapkan impor publik dan Revolut 3D sebagai file PDF dan CSV (disarankan CSV).
-- Berbagai perbaikan bug dan peningkatan.
+Perbaikan umum

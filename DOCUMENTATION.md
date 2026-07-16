@@ -545,3 +545,7 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
     - Updated `ContentView.swift` to track the active tab using `@State private var selectedTab` and assign tags to `TabView` items.
     - Modified `DashboardView.swift` to accept a `@Binding var selectedTab`, wrapping supported `MetricCard`s in `Button`s.
     - Added a custom `CardBounceButtonStyle` at the bottom of `DashboardView.swift` to handle press interactions seamlessly without altering the card's native look.
+
+- [2026-07-16 21:26:36]: App Version Bump (1.1.2) & App Store Metadata Upload
+  - *Details*: Incremented app versions and pushed translated metadata for App Store Connect release.
+  - *Tech Notes*: Bumped MARKETING_VERSION to 1.1.2 and CURRENT_PROJECT_VERSION to 17. Ran fastlane ios metadata and fastlane mac metadata.

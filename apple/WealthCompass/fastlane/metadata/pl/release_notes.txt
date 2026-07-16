@@ -1,2 +1,1 @@
-- Wdrożono import 3D publiczny i Revolut jako pliki PDF i CSV (zalecane CSV).
-- Różne poprawki i ulepszenia błędów.
+Ogólne ulepszenia

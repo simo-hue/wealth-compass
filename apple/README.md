@@ -1,13 +1,26 @@
-# Wealth Compass for Apple Platforms
+# Wealth Compass (Apple Platforms)
 
-The Apple implementation is one Xcode project with two independent native application targets:
+Wealth Compass is a comprehensive, privacy-focused personal finance dashboard designed to give you a complete 360-degree view of your financial health. This repository contains the native Apple ecosystem implementation, providing secure, local-first tracking of your assets, liabilities, and cash flow.
 
-- `WealthCompassMobile`: SwiftUI for iPhone, iOS 17+
-- `WealthCompassMac`: native SwiftUI for macOS 14+
+## Native iOS & macOS Apps
 
-Neither target uses Mac Catalyst. The macOS application is built against the macOS SDK and uses desktop navigation, tables, menus, keyboard shortcuts, AppKit file panels, an in-window Settings page, sandbox entitlements, and Mac icon assets.
+The Apple implementation is driven by a single Xcode project containing two independent, fully native application targets:
 
-## Project Layout
+- **WealthCompassMobile**: Built with SwiftUI for iPhone, requiring iOS 17 or later.
+- **WealthCompassMac**: Built with native SwiftUI for macOS 14 or later. 
+
+*(Note: The macOS target does **not** use Mac Catalyst. It is built directly against the macOS SDK to leverage authentic desktop navigation, tables, menus, keyboard shortcuts, AppKit file panels, an in-window Settings page, sandbox entitlements, and Mac icon assets.)*
+
+### Core Features
+- 📊 **Interactive Dashboard**: Visual history of your net worth over time, asset allocation breakdowns, and key performance metrics.
+- 💰 **Cash Flow Management**: Track income and expenses with categories, visual trends, and schedule recurring transaction reminders.
+- 📈 **Investment Portfolio**: Real-time stock & ETF price updates via Finnhub and Yahoo Finance (with keyless fallback). Track cost basis, current value, and profit/loss.
+- ₿ **Crypto Tracker**: Live data fetching from CoinGecko. Track crypto holdings and monitor live valuations.
+- 🔒 **Privacy & Security**: All financial data is strictly stored locally in the app sandbox. Supports Face ID / Touch ID biometric locks and a quick-toggle Privacy Mode to blur sensitive amounts.
+- 🌍 **Localization**: Fully localized in 38 languages via Xcode String Catalogs.
+- 🔄 **Data Portability**: Easily export your data to a JSON backup or import existing backups. Private CloudKit synchronization is available to keep your iPhone and Mac in sync.
+
+### Project Layout
 
 ```text
 WealthCompass/
@@ -26,9 +39,9 @@ WealthCompass/
 └── WealthCompass.xcodeproj
 ```
 
-The shared layer owns finance models, calculations, local persistence, import/export, exchange rates, market data, settings, and reusable visual components. Platform folders own lifecycle and interaction design.
+The `Shared` layer owns the core finance models, calculations, local persistence, import/export logic, exchange rates, market data, settings, and reusable visual components. The `iOS` and `macOS` platform folders handle platform-specific application lifecycles and interaction design.
 
-## Local Storage
+### Local Storage
 
 Both applications store an independent JSON database in their sandboxed Application Support directory:
 
@@ -36,12 +49,11 @@ Both applications store an independent JSON database in their sandboxed Applicat
 Application Support/Wealth Compass/wealth-compass-local-data.json
 ```
 
-The iPhone app automatically copies the previous Documents-based database into this location the first time the new version starts.
+The storage implementation is abstracted behind `FinancePersistence`. This is the boundary used by the current local store and the CloudKit synchronization layer.
 
-The storage implementation is behind `FinancePersistence`. This is the boundary used by the current local store and the CloudKit synchronization layer.
+### Building from Source
 
-## Build
-
+To build the macOS application:
 ```bash
 xcodebuild \
   -project WealthCompass/WealthCompass.xcodeproj \
@@ -50,6 +62,7 @@ xcodebuild \
   build
 ```
 
+To build the iOS application (Simulator):
 ```bash
 xcodebuild \
   -project WealthCompass/WealthCompass.xcodeproj \
@@ -58,4 +71,16 @@ xcodebuild \
   build
 ```
 
-For the iCloud sync design notes and remaining work, see [`WealthCompass/TO_IMPROVE.md`](./WealthCompass/TO_IMPROVE.md).
+For iCloud sync design notes and remaining architecture work, see [`WealthCompass/TO_IMPROVE.md`](./WealthCompass/TO_IMPROVE.md).
+
+---
+
+## 🌐 Web Application (Legacy / Alternative)
+
+In addition to the native Apple applications, the repository root contains the source code for the **Wealth Compass Web App**. 
+
+- **Tech Stack**: React, TypeScript, Vite, Tailwind CSS, shadcn/ui, Recharts.
+- **Backend**: Supabase (with Row Level Security).
+- **Deployment**: Deployed via GitHub Actions.
+
+The web app is structurally independent of the Apple applications. Unlike the local-first native Apple apps, the web app uses a centralized Supabase backend to persist its data. The web app is located at the root directory of this repository.

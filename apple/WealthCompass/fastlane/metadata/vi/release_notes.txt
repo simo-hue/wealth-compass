@@ -1,2 +1,1 @@
-- Đã triển khai nhập 3D công khai và Revolut dưới dạng tệp PDF và CSV (khuyến nghị CSV).
-- Sửa lỗi và cải tiến khác nhau.
+Cải tiến chung
