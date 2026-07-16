@@ -1,11 +1,14 @@
 # Wealth Compass
 
-<a href="https://apps.apple.com/app/wealth-compass/idYOUR_APP_ID_HERE" target="_blank">
-  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" width="160">
-</a>
-<a href="https://apps.apple.com/app/wealth-compass/idYOUR_APP_ID_HERE" target="_blank">
-  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-mac-app-store.svg" alt="Download on the Mac App Store" width="160">
-</a>
+<p align="center">
+  <img src="apple/icon.png" width="128" height="128" style="border-radius: 24px;" alt="Wealth Compass Logo">
+</p>
+
+<p align="center">
+  <a href="https://apps.apple.com/us/app/wealth-compass-tracker/id6777399748" target="_blank">
+    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" width="160">
+  </a>
+</p>
 
 Wealth Compass is a comprehensive, privacy-focused personal finance dashboard designed to give you a complete 360-degree view of your financial health. Available as a native app for **iOS and macOS**, it offers real-time tracking of assets, liabilities, and cash flow in a beautiful, local-first interface.
 
