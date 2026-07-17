@@ -45,4 +45,4 @@ whatever the `origin` remote points at, not the `homepage` field.
 ## Note on `gh-pages-webapp`
 
 An older GitHub Actions workflow used to publish to a `gh-pages-webapp` branch. That workflow was
-deleted in commit `1e1b7cc` (2026-06-22) and Pages does not serve that branch. It is stale.
+deleted in commit `ba8c852` (2026-06-22) and Pages does not serve that branch. It is stale.

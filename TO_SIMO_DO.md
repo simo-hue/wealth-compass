@@ -118,7 +118,7 @@ deploy itself is the only real proof.
 
 ### 2. Your CI deploy workflow was deleted by accident in June — restore it?
 
-`.github/workflows/deploy.yml` was removed in commit **`1e1b7cc` (2026-06-22)**, whose message is
+`.github/workflows/deploy.yml` was removed in commit **`ba8c852` (2026-06-22)**, whose message is
 **"icloud fix"** — a commit about iCloud sync, nothing to do with CI. It looks unintentional. Before
 that it auto-deployed on every push to `main`; since then every deploy has been manual, and the
 README had been advertising CI that no longer existed.
@@ -145,3 +145,90 @@ git push origin --delete gh-pages-webapp   # only if you agree it's dead
   **not** from the move — every flagged file is a 100% byte-identical rename. Untouched, and worth a
   separate pass if you care.
 - `npm install` reports **14 vulnerabilities (7 high)**. Also pre-existing, also out of scope here.
+
+---
+
+# 🔴 [2026-07-17] SECURITY — your financial data was public for 6 weeks. One action is URGENT.
+
+## What happened
+
+`apple/export template.json` was **not** a template despite its name. It was a real export of your
+finances, public on `origin/main` from **2026-06-06** (commit `5ac5154`, was `ad6a4ff`) until today:
+
+- 139 transactions, 3 investments, 6 crypto holdings, 68 net-worth snapshots
+- Your full net-worth curve: **€10,371 → €14,995**, Dec 2025 → Jun 2026 (last €14,937.77)
+- **Health data**: `Analisi sangue`, `Pharmacy`, `medicines for cold`, `supporto toracico` —
+  special-category data under GDPR Art. 9
+- **Named third parties**: `Cena con mia`, `London with mia`, `teaching Maxim`, `Lunch with lee`,
+  `Sito web Matteo` — so this is other people's data too, not only yours
+- Attributable to you by name via commit metadata and the Apple ID in `fastlane/Appfile`
+
+## What I already did
+
+- Moved the file to the gitignored `IMPORT_TEMPLATE/` — **your data is preserved, not deleted**
+- Purged it from all 291 commits with `git filter-repo` and force-pushed `main` + `code-audit`
+- Also purged the `.ipa`, `.dSYM.zip`, and the Xcode `build/` tree (`.git`: **409MB → 60MB**)
+- Added `.gitignore` rules (`*.ipa`, `*.dSYM.zip`, `.cursor/`, `export*.json`) so it can't recur
+- Backup of the pre-rewrite repo: `~/wealth-compass-BACKUP-before-history-rewrite.bundle` (268MB,
+  verified restorable). **Keep it until you're satisfied, then delete it — it still contains the data.**
+
+## 🔴 ACTION 1 — the data is STILL PUBLIC. Only you can fix this.
+
+**The force-push did not evict it.** Your repo has **3 forks**, so GitHub keeps the old objects in the
+shared fork network. I verified this against the live API *after* the push — all still HTTP 200:
+
+```
+https://api.github.com/repos/simo-hue/wealth-compass/commits/443cf2d          -> 200
+https://api.github.com/repos/simo-hue/wealth-compass/commits/ad6a4ff          -> 200
+https://api.github.com/repos/simo-hue/wealth-compass/git/blobs/4a27b6bf6394b21bcc2c287935429d136421a37f -> 200  ← YOUR DATA
+```
+
+**Contact GitHub Support and ask them to purge the cached views and unreachable objects** for
+`simo-hue/wealth-compass`. This is a standard request for leaked-data incidents and it is the *only*
+way to remove them. https://support.github.com/contact — cite the blob SHA above.
+
+The forks (all last pushed *before* 2026-06-06, so they likely never had it in their own branches):
+- `Madhuzutan/wealth-compass` (2026-02-14)
+- `libriperilcambiamento/wealth-compass` (2026-03-30)
+- `valeriobasiliocova/wealth-compass` (2026-01-02)
+
+Support will likely ask you to have these deleted first. Note `libriperilcambiamento` is the same org
+in the old `homepage` field — it may be your own, in which case just delete it.
+
+**Regardless of outcome: treat this data as disclosed.** It was public for 6 weeks and may already be
+copied, cached, or indexed.
+
+## 🟠 ACTION 2 — confirm Row Level Security on Supabase
+
+Your project ref **`tstmgujgiygcravqfoto`** is public in the gh-pages bundle. That's *expected* — the
+anon key is designed to ship to browsers. But it means **RLS is your entire security boundary**. If any
+table has RLS off or a permissive policy, that public key reads your database.
+
+Check every table in Supabase → Authentication → Policies. Do this today. It is independent of
+everything above, and it is the one thing that would turn a privacy issue into a breach.
+
+Related: `VITE_ALLOWED_EMAIL` is a *client-side* check in `AuthContext.tsx`. Anyone can bypass it in
+devtools — it is UX, not security. Only RLS actually protects the data.
+
+## 🟡 ACTION 3 — everyone must re-clone
+
+The rewrite changed every commit hash on `main` and `code-audit`. Any existing clone (other machines,
+CI, collaborators) will now conflict and must re-clone. Don't `git pull` an old clone — re-clone it.
+
+`gh-pages`, `gh-pages-webapp`, and `promotional-website` were **not** rewritten (they never contained
+the data), so **your live site is untouched**.
+
+## ✅ Verified clean — no credential was ever leaked
+
+Scanned all 291 commits, all 5 branches, all blobs including binaries:
+
+- **No `service_role` key ever.** The only JWT in the entire history decodes to `"role":"anon"` — the
+  publishable key, safe by design.
+- **No AWS / GitHub / Stripe tokens, no private keys, no `.env` ever committed.**
+- **Your Finnhub key was never exposed** — bundles use `token=${t}` resolved from `localStorage` at
+  runtime; Vite never inlined it. Same in the Apple app (Keychain, no hardcoded fallback).
+- **`IMPORT_TEMPLATE/` (your bank statements with IBANs) was NEVER committed.** That `.gitignore` line
+  did its job. Verified three ways, including an IBAN regex across every text blob in history.
+- `cloudkit-development.ckdb` is schema DDL only — no data rows.
+
+**Nothing needs rotating.** This was a privacy exposure, not a credential breach.
