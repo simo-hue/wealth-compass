@@ -14,11 +14,32 @@ private enum CryptoTab: String, CaseIterable, Identifiable {
     }
 }
 
+// Drives the add/edit sheet by item identity (mirrors macOS `MacEditor`). Presenting via
+// `.sheet(item:)` instead of `.sheet(isPresented:)` + a separate `editingHolding` state avoids
+// the first-tap race where the form seeded its @State from a still-nil selection (empty banner).
+private enum CryptoFormRoute: Identifiable {
+    case add
+    case edit(CryptoHolding)
+
+    var id: String {
+        switch self {
+        case .add: "new"
+        case .edit(let holding): holding.id.uuidString
+        }
+    }
+
+    var holding: CryptoHolding? {
+        switch self {
+        case .add: nil
+        case .edit(let holding): holding
+        }
+    }
+}
+
 struct CryptoView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
-    @State private var showingForm = false
-    @State private var editingHolding: CryptoHolding?
+    @State private var activeForm: CryptoFormRoute?
     @State private var holdingPendingDeletion: CryptoHolding?
     @State private var selectedTab: CryptoTab = .overview
 
@@ -27,8 +48,7 @@ struct CryptoView: View {
             VStack(alignment: .leading, spacing: 20) {
                 PageHeader(title: LocalizedStringKey("Crypto assets"), subtitle: LocalizedStringKey("Track holdings, allocation, and performance.")) {
                     PrimaryActionButton(systemImage: "plus", accessibilityLabel: "Add Crypto Holding") {
-                        editingHolding = nil
-                        showingForm = true
+                        activeForm = .add
                     }
                 }
 
@@ -45,8 +65,8 @@ struct CryptoView: View {
             .padding(16)
         }
         .pageChrome()
-        .sheet(isPresented: $showingForm, onDismiss: { editingHolding = nil }) {
-            CryptoFormView(holding: editingHolding) { holding in
+        .sheet(item: $activeForm) { route in
+            CryptoFormView(holding: route.holding) { holding in
                 finance.upsertCrypto(holding, settings: settings)
             }
         }
@@ -183,8 +203,7 @@ struct CryptoView: View {
                             holdingRow(holding)
                                 .contextMenu {
                                     Button {
-                                        editingHolding = holding
-                                        showingForm = true
+                                        activeForm = .edit(holding)
                                     } label: {
                                         Label("Edit", systemImage: "pencil")
                                     }
@@ -257,15 +276,13 @@ struct CryptoView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            editingHolding = holding
-            showingForm = true
+            activeForm = .edit(holding)
         }
         // WC-L24: surface tap-to-edit as an activatable button for VoiceOver / Switch Control.
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityAction {
-            editingHolding = holding
-            showingForm = true
+            activeForm = .edit(holding)
         }
     }
 }

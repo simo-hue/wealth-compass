@@ -76,3 +76,19 @@ Then smoke-test: Settings → **Import Data…** → pick a Revolut/Trade Republ
   - **Manual check**: Settings → Import Data → pick `Account statement.pdf` (expect ~5 transactions) and `Net Worth.pdf` (expect **one net-worth snapshot** — a point on the net-worth history chart dated 13 Jul, €12.480,55 — *not* holdings/cash). Summary should name "Trade Republic account statement (PDF)" / "…net-worth statement (PDF)".
   - The **Revolut PDF is intentionally rejected** with a helpful message ("PDF statements are supported for Trade Republic only — import the CSV instead"); use `consolidated_statement.csv` for Revolut.
   - **No more cash double-count**: after the professional-review pass, the Net Worth PDF imports as a `NetWorthSnapshot` (not holdings + cash), so it composes cleanly with the transaction CSV. Your actual TR holdings (with cost basis) come from `Transaction export.csv`; the Net Worth PDF just adds a net-worth history point. A user who *only* has the Net Worth PDF gets the snapshot but no individual holdings — that's expected.
+
+---
+
+## [2026-07-17] Fix: empty edit-form on first tap (iOS Investments/Crypto) — build + tap test
+
+Fixed the bug where tapping a row in **Investments → Positions** or **Crypto → Holdings** opened the edit sheet empty on the *first* tap (correct only on the second). Changed both iOS views to present the editor with `.sheet(item:)` (item-identity driven) instead of `.sheet(isPresented:)` + a separate selection `@State`. Files: `apple/WealthCompass/Sources/iOS/Views/InvestmentsView.swift`, `apple/WealthCompass/Sources/iOS/Views/CryptoView.swift`. macOS was already correct and is untouched.
+
+**This environment only has Command Line Tools, so `xcodebuild` couldn't run.** I `swiftc -parse`-checked both files (no syntax errors), but the full build + a manual tap test still need Xcode:
+```bash
+cd apple
+xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile -destination 'generic/platform=iOS Simulator' build
+```
+Then smoke-test on the simulator/device:
+- **Investments → Positions** tab → tap any position → the edit sheet must open **already pre-filled on the first tap** (symbol, quantity, price, etc.). Repeat with the **row context-menu → Edit**, and with VoiceOver's activate action.
+- **Crypto → Holdings** tab → same check.
+- Confirm the **+ (Add)** button in both pages still opens a blank new-asset form, and that saving/dismissing works and the sheet fully dismisses (no lingering state).

@@ -14,11 +14,32 @@ private enum InvestmentsTab: String, CaseIterable, Identifiable {
     }
 }
 
+// Drives the add/edit sheet by item identity (mirrors macOS `MacEditor`). Presenting via
+// `.sheet(item:)` instead of `.sheet(isPresented:)` + a separate `editingInvestment` state avoids
+// the first-tap race where the form seeded its @State from a still-nil selection (empty banner).
+private enum InvestmentFormRoute: Identifiable {
+    case add
+    case edit(Investment)
+
+    var id: String {
+        switch self {
+        case .add: "new"
+        case .edit(let investment): investment.id.uuidString
+        }
+    }
+
+    var investment: Investment? {
+        switch self {
+        case .add: nil
+        case .edit(let investment): investment
+        }
+    }
+}
+
 struct InvestmentsView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
-    @State private var showingForm = false
-    @State private var editingInvestment: Investment?
+    @State private var activeForm: InvestmentFormRoute?
     @State private var investmentPendingDeletion: Investment?
     @State private var selectedTab: InvestmentsTab = .overview
 
@@ -27,8 +48,7 @@ struct InvestmentsView: View {
             VStack(alignment: .leading, spacing: 20) {
                 PageHeader(title: LocalizedStringKey("Investments"), subtitle: LocalizedStringKey("Follow positions, allocation, and performance.")) {
                     PrimaryActionButton(systemImage: "plus", accessibilityLabel: "Add Investment") {
-                        editingInvestment = nil
-                        showingForm = true
+                        activeForm = .add
                     }
                 }
 
@@ -48,8 +68,8 @@ struct InvestmentsView: View {
             .padding(16)
         }
         .pageChrome()
-        .sheet(isPresented: $showingForm, onDismiss: { editingInvestment = nil }) {
-            InvestmentFormView(investment: editingInvestment) { investment in
+        .sheet(item: $activeForm) { route in
+            InvestmentFormView(investment: route.investment) { investment in
                 finance.upsertInvestment(investment, settings: settings)
             }
         }
@@ -127,8 +147,7 @@ struct InvestmentsView: View {
                             investmentRow(investment)
                                 .contextMenu {
                                     Button {
-                                        editingInvestment = investment
-                                        showingForm = true
+                                        activeForm = .edit(investment)
                                     } label: {
                                         Label("Edit", systemImage: "pencil")
                                     }
@@ -208,15 +227,13 @@ struct InvestmentsView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            editingInvestment = investment
-            showingForm = true
+            activeForm = .edit(investment)
         }
         // WC-L24: surface tap-to-edit as an activatable button for VoiceOver / Switch Control.
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityAction {
-            editingInvestment = investment
-            showingForm = true
+            activeForm = .edit(investment)
         }
     }
 }
