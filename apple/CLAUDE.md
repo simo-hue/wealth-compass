@@ -10,7 +10,7 @@ This directory (`apple/`) is the **native Apple implementation** of Wealth Compa
 - `WealthCompassMac` — native SwiftUI for macOS 14+ (no Mac Catalyst; built against the macOS SDK with sidebar navigation, tables, menus, keyboard shortcuts, an in-window Settings page, and sandbox entitlements)
 - `WealthCompassTests` — XCTest unit tests
 
-The **parent directory** (`../`) is a separate React + Vite + Supabase web app that shares the product but no code; its `.github/workflows/deploy.yml` only builds/deploys that web app. The JSON backup format is the interchange point between the web and Apple apps (see the import path in `FinanceStore`).
+The **sibling directory** (`../web-app/`) is a separate React + Vite + Supabase web app that shares the product but no code; it is built and deployed entirely from within that directory (`cd web-app && npm run deploy` — manual, no CI workflow) and nothing in it touches this one. The **parent directory** (`../`) is just the container holding both platforms plus repo-wide docs. The JSON backup format is the interchange point between the web and Apple apps (see the import path in `FinanceStore`).
 
 There is **no** Swift Package Manager / CocoaPods and there are no third-party dependencies — everything is Apple frameworks (SwiftUI, CloudKit, CryptoKit, Security, OSLog, UIKit/AppKit).
 

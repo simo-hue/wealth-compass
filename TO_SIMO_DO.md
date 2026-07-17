@@ -92,3 +92,56 @@ Then smoke-test on the simulator/device:
 - **Investments → Positions** tab → tap any position → the edit sheet must open **already pre-filled on the first tap** (symbol, quantity, price, etc.). Repeat with the **row context-menu → Edit**, and with VoiceOver's activate action.
 - **Crypto → Holdings** tab → same check.
 - Confirm the **+ (Add)** button in both pages still opens a blank new-asset form, and that saving/dismissing works and the sheet fully dismisses (no lingering state).
+---
+
+## [2026-07-17] Repo reorg: web app moved to `web-app/` — deploy verification + 3 decisions
+
+The web app moved from the repository root into `web-app/`. `apple/` is untouched apart from two
+doc sentences that pointed at the old location. I verified the build (identical output hashes to the
+pre-move build — see DOCUMENTATION.md), but **three things need you**:
+
+### 1. Verify the deploy still works — I could not do this for you
+
+Deploying publishes your live site, so I did not run it. This is the one part of the move I could not
+prove from here:
+
+```bash
+cd web-app
+npm run deploy
+```
+
+Then check <https://simo-hue.github.io/wealth-compass/> still loads, and that navigating between
+pages works (the `/wealth-compass/` sub-path is served by both the Vite `base` and the Router
+`basename`). Everything I *could* check says this is safe: `gh-pages` resolves the target from the
+`origin` remote rather than the working directory, and the build output is byte-identical. But the
+deploy itself is the only real proof.
+
+### 2. Your CI deploy workflow was deleted by accident in June — restore it?
+
+`.github/workflows/deploy.yml` was removed in commit **`1e1b7cc` (2026-06-22)**, whose message is
+**"icloud fix"** — a commit about iCloud sync, nothing to do with CI. It looks unintentional. Before
+that it auto-deployed on every push to `main`; since then every deploy has been manual, and the
+README had been advertising CI that no longer existed.
+
+Note it published to the **`gh-pages-webapp`** branch, but Pages serves **`gh-pages`** — so restoring
+it verbatim would publish to a branch nobody reads. If you want it back, say so and I'll restore it
+with `working-directory: web-app`, `folder: web-app/dist`, and `branch: gh-pages`. Your call whether
+pushes to `main` should auto-publish.
+
+### 3. Stale branch `origin/gh-pages-webapp` — safe to delete?
+
+Last written **2026-06-10** by the now-deleted workflow. Pages does not serve it. It appears dead:
+
+```bash
+git push origin --delete gh-pages-webapp   # only if you agree it's dead
+```
+
+### Also worth knowing
+
+- `package.json` `homepage` said `libriperilcambiamento.github.io` while your remote is `simo-hue`.
+  You confirmed `simo-hue`, so I corrected it in `package.json`, `DEPLOYMENT.md`, and the README.
+  Vite ignores `homepage` (it's a Create React App field), so this was cosmetic — but it was wrong.
+- `npm run lint` reports **52 pre-existing problems** (38 errors, mostly `no-explicit-any`). These are
+  **not** from the move — every flagged file is a 100% byte-identical rename. Untouched, and worth a
+  separate pass if you care.
+- `npm install` reports **14 vulnerabilities (7 high)**. Also pre-existing, also out of scope here.

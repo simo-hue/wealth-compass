@@ -1,5 +1,9 @@
-node_modules
+# Repo-wide ignores only. Platform-specific ignores live alongside their code:
+# apple/.gitignore (Xcode) and web-app/.gitignore (Node).
+
+.DS_Store
 
 # Real broker/bank statement samples used to build the CSV importer — contain personal
 # financial data (IBANs, merchant history) and must never be committed. Tests use synthetic fixtures.
+# Consumed by apple/WealthCompass/Sources/Shared/Services/BrokerStatementImportService.swift.
 IMPORT_TEMPLATE/

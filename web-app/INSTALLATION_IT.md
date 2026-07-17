@@ -17,8 +17,11 @@ Prima di iniziare, assicurati di avere installato:
 
 ```bash
 git clone <URL_TUO_REPO>
-cd wealth-compass
+cd wealth-compass/web-app
 ```
+
+> La radice del repository contiene entrambe le piattaforme: `apple/` per le app native iOS e
+> macOS, e `web-app/` per questa. Tutti i comandi seguenti vanno eseguiti da `web-app/`.
 
 ### 2. Installa le Dipendenze
 
@@ -34,7 +37,7 @@ npm install
 
 ### 4. Variabili d'Ambiente
 
-Crea un file `.env` nella directory principale copiando l'esempio (se disponibile) o creandone uno nuovo.
+Crea un file `.env` in questa directory `web-app/` (accanto a `package.json`) copiando `env_example.txt`, o creandone uno nuovo.
 
 ```bash
 touch .env

@@ -1,8 +1,8 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "wealth-compass-web",
   "private": true,
   "version": "1.1.1",
-  "homepage": "https://libriperilcambiamento.github.io/wealth-compass/",
+  "homepage": "https://simo-hue.github.io/wealth-compass/",
   "type": "module",
   "scripts": {
     "dev": "vite",

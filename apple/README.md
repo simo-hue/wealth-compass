@@ -77,10 +77,10 @@ For iCloud sync design notes and remaining architecture work, see [`WealthCompas
 
 ## 🌐 Web Application (Legacy / Alternative)
 
-In addition to the native Apple applications, the repository root contains the source code for the **Wealth Compass Web App**. 
+In addition to the native Apple applications, the [`web-app/`](../web-app/) directory contains the source code for the **Wealth Compass Web App**.
 
 - **Tech Stack**: React, TypeScript, Vite, Tailwind CSS, shadcn/ui, Recharts.
 - **Backend**: Supabase (with Row Level Security).
-- **Deployment**: Deployed via GitHub Actions.
+- **Deployment**: Manual — `cd web-app && npm run deploy` publishes to the `gh-pages` branch. There is no CI workflow.
 
-The web app is structurally independent of the Apple applications. Unlike the local-first native Apple apps, the web app uses a centralized Supabase backend to persist its data. The web app is located at the root directory of this repository.
+The web app is structurally independent of the Apple applications. Unlike the local-first native Apple apps, the web app uses a centralized Supabase backend to persist its data. The web app is located in [`web-app/`](../web-app/), a sibling of this `apple/` directory.

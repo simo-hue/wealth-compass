@@ -38,9 +38,12 @@ For architecture and detailed build instructions, see [`apple/README.md`](./appl
 
 ## 📁 Repository Layout
 
+The repository holds two independent implementations of the same product, one per platform. They
+share the JSON backup format, but no code.
+
 ```text
 wealth-compass/
-├── apple/
+├── apple/                       Native iOS and macOS apps — see apple/README.md
 │   └── WealthCompass/
 │       ├── Sources/Shared/      Shared iPhone and Mac domain code
 │       ├── Sources/iOS/         iPhone application and views
@@ -48,26 +51,33 @@ wealth-compass/
 │       ├── Resources/iOS/
 │       ├── Resources/macOS/
 │       └── WealthCompass.xcodeproj
-├── src/                         Web application (Legacy/Alternative)
-├── public/                      Web assets
-└── .github/workflows/           Web deployment
+├── web-app/                     Web application — see web-app/README.md
+│   ├── src/                     React application source
+│   ├── public/                  Web assets
+│   └── package.json             Build, lint, and deploy scripts
+├── DOCUMENTATION.md             Repo-wide change journal (both platforms)
+└── TO_SIMO_DO.md                Repo-wide manual actions
 ```
 
 ---
 
 ## 🌐 Web Application (Alternative)
 
-In addition to the native Apple apps, the repository root contains the source code for the **Wealth Compass Web App**. 
+In addition to the native Apple apps, [`web-app/`](./web-app/) contains the source code for the
+**Wealth Compass Web App**.
 
 - **Tech Stack**: React, TypeScript, Vite, Tailwind CSS, shadcn/ui.
 - **Backend & Auth**: Supabase (with Row Level Security).
-- **Deployment**: Deployed via GitHub Actions to GitHub Pages.
+- **Deployment**: Manual — `cd web-app && npm run deploy` builds the app and publishes it to the
+  `gh-pages` branch, which GitHub Pages serves at
+  <https://simo-hue.github.io/wealth-compass/>. There is no CI workflow.
 
-Unlike the local-first native Apple apps, the web app relies on a centralized Supabase backend to persist its data. The web app remains at the repository root so its existing Vite and GitHub Pages deployment stays stable.
+Unlike the local-first native Apple apps, the web app relies on a centralized Supabase backend to persist its data.
 
 ### Web App Installation
-- [**Installation Guide (English)**](./INSTALLATION.md)
-- [**Guida all'Installazione (Italiano)**](./INSTALLATION_IT.md)
+- [**Web App README**](./web-app/README.md)
+- [**Installation Guide (English)**](./web-app/INSTALLATION.md)
+- [**Guida all'Installazione (Italiano)**](./web-app/INSTALLATION_IT.md)
 
 ---
 
