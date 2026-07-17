@@ -21,3 +21,21 @@ xcuserdata/
 *.xcresult
 *.xcresult.zip
 /TESTS/
+
+# Shipped build products — regenerable from Xcode, and multi-MB. These were tracked until
+# 2026-07-17; the .ipa also embeds a provisioning profile (team id + device UDID).
+*.ipa
+*.app.dSYM.zip
+*.dSYM/
+*.xcarchive
+
+# Editor telemetry
+.cursor/
+
+# App data exports — a real export is a full financial history (balances, transactions,
+# net-worth curve) and must NEVER be committed. `apple/export template.json` was tracked
+# from 2026-06-06 to 2026-07-17 and turned out to hold real personal data despite its name.
+# Keep real exports in the gitignored /IMPORT_TEMPLATE/ at the repo root. If you ever need a
+# committed fixture, name it *.sample.json and make sure it is synthetic.
+export*.json
+*.export.json
