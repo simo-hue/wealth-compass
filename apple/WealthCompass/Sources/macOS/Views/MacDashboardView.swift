@@ -39,6 +39,7 @@ struct MacDashboardView: View {
             // was the only page with no visible top "grey bar". So the header is a fixed row, not scrolled.
             dashboardHeader
                 .padding(.horizontal, 24)
+                .scenePadding(.minimum, edges: .horizontal)
                 .padding(.top, 24)
                 .padding(.bottom, 16)
 

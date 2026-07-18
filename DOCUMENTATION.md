@@ -587,3 +587,7 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
     - **Open security item**: Supabase project ref `tstmgujgiygcravqfoto` is public in the gh-pages bundle (expected — the anon key ships to browsers by design), which makes **RLS the entire security boundary**. `VITE_ALLOWED_EMAIL` in `AuthContext.tsx` is a client-side check and is trivially bypassable — UX, not security. Confirming RLS on every table is logged in `TO_SIMO_DO.md`.
     - **Commit hashes changed repo-wide**; doc references were remapped via `.git/filter-repo/commit-map` (`1e1b7cc` → `ba8c852`, `8b95230` → `944da02`). Pre-rewrite backup: `~/wealth-compass-BACKUP-before-history-rewrite.bundle` (268MB, `git bundle verify` passed) — it still contains the data and should be deleted once the remote purge is confirmed.
     - No dependency or runtime changes.
+
+- [2026-07-18T09:15:00+02:00]: macOS Dashboard Header Padding Fix
+  - *Details*: Fixed an alignment issue on the macOS Dashboard where the "Add Transaction" button was not aligned with the rest of the overview page content. 
+  - *Tech Notes*: Added `.scenePadding(.minimum, edges: .horizontal)` to `dashboardHeader` in `MacDashboardView.swift` to match the padding of the main `ScrollView` content.
