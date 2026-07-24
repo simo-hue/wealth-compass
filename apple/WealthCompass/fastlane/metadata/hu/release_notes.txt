@@ -1,1 +1,1 @@
-Általános fejlesztések
+General improvements and bug fixes.

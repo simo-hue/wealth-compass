@@ -189,7 +189,7 @@ struct MacDashboardView: View {
                     Label("Build your first financial view", systemImage: "sparkles")
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(.white)
-                    Text("Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically.")
+                    Text("Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically.")
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.64))
                         .fixedSize(horizontal: false, vertical: true)

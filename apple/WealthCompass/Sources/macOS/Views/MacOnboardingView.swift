@@ -233,7 +233,7 @@ struct MacOnboardingView: View {
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                 
-                Text("Your financial data stays on your Mac and in your private iCloud — there's no Wealth Compass server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests.")
+                Text("Your financial data stays on your Mac and in your private iCloud — there's no Wealth Compass Tracker server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests.")
                     .font(.title3)
                     .foregroundStyle(WCColor.textSecondary)
                     .multilineTextAlignment(.center)

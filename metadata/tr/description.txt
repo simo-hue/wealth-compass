@@ -1,0 +1,21 @@
+Wealth Compass, net değerinizi, nakit akışınızı, yatırımlarınızı, kripto varlıklarınızı ve borçlarınızı tek bir yerde anlamanıza yardımcı olan özel, yerel öncelikli bir kişisel finans kontrol panelidir.
+
+Finansal durumunuzun net bir resmini oluşturun:
+
+- Net değeri, nakit bakiyesini, yatırımları ve kriptoyu hızlıca görüntüleyin
+- Gelir ve giderleri kategoriler ve görsel eğilimlerle takip edin
+- Tekrarlayan işlemleri planlayın ve isteğe bağlı yerel hatırlatmalar alın
+- Hisse senedi, ETF ve kripto para varlıklarını izleyin
+- Maliyet bazını, kâr ve zararı, portföy dağılımını gözden geçirin
+- Varlıklarınızın yanında borçlarınızı da takip edin
+- Otomatik yerel anlık görüntülerle net değer geçmişini takip edin
+- Değerleri önbelleğe alınmış ECB referans kurları ile dönüştürün
+- Özel Mod ile hassas tutarları anında gizleyin
+- Uygulamayı Face ID veya Touch ID ile koruyun
+- Yerel verilerinizi istediğiniz zaman ihraç edin, içe aktarın ve silin
+
+Finansal kayıtlarınız cihazınızda kalır. Wealth Compass hesap gerektirmez ve portföyünüzü veya işlem geçmişinizi geliştirici tarafından işletilen sunucularda saklamaz.
+
+İsteğe bağlı piyasa fiyatı güncellemeleri, sizin sağladığınız API kimlik bilgilerini kullanır. Kimlik bilgileri iOS Anahtarlık'ta güvenli bir şekilde saklanır.
+
+Wealth Compass bir bilgilendirme takip aracıdır. Finansal kurumlara bağlanmaz, işlem yapmaz, finansal tavsiye vermez veya üçüncü taraf piyasa verilerinin doğruluğunu garanti etmez.

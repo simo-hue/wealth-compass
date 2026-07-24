@@ -66,28 +66,28 @@
     "%@ Cached or fallback rates remain active." : {
 
     },
-    "%@ is scheduled. Open Wealth Compass to review it." : {
+    "%@ is scheduled. Open Wealth Compass Tracker to review it." : {
 
     },
     "%@ units" : {
 
     },
-    "%@: %@. Wealth Compass records it automatically when the app is active." : {
+    "%@: %@. Wealth Compass Tracker records it automatically when the app is active." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@: %2$@. Wealth Compass records it automatically when the app is active."
+            "value" : "%1$@: %2$@. Wealth Compass Tracker records it automatically when the app is active."
           }
         }
       }
     },
-    "%@: %@. Wealth Compass records it while the app is active." : {
+    "%@: %@. Wealth Compass Tracker records it while the app is active." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@: %2$@. Wealth Compass records it while the app is active."
+            "value" : "%1$@: %2$@. Wealth Compass Tracker records it while the app is active."
           }
         }
       }
@@ -380,7 +380,7 @@
     "Edit schedule" : {
 
     },
-    "Enable biometric protection for Wealth Compass." : {
+    "Enable biometric protection for Wealth Compass Tracker." : {
 
     },
     "End Date" : {
@@ -746,7 +746,7 @@
     "Record cash flow or add a position to bring this dashboard to life." : {
 
     },
-    "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically." : {
+    "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically." : {
 
     },
     "Recurring" : {
@@ -954,7 +954,7 @@
     "Unlock with %@" : {
 
     },
-    "Unlock your local Wealth Compass data." : {
+    "Unlock your local Wealth Compass Tracker data." : {
 
     },
     "Up to Date" : {
@@ -990,7 +990,7 @@
     "We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers." : {
 
     },
-    "Wealth Compass" : {
+    "Wealth Compass Tracker" : {
 
     },
     "Weekly" : {
@@ -999,7 +999,7 @@
     "Welcome to WealthCompass" : {
 
     },
-    "When enabled, Wealth Compass locks whenever the app leaves the foreground." : {
+    "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground." : {
 
     },
     "Year to Date" : {

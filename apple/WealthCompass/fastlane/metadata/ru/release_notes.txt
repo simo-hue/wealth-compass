@@ -1,1 +1,1 @@
-Общие улучшения
+General improvements and bug fixes.

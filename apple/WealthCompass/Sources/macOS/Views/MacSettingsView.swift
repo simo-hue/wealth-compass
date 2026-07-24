@@ -242,7 +242,7 @@ struct MacSettingsView: View {
             exchangeRatesSection
 
             SettingsSection(title: "Privacy & Security") {
-                SettingsRow(title: "Privacy Mode", subtitle: "Hide financial values throughout Wealth Compass.") {
+                SettingsRow(title: "Privacy Mode", subtitle: "Hide financial values throughout Wealth Compass Tracker.") {
                     Toggle("", isOn: $settings.isPrivacyMode)
                         .toggleStyle(.switch)
                         .labelsHidden()
@@ -252,7 +252,7 @@ struct MacSettingsView: View {
 
                 SettingsRow(
                     title: settings.localized("\(appLock.biometryName(appLanguage: settings.appLanguage)) App Lock"),
-                    subtitle: appLock.lastError ?? settings.localized("When enabled, Wealth Compass locks when the app is no longer active.")
+                    subtitle: appLock.lastError ?? settings.localized("When enabled, Wealth Compass Tracker locks when the app is no longer active.")
                 ) {
                     Toggle("", isOn: biometricLockBinding)
                         .toggleStyle(.switch)

@@ -65,8 +65,8 @@ struct ExchangeRateRefreshResult: Equatable {
             // instead of splicing a separately-localized fragment into a localized frame (the fragment
             // was translated in only 6 locales, leaving a half-English sentence in 28 others).
             return snapshot == nil
-                ? AppLocalization.string("\(errorMessage)\n\nWealth Compass will continue using the built-in offline fallback rates.", appLanguage: appLanguage)
-                : AppLocalization.string("\(errorMessage)\n\nWealth Compass will continue using the last cached rates.", appLanguage: appLanguage)
+                ? AppLocalization.string("\(errorMessage)\n\nWealth Compass Tracker will continue using the built-in offline fallback rates.", appLanguage: appLanguage)
+                : AppLocalization.string("\(errorMessage)\n\nWealth Compass Tracker will continue using the last cached rates.", appLanguage: appLanguage)
         }
 
         if let snapshot {

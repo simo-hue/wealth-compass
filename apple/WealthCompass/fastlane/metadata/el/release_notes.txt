@@ -1,1 +1,1 @@
-Γενικές βελτιώσεις
+General improvements and bug fixes.

@@ -1,1 +1,1 @@
-Melhorias gerais
+General improvements and bug fixes.

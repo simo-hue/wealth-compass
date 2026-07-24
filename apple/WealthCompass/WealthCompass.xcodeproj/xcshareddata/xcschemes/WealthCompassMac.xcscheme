@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AE0000000000000000000011"
-               BuildableName = "Wealth Compass.app"
+               BuildableName = "Wealth Compass Tracker.app"
                BlueprintName = "WealthCompassMac"
                ReferencedContainer = "container:WealthCompass.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AE0000000000000000000011"
-            BuildableName = "Wealth Compass.app"
+            BuildableName = "Wealth Compass Tracker.app"
             BlueprintName = "WealthCompassMac"
             ReferencedContainer = "container:WealthCompass.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AE0000000000000000000011"
-            BuildableName = "Wealth Compass.app"
+            BuildableName = "Wealth Compass Tracker.app"
             BlueprintName = "WealthCompassMac"
             ReferencedContainer = "container:WealthCompass.xcodeproj">
          </BuildableReference>

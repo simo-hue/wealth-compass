@@ -1,1 +1,1 @@
-Mejoras generales
+General improvements and bug fixes.

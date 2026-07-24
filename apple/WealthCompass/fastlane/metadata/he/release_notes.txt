@@ -1,1 +1,1 @@
-שיפורים כלליים
+General improvements and bug fixes.

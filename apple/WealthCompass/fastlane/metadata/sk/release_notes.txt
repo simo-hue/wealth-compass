@@ -1,1 +1,1 @@
-Všeobecné vylepšenia
+General improvements and bug fixes.

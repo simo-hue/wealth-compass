@@ -1,6 +1,6 @@
 import Foundation
 
-/// Direct endpoints for the third-party data providers Wealth Compass contacts.
+/// Direct endpoints for the third-party data providers Wealth Compass Tracker contacts.
 ///
 /// There is **no** intermediary server. Each request goes straight from the device
 /// to the provider that issued the user's API key, so no developer-operated hop can

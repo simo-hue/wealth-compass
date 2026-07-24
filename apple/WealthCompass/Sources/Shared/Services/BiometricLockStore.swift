@@ -66,7 +66,7 @@ class BiometricLockStore: ObservableObject {
 
     func enableLock(appLanguage: String?) async -> Bool {
         let result = await authenticate(
-            reason: AppLocalization.string("Enable biometric protection for Wealth Compass.", appLanguage: appLanguage),
+            reason: AppLocalization.string("Enable biometric protection for Wealth Compass Tracker.", appLanguage: appLanguage),
             appLanguage: appLanguage
         )
         if result.success {
@@ -98,7 +98,7 @@ class BiometricLockStore: ObservableObject {
     @discardableResult
     func confirmDisableLock(appLanguage: String?) async -> Bool {
         let result = await authenticate(
-            reason: AppLocalization.string("Turn off app protection for Wealth Compass.", appLanguage: appLanguage),
+            reason: AppLocalization.string("Turn off app protection for Wealth Compass Tracker.", appLanguage: appLanguage),
             appLanguage: appLanguage
         )
         if result.success {
@@ -117,7 +117,7 @@ class BiometricLockStore: ObservableObject {
 
     func unlock(appLanguage: String?) async {
         let result = await authenticate(
-            reason: AppLocalization.string("Unlock your local Wealth Compass data.", appLanguage: appLanguage),
+            reason: AppLocalization.string("Unlock your local Wealth Compass Tracker data.", appLanguage: appLanguage),
             appLanguage: appLanguage
         )
         guard result.success else { return }

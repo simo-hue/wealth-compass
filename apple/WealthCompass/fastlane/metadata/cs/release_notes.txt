@@ -1,1 +1,1 @@
-Obecná vylepšení
+General improvements and bug fixes.

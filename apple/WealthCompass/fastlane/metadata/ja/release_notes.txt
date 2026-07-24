@@ -1,1 +1,1 @@
-全体的な改善
+General improvements and bug fixes.

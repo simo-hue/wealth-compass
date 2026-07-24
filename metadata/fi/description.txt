@@ -1,0 +1,21 @@
+Wealth Compass on yksityinen, paikallisesti ensisijainen henkilökohtainen talouskojelauta, joka auttaa sinua ymmärtämään nettovarallisuutesi, kassavirran, sijoitukset, kryptovarallisuudet ja velat yhdessä paikassa.
+
+Rakenna selkeä kuva taloudestasi:
+
+- Näe nettovarallisuus, käteisvarat, sijoitukset ja kryptot yhdellä vilkaisulla
+- Seuraa tuloja ja menoja kategorioiden ja visuaalisten trendien avulla
+- Aikatauluta toistuvat tapahtumat ja vastaanota valinnaisia paikallisia muistutuksia
+- Seuraa osake-, ETF- ja kryptovarasaldoja
+- Tarkastele kustannusperusteita, voittoja ja tappioita sekä salkun jakautumista
+- Seuraa velkoja samalla kun tarkistat varasi
+- Seuraa nettovarallisuuden historiaa automaattisilla paikallisilla otoksilla
+- Muunna arvoja välimuistissa olevien EKP:n viitekurssien avulla
+- Piilota arkaluonteiset summat välittömästi Yksityisyystilassa
+- Suojaa sovellus Face ID:llä tai Touch ID:llä
+- Vie, tuo ja poista paikalliset tietosi milloin tahansa
+
+Taloustietosi pysyvät laitteellasi. Wealth Compass ei vaadi tiliä eikä tallenna salkkuasi tai tapahtumahistoriaasi kehittäjän hallinnoimille palvelimille.
+
+Valinnaiset markkinahintapäivitykset käyttävät API-tunnuksia, jotka annat. Tunnukset tallennetaan turvallisesti iOS:n avaintenketjuun.
+
+Wealth Compass on tiedon seurannan työkalu. Se ei yhdistä rahoituslaitoksiin, tee kauppoja, anna taloudellisia neuvoja tai takaa kolmannen osapuolen markkinatietojen tarkkuutta.

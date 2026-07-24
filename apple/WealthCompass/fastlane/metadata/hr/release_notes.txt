@@ -1,1 +1,1 @@
-Opća poboljšanja
+General improvements and bug fixes.

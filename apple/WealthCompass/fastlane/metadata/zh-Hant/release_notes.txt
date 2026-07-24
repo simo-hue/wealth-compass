@@ -1,1 +1,1 @@
-一般改進
+General improvements and bug fixes.

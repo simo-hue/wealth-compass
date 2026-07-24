@@ -1,1 +1,1 @@
-Yleisiä parannuksia
+General improvements and bug fixes.

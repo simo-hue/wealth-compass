@@ -94,7 +94,7 @@ struct MacLockView: View {
                         .foregroundStyle(WCColor.primary)
 
                     VStack(spacing: 6) {
-                        Text("Wealth Compass")
+                        Text("Wealth Compass Tracker")
                             .font(.largeTitle.bold())
                         Text(settings.localized("Unlock with \(appLock.biometryName(appLanguage: settings.appLanguage))"))
                             .foregroundStyle(WCColor.textSecondary)

@@ -1,0 +1,21 @@
+Wealth Compass adalah papan pemuka kewangan peribadi tempatan yang membantu anda memahami nilai bersih, aliran tunai, pelaburan, aset kripto, dan liabiliti anda dalam satu tempat.
+
+Bina gambaran jelas tentang kewangan anda:
+
+- Lihat nilai bersih, baki tunai, pelaburan, dan kripto sekilas pandang
+- Jejaki pendapatan dan perbelanjaan dengan kategori dan tren visual
+- Jadualkan transaksi berulang dan terima peringatan tempatan pilihan
+- Pantau pegangan saham, ETF, dan mata wang kripto
+- Semak asas kos, untung dan rugi, serta peruntukan portfolio
+- Jejaki liabiliti bersama aset anda
+- Ikuti sejarah nilai bersih dengan tangkapan skrin tempatan automatik
+- Tukar nilai menggunakan kadar pertukaran ECB yang di-cache
+- Sembunyikan jumlah sensitif serta-merta dengan Mod Privasi
+- Lindungi aplikasi dengan Face ID atau Touch ID
+- Eksport, import, dan padam data tempatan anda bila-bila masa anda mahu
+
+Rekod kewangan anda disimpan pada peranti anda. Wealth Compass tidak memerlukan akaun dan tidak menyimpan portfolio atau sejarah transaksi anda pada pelayan yang dikendalikan oleh pembangun.
+
+Kemaskini harga pasaran pilihan menggunakan kredensial API yang anda berikan. Kredensial disimpan dengan selamat dalam iOS Keychain.
+
+Wealth Compass adalah alat pemantauan maklumat. Ia tidak disambungkan kepada institusi kewangan, melaksanakan dagangan, memberikan nasihat kewangan, atau menjamin ketepatan data pasaran pihak ketiga.

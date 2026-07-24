@@ -1,1 +1,1 @@
-Millores generals
+General improvements and bug fixes.

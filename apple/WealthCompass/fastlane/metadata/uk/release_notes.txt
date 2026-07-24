@@ -1,1 +1,1 @@
-Загальні поліпшення
+General improvements and bug fixes.

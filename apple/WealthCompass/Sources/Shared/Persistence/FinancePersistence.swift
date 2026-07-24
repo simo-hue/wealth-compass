@@ -36,7 +36,7 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
 
     init(
         fileManager: FileManager = .default,
-        directoryName: String = "Wealth Compass",
+        directoryName: String = "Wealth Compass Tracker",
         fileName: String = "wealth-compass-local-data.json"
     ) {
         self.fileManager = fileManager

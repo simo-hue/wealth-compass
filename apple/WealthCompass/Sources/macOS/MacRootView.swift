@@ -116,7 +116,7 @@ struct MacRootView: View {
                 Label(destination.title, systemImage: destination.systemImage)
                     .tag(destination)
             }
-            .navigationTitle("Wealth Compass")
+            .navigationTitle("Wealth Compass Tracker")
             .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 280)
         } detail: {
             detail

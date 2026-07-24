@@ -1,1 +1,1 @@
-Genel iyileştirmeler
+General improvements and bug fixes.

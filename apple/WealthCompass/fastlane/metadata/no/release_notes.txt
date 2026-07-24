@@ -1,1 +1,1 @@
-Generelle forbedringer
+General improvements and bug fixes.

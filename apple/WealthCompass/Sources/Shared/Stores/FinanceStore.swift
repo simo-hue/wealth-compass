@@ -62,7 +62,7 @@ struct FinanceImportResult: Identifiable {
     let categoriesAdded: Int
     let skippedRecords: Int
     /// Human-readable name of the detected non-native source (e.g. "Revolut consolidated statement").
-    /// `nil` for a native Wealth Compass JSON backup. Shown as the first summary line when present.
+    /// `nil` for a native Wealth Compass Tracker JSON backup. Shown as the first summary line when present.
     var detectedSource: String? = nil
 
     var importedRecordCount: Int {
@@ -118,13 +118,13 @@ enum FinanceImportError: LocalizedError {
         case .emptyFile:
             AppLocalization.string("The selected file is empty.", appLanguage: appLanguage)
         case .invalidJSON(let details):
-            AppLocalization.string("The selected file is not a valid Wealth Compass JSON backup. \(details)", appLanguage: appLanguage)
+            AppLocalization.string("The selected file is not a valid Wealth Compass Tracker JSON backup. \(details)", appLanguage: appLanguage)
         case .noSupportedRecords:
             AppLocalization.string("No supported finance records were found in the selected file.", appLanguage: appLanguage)
         case .localPersistenceError:
             AppLocalization.string("Changes cannot be saved until the local database load error is resolved.", appLanguage: appLanguage)
         case .unrecognizedFormat:
-            AppLocalization.string("This file isn't a Wealth Compass backup or a supported Revolut / Trade Republic statement.", appLanguage: appLanguage)
+            AppLocalization.string("This file isn't a Wealth Compass Tracker backup or a supported Revolut / Trade Republic statement.", appLanguage: appLanguage)
         case .malformedCSV(let details):
             AppLocalization.string("The statement file could not be read. \(details)", appLanguage: appLanguage)
         case .malformedPDF(let details):
@@ -1155,7 +1155,7 @@ final class FinanceStore: ObservableObject {
         let os = ProcessInfo.processInfo.operatingSystemVersionString
 
         var lines = [
-            "Wealth Compass sync diagnostics",
+            "Wealth Compass Tracker sync diagnostics",
             "version \(version) (\(build)) · \(platform) · \(os)",
             "iCloud sync: \(isICloudSyncEnabledResolved ? "on" : "off")",
             "generated \(stamp)",

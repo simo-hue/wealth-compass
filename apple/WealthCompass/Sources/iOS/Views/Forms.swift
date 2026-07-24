@@ -395,7 +395,7 @@ struct RecurringTransactionFormView: View {
                     Toggle("Notify When Due", isOn: $notificationsEnabled)
                         .tint(WCColor.primary)
 
-                    Text("Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.")
+                    Text("Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens.")
                     .font(.caption)
                     .foregroundStyle(WCColor.textSecondary)
                 }

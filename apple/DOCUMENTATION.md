@@ -511,3 +511,25 @@
 - [2026-07-14T14:24:52+0200]: macOS wide-screen layout — Overview/Settings pages now fill large external displays
   - *Details*: On very large / external displays the Cash Flow, Crypto, and Investments **Overview** tabs and the **Settings** page left dead side margins, while the Dashboard already filled the width. Reworked those pages to fill the pane edge-to-edge like the Dashboard. The summary-card rows now stretch to fill (flexible columns that reflow 6/5/4/3/2/1 by width, capped at the actual card count so a partial last row never leaves an empty trailing slot) instead of the old `.adaptive(maximum: 320)` grid that clumped left. Cash Flow's two `maxWidth: 1440` caps (Overview VStack + Transactions card grid) and Settings' `maxWidth: 1200` cap were removed. On a laptop-sized pane the pages look unchanged; only large displays now fill. Top Holdings preview grids were intentionally left as-is (fixed comfortable card width, left-aligned).
   - *Tech Notes*: Added top-level `fillingFlexibleColumns(availableWidth:itemCount:minItemWidth:spacing:)` in `Sources/Shared/UI/DesignSystem.swift`. Extended `DynamicMasonryLayout` (`Sources/Shared/UI/DynamicMasonryLayout.swift`) with an optional `maxColumns`, now honored by both `sizeThatFits` and `placeSubviews` via a shared `columnCount(for:)`. `MacCryptoView` overview converted from `ViewThatFits(in: .vertical)` to `GeometryReader { ScrollView { … } }` so the summary grid can read the pane width. `summaryCards` (all three pages) and `overviewContent` (Crypto) became width-parameterized funcs; privacy mode passes `itemCount` 5 vs 6 (Cash Flow always 6). Settings masonry retuned to `minColumnWidth: 460, maxColumns: 3`. **No iOS changes** — `DynamicMasonryLayout`'s new parameter defaults to `nil` (backward compatible; it has no other callers). **Not compiled here** — the build machine has only Command Line Tools, no Xcode, so `xcodebuild` could not run; verified via symbol-integrity grep + a 3-lens adversarial static review (compile / SwiftUI-layout / regression), 0 findings. On-device build + visual check still pending (see `TO_SIMO_DO.md`).
+
+- [2026-07-24T11:18:00+02:00]: App Rename to "Wealth Compass Tracker"
+  - *Details*: Renamed the application and all localized strings from "Wealth Compass" to "Wealth Compass Tracker" across all languages as requested.
+  - *Tech Notes*: Executed a regex replace across `.xcstrings`, `.plist`, `.swift`, and `.pbxproj` files to ensure consistent naming.
+
+- [2026-07-24T11:20:00+02:00]: App Rename in Fastlane Metadata
+  - *Details*: Updated all localized `name.txt` files inside the fastlane metadata directory so the app will appear as "Wealth Compass Tracker" globally in App Store Connect.
+  - *Tech Notes*: Ran a script iterating over `fastlane/metadata/*/name.txt` and forcefully set the content to "Wealth Compass Tracker".
+
+- [2026-07-24T11:47:00+02:00]: Swift 6 Concurrency Warning Fix
+  - *Details*: Fixed a Swift 6 language mode concurrency warning in `RecurringNotificationService.swift` where the main actor-isolated static property `AppSettings.appLanguageDefaultsKey` was being accessed from a different actor.
+  - *Tech Notes*: Added the `nonisolated` keyword to `appLanguageDefaultsKey` in `AppSettings.swift`. Since it's a static `String` constant (`Sendable`), it is safe to access synchronously across actor boundaries.
+
+- [2026-07-24T11:49:00+02:00]: App Version Bump (1.1.3)
+  - *Details*: Incremented the app version across the codebase to 1.1.3 (build 18) for an App Store release.
+  - *Tech Notes*: Bumped `MARKETING_VERSION` to `1.1.3` and `CURRENT_PROJECT_VERSION` to `18` in `project.pbxproj` using `agvtool`. Updated `CFBundleShortVersionString` to `1.1.3` in `Info.plist`.
+
+- [2026-07-24T11:55:00+02:00]: App Store Connect Metadata Upload
+  - *Details*: Successfully ran `fastlane ios metadata` and `fastlane mac metadata` to upload the latest localized app names to App Store Connect for the newly created version 1.1.3.
+
+- [2026-07-24T12:01:00+02:00]: App Store Connect Release Notes Update
+  - *Details*: Uploaded the updated "What's New" text ("General improvements and bug fixes.") to all 39 localizations in App Store Connect for the 1.1.3 release.

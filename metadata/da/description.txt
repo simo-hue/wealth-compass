@@ -1,0 +1,21 @@
+Wealth Compass er et privat, lokalt første dashboard til personlig økonomi, der hjælper dig med at forstå din nettoværdi, pengestrømme, investeringer, kryptoaktiver og passiver på ét sted.
+
+Skab et klart billede af din økonomi:
+
+- Se nettoværdi, kassebeholdning, investeringer og krypto på et øjeblik
+- Spor indtægter og udgifter med kategorier og visuelle tendenser
+- Planlæg tilbagevendende transaktioner og modtag valgfri lokale påmindelser
+- Overvåg aktie-, ETF- og cryptocurrency-beholdninger
+- Gennemgå omkostningsgrundlag, resultat og porteføljefordeling
+- Spor passiver sammen med dine aktiver
+- Følg nettoværdihistorien med automatiske lokale snapshots
+- Konverter værdier ved hjælp af cachelagrede ECB-referencekurser
+- Skjul følsomme mængder øjeblikkeligt med Privacy Mode
+- Beskyt appen med Face ID eller Touch ID
+- Eksporter, importer og slet dine lokale data, når du vil
+
+Dine økonomiske optegnelser forbliver på din enhed. Wealth Compass kræver ikke en konto og gemmer ikke din portefølje eller transaktionshistorik på udviklerdrevne servere.
+
+Valgfri markedsprisopdateringer bruger API-legitimationsoplysninger, som du angiver. Legitimationsoplysninger gemmes sikkert i iOS-nøgleringen.
+
+Wealth Compass er et informationssporingsværktøj. Den forbinder ikke til finansielle institutioner, udfører handler, yder finansiel rådgivning eller garanterer nøjagtigheden af ​​tredjeparts markedsdata.

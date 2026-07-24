@@ -1,0 +1,21 @@
+Wealth Compass là một bảng điều khiển tài chính cá nhân riêng tư, ưu tiên địa phương, giúp bạn hiểu về giá trị ròng, dòng tiền, đầu tư, tài sản tiền điện tử và các khoản nợ ở cùng một nơi.
+
+Xây dựng bức tranh rõ ràng về tài chính của bạn:
+
+- Xem giá trị ròng, số dư tiền mặt, đầu tư và tiền điện tử chỉ trong nháy mắt
+- Theo dõi thu nhập và chi tiêu với các danh mục và xu hướng trực quan
+- Lên lịch giao dịch định kỳ và nhận nhắc nhở địa phương tùy chọn
+- Giám sát cổ phiếu, ETF và tài sản tiền điện tử
+- Xem lại giá cơ sở, lãi/lỗ và phân bổ danh mục
+- Theo dõi các khoản nợ cùng với tài sản của bạn
+- Theo dõi lịch sử giá trị ròng với các ảnh chụp nhanh tự động tại địa phương
+- Chuyển đổi giá trị bằng cách sử dụng tỷ giá hối đoái tham chiếu ECB đã lưu
+- Ẩn các số tiền nhạy cảm ngay lập tức với Chế độ Riêng tư
+- Bảo vệ ứng dụng bằng Face ID hoặc Touch ID
+- Xuất, nhập và xóa dữ liệu cục bộ của bạn bất cứ khi nào bạn muốn
+
+Hồ sơ tài chính của bạn được lưu trên thiết bị của bạn. Wealth Compass không yêu cầu tài khoản và không lưu danh mục hoặc lịch sử giao dịch của bạn trên máy chủ do nhà phát triển điều hành.
+
+Cập nhật giá thị trường tùy chọn sử dụng thông tin đăng nhập API mà bạn cung cấp. Thông tin đăng nhập được lưu trữ an toàn trong iOS Keychain.
+
+Wealth Compass là công cụ theo dõi thông tin. Nó không kết nối với các tổ chức tài chính, thực hiện giao dịch, cung cấp lời khuyên tài chính hoặc đảm bảo độ chính xác của dữ liệu thị trường từ bên thứ ba.

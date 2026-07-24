@@ -30,7 +30,7 @@ struct LockView: View {
                     }
 
                     VStack(spacing: 8) {
-                        Text("Wealth Compass")
+                        Text("Wealth Compass Tracker")
                             .font(.system(size: titleSize, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                         Text(settings.localized("Unlock with \(appLock.biometryName(appLanguage: settings.appLanguage))"))

@@ -1,1 +1,1 @@
-일반적인 개선
+General improvements and bug fixes.

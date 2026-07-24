@@ -1,1 +1,1 @@
-Cải tiến chung
+General improvements and bug fixes.

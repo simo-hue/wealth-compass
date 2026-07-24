@@ -390,7 +390,7 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
 
     init(
         fileManager: FileManager = .default,
-        directoryName: String = "Wealth Compass",
+        directoryName: String = "Wealth Compass Tracker",
         fileName: String = "wealth-compass-cloud-sync.json"
     ) {
         self.fileManager = fileManager

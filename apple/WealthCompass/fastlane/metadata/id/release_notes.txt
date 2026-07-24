@@ -1,1 +1,1 @@
-Perbaikan umum
+General improvements and bug fixes.

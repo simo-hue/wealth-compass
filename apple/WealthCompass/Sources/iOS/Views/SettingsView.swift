@@ -68,7 +68,7 @@ struct SettingsView: View {
                             .font(.caption)
                             .foregroundStyle(WCColor.destructive)
                     } else {
-                        Text("When enabled, Wealth Compass locks whenever the app leaves the foreground.")
+                        Text("When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground.")
                             .font(.caption)
                             .foregroundStyle(WCColor.textSecondary)
                     }

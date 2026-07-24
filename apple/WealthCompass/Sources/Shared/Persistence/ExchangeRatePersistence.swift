@@ -16,7 +16,7 @@ struct LocalExchangeRatePersistence: ExchangeRatePersistence {
 
     init(
         fileManager: FileManager = .default,
-        directoryName: String = "Wealth Compass",
+        directoryName: String = "Wealth Compass Tracker",
         fileName: String = "exchange-rates.json"
     ) {
         self.fileManager = fileManager

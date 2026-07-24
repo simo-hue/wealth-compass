@@ -1,1 +1,1 @@
-Allmänna förbättringar
+General improvements and bug fixes.

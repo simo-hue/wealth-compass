@@ -1679,7 +1679,7 @@
         }
       }
     },
-    "%@\n\nWealth Compass will continue using %@." : {
+    "%@\n\nWealth Compass Tracker will continue using %@." : {
       "extractionState" : "stale",
       "localizations" : {
         "ar" : {
@@ -1691,67 +1691,67 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass continuarà utilitzant %@."
+            "value" : "%@\n\nWealth Compass Tracker continuarà utilitzant %@."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass bude nadále používat %@."
+            "value" : "%@\n\nWealth Compass Tracker bude nadále používat %@."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass vil fortsætte med at bruge %@."
+            "value" : "%@\n\nWealth Compass Tracker vil fortsætte med at bruge %@."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass wird weiterhin %@ verwenden."
+            "value" : "%@\n\nWealth Compass Tracker wird weiterhin %@ verwenden."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nΤο Wealth Compass θα συνεχίσει να χρησιμοποιεί %@."
+            "value" : "%@\n\nΤο Wealth Compass Tracker θα συνεχίσει να χρησιμοποιεί %@."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@\n\nWealth Compass will continue using %2$@."
+            "value" : "%1$@\n\nWealth Compass Tracker will continue using %2$@."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass seguirá usando %@."
+            "value" : "%@\n\nWealth Compass Tracker seguirá usando %@."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass seguirá usando %@."
+            "value" : "%@\n\nWealth Compass Tracker seguirá usando %@."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass jatkaa %@:n käyttöä."
+            "value" : "%@\n\nWealth Compass Tracker jatkaa %@:n käyttöä."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass continuera à utiliser %@."
+            "value" : "%@\n\nWealth Compass Tracker continuera à utiliser %@."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass ימשיך להשתמש ב-%@."
+            "value" : "%@\n\nWealth Compass Tracker ימשיך להשתמש ב-%@."
           }
         },
         "hi" : {
@@ -1763,37 +1763,37 @@
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass nastavit će koristiti %@."
+            "value" : "%@\n\nWealth Compass Tracker nastavit će koristiti %@."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nA Wealth Compass továbbra is a %@ szolgáltatást fogja használni."
+            "value" : "%@\n\nA Wealth Compass Tracker továbbra is a %@ szolgáltatást fogja használni."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass akan terus menggunakan %@."
+            "value" : "%@\n\nWealth Compass Tracker akan terus menggunakan %@."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass continuerà a utilizzare %@."
+            "value" : "%@\n\nWealth Compass Tracker continuerà a utilizzare %@."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass は引き続き %@ を使用します。"
+            "value" : "%@\n\nWealth Compass Tracker は引き続き %@ を使用します。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass는 %@을(를) 계속 사용할 것입니다."
+            "value" : "%@\n\nWealth Compass Tracker는 %@을(를) 계속 사용할 것입니다."
           }
         },
         "ms" : {
@@ -1805,55 +1805,55 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass vil fortsette å bruke %@."
+            "value" : "%@\n\nWealth Compass Tracker vil fortsette å bruke %@."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass blijft %@ gebruiken."
+            "value" : "%@\n\nWealth Compass Tracker blijft %@ gebruiken."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass będzie nadal korzystać z %@."
+            "value" : "%@\n\nWealth Compass Tracker będzie nadal korzystać z %@."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass continuará usando %@."
+            "value" : "%@\n\nWealth Compass Tracker continuará usando %@."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass continuará a utilizar %@."
+            "value" : "%@\n\nWealth Compass Tracker continuará a utilizar %@."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass va folosi în continuare %@."
+            "value" : "%@\n\nWealth Compass Tracker va folosi în continuare %@."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass продолжит использовать %@."
+            "value" : "%@\n\nWealth Compass Tracker продолжит использовать %@."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass bude naďalej používať %@."
+            "value" : "%@\n\nWealth Compass Tracker bude naďalej používať %@."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass kommer att fortsätta använda %@."
+            "value" : "%@\n\nWealth Compass Tracker kommer att fortsätta använda %@."
           }
         },
         "th" : {
@@ -1871,13 +1871,13 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass продовжить використовувати %@."
+            "value" : "%@\n\nWealth Compass Tracker продовжить використовувати %@."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\n\nWealth Compass sẽ tiếp tục sử dụng %@."
+            "value" : "%@\n\nWealth Compass Tracker sẽ tiếp tục sử dụng %@."
           }
         },
         "zh-Hans" : {
@@ -1894,10 +1894,10 @@
         }
       }
     },
-    "%@\n\nWealth Compass will continue using the built-in offline fallback rates." : {
+    "%@\n\nWealth Compass Tracker will continue using the built-in offline fallback rates." : {
 
     },
-    "%@\n\nWealth Compass will continue using the last cached rates." : {
+    "%@\n\nWealth Compass Tracker will continue using the last cached rates." : {
 
     },
     "%@ (%@)" : {
@@ -4239,7 +4239,7 @@
         }
       }
     },
-    "%@ is scheduled. Open Wealth Compass to review it." : {
+    "%@ is scheduled. Open Wealth Compass Tracker to review it." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4250,61 +4250,61 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ està programat. Obriu Wealth Compass per revisar-lo."
+            "value" : "%@ està programat. Obriu Wealth Compass Tracker per revisar-lo."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ je naplánováno. Otevřete Wealth Compass a zkontrolujte jej."
+            "value" : "%@ je naplánováno. Otevřete Wealth Compass Tracker a zkontrolujte jej."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ er planlagt. Åbn Wealth Compass for at gennemgå det."
+            "value" : "%@ er planlagt. Åbn Wealth Compass Tracker for at gennemgå det."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ ist geplant. Öffnen Sie Wealth Compass, um es zu überprüfen."
+            "value" : "%@ ist geplant. Öffnen Sie Wealth Compass Tracker, um es zu überprüfen."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ έχει προγραμματιστεί. Ανοίξτε το Wealth Compass για να το ελέγξετε."
+            "value" : "%@ έχει προγραμματιστεί. Ανοίξτε το Wealth Compass Tracker για να το ελέγξετε."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ está programado. Abra Wealth Compass para revisarlo."
+            "value" : "%@ está programado. Abra Wealth Compass Tracker para revisarlo."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ está programado. Abra Wealth Compass para revisarlo."
+            "value" : "%@ está programado. Abra Wealth Compass Tracker para revisarlo."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ on ajoitettu. Avaa Wealth Compass tarkistaaksesi sen."
+            "value" : "%@ on ajoitettu. Avaa Wealth Compass Tracker tarkistaaksesi sen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ est programmé. Ouvrez Wealth Compass pour l’examiner."
+            "value" : "%@ est programmé. Ouvrez Wealth Compass Tracker pour l’examiner."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ מתוזמן. פתח את Wealth Compass כדי לסקור אותו."
+            "value" : "%@ מתוזמן. פתח את Wealth Compass Tracker כדי לסקור אותו."
           }
         },
         "hi" : {
@@ -4316,37 +4316,37 @@
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ je na rasporedu. Otvorite Wealth Compass da biste ga pregledali."
+            "value" : "%@ je na rasporedu. Otvorite Wealth Compass Tracker da biste ga pregledali."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ ütemezve. Nyissa meg a Wealth Compass alkalmazást az áttekintéshez."
+            "value" : "%@ ütemezve. Nyissa meg a Wealth Compass Tracker alkalmazást az áttekintéshez."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ dijadwalkan. Buka Wealth Compass untuk meninjaunya."
+            "value" : "%@ dijadwalkan. Buka Wealth Compass Tracker untuk meninjaunya."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ è programmato. Apri Wealth Compass per esaminarlo."
+            "value" : "%@ è programmato. Apri Wealth Compass Tracker per esaminarlo."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ が予定されています。 Wealth Compassを開いて確認してください。"
+            "value" : "%@ が予定されています。 Wealth Compass Trackerを開いて確認してください。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@이(가) 예정되어 있습니다. Wealth Compass를 열어서 검토하세요."
+            "value" : "%@이(가) 예정되어 있습니다. Wealth Compass Tracker를 열어서 검토하세요."
           }
         },
         "ms" : {
@@ -4358,43 +4358,43 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ er planlagt. Åpne Wealth Compass for å se den."
+            "value" : "%@ er planlagt. Åpne Wealth Compass Tracker for å se den."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ is gepland. Open Wealth Compass om het te bekijken."
+            "value" : "%@ is gepland. Open Wealth Compass Tracker om het te bekijken."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ jest zaplanowane. Otwórz Wealth Compass, aby go przejrzeć."
+            "value" : "%@ jest zaplanowane. Otwórz Wealth Compass Tracker, aby go przejrzeć."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ está agendado. Abra o Wealth Compass para revisá-lo."
+            "value" : "%@ está agendado. Abra o Wealth Compass Tracker para revisá-lo."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ está agendado. Abra o Wealth Compass para o rever."
+            "value" : "%@ está agendado. Abra o Wealth Compass Tracker para o rever."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ este programată. Deschide Wealth Compass pentru a o revizui."
+            "value" : "%@ este programată. Deschide Wealth Compass Tracker pentru a o revizui."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ запланирован. Откройте Wealth Compass, чтобы просмотреть его."
+            "value" : "%@ запланирован. Откройте Wealth Compass Tracker, чтобы просмотреть его."
           }
         },
         "sk" : {
@@ -4406,7 +4406,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ är schemalagd. Öppna Wealth Compass för att granska den."
+            "value" : "%@ är schemalagd. Öppna Wealth Compass Tracker för att granska den."
           }
         },
         "th" : {
@@ -4424,13 +4424,13 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ заплановано. Відкрийте Wealth Compass, щоб переглянути його."
+            "value" : "%@ заплановано. Відкрийте Wealth Compass Tracker, щоб переглянути його."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ đã được lên lịch. Mở Wealth Compass để xem lại."
+            "value" : "%@ đã được lên lịch. Mở Wealth Compass Tracker để xem lại."
           }
         },
         "zh-Hans" : {
@@ -6353,78 +6353,78 @@
         }
       }
     },
-    "%@: %@. Wealth Compass records it automatically when the app is active." : {
+    "%@: %@. Wealth Compass Tracker records it automatically when the app is active." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. تقوم Wealth Compass بتسجيله تلقائيًا عندما يكون التطبيق نشطًا."
+            "value" : "%@: %@. تقوم Wealth Compass Tracker بتسجيله تلقائيًا عندما يكون التطبيق نشطًا."
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass el registra automàticament quan l'aplicació està activa."
+            "value" : "%@: %@. Wealth Compass Tracker el registra automàticament quan l'aplicació està activa."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass jej zaznamená automaticky, když je aplikace aktivní."
+            "value" : "%@: %@. Wealth Compass Tracker jej zaznamená automaticky, když je aplikace aktivní."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass optager det automatisk, når appen er aktiv."
+            "value" : "%@: %@. Wealth Compass Tracker optager det automatisk, når appen er aktiv."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass zeichnet es automatisch auf, wenn die App aktiv ist."
+            "value" : "%@: %@. Wealth Compass Tracker zeichnet es automatisch auf, wenn die App aktiv ist."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Το Wealth Compass το καταγράφει αυτόματα όταν η εφαρμογή είναι ενεργή."
+            "value" : "%@: %@. Το Wealth Compass Tracker το καταγράφει αυτόματα όταν η εφαρμογή είναι ενεργή."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@: %2$@. Wealth Compass records it automatically when the app is active."
+            "value" : "%1$@: %2$@. Wealth Compass Tracker records it automatically when the app is active."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass lo registra automáticamente cuando la aplicación está activa."
+            "value" : "%@: %@. Wealth Compass Tracker lo registra automáticamente cuando la aplicación está activa."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass lo registra automáticamente cuando la aplicación está activa."
+            "value" : "%@: %@. Wealth Compass Tracker lo registra automáticamente cuando la aplicación está activa."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass tallentaa sen automaattisesti, kun sovellus on aktiivinen."
+            "value" : "%@: %@. Wealth Compass Tracker tallentaa sen automaattisesti, kun sovellus on aktiivinen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ : %@. Wealth Compass l'enregistre automatiquement lorsque l'application est active."
+            "value" : "%@ : %@. Wealth Compass Tracker l'enregistre automatiquement lorsque l'application est active."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass מקליט אותו באופן אוטומטי כאשר האפליקציה פעילה."
+            "value" : "%@: %@. Wealth Compass Tracker מקליט אותו באופן אוטומטי כאשר האפליקציה פעילה."
           }
         },
         "hi" : {
@@ -6436,121 +6436,121 @@
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass ga automatski bilježi kada je aplikacija aktivna."
+            "value" : "%@: %@. Wealth Compass Tracker ga automatski bilježi kada je aplikacija aktivna."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. A Wealth Compass automatikusan rögzíti, amikor az alkalmazás aktív."
+            "value" : "%@: %@. A Wealth Compass Tracker automatikusan rögzíti, amikor az alkalmazás aktív."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass mencatatnya secara otomatis saat aplikasi aktif."
+            "value" : "%@: %@. Wealth Compass Tracker mencatatnya secara otomatis saat aplikasi aktif."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass lo registra automaticamente quando l'app è attiva."
+            "value" : "%@: %@. Wealth Compass Tracker lo registra automaticamente quando l'app è attiva."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@。 Wealth Compass は、アプリがアクティブなときに自動的に記録します。"
+            "value" : "%@: %@。 Wealth Compass Tracker は、アプリがアクティブなときに自動的に記録します。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass는 앱이 활성화되면 자동으로 기록합니다."
+            "value" : "%@: %@. Wealth Compass Tracker는 앱이 활성화되면 자동으로 기록합니다."
           }
         },
         "ms" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass merekodkannya secara automatik apabila apl aktif."
+            "value" : "%@: %@. Wealth Compass Tracker merekodkannya secara automatik apabila apl aktif."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass registrerer det automatisk når appen er aktiv."
+            "value" : "%@: %@. Wealth Compass Tracker registrerer det automatisk når appen er aktiv."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass registreert het automatisch wanneer de app actief is."
+            "value" : "%@: %@. Wealth Compass Tracker registreert het automatisch wanneer de app actief is."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass rejestruje je automatycznie, gdy aplikacja jest aktywna."
+            "value" : "%@: %@. Wealth Compass Tracker rejestruje je automatycznie, gdy aplikacja jest aktywna."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass registra automaticamente quando o aplicativo está ativo."
+            "value" : "%@: %@. Wealth Compass Tracker registra automaticamente quando o aplicativo está ativo."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. O Wealth Compass regista automaticamente quando a aplicação está ativa."
+            "value" : "%@: %@. O Wealth Compass Tracker regista automaticamente quando a aplicação está ativa."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass îl înregistrează automat când aplicația este activă."
+            "value" : "%@: %@. Wealth Compass Tracker îl înregistrează automat când aplicația este activă."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass записывает его автоматически, когда приложение активно."
+            "value" : "%@: %@. Wealth Compass Tracker записывает его автоматически, когда приложение активно."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass to automaticky zaznamená, keď je aplikácia aktívna."
+            "value" : "%@: %@. Wealth Compass Tracker to automaticky zaznamená, keď je aplikácia aktívna."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass registrerar det automatiskt när appen är aktiv."
+            "value" : "%@: %@. Wealth Compass Tracker registrerar det automatiskt när appen är aktiv."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass จะบันทึกโดยอัตโนมัติเมื่อแอปเปิดใช้งานอยู่"
+            "value" : "%@: %@. Wealth Compass Tracker จะบันทึกโดยอัตโนมัติเมื่อแอปเปิดใช้งานอยู่"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass, uygulama aktif olduğunda bunu otomatik olarak kaydeder."
+            "value" : "%@: %@. Wealth Compass Tracker, uygulama aktif olduğunda bunu otomatik olarak kaydeder."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass записує його автоматично, коли програма активна."
+            "value" : "%@: %@. Wealth Compass Tracker записує його автоматично, коли програма активна."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass sẽ tự động ghi lại khi ứng dụng hoạt động."
+            "value" : "%@: %@. Wealth Compass Tracker sẽ tự động ghi lại khi ứng dụng hoạt động."
           }
         },
         "zh-Hans" : {
@@ -6567,79 +6567,79 @@
         }
       }
     },
-    "%@: %@. Wealth Compass records it while the app is active." : {
+    "%@: %@. Wealth Compass Tracker records it while the app is active." : {
       "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. تقوم Wealth Compass بتسجيله أثناء نشاط التطبيق."
+            "value" : "%@: %@. تقوم Wealth Compass Tracker بتسجيله أثناء نشاط التطبيق."
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass el registra mentre l'aplicació està activa."
+            "value" : "%@: %@. Wealth Compass Tracker el registra mentre l'aplicació està activa."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass to zaznamená, když je aplikace aktivní."
+            "value" : "%@: %@. Wealth Compass Tracker to zaznamená, když je aplikace aktivní."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass optager det, mens appen er aktiv."
+            "value" : "%@: %@. Wealth Compass Tracker optager det, mens appen er aktiv."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass zeichnet es auf, während die App aktiv ist."
+            "value" : "%@: %@. Wealth Compass Tracker zeichnet es auf, während die App aktiv ist."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Το Wealth Compass το καταγράφει ενώ η εφαρμογή είναι ενεργή."
+            "value" : "%@: %@. Το Wealth Compass Tracker το καταγράφει ενώ η εφαρμογή είναι ενεργή."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@: %2$@. Wealth Compass records it while the app is active."
+            "value" : "%1$@: %2$@. Wealth Compass Tracker records it while the app is active."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass lo registra mientras la aplicación está activa."
+            "value" : "%@: %@. Wealth Compass Tracker lo registra mientras la aplicación está activa."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass lo registra mientras la aplicación está activa."
+            "value" : "%@: %@. Wealth Compass Tracker lo registra mientras la aplicación está activa."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass tallentaa sen, kun sovellus on aktiivinen."
+            "value" : "%@: %@. Wealth Compass Tracker tallentaa sen, kun sovellus on aktiivinen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ : %@. Wealth Compass l'enregistre pendant que l'application est active."
+            "value" : "%@ : %@. Wealth Compass Tracker l'enregistre pendant que l'application est active."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass records it while the app is active."
+            "value" : "%@: %@. Wealth Compass Tracker records it while the app is active."
           }
         },
         "hi" : {
@@ -6651,37 +6651,37 @@
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass to bilježi dok je aplikacija aktivna."
+            "value" : "%@: %@. Wealth Compass Tracker to bilježi dok je aplikacija aktivna."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. A Wealth Compass rögzíti, amíg az alkalmazás aktív."
+            "value" : "%@: %@. A Wealth Compass Tracker rögzíti, amíg az alkalmazás aktív."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass mencatatnya saat aplikasi aktif."
+            "value" : "%@: %@. Wealth Compass Tracker mencatatnya saat aplikasi aktif."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass lo registra mentre l'app è attiva."
+            "value" : "%@: %@. Wealth Compass Tracker lo registra mentre l'app è attiva."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@。 Wealth Compass は、アプリがアクティブな間、それを記録します。"
+            "value" : "%@: %@。 Wealth Compass Tracker は、アプリがアクティブな間、それを記録します。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass는 앱이 활성화된 동안 이를 기록합니다."
+            "value" : "%@: %@. Wealth Compass Tracker는 앱이 활성화된 동안 이를 기록합니다."
           }
         },
         "ms" : {
@@ -6693,79 +6693,79 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass registrerer det mens appen er aktiv."
+            "value" : "%@: %@. Wealth Compass Tracker registrerer det mens appen er aktiv."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass registreert het terwijl de app actief is."
+            "value" : "%@: %@. Wealth Compass Tracker registreert het terwijl de app actief is."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass rejestruje je, gdy aplikacja jest aktywna."
+            "value" : "%@: %@. Wealth Compass Tracker rejestruje je, gdy aplikacja jest aktywna."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass registra enquanto o aplicativo está ativo."
+            "value" : "%@: %@. Wealth Compass Tracker registra enquanto o aplicativo está ativo."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass regista enquanto a aplicação está ativa."
+            "value" : "%@: %@. Wealth Compass Tracker regista enquanto a aplicação está ativa."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass îl înregistrează în timp ce aplicația este activă."
+            "value" : "%@: %@. Wealth Compass Tracker îl înregistrează în timp ce aplicația este activă."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass записывает его, пока приложение активно."
+            "value" : "%@: %@. Wealth Compass Tracker записывает его, пока приложение активно."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass to zaznamenáva, keď je aplikácia aktívna."
+            "value" : "%@: %@. Wealth Compass Tracker to zaznamenáva, keď je aplikácia aktívna."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass registrerar det medan appen är aktiv."
+            "value" : "%@: %@. Wealth Compass Tracker registrerar det medan appen är aktiv."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass จะบันทึกในขณะที่แอปทำงานอยู่"
+            "value" : "%@: %@. Wealth Compass Tracker จะบันทึกในขณะที่แอปทำงานอยู่"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass, uygulama aktifken bunu kaydeder."
+            "value" : "%@: %@. Wealth Compass Tracker, uygulama aktifken bunu kaydeder."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass записує його, поки програма активна."
+            "value" : "%@: %@. Wealth Compass Tracker записує його, поки програма активна."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: %@. Wealth Compass ghi lại nó trong khi ứng dụng đang hoạt động."
+            "value" : "%@: %@. Wealth Compass Tracker ghi lại nó trong khi ứng dụng đang hoạt động."
           }
         },
         "zh-Hans" : {
@@ -42437,7 +42437,7 @@
         }
       }
     },
-    "Enable biometric protection for Wealth Compass." : {
+    "Enable biometric protection for Wealth Compass Tracker." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -42448,61 +42448,61 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activa la protecció biomètrica per a Wealth Compass."
+            "value" : "Activa la protecció biomètrica per a Wealth Compass Tracker."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Povolit biometrickou ochranu pro Wealth Compass."
+            "value" : "Povolit biometrickou ochranu pro Wealth Compass Tracker."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiver biometrisk beskyttelse for Wealth Compass."
+            "value" : "Aktiver biometrisk beskyttelse for Wealth Compass Tracker."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktivieren Sie den biometrischen Schutz für Wealth Compass."
+            "value" : "Aktivieren Sie den biometrischen Schutz für Wealth Compass Tracker."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ενεργοποιήστε τη βιομετρική προστασία για το Wealth Compass."
+            "value" : "Ενεργοποιήστε τη βιομετρική προστασία για το Wealth Compass Tracker."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Habilite la protección biométrica para Wealth Compass."
+            "value" : "Habilite la protección biométrica para Wealth Compass Tracker."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Habilite la protección biométrica para Wealth Compass."
+            "value" : "Habilite la protección biométrica para Wealth Compass Tracker."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ota käyttöön Wealth Compassin biometrinen suojaus."
+            "value" : "Ota käyttöön Wealth Compass Trackerin biometrinen suojaus."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activer la protection biométrique pour Wealth Compass."
+            "value" : "Activer la protection biométrique pour Wealth Compass Tracker."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "אפשר הגנה ביומטרית עבור Wealth Compass."
+            "value" : "אפשר הגנה ביומטרית עבור Wealth Compass Tracker."
           }
         },
         "hi" : {
@@ -42514,37 +42514,37 @@
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Omogućite biometrijsku zaštitu za Wealth Compass."
+            "value" : "Omogućite biometrijsku zaštitu za Wealth Compass Tracker."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Biometrikus védelem engedélyezése a Wealth Compass számára."
+            "value" : "Biometrikus védelem engedélyezése a Wealth Compass Tracker számára."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktifkan perlindungan biometrik untuk Wealth Compass."
+            "value" : "Aktifkan perlindungan biometrik untuk Wealth Compass Tracker."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abilita la protezione biometrica per Wealth Compass."
+            "value" : "Abilita la protezione biometrica per Wealth Compass Tracker."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wealth Compass の生体認証保護を有効にします。"
+            "value" : "Wealth Compass Tracker の生体認証保護を有効にします。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wealth Compass에 대한 생체 인식 보호를 활성화합니다."
+            "value" : "Wealth Compass Tracker에 대한 생체 인식 보호를 활성화합니다."
           }
         },
         "ms" : {
@@ -42556,61 +42556,61 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiver biometrisk beskyttelse for Wealth Compass."
+            "value" : "Aktiver biometrisk beskyttelse for Wealth Compass Tracker."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schakel biometrische bescherming in voor Wealth Compass."
+            "value" : "Schakel biometrische bescherming in voor Wealth Compass Tracker."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Włącz ochronę biometryczną w Wealth Compass."
+            "value" : "Włącz ochronę biometryczną w Wealth Compass Tracker."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ative a proteção biométrica para o Wealth Compass."
+            "value" : "Ative a proteção biométrica para o Wealth Compass Tracker."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ative a proteção biométrica para o Wealth Compass."
+            "value" : "Ative a proteção biométrica para o Wealth Compass Tracker."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activați protecția biometrică pentru Wealth Compass."
+            "value" : "Activați protecția biometrică pentru Wealth Compass Tracker."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Включите биометрическую защиту для Wealth Compass."
+            "value" : "Включите биометрическую защиту для Wealth Compass Tracker."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Povoliť biometrickú ochranu pre Wealth Compass."
+            "value" : "Povoliť biometrickú ochranu pre Wealth Compass Tracker."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktivera biometriskt skydd för Wealth Compass."
+            "value" : "Aktivera biometriskt skydd för Wealth Compass Tracker."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "เปิดใช้งานการป้องกันไบโอเมตริกซ์สำหรับ Wealth Compass"
+            "value" : "เปิดใช้งานการป้องกันไบโอเมตริกซ์สำหรับ Wealth Compass Tracker"
           }
         },
         "tr" : {
@@ -42622,25 +42622,25 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Увімкніть біометричний захист для Wealth Compass."
+            "value" : "Увімкніть біометричний захист для Wealth Compass Tracker."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kích hoạt tính năng bảo vệ sinh trắc học cho Wealth Compass."
+            "value" : "Kích hoạt tính năng bảo vệ sinh trắc học cho Wealth Compass Tracker."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "为 Wealth Compass 启用生物识别保护。"
+            "value" : "为 Wealth Compass Tracker 启用生物识别保护。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "為 Wealth Compass 啟用生物辨識保護。"
+            "value" : "為 Wealth Compass Tracker 啟用生物辨識保護。"
           }
         }
       }
@@ -55051,79 +55051,79 @@
         }
       }
     },
-    "Hide financial values throughout Wealth Compass." : {
+    "Hide financial values throughout Wealth Compass Tracker." : {
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إخفاء القيم المالية في جميع أنحاء Wealth Compass."
+            "value" : "إخفاء القيم المالية في جميع أنحاء Wealth Compass Tracker."
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Amaga els valors financers de Wealth Compass."
+            "value" : "Amaga els valors financers de Wealth Compass Tracker."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skryjte finanční hodnoty v celém Wealth Compass."
+            "value" : "Skryjte finanční hodnoty v celém Wealth Compass Tracker."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skjul økonomiske værdier i hele Wealth Compass."
+            "value" : "Skjul økonomiske værdier i hele Wealth Compass Tracker."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verstecken Sie finanzielle Werte im gesamten Wealth Compass."
+            "value" : "Verstecken Sie finanzielle Werte im gesamten Wealth Compass Tracker."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Απόκρυψη οικονομικών αξιών σε όλο το Wealth Compass."
+            "value" : "Απόκρυψη οικονομικών αξιών σε όλο το Wealth Compass Tracker."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hide financial values throughout Wealth Compass."
+            "value" : "Hide financial values throughout Wealth Compass Tracker."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oculte valores financieros en Wealth Compass."
+            "value" : "Oculte valores financieros en Wealth Compass Tracker."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oculte valores financieros en Wealth Compass."
+            "value" : "Oculte valores financieros en Wealth Compass Tracker."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Piilota taloudelliset arvot Wealth Compassissa."
+            "value" : "Piilota taloudelliset arvot Wealth Compass Trackerissa."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cachez les valeurs financières dans Wealth Compass."
+            "value" : "Cachez les valeurs financières dans Wealth Compass Tracker."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "הסתר ערכים פיננסיים ברחבי Wealth Compass."
+            "value" : "הסתר ערכים פיננסיים ברחבי Wealth Compass Tracker."
           }
         },
         "hi" : {
@@ -55135,37 +55135,37 @@
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sakrij financijske vrijednosti kroz Wealth Compass."
+            "value" : "Sakrij financijske vrijednosti kroz Wealth Compass Tracker."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pénzügyi értékek elrejtése a Wealth Compassben."
+            "value" : "Pénzügyi értékek elrejtése a Wealth Compass Trackerben."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sembunyikan nilai finansial di seluruh Wealth Compass."
+            "value" : "Sembunyikan nilai finansial di seluruh Wealth Compass Tracker."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nascondi i valori finanziari in Wealth Compass."
+            "value" : "Nascondi i valori finanziari in Wealth Compass Tracker."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wealth Compass 全体で財務価値を非表示にします。"
+            "value" : "Wealth Compass Tracker 全体で財務価値を非表示にします。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wealth Compass 전체에서 재정적 가치를 숨깁니다."
+            "value" : "Wealth Compass Tracker 전체에서 재정적 가치를 숨깁니다."
           }
         },
         "ms" : {
@@ -55177,13 +55177,13 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skjul økonomiske verdier gjennom Wealth Compass."
+            "value" : "Skjul økonomiske verdier gjennom Wealth Compass Tracker."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verberg financiële waarden in Wealth Compass."
+            "value" : "Verberg financiële waarden in Wealth Compass Tracker."
           }
         },
         "pl" : {
@@ -55195,43 +55195,43 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oculte valores financeiros em todo o Wealth Compass."
+            "value" : "Oculte valores financeiros em todo o Wealth Compass Tracker."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oculte valores financeiros em todo o Wealth Compass."
+            "value" : "Oculte valores financeiros em todo o Wealth Compass Tracker."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ascundeți valorile financiare în Wealth Compass."
+            "value" : "Ascundeți valorile financiare în Wealth Compass Tracker."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скрывайте финансовые ценности в Wealth Compass."
+            "value" : "Скрывайте финансовые ценности в Wealth Compass Tracker."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skryť finančné hodnoty v rámci Wealth Compass."
+            "value" : "Skryť finančné hodnoty v rámci Wealth Compass Tracker."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dölj ekonomiska värden i hela Wealth Compass."
+            "value" : "Dölj ekonomiska värden i hela Wealth Compass Tracker."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ซ่อนมูลค่าทางการเงินไว้ใน Wealth Compass"
+            "value" : "ซ่อนมูลค่าทางการเงินไว้ใน Wealth Compass Tracker"
           }
         },
         "tr" : {
@@ -55243,13 +55243,13 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Приховайте фінансові цінності в Wealth Compass."
+            "value" : "Приховайте фінансові цінності в Wealth Compass Tracker."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ẩn các giá trị tài chính trong Wealth Compass."
+            "value" : "Ẩn các giá trị tài chính trong Wealth Compass Tracker."
           }
         },
         "zh-Hans" : {
@@ -88193,198 +88193,198 @@
         }
       }
     },
-    "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically." : {
+    "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تسجيل التدفق النقدي أو إضافة موقف. ستقوم Wealth Compass بإنشاء لقطات وملء لوحة المعلومات هذه تلقائيًا."
+            "value" : "تسجيل التدفق النقدي أو إضافة موقف. ستقوم Wealth Compass Tracker بإنشاء لقطات وملء لوحة المعلومات هذه تلقائيًا."
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erfassen Sie den Cashflow oder fügen Sie eine Position hinzu. Wealth Compass erstellt Schnappschüsse und füllt dieses Dashboard automatisch."
+            "value" : "Erfassen Sie den Cashflow oder fügen Sie eine Position hinzu. Wealth Compass Tracker erstellt Schnappschüsse und füllt dieses Dashboard automatisch."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Registre el flujo de caja o agregue una posición. Wealth Compass creará instantáneas y completará este panel automáticamente."
+            "value" : "Registre el flujo de caja o agregue una posición. Wealth Compass Tracker creará instantáneas y completará este panel automáticamente."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enregistrez les flux de trésorerie ou ajoutez une position. Wealth Compass créera des instantanés et remplira automatiquement ce tableau de bord."
+            "value" : "Enregistrez les flux de trésorerie ou ajoutez une position. Wealth Compass Tracker créera des instantanés et remplira automatiquement ce tableau de bord."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "hr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Registra il flusso di cassa o aggiungi una posizione. Wealth Compass creerà istantanee e riempirà automaticamente questa dashboard."
+            "value" : "Registra il flusso di cassa o aggiungi una posizione. Wealth Compass Tracker creerà istantanee e riempirà automaticamente questa dashboard."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "ms" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         },
         "zh-Hans" : {
@@ -88396,7 +88396,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Record cash flow or add a position. Wealth Compass will create snapshots and fill this dashboard automatically."
+            "value" : "Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically."
           }
         }
       }
@@ -103846,42 +103846,42 @@
         }
       }
     },
-    "The selected file is not a valid Wealth Compass JSON backup. %@" : {
+    "The selected file is not a valid Wealth Compass Tracker JSON backup. %@" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الملف المحدد ليس نسخة احتياطية صالحة لـ Wealth Compass JSON. %@"
+            "value" : "الملف المحدد ليس نسخة احتياطية صالحة لـ Wealth Compass Tracker JSON. %@"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die ausgewählte Datei ist kein gültiges Wealth Compass JSON-Backup. %@"
+            "value" : "Die ausgewählte Datei ist kein gültiges Wealth Compass Tracker JSON-Backup. %@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El archivo seleccionado no es una copia de seguridad JSON válida de Wealth Compass. %@"
+            "value" : "El archivo seleccionado no es una copia de seguridad JSON válida de Wealth Compass Tracker. %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le fichier sélectionné n’est pas une sauvegarde JSON Wealth Compass valide. %@"
+            "value" : "Le fichier sélectionné n’est pas une sauvegarde JSON Wealth Compass Tracker valide. %@"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il file selezionato non è un backup JSON Wealth Compass valido. %@"
+            "value" : "Il file selezionato non è un backup JSON Wealth Compass Tracker valido. %@"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "所选文件不是有效的 Wealth Compass JSON 备份。 %@"
+            "value" : "所选文件不是有效的 Wealth Compass Tracker JSON 备份。 %@"
           }
         }
       }
@@ -104600,210 +104600,210 @@
         }
       }
     },
-    "This file isn't a Wealth Compass backup or a supported Revolut / Trade Republic statement." : {
+    "This file isn't a Wealth Compass Tracker backup or a supported Revolut / Trade Republic statement." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هذا الملف ليس نسخة احتياطية من Wealth Compass ولا كشفًا مدعومًا من Revolut / Trade Republic."
+            "value" : "هذا الملف ليس نسخة احتياطية من Wealth Compass Tracker ولا كشفًا مدعومًا من Revolut / Trade Republic."
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aquest fitxer no és una còpia de seguretat de Wealth Compass ni un extracte compatible de Revolut / Trade Republic."
+            "value" : "Aquest fitxer no és una còpia de seguretat de Wealth Compass Tracker ni un extracte compatible de Revolut / Trade Republic."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tento soubor není zálohou Wealth Compass ani podporovaným výpisem Revolut / Trade Republic."
+            "value" : "Tento soubor není zálohou Wealth Compass Tracker ani podporovaným výpisem Revolut / Trade Republic."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Denne fil er ikke en Wealth Compass-sikkerhedskopi eller et understøttet Revolut- / Trade Republic-kontoudtog."
+            "value" : "Denne fil er ikke en Wealth Compass Tracker-sikkerhedskopi eller et understøttet Revolut- / Trade Republic-kontoudtog."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Datei ist kein Wealth Compass-Backup und kein unterstützter Revolut- / Trade Republic-Kontoauszug."
+            "value" : "Diese Datei ist kein Wealth Compass Tracker-Backup und kein unterstützter Revolut- / Trade Republic-Kontoauszug."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Αυτό το αρχείο δεν είναι αντίγραφο ασφαλείας του Wealth Compass ούτε υποστηριζόμενο αντίγραφο κίνησης Revolut / Trade Republic."
+            "value" : "Αυτό το αρχείο δεν είναι αντίγραφο ασφαλείας του Wealth Compass Tracker ούτε υποστηριζόμενο αντίγραφο κίνησης Revolut / Trade Republic."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este archivo no es una copia de Wealth Compass ni un extracto compatible de Revolut / Trade Republic."
+            "value" : "Este archivo no es una copia de Wealth Compass Tracker ni un extracto compatible de Revolut / Trade Republic."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este archivo no es una copia de seguridad de Wealth Compass ni un estado de cuenta compatible de Revolut / Trade Republic."
+            "value" : "Este archivo no es una copia de seguridad de Wealth Compass Tracker ni un estado de cuenta compatible de Revolut / Trade Republic."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tämä tiedosto ei ole Wealth Compass -varmuuskopio eikä tuettu Revolut- tai Trade Republic -tiliote."
+            "value" : "Tämä tiedosto ei ole Wealth Compass Tracker -varmuuskopio eikä tuettu Revolut- tai Trade Republic -tiliote."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce fichier n'est pas une sauvegarde Wealth Compass ni un relevé Revolut / Trade Republic pris en charge."
+            "value" : "Ce fichier n'est pas une sauvegarde Wealth Compass Tracker ni un relevé Revolut / Trade Republic pris en charge."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "קובץ זה אינו גיבוי של Wealth Compass או דף חשבון נתמך של Revolut / Trade Republic."
+            "value" : "קובץ זה אינו גיבוי של Wealth Compass Tracker או דף חשבון נתמך של Revolut / Trade Republic."
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "यह फ़ाइल न तो Wealth Compass बैकअप है और न ही कोई समर्थित Revolut / Trade Republic विवरण।"
+            "value" : "यह फ़ाइल न तो Wealth Compass Tracker बैकअप है और न ही कोई समर्थित Revolut / Trade Republic विवरण।"
           }
         },
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ova datoteka nije Wealth Compass sigurnosna kopija niti podržani Revolut / Trade Republic izvod."
+            "value" : "Ova datoteka nije Wealth Compass Tracker sigurnosna kopija niti podržani Revolut / Trade Republic izvod."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ez a fájl nem Wealth Compass biztonsági másolat, és nem támogatott Revolut / Trade Republic kivonat."
+            "value" : "Ez a fájl nem Wealth Compass Tracker biztonsági másolat, és nem támogatott Revolut / Trade Republic kivonat."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "File ini bukan cadangan Wealth Compass atau rekening koran Revolut / Trade Republic yang didukung."
+            "value" : "File ini bukan cadangan Wealth Compass Tracker atau rekening koran Revolut / Trade Republic yang didukung."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questo file non è un backup di Wealth Compass né un estratto conto Revolut / Trade Republic supportato."
+            "value" : "Questo file non è un backup di Wealth Compass Tracker né un estratto conto Revolut / Trade Republic supportato."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このファイルは Wealth Compass のバックアップでも、サポートされている Revolut / Trade Republic の明細書でもありません。"
+            "value" : "このファイルは Wealth Compass Tracker のバックアップでも、サポートされている Revolut / Trade Republic の明細書でもありません。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "이 파일은 Wealth Compass 백업이나 지원되는 Revolut / Trade Republic 명세서가 아닙니다."
+            "value" : "이 파일은 Wealth Compass Tracker 백업이나 지원되는 Revolut / Trade Republic 명세서가 아닙니다."
           }
         },
         "ms" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fail ini bukan sandaran Wealth Compass atau penyata Revolut / Trade Republic yang disokong."
+            "value" : "Fail ini bukan sandaran Wealth Compass Tracker atau penyata Revolut / Trade Republic yang disokong."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Denne filen er ikke en Wealth Compass-sikkerhetskopi eller en støttet Revolut- / Trade Republic-kontoutskrift."
+            "value" : "Denne filen er ikke en Wealth Compass Tracker-sikkerhetskopi eller en støttet Revolut- / Trade Republic-kontoutskrift."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dit bestand is geen Wealth Compass-back-up of een ondersteund Revolut- / Trade Republic-overzicht."
+            "value" : "Dit bestand is geen Wealth Compass Tracker-back-up of een ondersteund Revolut- / Trade Republic-overzicht."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ten plik nie jest kopią zapasową Wealth Compass ani obsługiwanym wyciągiem Revolut / Trade Republic."
+            "value" : "Ten plik nie jest kopią zapasową Wealth Compass Tracker ani obsługiwanym wyciągiem Revolut / Trade Republic."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este arquivo não é um backup do Wealth Compass nem um extrato compatível da Revolut / Trade Republic."
+            "value" : "Este arquivo não é um backup do Wealth Compass Tracker nem um extrato compatível da Revolut / Trade Republic."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este ficheiro não é um backup do Wealth Compass nem um extrato compatível do Revolut / Trade Republic."
+            "value" : "Este ficheiro não é um backup do Wealth Compass Tracker nem um extrato compatível do Revolut / Trade Republic."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Acest fișier nu este un backup Wealth Compass sau un extras Revolut / Trade Republic acceptat."
+            "value" : "Acest fișier nu este un backup Wealth Compass Tracker sau un extras Revolut / Trade Republic acceptat."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Этот файл не является резервной копией Wealth Compass или поддерживаемой выпиской Revolut / Trade Republic."
+            "value" : "Этот файл не является резервной копией Wealth Compass Tracker или поддерживаемой выпиской Revolut / Trade Republic."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tento súbor nie je zálohou Wealth Compass ani podporovaným výpisom Revolut / Trade Republic."
+            "value" : "Tento súbor nie je zálohou Wealth Compass Tracker ani podporovaným výpisom Revolut / Trade Republic."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Den här filen är inte en Wealth Compass-säkerhetskopia eller ett kontoutdrag som stöds från Revolut / Trade Republic."
+            "value" : "Den här filen är inte en Wealth Compass Tracker-säkerhetskopia eller ett kontoutdrag som stöds från Revolut / Trade Republic."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ไฟล์นี้ไม่ใช่ข้อมูลสำรองของ Wealth Compass หรือใบแจ้งยอดของ Revolut / Trade Republic ที่รองรับ"
+            "value" : "ไฟล์นี้ไม่ใช่ข้อมูลสำรองของ Wealth Compass Tracker หรือใบแจ้งยอดของ Revolut / Trade Republic ที่รองรับ"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bu dosya bir Wealth Compass yedeklemesi veya desteklenen bir Revolut / Trade Republic ekstresi değil."
+            "value" : "Bu dosya bir Wealth Compass Tracker yedeklemesi veya desteklenen bir Revolut / Trade Republic ekstresi değil."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Цей файл не є резервною копією Wealth Compass чи підтримуваною випискою Revolut / Trade Republic."
+            "value" : "Цей файл не є резервною копією Wealth Compass Tracker чи підтримуваною випискою Revolut / Trade Republic."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tệp này không phải là bản sao lưu Wealth Compass hoặc sao kê Revolut / Trade Republic được hỗ trợ."
+            "value" : "Tệp này không phải là bản sao lưu Wealth Compass Tracker hoặc sao kê Revolut / Trade Republic được hỗ trợ."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此文件不是 Wealth Compass 备份，也不是受支持的 Revolut / Trade Republic 对账单。"
+            "value" : "此文件不是 Wealth Compass Tracker 备份，也不是受支持的 Revolut / Trade Republic 对账单。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此檔案並非 Wealth Compass 備份，也不是受支援的 Revolut / Trade Republic 對帳單。"
+            "value" : "此檔案並非 Wealth Compass Tracker 備份，也不是受支援的 Revolut / Trade Republic 對帳單。"
           }
         }
       }
@@ -105270,37 +105270,37 @@
         }
       }
     },
-    "This permanently removes all local Wealth Compass data from this device." : {
+    "This permanently removes all local Wealth Compass Tracker data from this device." : {
       "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يؤدي هذا إلى إزالة جميع بيانات Wealth Compass المحلية من هذا الجهاز بشكل دائم."
+            "value" : "يؤدي هذا إلى إزالة جميع بيانات Wealth Compass Tracker المحلية من هذا الجهاز بشكل دائم."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dadurch werden alle lokalen Wealth Compass-Daten dauerhaft von diesem Gerät entfernt."
+            "value" : "Dadurch werden alle lokalen Wealth Compass Tracker-Daten dauerhaft von diesem Gerät entfernt."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esto elimina permanentemente todos los datos locales de Wealth Compass de este dispositivo."
+            "value" : "Esto elimina permanentemente todos los datos locales de Wealth Compass Tracker de este dispositivo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cela supprime définitivement toutes les données locales de Wealth Compass de cet appareil."
+            "value" : "Cela supprime définitivement toutes les données locales de Wealth Compass Tracker de cet appareil."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ciò rimuove permanentemente tutti i dati locali di Wealth Compass da questo dispositivo."
+            "value" : "Ciò rimuove permanentemente tutti i dati locali di Wealth Compass Tracker da questo dispositivo."
           }
         },
         "zh-Hans" : {
@@ -108900,7 +108900,7 @@
         }
       }
     },
-    "Turn off app protection for Wealth Compass." : {
+    "Turn off app protection for Wealth Compass Tracker." : {
 
     },
     "Turn off Privacy Mode to reveal values and movement." : {
@@ -110427,7 +110427,7 @@
         }
       }
     },
-    "Unlock your local Wealth Compass data." : {
+    "Unlock your local Wealth Compass Tracker data." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -110438,187 +110438,187 @@
         "ca" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schalten Sie Ihre lokalen Wealth Compass-Daten frei."
+            "value" : "Schalten Sie Ihre lokalen Wealth Compass Tracker-Daten frei."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desbloquee sus datos locales de Wealth Compass."
+            "value" : "Desbloquee sus datos locales de Wealth Compass Tracker."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Débloquez vos données Wealth Compass locales."
+            "value" : "Débloquez vos données Wealth Compass Tracker locales."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "hr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sblocca i dati della tua Wealth Compass locale."
+            "value" : "Sblocca i dati della tua Wealth Compass Tracker locale."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "ms" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         },
         "zh-Hans" : {
@@ -110630,7 +110630,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unlock your local Wealth Compass data."
+            "value" : "Unlock your local Wealth Compass Tracker data."
           }
         }
       }
@@ -113706,7 +113706,7 @@
         }
       }
     },
-    "Wealth Compass" : {
+    "Wealth Compass Tracker" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -113717,19 +113717,19 @@
         "ca" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "de" : {
@@ -113741,7 +113741,7 @@
         "el" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "es" : {
@@ -113753,13 +113753,13 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "fr" : {
@@ -113771,31 +113771,31 @@
         "he" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "hr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "it" : {
@@ -113807,97 +113807,97 @@
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "ms" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         },
         "zh-Hans" : {
@@ -113909,210 +113909,210 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass"
+            "value" : "Wealth Compass Tracker"
           }
         }
       }
     },
-    "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens." : {
+    "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens." : {
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تسجل Wealth Compass الأحداث المستحقة أثناء نشاط التطبيق. إذا تم إغلاق التطبيق، تتم إضافة الأحداث الفائتة تلقائيًا في المرة التالية التي يتم فيها فتحه."
+            "value" : "تسجل Wealth Compass Tracker الأحداث المستحقة أثناء نشاط التطبيق. إذا تم إغلاق التطبيق، تتم إضافة الأحداث الفائتة تلقائيًا في المرة التالية التي يتم فيها فتحه."
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wealth Compass zeichnet fällige Ereignisse auf, während die App aktiv ist. Wenn die App geschlossen wurde, werden verpasste Vorkommnisse beim nächsten Öffnen automatisch hinzugefügt."
+            "value" : "Wealth Compass Tracker zeichnet fällige Ereignisse auf, während die App aktiv ist. Wenn die App geschlossen wurde, werden verpasste Vorkommnisse beim nächsten Öffnen automatisch hinzugefügt."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wealth Compass registra las ocurrencias debidas mientras la aplicación está activa. Si la aplicación se cerró, las ocurrencias omitidas se agregan automáticamente la próxima vez que se abre."
+            "value" : "Wealth Compass Tracker registra las ocurrencias debidas mientras la aplicación está activa. Si la aplicación se cerró, las ocurrencias omitidas se agregan automáticamente la próxima vez que se abre."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wealth Compass enregistre les événements dus pendant que l'application est active. Si l'application a été fermée, les occurrences manquées sont ajoutées automatiquement à la prochaine ouverture."
+            "value" : "Wealth Compass Tracker enregistre les événements dus pendant que l'application est active. Si l'application a été fermée, les occurrences manquées sont ajoutées automatiquement à la prochaine ouverture."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "hr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wealth Compass registra gli eventi dovuti mentre l'app è attiva. Se l'app è stata chiusa, gli eventi persi verranno aggiunti automaticamente alla successiva apertura."
+            "value" : "Wealth Compass Tracker registra gli eventi dovuti mentre l'app è attiva. Se l'app è stata chiusa, gli eventi persi verranno aggiunti automaticamente alla successiva apertura."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "ms" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         },
         "zh-Hans" : {
@@ -114124,7 +114124,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wealth Compass records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
+            "value" : "Wealth Compass Tracker records due occurrences while the app is active. If the app was closed, missed occurrences are added automatically the next time it opens."
           }
         }
       }
@@ -114545,413 +114545,413 @@
         }
       }
     },
-    "When enabled, Wealth Compass locks when the app is no longer active." : {
+    "When enabled, Wealth Compass Tracker locks when the app is no longer active." : {
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "عند التمكين، يتم قفل Wealth Compass عندما لا يعد التطبيق نشطًا."
+            "value" : "عند التمكين، يتم قفل Wealth Compass Tracker عندما لا يعد التطبيق نشطًا."
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn aktiviert, wird Wealth Compass gesperrt, wenn die App nicht mehr aktiv ist."
+            "value" : "Wenn aktiviert, wird Wealth Compass Tracker gesperrt, wenn die App nicht mehr aktiv ist."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuando está habilitado, Wealth Compass se bloquea cuando la aplicación ya no está activa."
+            "value" : "Cuando está habilitado, Wealth Compass Tracker se bloquea cuando la aplicación ya no está activa."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lorsqu'elle est activée, Wealth Compass se verrouille lorsque l'application n'est plus active."
+            "value" : "Lorsqu'elle est activée, Wealth Compass Tracker se verrouille lorsque l'application n'est plus active."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "hr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se abilitato, Wealth Compass si blocca quando l'app non è più attiva."
+            "value" : "Se abilitato, Wealth Compass Tracker si blocca quando l'app non è più attiva."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "ms" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "启用后，Wealth Compass 将在应用程序不再处于活动状态时锁定。"
+            "value" : "启用后，Wealth Compass Tracker 将在应用程序不再处于活动状态时锁定。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks when the app is no longer active."
+            "value" : "When enabled, Wealth Compass Tracker locks when the app is no longer active."
           }
         }
       }
     },
-    "When enabled, Wealth Compass locks whenever the app leaves the foreground." : {
+    "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "عند التمكين، يتم قفل Wealth Compass عندما يغادر التطبيق المقدمة."
+            "value" : "عند التمكين، يتم قفل Wealth Compass Tracker عندما يغادر التطبيق المقدمة."
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn aktiviert, wird Wealth Compass immer dann gesperrt, wenn die App den Vordergrund verlässt."
+            "value" : "Wenn aktiviert, wird Wealth Compass Tracker immer dann gesperrt, wenn die App den Vordergrund verlässt."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuando está habilitado, Wealth Compass se bloquea cada vez que la aplicación sale del primer plano."
+            "value" : "Cuando está habilitado, Wealth Compass Tracker se bloquea cada vez que la aplicación sale del primer plano."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lorsqu'il est activé, Wealth Compass se verrouille chaque fois que l'application quitte le premier plan."
+            "value" : "Lorsqu'il est activé, Wealth Compass Tracker se verrouille chaque fois que l'application quitte le premier plan."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "hr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se abilitato, Wealth Compass si blocca ogni volta che l'app lascia il primo piano."
+            "value" : "Se abilitato, Wealth Compass Tracker si blocca ogni volta che l'app lascia il primo piano."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "ms" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         },
         "zh-Hans" : {
@@ -114963,7 +114963,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "When enabled, Wealth Compass locks whenever the app leaves the foreground."
+            "value" : "When enabled, Wealth Compass Tracker locks whenever the app leaves the foreground."
           }
         }
       }
@@ -116683,10 +116683,10 @@
         }
       }
     },
-    "Your financial data stays on your device and in your private iCloud — there's no Wealth Compass server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests." : {
+    "Your financial data stays on your device and in your private iCloud — there's no Wealth Compass Tracker server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests." : {
 
     },
-    "Your financial data stays on your Mac and in your private iCloud — there's no Wealth Compass server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests." : {
+    "Your financial data stays on your Mac and in your private iCloud — there's no Wealth Compass Tracker server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests." : {
 
     },
     "Your financial horizon" : {

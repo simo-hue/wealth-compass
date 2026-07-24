@@ -81,9 +81,9 @@ actor RecurringNotificationService {
                     .currency(code: currencyCode)
                         .locale(AppLocalization.effectiveLocale(appLanguage: appLanguage))
                 )
-                content.body = AppLocalization.string("\(schedule.category): \(amount). Wealth Compass records it automatically when the app is active.", appLanguage: appLanguage)
+                content.body = AppLocalization.string("\(schedule.category): \(amount). Wealth Compass Tracker records it automatically when the app is active.", appLanguage: appLanguage)
             } else {
-                content.body = AppLocalization.string("\(schedule.category) is scheduled. Open Wealth Compass to review it.", appLanguage: appLanguage)
+                content.body = AppLocalization.string("\(schedule.category) is scheduled. Open Wealth Compass Tracker to review it.", appLanguage: appLanguage)
             }
             content.sound = .default
             content.userInfo = ["recurringTransactionID": schedule.id.uuidString]
