@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+新增了 PDF 匯出功能。

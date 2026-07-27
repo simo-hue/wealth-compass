@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+PDF 내보내기 기능이 추가되었습니다.

@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+Đã thêm chức năng xuất PDF.

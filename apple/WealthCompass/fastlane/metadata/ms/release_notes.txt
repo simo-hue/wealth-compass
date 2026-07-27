@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+Fungsi eksport PDF telah ditambah.

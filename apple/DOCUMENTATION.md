@@ -533,3 +533,10 @@
 
 - [2026-07-24T12:01:00+02:00]: App Store Connect Release Notes Update
   - *Details*: Uploaded the updated "What's New" text ("General improvements and bug fixes.") to all 39 localizations in App Store Connect for the 1.1.3 release.
+
+- [2026-07-27T14:12:00+02:00]: App Version Bump (1.1.4)
+  - *Details*: Incremented the app version across the codebase to 1.1.4 (build 20) for an App Store release.
+  - *Tech Notes*: Bumped `MARKETING_VERSION` to `1.1.4` and `CURRENT_PROJECT_VERSION` to `20` in `project.pbxproj`. Updated `CFBundleShortVersionString` to `1.1.4` and `CFBundleVersion` to `20` in `Info.plist` using `agvtool`. Also updated `appVersion` in `render_sample_report.swift`.
+
+- [2026-07-27T14:24:00+02:00]: App Store Connect Release Notes Update (1.1.4)
+  - *Details*: Updated the "What's New" text to "Added PDF export functionality." across all 39 localizations in `apple/WealthCompass/fastlane/metadata` to prepare for fastlane delivery for the 1.1.4 release.

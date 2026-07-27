@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+Hozzáadva a PDF exportálási funkció.

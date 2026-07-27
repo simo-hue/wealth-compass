@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+PDF dışa aktarma işlevi eklendi.

@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+נוספה אפשרות לייצוא קבצי PDF.

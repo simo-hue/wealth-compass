@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+A fost adăugată funcționalitatea de export PDF.

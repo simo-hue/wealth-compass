@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+Adicionada a funcionalidade de exportação para PDF.

@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+Lagt til funksjonalitet for PDF-eksport.

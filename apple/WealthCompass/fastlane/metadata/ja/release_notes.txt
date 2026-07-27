@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+PDFエクスポート機能を追加しました。

@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+Dodana funkcionalnost izvoza u PDF.

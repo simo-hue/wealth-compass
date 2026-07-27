@@ -833,249 +833,6 @@
         }
       }
     },
-    "%lld future-dated entries are listed in grey. They are excluded from the balances and subtotals above, matching how the app itself reports current cash." : {
-
-    },
-    "(continued)" : {
-
-    },
-    "+ %lld more" : {
-
-    },
-    "Allocation" : {
-
-    },
-    "Appendix" : {
-
-    },
-    "Application" : {
-
-    },
-    "Assets" : {
-
-    },
-    "Avg Buy" : {
-
-    },
-    "Balance" : {
-
-    },
-    "Cash in this app is the running total of every income minus every expense, so the closing balance above is the cash figure as at the end of this period. The opening balance carries forward all activity before it." : {
-
-    },
-    "Choose Sections" : {
-
-    },
-    "Closing Balance" : {
-
-    },
-    "Contents" : {
-
-    },
-    "Conversion rates, data summary and document details" : {
-
-    },
-    "Custom Range" : {
-
-    },
-    "Data Summary" : {
-
-    },
-    "Date Range" : {
-
-    },
-    "Digital asset holdings and performance" : {
-
-    },
-    "Document" : {
-
-    },
-    "Effective Date" : {
-
-    },
-    "Every figure in this report is expressed in the base currency, converted at the rates above. Amounts shown in a holding's own currency are unconverted." : {
-
-    },
-    "Expenses by Category" : {
-
-    },
-    "Expenses This Month" : {
-
-    },
-    "Export" : {
-
-    },
-    "Export Report" : {
-
-    },
-    "Export..." : {
-
-    },
-    "Fees" : {
-
-    },
-    "Fees Paid" : {
-
-    },
-    "Financial Report" : {
-
-    },
-    "Format" : {
-
-    },
-    "Frequency" : {
-
-    },
-    "Full Report" : {
-
-    },
-    "Future-dated — not counted in cash" : {
-
-    },
-    "Gain / Loss" : {
-
-    },
-    "Generated" : {
-
-    },
-    "Holdings, allocation and performance" : {
-
-    },
-    "In %@" : {
-
-    },
-    "Income This Month" : {
-
-    },
-    "Income, expenses, recurring commitments and the full transaction ledger" : {
-
-    },
-    "Last 12 Months" : {
-
-    },
-    "Live rate" : {
-
-    },
-    "Market Value" : {
-
-    },
-    "Month-end net worth" : {
-
-    },
-    "Monthly Trend" : {
-
-    },
-    "Net cash liabilities of %@ are excluded from the allocation ring, because a ring cannot show a negative share. Net worth above accounts for them in full." : {
-
-    },
-    "Net Worth History" : {
-
-    },
-    "Net Worth Snapshots" : {
-
-    },
-    "Net worth, asset allocation and liabilities" : {
-
-    },
-    "Next Due" : {
-
-    },
-    "No entries recorded." : {
-
-    },
-    "No exchange rate snapshot had been retrieved when this report was generated. Foreign-currency amounts were converted using the app's built-in offline fallback rates, which are approximate." : {
-
-    },
-    "Offline fallback rate" : {
-
-    },
-    "Opening Balance" : {
-
-    },
-    "Page %1$@ of %2$@" : {
-
-    },
-    "Platform" : {
-
-    },
-    "Prepared from data entered by the account holder. Market values reflect the most recent prices retrieved by the app and are not independently verified. This document is a personal record, not financial advice or a statement from a regulated institution." : {
-
-    },
-    "Preparing Report" : {
-
-    },
-    "Preparing…" : {
-
-    },
-    "Price" : {
-
-    },
-    "Provider" : {
-
-    },
-    "Quote Base" : {
-
-    },
-    "Rates applied to convert holdings into the base currency" : {
-
-    },
-    "Recurring Commitments" : {
-
-    },
-    "Recurring Rules" : {
-
-    },
-    "Report Exported" : {
-
-    },
-    "Retrieved" : {
-
-    },
-    "Sampled at each month end from the app's daily snapshot history." : {
-
-    },
-    "savings rate" : {
-
-    },
-    "Scope" : {
-
-    },
-    "Select at least one section to export." : {
-
-    },
-    "Share" : {
-
-    },
-    "Start Date" : {
-
-    },
-    "subtotal" : {
-
-    },
-    "The period applies to the transaction ledger only. Holdings are point-in-time and are always reported in full." : {
-
-    },
-    "This Year" : {
-
-    },
-    "Total" : {
-
-    },
-    "Total Expenses" : {
-
-    },
-    "Total Liabilities" : {
-
-    },
-    "Transaction Ledger" : {
-
-    },
-    "Units per %@" : {
-
-    },
-    "Wealth Compass" : {
-
-    },
     "· %@" : {
       "localizations" : {
         "ar" : {
@@ -1283,6 +1040,9 @@
           }
         }
       }
+    },
+    "(continued)" : {
+
     },
     "\\n\\n%@ due recurring %@ added to Cash Flow." : {
       "extractionState" : "manual",
@@ -9786,6 +9546,9 @@
     "%lld due transactions were added to Cash Flow." : {
 
     },
+    "%lld future-dated entries are listed in grey. They are excluded from the balances and subtotals above, matching how the app itself reports current cash." : {
+
+    },
     "%lld holdings" : {
       "localizations" : {
         "ar" : {
@@ -12080,6 +11843,9 @@
           }
         }
       }
+    },
+    "+ %lld more" : {
+
     },
     "1 %@" : {
       "localizations" : {
@@ -18593,6 +18359,9 @@
         }
       }
     },
+    "Allocation" : {
+
+    },
     "Allocation by Geography" : {
       "localizations" : {
         "ar" : {
@@ -20258,6 +20027,9 @@
         }
       }
     },
+    "Appendix" : {
+
+    },
     "Apple (AAPL)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20473,6 +20245,9 @@
         }
       }
     },
+    "Application" : {
+
+    },
     "Asset Allocation" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20687,6 +20462,9 @@
           }
         }
       }
+    },
+    "Assets" : {
+
     },
     "ASSETS" : {
       "localizations" : {
@@ -21316,6 +21094,9 @@
     "Average Buy Price (%@)" : {
 
     },
+    "Avg Buy" : {
+
+    },
     "Back" : {
 
     },
@@ -21533,6 +21314,9 @@
           }
         }
       }
+    },
+    "Balance" : {
+
     },
     "Balances derived from your activity and holdings" : {
       "localizations" : {
@@ -25086,6 +24870,9 @@
     "Cash flow view" : {
 
     },
+    "Cash in this app is the running total of every income minus every expense, so the closing balance above is the cash figure as at the end of this period. The opening balance carries forward all activity before it." : {
+
+    },
     "Cash-flow chart concealed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26364,6 +26151,9 @@
         }
       }
     },
+    "Choose Sections" : {
+
+    },
     "Choose the free Demo API tier." : {
       "localizations" : {
         "ar" : {
@@ -26781,6 +26571,9 @@
       }
     },
     "Clear search" : {
+
+    },
+    "Closing Balance" : {
 
     },
     "CloudKit record %@ has no payload." : {
@@ -29717,6 +29510,9 @@
         }
       }
     },
+    "Contents" : {
+
+    },
     "Continue" : {
       "localizations" : {
         "ar" : {
@@ -29924,6 +29720,9 @@
           }
         }
       }
+    },
+    "Conversion rates, data summary and document details" : {
+
     },
     "Convert Amounts" : {
 
@@ -34116,6 +33915,9 @@
         }
       }
     },
+    "Custom Range" : {
+
+    },
     "Custom..." : {
       "localizations" : {
         "ar" : {
@@ -35163,6 +34965,9 @@
         }
       }
     },
+    "Data Summary" : {
+
+    },
     "Date" : {
       "localizations" : {
         "ar" : {
@@ -35370,6 +35175,9 @@
           }
         }
       }
+    },
+    "Date Range" : {
+
     },
     "Delete" : {
       "localizations" : {
@@ -39547,6 +39355,9 @@
     "Diagnostics Exported" : {
 
     },
+    "Digital asset holdings and performance" : {
+
+    },
     "Discard" : {
 
     },
@@ -39757,6 +39568,9 @@
           }
         }
       }
+    },
+    "Document" : {
+
     },
     "Done" : {
 
@@ -42464,6 +42278,9 @@
           }
         }
       }
+    },
+    "Effective Date" : {
+
     },
     "Emerging Markets" : {
       "extractionState" : "manual",
@@ -46063,6 +45880,9 @@
         }
       }
     },
+    "Every figure in this report is expressed in the base currency, converted at the rates above. Amounts shown in a holding's own currency are unconverted." : {
+
+    },
     "Everything you own, owe, earn, and spend." : {
       "localizations" : {
         "ar" : {
@@ -48160,6 +47980,9 @@
         }
       }
     },
+    "Expenses by Category" : {
+
+    },
     "Expenses grouped by category" : {
       "localizations" : {
         "ar" : {
@@ -48367,6 +48190,12 @@
           }
         }
       }
+    },
+    "Expenses This Month" : {
+
+    },
+    "Export" : {
+
     },
     "Export Failed" : {
       "extractionState" : "manual",
@@ -48584,6 +48413,7 @@
       }
     },
     "Export JSON..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -48791,10 +48621,16 @@
         }
       }
     },
+    "Export Report" : {
+
+    },
     "Export Sync Diagnostics" : {
 
     },
     "Export Sync Diagnostics..." : {
+
+    },
+    "Export..." : {
 
     },
     "Face ID" : {
@@ -49629,6 +49465,12 @@
         }
       }
     },
+    "Fees" : {
+
+    },
+    "Fees Paid" : {
+
+    },
     "Finance" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -50051,6 +49893,9 @@
           }
         }
       }
+    },
+    "Financial Report" : {
+
     },
     "Finish" : {
       "localizations" : {
@@ -52972,6 +52817,9 @@
         }
       }
     },
+    "Format" : {
+
+    },
     "Freelance" : {
       "localizations" : {
         "ar" : {
@@ -53180,6 +53028,9 @@
         }
       }
     },
+    "Frequency" : {
+
+    },
     "Fuel" : {
       "localizations" : {
         "ar" : {
@@ -53387,6 +53238,9 @@
           }
         }
       }
+    },
+    "Full Report" : {
+
     },
     "Future %@ occurrences for %@ will no longer be created." : {
       "localizations" : {
@@ -53817,6 +53671,12 @@
         }
       }
     },
+    "Future-dated — not counted in cash" : {
+
+    },
+    "Gain / Loss" : {
+
+    },
     "General" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -54031,6 +53891,9 @@
           }
         }
       }
+    },
+    "Generated" : {
+
     },
     "Generated from a recurring schedule" : {
       "localizations" : {
@@ -55723,6 +55586,9 @@
           }
         }
       }
+    },
+    "Holdings, allocation and performance" : {
+
     },
     "Housing" : {
       "localizations" : {
@@ -59515,6 +59381,9 @@
         }
       }
     },
+    "In %@" : {
+
+    },
     "Income" : {
       "localizations" : {
         "ar" : {
@@ -60138,6 +60007,12 @@
           }
         }
       }
+    },
+    "Income This Month" : {
+
+    },
+    "Income, expenses, recurring commitments and the full transaction ledger" : {
+
     },
     "Invalid API Key" : {
       "extractionState" : "manual",
@@ -62028,6 +61903,9 @@
         }
       }
     },
+    "JSON is always a complete backup of every record, so the section and period choices do not apply." : {
+
+    },
     "just now" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -63490,6 +63368,9 @@
           }
         }
       }
+    },
+    "Last 12 Months" : {
+
     },
     "Last 30 Days" : {
       "localizations" : {
@@ -65578,6 +65459,9 @@
         }
       }
     },
+    "Live rate" : {
+
+    },
     "Local" : {
       "localizations" : {
         "ar" : {
@@ -67054,6 +66938,9 @@
     "Market Data Error" : {
 
     },
+    "Market Value" : {
+
+    },
     "Merge" : {
       "localizations" : {
         "ar" : {
@@ -68302,6 +68189,9 @@
         }
       }
     },
+    "Month-end net worth" : {
+
+    },
     "Monthly" : {
       "localizations" : {
         "ar" : {
@@ -69155,6 +69045,9 @@
         }
       }
     },
+    "Monthly Trend" : {
+
+    },
     "Name" : {
       "localizations" : {
         "ar" : {
@@ -69570,6 +69463,9 @@
           }
         }
       }
+    },
+    "Net cash liabilities of %@ are excluded from the allocation ring, because a ring cannot show a negative share. Net worth above accounts for them in full." : {
+
     },
     "Net Savings" : {
       "extractionState" : "manual",
@@ -70202,6 +70098,9 @@
         }
       }
     },
+    "Net Worth History" : {
+
+    },
     "Net worth range" : {
       "localizations" : {
         "ar" : {
@@ -70409,6 +70308,12 @@
           }
         }
       }
+    },
+    "Net Worth Snapshots" : {
+
+    },
+    "Net worth, asset allocation and liabilities" : {
+
     },
     "Net-worth history" : {
 
@@ -72302,6 +72207,9 @@
         }
       }
     },
+    "Next Due" : {
+
+    },
     "Next: %@" : {
       "localizations" : {
         "ar" : {
@@ -74194,6 +74102,12 @@
           }
         }
       }
+    },
+    "No entries recorded." : {
+
+    },
+    "No exchange rate snapshot had been retrieved when this report was generated. Foreign-currency amounts were converted using the app's built-in offline fallback rates, which are approximate." : {
+
     },
     "No expenses for this period" : {
       "extractionState" : "manual",
@@ -79855,6 +79769,9 @@
         }
       }
     },
+    "Offline fallback rate" : {
+
+    },
     "OK" : {
       "localizations" : {
         "ar" : {
@@ -81103,6 +81020,9 @@
         }
       }
     },
+    "Opening Balance" : {
+
+    },
     "Optic ID" : {
       "localizations" : {
         "ar" : {
@@ -81934,6 +81854,9 @@
           }
         }
       }
+    },
+    "Page %1$@ of %2$@" : {
+
     },
     "Paste CoinGecko API key" : {
       "extractionState" : "manual",
@@ -84248,6 +84171,9 @@
     "Pick your base currency and language. You can change both anytime in Settings." : {
 
     },
+    "Platform" : {
+
+    },
     "Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -85303,6 +85229,7 @@
 
     },
     "Prepare Backup" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -85509,6 +85436,18 @@
           }
         }
       }
+    },
+    "Prepared from data entered by the account holder. Market values reflect the most recent prices retrieved by the app and are not independently verified. This document is a personal record, not financial advice or a statement from a regulated institution." : {
+
+    },
+    "Preparing Report" : {
+
+    },
+    "Preparing…" : {
+
+    },
+    "Price" : {
+
     },
     "Prices Updated" : {
       "localizations" : {
@@ -86349,6 +86288,9 @@
         }
       }
     },
+    "Privacy Mode hides amounts on screen, but the PDF contains your real figures." : {
+
+    },
     "Privacy on" : {
       "localizations" : {
         "ar" : {
@@ -87181,6 +87123,9 @@
         }
       }
     },
+    "Provider" : {
+
+    },
     "Quantity" : {
       "localizations" : {
         "ar" : {
@@ -87389,6 +87334,9 @@
         }
       }
     },
+    "Quote Base" : {
+
+    },
     "Range floor" : {
       "localizations" : {
         "ar" : {
@@ -87596,6 +87544,9 @@
           }
         }
       }
+    },
+    "Rates applied to convert holdings into the base currency" : {
+
     },
     "Rates may be incomplete" : {
 
@@ -89360,6 +89311,12 @@
           }
         }
       }
+    },
+    "Recurring Commitments" : {
+
+    },
+    "Recurring Rules" : {
+
     },
     "Recurring Schedules" : {
       "extractionState" : "manual",
@@ -92991,6 +92948,9 @@
         }
       }
     },
+    "Report Exported" : {
+
+    },
     "Resume schedule" : {
       "localizations" : {
         "ar" : {
@@ -93198,6 +93158,9 @@
           }
         }
       }
+    },
+    "Retrieved" : {
+
     },
     "Retrieving %@ price..." : {
       "localizations" : {
@@ -93618,6 +93581,9 @@
         }
       }
     },
+    "Sampled at each month end from the app's daily snapshot history." : {
+
+    },
     "Save" : {
       "localizations" : {
         "ar" : {
@@ -93830,6 +93796,9 @@
 
     },
     "Save Failed" : {
+
+    },
+    "savings rate" : {
 
     },
     "Savings Rate" : {
@@ -94463,6 +94432,9 @@
         }
       }
     },
+    "Scope" : {
+
+    },
     "Search" : {
       "localizations" : {
         "ar" : {
@@ -95086,6 +95058,9 @@
           }
         }
       }
+    },
+    "Select at least one section to export." : {
+
     },
     "Selected date" : {
       "localizations" : {
@@ -96127,7 +96102,11 @@
         }
       }
     },
+    "Share" : {
+
+    },
     "Share Backup" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -97763,6 +97742,9 @@
         }
       }
     },
+    "Start Date" : {
+
+    },
     "Status" : {
       "localizations" : {
         "ar" : {
@@ -99144,6 +99126,9 @@
           }
         }
       }
+    },
+    "subtotal" : {
+
     },
     "Swiss Franc" : {
       "extractionState" : "stale",
@@ -103794,6 +103779,9 @@
         }
       }
     },
+    "The period applies to the transaction ledger only. Holdings are point-in-time and are always reported in full." : {
+
+    },
     "The schedule was saved, but notifications are not authorized. You can enable them in iOS Settings and then edit this schedule." : {
       "localizations" : {
         "ar" : {
@@ -106076,6 +106064,9 @@
         }
       }
     },
+    "This Year" : {
+
+    },
     "Top Expense Categories" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -106714,6 +106705,9 @@
         }
       }
     },
+    "Total" : {
+
+    },
     "TOTAL" : {
       "localizations" : {
         "ar" : {
@@ -107176,6 +107170,12 @@
           }
         }
       }
+    },
+    "Total Expenses" : {
+
+    },
+    "Total Liabilities" : {
+
     },
     "Touch ID" : {
       "localizations" : {
@@ -107880,6 +107880,9 @@
           }
         }
       }
+    },
+    "Transaction Ledger" : {
+
     },
     "Transaction Period" : {
       "localizations" : {
@@ -110253,6 +110256,9 @@
           }
         }
       }
+    },
+    "Units per %@" : {
+
     },
     "Unlock" : {
       "localizations" : {
@@ -113948,6 +113954,9 @@
           }
         }
       }
+    },
+    "Wealth Compass" : {
+
     },
     "Wealth Compass Tracker" : {
       "localizations" : {

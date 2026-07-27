@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+Προστέθηκε η δυνατότητα εξαγωγής PDF.

@@ -1,1 +1,1 @@
-General improvements and bug fixes.
+Додано функцію експорту у PDF.
