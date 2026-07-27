@@ -833,6 +833,249 @@
         }
       }
     },
+    "%lld future-dated entries are listed in grey. They are excluded from the balances and subtotals above, matching how the app itself reports current cash." : {
+
+    },
+    "(continued)" : {
+
+    },
+    "+ %lld more" : {
+
+    },
+    "Allocation" : {
+
+    },
+    "Appendix" : {
+
+    },
+    "Application" : {
+
+    },
+    "Assets" : {
+
+    },
+    "Avg Buy" : {
+
+    },
+    "Balance" : {
+
+    },
+    "Cash in this app is the running total of every income minus every expense, so the closing balance above is the cash figure as at the end of this period. The opening balance carries forward all activity before it." : {
+
+    },
+    "Choose Sections" : {
+
+    },
+    "Closing Balance" : {
+
+    },
+    "Contents" : {
+
+    },
+    "Conversion rates, data summary and document details" : {
+
+    },
+    "Custom Range" : {
+
+    },
+    "Data Summary" : {
+
+    },
+    "Date Range" : {
+
+    },
+    "Digital asset holdings and performance" : {
+
+    },
+    "Document" : {
+
+    },
+    "Effective Date" : {
+
+    },
+    "Every figure in this report is expressed in the base currency, converted at the rates above. Amounts shown in a holding's own currency are unconverted." : {
+
+    },
+    "Expenses by Category" : {
+
+    },
+    "Expenses This Month" : {
+
+    },
+    "Export" : {
+
+    },
+    "Export Report" : {
+
+    },
+    "Export..." : {
+
+    },
+    "Fees" : {
+
+    },
+    "Fees Paid" : {
+
+    },
+    "Financial Report" : {
+
+    },
+    "Format" : {
+
+    },
+    "Frequency" : {
+
+    },
+    "Full Report" : {
+
+    },
+    "Future-dated — not counted in cash" : {
+
+    },
+    "Gain / Loss" : {
+
+    },
+    "Generated" : {
+
+    },
+    "Holdings, allocation and performance" : {
+
+    },
+    "In %@" : {
+
+    },
+    "Income This Month" : {
+
+    },
+    "Income, expenses, recurring commitments and the full transaction ledger" : {
+
+    },
+    "Last 12 Months" : {
+
+    },
+    "Live rate" : {
+
+    },
+    "Market Value" : {
+
+    },
+    "Month-end net worth" : {
+
+    },
+    "Monthly Trend" : {
+
+    },
+    "Net cash liabilities of %@ are excluded from the allocation ring, because a ring cannot show a negative share. Net worth above accounts for them in full." : {
+
+    },
+    "Net Worth History" : {
+
+    },
+    "Net Worth Snapshots" : {
+
+    },
+    "Net worth, asset allocation and liabilities" : {
+
+    },
+    "Next Due" : {
+
+    },
+    "No entries recorded." : {
+
+    },
+    "No exchange rate snapshot had been retrieved when this report was generated. Foreign-currency amounts were converted using the app's built-in offline fallback rates, which are approximate." : {
+
+    },
+    "Offline fallback rate" : {
+
+    },
+    "Opening Balance" : {
+
+    },
+    "Page %1$@ of %2$@" : {
+
+    },
+    "Platform" : {
+
+    },
+    "Prepared from data entered by the account holder. Market values reflect the most recent prices retrieved by the app and are not independently verified. This document is a personal record, not financial advice or a statement from a regulated institution." : {
+
+    },
+    "Preparing Report" : {
+
+    },
+    "Preparing…" : {
+
+    },
+    "Price" : {
+
+    },
+    "Provider" : {
+
+    },
+    "Quote Base" : {
+
+    },
+    "Rates applied to convert holdings into the base currency" : {
+
+    },
+    "Recurring Commitments" : {
+
+    },
+    "Recurring Rules" : {
+
+    },
+    "Report Exported" : {
+
+    },
+    "Retrieved" : {
+
+    },
+    "Sampled at each month end from the app's daily snapshot history." : {
+
+    },
+    "savings rate" : {
+
+    },
+    "Scope" : {
+
+    },
+    "Select at least one section to export." : {
+
+    },
+    "Share" : {
+
+    },
+    "Start Date" : {
+
+    },
+    "subtotal" : {
+
+    },
+    "The period applies to the transaction ledger only. Holdings are point-in-time and are always reported in full." : {
+
+    },
+    "This Year" : {
+
+    },
+    "Total" : {
+
+    },
+    "Total Expenses" : {
+
+    },
+    "Total Liabilities" : {
+
+    },
+    "Transaction Ledger" : {
+
+    },
+    "Units per %@" : {
+
+    },
+    "Wealth Compass" : {
+
+    },
     "· %@" : {
       "localizations" : {
         "ar" : {

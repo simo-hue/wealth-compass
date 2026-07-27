@@ -108,6 +108,7 @@ struct MacSettingsView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appLock: MacAppLockStore
+    @EnvironmentObject private var appModel: MacAppModel
     @State private var importMode: FinanceImportMode = .merge
     @State private var selectedTab: MacSettingsTab = .general
 
@@ -125,6 +126,7 @@ struct MacSettingsView: View {
     @State private var showingEraseFailure = false
     @State private var eraseFailureMessage = ""
     @State private var isErasing = false
+    @StateObject private var exporter = ExportCoordinator()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -153,6 +155,26 @@ struct MacSettingsView: View {
         .background(ScreenBackground())
         // navigationTitle centralized in MacRootView (collapse-aware).
         .onAppear(perform: refreshMarketDataKeyStatus)
+        .onChange(of: appModel.exportRequest, initial: true) { _, request in
+            // File ▸ Export… (⌘E) selects this page and then asks it to open the sheet. The token
+            // is cleared so a later ⌘E produces a fresh change to observe.
+            guard request != nil else { return }
+            selectedTab = .data
+            exporter.presentOptions()
+            appModel.exportRequest = nil
+        }
+        .sheet(isPresented: $exporter.isShowingOptions) {
+            ExportOptionsView(options: $exporter.options,
+                              isPrivacyModeOn: settings.isPrivacyMode,
+                              appLanguage: settings.appLanguage,
+                              onCancel: { exporter.isShowingOptions = false },
+                              onExport: performExport)
+        }
+        .sheet(item: $exporter.progress) { progress in
+            ExportProgressView(progress: progress,
+                               appLanguage: settings.appLanguage,
+                               onCancel: progress.cancel)
+        }
         .sheet(item: $activeCredentialEditor) { credential in
             MacMarketDataCredentialEditor(
                 credential: credential,
@@ -432,7 +454,9 @@ struct MacSettingsView: View {
 
                 HStack(spacing: 16) {
                     Button("Import Data...", action: importData)
-                    Button("Export JSON...", action: exportBackup)
+                    // Replaces the old "Export JSON..." button: format is now chosen in the sheet,
+                    // so PDF and JSON share one entry point (and one on the File menu, ⌘E).
+                    Button("Export...") { exporter.presentOptions() }
                 }
                 .padding(.top, 8)
 
@@ -774,20 +798,26 @@ struct MacSettingsView: View {
         }
     }
 
-    private func exportBackup() {
-        // L55: exportBackupURL is now async (encodes off the MainActor). The save panel + the small
-        // temp→destination copy run on the main thread inside the Task.
+    /// Runs whichever export the sheet was configured for, then hands the result to `NSSavePanel`.
+    ///
+    /// The build itself is off the MainActor (see `FinanceStore.exportReportURL`); the save panel
+    /// and the small temp→destination copy run on the main thread inside the Task, as the previous
+    /// JSON-only implementation did.
+    private func performExport() {
+        let isPDF = exporter.options.format == .pdf
         Task {
             do {
-                let temporaryURL = try await finance.exportBackupURL()
+                guard let temporaryURL = try await exporter.export(finance: finance, settings: settings) else {
+                    return  // cancelled — no alert, the user knows
+                }
                 let panel = NSSavePanel()
-                panel.allowedContentTypes = [.json]
+                panel.allowedContentTypes = [isPDF ? .pdf : .json]
                 panel.nameFieldStringValue = temporaryURL.lastPathComponent
 
                 guard panel.runModal() == .OK, let destination = panel.url else { return }
                 try Data(contentsOf: temporaryURL).write(to: destination, options: .atomic)
                 settingsAlert = MacSettingsAlert(
-                    title: settings.localized("Backup Exported"),
+                    title: settings.localized(isPDF ? "Report Exported" : "Backup Exported"),
                     message: destination.path
                 )
             } catch {

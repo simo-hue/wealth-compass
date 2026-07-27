@@ -1,11 +1,13 @@
 import SwiftUI
+import UIKit
 import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appLock: AppLockStore
-    @State private var backupURL: URL?
+    @StateObject private var exporter = ExportCoordinator()
+    @State private var exportedFile: ExportedFile?
     @State private var diagnosticsURL: URL?
     @State private var backupError: String?
     @State private var importMode: FinanceImportMode = .merge
@@ -138,30 +140,19 @@ struct SettingsView: View {
                 }
 
                 Section("Data") {
+                    // Replaces the old two-tap "Prepare Backup" → "Share Backup" pair: one action
+                    // now picks the format (PDF report or JSON backup), builds it, and hands it
+                    // straight to the share sheet — matching what macOS has always done in one step.
                     Button {
-                        // L55: exportBackupURL is now async (encodes off the MainActor).
-                        Task {
-                            do {
-                                backupURL = try await finance.exportBackupURL()
-                                backupError = nil
-                            } catch {
-                                backupError = error.localizedDescription
-                            }
-                        }
+                        exporter.presentOptions()
                     } label: {
-                        Label("Prepare Backup", systemImage: "doc.badge.arrow.up")
+                        Label("Export...", systemImage: "square.and.arrow.up")
                     }
 
                     Button {
                         showingImportOptions = true
                     } label: {
                         Label("Import Data", systemImage: "doc.badge.plus")
-                    }
-
-                    if let backupURL {
-                        ShareLink(item: backupURL) {
-                            Label("Share Backup", systemImage: "square.and.arrow.up")
-                        }
                     }
 
                     if let backupError {
@@ -271,6 +262,27 @@ struct SettingsView: View {
             }
             .fileImporter(isPresented: $showingFileImporter, allowedContentTypes: [.json, .commaSeparatedText, .plainText, .pdf]) { result in
                 handleImportSelection(result)
+            }
+            .sheet(isPresented: $exporter.isShowingOptions) {
+                ExportOptionsView(options: $exporter.options,
+                                  isPrivacyModeOn: settings.isPrivacyMode,
+                                  appLanguage: settings.appLanguage,
+                                  onCancel: { exporter.isShowingOptions = false },
+                                  onExport: performExport)
+            }
+            .sheet(item: $exporter.progress) { progress in
+                ExportProgressView(progress: progress,
+                                   appLanguage: settings.appLanguage,
+                                   onCancel: progress.cancel)
+                    .presentationDetents([.height(200)])
+                    // Cancel must be the only way out: swiping the sheet away left the render
+                    // running and still presented the share sheet when it finished.
+                    .interactiveDismissDisabled()
+            }
+            .sheet(item: $exportedFile) { file in
+                // The share sheet is the point of exporting on iOS — a report's usual destination
+                // is an accountant's inbox, and "Save to Files" is inside it anyway.
+                ExportShareSheet(url: file.url)
             }
             .sheet(item: $activeCredentialEditor) { credential in
                 MarketDataCredentialEditor(
@@ -571,12 +583,30 @@ struct SettingsView: View {
             try await finance.eraseEverything(deleteCloud: deleteCloud)
             appLock.disableLock()
             await RecurringTransactionNotificationService.shared.cancelAll()
-            backupURL = nil
+            exportedFile = nil
         } catch {
             let syncError = error as? CloudSyncError
             eraseFailureMessage = syncError?.localizedDescription(appLanguage: settings.appLanguage)
                 ?? error.localizedDescription
             showingEraseFailure = true
+        }
+    }
+
+    /// Builds the file the export sheet was configured for and presents the share sheet.
+    ///
+    /// Mirrors `MacSettingsView.performExport`; only the delivery differs (share sheet here,
+    /// `NSSavePanel` there), which is the one place the two platforms are deliberately unalike.
+    private func performExport() {
+        Task {
+            do {
+                guard let url = try await exporter.export(finance: finance, settings: settings) else {
+                    return  // cancelled — the user already knows
+                }
+                backupError = nil
+                exportedFile = ExportedFile(url: url)
+            } catch {
+                backupError = error.localizedDescription
+            }
         }
     }
 
@@ -600,7 +630,7 @@ struct SettingsView: View {
                     } else {
                         importSummaryNote = nil
                     }
-                    backupURL = nil
+                    exportedFile = nil
                     backupError = nil
                     importSummary = result
                 } catch {
@@ -758,6 +788,25 @@ struct SettingsView: View {
         if let error = error as? MarketDataError { return error.localizedDescription(appLanguage: appLanguage) }
         return (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
     }
+}
+
+/// Identifiable wrapper so a freshly generated file can drive `.sheet(item:)`. `ShareLink` needs
+/// its item at construction time, which does not fit a file that only exists once the export has
+/// finished running.
+private struct ExportedFile: Identifiable {
+    let id = UUID()
+    let url: URL
+}
+
+/// Minimal `UIActivityViewController` bridge for sharing the generated file.
+private struct ExportShareSheet: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: [url], applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
 }
 
 private struct SettingsAlertState: Identifiable {

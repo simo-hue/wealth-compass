@@ -21,8 +21,28 @@
 		AD00000000000000000000A3 /* AnalyticsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A3 /* AnalyticsEngine.swift */; };
 		AD00000000000000000000B3 /* AnalyticsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A3 /* AnalyticsEngine.swift */; };
 		AD00000000000000000000AC /* BrokerStatementImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000AC /* BrokerStatementImportService.swift */; };
+		AD0000000000000000000E11 /* ReportDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E10 /* ReportDocument.swift */; };
+		AD0000000000000000000E21 /* ReportTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E20 /* ReportTheme.swift */; };
+		AD0000000000000000000E31 /* ReportExportOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E30 /* ReportExportOptions.swift */; };
+		AD0000000000000000000E41 /* PDFDrawingContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E40 /* PDFDrawingContext.swift */; };
+		AD0000000000000000000E51 /* ReportChartRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E50 /* ReportChartRenderer.swift */; };
+		AD0000000000000000000E61 /* ReportPaginator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E60 /* ReportPaginator.swift */; };
+		AD0000000000000000000E71 /* PDFReportRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E70 /* PDFReportRenderer.swift */; };
+		AD0000000000000000000E81 /* ReportDocumentBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E80 /* ReportDocumentBuilder.swift */; };
+		AD0000000000000000000E91 /* ExportOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E90 /* ExportOptionsView.swift */; };
 		AD00000000000000000000BC /* BrokerStatementImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000AC /* BrokerStatementImportService.swift */; };
+		AD0000000000000000000E12 /* ReportDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E10 /* ReportDocument.swift */; };
+		AD0000000000000000000E22 /* ReportTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E20 /* ReportTheme.swift */; };
+		AD0000000000000000000E32 /* ReportExportOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E30 /* ReportExportOptions.swift */; };
+		AD0000000000000000000E42 /* PDFDrawingContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E40 /* PDFDrawingContext.swift */; };
+		AD0000000000000000000E52 /* ReportChartRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E50 /* ReportChartRenderer.swift */; };
+		AD0000000000000000000E62 /* ReportPaginator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E60 /* ReportPaginator.swift */; };
+		AD0000000000000000000E72 /* PDFReportRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E70 /* PDFReportRenderer.swift */; };
+		AD0000000000000000000E82 /* ReportDocumentBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E80 /* ReportDocumentBuilder.swift */; };
+		AD0000000000000000000E92 /* ExportOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000E90 /* ExportOptionsView.swift */; };
 		AD00000000000000000000C8 /* BrokerStatementImportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C8 /* BrokerStatementImportServiceTests.swift */; };
+		AD00000000000000000000CA /* ReportRenderingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000CA /* ReportRenderingTests.swift */; };
+		AD00000000000000000000C9 /* ReportExportOptionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C9 /* ReportExportOptionsTests.swift */; };
 		AD00000000000000000000A4 /* PieSliceHitTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A4 /* PieSliceHitTester.swift */; };
 		AD00000000000000000000B4 /* PieSliceHitTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A4 /* PieSliceHitTester.swift */; };
 		AD00000000000000000000A5 /* RecurringScheduleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A5 /* RecurringScheduleBuilder.swift */; };
@@ -125,6 +145,15 @@
 		AC00000000000000000000A2 /* SnapshotEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SnapshotEngine.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A3 /* AnalyticsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AnalyticsEngine.swift; sourceTree = "<group>"; };
 		AC00000000000000000000AC /* BrokerStatementImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/BrokerStatementImportService.swift; sourceTree = "<group>"; };
+		AC0000000000000000000E10 /* ReportDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Export/ReportDocument.swift; sourceTree = "<group>"; };
+		AC0000000000000000000E20 /* ReportTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Export/ReportTheme.swift; sourceTree = "<group>"; };
+		AC0000000000000000000E30 /* ReportExportOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Export/ReportExportOptions.swift; sourceTree = "<group>"; };
+		AC0000000000000000000E40 /* PDFDrawingContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Export/PDFDrawingContext.swift; sourceTree = "<group>"; };
+		AC0000000000000000000E50 /* ReportChartRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Export/ReportChartRenderer.swift; sourceTree = "<group>"; };
+		AC0000000000000000000E60 /* ReportPaginator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Export/ReportPaginator.swift; sourceTree = "<group>"; };
+		AC0000000000000000000E70 /* PDFReportRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Export/PDFReportRenderer.swift; sourceTree = "<group>"; };
+		AC0000000000000000000E80 /* ReportDocumentBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Export/ReportDocumentBuilder.swift; sourceTree = "<group>"; };
+		AC0000000000000000000E90 /* ExportOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Export/ExportOptionsView.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A4 /* PieSliceHitTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/PieSliceHitTester.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A5 /* RecurringScheduleBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/RecurringScheduleBuilder.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A6 /* NetworkRetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/NetworkRetry.swift; sourceTree = "<group>"; };
@@ -183,6 +212,8 @@
 		AC00000000000000000000C4 /* AnalyticsEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsEngineTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C5 /* FinanceImportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceImportServiceTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C8 /* BrokerStatementImportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerStatementImportServiceTests.swift; sourceTree = "<group>"; };
+		AC00000000000000000000CA /* ReportRenderingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportRenderingTests.swift; sourceTree = "<group>"; };
+		AC00000000000000000000C9 /* ReportExportOptionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportExportOptionsTests.swift; sourceTree = "<group>"; };
 		AC0000000000000000000051 /* WealthCompassTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WealthCompassTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1614C7598D89322EDC6DD1C /* DynamicMasonryLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DynamicMasonryLayout.swift; path = Sources/Shared/UI/DynamicMasonryLayout.swift; sourceTree = "<group>"; };
 		C0D3A0010000000000000001 /* MarketDataAPIKeyGuide.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MarketDataAPIKeyGuide.swift; path = ../../../UI/MarketDataAPIKeyGuide.swift; sourceTree = "<group>"; };
@@ -317,6 +348,15 @@
 				AC00000000000000000000A6 /* NetworkRetry.swift */,
 				AC00000000000000000000A7 /* FinanceImportService.swift */,
 				AC00000000000000000000AC /* BrokerStatementImportService.swift */,
+				AC0000000000000000000E10 /* ReportDocument.swift */,
+				AC0000000000000000000E20 /* ReportTheme.swift */,
+				AC0000000000000000000E30 /* ReportExportOptions.swift */,
+				AC0000000000000000000E40 /* PDFDrawingContext.swift */,
+				AC0000000000000000000E50 /* ReportChartRenderer.swift */,
+				AC0000000000000000000E60 /* ReportPaginator.swift */,
+				AC0000000000000000000E70 /* PDFReportRenderer.swift */,
+				AC0000000000000000000E80 /* ReportDocumentBuilder.swift */,
+				AC0000000000000000000E90 /* ExportOptionsView.swift */,
 				AC00000000000000000000A8 /* RecurringNotificationService.swift */,
 				AC00000000000000000000A9 /* BiometricLockStore.swift */,
 				AC00000000000000000000AA /* OnboardingViewModel.swift */,
@@ -423,6 +463,8 @@
 				AC00000000000000000000C4 /* AnalyticsEngineTests.swift */,
 				AC00000000000000000000C5 /* FinanceImportServiceTests.swift */,
 				AC00000000000000000000C8 /* BrokerStatementImportServiceTests.swift */,
+				AC00000000000000000000CA /* ReportRenderingTests.swift */,
+				AC00000000000000000000C9 /* ReportExportOptionsTests.swift */,
 				AC00000000000000000000C6 /* PersistenceCoordinatorTests.swift */,
 				AC00000000000000000000C7 /* MarketDataServiceTests.swift */,
 			);
@@ -631,6 +673,15 @@
 				AD00000000000000000000A6 /* NetworkRetry.swift in Sources */,
 				AD00000000000000000000A7 /* FinanceImportService.swift in Sources */,
 				AD00000000000000000000AC /* BrokerStatementImportService.swift in Sources */,
+				AD0000000000000000000E11 /* ReportDocument.swift in Sources */,
+				AD0000000000000000000E21 /* ReportTheme.swift in Sources */,
+				AD0000000000000000000E31 /* ReportExportOptions.swift in Sources */,
+				AD0000000000000000000E41 /* PDFDrawingContext.swift in Sources */,
+				AD0000000000000000000E51 /* ReportChartRenderer.swift in Sources */,
+				AD0000000000000000000E61 /* ReportPaginator.swift in Sources */,
+				AD0000000000000000000E71 /* PDFReportRenderer.swift in Sources */,
+				AD0000000000000000000E81 /* ReportDocumentBuilder.swift in Sources */,
+				AD0000000000000000000E91 /* ExportOptionsView.swift in Sources */,
 				AD00000000000000000000A8 /* RecurringNotificationService.swift in Sources */,
 				AD00000000000000000000A9 /* BiometricLockStore.swift in Sources */,
 				AD00000000000000000000AA /* OnboardingViewModel.swift in Sources */,
@@ -678,6 +729,15 @@
 				AD00000000000000000000B6 /* NetworkRetry.swift in Sources */,
 				AD00000000000000000000B7 /* FinanceImportService.swift in Sources */,
 				AD00000000000000000000BC /* BrokerStatementImportService.swift in Sources */,
+				AD0000000000000000000E12 /* ReportDocument.swift in Sources */,
+				AD0000000000000000000E22 /* ReportTheme.swift in Sources */,
+				AD0000000000000000000E32 /* ReportExportOptions.swift in Sources */,
+				AD0000000000000000000E42 /* PDFDrawingContext.swift in Sources */,
+				AD0000000000000000000E52 /* ReportChartRenderer.swift in Sources */,
+				AD0000000000000000000E62 /* ReportPaginator.swift in Sources */,
+				AD0000000000000000000E72 /* PDFReportRenderer.swift in Sources */,
+				AD0000000000000000000E82 /* ReportDocumentBuilder.swift in Sources */,
+				AD0000000000000000000E92 /* ExportOptionsView.swift in Sources */,
 				AD00000000000000000000B8 /* RecurringNotificationService.swift in Sources */,
 				AD00000000000000000000B9 /* BiometricLockStore.swift in Sources */,
 				AD00000000000000000000BA /* OnboardingViewModel.swift in Sources */,
@@ -722,6 +782,8 @@
 				AD00000000000000000000C4 /* AnalyticsEngineTests.swift in Sources */,
 				AD00000000000000000000C5 /* FinanceImportServiceTests.swift in Sources */,
 				AD00000000000000000000C8 /* BrokerStatementImportServiceTests.swift in Sources */,
+				AD00000000000000000000CA /* ReportRenderingTests.swift in Sources */,
+				AD00000000000000000000C9 /* ReportExportOptionsTests.swift in Sources */,
 				AD00000000000000000000C6 /* PersistenceCoordinatorTests.swift in Sources */,
 				AD00000000000000000000C7 /* MarketDataServiceTests.swift in Sources */,
 			);

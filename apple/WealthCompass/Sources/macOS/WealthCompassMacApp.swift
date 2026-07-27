@@ -47,6 +47,16 @@ struct WealthCompassMacApp: App {
                 .keyboardShortcut("k", modifiers: [.command, .shift])
             }
 
+            // A Mac app without a File-menu export feels broken, and this routes to the same
+            // shared sheet the Settings page uses rather than adding a second export surface.
+            CommandGroup(after: .newItem) {
+                Divider()
+                Button(AppLocalization.string("Export...", appLanguage: settings.appLanguage)) {
+                    appModel.requestExport()
+                }
+                .keyboardShortcut("e", modifiers: .command)
+            }
+
             // Sidebar navigation shortcuts (Cmd+1 through Cmd+5)
             CommandMenu(AppLocalization.string("Navigate", appLanguage: settings.appLanguage)) {
                 Button(AppLocalization.string("Dashboard", appLanguage: settings.appLanguage)) {

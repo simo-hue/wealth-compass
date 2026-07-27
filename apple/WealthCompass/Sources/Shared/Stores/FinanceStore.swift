@@ -1133,6 +1133,82 @@ final class FinanceStore: ObservableObject {
         return url
     }
 
+    /// Builds the branded PDF report and returns its URL.
+    ///
+    /// Mirrors `exportBackupURL`'s shape: snapshot the value types on the MainActor, then do the
+    /// work on a detached task — a full report over a multi-year ledger is tens of pages of
+    /// CoreText layout and would visibly stall the UI otherwise.
+    ///
+    /// The report deliberately contains **real amounts even when privacy mode is on**. A redacted
+    /// financial statement has no use, and the JSON backup already ignores the setting; the export
+    /// sheet says so explicitly rather than letting the user discover it after sharing the file.
+    func exportReportURL(options: ReportExportOptions,
+                         settings: AppSettings,
+                         progress: (@Sendable (Int, Int) -> Void)? = nil,
+                         isCancelled: (@Sendable () -> Bool)? = nil) async throws -> URL {
+        let now = Date()
+        // Each export gets its own directory, keeping the *filename* clean (it is what the share
+        // sheet and save panel show) while making the path unique. Two exports started on the same
+        // day previously resolved to the identical temporary URL and would render into the same
+        // file — silently corrupting or swapping each other's output.
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("export-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let url = directory.appendingPathComponent(options.fileName(date: now))
+        Self.pruneStaleExports(keeping: directory)
+
+        let info = Bundle.main.infoDictionary
+        let buildContext = ReportBuildContext(
+            data: data,
+            converter: settings.currencyConverter,
+            baseCurrency: settings.currency,
+            exchangeRateSnapshot: settings.exchangeRateSnapshot,
+            appLanguage: settings.appLanguage,
+            locale: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage),
+            calendar: .current,
+            now: now,
+            appVersion: info?["CFBundleShortVersionString"] as? String ?? "?",
+            appBuild: info?["CFBundleVersion"] as? String ?? "?",
+            platformName: ReportPlatform.name,
+            brandMarkPNG: ReportPlatform.brandMarkPNG(),
+            // Paper follows the *system region*, not the in-app language override: an Italian user
+            // running the app in English still prints on A4.
+            paper: .forRegion(.current),
+            direction: .resolve(locale: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage)))
+
+        try await Task.detached(priority: .userInitiated) {
+            let document = ReportDocumentBuilder(context: buildContext, options: options).build()
+            try PDFReportRenderer.render(document: document,
+                                         to: url,
+                                         progress: progress,
+                                         isCancelled: isCancelled)
+        }.value
+        return url
+    }
+
+    /// Removes previously exported reports and backups from the temporary directory.
+    ///
+    /// `exportBackupURL` has always left its files behind; a multi-page PDF makes that a real cost,
+    /// so both formats are cleaned up here. Best-effort — a failure to tidy must never fail an
+    /// export.
+    private static func pruneStaleExports(keeping current: URL) {
+        let temporary = FileManager.default.temporaryDirectory
+        guard let entries = try? FileManager.default.contentsOfDirectory(
+            at: temporary, includingPropertiesForKeys: nil) else { return }
+        let currentName = current.lastPathComponent
+        for entry in entries {
+            let name = entry.lastPathComponent
+            guard name != currentName else { continue }
+            // Per-export directories, plus loose files from the older flat naming scheme (and from
+            // `exportBackupURL`, which has never cleaned up after itself).
+            let isExportDirectory = name.hasPrefix("export-")
+            let isLegacyExport = name.hasPrefix("wealth-compass-")
+                && (name.hasSuffix(".pdf") || name.hasSuffix(".json"))
+            guard isExportDirectory || isLegacyExport else { continue }
+            try? FileManager.default.removeItem(at: entry)
+        }
+    }
+
     /// Writes the recent in-memory sync/persistence telemetry (counts / bytes / ms + errors —
     /// never payloads or amounts; see `SyncDiagnosticsLog`) to a temp `.txt` for the "Export Sync
     /// Diagnostics" support action, and returns its URL. A small non-identifying header (app

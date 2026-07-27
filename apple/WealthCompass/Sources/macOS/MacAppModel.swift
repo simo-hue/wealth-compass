@@ -57,6 +57,18 @@ final class MacAppModel: ObservableObject {
     @Published var selection: MacDestination? = .dashboard
     @Published var editor: MacEditor?
 
+    /// Set by File ▸ Export… (⌘E) to ask the Settings page to open the export sheet.
+    ///
+    /// A fresh token rather than a Bool, so pressing ⌘E twice in a row fires twice — a Bool that
+    /// is already `true` produces no change for `onChange` to observe.
+    @Published var exportRequest: UUID?
+
+    /// Selects the Settings page and asks it to present the export sheet.
+    func requestExport() {
+        selection = .settings
+        exportRequest = UUID()
+    }
+
     func presentNewItem(for destination: MacDestination? = nil) {
         switch destination ?? selection {
         case .investments:
