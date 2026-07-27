@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, BarChart2, Lock, Smartphone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { HeroDemo } from '../components/previews/HeroDemo';
+import appleIcon from '../assets/apple-icon.png';
 
 export const Home = () => {
     return (
@@ -27,7 +28,7 @@ export const Home = () => {
                             analyze investments, and manage cash flow with clarity.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row justify-center gap-4">
+                        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
                             <a
                                 href="https://github.com/simo-hue/wealth-compass"
                                 target="_blank"
@@ -42,6 +43,21 @@ export const Home = () => {
                             >
                                 Explore Features
                             </Link>
+                        </div>
+                        
+                        <div className="flex justify-center mt-6">
+                            <a 
+                                href="https://apps.apple.com/us/app/wealth-compass-tracker/id6777399748" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all backdrop-blur-sm group"
+                            >
+                                <img src={appleIcon} alt="Wealth Compass iOS App" className="w-12 h-12 rounded-xl shadow-lg group-hover:scale-105 transition-transform" />
+                                <div className="text-left">
+                                    <p className="text-xs text-gray-400 font-medium">Download the native app</p>
+                                    <p className="text-lg font-bold text-white">Available on macOS & iOS</p>
+                                </div>
+                            </a>
                         </div>
                     </motion.div>
 
