@@ -591,3 +591,15 @@ Added a dedicated Settings link to the main navigation sidebar in the macOS app 
 - [2026-07-18T09:15:00+02:00]: macOS Dashboard Header Padding Fix
   - *Details*: Fixed an alignment issue on the macOS Dashboard where the "Add Transaction" button was not aligned with the rest of the overview page content. 
   - *Tech Notes*: Added `.scenePadding(.minimum, edges: .horizontal)` to `dashboardHeader` in `MacDashboardView.swift` to match the padding of the main `ScrollView` content.
+
+- [2026-07-27]: Fix GitHub Pages Deployment Crash
+  - *Details*: Resolved an issue where the deployed website would render a blank page. The application was crashing on load because it expected Supabase environment variables that are missing in the GitHub Pages environment.
+  - *Tech Notes*: Updated `src/lib/supabase.ts` to provide dummy fallback strings when `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are not set. This allows the Supabase client to instantiate without throwing a fatal error, allowing public routes (like the landing page) to render successfully. The fix was deployed to `gh-pages` branch using `npm run deploy`.
+
+- [2026-07-27]: Added Apple App Store Link
+  - *Details*: Added a prominent download button to the hero section on the landing page for the native macOS and iOS apps.
+  - *Tech Notes*: Imported the official app icon to  and updated . Redeployed to .
+
+- [2026-07-27]: Added Apple App Store Link
+  - *Details*: Added a prominent download button to the hero section on the landing page for the native macOS and iOS apps.
+  - *Tech Notes*: Imported the official app icon to src/assets/apple-icon.png and updated src/pages/Home.tsx. Redeployed to gh-pages.
