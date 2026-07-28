@@ -1,11 +1,12 @@
 {
     "name": "Wealth Compass",
     "short_name": "Wealth Compass",
-    "theme_color": "#000000",
-    "background_color": "#ffffff",
+    "description": "A local-first net-worth tracker for iPhone and Mac. Cash, investments, crypto and debts in one place, on your device. Free, no account, no tracking.",
+    "theme_color": "#16202b",
+    "background_color": "#16202b",
     "display": "standalone",
     "scope": "/wealth-compass/",
-    "start_url": "/wealth-compass/sw/dashboard",
+    "start_url": "/wealth-compass/",
     "icons": [
         {
             "src": "pwa-192x192.png",
