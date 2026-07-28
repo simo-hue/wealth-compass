@@ -334,3 +334,45 @@ Realistic ceiling is modest: 3 GitHub stars, no reviews, no press. None of this 
 **Do not** do directory-submission runs, solicit reviews, pay for "best of" placements, or seed
 comments. On an entity this small, a sudden spike in mention volume is more likely to suppress you than
 lift you — and it would be the one thing on this site that could not survive being made public.
+
+---
+
+# Status after deploy (2026-07-28)
+
+**The site is live.** `gh-pages` is published and every route verified by curl against the real host.
+Source is on the `landing-page-rebuild` branch, pushed — open the PR at
+<https://github.com/simo-hue/wealth-compass/pull/new/landing-page-rebuild> (the `gh` CLI is not
+installed on this machine, so it could not be opened from here).
+
+## Now done in the repo — no longer your job
+
+- ✅ **App Store URLs corrected in all 39 locales.** `metadata/*/marketing_url.txt` → `/`,
+      `support_url.txt` → `/support/`, `privacy_url.txt` → `/privacy/`, all with trailing slashes so
+      they resolve directly instead of through a 301. ⚠️ **These are fastlane metadata — they reach
+      App Store Connect only on the next `deliver` run.**
+- ✅ **"38 languages" → 35** in `README.md` and `apple/README.md`, verified against the catalogue.
+- ✅ **The licence is now stated.** `README.md` has a Licence section explaining why PolyForm
+      Noncommercial is not open source, a table of what it permits, and an author block. GitHub will
+      still report `NOASSERTION` — PolyForm is not in its SPDX set — which the section says outright.
+- ✅ **Superseded marketing code removed**: the old Features/Founder/Tutorial pages, `WebsiteLayout`,
+      the six preview components, and `founder.png` (944 kB that shipped on every deploy for an image
+      no page requested).
+- ✅ A build-time guard now fails the build if any page references a same-site asset that is not in
+      `dist`, after exactly that bug shipped a Person image pointing at a 404.
+
+## Still yours, in priority order
+
+1. **GitHub About box + topics** — §1 above. Unchanged and still the highest-leverage item: it is
+   what answer engines quote, and it still describes the retired React/Supabase app as "open-source".
+   I could not do this from here: it is a repo *setting*, not a file, and there is no `gh` CLI or API
+   token on this machine. I am not going to pull a credential out of your keychain to change account
+   settings.
+2. **`fastlane deliver`** to push the corrected URLs to App Store Connect. The repo is right; the
+   listing is not, until you run it.
+3. **The four edits in the `simo-hue.github.io` repo** — §2, §3, §4 above: the sitemap line and AI
+   crawler groups in the root `robots.txt`, the Wealth Compass block in the root `llms.txt`, the
+   ORCID/Scholar/Apple-developer entries in the Person `sameAs`, and three links in your existing blog
+   post. Four small text edits, worth batching into one session.
+4. **Search Console + Bing** property for the `/wealth-compass/` prefix, then submit the sitemap.
+5. Name normalisation on ORCID / Scholar / GitHub (§6), and the App Store description additions (§7).
+6. Merge the PR.
