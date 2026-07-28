@@ -17,7 +17,7 @@ The Apple implementation is driven by a single Xcode project containing two inde
 - 📈 **Investment Portfolio**: Real-time stock & ETF price updates via Finnhub and Yahoo Finance (with keyless fallback). Track cost basis, current value, and profit/loss.
 - ₿ **Crypto Tracker**: Live data fetching from CoinGecko. Track crypto holdings and monitor live valuations.
 - 🔒 **Privacy & Security**: All financial data is strictly stored locally in the app sandbox. Supports Face ID / Touch ID biometric locks and a quick-toggle Privacy Mode to blur sensitive amounts.
-- 🌍 **Localization**: Fully localized in 38 languages via Xcode String Catalogs.
+- 🌍 **Localization**: Fully localized in 35 languages via Xcode String Catalogs.
 - 🔄 **Data Portability**: Easily export your data to a JSON backup or import existing backups. Private CloudKit synchronization is available to keep your iPhone and Mac in sync.
 
 ### Project Layout

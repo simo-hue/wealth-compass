@@ -1,0 +1,58 @@
+/* Simulation-only styles. Everything here is scoped under .wc-screen so it can
+   never leak into the marketing chrome. */
+
+.wc-screen {
+  background: #04070c;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ScreenBackground — the two blurred circles from DesignSystem.swift. The Swift
+   version drives them with .easeInOut(duration: 5).repeatForever(autoreverses:)
+   and stops the loop when scenePhase leaves .active, so it never keeps the
+   render loop alive behind a hidden app. The web mirror pauses on the same
+   principle: play-state is toggled by an IntersectionObserver in ui.tsx. */
+@keyframes wc-scenery-a {
+  from { transform: scale(0.95) rotate(-5deg); }
+  to   { transform: scale(1.05) rotate(5deg); }
+}
+@keyframes wc-scenery-b {
+  from { transform: scale(1.05) rotate(5deg); }
+  to   { transform: scale(0.95) rotate(-5deg); }
+}
+.wc-scenery { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.wc-scenery span {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  animation-duration: 5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+.wc-scenery[data-paused='true'] span { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wc-scenery span { animation: none !important; }
+}
+
+/* Hide scrollbars inside the device screens — a real iPhone doesn't show one. */
+.wc-scroll { overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; overscroll-behavior: contain; }
+.wc-scroll::-webkit-scrollbar { display: none; }
+
+/* The app's white-to-green PageHeader title gradient. */
+.wc-title-gradient {
+  background: linear-gradient(90deg, #ffffff 0%, rgba(31, 219, 153, 0.92) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.wc-screen[dir='rtl'] .wc-title-gradient {
+  background: linear-gradient(270deg, #ffffff 0%, rgba(31, 219, 153, 0.92) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
