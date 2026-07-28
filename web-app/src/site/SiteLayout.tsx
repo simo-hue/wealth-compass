@@ -12,14 +12,16 @@ import './site.css';
  * collides when it does move.
  *
  * The breakpoint is 780px, not the 900px used elsewhere in site.css. Measured in
- * Chrome with the real faces: wordmark 164.7 + links 306.3 + store button 125.9
- * + two 28px gaps = 652.9px of bar, against a content box of 0.92 × viewport, so
- * the links start folding into the wordmark at 710px. 780 leaves a margin over
+ * Chrome with the real faces: wordmark 170.7 + links 306.3 + store button 125.9
+ * + two 28px gaps = 658.9px of bar, against a content box of 0.92 × viewport, so
+ * the links start folding into the wordmark at 716px. 780 leaves a margin over
  * that without putting a menu button on tablets that have room for the real row.
  *
  * The links measured 281.3 and folded at 682 until the /open-source label stopped
- * saying "Open source" — see NAV. Renaming it cost 25px of row, and the cut still
- * clears the fold by 70. Re-measure here before lengthening a label again.
+ * saying "Open source" — see NAV. Renaming it cost 25px of row. The wordmark then
+ * measured 164.7 and folded at 710, until the mark became the app icon at 28px
+ * rather than a drawing at 22 — 6px more, and 6px later. The cut still clears the
+ * fold by 64. Re-measure here before lengthening a label or growing the mark.
  */
 const CHROME_CSS = `
 .wc-site-shell {
@@ -79,10 +81,14 @@ const CHROME_CSS = `
 }
 
 /* Below this the wordmark's text is what stops the bar fitting, and the compass
-   alone is still a home link. Mark + menu + store button need 362.6px, which
-   runs out at 403px; the cut is at 430 so that every common phone width lands on
-   the same side of it and a font-metric difference during swap cannot push the
-   store button off the edge. */
+   alone is still a home link. Wordmark + menu + store button need 368.6px (170.7
+   + 40 + 125.9 + two 16px gaps), and down here --gutter has clamped to a flat
+   20px a side, so the bar runs out at 409px. The cut is at 430 so that every
+   common phone width lands on the same side of it and a font-metric difference
+   during swap cannot push the store button off the edge.
+
+   The link keeps its accessible name when this fires: aria-label is on the
+   anchor, not on the text this hides. */
 @media (max-width: 430px) {
   .wc-site .wc-wordmark-text { display: none; }
 }
@@ -152,13 +158,32 @@ function SiteLink({ to, children, ...rest }: SiteLinkProps) {
   );
 }
 
-/** The compass rose, drawn rather than imported — the product's own instrument. */
-function Mark({ size = 22 }: { size?: number }) {
+/**
+ * The app's icon — the real one, off the App Store listing.
+ *
+ * This used to be a drawn four-point star, on the reasoning that the chrome is
+ * achromatic and a drawn mark could inherit currentColor. It was the wrong call:
+ * a visitor arriving from the store sees one icon there and a different mark
+ * here, and a landing page whose only job is a download has no business
+ * introducing a second logo. `scripts/generate-icons.py` derives this and every
+ * favicon from `apple/…/AppIcon-1024.png`, so there is now exactly one source.
+ *
+ * Sized 28 rather than the star's 22 because the art is dense — a gold ring, a
+ * needle, a bar chart and two badges. Rendered pixel-doubled at 22, 26, 28 and
+ * 32: below 28 the chart collapses into noise, and at 28 it still reads as a
+ * compass. Corners come rounded and transparent in the file itself, so there is
+ * no border-radius here to double-round them.
+ */
+function Mark({ size = 28 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="10.2" fill="none" stroke="currentColor" strokeWidth="1.2" opacity="0.45" />
-      <path d="M12 3.4 14.1 9.9 20.6 12 14.1 14.1 12 20.6 9.9 14.1 3.4 12 9.9 9.9Z" fill="currentColor" />
-    </svg>
+    <img
+      src={`${import.meta.env.BASE_URL}images/logo.png`}
+      width={size}
+      height={size}
+      alt=""
+      decoding="async"
+      style={{ display: 'block', flexShrink: 0 }}
+    />
   );
 }
 
@@ -242,7 +267,12 @@ function Nav() {
       }}
     >
       <div className="page wc-nav-bar">
-        <SiteLink to="/" style={{ display: 'flex', alignItems: 'center', gap: 9, flexShrink: 0 }}>
+        {/* The label is on the link, not the image, because the text beside it
+            is display:none below 430px — which takes it out of the accessibility
+            tree too, and left the home link with no accessible name at all on a
+            phone. Naming the link covers both sizes and keeps the mark
+            decorative, so the name is never announced twice. */}
+        <SiteLink to="/" aria-label="Wealth Compass" style={{ display: 'flex', alignItems: 'center', gap: 9, flexShrink: 0 }}>
           <Mark />
           <span
             className="wc-wordmark-text"
@@ -311,7 +341,7 @@ function Footer() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2.5rem', justifyContent: 'space-between' }}>
           <div style={{ display: 'grid', gap: '0.9rem', maxWidth: '34ch' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-              <Mark size={20} />
+              <Mark size={26} />
               <span style={{ fontFamily: 'var(--display)', fontStretch: '112%', fontWeight: 700, fontSize: 15 }}>
                 Wealth Compass
               </span>

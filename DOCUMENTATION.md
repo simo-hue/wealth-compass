@@ -790,9 +790,45 @@ Brief and constraints are recorded before that work starts.
 
 ## Current Status
 
-**The website is finished and verified. It has not been deployed.** `cd web-app && npm run deploy`
-publishes to the same `gh-pages` branch and the same URL.
+**The website is finished, verified and deployed** — published to `gh-pages` on 2026-07-28, including
+the real-logo change logged below this section. `cd web-app && npm run deploy` republishes to the same
+branch and the same URL.
 
 The remaining work is all outside this repo and is listed in TO_SIMO_DO.md — most importantly the
 GitHub About box, which is what AI answer engines currently quote when asked what this project is, and
 which still describes the retired React/Supabase web app.
+
+---
+
+- **2026-07-28: The landing page now uses the app's real logo**
+  - *Details*: The site chrome carried a hand-drawn four-point star as its mark, and the
+    favicon / apple-touch-icon / PWA icons were still the **purple compass from the previous
+    site** — two logos for one product, neither of them the icon on the App Store listing a
+    visitor has just come from. Everything is now derived from the shipping app icon
+    (`apple/…/AppIcon.appiconset/AppIcon-1024.png`).
+  - *Tech Notes*:
+    - New `web-app/scripts/generate-icons.py` (Pillow, run by hand, not a build step, outputs
+      committed). It cuts the black that iOS icons bake into their corners back to transparency —
+      threshold the near-black, flood-fill from the four corners so only *exterior* black is
+      taken, crop, and repaint the cut area in the rim colour before writing the alpha, because
+      Pillow does not premultiply on resize and black RGB under a transparent pixel draws a dark
+      hairline around the mark at nav size. Emits `images/logo.png` (128, transparent),
+      `favicon.png` (64), `favicon.ico` (16/32/48), and `apple-touch-icon.png` / `pwa-192` /
+      `pwa-512` **opaque**, since iOS and Android mask those themselves and a transparent corner
+      under the mask renders black. All quantised to a 256-entry palette — indistinguishable at
+      every size written, 4–5× smaller (`pwa-512` 277 → 47 kB, the nav mark 26 → 5.8 kB).
+    - `SiteLayout.tsx`: `Mark` is now an `<img>` at 28px (footer 26), up from the star's 22.
+      Rendered pixel-doubled at 22/26/28/32 first — the art is dense (ring, needle, bar chart,
+      two badges) and below 28 the chart collapses into noise. No CSS `border-radius`: the file
+      already carries its own rounded, transparent corners.
+    - Both nav breakpoint comments re-measured in Chrome rather than adjusted by arithmetic. The
+      wordmark lockup went 164.7 → 170.7px, so the desktop row now folds at 716px (was 710, cut
+      at 780) and the wordmark-text row runs out at 409px (was 403, cut at 430). Both still clear.
+    - Fixed in passing: below 430px `.wc-wordmark-text` is `display:none`, which also takes it out
+      of the accessibility tree — the home link had **no accessible name at all** on a phone. The
+      `aria-label` now sits on the anchor, so the name survives the breakpoint and is never
+      announced twice.
+  - *Verification*: `npm run build` passes, including the guard that every same-site asset a page
+    references exists in `dist` — which now covers `images/logo.png`. `npx eslint
+    src/site/SiteLayout.tsx` clean. Checked live at 1280px and 420px: mark renders, no console
+    errors, footer `<img>` reports `complete`, `naturalWidth` 128, laid out at 26px.
