@@ -20,6 +20,7 @@
  * so the URL Google indexes is the URL that declares itself canonical. The home page is
  * /wealth-compass/ and is the one exception, because it already ends in a slash.
  */
+import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -246,7 +247,11 @@ function entityGraph(route, facts) {
     givenName: 'Simone',
     familyName: 'Mattioli',
     url: 'https://simo-hue.github.io/',
-    image: `${SITE}/images/founder.png`,
+    // The 2x PNG rather than the WebP the page itself renders: structured-data
+    // consumers vary in format support, and this one costs nothing extra since
+    // both files ship. Whatever this points at must exist — an image URL that
+    // 404s is worse than no image property.
+    image: `${SITE}/images/founder@2x.png`,
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Verona',
@@ -487,5 +492,51 @@ for (const route of ROUTES) {
 }
 await writeFile(path.join(DIST, 'sitemap.xml'), sitemap(entries));
 console.log(`  dist/sitemap.xml                 ${entries.length} URLs`);
+
+/**
+ * Every same-site asset URL the emitted pages point at must exist in dist.
+ *
+ * This exists because it already went wrong once: an image was deleted from
+ * public/ after the JSON-LD referencing it was written, so `Person.image` shipped
+ * pointing at a 404 — invisible on the page, and exactly the kind of thing that
+ * quietly degrades a structured-data record. Route URLs are excluded; they are
+ * directories with their own index.html and are covered by the render assertions
+ * above.
+ */
+const emitted = await Promise.all(
+  [...ROUTES.map((r) => (r.path === '/' ? 'index.html' : path.join(r.path.slice(1), 'index.html'))), '404.html'].map(
+    async (rel) => [rel, await readFile(path.join(DIST, rel), 'utf8')],
+  ),
+);
+
+const BASE_PATH = new URL(SITE).pathname; // "/wealth-compass"
+const missing = new Map();
+
+for (const [page, html] of emitted) {
+  // Every quoted string in the document — this covers href/src/content attributes
+  // and JSON-LD values alike, without needing to know which is which.
+  for (const [, value] of html.matchAll(/"([^"]*)"/g)) {
+    let rel = null;
+    if (value.startsWith(`${SITE}/`)) rel = value.slice(SITE.length);
+    else if (value.startsWith(`${BASE_PATH}/`)) rel = value.slice(BASE_PATH.length);
+    if (rel === null) continue;
+
+    const clean = rel.split(/[?#]/)[0];
+    // No extension means a route, which is a directory with its own index.html
+    // and is already covered by the per-route render assertions above.
+    if (!path.extname(clean)) continue;
+
+    if (!existsSync(path.join(DIST, clean))) {
+      missing.set(clean, (missing.get(clean) ?? new Set()).add(page));
+    }
+  }
+}
+
+if (missing.size) {
+  const detail = [...missing]
+    .map(([url, pages]) => `  ${url}  (referenced by ${[...pages].join(', ')})`)
+    .join('\n');
+  throw new Error(`Referenced asset${missing.size > 1 ? 's' : ''} missing from dist:\n${detail}`);
+}
 
 console.log(`\nPrerendered ${ROUTES.length} routes, ${REDIRECTS.length} redirect stubs. Every marketing URL is now a file.`);
