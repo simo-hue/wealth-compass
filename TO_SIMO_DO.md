@@ -14,13 +14,6 @@ you run the checks below whenever you're at a real Mac and report anything red.
 The whole feature was written and verified without Xcode (this machine has Command Line Tools
 only). What I could verify, and what I could not:
 
-**Verified here**
-- [x] `Sources/Shared` + `Sources/macOS` typecheck cleanly (`swiftc -typecheck`, 0 errors, 0 warnings).
-- [x] The renderer compiles, runs, and produces correct PDFs — six sample variants inspected page by page.
-- [x] `project.pbxproj` passes `plutil -lint`; every new build file resolves to a real file reference.
-- [x] `Localizable.xcstrings` round-trips byte-exact; diff is additions only.
-- [x] All 29 assertions in `Tests/ReportExportOptionsTests.swift` re-run against the real code and pass.
-
 **Needs you, at a Mac with Xcode**
 - [ ] **Build the iOS target.** `Sources/iOS/Views/SettingsView.swift` is the one file I could not
       typecheck — there is no iOS SDK here, so UIKit is unavailable. Its changes mirror the macOS
