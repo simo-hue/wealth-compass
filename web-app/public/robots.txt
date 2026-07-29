@@ -1,14 +1,22 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# INERT ON THE CURRENT HOST — do not rely on anything below.
+#
+# A crawler fetches robots.txt from the ORIGIN ROOT only. This site is deployed to a
+# GitHub Pages project path, so the file that governs it is
+# https://simo-hue.github.io/robots.txt — which is served from a different repository.
+# This file answers at https://simo-hue.github.io/wealth-compass/robots.txt, an address
+# no crawler asks for, so none of these rules take effect today.
+#
+# It is kept because it becomes live and correct the moment the site moves to its own
+# domain, and because the alternative is discovering at that point that nobody wrote it.
+# Until then, treat the /sw/ exclusion below as documentation of intent, not protection:
+# what actually keeps the authenticated app out of the index is that its URLs are not
+# files on the host and return 404.
 
 User-agent: *
 Allow: /
+
+# The authenticated web app is a private, single-tenant instance; there is
+# nothing there for a crawler to index.
+Disallow: /wealth-compass/sw/
+
+Sitemap: https://simo-hue.github.io/wealth-compass/sitemap.xml

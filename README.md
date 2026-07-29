@@ -10,7 +10,15 @@
   </a>
 </p>
 
-Wealth Compass is a comprehensive, privacy-focused personal finance dashboard designed to give you a complete 360-degree view of your financial health. Available as a native app for **iOS and macOS**, it offers real-time tracking of assets, liabilities, and cash flow in a beautiful, local-first interface.
+Wealth Compass is a local-first net-worth tracker for **iPhone and Mac**. Cash, investments, crypto
+and debts go in one place, on your device, and it works out what they add up to. It is free, one
+universal App Store purchase covers both platforms, there is no account to create, and Apple's privacy
+label on the listing reads **Data Not Collected**.
+
+The source is public but **not open source** — see [Licence](#-licence) below.
+
+Built by [Simone Mattioli](https://simo-hue.github.io/) in Verona, Italy.
+Product site: <https://simo-hue.github.io/wealth-compass/>
 
 ## 📱 Native Apple Applications
 
@@ -25,7 +33,7 @@ The core of Wealth Compass is a native Apple ecosystem implementation, ensuring 
 - 📈 **Investment Portfolio**: Real-time stock & ETF price updates via Finnhub and Yahoo Finance. Track cost basis, current value, and profit/loss.
 - ₿ **Crypto Tracker**: Live data fetching from CoinGecko. Track crypto holdings and monitor live valuations.
 - 🔒 **Privacy & Security**: All financial data is strictly stored locally in the app sandbox. Supports Face ID / Touch ID biometric locks and a quick-toggle Privacy Mode to blur sensitive amounts.
-- 🌍 **Localization**: Fully localized in 38 languages via Xcode String Catalogs.
+- 🌍 **Localization**: Fully localized in 35 languages via Xcode String Catalogs.
 - 🔄 **Data Portability**: Easily export your data to a JSON backup or import existing backups. Private CloudKit synchronization is available to keep your iPhone and Mac in sync.
 
 ### Building the Apple Apps
@@ -61,18 +69,31 @@ wealth-compass/
 
 ---
 
-## 🌐 Web Application (Alternative)
+## 🌐 `web-app/` — the product site, and the web app it grew out of
 
-In addition to the native Apple apps, [`web-app/`](./web-app/) contains the source code for the
-**Wealth Compass Web App**.
+[`web-app/`](./web-app/) now contains two things in one Vite project:
+
+**1. The product site** at <https://simo-hue.github.io/wealth-compass/> — the marketing site for the
+Apple apps. It carries hand-built simulations of the iPhone and Mac apps, ported from the SwiftUI
+source in [`apple/`](./apple/), which is why the two directories are coupled at build time (see below).
+
+**2. The original web app**, under `/sw`, behind a lazy boundary. This is where the project started.
+Unlike the local-first Apple apps it depends on a **centralized Supabase backend that you run
+yourself**, and the deployed instance is single-tenant — gated to one email address — so it is source
+to self-host, not a service to sign up for.
 
 - **Tech Stack**: React, TypeScript, Vite, Tailwind CSS, shadcn/ui.
-- **Backend & Auth**: Supabase (with Row Level Security).
-- **Deployment**: Manual — `cd web-app && npm run deploy` builds the app and publishes it to the
-  `gh-pages` branch, which GitHub Pages serves at
-  <https://simo-hue.github.io/wealth-compass/>. There is no CI workflow.
+- **Backend & Auth** (the `/sw` app only): Supabase, with Row Level Security.
+- **Deployment**: Manual — `cd web-app && npm run deploy` builds and publishes `dist/` to the
+  `gh-pages` branch, which GitHub Pages serves. There is no CI workflow.
 
-Unlike the local-first native Apple apps, the web app relies on a centralized Supabase backend to persist its data.
+> **Build dependency:** `npm run build` reads `apple/WealthCompass/` for the app's locale count, its
+> deployment targets and its version, so the figures on the site cannot silently go stale. Building
+> `web-app/` from a checkout without the `apple/` tree will fail by design.
+
+The build prerenders each marketing route to static HTML. That matters on GitHub Pages: a
+client-routed SPA returns a 404 for any cold hit on a sub-path, which is what previously broke the
+privacy and support URLs registered with Apple.
 
 ### Web App Installation
 - [**Web App README**](./web-app/README.md)
@@ -81,6 +102,34 @@ Unlike the local-first native Apple apps, the web app relies on a centralized Su
 
 ---
 
+## 📄 Licence
+
+**[PolyForm Noncommercial 1.0.0](./LICENSE)** — source-available, **not open source**.
+
+The distinction is deliberate and worth stating plainly, because "open source" has a specific meaning
+and this licence does not meet it. The [Open Source Definition](https://opensource.org/osd) requires
+that a licence not restrict the field of endeavour; PolyForm Noncommercial restricts use to
+noncommercial purposes, so it is not OSI-approved and the term does not apply.
+
+What that means in practice:
+
+| You can | You cannot |
+|---|---|
+| Read every line of the source | Use it for a commercial purpose |
+| Build and run it yourself | Sell it, or sell a service built on it |
+| Change it and redistribute your changes | Relicense it |
+| Self-host the web app for personal use | |
+
+GitHub reports this repository's licence as `NOASSERTION` because PolyForm is not in its SPDX set.
+The authoritative text is [`LICENSE`](./LICENSE).
+
+## 👤 Author
+
+**Simone Mattioli** — Verona, Italy.
+[Website](https://simo-hue.github.io/) · [GitHub](https://github.com/simo-hue) ·
+[ORCID](https://orcid.org/0009-0006-5047-8004) ·
+[Google Scholar](https://scholar.google.com/citations?user=uLGrDbIAAAAJ)
+
 <p align="center">
-  <span style="color: #666; font-size: 0.8em;">Wealth Compass &copy; 2026</span>
+  <span style="color: #666; font-size: 0.8em;">Wealth Compass &copy; 2026 Simone Mattioli</span>
 </p>

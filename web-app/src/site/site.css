@@ -1,0 +1,540 @@
+/* ============================================================================
+   Wealth Compass — marketing site design system
+   ----------------------------------------------------------------------------
+   This is deliberately NOT the app's design system. The app owns near-black and
+   green; the site is a cold slate frame around it. WCColor.primary (#1FDB99)
+   must never appear in site chrome — only inside a simulated device screen.
+   The app's tokens live in src/sim/tokens.ts, ported from
+   apple/WealthCompass/Sources/Shared/UI/DesignSystem.swift.
+
+   Font paths are absolute and include the GitHub Pages sub-path. They belong to
+   the same load-bearing set as vite `base` / router `basename` / package
+   `homepage` — see web-app/DEPLOYMENT.md.
+   ========================================================================= */
+
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 62.5% 125%;
+  font-display: swap;
+  src: url(/wealth-compass/fonts/Archivo-latin-ext-k3kQo8.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 62.5% 125%;
+  font-display: swap;
+  src: url(/wealth-compass/fonts/Archivo-latin-k3kQo8.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Metric-matched stand-in for Archivo while the woff2 is in flight. Every face
+   here is font-display: swap, which is right for LCP — the H1 paints immediately
+   in the fallback — but that only pays off if the fallback is the same *size*,
+   or the headline re-wraps when Archivo lands and the whole page below it moves.
+   These numbers were measured off public/fonts/Archivo-latin-k3kQo8.woff2, not
+   copied: it is a variable font (wght 100-900, wdth 62-125), instanced at the
+   only setting var(--display) is ever used at — wght 700, wdth 125, because
+   .display below pins font-stretch: 125% and font-weight: 700 — and compared
+   against Arial Bold on the standard English-letter-frequency weighted average
+   advance width:
+     Archivo 700/125  0.592108em   Arial Bold  0.474790em   ->  124.71%
+   On the actual hero H1 string that leaves a 0.74% width error, down from 24%.
+   ascent/descent are Archivo's own metrics — 878 and -210 on a 1000 upm, and
+   OS/2 fsSelection bit 7 is set, so hhea and typo agree and every platform reads
+   the same pair — each divided by the size-adjust, since size-adjust scales the
+   overrides too: 0.878 / 1.2471 = 70.4%, 0.210 / 1.2471 = 16.84%. Archivo's
+   line gap is 0 where Arial's is not, hence the explicit 0%.
+   Helvetica Neue Bold is listed first only so macOS's first paint keeps the face
+   it uses today; its weighted average is 0.474930em, 0.03% off Arial Bold's, so
+   one set of numbers serves both. If none of these resolve the family simply has
+   no face and the stack falls through to today's behaviour. */
+@font-face {
+  font-family: 'Archivo Fallback';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Helvetica Neue Bold'), local('HelveticaNeue-Bold'),
+       local('Arial Bold'), local('Arial-BoldMT'), local('Arial');
+  size-adjust: 124.71%;
+  ascent-override: 70.4%;
+  descent-override: 16.84%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(/wealth-compass/fonts/InstrumentSans-latin-ext-pxiTyp.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(/wealth-compass/fonts/InstrumentSans-latin-pxiTyp.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/wealth-compass/fonts/IBMPlexMono-latin-ext--F63fj.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/wealth-compass/fonts/IBMPlexMono-latin--F63fj.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/wealth-compass/fonts/IBMPlexMono-latin-ext--F6qfj.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/wealth-compass/fonts/IBMPlexMono-latin--F6qfj.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+.wc-site {
+  /* --- Palette. Cold, achromatic, no green. ------------------------------ */
+  --canvas: #16202b;
+  --canvas-deep: #101822;
+  --surface: #1d2a38;
+  --surface-hi: #243343;
+  --ink: #e8edf2;
+  --ink-muted: #93a4b5;
+  /* Every use of --ink-faint is 10–12px uppercase mono, so it needs 4.5:1 (WCAG
+     1.4.3), not the 3:1 large-text allowance. Contrast against all four
+     backgrounds it is ever set on — canvas 5.79, canvas-deep 6.28, surface 5.12,
+     surface-hi 4.53. The previous #6b7e90 measured 3.93 / 4.26 / 3.48 / 3.08 and
+     failed on every one of them. This is the smallest proportional lightening of
+     that value that clears 4.5 everywhere, which keeps as much separation as AA
+     permits from --ink-muted (6.44 / 6.99 / 5.70 / 5.04). --ink is 13.98 on
+     canvas, 10.94 worst case. */
+  --ink-faint: #849cb2;
+  /* 1.44:1 on canvas: a hairline, not a contour. Horizon.tsx strokes the
+     signature trail with this token, and the trail is meant to sit just above
+     the noise floor — which is why it is not raised to the 3:1 WCAG 1.4.11 asks
+     of a *meaningful* border. The .who-photo and .source-strip borders that also
+     use it are decorative (the photo is alt="", the strip reads fine without its
+     box); the prefers-contrast block at the foot of this file gives those two a
+     real 3:1 border for anyone who asks for one. */
+  --rule: #2c3b4c;
+  --rule-soft: #223040;
+  /* Only inside @media (prefers-contrast: more). */
+  --rule-strong: #617689;
+  /* Spent once, on the source-available seal. If it shows up anywhere else,
+     something has gone wrong. */
+  --seal: #f2a93b;
+
+  /* --- Type roles -------------------------------------------------------- */
+  --display: 'Archivo', 'Archivo Fallback', 'Helvetica Neue', Arial, sans-serif;
+  --body: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --data: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --measure: 62ch;
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --page: 1240px;
+
+  /* CLIP, NOT HIDDEN. Do not "simplify" this to overflow: hidden — hidden makes
+     this element a scroll container, and position: sticky on the nav in
+     SiteLayout.tsx and on .areas-device would then resolve against it instead of
+     the viewport and stop working. clip creates no scrollport, so sticky still
+     sees the viewport, and unlike hidden it is legal next to overflow-y: visible.
+     What it contains: .hero-horizon is width: 100vw offset by calc(50% - 50vw),
+     and with a classic 15px scrollbar 100vw counts the scrollbar while 50%
+     resolves against clientWidth, so the horizon hangs ~7.5px past each edge.
+     That used to be masked only by an inline overflow: hidden on the hero
+     <section> in pages/Home.tsx — a coupling across two files that nothing
+     documented. Safari < 16 ignores clip and falls back to today's behaviour. */
+  overflow-x: clip;
+
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* --- Display -------------------------------------------------------------
+   Archivo at its widest. Used large and sparingly; never below 1.25rem, where
+   the expanded width stops reading as deliberate and starts reading as a bug. */
+.wc-site .display {
+  font-family: var(--display);
+  font-stretch: 125%;
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  margin: 0;
+}
+.wc-site .display-xl { font-size: clamp(2.25rem, 4.6vw, 3.75rem); }
+.wc-site .display-l  { font-size: clamp(1.9rem, 3.8vw, 3.1rem); }
+.wc-site .display-m  { font-size: clamp(1.375rem, 2.2vw, 1.85rem); line-height: 1.05; }
+
+/* --- Data / labels -------------------------------------------------------
+   Every numeral and every eyebrow on this site is monospace. Not decoration:
+   the app sets .monospacedDigit() on all of its figures so values don't jitter
+   when they change, and the site quotes that logic. */
+.wc-site .eyebrow {
+  font-family: var(--data);
+  font-weight: 500;
+  font-size: 0.6875rem;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0;
+}
+.wc-site .num,
+.wc-site .mono { font-family: var(--data); font-variant-numeric: tabular-nums; }
+
+.wc-site .lede {
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--ink-muted);
+  max-width: var(--measure);
+  margin: 0;
+}
+.wc-site p { margin: 0; }
+
+/* --- Structure ------------------------------------------------------------ */
+.wc-site .page { max-width: var(--page); margin-inline: auto; padding-inline: var(--gutter); }
+.wc-site .rule { border: 0; border-top: 1px solid var(--rule-soft); margin: 0; }
+
+/* --- Links & focus -------------------------------------------------------- */
+.wc-site a { color: inherit; text-decoration: none; }
+.wc-site :focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Underline that grows from the left in 120ms — the only hover motion in the
+   site chrome. */
+.wc-site .u-link {
+  position: relative;
+  padding-bottom: 2px;
+}
+.wc-site .u-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 120ms ease-out;
+}
+.wc-site .u-link:hover::after,
+.wc-site .u-link:focus-visible::after { transform: scaleX(1); }
+
+/* --- App Store badge ------------------------------------------------------ */
+.wc-site .badge-store {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.5rem 0.9rem 1.25rem;
+  background: var(--ink);
+  color: var(--canvas);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.1;
+  transition: transform 120ms ease-out, background-color 120ms ease-out;
+}
+.wc-site .badge-store:hover { background: #fff; transform: translateY(-1px); }
+.wc-site .badge-store small {
+  display: block;
+  font-family: var(--data);
+  font-weight: 400;
+  font-size: 0.625rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  /* 10px text, so 4.5:1. --canvas at 0.62 over --ink composites to #666e77 and
+     measures 4.39 — a near miss. 0.70 composites to #555e67 at 5.60, and 6.08
+     over the #fff hover state. */
+  opacity: 0.7;
+}
+
+/* --- Hero device composition ---------------------------------------------
+   Both device *boxes* are always in the DOM, but only the phone's contents are.
+   Home.tsx gates <MacWindow> behind a matchMedia check on this file's 1180px
+   breakpoint that reads false during prerender and on the first client render,
+   so above 1180px an empty .hero-mac is laid out first and the Mac arrives a
+   frame later. That is what aspect-ratio on .hero-mac is for: the box reserves
+   its height before its contents exist, instead of growing ~550px and shoving
+   the rest of the page down. 1440/900 is not an eyeballed guess — MacWindow
+   renders at width × MAC_H·(width / MAC_W) with MAC_W 1440 and MAC_H 900, so
+   the reserved box and the real one are the same height to the pixel.
+   Under 1180px the Mac leaves the hero entirely, and since that is display: none
+   the ratio is inert there. It is never lost, because MacSection renders it
+   full-bleed further down the page at every width. */
+/* The horizon lives inside this stage and is positioned relative to the devices
+   rather than to the section, so it always crosses the glass no matter how the
+   headline above it wraps. */
+.wc-site .hero-stage {
+  position: relative;
+  margin-top: clamp(1.75rem, 3.5vw, 3rem);
+}
+.wc-site .hero-horizon {
+  position: absolute;
+  left: calc(50% - 50vw);
+  width: 100vw;
+  top: 8%;
+  height: 62%;
+  z-index: 0;
+  pointer-events: none;
+}
+.wc-site .hero-devices {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.wc-site .hero-mac { display: none; aspect-ratio: 1440 / 900; }
+.wc-site .hero-phone { display: block; }
+
+/* 1180px, not 900px. MacWindow lays the UI out at 1440×900pt and scales to the
+   width it is handed, so the breakpoint is really a legibility threshold. The
+   Mac is flex: 1 1 0 next to a fixed 310px phone pulled back by -7% of the row,
+   which solves to macWidth = 1.07·W − 310 for a content width W of 0.92·viewport
+   (the --gutter clamp is on its 4vw branch through this whole band):
+     900px  -> 576px -> scale 0.400   an 11pt caption lands at 4.4px
+     1024px -> 698px -> 0.485
+     1120px -> 792px -> 0.550         the floor worth shipping
+     1180px -> 852px -> 0.591
+     1209px+ -> 880px (max-width cap) -> 0.611
+   Below 1180 the Mac would render its >= 1090pt two-column dashboard branch at a
+   size where nothing in it can be read, so it waits for the full-bleed section
+   instead. The phone hangs ~200-220px below the Mac's bottom edge across the
+   whole band; that stagger is the composition, not a gap to be closed. */
+@media (min-width: 1180px) {
+  .wc-site .hero-mac { display: block; }
+  .wc-site .hero-phone { margin-left: -7%; margin-top: 7%; }
+}
+
+.wc-site .spec-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+  font-family: var(--data);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.wc-site .spec-strip li { list-style: none; }
+.wc-site .spec-strip li + li { position: relative; }
+.wc-site .spec-strip li + li::before {
+  content: '·';
+  position: absolute;
+  left: -0.85rem;
+  color: var(--rule);
+}
+
+/* --- The five areas ------------------------------------------------------
+   The device is sticky and the copy scrolls past it; an IntersectionObserver in
+   Home.tsx switches the tab to match the block in view, so the tab bar is the
+   section's real navigation rather than decoration. */
+.wc-site .areas {
+  display: grid;
+  gap: clamp(2rem, 4vw, 4rem);
+  padding-block: clamp(4rem, 9vw, 8rem);
+}
+.wc-site .areas-device {
+  position: sticky;
+  top: 78px;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-self: start;
+  /* On a phone the device pins to the top and the copy runs underneath it, so it
+     needs an opaque backdrop or text scrolls through the bezel. */
+  padding-block: 0.75rem 1.25rem;
+  background: linear-gradient(to bottom, var(--canvas) 82%, transparent);
+}
+.wc-site .areas-block {
+  min-height: 62vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 1.5rem;
+}
+.wc-site .areas-block + .areas-block { border-top: 1px solid var(--rule-soft); }
+
+@media (min-width: 900px) {
+  .wc-site .areas {
+    grid-template-columns: minmax(300px, 0.85fr) 1fr;
+    align-items: start;
+  }
+  .wc-site .areas-device {
+    top: 96px;
+    padding-block: 0;
+    background: none;
+  }
+  .wc-site .areas-block { min-height: 78vh; }
+}
+
+/* --- The Mac ---------------------------------------------------------------
+   Full-bleed. Under 900px the window keeps its real proportions and the section
+   scrolls horizontally instead of shrinking the UI into illegibility. */
+.wc-site .mac-section { padding-block: clamp(3rem, 7vw, 6rem); }
+.wc-site .mac-stage {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  padding-inline: var(--gutter);
+  padding-bottom: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+.wc-site .mac-holder { width: min(1100px, 100%); min-width: 760px; margin-inline: auto; }
+
+/* The stage is a scroll container, so it needs to be focusable to be pannable by
+   keyboard — that is a tabindex="0" in pages/Home.tsx, not something CSS can do.
+   The ring goes *inside* here: the stage is full-bleed, and the site's default
+   outline-offset of 3px would put the ring past the viewport edge where
+   .wc-site's overflow-x: clip removes it. */
+.wc-site .mac-stage:focus-visible { outline: 2px solid var(--ink); outline-offset: -3px; }
+
+/* 825px, not 899px: .mac-holder is min-width 760px inside a stage whose content
+   box is viewport − 2·--gutter = 0.92·viewport, so the stage only overflows
+   below 760 / 0.92 ≈ 826px. Above that there was nothing to pan and the hint was
+   promising a gesture that did nothing. It is ::after content, so assistive tech
+   may never see it at all — the durable fix is a real element in Home.tsx. */
+@media (max-width: 825px) {
+  .wc-site .mac-stage::after {
+    content: 'drag to pan →';
+    display: block;
+    font-family: var(--data);
+    font-size: 0.625rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding-top: 0.9rem;
+  }
+}
+
+/* --- Verifiable claims ----------------------------------------------------- */
+.wc-site .facts { display: grid; gap: 0; margin: 0; }
+.wc-site .fact {
+  display: grid;
+  gap: 0.5rem 2.5rem;
+  padding-block: 1.5rem;
+  border-top: 1px solid var(--rule-soft);
+}
+.wc-site .fact:last-child { border-bottom: 1px solid var(--rule-soft); }
+.wc-site .fact dd { margin: 0; display: grid; gap: 0.5rem; }
+.wc-site .fact-claim {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.wc-site .fact-proof { font-size: 0.6875rem; letter-spacing: 0.08em; color: var(--ink-faint); }
+
+@media (min-width: 760px) {
+  .wc-site .fact { grid-template-columns: 15rem 1fr; }
+}
+
+/* --- Authorship ------------------------------------------------------------ */
+.wc-site .who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  padding-block: clamp(3rem, 6vw, 5rem);
+  border-top: 1px solid var(--rule-soft);
+}
+.wc-site .who-photo {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.05);
+  border: 1px solid var(--rule);
+}
+
+/* --- Source strip ---------------------------------------------------------- */
+.wc-site .source-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem 2rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+}
+
+/* --- Closing call to action ------------------------------------------------ */
+.wc-site .cta {
+  padding-block: clamp(4rem, 9vw, 8rem);
+  border-top: 1px solid var(--rule-soft);
+  background: var(--canvas-deep);
+}
+
+/* --- Short viewports -------------------------------------------------------
+   Below 900px the sticky device sits *over* the copy rather than beside it, and
+   on a short screen it takes the screen with it. At 375×667 the phone is
+   min(300px, 62vw) = 232px wide, and because IPhone.tsx renders 440×956pt and
+   scales, that is 505px tall; plus top: 78px and 32px of padding it occupies
+   615px of a 667px viewport and leaves 52px to read an .areas-block in. Its size
+   comes from an inline width in Home.tsx and cannot be shrunk from here, so on a
+   short screen it simply stops sticking — and the tall dwell heights, which only
+   existed to give it something to stick through, go with it. Landscape phones
+   (812×375) match this too. */
+@media (max-width: 899px) and (max-height: 700px) {
+  .wc-site .areas-device {
+    position: static;
+    background: none;
+    padding-block: 0 1.5rem;
+  }
+  .wc-site .areas-block { min-height: 0; }
+}
+
+/* --- Raised contrast --------------------------------------------------------
+   --rule stays a hairline for everyone else because Horizon.tsx strokes the
+   signature trail with it. These two borders are the ones a low-vision reader
+   loses: --rule measures 1.44:1 on canvas and 1.28:1 on the strip's --surface,
+   and --surface itself is only 1.13:1 against --canvas, so the card has no other
+   edge. --rule-strong is 3.50 on canvas and 3.10 on surface, clearing 1.4.11. */
+@media (prefers-contrast: more) {
+  .wc-site .who-photo,
+  .wc-site .source-strip { border-color: var(--rule-strong); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wc-site .areas-device { position: static; background: none; }
+  .wc-site *,
+  .wc-site *::before,
+  .wc-site *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

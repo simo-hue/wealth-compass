@@ -1,85 +1,70 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Suspense, lazy } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
-import SettingsPage from "./pages/Settings";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
-import { FinanceProvider } from "./contexts/FinanceContext";
-import { SettingsProvider } from "./contexts/SettingsContext";
-import { AuthProvider } from "./contexts/AuthContext";
-import { ProtectedRoute } from "./routes/ProtectedRoute";
-import LoginPage from "./pages/Login";
-import MainLayout from "./components/layout/MainLayout";
-import { Layout as WebsiteLayout } from "./components/layout/WebsiteLayout";
-import CashFlowPage from "./pages/CashFlow";
-import InvestmentsPage from "./pages/Investments";
-import CryptoPage from "./pages/Crypto";
-import CalculationsPage from "./pages/Calculations";
+import { SiteLayout } from "./site/SiteLayout";
 
-// Website Pages
+// Marketing pages. These are the prerendered routes, so they are imported
+// eagerly — they ARE the static output.
 import { Home } from "./pages/Home";
-import { Features } from "./pages/Features";
-import { Founder } from "./pages/Founder";
 import { FAQ } from "./pages/FAQ";
-import { Tutorial } from "./pages/Tutorial";
+import { Support } from "./pages/Support";
+import { OpenSource } from "./pages/OpenSource";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { TermsOfService } from "./pages/TermsOfService";
-import { Support } from "./pages/Support";
+
+/**
+ * The original Supabase-backed web app, behind one lazy boundary.
+ *
+ * Everything it needs — AuthProvider, SettingsProvider, FinanceProvider, the
+ * toast stack, Supabase, recharts — is inside SwRoutes, so none of it reaches
+ * the marketing bundle. Previously those providers wrapped the public routes,
+ * which meant every landing-page visit instantiated a Supabase client and fired
+ * an exchange-rate request at api.frankfurter.app. The site footer claims the
+ * page loads nothing from a third party; this is what makes that true.
+ */
+const SwRoutes = lazy(() => import("./sw/SwRoutes"));
+
+export const BASENAME = "/wealth-compass";
+
+/**
+ * The route table, separated from the router so the prerender step can drive the
+ * same tree through a StaticRouter while the browser uses a BrowserRouter.
+ * BrowserRouter reads `document` during render and cannot be used server-side.
+ */
+export const AppRoutes = () => (
+  <Routes>
+    <Route element={<SiteLayout />}>
+      <Route path="/" element={<Home />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/support" element={<Support />} />
+      <Route path="/open-source" element={<OpenSource />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
+
+      {/* The old marketing structure. These URLs are linked from elsewhere on
+          the web and from earlier App Store metadata, so they redirect rather
+          than 404. /features and /founder became sections of the home page. */}
+      <Route path="/features" element={<Navigate to="/#areas" replace />} />
+      <Route path="/founder" element={<Navigate to="/#who" replace />} />
+      <Route path="/tutorial" element={<Navigate to="/open-source" replace />} />
+    </Route>
+
+    <Route path="sw/*" element={<Suspense fallback={null}><SwRoutes /></Suspense>} />
+
+    <Route path="*" element={<NotFound />} />
+  </Routes>
+);
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
-        <SettingsProvider>
-          <FinanceProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter basename="/wealth-compass" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <Routes>
-                {/* Public Website Routes */}
-                <Route element={<WebsiteLayout />}>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/features" element={<Features />} />
-                  <Route path="/founder" element={<Founder />} />
-                  <Route path="/faq" element={<FAQ />} />
-                  <Route path="/tutorial" element={<Tutorial />} />
-                  <Route path="/privacy" element={<PrivacyPolicy />} />
-                  <Route path="/support" element={<Support />} />
-                  <Route path="/terms" element={<TermsOfService />} />
-                </Route>
-
-                {/* Application Routes prefixed with /sw */}
-                <Route path="sw">
-                  {/* Auth Routes */}
-                  <Route path="login" element={<LoginPage />} />
-
-                  {/* Protected App Routes */}
-                  <Route element={
-                    <ProtectedRoute>
-                      <MainLayout />
-                    </ProtectedRoute>
-                  }>
-                    {/* Accessing /sw should redirect to dashboard */}
-                    <Route index element={<Navigate to="dashboard" replace />} />
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="cash-flow" element={<CashFlowPage />} />
-                    <Route path="investments" element={<InvestmentsPage />} />
-                    <Route path="crypto" element={<CryptoPage />} />
-                    <Route path="calculations" element={<CalculationsPage />} />
-                    <Route path="settings" element={<SettingsPage />} />
-                  </Route>
-                </Route>
-
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </FinanceProvider>
-        </SettingsProvider>
-      </AuthProvider>
+      <BrowserRouter basename={BASENAME} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <AppRoutes />
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
