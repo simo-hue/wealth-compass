@@ -101,6 +101,10 @@ struct SankeyDiagramView: View {
             .animation(.spring(response: 0.45, dampingFraction: 0.86), value: sankey)
         }
         .frame(height: diagramHeight)
+        // A geometry fault must never be able to paint over the card's header again: a mis-scaled
+        // hub once drew 15x the card height and covered the title. The layout is bounded by
+        // construction and asserted to be, so this only ever costs a clip that never fires.
+        .clipped()
         .background {
             GeometryReader { proxy in
                 Color.clear.preference(key: SankeyWidthKey.self, value: proxy.size.width)

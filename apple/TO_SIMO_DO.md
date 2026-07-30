@@ -41,3 +41,7 @@
 ## Money Flow — adaptive label sizing (2026-07-30)
 - [ ] **Check the collapsed labels read well at your window size.** Name and amount now share one line for any flow thinner than 32pt. On a narrow pane a long category ("Entertainment", "Smaller categories") plus its amount may truncate — the amount is protected, the name shrinks first. If truncation is common at your width, the fix is to widen `preferredLabelWidth` or drop the name to `.caption` in the collapsed form.
 - [ ] **Confirm the leader lines look right.** They only appear now when a pipe is too thin for even one line, so they should be rare — but that also means they are the only cue for the very smallest flows.
+
+## Money Flow — widget overflow fix + All Time default (2026-07-30)
+- [ ] **Re-check the Dashboard widget.** The hub should now be exactly as tall as the flows leaving it and stay well inside the card, with the title clear. This was reproduced and fixed against your exact figures, but it is worth a look at your real window size.
+- [ ] **Cash Flow now opens on All Time.** The Dashboard's compact card still opens on Last 30 Days. Tell me if you want them consistent.

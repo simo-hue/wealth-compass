@@ -76,7 +76,10 @@ struct MacCashFlowView: View {
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appModel: MacAppModel
     @State private var searchText = ""
-    @State private var moneyFlowPeriod: AnalyticsPeriod = .thirtyDays
+    // All Time by default: the Money Flow card answers "where does my money go", and a single
+    // month is often too sparse to show a shape — the Dashboard's compact card stays on 30 days,
+    // where recency is the point.
+    @State private var moneyFlowPeriod: AnalyticsPeriod = .all
     /// Set when the user drills in from the Money Flow diagram; shown as a removable chip in the
     /// filter bar and cleared by dismissing it.
     @State private var categoryFilter: CashFlowCategoryFilter?

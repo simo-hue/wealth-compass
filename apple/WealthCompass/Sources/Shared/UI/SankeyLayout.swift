@@ -268,7 +268,14 @@ enum SankeyLayout {
             return usable / load.sum
         }
         guard let scale = candidates.min(), scale > 0, scale.isFinite else { return Resolved() }
-        let flowHeight = total * scale
+
+        // The hub is only as tall as what actually attaches to it. In `.full` the inflows tile it
+        // edge to edge, so it carries the whole period total. In `.fanOut` there are no inflows at
+        // all, and sizing it by `total` there made it `total / spent` times too tall — 15.6x on
+        // real data (2.748 € of income against 176,02 € of spending), which painted the hub bar
+        // straight over the card's own title.
+        let hubValue = inflows.isEmpty ? CGFloat(spentValue) : total
+        let flowHeight = hubValue * scale
 
         // Horizontal bands.
         let hubRect: CGRect
@@ -537,14 +544,14 @@ enum SankeyLayout {
             let flowRect = CGRect(x: x, y: cursor, width: width, height: height)
             cursor += height + config.nodeSpacing
 
-            // Inflate the drawn bar around the true band's centre, never shifting it.
+            // Inflate the drawn bar around the true band's centre. A band flush against the edge of
+            // the rect would otherwise send the inflated bar over it — the bottom sliver of an
+            // extreme long tail overhung by half the floor — so slide it back inside rather than
+            // let it overhang. It still overlaps its own band, which is what makes it pointable.
             let drawnHeight = max(height, config.minimumNodeHeight)
-            let drawnRect = CGRect(
-                x: x,
-                y: flowRect.midY - drawnHeight / 2,
-                width: width,
-                height: drawnHeight
-            )
+            var drawnY = flowRect.midY - drawnHeight / 2
+            drawnY = max(rect.minY, min(drawnY, rect.maxY - drawnHeight))
+            let drawnRect = CGRect(x: x, y: drawnY, width: width, height: drawnHeight)
             return NodeFrame(
                 id: node.id,
                 rect: drawnRect,

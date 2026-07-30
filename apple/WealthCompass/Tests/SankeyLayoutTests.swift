@@ -138,7 +138,12 @@ final class SankeyLayoutTests: XCTestCase {
         XCTAssertFalse(floored.isEmpty, "slivers should be floored")
         for frame in floored {
             XCTAssertGreaterThan(frame.rect.height, frame.flowRect.height, "the bar is inflated")
-            XCTAssertEqual(frame.rect.midY, frame.flowRect.midY, accuracy: 1e-6, "but stays centred on its true band")
+            // Centred on its band, unless the band sits flush against the rect edge and the
+            // inflated bar had to be slid back inside — it must still overlap the flow it names.
+            XCTAssertLessThan(frame.rect.minY, frame.flowRect.maxY + 1e-6, "the bar still overlaps its band")
+            XCTAssertGreaterThan(frame.rect.maxY, frame.flowRect.minY - 1e-6, "the bar still overlaps its band")
+            XCTAssertGreaterThanOrEqual(frame.rect.minY, rect.minY - 1e-6, "and stays inside the rect")
+            XCTAssertLessThanOrEqual(frame.rect.maxY, rect.maxY + 1e-6, "and stays inside the rect")
         }
         for ribbon in resolved.ribbons {
             let otherID = ribbon.sourceID == sankey.hub.id ? ribbon.targetID : ribbon.sourceID
@@ -374,6 +379,47 @@ final class SankeyLayoutTests: XCTestCase {
         }
     }
 
+    /// Regression: the Dashboard's compact card drew its hub 15x the card height and painted over
+    /// the card's own title.
+    ///
+    /// `.fanOut` has no inflow column, so nothing constrained the hub against the period total —
+    /// and every hub-closure and overlap assertion still passed, because they are all *relative* to
+    /// the hub. Absolute containment has to be asserted on its own.
+    func testFanOutGeometryStaysInsideTheCard() {
+        let sankey = model(dominantSurplusMonth, maxNodes: 4)
+        for size in [CGSize(width: 436, height: 300), CGSize(width: 700, height: 560), CGSize(width: 380, height: 240)] {
+            let bounds = CGRect(origin: .zero, size: size)
+            let resolved = SankeyLayout.resolve(sankey, in: bounds, mode: .fanOut, config: .compact)
+            assertFinite(resolved, "at \(Int(size.width))x\(Int(size.height))")
+            assertWithinBounds(resolved, bounds, "\(Int(size.width))x\(Int(size.height))")
+
+            guard let hub = resolved.node(id: sankey.hub.id) else { return XCTFail("no hub") }
+            let spent = CGFloat(sankey.outflows.filter { $0.role != .surplus }.reduce(0) { $0 + $1.value }) * resolved.scale
+            XCTAssertEqual(hub.flowRect.height, spent, accuracy: 1e-6, "the hub is only as tall as the flows leaving it")
+        }
+    }
+
+    /// Nothing the layout produces may fall outside the rect it was given, in any mode.
+    private func assertWithinBounds(_ resolved: SankeyLayout.Resolved, _ bounds: CGRect, _ label: String,
+                                    file: StaticString = #filePath, line: UInt = #line) {
+        for node in resolved.nodes {
+            XCTAssertGreaterThanOrEqual(node.rect.minY, bounds.minY - 0.5, "\(label): \(node.id) bar above the rect", file: file, line: line)
+            XCTAssertLessThanOrEqual(node.rect.maxY, bounds.maxY + 0.5, "\(label): \(node.id) bar below the rect", file: file, line: line)
+            XCTAssertGreaterThanOrEqual(node.flowRect.minY, bounds.minY - 0.5, "\(label): \(node.id) band above the rect", file: file, line: line)
+            XCTAssertLessThanOrEqual(node.flowRect.maxY, bounds.maxY + 0.5, "\(label): \(node.id) band below the rect", file: file, line: line)
+        }
+        for label2 in resolved.labels {
+            XCTAssertGreaterThanOrEqual(label2.rect.minY, bounds.minY - 0.5, "\(label): label \(label2.id) above the rect", file: file, line: line)
+            XCTAssertLessThanOrEqual(label2.rect.maxY, bounds.maxY + 0.5, "\(label): label \(label2.id) below the rect", file: file, line: line)
+        }
+        for ribbon in resolved.ribbons {
+            for point in [ribbon.sourceTop, ribbon.sourceBottom, ribbon.targetTop, ribbon.targetBottom] {
+                XCTAssertGreaterThanOrEqual(point.y, bounds.minY - 0.5, "\(label): ribbon \(ribbon.id) above the rect", file: file, line: line)
+                XCTAssertLessThanOrEqual(point.y, bounds.maxY + 0.5, "\(label): ribbon \(ribbon.id) below the rect", file: file, line: line)
+            }
+        }
+    }
+
     func testLayoutIsDeterministic() {
         let sankey = model(typicalMonth)
         XCTAssertEqual(SankeyLayout.resolve(sankey, in: rect), SankeyLayout.resolve(sankey, in: rect))
@@ -387,6 +433,7 @@ final class SankeyLayoutTests: XCTestCase {
             assertFinite(resolved, "at \(width)pt")
             assertNoOverlap(resolved)
             assertHubCloses(resolved, sankey)
+            assertWithinBounds(resolved, bounds, "at \(width)pt")
             XCTAssertTrue(
                 resolved.nodes.allSatisfy { $0.flowRect.minY >= bounds.minY - 1e-6 && $0.flowRect.maxY <= bounds.maxY + 1e-6 },
                 "bands stay inside the rect at \(width)pt"
