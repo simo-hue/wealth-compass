@@ -517,6 +517,17 @@ struct ReportDocumentBuilder {
                 axisFormatter: { [self] in axisLabel($0) })))
         }
 
+        // Money Flow. Built from the ranged ledger for the same reason the category totals below
+        // are: `cashFlowSankey(period:)` would impose its own window and contradict the export
+        // range. Placed ahead of the category breakdown because it frames it — the donut answers
+        // "how was spending split", this answers "where did the money come from and what was left".
+        let flowTransactions = rangedTransactions.filter { !isFutureDated($0) }
+        let sankey = engine.cashFlowSankey(transactions: flowTransactions)
+        if !sankey.isEmpty {
+            blocks.append(.subheading(L("Money Flow"), anchor: "cashflow-money-flow"))
+            blocks.append(.chart(.sankey(model: sankey, amountFormatter: { [self] in money($0) })))
+        }
+
         // Categories, computed over the *selected range* rather than via
         // `expensesByCategory(period:)`, whose own period window would contradict the export range.
         let expenses = rangedTransactions.filter { $0.type == .expense && !isFutureDated($0) }

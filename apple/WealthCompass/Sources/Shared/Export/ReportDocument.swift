@@ -171,6 +171,11 @@ enum ReportChart: Sendable {
               axisFormatter: @Sendable (Double) -> String,
               dateFormatter: @Sendable (Date) -> String)
 
+    /// Money Flow. Carries the analytics model directly rather than a flattened print copy: the
+    /// geometry comes from the same `SankeyLayout` the on-screen card uses, so the two cannot
+    /// drift. `amountFormatter` follows the same pre-format convention as `ReportSlice`.
+    case sankey(model: CashFlowSankey, amountFormatter: @Sendable (Double) -> String)
+
     /// Drawn height in points. Donuts need room for the legend; the plotted charts want a
     /// readable aspect ratio without eating a whole page.
     var height: CGFloat {
@@ -178,6 +183,7 @@ enum ReportChart: Sendable {
         case .donut: return 190
         case .groupedBars: return 200
         case .area: return 190
+        case .sankey: return 240
         }
     }
 }

@@ -166,6 +166,12 @@ final class FinanceStore: ObservableObject {
     private var cachedMonthlyCashFlow: (version: Int, currency: Currency, rateStamp: Date?, month: Date, value: MonthlyCashFlow)?
     private var cachedCashFlowTrend: (version: Int, currency: Currency, rateStamp: Date?, months: Int, monthStamp: Date, value: [CashFlowMonth])?
     private var cachedExpensesByCategory: (version: Int, currency: Currency, rateStamp: Date?, period: AnalyticsPeriod, dayStamp: Date, value: [CategoryTotal])?
+    /// Money Flow diagram. Keyed like the others plus `maxNodes` (the Dashboard's compact card folds
+    /// at a lower threshold than the full one) and `appLanguage` — unlike every cache above it, this
+    /// value carries *localized* strings ("Cash Flow", "Surplus", "Smaller categories"). The in-app
+    /// language override re-`.id`s the root view to force a re-render, but that alone would re-read a
+    /// stale entry here and leave the diagram labelled in the previous language.
+    private var cachedCashFlowSankey: (version: Int, currency: Currency, rateStamp: Date?, period: AnalyticsPeriod, maxNodes: Int, language: String?, dayStamp: Date, value: CashFlowSankey)?
     /// Memoized monthly transaction count (deep-audit M27) — keyed by data version + month; avoids the
     /// O(n) filter re-running on every macOS cash-flow body/resize pass (and the sorted accessor).
     private var cachedMonthlyTransactionCount: (version: Int, month: Date, value: Int)?
@@ -1006,6 +1012,33 @@ final class FinanceStore: ObservableObject {
         }
         let result = analytics(settings).expensesByCategory(period: period)
         cachedExpensesByCategory = (dataVersion, settings.currency, rateStamp, period, dayStamp, result)
+        return result
+    }
+
+    /// The Money Flow (Sankey) model for a period — see `AnalyticsEngine.cashFlowSankey`.
+    ///
+    /// `maxNodesPerSide` is a parameter rather than a constant because the two cards fold at
+    /// different thresholds: the full-width card on Cash Flow has room for 7 per side, the compact
+    /// Dashboard card does not.
+    func cashFlowSankey(period: AnalyticsPeriod, maxNodesPerSide: Int = 7, settings: AppSettings) -> CashFlowSankey {
+        let rateStamp = settings.exchangeRateSnapshot?.fetchedAt
+        // Period windows are relative to today, and the engine clamps future-dated rows, so both
+        // ends of the window move at midnight.
+        let dayStamp = Calendar.current.startOfDay(for: Date())
+        if let cache = cachedCashFlowSankey,
+           cache.version == dataVersion,
+           cache.currency == settings.currency,
+           cache.rateStamp == rateStamp,
+           cache.period == period,
+           cache.maxNodes == maxNodesPerSide,
+           cache.language == settings.appLanguage,
+           cache.dayStamp == dayStamp {
+            return cache.value
+        }
+        let result = analytics(settings).cashFlowSankey(period: period, maxNodesPerSide: maxNodesPerSide)
+        cachedCashFlowSankey = (
+            dataVersion, settings.currency, rateStamp, period, maxNodesPerSide, settings.appLanguage, dayStamp, result
+        )
         return result
     }
 

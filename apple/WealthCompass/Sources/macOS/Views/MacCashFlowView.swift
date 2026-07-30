@@ -74,15 +74,18 @@ private enum MacCashFlowTab: MacSelectorTab {
 struct MacCashFlowView: View {
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
+    @EnvironmentObject private var appModel: MacAppModel
     @State private var searchText = ""
-    @State private var analyticsPeriod: AnalyticsPeriod = .all
+    @State private var moneyFlowPeriod: AnalyticsPeriod = .thirtyDays
+    /// Set when the user drills in from the Money Flow diagram; shown as a removable chip in the
+    /// filter bar and cleared by dismissing it.
+    @State private var categoryFilter: CashFlowCategoryFilter?
     @State private var transactionPeriod: AnalyticsPeriod = .thirtyDays
     @State private var transactionTypeFilter: MacTransactionTypeFilter = .all
     @State private var editor: MacCashFlowEditor?
     @State private var activeAlert: MacCashFlowAlert?
     @State private var selectedTab: MacCashFlowTab = .overview
     @State private var cashFlowRange: CashFlowTimeframe = .sixMonths
-    @State private var hoveredExpenseCategory: CategoryTotal?
     @State private var hoveredCashFlowMonth: CashFlowMonth?
 
     var body: some View {
@@ -101,19 +104,13 @@ struct MacCashFlowView: View {
                         VStack(alignment: .leading, spacing: 20) {
                             summaryCards(width: proxy.size.width)
 
-                            if proxy.size.width >= 1_090 {
-                                HStack(alignment: .top, spacing: 20) {
-                                    cashFlowTrendCard
-                                        .frame(width: max(340, proxy.size.width * 0.55))
-                                    expenseCategoriesCard
-                                }
-                                .fixedSize(horizontal: false, vertical: true)
-                            } else {
-                                VStack(spacing: 20) {
-                                    cashFlowTrendCard
-                                    expenseCategoriesCard
-                                }
-                            }
+                            // Full width, directly under the metrics: a Sankey needs a long
+                            // horizontal run or its ribbons read as blobs. The Expense Categories
+                            // donut that used to share this row was retired when this landed — its
+                            // entire content is this diagram's right-hand column.
+                            moneyFlowCard
+
+                            cashFlowTrendCard
 
                             if proxy.size.width >= 1_090 {
                                 HStack(alignment: .top, spacing: 20) {
@@ -202,6 +199,15 @@ struct MacCashFlowView: View {
             }
         }
         .alert(item: $activeAlert, content: alert(for:))
+        .onChange(of: appModel.cashFlowFilter) { _, request in
+            guard let request else { return }
+            applyIncomingFilter(request)
+        }
+        .onAppear {
+            // The Dashboard sets the request and switches pages in the same turn, so this view may
+            // not exist yet when the change fires.
+            if let request = appModel.cashFlowFilter { applyIncomingFilter(request) }
+        }
     }
 
     // The 6 cash-flow summary cards fill the pane width edge-to-edge (matching the Dashboard),
@@ -386,19 +392,24 @@ struct MacCashFlowView: View {
         }
     }
 
-    private var expenseCategoriesCard: some View {
-        FinanceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
+    /// The Money Flow (Sankey) card. Replaced the Expense Categories donut that used to sit here:
+    /// the donut's entire content is this diagram's right-hand column, and this adds the income
+    /// side, the surplus, and a way into the underlying transactions.
+    private var moneyFlowCard: some View {
+        let sankey = finance.cashFlowSankey(period: moneyFlowPeriod, settings: settings)
+
+        return FinanceCard {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Expense Categories")
+                        Text("Money Flow")
                             .font(.headline)
-                        Text("Breakdown of recorded spending")
+                        Text("Where your income went this period")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    Spacer()
-                    Picker("Expense period", selection: $analyticsPeriod) {
+                    Spacer(minLength: 16)
+                    Picker("Money Flow period", selection: $moneyFlowPeriod) {
                         ForEach(AnalyticsPeriod.allCases) { period in
                             Text(period.title).tag(period)
                         }
@@ -408,91 +419,45 @@ struct MacCashFlowView: View {
                     .frame(width: 142)
                 }
 
-                let categories = finance.expensesByCategory(period: analyticsPeriod, settings: settings)
-                let totalExpenses = categories.reduce(0) { $0 + $1.value }
-                if categories.isEmpty {
-                    EmptyState(title: "No expenses for this period", systemImage: "chart.pie")
-                        .frame(maxWidth: .infinity, minHeight: 244)
-                } else {
-                    ZStack {
-                        Chart(categories) { item in
-                            SectorMark(
-                                angle: .value("Expense", item.value),
-                                innerRadius: .ratio(0.62),
-                                angularInset: 2
-                            )
-                            .foregroundStyle(by: .value("Category", item.name))
-                            .cornerRadius(5)
-                            .opacity(hoveredExpenseCategory == nil || hoveredExpenseCategory?.id == item.id ? 1.0 : 0.3)
-                            .accessibilityLabel(Text(item.name))
-                            .accessibilityValue(Text(settings.privateCurrency(item.value)))
-                        }
-                        .chartLegend(.hidden)
-                        .chartBackground { proxy in
-                            GeometryReader { geometry in
-                                if let plotFrame = proxy.plotFrame {
-                                    let frame = geometry[plotFrame]
-                                    VStack(spacing: 3) {
-                                        if let hoveredExpenseCategory {
-                                            Text(hoveredExpenseCategory.name)
-                                                .textCase(.uppercase)
-                                                .font(.caption2.weight(.bold))
-                                                .tracking(1.3)
-                                                .foregroundStyle(.white.opacity(0.8))
-                                            Text(settings.privateCurrency(hoveredExpenseCategory.value))
-                                                .font(.headline.monospacedDigit().weight(.bold))
-                                                .foregroundStyle(.white)
-                                                .lineLimit(1)
-                                                .minimumScaleFactor(0.7)
-                                            Text("\(hoveredExpenseCategory.percentage.formatted(.number.precision(.fractionLength(1))))%")
-                                                .font(.caption2.monospacedDigit())
-                                                .foregroundStyle(.white.opacity(0.6))
-                                        } else {
-                                            Text("EXPENSES")
-                                                .font(.caption2.weight(.bold))
-                                                .tracking(1.3)
-                                                .foregroundStyle(WCColor.textTertiary)
-                                            Text(settings.privateCurrency(totalExpenses))
-                                                .font(.headline.monospacedDigit().weight(.bold))
-                                                .foregroundStyle(.white)
-                                                .lineLimit(1)
-                                                .minimumScaleFactor(0.7)
-                                        }
-                                    }
-                                    .position(x: frame.midX, y: frame.midY)
-                                }
-                            }
-                        }
-                        .chartOverlay { proxy in
-                            GeometryReader { geometry in
-                                if let plotFrame = proxy.plotFrame {
-                                    let frame = geometry[plotFrame]
-                                    Rectangle().fill(.clear).contentShape(Rectangle())
-                                        .accessibilityHidden(true)
-                                        .onContinuousHover { phase in
-                                            switch phase {
-                                            case .active(let location):
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    hoveredExpenseCategory = categorySlice(at: location, in: frame, categories: categories)
-                                                }
-                                            case .ended:
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    hoveredExpenseCategory = nil
-                                                }
-                                            }
-                                        }
-                                }
-                            }
-                        }
-                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: categories.map(\.value))
-                        .accessibilityElement(children: .contain)
-                        .accessibilityLabel(Text("Expense Categories"))
-                    }
-                    .frame(minHeight: 250, maxHeight: .infinity)
+                SankeyDiagramView(sankey: sankey, settings: settings) { node in
+                    drillIn(to: node)
                 }
             }
             .frame(maxHeight: .infinity, alignment: .top)
         }
+    }
+
+    /// Clicking a node opens the Transactions tab filtered to what it stands for. Already on this
+    /// page, so it switches tabs directly rather than routing through `MacAppModel`.
+    private func drillIn(to node: CashFlowSankeyNode) {
+        guard node.isDrillable else { return }
+        let type: TransactionType = node.role == .income ? .income : .expense
+        categoryFilter = CashFlowCategoryFilter(
+            categories: Set(node.categories),
+            title: node.title,
+            type: type,
+            period: moneyFlowPeriod
+        )
+        transactionTypeFilter = type == .income ? .income : .expense
+        transactionPeriod = moneyFlowPeriod
+        searchText = ""
+        selectedTab = .transactions
+    }
+
+    /// Applies a drill-through that arrived from the Dashboard's compact diagram.
+    private func applyIncomingFilter(_ request: CashFlowCategoryFilter) {
+        categoryFilter = request
+        transactionTypeFilter = request.type == .income ? .income : .expense
+        transactionPeriod = request.period
+        searchText = ""
+        selectedTab = .transactions
+        // Consume it, so navigating back to this page later does not silently re-apply a filter
+        // the user has since dismissed.
+        //
+        // Deferred a turn: this runs from `onAppear` during the root view's own update for the
+        // navigation that brought us here, and mutating an `@Published` on `MacAppModel` inline
+        // would publish a change from within that update.
+        Task { @MainActor in appModel.cashFlowFilter = nil }
     }
 
     private var recentActivityCard: some View {
@@ -715,6 +680,31 @@ struct MacCashFlowView: View {
                 .frame(width: 160)
             }
 
+            // Only present when you arrived here from the Money Flow diagram; the bar is otherwise
+            // exactly what it has always been.
+            if let categoryFilter {
+                HStack(spacing: 6) {
+                    Text(categoryFilter.title)
+                        .font(.caption.weight(.medium))
+                        .lineLimit(1)
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.15)) { self.categoryFilter = nil }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Clear category filter")
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .foregroundStyle(WCColor.primary)
+                .background(Capsule().fill(WCColor.primary.opacity(0.14)))
+                .overlay(Capsule().stroke(WCColor.primary.opacity(0.34), lineWidth: 1))
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(Text(settings.localized("Filtered to \(categoryFilter.title)")))
+            }
+
             Text("Showing \(filteredTransactions.count) of \(finance.transactions.count)")
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(.secondary)
@@ -860,6 +850,10 @@ struct MacCashFlowView: View {
         // Hoist the period bounds out of the per-row closure (both were recomputed per transaction).
         let startDate = transactionStartDate
         let endDate = transactionEndDate
+        // Matched on the category field only — deliberately not folded into `searchText`, which
+        // also matches descriptions and could not express the multi-category "Smaller categories"
+        // node in the first place.
+        let categories = categoryFilter?.categories
         return finance.transactions.filter { transaction in
             let matchesType = transactionTypeFilter.transactionType.map { $0 == transaction.type } ?? true
             let matchesPeriod = startDate.map { start in
@@ -868,22 +862,30 @@ struct MacCashFlowView: View {
             let matchesSearch = searchText.isEmpty
                 || transaction.category.localizedCaseInsensitiveContains(searchText)
                 || transaction.description.localizedCaseInsensitiveContains(searchText)
-            return matchesType && matchesPeriod && matchesSearch
+            let matchesCategory = categories.map { $0.contains(transaction.category) } ?? true
+            return matchesType && matchesPeriod && matchesSearch && matchesCategory
         }
     }
 
 
+    /// Rolling windows are snapped to the start of the day, matching
+    /// `AnalyticsEngine.filteredTransactions`, which compares at calendar-day granularity.
+    ///
+    /// Without the snap the two disagree by up to a day: transactions are stored at `startOfDay`,
+    /// so a raw `now - 30 days` instant lands mid-day and excludes the boundary day that the
+    /// analytics *do* count. Harmless while the two never met; the Money Flow drill-through now
+    /// puts them side by side, where a category could show €500 in the diagram and list €450.
     private var transactionStartDate: Date? {
         let calendar = Calendar.current
         let now = Date()
 
         switch transactionPeriod {
         case .sevenDays:
-            return calendar.date(byAdding: .day, value: -7, to: now)
+            return calendar.date(byAdding: .day, value: -7, to: now).map(calendar.startOfDay(for:))
         case .thirtyDays:
-            return calendar.date(byAdding: .day, value: -30, to: now)
+            return calendar.date(byAdding: .day, value: -30, to: now).map(calendar.startOfDay(for:))
         case .threeMonths:
-            return calendar.date(byAdding: .month, value: -3, to: now)
+            return calendar.date(byAdding: .month, value: -3, to: now).map(calendar.startOfDay(for:))
         case .yearToDate:
             return calendar.date(from: calendar.dateComponents([.year], from: now))
         case .all:
@@ -925,6 +927,12 @@ struct MacCashFlowView: View {
     private var transactionEmptyDescription: String {
         if finance.transactions.isEmpty {
             return settings.localized("Add your first income or expense.")
+        }
+        // Right after a drill-through the category chip is the likeliest culprit, and it is the one
+        // filter the old copy never mentioned — narrowing the period afterwards would empty the
+        // list with no explanation on screen.
+        if categoryFilter != nil {
+            return settings.localized("Clear the category chip, or change the search, type, or period filters.")
         }
         return settings.localized("Change the search, type, or period filters.")
     }
@@ -1028,11 +1036,6 @@ struct MacCashFlowView: View {
         }
     }
 
-    private func categorySlice(at location: CGPoint, in rect: CGRect, categories: [CategoryTotal]) -> CategoryTotal? {
-        // WC-L15: `total` was dead — `PieSliceHitTester.sliceIndex` derives the total from `values`.
-        return PieSliceHitTester.sliceIndex(at: location, in: rect, values: categories.map(\.value))
-            .map { categories[$0] }
-    }
 }
 
 private struct MacCashFlowTransactionEditor: View {

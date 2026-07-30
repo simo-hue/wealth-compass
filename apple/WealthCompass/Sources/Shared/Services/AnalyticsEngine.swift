@@ -241,6 +241,15 @@ struct AnalyticsEngine {
         let expenses = filteredTransactions(period: period).filter { $0.type == .expense }
         let grouped = Dictionary(grouping: expenses, by: \.category)
             .mapValues { $0.reduce(Decimal(0)) { $0 + displayAmount($1) } }
+            // `Decimal` addition *returns NaN* on overflow rather than trapping, so a single absurd
+            // imported amount produced a category whose value and percentage were both NaN — and
+            // these feed `SectorMark` geometry directly. One NaN in a chart is the exact failure
+            // the guards in `AppSettings.convert` exist to prevent. `sankeyCategoryTotals` already
+            // filters this way; only finiteness is screened here, because dropping non-positive
+            // categories as well would change which wedges appear, which is a separate decision.
+            .filter { $0.value.isFinite }
+        // Summed from the filtered set, so the percentages still add to 100 once a bad category
+        // has been dropped.
         let total = grouped.values.reduce(Decimal(0), +)
 
         return grouped.map { key, value in
@@ -251,6 +260,239 @@ struct AnalyticsEngine {
             )
         }
         .sorted { $0.value > $1.value }
+    }
+
+    // MARK: - Money Flow (Sankey)
+
+    /// The Money Flow model for a period: income categories → a single hub → expense categories,
+    /// with the imbalance absorbed by one synthetic node so the diagram conserves flow.
+    ///
+    /// Two deliberate departures from `expensesByCategory`:
+    ///
+    /// 1. Future-dated rows are clamped on *every* period, `.all` included.
+    ///    `filteredTransactions(period: .all)` returns the raw array, which would let a post-dated
+    ///    recurring occurrence widen a ribbon for money that hasn't moved — and desynchronize the
+    ///    diagram from `calculateTotals`, which has excluded the future since deep-audit L51.
+    /// 2. Percentages are of the whole diagram, not of one column, because the detail row reads
+    ///    "N% of cash flow" for income and expense nodes alike.
+    func cashFlowSankey(period: AnalyticsPeriod, maxNodesPerSide: Int = 7) -> CashFlowSankey {
+        let today = calendar.startOfDay(for: now)
+        let transactions = filteredTransactions(period: period)
+            .filter { calendar.startOfDay(for: $0.date) <= today }
+        return cashFlowSankey(transactions: transactions, maxNodesPerSide: maxNodesPerSide)
+    }
+
+    /// Builds the diagram from an explicit transaction set.
+    ///
+    /// The PDF report needs this: it bounds its ledger by the *export's* date range, and feeding it
+    /// an `AnalyticsPeriod` window instead would make the diagram contradict the rest of the
+    /// document — the same trap `ReportDocumentBuilder` already documents for
+    /// `expensesByCategory(period:)`. Future-dating is the caller's call here, since a historical
+    /// range has no "future" to clamp.
+    func cashFlowSankey(transactions: [Transaction], maxNodesPerSide: Int = 7) -> CashFlowSankey {
+        let hubTitle = localized("Cash Flow")
+
+        let incomeTotals = sankeyCategoryTotals(transactions, type: .income)
+        let expenseTotals = sankeyCategoryTotals(transactions, type: .expense)
+        let totalIncome = incomeTotals.reduce(0) { $0 + $1.value }
+        let totalExpense = expenseTotals.reduce(0) { $0 + $1.value }
+        let total = max(totalIncome, totalExpense)
+        guard total.isFinite, total > 0 else { return .empty(hubTitle: hubTitle) }
+
+        var inflows = sankeyNodes(from: incomeTotals, role: .income, maxNodes: maxNodesPerSide, total: total)
+        var outflows = sankeyNodes(from: expenseTotals, role: .expense, maxNodes: maxNodesPerSide, total: total)
+
+        // At most one of these fires, and it is what makes the two columns sum to the same number.
+        // Both are appended rather than sorted in, so they sit at the bottom of their column at
+        // every period instead of migrating as their size changes.
+        //
+        // The threshold is *relative*, not a fixed number of cents, and it has to be: both totals
+        // are Doubles summed from many Decimals, so the summation residue scales with the total.
+        // A fixed half-cent floor is simultaneously too coarse for a €0.006 month — where a real
+        // €0.004 imbalance is two thirds of the diagram — and too fine at €1e14, where pure float
+        // noise exceeds it and would draw a hairline ribbon labelled "€0.00". A relative floor is
+        // correct at every magnitude; 1e-9 sits ~six orders above the per-operation residue.
+        let imbalance = totalIncome - totalExpense
+        let noiseFloor = total * 1e-9
+        if imbalance < -noiseFloor {
+            inflows.append(
+                CashFlowSankeyNode(
+                    id: "shortfall",
+                    title: localized("Drawn from Savings"),
+                    // `total - totalIncome` rather than `-imbalance`: the column's job is to reach
+                    // the hub, so compute it from the hub.
+                    value: total - totalIncome,
+                    role: .shortfall,
+                    share: sankeyShare(total - totalIncome, of: total),
+                    colorIndex: nil,
+                    categories: [],
+                    folded: []
+                )
+            )
+        } else if imbalance > noiseFloor {
+            outflows.append(
+                CashFlowSankeyNode(
+                    id: "surplus",
+                    title: localized("Surplus"),
+                    value: total - totalExpense,
+                    role: .surplus,
+                    share: sankeyShare(total - totalExpense, of: total),
+                    colorIndex: nil,
+                    categories: [],
+                    folded: []
+                )
+            )
+        } else {
+            // Below the floor the two columns are equal to every digit that matters — but `total`
+            // still took the larger of the two Doubles, so the shorter column would fall a residue
+            // short of the hub. The layout stacks ribbons against the hub edge by cursor, so that
+            // residue renders as a literal bare stretch of hub. Push it onto the column's largest
+            // node: invisible by construction, and `inflows.sum == hub == outflows.sum` holds
+            // exactly, which is what both the model contract and `SankeyLayout` are written against.
+            inflows = absorbingResidue(inflows, upTo: total)
+            outflows = absorbingResidue(outflows, upTo: total)
+        }
+
+        let hub = CashFlowSankeyNode(
+            id: "hub",
+            title: hubTitle,
+            value: total,
+            role: .hub,
+            share: 100,
+            colorIndex: nil,
+            categories: [],
+            folded: []
+        )
+
+        let links = inflows.map { CashFlowSankeyLink(sourceID: $0.id, targetID: hub.id, value: $0.value) }
+            + outflows.map { CashFlowSankeyLink(sourceID: hub.id, targetID: $0.id, value: $0.value) }
+
+        return CashFlowSankey(inflows: inflows, hub: hub, outflows: outflows, links: links)
+    }
+
+    /// Per-category totals for one transaction type, in display currency, largest first.
+    ///
+    /// Non-positive and non-finite totals are dropped *here* rather than at render time so the
+    /// column sums downstream are computed from exactly the rows that will be drawn. Filtering
+    /// later would leave the columns no longer summing to the hub, and the ribbons would stop
+    /// meeting its edge.
+    private func sankeyCategoryTotals(
+        _ transactions: [Transaction],
+        type: TransactionType
+    ) -> [(name: String, value: Double)] {
+        Dictionary(grouping: transactions.filter { $0.type == type }, by: \.category)
+            .mapValues { $0.reduce(Decimal(0)) { $0 + displayAmount($1) } }
+            .map { (name: $0.key, value: $0.value.doubleValue) }
+            .filter { $0.value.isFinite && $0.value > 0 }
+            .sorted { lhs, rhs in
+                // Tie-break by name so identical data never reshuffles between renders — otherwise
+                // two equal-value categories could swap places and SwiftUI would animate a
+                // meaningless move.
+                lhs.value == rhs.value ? lhs.name < rhs.name : lhs.value > rhs.value
+            }
+    }
+
+    /// Ranks one column's categories, folding everything past `maxNodes` into a single bucket.
+    ///
+    /// A lone leftover is deliberately *not* folded: replacing one category with "Smaller
+    /// categories" hides its name and buys no room, so `maxNodes + 1` categories all keep their
+    /// own node. The bucket is named for why it exists rather than what it contains, because
+    /// "Other" is already a real category on both sides — it is the fallback every import path
+    /// writes for a missing category, so on imported data it is often one of the largest.
+    ///
+    /// (A user *can* still create a custom category literally named "Smaller categories", which
+    /// would render two same-titled boxes. Their ids and values differ so nothing breaks; it is
+    /// left alone as a cosmetic edge rather than reserving a name in the user's vocabulary.)
+    private func sankeyNodes(
+        from totals: [(name: String, value: Double)],
+        role: CashFlowSankeyRole,
+        maxNodes: Int,
+        total: Double
+    ) -> [CashFlowSankeyNode] {
+        guard !totals.isEmpty else { return [] }
+        let limit = max(1, maxNodes)
+
+        func node(_ item: (name: String, value: Double), colorIndex: Int) -> CashFlowSankeyNode {
+            CashFlowSankeyNode(
+                // The `-cat-` segment keeps real categories out of the synthetic id namespace: a
+                // category named "folded" would otherwise collide with the bucket, and since a
+                // link's id is derived from its endpoints', the *ribbons* would collide too —
+                // `ForEach` would silently drop one and real money would vanish from the diagram.
+                id: "\(role.rawValue)-cat-\(item.name)",
+                // Imports only default a *nil* category to "Other" (FinanceImportService), so a
+                // present-but-blank one survives into the data and would draw an unlabelled box
+                // with an empty VoiceOver label. `categories` deliberately keeps the raw value so
+                // the drill-through filter still matches what is stored.
+                title: item.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    ? localized("Uncategorized")
+                    : item.name,
+                value: item.value,
+                role: role,
+                share: sankeyShare(item.value, of: total),
+                colorIndex: colorIndex,
+                categories: [item.name],
+                folded: []
+            )
+        }
+
+        // `totals.count - 1 > limit`, not `totals.count > limit + 1`: a caller passing `Int.max`
+        // as a "never fold" sentinel would overflow the addition and trap. `totals` is guarded
+        // non-empty above, so the subtraction cannot underflow.
+        guard totals.count - 1 > limit else {
+            return totals.enumerated().map { node($1, colorIndex: $0) }
+        }
+
+        let kept = totals.prefix(limit).enumerated().map { node($1, colorIndex: $0) }
+        let remainder = Array(totals.dropFirst(limit))
+        let foldedValue = remainder.reduce(0) { $0 + $1.value }
+        let bucket = CashFlowSankeyNode(
+            id: "\(role.rawValue)-folded",
+            title: localized("Smaller categories"),
+            value: foldedValue,
+            role: role,
+            share: sankeyShare(foldedValue, of: total),
+            // Not a palette slot: the bucket renders neutral, so it never competes with a real
+            // category for attention.
+            colorIndex: nil,
+            categories: remainder.map(\.name),
+            folded: remainder.map {
+                CategoryTotal(name: $0.name, value: $0.value, percentage: sankeyShare($0.value, of: total))
+            }
+        )
+        return kept + [bucket]
+    }
+
+    /// Tops up a column's largest node so the column sums to exactly `total`.
+    ///
+    /// Only called when the imbalance is already below the noise floor, so the adjustment is
+    /// invisible — its job is purely to keep the ribbons meeting the hub edge with no gap.
+    private func absorbingResidue(
+        _ column: [CashFlowSankeyNode],
+        upTo total: Double
+    ) -> [CashFlowSankeyNode] {
+        guard let largest = column.first else { return column }
+        let residue = total - column.reduce(0) { $0 + $1.value }
+        guard residue != 0, residue.isFinite else { return column }
+        var adjusted = column
+        // `column` is sorted descending, so index 0 absorbs it with the least relative distortion.
+        adjusted[0] = CashFlowSankeyNode(
+            id: largest.id,
+            title: largest.title,
+            value: largest.value + residue,
+            role: largest.role,
+            share: sankeyShare(largest.value + residue, of: total),
+            colorIndex: largest.colorIndex,
+            categories: largest.categories,
+            folded: largest.folded
+        )
+        return adjusted
+    }
+
+    /// Percent of the diagram total, hardened against the zero/NaN cases that would otherwise
+    /// reach chart geometry.
+    private func sankeyShare(_ value: Double, of total: Double) -> Double {
+        guard total.isFinite, total > 0, value.isFinite else { return 0 }
+        return (value / total) * 100
     }
 
     func assetAllocation() -> [AllocationSlice] {

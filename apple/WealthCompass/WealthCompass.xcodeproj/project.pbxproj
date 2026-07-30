@@ -45,6 +45,12 @@
 		AD00000000000000000000C9 /* ReportExportOptionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C9 /* ReportExportOptionsTests.swift */; };
 		AD00000000000000000000A4 /* PieSliceHitTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A4 /* PieSliceHitTester.swift */; };
 		AD00000000000000000000B4 /* PieSliceHitTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A4 /* PieSliceHitTester.swift */; };
+		AD0000000000000000000F11 /* CashFlowSankey.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000F10 /* CashFlowSankey.swift */; };
+		AD0000000000000000000F12 /* CashFlowSankey.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000F10 /* CashFlowSankey.swift */; };
+		AD0000000000000000000F21 /* SankeyLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000F20 /* SankeyLayout.swift */; };
+		AD0000000000000000000F22 /* SankeyLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000F20 /* SankeyLayout.swift */; };
+		AD0000000000000000000F31 /* SankeyDiagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000F30 /* SankeyDiagramView.swift */; };
+		AD0000000000000000000F32 /* SankeyDiagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000F30 /* SankeyDiagramView.swift */; };
 		AD00000000000000000000A5 /* RecurringScheduleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A5 /* RecurringScheduleBuilder.swift */; };
 		AD00000000000000000000B5 /* RecurringScheduleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A5 /* RecurringScheduleBuilder.swift */; };
 		AD00000000000000000000A6 /* NetworkRetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000A6 /* NetworkRetry.swift */; };
@@ -115,6 +121,7 @@
 		AD00000000000000000000C2 /* SnapshotEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C2 /* SnapshotEngineTests.swift */; };
 		AD00000000000000000000C3 /* RecurringScheduleBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */; };
 		AD00000000000000000000C4 /* AnalyticsEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C4 /* AnalyticsEngineTests.swift */; };
+		AD0000000000000000000F41 /* SankeyLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000F40 /* SankeyLayoutTests.swift */; };
 		AD00000000000000000000C5 /* FinanceImportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C5 /* FinanceImportServiceTests.swift */; };
 		C0D3A0020000000000000001 /* MarketDataAPIKeyGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3A0010000000000000001 /* MarketDataAPIKeyGuide.swift */; };
 		C0D3A0030000000000000001 /* MarketDataAPIKeyGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3A0010000000000000001 /* MarketDataAPIKeyGuide.swift */; };
@@ -155,6 +162,9 @@
 		AC0000000000000000000E80 /* ReportDocumentBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Export/ReportDocumentBuilder.swift; sourceTree = "<group>"; };
 		AC0000000000000000000E90 /* ExportOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Export/ExportOptionsView.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A4 /* PieSliceHitTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/PieSliceHitTester.swift; sourceTree = "<group>"; };
+		AC0000000000000000000F10 /* CashFlowSankey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/CashFlowSankey.swift; sourceTree = "<group>"; };
+		AC0000000000000000000F20 /* SankeyLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/SankeyLayout.swift; sourceTree = "<group>"; };
+		AC0000000000000000000F30 /* SankeyDiagramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/SankeyDiagramView.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A5 /* RecurringScheduleBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/RecurringScheduleBuilder.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A6 /* NetworkRetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/NetworkRetry.swift; sourceTree = "<group>"; };
 		AC00000000000000000000A7 /* FinanceImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/FinanceImportService.swift; sourceTree = "<group>"; };
@@ -210,6 +220,7 @@
 		AC00000000000000000000C2 /* SnapshotEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotEngineTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringScheduleBuilderTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C4 /* AnalyticsEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsEngineTests.swift; sourceTree = "<group>"; };
+		AC0000000000000000000F40 /* SankeyLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SankeyLayoutTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C5 /* FinanceImportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceImportServiceTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C8 /* BrokerStatementImportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerStatementImportServiceTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000CA /* ReportRenderingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportRenderingTests.swift; sourceTree = "<group>"; };
@@ -344,6 +355,9 @@
 				AC00000000000000000000A2 /* SnapshotEngine.swift */,
 				AC00000000000000000000A3 /* AnalyticsEngine.swift */,
 				AC00000000000000000000A4 /* PieSliceHitTester.swift */,
+				AC0000000000000000000F10 /* CashFlowSankey.swift */,
+				AC0000000000000000000F20 /* SankeyLayout.swift */,
+				AC0000000000000000000F30 /* SankeyDiagramView.swift */,
 				AC00000000000000000000A5 /* RecurringScheduleBuilder.swift */,
 				AC00000000000000000000A6 /* NetworkRetry.swift */,
 				AC00000000000000000000A7 /* FinanceImportService.swift */,
@@ -461,6 +475,7 @@
 				AC00000000000000000000C2 /* SnapshotEngineTests.swift */,
 				AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */,
 				AC00000000000000000000C4 /* AnalyticsEngineTests.swift */,
+				AC0000000000000000000F40 /* SankeyLayoutTests.swift */,
 				AC00000000000000000000C5 /* FinanceImportServiceTests.swift */,
 				AC00000000000000000000C8 /* BrokerStatementImportServiceTests.swift */,
 				AC00000000000000000000CA /* ReportRenderingTests.swift */,
@@ -669,6 +684,9 @@
 				AD00000000000000000000A2 /* SnapshotEngine.swift in Sources */,
 				AD00000000000000000000A3 /* AnalyticsEngine.swift in Sources */,
 				AD00000000000000000000A4 /* PieSliceHitTester.swift in Sources */,
+				AD0000000000000000000F11 /* CashFlowSankey.swift in Sources */,
+				AD0000000000000000000F21 /* SankeyLayout.swift in Sources */,
+				AD0000000000000000000F31 /* SankeyDiagramView.swift in Sources */,
 				AD00000000000000000000A5 /* RecurringScheduleBuilder.swift in Sources */,
 				AD00000000000000000000A6 /* NetworkRetry.swift in Sources */,
 				AD00000000000000000000A7 /* FinanceImportService.swift in Sources */,
@@ -725,6 +743,9 @@
 				AD00000000000000000000B2 /* SnapshotEngine.swift in Sources */,
 				AD00000000000000000000B3 /* AnalyticsEngine.swift in Sources */,
 				AD00000000000000000000B4 /* PieSliceHitTester.swift in Sources */,
+				AD0000000000000000000F12 /* CashFlowSankey.swift in Sources */,
+				AD0000000000000000000F22 /* SankeyLayout.swift in Sources */,
+				AD0000000000000000000F32 /* SankeyDiagramView.swift in Sources */,
 				AD00000000000000000000B5 /* RecurringScheduleBuilder.swift in Sources */,
 				AD00000000000000000000B6 /* NetworkRetry.swift in Sources */,
 				AD00000000000000000000B7 /* FinanceImportService.swift in Sources */,
@@ -780,6 +801,7 @@
 				AD00000000000000000000C2 /* SnapshotEngineTests.swift in Sources */,
 				AD00000000000000000000C3 /* RecurringScheduleBuilderTests.swift in Sources */,
 				AD00000000000000000000C4 /* AnalyticsEngineTests.swift in Sources */,
+				AD0000000000000000000F41 /* SankeyLayoutTests.swift in Sources */,
 				AD00000000000000000000C5 /* FinanceImportServiceTests.swift in Sources */,
 				AD00000000000000000000C8 /* BrokerStatementImportServiceTests.swift in Sources */,
 				AD00000000000000000000CA /* ReportRenderingTests.swift in Sources */,

@@ -7,7 +7,7 @@ struct MacDashboardView: View {
     @EnvironmentObject private var appModel: MacAppModel
 
     @State private var timeRange: TimeRange = .oneYear
-    @State private var expensePeriod: AnalyticsPeriod = .thirtyDays
+    @State private var moneyFlowPeriod: AnalyticsPeriod = .thirtyDays
     @State private var selectedNetWorthDate: Date?
     @State private var cashFlowRange: CashFlowTimeframe = .sixMonths
     @State private var hoveredAssetSlice: AllocationSlice?
@@ -68,12 +68,12 @@ struct MacDashboardView: View {
 
                         if proxy.size.width >= 1_020 {
                             HStack(alignment: .top, spacing: 20) {
-                                topExpensesCard
+                                moneyFlowCard
                                 recentActivityCard
                             }
                         } else {
                             VStack(spacing: 20) {
-                                topExpensesCard
+                                moneyFlowCard
                                 recentActivityCard
                             }
                         }
@@ -696,15 +696,24 @@ struct MacDashboardView: View {
         }
     }
 
-    private var topExpensesCard: some View {
-        let expenses = Array(finance.expensesByCategory(period: expensePeriod, settings: settings).prefix(5))
+    /// The compact Money Flow diagram. Replaced the Top Expense Categories list that used to sit
+    /// here: it answers the same question — where did the money go — but also shows what was left
+    /// over, and a node opens the transactions behind it instead of dead-ending.
+    ///
+    /// `.fanOut` collapses the income side into the single hub node at the left edge. In a 2-up
+    /// Dashboard row this card is only ~436pt wide at the narrow breakpoint, and two label gutters
+    /// would leave ~156pt of ribbon — flows short enough to read as blobs. One gutter roughly
+    /// doubles the run. It folds at 4 rather than 7 for the same reason: at this height, seven
+    /// labels plus a surplus cannot all be seated without dropping some.
+    private var moneyFlowCard: some View {
+        let sankey = finance.cashFlowSankey(period: moneyFlowPeriod, maxNodesPerSide: 4, settings: settings)
 
         return DashboardGlassCard {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(alignment: .top, spacing: 16) {
-                    sectionHeading("Top Expense Categories", subtitle: "Where recorded spending is concentrated")
+                    sectionHeading("Money Flow", subtitle: "Where your income went this period")
                     Spacer()
-                    Picker("Expense period", selection: $expensePeriod) {
+                    Picker("Money Flow period", selection: $moneyFlowPeriod) {
                         ForEach(AnalyticsPeriod.allCases) { period in
                             Text(period.title).tag(period)
                         }
@@ -714,65 +723,33 @@ struct MacDashboardView: View {
                     .frame(width: 142)
                 }
 
-                if expenses.isEmpty {
+                // The diagram draws its own empty and privacy states, but the Dashboard's empty
+                // state offers a way out of it, so prefer that one when there is simply no data.
+                if sankey.isEmpty && !settings.isPrivacyMode {
                     DashboardEmptyState(
-                        title: "No expenses for this period",
-                        message: "Choose another period or record an expense.",
-                        systemImage: "list.bullet.rectangle.portrait",
+                        title: "No cash flow in this period",
+                        message: "Choose another period or record a transaction.",
+                        systemImage: "arrow.left.arrow.right",
                         actionTitle: "Add Transaction"
                     ) {
                         appModel.presentNewItem(for: .cashFlow)
                     }
                     .frame(minHeight: 246)
                 } else {
-                    VStack(spacing: 15) {
-                        ForEach(Array(expenses.enumerated()), id: \.element.id) { index, item in
-                            VStack(spacing: 8) {
-                                HStack(spacing: 10) {
-                                    Text("\(index + 1)")
-                                        .font(.caption2.monospacedDigit().weight(.bold))
-                                        .foregroundStyle(WCColor.textFaint)
-                                        .frame(width: 18)
-                                    Text(item.name)
-                                        .font(.subheadline.weight(.medium))
-                                        .foregroundStyle(.white.opacity(0.82))
-                                        .lineLimit(1)
-                                    Spacer()
-                                    Text(settings.privateCurrency(item.value))
-                                        .font(.subheadline.monospacedDigit().weight(.semibold))
-                                        .foregroundStyle(.white)
-                                    Text(privatePercent(item.percentage))
-                                        .font(.caption.monospacedDigit().weight(.medium))
-                                        .foregroundStyle(WCColor.textTertiary)
-                                        .frame(width: 48, alignment: .trailing)
-                                }
-
-                                if settings.isPrivacyMode {
-                                    Capsule()
-                                        .fill(.white.opacity(0.07))
-                                        .frame(height: 5)
-                                } else {
-                                    GeometryReader { geometry in
-                                        ZStack(alignment: .leading) {
-                                            Capsule()
-                                                .fill(.white.opacity(0.06))
-                                            Capsule()
-                                                .fill(
-                                                    LinearGradient(
-                                                        colors: [WCColor.warning, WCColor.destructive.opacity(0.82)],
-                                                        startPoint: .leading,
-                                                        endPoint: .trailing
-                                                    )
-                                                )
-                                                .frame(width: geometry.size.width * max(0, min(item.percentage / 100, 1)))
-                                        }
-                                    }
-                                    .frame(height: 5)
-                                }
-                            }
-                        }
+                    SankeyDiagramView(
+                        sankey: sankey,
+                        settings: settings,
+                        mode: .fanOut,
+                        config: .compact
+                    ) { node in
+                        appModel.requestCashFlowFilter(
+                            categories: Set(node.categories),
+                            title: node.title,
+                            type: node.role == .income ? .income : .expense,
+                            period: moneyFlowPeriod
+                        )
                     }
-                    .frame(minHeight: 246, alignment: .top)
+                    .frame(minHeight: 246)
                 }
             }
             .frame(maxHeight: .infinity, alignment: .top)

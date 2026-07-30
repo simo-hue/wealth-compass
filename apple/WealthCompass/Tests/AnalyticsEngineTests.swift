@@ -476,4 +476,215 @@ final class AnalyticsEngineTests: XCTestCase {
         ).cryptoAllocation()
         XCTAssertEqual(slices.first?.value ?? 0, 100, accuracy: 0.01, "125 USD ÷ 1.25 = 100 EUR")
     }
+
+    // MARK: - Money Flow (Sankey)
+
+    /// The invariant the whole diagram rests on. `SankeyLayout` stacks ribbons against the hub edge
+    /// by cursor, so any drift here renders as a bare stretch of hub.
+    private func assertConserved(_ sankey: CashFlowSankey, _ label: String, file: StaticString = #filePath, line: UInt = #line) {
+        let inflow = sankey.inflows.reduce(0) { $0 + $1.value }
+        let outflow = sankey.outflows.reduce(0) { $0 + $1.value }
+        XCTAssertEqual(inflow, sankey.total, accuracy: 1e-9, "\(label): inflows reach the hub", file: file, line: line)
+        XCTAssertEqual(outflow, sankey.total, accuracy: 1e-9, "\(label): outflows reach the hub", file: file, line: line)
+        // Ids feed `ForEach`; a node collision silently drops a node, and because a link's id is
+        // derived from its endpoints', it drops a whole ribbon of real money too.
+        XCTAssertEqual(Set(sankey.nodes.map(\.id)).count, sankey.nodes.count, "\(label): node ids unique", file: file, line: line)
+        XCTAssertEqual(Set(sankey.links.map(\.id)).count, sankey.links.count, "\(label): link ids unique", file: file, line: line)
+        XCTAssertTrue(sankey.nodes.allSatisfy { $0.share.isFinite }, "\(label): shares finite", file: file, line: line)
+    }
+
+    func testCashFlowSankeySurplusMonth() {
+        let data = FinancialData(transactions: [
+            tx(.income, 17248, "Salary", date(2026, 7, 2)),
+            tx(.income, 1419, "Freelance", date(2026, 7, 5)),
+            tx(.expense, 9559, "Housing", date(2026, 7, 3)),
+            tx(.expense, 761, "Food", date(2026, 7, 8)),
+        ])
+        let sankey = engine(data, now: date(2026, 7, 29)).cashFlowSankey(period: .thirtyDays)
+
+        XCTAssertEqual(sankey.total, 18667, accuracy: 0.001, "hub is total income")
+        XCTAssertEqual(sankey.inflows.map(\.title), ["Salary", "Freelance"], "ranked descending")
+        XCTAssertEqual(sankey.outflows.map(\.role), [.expense, .expense, .surplus], "surplus pinned last")
+        XCTAssertEqual(sankey.outflows.last?.value ?? 0, 8347, accuracy: 0.001, "surplus = income − expenses")
+        XCTAssertFalse(sankey.outflows.last?.isDrillable ?? true, "surplus has no rows behind it")
+        assertConserved(sankey, "surplus")
+    }
+
+    func testCashFlowSankeyDeficitMonthDrawsFromSavings() {
+        let data = FinancialData(transactions: [
+            tx(.income, 2000, "Salary", date(2026, 7, 2)),
+            tx(.expense, 3500, "Housing", date(2026, 7, 3)),
+        ])
+        let sankey = engine(data, now: date(2026, 7, 29)).cashFlowSankey(period: .thirtyDays)
+
+        XCTAssertEqual(sankey.total, 3500, accuracy: 0.001, "hub is total spending when overspending")
+        XCTAssertEqual(sankey.inflows.map(\.role), [.income, .shortfall])
+        XCTAssertEqual(sankey.inflows.last?.value ?? 0, 1500, accuracy: 0.001)
+        XCTAssertFalse(sankey.outflows.contains { $0.role == .surplus }, "surplus and shortfall are exclusive")
+        assertConserved(sankey, "deficit")
+    }
+
+    /// The imbalance threshold has to be *relative*. A fixed half-cent floor is both too coarse for
+    /// a sub-cent month — where a real imbalance is most of the diagram — and too fine at 1e14,
+    /// where pure `Double` summation residue exceeds it and draws a hairline "€0.00" ribbon.
+    func testCashFlowSankeyConservesAtBothExtremesOfMagnitude() {
+        for (income, expense) in [(0.01, 0.006), (0.006, 0.002), (0.002, 0.006), (1000.0, 999.996)] {
+            let data = FinancialData(transactions: [
+                tx(.income, income, "Salary", date(2026, 7, 2)),
+                tx(.expense, expense, "Housing", date(2026, 7, 3)),
+            ])
+            assertConserved(
+                engine(data, now: date(2026, 7, 29)).cashFlowSankey(period: .thirtyDays),
+                "tiny \(income)/\(expense)"
+            )
+        }
+
+        let third = 111_111_111_111_111.11
+        let huge = FinancialData(transactions: [
+            tx(.income, third * 3, "Salary", date(2026, 7, 2)),
+            tx(.expense, third, "Housing", date(2026, 7, 3)),
+            tx(.expense, third, "Food", date(2026, 7, 4)),
+            tx(.expense, third, "Transport", date(2026, 7, 5)),
+        ])
+        let sankey = engine(huge, now: date(2026, 7, 29)).cashFlowSankey(period: .thirtyDays)
+        XCTAssertFalse(sankey.outflows.contains { $0.role == .surplus }, "float residue is not a surplus")
+        XCTAssertFalse(sankey.inflows.contains { $0.role == .shortfall }, "float residue is not a shortfall")
+        assertConserved(sankey, "1e14")
+    }
+
+    func testCashFlowSankeyFoldsTheLongTail() {
+        var rows = [tx(.income, 50_000, "Salary", date(2026, 7, 1))]
+        for index in 1...12 {
+            rows.append(tx(.expense, Double(1000 - index * 50), "Cat\(String(format: "%02d", index))", date(2026, 7, 2)))
+        }
+        let sankey = engine(FinancialData(transactions: rows), now: date(2026, 7, 29))
+            .cashFlowSankey(period: .thirtyDays)
+
+        let expenses = sankey.outflows.filter { $0.role == .expense }
+        XCTAssertEqual(expenses.count, 8, "top 7 plus one bucket")
+        let bucket = expenses.last
+        XCTAssertTrue(bucket?.isFolded ?? false)
+        XCTAssertEqual(bucket?.categories.count, 5)
+        XCTAssertEqual(bucket?.value ?? 0, bucket?.folded.reduce(0) { $0 + $1.value } ?? -1, accuracy: 0.001)
+        XCTAssertTrue(bucket?.isDrillable ?? false, "the bucket filters to all of its categories")
+        XCTAssertNil(bucket?.colorIndex, "the bucket is styled neutrally, not from the palette")
+        assertConserved(sankey, "fold")
+    }
+
+    /// A lone leftover keeps its own node: replacing one category with "Smaller categories" hides
+    /// its name and buys no room.
+    func testCashFlowSankeyDoesNotFoldASingleLeftover() {
+        var rows = [tx(.income, 50_000, "Salary", date(2026, 7, 1))]
+        for index in 1...8 { rows.append(tx(.expense, Double(1000 - index * 50), "Cat\(index)", date(2026, 7, 2))) }
+        let sankey = engine(FinancialData(transactions: rows), now: date(2026, 7, 29))
+            .cashFlowSankey(period: .thirtyDays)
+
+        let expenses = sankey.outflows.filter { $0.role == .expense }
+        XCTAssertEqual(expenses.count, 8)
+        XCTAssertFalse(expenses.contains(where: \.isFolded))
+    }
+
+    /// "Other" is a default category on both sides *and* the fallback every import path writes, so
+    /// it must rank on its own merits and never merge into the synthetic bucket.
+    func testCashFlowSankeyKeepsARealOtherCategorySeparateFromTheBucket() {
+        var rows = [
+            tx(.income, 50_000, "Salary", date(2026, 7, 1)),
+            tx(.expense, 10_034, "Other", date(2026, 7, 2)),
+        ]
+        for index in 1...12 {
+            rows.append(tx(.expense, Double(500 - index * 20), "Cat\(String(format: "%02d", index))", date(2026, 7, 2)))
+        }
+        let sankey = engine(FinancialData(transactions: rows), now: date(2026, 7, 29))
+            .cashFlowSankey(period: .thirtyDays)
+
+        XCTAssertEqual(sankey.outflows.first?.title, "Other", "ranks first on value")
+        XCTAssertEqual(sankey.outflows.first?.value ?? 0, 10_034, accuracy: 0.001)
+        XCTAssertFalse(sankey.outflows.first?.isFolded ?? true)
+        XCTAssertFalse(sankey.outflows.first { $0.isFolded }?.categories.contains("Other") ?? true)
+        assertConserved(sankey, "real Other")
+    }
+
+    /// Real category ids are namespaced away from the synthetic ones, so a category literally named
+    /// "folded" cannot collide with the bucket — which would take a ribbon down with it.
+    func testCashFlowSankeySurvivesACategoryNamedFolded() {
+        var rows = [
+            tx(.income, 50_000, "Salary", date(2026, 7, 1)),
+            tx(.expense, 9_999, "folded", date(2026, 7, 2)),
+            tx(.expense, 8_000, "cat-folded", date(2026, 7, 2)),
+        ]
+        for index in 1...12 {
+            rows.append(tx(.expense, Double(500 - index * 20), "Cat\(String(format: "%02d", index))", date(2026, 7, 2)))
+        }
+        let sankey = engine(FinancialData(transactions: rows), now: date(2026, 7, 29))
+            .cashFlowSankey(period: .thirtyDays)
+
+        XCTAssertTrue(sankey.outflows.contains { $0.title == "folded" && !$0.isFolded })
+        XCTAssertTrue(sankey.outflows.contains(where: \.isFolded))
+        assertConserved(sankey, "folded collision")
+    }
+
+    func testCashFlowSankeyClampsFutureDatedRowsOnEveryPeriod() {
+        let data = FinancialData(transactions: [
+            tx(.income, 1000, "Salary", date(2026, 7, 1)),
+            tx(.income, 5000, "Salary", date(2026, 12, 1)),   // post-dated recurring occurrence
+            tx(.expense, 300, "Housing", date(2026, 7, 2)),
+        ])
+        for period in [AnalyticsPeriod.all, .yearToDate, .thirtyDays] {
+            let sankey = engine(data, now: date(2026, 7, 29)).cashFlowSankey(period: period)
+            XCTAssertEqual(sankey.total, 1000, accuracy: 0.001, "\(period.rawValue) excludes the future")
+            assertConserved(sankey, period.rawValue)
+        }
+    }
+
+    func testCashFlowSankeyDropsNonPositiveAndLabelsBlankCategories() {
+        let data = FinancialData(transactions: [
+            tx(.income, 1000, "Salary", date(2026, 7, 1)),
+            tx(.expense, 500, "Housing", date(2026, 7, 2)),
+            tx(.expense, -500, "Refund", date(2026, 7, 3)),
+            tx(.expense, 0, "Zero", date(2026, 7, 4)),
+            tx(.expense, 200, "", date(2026, 7, 5)),
+        ])
+        let sankey = engine(data, now: date(2026, 7, 29)).cashFlowSankey(period: .thirtyDays)
+
+        XCTAssertTrue(sankey.outflows.allSatisfy { $0.value > 0 }, "a negative ribbon has no geometry")
+        XCTAssertFalse(sankey.outflows.contains { $0.title == "Refund" || $0.title == "Zero" })
+        let blank = sankey.outflows.first { $0.categories == [""] }
+        XCTAssertNotNil(blank, "a blank category still gets a node")
+        XCTAssertFalse(blank?.title.isEmpty ?? true, "and a readable title rather than an empty box")
+        assertConserved(sankey, "non-positive")
+    }
+
+    /// `Int.max` as a "never fold" sentinel used to overflow `limit + 1` and trap.
+    func testCashFlowSankeyToleratesAnUnboundedNodeLimit() {
+        var rows = [tx(.income, 5000, "Salary", date(2026, 7, 1))]
+        for index in 1...13 { rows.append(tx(.expense, Double(100 + index), "Cat\(index)", date(2026, 7, 2))) }
+        let sankey = engine(FinancialData(transactions: rows), now: date(2026, 7, 29))
+            .cashFlowSankey(period: .thirtyDays, maxNodesPerSide: .max)
+
+        XCTAssertEqual(sankey.outflows.filter { $0.role == .expense }.count, 13, "nothing folded")
+        assertConserved(sankey, "Int.max")
+    }
+
+    func testCashFlowSankeyIsEmptyWithoutTransactions() {
+        let sankey = engine(FinancialData(), now: date(2026, 7, 29)).cashFlowSankey(period: .thirtyDays)
+        XCTAssertTrue(sankey.isEmpty)
+        XCTAssertTrue(sankey.inflows.isEmpty && sankey.outflows.isEmpty && sankey.links.isEmpty)
+    }
+
+    /// `Decimal` addition returns NaN on overflow rather than trapping, and these values feed
+    /// `SectorMark` geometry directly.
+    func testExpensesByCategoryDropsOverflowedTotals() {
+        let huge = Decimal.greatestFiniteMagnitude
+        let data = FinancialData(transactions: [
+            Transaction(type: .expense, category: "Overflow", amount: huge, description: "", date: date(2026, 7, 2)),
+            Transaction(type: .expense, category: "Overflow", amount: huge, description: "", date: date(2026, 7, 3)),
+            tx(.expense, 400, "Housing", date(2026, 7, 4)),
+        ])
+        let categories = engine(data, now: date(2026, 7, 29)).expensesByCategory(period: .thirtyDays)
+
+        XCTAssertTrue(categories.allSatisfy { $0.value.isFinite }, "no NaN value reaches the chart")
+        XCTAssertTrue(categories.allSatisfy { $0.percentage.isFinite }, "no NaN percentage reaches the chart")
+        XCTAssertFalse(categories.contains { $0.name == "Overflow" })
+        XCTAssertEqual(categories.first?.percentage ?? 0, 100, accuracy: 0.001, "percentages recomputed over the survivors")
+    }
 }

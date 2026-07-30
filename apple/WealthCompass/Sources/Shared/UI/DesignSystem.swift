@@ -45,6 +45,35 @@ enum ColorPalette {
         WCColor.accent
     ]
     
+    /// Expense nodes in the Money Flow diagram.
+    ///
+    /// Eight entries, not `chart`'s seven, because one column can hold eight *real* categories —
+    /// the top-7 cap plus the leftover that is deliberately left un-folded when only one would
+    /// remain. With seven colours the eighth node wraps back onto the first and two unrelated
+    /// categories render identically.
+    ///
+    /// The folded bucket is **not** indexed here: it renders `flowFolded` instead, because it is a
+    /// remainder rather than a category and should not compete with real ones for attention.
+    ///
+    /// Deliberately contains **no green**. Green is reserved for the income side, the hub and the
+    /// surplus, so that "green = money you kept" reads at a glance; letting the largest expense
+    /// category borrow `WCColor.primary` — as it would if this mirrored `chart` — put a big green
+    /// block on the spending side and destroyed exactly that signal.
+    static let chartFlow: [Color] = [
+        .blue,
+        WCColor.warning,
+        WCColor.destructive,
+        .purple,
+        WCColor.accent,
+        .pink,
+        .indigo,
+        .brown
+    ]
+
+    /// The "Smaller categories" bucket — deliberately neutral, mirroring how the reference
+    /// implementation greys out its residual node.
+    static let flowFolded = Color(red: 0.45, green: 0.48, blue: 0.55)
+
     // L56: span distinct, colorblind-safer hue families (one warm accent, cool anchors) instead of a
     // warm-only ramp with two adjacent oranges + two reds — consecutive entries differ in hue AND
     // lightness so the two largest geographies don't render as confusable near-identical wedges.

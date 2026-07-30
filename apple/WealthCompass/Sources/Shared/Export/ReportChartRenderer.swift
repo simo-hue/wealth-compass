@@ -55,6 +55,9 @@ enum ReportChartRenderer {
                      dateFormatter: dateFormatter,
                      in: rect,
                      context: context)
+
+        case let .sankey(model, amountFormatter):
+            drawSankey(model: model, amountFormatter: amountFormatter, in: rect, context: context)
         }
     }
 
@@ -70,6 +73,17 @@ enum ReportChartRenderer {
             let rows = min(plotted.count, Layout.maxLegendRows)
             let needed = CGFloat(rows) * legendRowHeight(context) + Layout.legendVerticalPadding * 2
             return min(max(chart.height, needed), Layout.maxDonutHeight)
+
+        case let .sankey(model, _):
+            // Grow to whatever the busiest column needs to seat every label. Below that height the
+            // layout starts dropping the smallest labels — acceptable on screen, where hovering
+            // recovers them, but on paper a dropped label is simply gone.
+            let needed = SankeyLayout.minimumHeight(
+                inflowCount: model.inflows.count,
+                outflowCount: model.outflows.count,
+                config: .report
+            )
+            return min(max(chart.height, needed + Layout.legendVerticalPadding * 2), Layout.maxDonutHeight)
 
         case .groupedBars, .area:
             return chart.height
@@ -340,6 +354,122 @@ enum ReportChartRenderer {
     }
 
     // MARK: - Donut
+
+    // MARK: - Money Flow (Sankey)
+
+    /// Draws the Money Flow diagram. Geometry comes from `SankeyLayout` — the very engine behind
+    /// the on-screen card — so the printed diagram cannot drift from the one in the app.
+    private static func drawSankey(
+        model: CashFlowSankey,
+        amountFormatter: @Sendable (Double) -> String,
+        in rect: CGRect,
+        context: PDFDrawingContext
+    ) {
+        let layout = SankeyLayout.resolve(model, in: rect, config: .report)
+        guard !layout.nodes.isEmpty else { return }
+
+        let palette = context.theme.palette
+        let nodes = Dictionary(model.nodes.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+
+        func color(for node: CashFlowSankeyNode?) -> ReportColor {
+            guard let node else { return palette.brand }
+            switch node.role {
+            // The print palette's emerald, not the app's — `WCColor.primary` is unreadable on white.
+            case .hub, .surplus, .income: return palette.brand
+            case .shortfall: return palette.negative
+            // `+ 1` skips the palette's emerald, which is `brand` — the colour this chart reserves
+            // for income, the hub and the surplus. Without the offset the largest expense category
+            // renders the same green as the money you kept. (`chartColor` wraps, so an eighth real
+            // category lands back on emerald; it takes exactly eight un-folded expense categories
+            // to reach, and a single reused hue in print is a far smaller problem than routinely
+            // colouring the biggest expense green.)
+            case .expense: return node.colorIndex.map { palette.chartColor($0 + 1) } ?? palette.inkMuted
+            }
+        }
+
+        // Ribbons first, so the bars and labels sit above them.
+        for ribbon in layout.ribbons where ribbon.thickness > 0.15 {
+            // The non-hub end carries the meaning. A flat tint rather than a gradient: it prints
+            // predictably and survives the greyscale the palette is already ordered for.
+            let tinted = ribbon.sourceID == model.hub.id ? nodes[ribbon.targetID] : nodes[ribbon.sourceID]
+            context.fillPath(ribbonPath(ribbon, context: context), color: color(for: tinted).opacity(0.22))
+        }
+
+        for frame in layout.nodes {
+            guard let node = nodes[frame.id] else { continue }
+            let radius = min(frame.rect.width / 2, frame.rect.height / 2, 2)
+            let path = CGPath(
+                roundedRect: context.pdfRect(frame.rect),
+                cornerWidth: radius,
+                cornerHeight: radius,
+                transform: nil
+            )
+            context.fillPath(path, color: color(for: node))
+        }
+
+        // Leader lines, where de-collision moved a label off its bar.
+        for label in layout.labels where label.isDisplaced {
+            guard let frame = layout.node(id: label.id), frame.role != .hub else { continue }
+            let trailing = label.alignment == .trailing
+            let path = CGMutablePath()
+            path.move(to: context.pdfPoint(
+                CGPoint(x: trailing ? label.rect.maxX + 3 : label.rect.minX - 3, y: label.rect.midY)))
+            path.addLine(to: context.pdfPoint(
+                CGPoint(x: trailing ? frame.rect.minX - 2 : frame.rect.maxX + 2, y: frame.rect.midY)))
+            context.strokePath(path, color: palette.hairlineStrong, lineWidth: 0.4)
+        }
+
+        // Labels: name over amount, as on screen.
+        for label in layout.labels {
+            guard let node = nodes[label.id] else { continue }
+            let alignment: ReportAlignment = label.alignment == .trailing ? .trailing : .leading
+            let lineHeight = context.lineHeight(for: .chartLegend)
+            context.drawLine(
+                node.title,
+                role: .chartLegend,
+                color: palette.ink,
+                in: CGRect(x: label.rect.minX, y: label.rect.minY, width: label.rect.width, height: lineHeight),
+                alignment: alignment
+            )
+            context.drawLine(
+                amountFormatter(node.value),
+                role: .chartAxis,
+                color: node.role == .shortfall ? palette.negative : palette.inkSecondary,
+                in: CGRect(
+                    x: label.rect.minX,
+                    y: label.rect.minY + lineHeight,
+                    width: label.rect.width,
+                    height: lineHeight
+                ),
+                alignment: alignment,
+                isNumeric: true
+            )
+        }
+    }
+
+    /// A ribbon's outline in PDF space.
+    ///
+    /// The control points are computed in *logical* coordinates and converted alongside the
+    /// anchors, because `pdfPoint` mirrors x for right-to-left documents — offsetting after the
+    /// conversion would bend the curve the wrong way in Arabic and Hebrew.
+    private static func ribbonPath(_ ribbon: SankeyLayout.Ribbon, context: PDFDrawingContext) -> CGPath {
+        let offset = ribbon.controlOffset
+        let path = CGMutablePath()
+        path.move(to: context.pdfPoint(ribbon.sourceTop))
+        path.addCurve(
+            to: context.pdfPoint(ribbon.targetTop),
+            control1: context.pdfPoint(CGPoint(x: ribbon.sourceTop.x + offset, y: ribbon.sourceTop.y)),
+            control2: context.pdfPoint(CGPoint(x: ribbon.targetTop.x - offset, y: ribbon.targetTop.y))
+        )
+        path.addLine(to: context.pdfPoint(ribbon.targetBottom))
+        path.addCurve(
+            to: context.pdfPoint(ribbon.sourceBottom),
+            control1: context.pdfPoint(CGPoint(x: ribbon.targetBottom.x - offset, y: ribbon.targetBottom.y)),
+            control2: context.pdfPoint(CGPoint(x: ribbon.sourceBottom.x + offset, y: ribbon.sourceBottom.y))
+        )
+        path.closeSubpath()
+        return path
+    }
 
     private static func drawDonut(slices: [ReportSlice],
                                   centerLabel: String?,

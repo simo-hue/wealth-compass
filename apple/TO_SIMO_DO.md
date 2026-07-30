@@ -10,3 +10,16 @@
   fastlane ios metadata
   fastlane mac metadata
   ```
+
+## Money Flow Sankey diagram (2026-07-29)
+- [ ] **Build both schemes in Xcode on the Mac mini.** This machine has only Command Line Tools, so no `.app` could be linked. Everything was verified as far as is possible here: `swiftc -typecheck` over all of `Sources/Shared` + `Sources/macOS` exits clean, a 1657-assertion harness linking the real shared sources passes, and both test files type-check against a module built from `Sources/Shared`. What that does *not* cover is linking, asset catalogs, entitlements and signing.
+- [ ] **Confirm the three new files appear in Xcode.** `CashFlowSankey.swift`, `SankeyLayout.swift` and `SankeyDiagramView.swift` were added to `project.pbxproj` by hand (both app targets); `SankeyLayoutTests.swift` was added to the test target. The file parses (`plutil -lint` clean) and target membership was verified by parsing the project, but it is worth a glance in the Project Navigator.
+- [ ] **Run the test suite.** XCTest cannot run here (no test host / simulator):
+  ```bash
+  cd apple
+  xcodebuild test -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile -destination 'platform=iOS Simulator,name=iPhone 16'
+  ```
+- [ ] **Visually check the two cards.** Cash Flow → Overview (full-width diagram, and confirm you are happy the `Expense Categories` donut is gone) and the Dashboard (compact card where `Top Expense Categories` used to be) — ideally at a *narrow* window too, around 1020pt, which is where the 2-up row is tightest. Also check hover dimming, clicking a node (should land on Transactions with a removable category chip), and Privacy Mode (whole diagram should conceal).
+- [ ] **Export a PDF report** and check the new `Money Flow` block in the Cash Flow section prints legibly, including in greyscale.
+- [ ] **Review the new translations.** 15 new keys were added to `Localizable.xcstrings` across all 34 non-source languages and marked `translated`. They are my translations, not a professional pass — the financial terms in particular ("Surplus", "Drawn from Savings", "Smaller categories") are worth a skim in the languages you read.
+- [ ] **Discard the spun-off `expensesByCategory` NaN task if it is still open.** That fix was applied directly in the main session (`AnalyticsEngine.expensesByCategory` now filters non-finite sums, with a regression test in `AnalyticsEngineTests`), so a second session working on it would conflict.
