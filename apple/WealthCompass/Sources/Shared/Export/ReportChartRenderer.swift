@@ -423,11 +423,24 @@ enum ReportChartRenderer {
             context.strokePath(path, color: palette.hairlineStrong, lineWidth: 0.4)
         }
 
-        // Labels: name over amount, as on screen.
+        // Labels: name over amount where the pipe is thick enough, collapsed onto one line where
+        // it is not — mirroring the screen card, so print and screen break identically.
         for label in layout.labels {
             guard let node = nodes[label.id] else { continue }
             let alignment: ReportAlignment = label.alignment == .trailing ? .trailing : .leading
             let lineHeight = context.lineHeight(for: .chartLegend)
+            guard label.lineCount >= 2 else {
+                // One string rather than two runs: at report type there is no room to set the name
+                // and the amount side by side and still have either survive truncation.
+                context.drawLine(
+                    "\(node.title)  \(amountFormatter(node.value))",
+                    role: .chartLegend,
+                    color: palette.ink,
+                    in: CGRect(x: label.rect.minX, y: label.rect.minY, width: label.rect.width, height: label.rect.height),
+                    alignment: alignment
+                )
+                continue
+            }
             context.drawLine(
                 node.title,
                 role: .chartLegend,

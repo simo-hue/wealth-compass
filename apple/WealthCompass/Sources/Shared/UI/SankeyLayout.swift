@@ -31,8 +31,12 @@ enum SankeyLayout {
         /// Purely a hit-target concession: the ribbon keeps its true scaled thickness, so the
         /// diagram never overstates a magnitude (see `SankeyNodeFrame.flowRect`).
         var minimumNodeHeight: CGFloat = 5
-        /// Height reserved for one label — two lines, name over amount.
+        /// Height reserved for a two-line label — name over amount.
         var labelHeight: CGFloat = 32
+        /// Height of the collapsed form, name and amount on one line. Used whenever the pipe a
+        /// label names is too thin to contain the two-line block, so the text stays within the flow
+        /// it describes instead of spilling across its neighbours.
+        var singleLineLabelHeight: CGFloat = 20
         /// Minimum vertical clearance between two labels.
         var labelSpacing: CGFloat = 4
         /// Gap between a bar and its label.
@@ -68,6 +72,7 @@ enum SankeyLayout {
             nodeSpacing: 7,
             minimumNodeHeight: 2.5,
             labelHeight: 21,
+            singleLineLabelHeight: 13,
             labelSpacing: 3,
             labelInset: 6,
             preferredLabelWidth: 108,
@@ -185,9 +190,23 @@ enum SankeyLayout {
         let id: String
         let rect: CGRect
         let alignment: Alignment
-        /// True when de-collision moved this label off its node's centre, so the view can draw a
-        /// connector or drop the label if it prefers.
+        /// True when the label could not be seated inside the pipe it names — the renderer draws a
+        /// leader line back to the flow so the name is still attributable.
         let isDisplaced: Bool
+        /// 2 for name over amount, 1 for the collapsed single-line form. Chosen from the thickness
+        /// of the pipe, never below 1: a label is dropped outright rather than emitted empty.
+        let lineCount: Int
+    }
+
+    /// One label's sizing decision, taken before placement.
+    private struct LabelPlan {
+        let frame: NodeFrame
+        /// The band the text should sit within — measured on the *ribbon at the label's own x*,
+        /// not on the node's band, because by the time a flow reaches the label gutter it has
+        /// curved away from the bar it started at.
+        let band: ClosedRange<CGFloat>
+        let lineCount: Int
+        let height: CGFloat
     }
 
     struct Resolved: Equatable {
@@ -288,54 +307,28 @@ enum SankeyLayout {
             scale: scale,
             config: config
         )
-        let hasUnspent = outflows.contains { $0.role == .surplus }
         let outflowFrames = stack(
             drawnOutflows,
             x: rightNodeX,
             width: config.nodeWidth,
             in: rect,
             scale: scale,
-            config: config,
-            topY: hasUnspent ? hubRect.minY : nil
+            config: config
         )
 
-        // The hub splits. Its `flowRect` is the whole bar — the inflow ribbons tile all of it, and
-        // that is what every ribbon attaches to. Its `rect` is only the *spent* part, so renderers
-        // draw solid bar exactly where money left and leave the rest to the unspent frame below.
+        // The hub is one whole bar: the inflow ribbons tile all of it. The outflow ribbons leave
+        // from a band centred on it, so income that was not spent reads as symmetric headroom above
+        // and below the flows rather than as a labelled thing in its own right.
         let spentHeight = min(hubRect.height, CGFloat(spentValue) * scale)
-        let spentRect = CGRect(x: hubRect.minX, y: hubRect.minY, width: hubRect.width, height: spentHeight)
         let hubFrame = NodeFrame(
             id: sankey.hub.id,
-            rect: spentRect,
+            rect: hubRect,
             flowRect: hubRect,
             role: .hub,
             value: sankey.hub.value,
             isFloored: false
         )
         resolved.nodes = inflowFrames + [hubFrame] + outflowFrames
-
-        // The unspent tail: a real frame, so it hovers and reports like any other element, but with
-        // no ribbon and no place in the right column.
-        var unspentFrame: NodeFrame?
-        if let surplus = outflows.first(where: { $0.role == .surplus }),
-           hubRect.maxY - spentRect.maxY > 0.5 {
-            let tail = CGRect(
-                x: hubRect.minX,
-                y: spentRect.maxY,
-                width: hubRect.width,
-                height: hubRect.maxY - spentRect.maxY
-            )
-            let frame = NodeFrame(
-                id: surplus.id,
-                rect: tail,
-                flowRect: tail,
-                role: .surplus,
-                value: surplus.value,
-                isFloored: false
-            )
-            unspentFrame = frame
-            resolved.nodes.append(frame)
-        }
 
         // MARK: Ribbons
         //
@@ -362,7 +355,7 @@ enum SankeyLayout {
             inCursor += thickness
         }
 
-        var outCursor = hubRect.minY
+        var outCursor = hubRect.midY - spentHeight / 2
         for frame in outflowFrames {
             let thickness = frame.flowRect.height
             resolved.ribbons.append(
@@ -385,17 +378,21 @@ enum SankeyLayout {
         // MARK: Labels
 
         let bounds = rect.minY...rect.maxY
+        let leftLabelX = leftNodeX + config.nodeWidth + config.labelInset
         let leftLabels = placeLabels(
-            for: inflowFrames,
-            x: leftNodeX + config.nodeWidth + config.labelInset,
+            labelPlans(for: inflowFrames, ribbons: resolved.ribbons, hubID: sankey.hub.id,
+                       centreX: leftLabelX + labelWidth / 2, config: config),
+            x: leftLabelX,
             width: labelWidth,
             alignment: .leading,
             bounds: bounds,
             config: config
         )
+        let outLabelX = rightNodeX - config.labelInset - labelWidth
         let rightLabels = placeLabels(
-            for: outflowFrames,
-            x: rightNodeX - config.labelInset - labelWidth,
+            labelPlans(for: outflowFrames, ribbons: resolved.ribbons, hubID: sankey.hub.id,
+                       centreX: outLabelX + labelWidth / 2, config: config),
+            x: outLabelX,
             width: labelWidth,
             alignment: .trailing,
             bounds: bounds,
@@ -415,14 +412,9 @@ enum SankeyLayout {
         var hubLabels: [Label] = []
         var hubCrowded = false
         if hubLabelWidth >= config.minimumLabelWidth, rect.height >= config.labelHeight {
-            // Two entries whenever there is an unspent tail: the period total centred on the spent
-            // part of the bar, and the surplus centred on the tail. They go through the same
-            // de-collision pass as any other column instead of being placed blind — on a
-            // high-savings month the spent part is a sliver at the very top, so the two would
-            // otherwise land on top of each other.
-            let hubColumn = [hubFrame] + (unspentFrame.map { [$0] } ?? [])
             let placed = placeLabels(
-                for: hubColumn,
+                labelPlans(for: [hubFrame], ribbons: resolved.ribbons, hubID: sankey.hub.id,
+                           centreX: hubLabelX + hubLabelWidth / 2, config: config),
                 x: hubLabelX,
                 width: hubLabelWidth,
                 alignment: .leading,
@@ -607,73 +599,116 @@ enum SankeyLayout {
         return max(config.minimumLabelWidth, min(config.preferredLabelWidth, available))
     }
 
-    /// Places one column's labels at their nodes' centres, then resolves any overlap.
+    /// Decides how tall each label may be, and where its text ought to sit.
+    ///
+    /// A label belongs to the pipe it names, so it is sized against that pipe's thickness and
+    /// centred on that pipe's band where the label actually is. A thick flow gets the two-line
+    /// block; a thin one collapses to a single line; one thinner than a single line cannot contain
+    /// text at any size, and is seated as close as possible and marked displaced so a leader line
+    /// is drawn instead.
+    private static func labelPlans(
+        for frames: [NodeFrame],
+        ribbons: [Ribbon],
+        hubID: String,
+        centreX: CGFloat,
+        config: Config
+    ) -> [LabelPlan] {
+        frames.map { frame in
+            let band: ClosedRange<CGFloat>
+            if frame.role == .hub {
+                band = frame.flowRect.minY...frame.flowRect.maxY
+            } else if let ribbon = ribbons.first(where: {
+                ($0.sourceID == hubID ? $0.targetID : $0.sourceID) == frame.id
+            }), let span = ribbon.verticalSpan(atX: centreX) {
+                band = span
+            } else {
+                band = frame.flowRect.minY...frame.flowRect.maxY
+            }
+            let thickness = band.upperBound - band.lowerBound
+            let twoLines = thickness >= config.labelHeight
+            return LabelPlan(
+                frame: frame,
+                band: band,
+                lineCount: twoLines ? 2 : 1,
+                height: twoLines ? config.labelHeight : config.singleLineLabelHeight
+            )
+        }
+    }
+
+    /// Places one column's labels inside the pipes they name, then resolves any overlap.
     ///
     /// The reference implementation has exactly this defect — at ten categories its labels
     /// physically overlap. Folding the long tail makes collisions rare; this makes them
     /// impossible.
     private static func placeLabels(
-        for frames: [NodeFrame],
+        _ plans: [LabelPlan],
         x: CGFloat,
         width: CGFloat,
         alignment: Label.Alignment,
         bounds: ClosedRange<CGFloat>,
         config: Config
     ) -> (labels: [Label], isCrowded: Bool) {
-        guard !frames.isEmpty else { return ([], false) }
-        let pitch = config.labelHeight + config.labelSpacing
+        guard !plans.isEmpty else { return ([], false) }
         let span = bounds.upperBound - bounds.lowerBound
-        let required = CGFloat(frames.count) * config.labelHeight
-            + CGFloat(frames.count - 1) * config.labelSpacing
+
+        func required(_ subset: [LabelPlan]) -> CGFloat {
+            subset.reduce(0) { $0 + $1.height } + CGFloat(max(0, subset.count - 1)) * config.labelSpacing
+        }
 
         /// Seats an already-fitting run: push down from the top, then lift back inside if the run
-        /// overflowed the bottom. Terminates without escaping the top because the caller only
-        /// invokes it when the run fits.
-        func seat(_ subset: [NodeFrame]) -> [Label] {
-            let desired = subset.map { $0.rect.midY - config.labelHeight / 2 }
+        /// overflowed the bottom. Heights vary per label now, so the cursor advances by each
+        /// label's own height rather than a shared pitch.
+        func seat(_ subset: [LabelPlan]) -> [Label] {
             var tops: [CGFloat] = []
             tops.reserveCapacity(subset.count)
             var cursor = bounds.lowerBound
-            for top in desired {
-                let placed = max(top, cursor)
+            for plan in subset {
+                let desired = (plan.band.lowerBound + plan.band.upperBound) / 2 - plan.height / 2
+                let placed = max(desired, cursor)
                 tops.append(placed)
-                cursor = placed + pitch
+                cursor = placed + plan.height + config.labelSpacing
             }
-            if let last = tops.last, last + config.labelHeight > bounds.upperBound {
-                tops[tops.count - 1] = bounds.upperBound - config.labelHeight
+            if let last = tops.last, last + subset[subset.count - 1].height > bounds.upperBound {
+                tops[tops.count - 1] = bounds.upperBound - subset[subset.count - 1].height
                 for index in stride(from: tops.count - 2, through: 0, by: -1) {
-                    tops[index] = min(tops[index], tops[index + 1] - pitch)
+                    tops[index] = min(tops[index], tops[index + 1] - subset[index].height - config.labelSpacing)
                 }
             }
-            return zip(subset, zip(tops, desired)).map { frame, placement in
-                Label(
-                    id: frame.id,
-                    rect: CGRect(x: x, y: placement.0, width: width, height: config.labelHeight),
+            return zip(subset, tops).map { plan, top in
+                // "Inside the pipe" is the whole point of the adaptive sizing, so that — not
+                // whether the label moved — is what marks it displaced and earns a leader line.
+                let inside = top >= plan.band.lowerBound - 0.5
+                    && top + plan.height <= plan.band.upperBound + 0.5
+                return Label(
+                    id: plan.frame.id,
+                    rect: CGRect(x: x, y: top, width: width, height: plan.height),
                     alignment: alignment,
-                    isDisplaced: abs(placement.0 - placement.1) > 0.5
+                    isDisplaced: !inside,
+                    lineCount: plan.lineCount
                 )
             }
         }
 
-        guard required > span else { return (seat(frames), false) }
+        guard required(plans) > span else { return (seat(plans), false) }
 
         // Not enough room to seat everyone. Spreading all of them evenly would still overlap — it
-        // cannot not, once `required > span` — which is the exact defect this pass exists to
+        // cannot not, once the run exceeds the span — which is the exact defect this pass exists to
         // prevent. So seat as many as genuinely fit, largest first, and leave the rest to the bar
         // and the hover detail row. `isCrowded` tells the view labels were dropped.
-        let capacity = max(0, Int((span + config.labelSpacing) / pitch))
-        guard capacity > 0 else { return ([], true) }
-        let keep = Set(
-            frames.enumerated()
-                .sorted { lhs, rhs in
-                    lhs.element.value == rhs.element.value
-                        ? lhs.offset < rhs.offset
-                        : lhs.element.value > rhs.element.value
-                }
-                .prefix(capacity)
-                .map(\.offset)
-        )
+        var keep = Set<Int>()
+        var running: [LabelPlan] = []
+        for (offset, plan) in plans.enumerated().sorted(by: { lhs, rhs in
+            lhs.element.frame.value == rhs.element.frame.value
+                ? lhs.offset < rhs.offset
+                : lhs.element.frame.value > rhs.element.frame.value
+        }) {
+            let candidate = running + [plan]
+            guard required(candidate) <= span else { continue }
+            running = candidate
+            keep.insert(offset)
+        }
+        guard !keep.isEmpty else { return ([], true) }
         // Re-filtered in column order, so what survives still reads top-to-bottom.
-        return (seat(frames.enumerated().filter { keep.contains($0.offset) }.map(\.element)), true)
+        return (seat(plans.enumerated().filter { keep.contains($0.offset) }.map(\.element)), true)
     }
 }

@@ -229,7 +229,7 @@ struct SankeyDiagramView: View {
     private func labelBody(_ node: CashFlowSankeyNode, _ label: SankeyLayout.Label) -> some View {
         // The label is the big, reliable target — a 5pt bar is not something to ask a pointer to
         // find, and it is the only target Switch Control can reach.
-        let base = labelContent(node, trailing: label.alignment == .trailing)
+        let base = labelContent(node, trailing: label.alignment == .trailing, lineCount: label.lineCount)
             .frame(
                 width: label.rect.width,
                 height: label.rect.height,
@@ -252,23 +252,30 @@ struct SankeyDiagramView: View {
         }
     }
 
-    @ViewBuilder
+
     /// `trailing` comes from the resolved label rather than the node's role: the surplus is an
     /// outflow, but it is now drawn as the hub's unspent tail and labelled in the hub's own
     /// left-aligned column, so role alone would align it the wrong way.
-    private func labelContent(_ node: CashFlowSankeyNode, trailing: Bool) -> some View {
+    @ViewBuilder
+    private func labelContent(_ node: CashFlowSankeyNode, trailing: Bool, lineCount: Int) -> some View {
         let alignment: HorizontalAlignment = trailing ? .trailing : .leading
-        VStack(alignment: alignment, spacing: 1) {
-            Text(node.title)
-                .font(.subheadline.weight(isSynthetic(node) ? .semibold : .regular))
-                .foregroundStyle(isSynthetic(node) ? Color.white : Color.white.opacity(0.82))
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-            Text(settings.privateCurrency(node.value))
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(node.role == .shortfall ? WCColor.warning : WCColor.textTertiary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
+        // Two lines only where the pipe is thick enough to contain them; otherwise the name and the
+        // amount collapse onto one, which nearly halves the block and keeps the text inside the flow
+        // it names rather than spilling across its neighbours.
+        Group {
+            if lineCount >= 2 {
+                VStack(alignment: alignment, spacing: 1) {
+                    labelName(node)
+                    labelAmount(node)
+                }
+            } else {
+                HStack(spacing: 6) {
+                    if trailing { Spacer(minLength: 0) }
+                    labelName(node)
+                    labelAmount(node)
+                    if !trailing { Spacer(minLength: 0) }
+                }
+            }
         }
         // Labels sit over the ribbon field — the flows run the full width, under the gutters — so
         // without a scrim the hub's total in particular was unreadable against the mass of colour
@@ -281,6 +288,26 @@ struct SankeyDiagramView: View {
                 .fill(WCColor.background.opacity(0.62))
         )
         .frame(maxWidth: .infinity, alignment: trailing ? .trailing : .leading)
+    }
+
+    private func labelName(_ node: CashFlowSankeyNode) -> some View {
+        Text(node.title)
+            .font(.subheadline.weight(isSynthetic(node) ? .semibold : .regular))
+            .foregroundStyle(isSynthetic(node) ? Color.white : Color.white.opacity(0.82))
+            .lineLimit(1)
+            // Truncating the name is better than truncating the amount: a clipped category is
+            // still recognisable, a clipped number is misinformation.
+            .layoutPriority(0)
+            .minimumScaleFactor(0.72)
+    }
+
+    private func labelAmount(_ node: CashFlowSankeyNode) -> some View {
+        Text(settings.privateCurrency(node.value))
+            .font(.caption.monospacedDigit())
+            .foregroundStyle(node.role == .shortfall ? WCColor.warning : WCColor.textTertiary)
+            .lineLimit(1)
+            .layoutPriority(1)
+            .minimumScaleFactor(0.72)
     }
 
     /// Mirrors the cash-flow card's legend row: the totals sit here until you point at something,

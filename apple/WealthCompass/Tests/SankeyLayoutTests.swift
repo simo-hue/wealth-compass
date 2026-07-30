@@ -80,21 +80,20 @@ final class SankeyLayoutTests: XCTestCase {
             }
             XCTAssertEqual(cursor, hub.flowRect.maxY, accuracy: 1e-6, "inbound stack fills the whole hub", file: file, line: line)
         }
-        // The surplus is not piped — it is the hub's unspent tail — so outbound ribbons tile only
-        // the spent part, and ribbons + tail together still account for the whole bar.
+        // The surplus is not drawn at all — income -> outcome and nothing else — so the outbound
+        // ribbons form a band CENTRED on the hub, shorter than the bar whenever spending is under
+        // income, with the difference showing as equal headroom above and below.
+        XCTAssertNil(resolved.node(id: "surplus"), "the surplus has no frame", file: file, line: line)
         XCTAssertFalse(resolved.ribbons.contains { $0.targetID == "surplus" }, "the surplus has no ribbon", file: file, line: line)
-        var cursor = hub.flowRect.minY
+        XCTAssertFalse(resolved.labels.contains { $0.id == "surplus" }, "the surplus has no label", file: file, line: line)
+
+        let spent = CGFloat(sankey.outflows.filter { $0.role != .surplus }.reduce(0) { $0 + $1.value }) * resolved.scale
+        var cursor = hub.flowRect.midY - spent / 2
         for ribbon in resolved.ribbons.filter({ $0.sourceID == sankey.hub.id }).sorted(by: { $0.sourceTop.y < $1.sourceTop.y }) {
             XCTAssertEqual(ribbon.sourceTop.y, cursor, accuracy: 1e-6, "outbound ribbon abuts the previous", file: file, line: line)
             cursor = ribbon.sourceBottom.y
         }
-        XCTAssertEqual(cursor, hub.rect.maxY, accuracy: 1e-6, "outbound stack fills the spent part", file: file, line: line)
-        if let surplus = sankey.outflows.first(where: { $0.role == .surplus }),
-           let tail = resolved.node(id: surplus.id) {
-            XCTAssertEqual(tail.rect.minY, hub.rect.maxY, accuracy: 1e-6, "the tail starts where spending ends", file: file, line: line)
-            XCTAssertEqual(tail.rect.maxY, hub.flowRect.maxY, accuracy: 1e-6, "the tail closes the hub", file: file, line: line)
-            XCTAssertEqual(tail.rect.minX, hub.rect.minX, accuracy: 1e-6, "the tail sits on the hub", file: file, line: line)
-        }
+        XCTAssertEqual(cursor, hub.flowRect.midY + spent / 2, accuracy: 1e-6, "the outbound band is centred on the hub", file: file, line: line)
     }
 
     private func assertNoOverlap(_ resolved: SankeyLayout.Resolved, file: StaticString = #filePath, line: UInt = #line) {
@@ -123,7 +122,8 @@ final class SankeyLayoutTests: XCTestCase {
         assertFinite(resolved)
         assertHubCloses(resolved, sankey)
         assertNoOverlap(resolved)
-        XCTAssertEqual(resolved.nodes.count, sankey.inflows.count + sankey.outflows.count + 1)
+        // The surplus gets no frame, so: income sources + hub + spending categories.
+        XCTAssertEqual(resolved.nodes.count, sankey.inflows.count + sankey.outflows.filter { $0.role != .surplus }.count + 1)
     }
 
     func testRibbonThicknessTracksTheTrueBandNotTheFlooredBar() {
@@ -257,32 +257,28 @@ final class SankeyLayoutTests: XCTestCase {
                 "\(node.id) must own a pointable band (has \(owned[node.id] ?? 0)pt)"
             )
         }
-        XCTAssertNil(owned["surplus"], "the surplus no longer occupies the outflow fan")
-
-        // It is reachable on the hub instead.
-        if let tail = resolved.node(id: "surplus") {
-            XCTAssertEqual(
-                SankeyLayout.hitTest(resolved, at: CGPoint(x: tail.rect.midX, y: tail.rect.midY), hubID: sankey.hub.id),
-                "surplus", "the unspent tail is hoverable"
-            )
-        } else {
-            XCTFail("a 93.6% surplus month should have an unspent tail")
-        }
+        XCTAssertNil(owned["surplus"], "the surplus never resolves under the pointer")
+        XCTAssertNil(resolved.node(id: "surplus"), "the surplus is not on the chart at all")
     }
 
     func testHitTestKeepsTheGeometryHonest() {
         let sankey = model(dominantSurplusMonth)
         let resolved = SankeyLayout.resolve(sankey, in: CGRect(x: 0, y: 0, width: 1250, height: 384))
         guard let hub = resolved.node(id: sankey.hub.id),
-              let surplus = resolved.node(id: "surplus"),
-              let salary = resolved.node(id: "income-cat-Salary")
+              let salary = resolved.node(id: "income-cat-Salary"),
+              let food = resolved.ribbons.first(where: { $0.targetID == "expense-cat-Food" })
         else { return XCTFail("missing frames") }
 
         // Deep inside a band still resolves to that band — the inflation is a near-miss rule only.
-        XCTAssertEqual(
-            SankeyLayout.hitTest(resolved, at: CGPoint(x: surplus.rect.midX, y: surplus.rect.midY), hubID: sankey.hub.id),
-            "surplus"
-        )
+        // Probe where the ribbon actually is at that x (it curves) and clear of the hub's own
+        // label, which wins outright by design.
+        let probeX = hub.rect.maxX + 220
+        if let span = food.verticalSpan(atX: probeX) {
+            XCTAssertEqual(
+                SankeyLayout.hitTest(resolved, at: CGPoint(x: probeX, y: (span.lowerBound + span.upperBound) / 2), hubID: sankey.hub.id),
+                "expense-cat-Food"
+            )
+        }
         XCTAssertEqual(
             SankeyLayout.hitTest(resolved, at: CGPoint(x: hub.rect.minX - 30, y: salary.flowRect.midY), hubID: sankey.hub.id),
             "income-cat-Salary"
@@ -331,6 +327,51 @@ final class SankeyLayoutTests: XCTestCase {
         XCTAssertNil(SankeyLayout.hitTest(resolved, at: CGPoint(x: 10, y: CGFloat.infinity), hubID: sankey.hub.id))
         XCTAssertNil(SankeyLayout.hitTest(SankeyLayout.Resolved(), at: .zero, hubID: sankey.hub.id))
         XCTAssertNil(SankeyLayout.hitTest(resolved, at: .zero, hubID: "not-a-node"))
+    }
+
+    /// A label belongs to the pipe it names, so it either fits inside that pipe's band or it is
+    /// marked displaced and earns a leader line. Nothing is left silently spilling across a
+    /// neighbouring flow — which is what a fixed two-line slot did for every category but the
+    /// largest.
+    func testLabelsStayInsideTheirPipesOrAreMarkedDisplaced() {
+        for rows in [typicalMonth, dominantSurplusMonth] {
+            let sankey = model(rows)
+            let bounds = CGRect(x: 0, y: 0, width: 1250, height: 384)
+            let resolved = SankeyLayout.resolve(sankey, in: bounds)
+            let config = SankeyLayout.Config.standard
+
+            for label in resolved.labels {
+                guard let frame = resolved.node(id: label.id) else { continue }
+                let band: ClosedRange<CGFloat>
+                if frame.role == .hub {
+                    band = frame.flowRect.minY...frame.flowRect.maxY
+                } else if let ribbon = resolved.ribbons.first(where: {
+                    ($0.sourceID == sankey.hub.id ? $0.targetID : $0.sourceID) == label.id
+                }), let span = ribbon.verticalSpan(atX: label.rect.midX) {
+                    band = span
+                } else {
+                    band = frame.flowRect.minY...frame.flowRect.maxY
+                }
+
+                let inside = label.rect.minY >= band.lowerBound - 0.5
+                    && label.rect.maxY <= band.upperBound + 0.5
+                XCTAssertTrue(inside || label.isDisplaced, "\(label.id) spills out of its pipe unmarked")
+
+                if label.lineCount == 2 {
+                    XCTAssertGreaterThanOrEqual(
+                        band.upperBound - band.lowerBound, config.labelHeight - 0.5,
+                        "\(label.id) got two lines in a pipe too thin to hold them"
+                    )
+                    XCTAssertEqual(label.rect.height, config.labelHeight, accuracy: 0.01)
+                } else {
+                    XCTAssertEqual(label.lineCount, 1, "a label is dropped, never emitted with no lines")
+                    XCTAssertEqual(label.rect.height, config.singleLineLabelHeight, accuracy: 0.01)
+                }
+            }
+            // The thin flows in this data must actually exercise the collapsed form, or the test
+            // proves nothing.
+            XCTAssertTrue(resolved.labels.contains { $0.lineCount == 1 }, "expected at least one collapsed label")
+        }
     }
 
     func testLayoutIsDeterministic() {

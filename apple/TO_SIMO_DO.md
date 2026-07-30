@@ -33,3 +33,11 @@
 - [ ] **Check the unspent tail reads correctly on a normal month.** The reference data is an extreme case (93.6% unspent), so the spent part of the hub is a sliver. On a month where you spent 40–60% it should look far more balanced — worth confirming.
 - [ ] **Hovering the empty lower-right.** With only two expense categories, the void where the surplus pipe used to be is now nearest to the bottom-most expense, so hovering there lights that category. It follows the "nearest flow, always one lit" rule you chose, but tell me if it feels wrong — the alternative is to resolve that region to the surplus instead.
 - [ ] **The tail is labelled "Surplus", not "Unspent".** I kept the existing word: it is already translated into all 34 languages and means the same thing. Say the word if you want "Unspent" and I will add the key.
+
+## Money Flow — surplus removed entirely (2026-07-30)
+- [ ] **Decide whether the thin spending band is acceptable.** With one shared scale and no surplus, your 30-day spending (6.4% of income) is a narrow band in the middle of the card. That is honest arithmetic, not a bug. If you want the categories to fill the height instead, say so and I will scale each side independently — the trade-off is that a €100 income ribbon and a €100 expense ribbon would no longer be the same thickness.
+- [ ] **The surplus number is no longer shown on this card at all.** The footer still reads TOTAL CASH FLOW. Tell me if you want the surplus back as a footer stat.
+
+## Money Flow — adaptive label sizing (2026-07-30)
+- [ ] **Check the collapsed labels read well at your window size.** Name and amount now share one line for any flow thinner than 32pt. On a narrow pane a long category ("Entertainment", "Smaller categories") plus its amount may truncate — the amount is protected, the name shrinks first. If truncation is common at your width, the fix is to widen `preferredLabelWidth` or drop the name to `.caption` in the collapsed form.
+- [ ] **Confirm the leader lines look right.** They only appear now when a pipe is too thin for even one line, so they should be rare — but that also means they are the only cue for the very smallest flows.
