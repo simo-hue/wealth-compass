@@ -257,3 +257,8 @@ comments. On an entity this small, a sudden spike in mention volume is more like
 lift you — and it would be the one thing on this site that could not survive being made public.
 
 ---
+### Manual Actions Required: App Store Connect Upload
+The versions and release notes for iOS and macOS have been updated locally.
+- Build and archive the updated apps (v1.1.5, build 21) via Xcode.
+- Upload the archives to App Store Connect.
+- If using Fastlane `deliver`, execute it to push the new release notes to App Store Connect.

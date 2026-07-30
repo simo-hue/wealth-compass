@@ -1,1 +1,1 @@
-A fost adăugată funcționalitatea de export PDF.
+new cash-flow graph

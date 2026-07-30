@@ -832,3 +832,7 @@ which still describes the retired React/Supabase web app.
     references exists in `dist` — which now covers `images/logo.png`. `npx eslint
     src/site/SiteLayout.tsx` clean. Checked live at 1280px and 420px: mark renders, no console
     errors, footer `<img>` reports `complete`, `naturalWidth` 128, laid out at 26px.
+
+- [2026-07-30]: App Version Bump and Release Notes Update
+  - *Details*: Incremented both the Build Version (to 21) and the Marketing Version (to 1.1.5) for both iOS and macOS apps. Updated the release notes ("What's new") to feature the "new cash-flow graph".
+  - *Tech Notes*: Used agvtool to bump CFBundleShortVersionString and CFBundleVersion across the .pbxproj and Info.plist files. Batch updated release_notes.txt across all localized metadata directories to "new cash-flow graph".

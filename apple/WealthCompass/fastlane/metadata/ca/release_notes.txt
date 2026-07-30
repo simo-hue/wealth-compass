@@ -1,1 +1,1 @@
-S'ha afegit la funcionalitat d'exportació a PDF.
+new cash-flow graph
