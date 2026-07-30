@@ -229,7 +229,7 @@ struct SankeyDiagramView: View {
     private func labelBody(_ node: CashFlowSankeyNode, _ label: SankeyLayout.Label) -> some View {
         // The label is the big, reliable target — a 5pt bar is not something to ask a pointer to
         // find, and it is the only target Switch Control can reach.
-        let base = labelContent(node)
+        let base = labelContent(node, trailing: label.alignment == .trailing)
             .frame(
                 width: label.rect.width,
                 height: label.rect.height,
@@ -253,8 +253,11 @@ struct SankeyDiagramView: View {
     }
 
     @ViewBuilder
-    private func labelContent(_ node: CashFlowSankeyNode) -> some View {
-        let alignment: HorizontalAlignment = isTrailingColumn(node) ? .trailing : .leading
+    /// `trailing` comes from the resolved label rather than the node's role: the surplus is an
+    /// outflow, but it is now drawn as the hub's unspent tail and labelled in the hub's own
+    /// left-aligned column, so role alone would align it the wrong way.
+    private func labelContent(_ node: CashFlowSankeyNode, trailing: Bool) -> some View {
+        let alignment: HorizontalAlignment = trailing ? .trailing : .leading
         VStack(alignment: alignment, spacing: 1) {
             Text(node.title)
                 .font(.subheadline.weight(isSynthetic(node) ? .semibold : .regular))
@@ -277,7 +280,7 @@ struct SankeyDiagramView: View {
             RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .fill(WCColor.background.opacity(0.62))
         )
-        .frame(maxWidth: .infinity, alignment: isTrailingColumn(node) ? .trailing : .leading)
+        .frame(maxWidth: .infinity, alignment: trailing ? .trailing : .leading)
     }
 
     /// Mirrors the cash-flow card's legend row: the totals sit here until you point at something,

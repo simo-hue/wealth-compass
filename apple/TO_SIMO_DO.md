@@ -28,3 +28,8 @@
 - [ ] **Re-check hover on the Mac mini.** The 2.5pt-ribbon problem is fixed and measured headlessly, but pointer feel is the one thing a harness cannot judge. Confirm that sweeping the pointer down the right-hand side steps cleanly through Food → Transport → Surplus, that the left side steps through the income sources, and that clicking still drills through to the filtered transaction list.
 - [ ] **Sanity-check the new card height.** It is now `0.30 × width` (clamped 280–520pt), so the Cash Flow page got noticeably taller. If it pushes Recent Activity / Recurring too far down for your taste, the multiplier is one number in `SankeyDiagramView.diagramHeight`.
 - [ ] **Look at the greyscale PDF again.** The income ramp is new and was chosen for luminance separation, but only a real print will confirm Dividends vs Salary vs Freelance stay distinguishable.
+
+## Money Flow — surplus removed from the pipes (2026-07-30)
+- [ ] **Check the unspent tail reads correctly on a normal month.** The reference data is an extreme case (93.6% unspent), so the spent part of the hub is a sliver. On a month where you spent 40–60% it should look far more balanced — worth confirming.
+- [ ] **Hovering the empty lower-right.** With only two expense categories, the void where the surplus pipe used to be is now nearest to the bottom-most expense, so hovering there lights that category. It follows the "nearest flow, always one lit" rule you chose, but tell me if it feels wrong — the alternative is to resolve that region to the surplus instead.
+- [ ] **The tail is labelled "Surplus", not "Unspent".** I kept the existing word: it is already translated into all 34 languages and means the same thing. Say the word if you want "Unspent" and I will add the key.

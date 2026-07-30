@@ -375,7 +375,11 @@ enum ReportChartRenderer {
             guard let node else { return palette.brand }
             switch node.role {
             // The print palette's emerald, not the app's — `WCColor.primary` is unreadable on white.
-            case .hub, .surplus, .income: return palette.brand
+            case .hub: return palette.brand
+            // The unspent tail of the hub, not a category — muted so it reads as a remainder in
+            // print exactly as it does on screen.
+            case .surplus: return palette.inkSecondary
+            case .income: return palette.brand
             case .shortfall: return palette.negative
             // `+ 1` skips the palette's emerald, which is `brand` — the colour this chart reserves
             // for income, the hub and the surplus. Without the offset the largest expense category

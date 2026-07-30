@@ -227,10 +227,28 @@ enum SankeyLayout {
         // One scale for the whole diagram, sized so the *most crowded* column fits. Using a single
         // scale is what keeps every ribbon a constant thickness end to end; sizing it to the worst
         // column is what keeps that column inside the rect.
-        let columns = [inflows.count, outflows.count].filter { $0 > 0 }
-        let usableHeights = columns.map { rect.height - CGFloat($0 - 1) * config.nodeSpacing }
-        guard let usableHeight = usableHeights.min(), usableHeight > 0 else { return Resolved() }
-        let scale = usableHeight / total
+        //
+        // The surplus is deliberately NOT drawn as a flow. It is the money that never left, so it
+        // gets no pipe and no bar in the right column; it becomes the unspent tail of the hub
+        // instead. It stays in the model, so `outflows.sum == hub` still holds and the ribbons plus
+        // that tail still account for every unit entering the hub.
+        let drawnOutflows = outflows.filter { $0.role != .surplus }
+        let spentValue = drawnOutflows.reduce(0.0) { $0 + $1.value }
+
+        // Each column is measured against its OWN sum, because with the surplus withdrawn the two
+        // sides no longer carry the same total. Taking the tightest result keeps one scale for the
+        // whole diagram — so a ribbon's width still means the same thing wherever it is — while
+        // guaranteeing the busier column still fits.
+        let columnLoads: [(count: Int, sum: CGFloat)] = [
+            (inflows.count, total),
+            (drawnOutflows.count, CGFloat(spentValue))
+        ].filter { $0.count > 0 && $0.sum > 0 }
+        let candidates = columnLoads.compactMap { load -> CGFloat? in
+            let usable = rect.height - CGFloat(load.count - 1) * config.nodeSpacing
+            guard usable > 0 else { return nil }
+            return usable / load.sum
+        }
+        guard let scale = candidates.min(), scale > 0, scale.isFinite else { return Resolved() }
         let flowHeight = total * scale
 
         // Horizontal bands.
@@ -270,23 +288,54 @@ enum SankeyLayout {
             scale: scale,
             config: config
         )
+        let hasUnspent = outflows.contains { $0.role == .surplus }
         let outflowFrames = stack(
-            outflows,
+            drawnOutflows,
             x: rightNodeX,
             width: config.nodeWidth,
             in: rect,
             scale: scale,
-            config: config
+            config: config,
+            topY: hasUnspent ? hubRect.minY : nil
         )
+
+        // The hub splits. Its `flowRect` is the whole bar — the inflow ribbons tile all of it, and
+        // that is what every ribbon attaches to. Its `rect` is only the *spent* part, so renderers
+        // draw solid bar exactly where money left and leave the rest to the unspent frame below.
+        let spentHeight = min(hubRect.height, CGFloat(spentValue) * scale)
+        let spentRect = CGRect(x: hubRect.minX, y: hubRect.minY, width: hubRect.width, height: spentHeight)
         let hubFrame = NodeFrame(
             id: sankey.hub.id,
-            rect: hubRect,
+            rect: spentRect,
             flowRect: hubRect,
             role: .hub,
             value: sankey.hub.value,
             isFloored: false
         )
         resolved.nodes = inflowFrames + [hubFrame] + outflowFrames
+
+        // The unspent tail: a real frame, so it hovers and reports like any other element, but with
+        // no ribbon and no place in the right column.
+        var unspentFrame: NodeFrame?
+        if let surplus = outflows.first(where: { $0.role == .surplus }),
+           hubRect.maxY - spentRect.maxY > 0.5 {
+            let tail = CGRect(
+                x: hubRect.minX,
+                y: spentRect.maxY,
+                width: hubRect.width,
+                height: hubRect.maxY - spentRect.maxY
+            )
+            let frame = NodeFrame(
+                id: surplus.id,
+                rect: tail,
+                flowRect: tail,
+                role: .surplus,
+                value: surplus.value,
+                isFloored: false
+            )
+            unspentFrame = frame
+            resolved.nodes.append(frame)
+        }
 
         // MARK: Ribbons
         //
@@ -364,22 +413,27 @@ enum SankeyLayout {
         let hubLabelX = hubRect.maxX + config.labelInset
         let hubLabelWidth = min(labelWidth, rightLabelX - hubLabelX - config.labelInset)
         var hubLabels: [Label] = []
+        var hubCrowded = false
         if hubLabelWidth >= config.minimumLabelWidth, rect.height >= config.labelHeight {
-            let hubLabelY = min(
-                max(hubRect.midY - config.labelHeight / 2, rect.minY),
-                rect.maxY - config.labelHeight
+            // Two entries whenever there is an unspent tail: the period total centred on the spent
+            // part of the bar, and the surplus centred on the tail. They go through the same
+            // de-collision pass as any other column instead of being placed blind — on a
+            // high-savings month the spent part is a sliver at the very top, so the two would
+            // otherwise land on top of each other.
+            let hubColumn = [hubFrame] + (unspentFrame.map { [$0] } ?? [])
+            let placed = placeLabels(
+                for: hubColumn,
+                x: hubLabelX,
+                width: hubLabelWidth,
+                alignment: .leading,
+                bounds: bounds,
+                config: config
             )
-            hubLabels = [
-                Label(
-                    id: sankey.hub.id,
-                    rect: CGRect(x: hubLabelX, y: hubLabelY, width: hubLabelWidth, height: config.labelHeight),
-                    alignment: .leading,
-                    isDisplaced: false
-                )
-            ]
+            hubLabels = placed.labels
+            hubCrowded = placed.isCrowded
         }
         resolved.labels = leftLabels.labels + hubLabels + rightLabels.labels
-        resolved.isCrowded = leftLabels.isCrowded || rightLabels.isCrowded
+        resolved.isCrowded = leftLabels.isCrowded || rightLabels.isCrowded || hubCrowded
 
         return resolved
     }
@@ -474,12 +528,18 @@ enum SankeyLayout {
         width: CGFloat,
         in rect: CGRect,
         scale: CGFloat,
-        config: Config
+        config: Config,
+        topY: CGFloat? = nil
     ) -> [NodeFrame] {
         guard !nodes.isEmpty else { return [] }
         let flowHeights = nodes.map { max(0, CGFloat($0.value) * scale) }
         let totalHeight = flowHeights.reduce(0, +) + CGFloat(nodes.count - 1) * config.nodeSpacing
-        var cursor = rect.midY - totalHeight / 2
+        // `topY` pins the column instead of centring it. The spending column uses it whenever
+        // there is an unspent tail: money leaves the top of the hub, so it should arrive at the top
+        // of the column too. Centred, the ribbons dived from the hub's top edge down to a column
+        // floating in the middle, and the empty space was split top and bottom instead of reading
+        // as the one contiguous "not spent" region it actually is.
+        var cursor = topY ?? (rect.midY - totalHeight / 2)
 
         return zip(nodes, flowHeights).map { node, height in
             let flowRect = CGRect(x: x, y: cursor, width: width, height: height)

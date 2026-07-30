@@ -71,20 +71,30 @@ final class SankeyLayoutTests: XCTestCase {
         guard let hub = resolved.node(id: sankey.hub.id) else {
             return XCTFail("hub frame missing", file: file, line: line)
         }
+        // `flowRect` is the whole bar; `rect` is only the part money actually left from.
         if mode == .full {
-            var cursor = hub.rect.minY
+            var cursor = hub.flowRect.minY
             for ribbon in resolved.ribbons.filter({ $0.targetID == sankey.hub.id }).sorted(by: { $0.targetTop.y < $1.targetTop.y }) {
                 XCTAssertEqual(ribbon.targetTop.y, cursor, accuracy: 1e-6, "inbound ribbon abuts the previous", file: file, line: line)
                 cursor = ribbon.targetBottom.y
             }
-            XCTAssertEqual(cursor, hub.rect.maxY, accuracy: 1e-6, "inbound stack fills the hub", file: file, line: line)
+            XCTAssertEqual(cursor, hub.flowRect.maxY, accuracy: 1e-6, "inbound stack fills the whole hub", file: file, line: line)
         }
-        var cursor = hub.rect.minY
+        // The surplus is not piped — it is the hub's unspent tail — so outbound ribbons tile only
+        // the spent part, and ribbons + tail together still account for the whole bar.
+        XCTAssertFalse(resolved.ribbons.contains { $0.targetID == "surplus" }, "the surplus has no ribbon", file: file, line: line)
+        var cursor = hub.flowRect.minY
         for ribbon in resolved.ribbons.filter({ $0.sourceID == sankey.hub.id }).sorted(by: { $0.sourceTop.y < $1.sourceTop.y }) {
             XCTAssertEqual(ribbon.sourceTop.y, cursor, accuracy: 1e-6, "outbound ribbon abuts the previous", file: file, line: line)
             cursor = ribbon.sourceBottom.y
         }
-        XCTAssertEqual(cursor, hub.rect.maxY, accuracy: 1e-6, "outbound stack fills the hub", file: file, line: line)
+        XCTAssertEqual(cursor, hub.rect.maxY, accuracy: 1e-6, "outbound stack fills the spent part", file: file, line: line)
+        if let surplus = sankey.outflows.first(where: { $0.role == .surplus }),
+           let tail = resolved.node(id: surplus.id) {
+            XCTAssertEqual(tail.rect.minY, hub.rect.maxY, accuracy: 1e-6, "the tail starts where spending ends", file: file, line: line)
+            XCTAssertEqual(tail.rect.maxY, hub.flowRect.maxY, accuracy: 1e-6, "the tail closes the hub", file: file, line: line)
+            XCTAssertEqual(tail.rect.minX, hub.rect.minX, accuracy: 1e-6, "the tail sits on the hub", file: file, line: line)
+        }
     }
 
     private func assertNoOverlap(_ resolved: SankeyLayout.Resolved, file: StaticString = #filePath, line: UInt = #line) {
@@ -183,7 +193,7 @@ final class SankeyLayoutTests: XCTestCase {
         XCTAssertEqual(tight.nodes.count, sankey.inflows.count + sankey.outflows.count + 1, "every bar is still drawn")
 
         // What survives is the largest flows.
-        let kept = tight.labels.compactMap { tight.node(id: $0.id) }.filter { $0.role != .hub }
+        let kept = tight.labels.compactMap { tight.node(id: $0.id) }.filter { $0.role == .expense }
         if let smallestKept = kept.map(\.value).min() {
             let dropped = tight.nodes
                 .filter { $0.role != .hub }
@@ -241,11 +251,22 @@ final class SankeyLayoutTests: XCTestCase {
             XCTAssertNotNil(id, "every point inside the diagram resolves to a flow")
             if let id { owned[id, default: 0] += 1 }
         }
-        for node in sankey.outflows {
+        for node in sankey.outflows where node.role != .surplus {
             XCTAssertGreaterThanOrEqual(
                 owned[node.id] ?? 0, 10,
                 "\(node.id) must own a pointable band (has \(owned[node.id] ?? 0)pt)"
             )
+        }
+        XCTAssertNil(owned["surplus"], "the surplus no longer occupies the outflow fan")
+
+        // It is reachable on the hub instead.
+        if let tail = resolved.node(id: "surplus") {
+            XCTAssertEqual(
+                SankeyLayout.hitTest(resolved, at: CGPoint(x: tail.rect.midX, y: tail.rect.midY), hubID: sankey.hub.id),
+                "surplus", "the unspent tail is hoverable"
+            )
+        } else {
+            XCTFail("a 93.6% surplus month should have an unspent tail")
         }
     }
 
@@ -259,7 +280,7 @@ final class SankeyLayoutTests: XCTestCase {
 
         // Deep inside a band still resolves to that band — the inflation is a near-miss rule only.
         XCTAssertEqual(
-            SankeyLayout.hitTest(resolved, at: CGPoint(x: hub.rect.maxX + 30, y: surplus.flowRect.midY), hubID: sankey.hub.id),
+            SankeyLayout.hitTest(resolved, at: CGPoint(x: surplus.rect.midX, y: surplus.rect.midY), hubID: sankey.hub.id),
             "surplus"
         )
         XCTAssertEqual(
