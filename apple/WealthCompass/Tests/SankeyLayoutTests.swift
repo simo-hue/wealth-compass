@@ -211,6 +211,107 @@ final class SankeyLayoutTests: XCTestCase {
         XCTAssertTrue(SankeyLayout.resolve(model([]), in: rect).nodes.isEmpty, "an empty model draws nothing")
     }
 
+    // MARK: - Hit testing
+
+    /// The bug this replaced: with Salary at 91% and Surplus at 94%, the pointer landed on the
+    /// dominant flow almost everywhere, and a 0.7% category was a 2.5pt band nothing could hit —
+    /// so in practice only the labels were reachable.
+    private var dominantSurplusMonth: [Transaction] {
+        [
+            tx(.income, 2498, "Salary"), tx(.income, 200, "Gift"), tx(.income, 50, "Other"),
+            tx(.expense, 157.07, "Food"), tx(.expense, 18.95, "Transport"),
+        ]
+    }
+
+    func testEveryFlowIsReachableEvenWhenOneDominates() {
+        let sankey = model(dominantSurplusMonth)
+        let bounds = CGRect(x: 0, y: 0, width: 1250, height: 384)
+        let resolved = SankeyLayout.resolve(sankey, in: bounds)
+        guard let hub = resolved.node(id: sankey.hub.id) else { return XCTFail("no hub") }
+
+        // Sanity: the geometry really is this lopsided, or the test proves nothing.
+        let transport = resolved.node(id: "expense-cat-Transport")
+        XCTAssertLessThan(transport?.flowRect.height ?? .infinity, 4, "Transport is a hairline ribbon")
+
+        // Sweep the outflow fan and tally who owns each point.
+        let sweepX = hub.rect.maxX + (bounds.maxX - hub.rect.maxX) * 0.45
+        var owned: [String: Int] = [:]
+        for y in stride(from: bounds.minY + 0.5, to: bounds.maxY, by: 1) {
+            let id = SankeyLayout.hitTest(resolved, at: CGPoint(x: sweepX, y: y), hubID: sankey.hub.id)
+            XCTAssertNotNil(id, "every point inside the diagram resolves to a flow")
+            if let id { owned[id, default: 0] += 1 }
+        }
+        for node in sankey.outflows {
+            XCTAssertGreaterThanOrEqual(
+                owned[node.id] ?? 0, 10,
+                "\(node.id) must own a pointable band (has \(owned[node.id] ?? 0)pt)"
+            )
+        }
+    }
+
+    func testHitTestKeepsTheGeometryHonest() {
+        let sankey = model(dominantSurplusMonth)
+        let resolved = SankeyLayout.resolve(sankey, in: CGRect(x: 0, y: 0, width: 1250, height: 384))
+        guard let hub = resolved.node(id: sankey.hub.id),
+              let surplus = resolved.node(id: "surplus"),
+              let salary = resolved.node(id: "income-cat-Salary")
+        else { return XCTFail("missing frames") }
+
+        // Deep inside a band still resolves to that band — the inflation is a near-miss rule only.
+        XCTAssertEqual(
+            SankeyLayout.hitTest(resolved, at: CGPoint(x: hub.rect.maxX + 30, y: surplus.flowRect.midY), hubID: sankey.hub.id),
+            "surplus"
+        )
+        XCTAssertEqual(
+            SankeyLayout.hitTest(resolved, at: CGPoint(x: hub.rect.minX - 30, y: salary.flowRect.midY), hubID: sankey.hub.id),
+            "income-cat-Salary"
+        )
+    }
+
+    func testHitTestNeverCrossesBetweenColumns() {
+        let sankey = model(dominantSurplusMonth)
+        let bounds = CGRect(x: 0, y: 0, width: 1250, height: 384)
+        let resolved = SankeyLayout.resolve(sankey, in: bounds)
+        guard let hub = resolved.node(id: sankey.hub.id) else { return XCTFail("no hub") }
+        let inflowIDs = Set(sankey.inflows.map(\.id))
+        let outflowIDs = Set(sankey.outflows.map(\.id))
+
+        for y in stride(from: bounds.minY + 2, to: bounds.maxY, by: 5) {
+            if let id = SankeyLayout.hitTest(resolved, at: CGPoint(x: hub.rect.minX - 20, y: y), hubID: sankey.hub.id) {
+                XCTAssertFalse(outflowIDs.contains(id), "left of the hub resolved to an outflow: \(id)")
+            }
+            if let id = SankeyLayout.hitTest(resolved, at: CGPoint(x: hub.rect.maxX + 20, y: y), hubID: sankey.hub.id) {
+                XCTAssertFalse(inflowIDs.contains(id), "right of the hub resolved to an inflow: \(id)")
+            }
+        }
+    }
+
+    func testLabelsAndBarsWinAsExplicitTargets() {
+        let sankey = model(typicalMonth)
+        let resolved = SankeyLayout.resolve(sankey, in: rect)
+        for label in resolved.labels {
+            XCTAssertEqual(
+                SankeyLayout.hitTest(resolved, at: CGPoint(x: label.rect.midX, y: label.rect.midY), hubID: sankey.hub.id),
+                label.id, "pointing at \(label.id)'s label"
+            )
+        }
+        for node in resolved.nodes where node.role != .hub {
+            XCTAssertEqual(
+                SankeyLayout.hitTest(resolved, at: CGPoint(x: node.rect.midX, y: node.rect.midY), hubID: sankey.hub.id),
+                node.id, "pointing at \(node.id)'s bar"
+            )
+        }
+    }
+
+    func testHitTestRejectsNonFiniteAndEmptyInput() {
+        let sankey = model(typicalMonth)
+        let resolved = SankeyLayout.resolve(sankey, in: rect)
+        XCTAssertNil(SankeyLayout.hitTest(resolved, at: CGPoint(x: CGFloat.nan, y: 10), hubID: sankey.hub.id))
+        XCTAssertNil(SankeyLayout.hitTest(resolved, at: CGPoint(x: 10, y: CGFloat.infinity), hubID: sankey.hub.id))
+        XCTAssertNil(SankeyLayout.hitTest(SankeyLayout.Resolved(), at: .zero, hubID: sankey.hub.id))
+        XCTAssertNil(SankeyLayout.hitTest(resolved, at: .zero, hubID: "not-a-node"))
+    }
+
     func testLayoutIsDeterministic() {
         let sankey = model(typicalMonth)
         XCTAssertEqual(SankeyLayout.resolve(sankey, in: rect), SankeyLayout.resolve(sankey, in: rect))

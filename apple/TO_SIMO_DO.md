@@ -23,3 +23,8 @@
 - [ ] **Export a PDF report** and check the new `Money Flow` block in the Cash Flow section prints legibly, including in greyscale.
 - [ ] **Review the new translations.** 15 new keys were added to `Localizable.xcstrings` across all 34 non-source languages and marked `translated`. They are my translations, not a professional pass — the financial terms in particular ("Surplus", "Drawn from Savings", "Smaller categories") are worth a skim in the languages you read.
 - [ ] **Discard the spun-off `expensesByCategory` NaN task if it is still open.** That fix was applied directly in the main session (`AnalyticsEngine.expensesByCategory` now filters non-finite sums, with a regression test in `AnalyticsEngineTests`), so a second session working on it would conflict.
+
+## Money Flow — hover fix + visual pass (2026-07-30)
+- [ ] **Re-check hover on the Mac mini.** The 2.5pt-ribbon problem is fixed and measured headlessly, but pointer feel is the one thing a harness cannot judge. Confirm that sweeping the pointer down the right-hand side steps cleanly through Food → Transport → Surplus, that the left side steps through the income sources, and that clicking still drills through to the filtered transaction list.
+- [ ] **Sanity-check the new card height.** It is now `0.30 × width` (clamped 280–520pt), so the Cash Flow page got noticeably taller. If it pushes Recent Activity / Recurring too far down for your taste, the multiplier is one number in `SankeyDiagramView.diagramHeight`.
+- [ ] **Look at the greyscale PDF again.** The income ramp is new and was chosen for luminance separation, but only a real print will confirm Dividends vs Salary vs Freelance stay distinguishable.

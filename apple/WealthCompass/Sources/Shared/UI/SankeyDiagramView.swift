@@ -5,8 +5,12 @@ import SwiftUI
 ///
 /// Geometry comes entirely from `SankeyLayout`, which is pure and unit-tested; this view only
 /// styles it. Ribbons are `Shape`s rather than a single `Canvas` pass so that they morph when the
-/// period changes, so hover hit-testing is per-ribbon with no hand-written point-in-shape maths,
-/// and so each flow is its own accessibility element.
+/// period changes and so each flow can carry its own accessibility element.
+///
+/// Pointer handling is deliberately *not* per-shape. Every drawn layer opts out of hit-testing and
+/// a single transparent overlay resolves the pointer through `SankeyLayout.hitTest` — see that
+/// method for why stacked `contentShape` modifiers cannot work on a chart whose elements span
+/// three orders of magnitude in thickness.
 struct SankeyDiagramView: View {
     let sankey: CashFlowSankey
     let settings: AppSettings
@@ -15,9 +19,11 @@ struct SankeyDiagramView: View {
     /// Called when a node backed by real transactions is clicked. Nil disables drill-through.
     var onSelect: ((CashFlowSankeyNode) -> Void)?
 
-    /// Id of the hovered node, or of a ribbon's non-hub endpoint when a ribbon is hovered — both
-    /// resolve to "which flow is the user pointing at".
+    /// Id of the flow the pointer resolved to, from the single overlay hit-test.
     @State private var hovered: String?
+    /// Drives `diagramHeight`. Measured rather than taken from the inner `GeometryReader`, because
+    /// the height has to be known to *propose* a size to that reader in the first place.
+    @State private var measuredWidth: CGFloat = 0
 
     private var nodesByID: [String: CashFlowSankeyNode] {
         Dictionary(sankey.nodes.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
@@ -69,15 +75,57 @@ struct SankeyDiagramView: View {
                 bars(layout)
                 labels(layout)
             }
+            // Exactly one hit-testing layer for the whole chart. Every drawn element opts out and
+            // the overlay below resolves the pointer geometrically against the resolved layout —
+            // see `SankeyLayout.hitTest` for why per-shape `contentShape` cannot work here.
+            .allowsHitTesting(false)
+            .overlay {
+                Rectangle()
+                    .fill(.clear)
+                    .contentShape(Rectangle())
+                    .onContinuousHover { phase in
+                        switch phase {
+                        case .active(let point):
+                            updateHover(SankeyLayout.hitTest(layout, at: point, hubID: sankey.hub.id))
+                        case .ended:
+                            updateHover(nil)
+                        }
+                    }
+                    // The pointer already resolved a flow on the way in, so a click needs no
+                    // second hit-test — it acts on whatever is currently lit.
+                    .onTapGesture {
+                        if let id = hovered, let node = nodesByID[id] { select(node) }
+                    }
+                    .accessibilityHidden(true)
+            }
             .animation(.spring(response: 0.45, dampingFraction: 0.86), value: sankey)
         }
-        // Headroom above the bare minimum. `minimumHeight` is the point at which labels merely
-        // stop being *dropped*; laying out at exactly that value leaves most of them shunted off
-        // their bars by the de-collision pass, because a long tail's desired positions all bunch
-        // together. The extra third buys back most of that slack.
-        .frame(minHeight: max(240, minimumDiagramHeight * 1.35))
+        .frame(height: diagramHeight)
+        .background {
+            GeometryReader { proxy in
+                Color.clear.preference(key: SankeyWidthKey.self, value: proxy.size.width)
+            }
+        }
+        .onPreferenceChange(SankeyWidthKey.self) { width in
+            guard width.isFinite, abs(width - measuredWidth) > 0.5 else { return }
+            measuredWidth = width
+        }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text("Money Flow"))
+    }
+
+    /// A Sankey reads as *flow* at roughly 3:1. Left to fill a wide window at a fixed minimum the
+    /// card became a 6:1 letterbox in which the ribbons flatten into horizontal bars and the curve —
+    /// the entire point of the chart — disappears. So height tracks width instead of standing still,
+    /// which also hands the long tail's labels their own slots back rather than leaving them
+    /// shunted onto leader lines.
+    ///
+    /// The label requirement still wins outright: `minimumHeight` is where labels merely stop being
+    /// *dropped*, and laying out at exactly that leaves most of them displaced, so it carries a
+    /// third again as headroom.
+    private var diagramHeight: CGFloat {
+        let aspect = min(520, max(280, measuredWidth * 0.30))
+        return max(aspect, minimumDiagramHeight * 1.35)
     }
 
     // MARK: - Layers
@@ -86,30 +134,35 @@ struct SankeyDiagramView: View {
         let nodes = nodesByID
         return ForEach(layout.ribbons) { ribbon in
             let shape = RibbonShape(ribbon: ribbon)
-            shape
-                .fill(
+            let endpoint = nodes[ribbon.sourceID == sankey.hub.id ? ribbon.targetID : ribbon.sourceID]
+            let remainder = endpoint.map(isRemainder) ?? false
+            ZStack {
+                shape.fill(
                     LinearGradient(
-                        colors: [
-                            color(for: nodes[ribbon.sourceID]).opacity(0.42),
-                            color(for: nodes[ribbon.targetID]).opacity(0.42)
-                        ],
+                        // The category's own colour is held across most of the ribbon and only
+                        // blends into the hub's green near the middle. A plain end-to-end gradient
+                        // dragged every inflow towards the hub's green, which undid the whole point
+                        // of grading the income side — five sources came out as one mass.
+                        stops: gradientStops(for: ribbon, nodes: nodes, remainder: remainder),
                         startPoint: .leading,
                         endPoint: .trailing
                     )
                 )
-                // The dim lives on a view modifier, not in the gradient's stops: SwiftUI does not
-                // interpolate a `ShapeStyle` change, so folding it into the fill would make the
-                // ribbons pop while the bars and labels cross-fade around them.
-                .opacity(isLit(ribbon) ? 1 : 0.24)
-                .contentShape(shape)
-                .onContinuousHover { phase in
-                    // Attribute the hover to the non-hub end: hovering a ribbon means "this flow",
-                    // and the hub is on every flow.
-                    updateHover(phase, id: ribbon.sourceID == sankey.hub.id ? ribbon.targetID : ribbon.sourceID)
+                // Outlined rather than filled. It keeps its true proportional width — the diagram
+                // never lies about magnitude — but on a high-savings month the surplus is
+                // legitimately 94% of the chart, and at equal visual weight it turned the whole
+                // card into one green mass with the actual spending buried inside it.
+                if remainder {
+                    shape.stroke(color(for: endpoint).opacity(0.8), lineWidth: 1)
                 }
-                // The node's own label already announces the flow, with its share and its action.
-                // Making ribbons elements too would read every flow twice.
-                .accessibilityHidden(true)
+            }
+            // The dim lives on a view modifier, not in the gradient's stops: SwiftUI does not
+            // interpolate a `ShapeStyle` change, so folding it into the fill would make the
+            // ribbons pop while the bars and labels cross-fade around them.
+            .opacity(isLit(ribbon) ? 1 : 0.24)
+            // The node's own label already announces the flow, with its share and its action.
+            // Making ribbons elements too would read every flow twice.
+            .accessibilityHidden(true)
         }
     }
 
@@ -146,22 +199,20 @@ struct SankeyDiagramView: View {
 
     @ViewBuilder
     private func barBody(_ node: CashFlowSankeyNode, _ frame: SankeyLayout.NodeFrame) -> some View {
-        let bar = RoundedRectangle(cornerRadius: min(3, frame.rect.width / 2), style: .continuous)
-            .fill(color(for: node))
-            .opacity(isLit(frame.id) ? 1 : 0.32)
-            .frame(width: frame.rect.width, height: frame.rect.height)
-            // A floored bar is only 5pt tall; widen the hit region so pointing at it is realistic.
-            .contentShape(Rectangle().inset(by: -6))
-            .onContinuousHover { updateHover($0, id: frame.id) }
-            // The label carries the accessibility element for this node, so the bar stays silent
-            // rather than announcing everything twice.
-            .accessibilityHidden(true)
-
-        if isDrillable(node) {
-            bar.onTapGesture { select(node) }
-        } else {
-            bar
+        let corner = RoundedRectangle(cornerRadius: min(3, frame.rect.width / 2), style: .continuous)
+        Group {
+            if isRemainder(node) {
+                corner.fill(color(for: node).opacity(0.28))
+                    .overlay(corner.stroke(color(for: node).opacity(0.85), lineWidth: 1))
+            } else {
+                corner.fill(color(for: node))
+            }
         }
+        .opacity(isLit(frame.id) ? 1 : 0.32)
+        .frame(width: frame.rect.width, height: frame.rect.height)
+        // The label carries the accessibility element for this node, so the bar stays silent
+        // rather than announcing everything twice.
+        .accessibilityHidden(true)
     }
 
     private func labels(_ layout: SankeyLayout.Resolved) -> some View {
@@ -185,8 +236,6 @@ struct SankeyDiagramView: View {
                 alignment: label.alignment == .trailing ? .trailing : .leading
             )
             .opacity(isLit(label.id) ? 1 : 0.38)
-            .contentShape(Rectangle())
-            .onContinuousHover { updateHover($0, id: label.id) }
             .accessibilityElement(children: .combine)
             .accessibilityLabel(Text(node.title))
             .accessibilityValue(Text(accessibilityValue(for: node)))
@@ -194,7 +243,6 @@ struct SankeyDiagramView: View {
 
         if isDrillable(node) {
             base
-                .onTapGesture { select(node) }
                 .accessibilityAddTraits(.isButton)
                 // Only offered where it does something — the hub and Surplus have no rows behind
                 // them, and an action that silently no-ops is worse than no action.
@@ -219,6 +267,16 @@ struct SankeyDiagramView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
         }
+        // Labels sit over the ribbon field — the flows run the full width, under the gutters — so
+        // without a scrim the hub's total in particular was unreadable against the mass of colour
+        // behind it. Fitted to the text, not to the label slot, so it stays a soft backing rather
+        // than a row of dark blocks.
+        .padding(.horizontal, 5)
+        .padding(.vertical, 2)
+        .background(
+            RoundedRectangle(cornerRadius: 5, style: .continuous)
+                .fill(WCColor.background.opacity(0.62))
+        )
         .frame(maxWidth: .infinity, alignment: isTrailingColumn(node) ? .trailing : .leading)
     }
 
@@ -273,12 +331,19 @@ struct SankeyDiagramView: View {
         // one would otherwise come out green and read as a real source.
         if node.isFolded { return ColorPalette.flowFolded }
         switch node.role {
-        // One green for everything on the income side: "money in" is the signal that matters, and
-        // there are rarely more than three sources to tell apart.
-        case .hub, .surplus, .income:
+        case .hub:
             return WCColor.primary
+        case .surplus:
+            return ColorPalette.flowRemainder
+        // The shortfall keeps its amber even though it is drawn in the same recessive outlined
+        // style as the surplus: it is structurally a remainder, but it is also the one thing on
+        // this chart that is *bad news*, and quieting the hue as well would bury it.
         case .shortfall:
             return WCColor.warning
+        case .income:
+            return node.colorIndex
+                .map { ColorPalette.chartFlowIncome[$0 % ColorPalette.chartFlowIncome.count] }
+                ?? WCColor.primary
         case .expense:
             return node.colorIndex
                 .map { ColorPalette.chartFlow[$0 % ColorPalette.chartFlow.count] }
@@ -289,6 +354,35 @@ struct SankeyDiagramView: View {
     /// A node can be drilled into only when it is backed by real rows *and* someone is listening.
     private func isDrillable(_ node: CashFlowSankeyNode) -> Bool {
         node.isDrillable && onSelect != nil
+    }
+
+    /// Ribbon gradient stops. The non-hub end owns most of the run so each flow keeps its identity;
+    /// only the stretch nearest the hub blends towards the hub's green.
+    private func gradientStops(
+        for ribbon: SankeyLayout.Ribbon,
+        nodes: [String: CashFlowSankeyNode],
+        remainder: Bool
+    ) -> [Gradient.Stop] {
+        // Quiet enough to stop dominating, solid enough to still read as a flow — at a lower alpha
+        // the surplus band turned into a hole in the middle of the card.
+        let alpha: Double = remainder ? 0.2 : 0.42
+        let source = color(for: nodes[ribbon.sourceID]).opacity(alpha)
+        let target = color(for: nodes[ribbon.targetID]).opacity(alpha)
+        // Inflows run category -> hub, outflows hub -> category, so which end to hold flips.
+        if ribbon.targetID == sankey.hub.id {
+            return [.init(color: source, location: 0),
+                    .init(color: source, location: 0.55),
+                    .init(color: target, location: 1)]
+        }
+        return [.init(color: source, location: 0),
+                .init(color: target, location: 0.45),
+                .init(color: target, location: 1)]
+    }
+
+    /// Surplus and shortfall: the balancing term that makes the diagram conserve flow, not a
+    /// category anyone spent money on. Drawn outlined instead of filled so it stops competing.
+    private func isRemainder(_ node: CashFlowSankeyNode) -> Bool {
+        node.role == .surplus || node.role == .shortfall
     }
 
     private func isSynthetic(_ node: CashFlowSankeyNode) -> Bool {
@@ -323,15 +417,9 @@ struct SankeyDiagramView: View {
         return hovered == ribbon.sourceID || hovered == ribbon.targetID
     }
 
-    private func updateHover(_ phase: HoverPhase, id: String) {
-        switch phase {
-        case .active:
-            guard hovered != id else { return }
-            withAnimation(.easeInOut(duration: 0.15)) { hovered = id }
-        case .ended:
-            guard hovered == id else { return }
-            withAnimation(.easeInOut(duration: 0.15)) { hovered = nil }
-        }
+    private func updateHover(_ id: String?) {
+        guard hovered != id else { return }
+        withAnimation(.easeInOut(duration: 0.15)) { hovered = id }
     }
 
     private func select(_ node: CashFlowSankeyNode) {
@@ -436,5 +524,13 @@ private struct RibbonShape: Shape {
         )
         path.closeSubpath()
         return path
+    }
+}
+
+/// Carries the card's width up so the diagram can set a height proportional to it.
+private struct SankeyWidthKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
