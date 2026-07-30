@@ -70,9 +70,37 @@ enum ColorPalette {
         .brown
     ]
 
+    /// The income side of the Money Flow diagram, largest first.
+    ///
+    /// All one hue family, because "green = money coming in" is the signal the whole colour scheme
+    /// is built around and a multi-hue income column would destroy it. Within that constraint the
+    /// steps alternate light and dark rather than walking a smooth ramp: adjacent entries are what
+    /// actually touch each other in the column, so alternating buys far more separation than a
+    /// monotonic gradient, and the resulting luminance spread is what lets the flows stay
+    /// distinguishable in the greyscale PDF report.
+    static let chartFlowIncome: [Color] = [
+        WCColor.primary,                              // vivid — the largest source
+        Color(red: 0.04, green: 0.52, blue: 0.40),    // deep forest
+        Color(red: 0.48, green: 0.90, blue: 0.73),    // pale mint
+        Color(red: 0.09, green: 0.68, blue: 0.62),    // teal green
+        Color(red: 0.30, green: 0.60, blue: 0.38),    // olive green
+        Color(red: 0.70, green: 0.95, blue: 0.85),    // palest mint
+        Color(red: 0.02, green: 0.38, blue: 0.30),    // darkest forest
+        Color(red: 0.20, green: 0.80, blue: 0.68)     // bright sea green
+    ]
+
     /// The "Smaller categories" bucket — deliberately neutral, mirroring how the reference
     /// implementation greys out its residual node.
     static let flowFolded = Color(red: 0.45, green: 0.48, blue: 0.55)
+
+    /// Surplus and "Drawn from Savings" — the balancing remainder, not a category.
+    ///
+    /// It keeps its true proportional width (the diagram never lies about magnitude), but it is
+    /// drawn as a quiet outlined band in this desaturated tone instead of solid brand green. On a
+    /// high-savings month the surplus is legitimately most of the diagram; rendering it at equal
+    /// visual weight made the whole card one green mass and buried the two or three expense
+    /// categories the reader actually came to see.
+    static let flowRemainder = Color(red: 0.36, green: 0.62, blue: 0.55)
 
     // L56: span distinct, colorblind-safer hue families (one warm accent, cool anchors) instead of a
     // warm-only ramp with two adjacent oranges + two reds — consecutive entries differ in hue AND

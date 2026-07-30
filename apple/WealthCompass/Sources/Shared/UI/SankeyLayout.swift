@@ -45,6 +45,9 @@ enum SankeyLayout {
         /// Where the Bezier control points sit along the horizontal span, as a fraction of it.
         /// 0.5 gives the symmetric S-curve of the reference.
         var curvature: CGFloat = 0.5
+        /// The band every flow is guaranteed for *pointing* purposes, independent of how thin it is
+        /// drawn. Affects `hitTest` only — never the geometry.
+        var minimumHitThickness: CGFloat = 12
 
         static let standard = Config()
 
@@ -115,6 +118,60 @@ enum SankeyLayout {
         let controlOffset: CGFloat
 
         var thickness: CGFloat { sourceBottom.y - sourceTop.y }
+
+        /// The vertical band this ribbon occupies at a given x, clamped to its two ends so a point
+        /// out in the label gutter still resolves against the nearest end rather than nothing.
+        ///
+        /// Both edges of a ribbon share one x-curve and differ only by a constant y offset, so the
+        /// band is `topEdge(x) ... topEdge(x) + thickness`.
+        func verticalSpan(atX x: CGFloat) -> ClosedRange<CGFloat>? {
+            guard sourceTop.x.isFinite, targetTop.x.isFinite,
+                  sourceTop.y.isFinite, targetTop.y.isFinite,
+                  thickness.isFinite, controlOffset.isFinite
+            else { return nil }
+
+            let height = max(0, thickness)
+            let lower = min(sourceTop.x, targetTop.x)
+            let upper = max(sourceTop.x, targetTop.x)
+            guard upper - lower > 0.0001 else {
+                let top = min(sourceTop.y, targetTop.y)
+                return top...(top + height)
+            }
+
+            let t = curveParameter(forX: min(max(x, lower), upper))
+            let inv = 1 - t
+            // The control points share their endpoints' y, so the y-curve collapses to a blend of
+            // just the two end values.
+            let top = sourceTop.y * (inv * inv * inv + 3 * inv * inv * t)
+                + targetTop.y * (3 * inv * t * t + t * t * t)
+            return top...(top + height)
+        }
+
+        /// Inverts the cubic's x-component by bisection. The x-curve is monotonic for any curvature
+        /// the layout produces, and 32 halvings resolve well below a pixel.
+        private func curveParameter(forX x: CGFloat) -> CGFloat {
+            let x0 = sourceTop.x
+            let x1 = targetTop.x
+            let c1 = x0 + controlOffset
+            let c2 = x1 - controlOffset
+
+            func xAt(_ t: CGFloat) -> CGFloat {
+                let inv = 1 - t
+                return inv * inv * inv * x0
+                    + 3 * inv * inv * t * c1
+                    + 3 * inv * t * t * c2
+                    + t * t * t * x1
+            }
+
+            var low: CGFloat = 0
+            var high: CGFloat = 1
+            let ascending = x1 >= x0
+            for _ in 0..<32 {
+                let mid = (low + high) / 2
+                if (xAt(mid) < x) == ascending { low = mid } else { high = mid }
+            }
+            return (low + high) / 2
+        }
     }
 
     struct Label: Identifiable, Equatable {
@@ -325,6 +382,73 @@ enum SankeyLayout {
         resolved.isCrowded = leftLabels.isCrowded || rightLabels.isCrowded
 
         return resolved
+    }
+
+    /// Resolves a pointer position to the flow it is pointing at, or nil when outside the diagram.
+    ///
+    /// This lives in the engine, hit-testing resolved geometry, rather than being a stack of
+    /// per-shape `contentShape` modifiers in the view — and that is a correctness decision, not a
+    /// tidiness one. Ribbon thickness spans three orders of magnitude in real data: a 0.7% flow is
+    /// a ~1pt band no pointer can land on, while a 94% surplus covers most of the plot and swallows
+    /// every hover aimed anywhere else. Containment alone therefore leaves most categories
+    /// unreachable except via their label.
+    ///
+    /// So the search runs widest-target-first — labels, then bars, then the ribbon the pointer is
+    /// inside, and finally the *nearest* ribbon in the same column. Exactly one flow resolves
+    /// anywhere inside the diagram, which makes a hairline flow reachable through all the empty
+    /// space around it while the big obvious masses still resolve to themselves.
+    static func hitTest(
+        _ resolved: Resolved,
+        at point: CGPoint,
+        hubID: String,
+        minimumHitThickness: CGFloat = Config.standard.minimumHitThickness
+    ) -> String? {
+        guard point.x.isFinite, point.y.isFinite,
+              let hub = resolved.node(id: hubID)
+        else { return nil }
+
+        // Labels draw on top and are by far the largest targets, so they win outright.
+        if let label = resolved.labels.first(where: { $0.rect.contains(point) }) {
+            return label.id
+        }
+        // Then the bars, inflated: a floored bar is 5pt tall and 11pt wide.
+        if let bar = resolved.nodes.first(where: { $0.rect.insetBy(dx: -6, dy: -6).contains(point) }) {
+            return bar.id
+        }
+
+        // Otherwise pick within the column the pointer is in. The hub's own midline splits them, so
+        // the inflow and outflow fans are never in competition.
+        let inbound = point.x < hub.rect.midX
+        let candidates = resolved.ribbons.filter { inbound ? $0.targetID == hubID : $0.sourceID == hubID }
+        guard !candidates.isEmpty else { return hub.id }
+
+        var nearest: (id: String, distance: CGFloat, thickness: CGFloat)?
+        for ribbon in candidates {
+            guard let span = ribbon.verticalSpan(atX: point.x) else { continue }
+            let endpointID = ribbon.sourceID == hubID ? ribbon.targetID : ribbon.sourceID
+            if span.contains(point.y) {
+                return endpointID          // genuinely inside a ribbon: unambiguous
+            }
+            // For the near-miss test only, inflate the band to a minimum pointable thickness. In
+            // real data a category can be 0.7% of the month — a 2.5pt ribbon — while the flow next
+            // to it is 88% and 337pt. Nearest-band alone would hand the small one only the few
+            // points of gap around it, which is still not a target anyone can hit. This guarantees
+            // every flow a usable band without touching what is *drawn*, so the picture stays
+            // proportionally honest.
+            let thickness = span.upperBound - span.lowerBound
+            let pad = max(0, (minimumHitThickness - thickness) / 2)
+            let low = span.lowerBound - pad
+            let high = span.upperBound + pad
+            let distance = point.y < low ? low - point.y : (point.y > high ? point.y - high : 0)
+            // Ties go to the thinner flow: where two inflated bands overlap, the big one is
+            // reachable across the rest of its span and the small one is not.
+            if nearest == nil
+                || distance < nearest!.distance
+                || (distance == nearest!.distance && thickness < nearest!.thickness) {
+                nearest = (endpointID, distance, thickness)
+            }
+        }
+        return nearest?.id ?? hub.id
     }
 
     /// The rect height at which every label in the busiest column still gets its own slot.
