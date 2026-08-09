@@ -19,6 +19,15 @@ protocol FinancePersistence: Sendable {
     func load() throws -> FinancePersistenceLoad?
     func save(_ data: FinancialData) throws
     func clear() throws
+
+    /// Brings an already-existing store up to the current data-protection class (WC-LOCK1).
+    /// Called after a successful load, i.e. while protected data is provably available.
+    func upgradeProtectionClassIfNeeded()
+}
+
+extension FinancePersistence {
+    /// No-op default so in-memory / test doubles don't have to care about on-disk protection.
+    func upgradeProtectionClassIfNeeded() {}
 }
 
 /// Stateless file writer (it only holds immutable configuration), so it is safe to hand to
@@ -78,6 +87,17 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
         try write(data)
     }
 
+    /// WC-LOCK1: re-stamps **only the live finance DB** with the current protection class, so an
+    /// install created before this fix stops being unreadable during a locked background launch.
+    /// See `DataProtection.upgradeProtectionClass`.
+    ///
+    /// The `.pre-cloudkit-backup` sidecar is intentionally left out: it is a verbatim copy of the
+    /// user's finance data that the app only ever *writes*, so relaxing its class would widen the
+    /// at-rest exposure of a full plaintext copy for no benefit at all.
+    func upgradeProtectionClassIfNeeded() {
+        DataProtection.upgradeProtectionClass(at: storageURL, fileManager: fileManager)
+    }
+
     func clear() throws {
         // Also remove the one-time pre-CloudKit migration backup: it is a verbatim copy of
         // the user's finance data, so a "real and complete" erase must not leave it behind.
@@ -108,9 +128,12 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
         // applies `.completeFileProtectionUnlessOpen`. The finance DB is a small JSON blob, so
         // reading it into memory to re-write with protection is cheap.
         let legacyData = try Data(contentsOf: legacyURL)
-        try legacyData.write(to: storageURL, options: [.atomic, .completeFileProtectionUnlessOpen])
+        try legacyData.write(to: storageURL, options: DataProtection.atomicWriteOptions)
     }
 
+    /// The one file that keeps `.completeFileProtectionUnlessOpen` (WC-LOCK1): it is written
+    /// exactly once, only after a successful decode (so never during a locked launch), and is
+    /// never read back by the app — so there is no reason to relax it alongside the live DB.
     private func createMigrationBackupIfNeeded(_ sourceData: Data) throws {
         let backupURL = storageURL.appendingPathExtension("pre-cloudkit-backup")
         guard !fileManager.fileExists(atPath: backupURL.path) else { return }
@@ -119,6 +142,6 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
 
     private func write(_ data: FinancialData) throws {
         let encoded = try FinanceJSONCoding.encode(data, prettyPrinted: true)
-        try encoded.write(to: storageURL, options: [.atomic, .completeFileProtectionUnlessOpen])
+        try encoded.write(to: storageURL, options: DataProtection.atomicWriteOptions)
     }
 }

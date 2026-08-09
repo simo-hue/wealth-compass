@@ -66,6 +66,11 @@
 		AD00000000000000000000AB /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000AB /* SettingsViewModel.swift */; };
 		AD00000000000000000000BB /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000AB /* SettingsViewModel.swift */; };
 		AD0000000000000000000002 /* FinancePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000002 /* FinancePersistence.swift */; };
+		BB10000000000000000A0002 /* DataProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB10000000000000000A0001 /* DataProtection.swift */; };
+		BB10000000000000000A0003 /* DataProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB10000000000000000A0001 /* DataProtection.swift */; };
+		BB10000000000000000B0002 /* FinanceDataUnavailableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB10000000000000000B0001 /* FinanceDataUnavailableView.swift */; };
+		BB10000000000000000B0003 /* FinanceDataUnavailableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB10000000000000000B0001 /* FinanceDataUnavailableView.swift */; };
+		BB10000000000000000C0002 /* DataProtectionRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB10000000000000000C0001 /* DataProtectionRecoveryTests.swift */; };
 		AD00000000000000000000E1 /* ExchangeRatePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000E1 /* ExchangeRatePersistence.swift */; };
 		AD0000000000000000000003 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000003 /* AppSettings.swift */; };
 		AD0000000000000000000004 /* FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000004 /* FinanceStore.swift */; };
@@ -173,6 +178,8 @@
 		AC00000000000000000000AA /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/OnboardingViewModel.swift; sourceTree = "<group>"; };
 		AC00000000000000000000AB /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/SettingsViewModel.swift; sourceTree = "<group>"; };
 		AC0000000000000000000002 /* FinancePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/FinancePersistence.swift; sourceTree = "<group>"; };
+		BB10000000000000000A0001 /* DataProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/DataProtection.swift; sourceTree = "<group>"; };
+		BB10000000000000000B0001 /* FinanceDataUnavailableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/FinanceDataUnavailableView.swift; sourceTree = "<group>"; };
 		AC00000000000000000000E1 /* ExchangeRatePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/ExchangeRatePersistence.swift; sourceTree = "<group>"; };
 		AC0000000000000000000003 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/AppSettings.swift; sourceTree = "<group>"; };
 		AC0000000000000000000004 /* FinanceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/FinanceStore.swift; sourceTree = "<group>"; };
@@ -214,6 +221,7 @@
 		AC0000000000000000000040 /* WealthCompassMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WealthCompassMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC0000000000000000000041 /* Wealth Compass Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wealth Compass Tracker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC0000000000000000000050 /* CloudSyncCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncCoreTests.swift; sourceTree = "<group>"; };
+		BB10000000000000000C0001 /* DataProtectionRecoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProtectionRecoveryTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C6 /* PersistenceCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceCoordinatorTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C7 /* MarketDataServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketDataServiceTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C1 /* CurrencyConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterTests.swift; sourceTree = "<group>"; };
@@ -376,6 +384,8 @@
 				AC00000000000000000000AA /* OnboardingViewModel.swift */,
 				AC00000000000000000000AB /* SettingsViewModel.swift */,
 				AC0000000000000000000002 /* FinancePersistence.swift */,
+				BB10000000000000000A0001 /* DataProtection.swift */,
+				BB10000000000000000B0001 /* FinanceDataUnavailableView.swift */,
 				AC00000000000000000000E1 /* ExchangeRatePersistence.swift */,
 				AC0000000000000000000003 /* AppSettings.swift */,
 				AC0000000000000000000004 /* FinanceStore.swift */,
@@ -471,6 +481,7 @@
 			isa = PBXGroup;
 			children = (
 				AC0000000000000000000050 /* CloudSyncCoreTests.swift */,
+				BB10000000000000000C0001 /* DataProtectionRecoveryTests.swift */,
 				AC00000000000000000000C1 /* CurrencyConverterTests.swift */,
 				AC00000000000000000000C2 /* SnapshotEngineTests.swift */,
 				AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */,
@@ -705,6 +716,8 @@
 				AD00000000000000000000AA /* OnboardingViewModel.swift in Sources */,
 				AD00000000000000000000AB /* SettingsViewModel.swift in Sources */,
 				AD0000000000000000000002 /* FinancePersistence.swift in Sources */,
+				BB10000000000000000A0002 /* DataProtection.swift in Sources */,
+				BB10000000000000000B0002 /* FinanceDataUnavailableView.swift in Sources */,
 				AD00000000000000000000E1 /* ExchangeRatePersistence.swift in Sources */,
 				AD0000000000000000000003 /* AppSettings.swift in Sources */,
 				AD0000000000000000000004 /* FinanceStore.swift in Sources */,
@@ -764,6 +777,8 @@
 				AD00000000000000000000BA /* OnboardingViewModel.swift in Sources */,
 				AD00000000000000000000BB /* SettingsViewModel.swift in Sources */,
 				AD0000000000000000000012 /* FinancePersistence.swift in Sources */,
+				BB10000000000000000A0003 /* DataProtection.swift in Sources */,
+				BB10000000000000000B0003 /* FinanceDataUnavailableView.swift in Sources */,
 				AD00000000000000000000E2 /* ExchangeRatePersistence.swift in Sources */,
 				AD0000000000000000000013 /* AppSettings.swift in Sources */,
 				AD0000000000000000000014 /* FinanceStore.swift in Sources */,
@@ -797,6 +812,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AD0000000000000000000050 /* CloudSyncCoreTests.swift in Sources */,
+				BB10000000000000000C0002 /* DataProtectionRecoveryTests.swift in Sources */,
 				AD00000000000000000000C1 /* CurrencyConverterTests.swift in Sources */,
 				AD00000000000000000000C2 /* SnapshotEngineTests.swift in Sources */,
 				AD00000000000000000000C3 /* RecurringScheduleBuilderTests.swift in Sources */,

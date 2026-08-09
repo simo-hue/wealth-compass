@@ -135,6 +135,23 @@ enum FinanceImportError: LocalizedError {
     }
 }
 
+/// Whether the on-disk finance database has actually been read into `FinanceStore.data` (WC-LOCK1).
+///
+/// Before this existed, "no data" and "data we could not read" were the same state — an empty
+/// `FinancialData` — so a failed load rendered a perfectly plausible zeroed dashboard: €0 net worth,
+/// no transactions, no error. Splitting them means the UI can refuse to draw numbers it hasn't
+/// actually loaded, and `save()` can refuse to persist a snapshot that isn't grounded in disk.
+enum FinanceDataLoadState: Equatable {
+    /// Not read yet: either still loading, or deliberately deferred because the device is locked
+    /// and the files are unreadable. Not an error — a retry is expected.
+    case notLoaded
+    /// `data` reflects disk. The only state in which the app may show figures or write.
+    case loaded
+    /// A read was attempted and failed. `isLocked` selects the user-facing wording only; recovery
+    /// never depends on it (see `DataProtection.isPermissionDenied`).
+    case failed(message: String, isLocked: Bool)
+}
+
 @MainActor
 final class FinanceStore: ObservableObject {
     @Published private(set) var data = FinancialData() {
@@ -184,6 +201,15 @@ final class FinanceStore: ObservableObject {
     /// A user-visible, app-wide error set when a local save fails so the user is told
     /// their latest change did not persist (H5). Surfaced as a banner by the root views.
     @Published private(set) var persistenceError: String?
+    /// WC-LOCK1: whether `data` has actually been read from disk. The root views gate the entire
+    /// finance UI on `.loaded`, so a zeroed dashboard can never stand in for unread data.
+    @Published private(set) var loadState: FinanceDataLoadState = .notLoaded
+
+    /// The single predicate every write path checks. Reads "the in-memory snapshot is grounded in
+    /// what's on disk", which is the actual precondition for saving, importing, or syncing —
+    /// stricter than the old `localPersistenceError == nil`, which was also true in the deferred
+    /// case where nothing had been read at all.
+    private var isLocalDataReady: Bool { loadState == .loaded }
 
     private static let logger = Logger(subsystem: "com.wealthcompass.persistence", category: "FinanceStore")
 
@@ -203,6 +229,16 @@ final class FinanceStore: ObservableObject {
     /// L52: handle to the init-time "restore sync-enabled state" task, so a factory reset can cancel
     /// it before it (re)starts the CloudKit engine after the wipe cleared the sync flag.
     private var initialSyncEnableTask: Task<Void, Never>?
+    /// WC-LOCK1: token for the `protectedDataDidBecomeAvailable` observer, removed on deinit.
+    private var protectedDataObserver: NSObjectProtocol?
+    /// Record keys the last successful decode had to skip (deep-audit H08), retained so a *later*
+    /// sync-metadata recovery can re-run `reconcileLocalInventory` with the same skip set. Without
+    /// it that reconcile would treat the undecodable records as locally deleted and tombstone them
+    /// account-wide — the exact hazard H08 exists to prevent.
+    private var lastLoadedSkippedRecordKeys: [CloudSyncRecordKey] = []
+    /// WC-LOCK1 re-entrancy latch for `retryLoadIfNeeded`. Main-actor-only, so a plain Bool is
+    /// sufficient: it is set and cleared without an intervening suspension point.
+    private var isReloading = false
 
     /// M31: weak bridge to the single live store so an app-delegate remote-notification handler — which
     /// has no environment injection — can drive a push-triggered sync (`handleRemoteCloudKitPush`). The
@@ -272,16 +308,39 @@ final class FinanceStore: ObservableObject {
         // M31: register as the single live store so a background CloudKit push can reach us.
         Self.current = self
 
-        let seedRecords = load()
+        SyncDiagnosticsLog.shared.record(
+            "LAUNCH store init — context=\(ProtectedDataAvailability.launchContext) protectedData=\(ProtectedDataAvailability.isAvailable ? "available" : "locked")"
+        )
+
+        // WC-LOCK1: always ATTEMPT the load, including on a silent-push background launch behind a
+        // locked screen.
+        //
+        // It is tempting to skip the read when `ProtectedDataAvailability.isAvailable` is false,
+        // but that flag tracks the *complete* protection class: it goes false on every lock. Our
+        // files are at `completeUntilFirstUserAuthentication` and stay perfectly readable in that
+        // window, so gating on it would switch off background sync for the entire time the screen
+        // is locked — precisely the capability relaxing the class was meant to buy. The only state
+        // where the read genuinely fails is before the first unlock since boot, and the honest way
+        // to detect that is to try. Every write path is gated on `loadState`, so a failed attempt
+        // is inert.
+        let seedRecords = applyLoadOutcome(performLoad())
+        // Started unconditionally: the consumer seeds the coordinator baseline as its very first
+        // action, so a later recovery can hand it a fresh baseline through `reseed` without the
+        // pipeline having to be torn down and rebuilt.
         startSaveConsumer(seedRecords: seedRecords)
         // Persist the WC-M1 currency backfill (if any) now that the save pipeline exists; it
         // diffs against the on-disk baseline seeded above, so only the stamped rows are written.
         if needsCurrencyBackfillSave {
             save()
         }
+        observeProtectedDataAvailability()
         let isSyncEnabled = settings?.isICloudSyncEnabled
             ?? UserDefaults.standard.bool(forKey: "wc_mobile_icloud_sync_enabled")
-        if isSyncEnabled {
+        // WC-LOCK1: only bring the engine up against data we actually read. Starting it on a
+        // deferred/failed load meant syncing against an empty in-memory dataset — which is how a
+        // locked background launch turned into a full 440-record re-fetch that could apply
+        // nothing. The unlock retry starts it instead.
+        if isSyncEnabled && isLocalDataReady {
             // L52: keep a handle so a factory reset mid-launch can cancel this before it restarts the
             // engine after the wipe cleared the flag (see wipeLocalState + the automatic-path guard in
             // setICloudSyncEnabled).
@@ -295,6 +354,9 @@ final class FinanceStore: ObservableObject {
         saveContinuation?.finish()
         saveConsumerTask?.cancel()
         initialSyncEnableTask?.cancel()
+        if let protectedDataObserver {
+            NotificationCenter.default.removeObserver(protectedDataObserver)
+        }
     }
 
     var transactions: [Transaction] {
@@ -432,6 +494,13 @@ final class FinanceStore: ObservableObject {
 
     @discardableResult
     func processDueRecurringTransactions(settings: AppSettings, now: Date = Date()) -> Int {
+        // WC-LOCK1: reachable from a 30s timer and from notification handlers that know nothing
+        // about `loadState`. Against an unread dataset this would generate occurrences into an
+        // empty in-memory copy, have `save()` refuse them, and still report "N scheduled
+        // transactions were added" — a claim about records that will vanish on the next load.
+        // It also can't be correct in principle: with no data read, the already-generated
+        // occurrences it de-duplicates against are invisible, so it would double-post on recovery.
+        guard isLocalDataReady else { return 0 }
         guard !data.recurringTransactions.isEmpty else { return 0 }
 
         let calendar = Calendar.current
@@ -609,6 +678,11 @@ final class FinanceStore: ObservableObject {
     func refreshMarketPrices(finnhubAPIKey: String?, coingeckoAPIKey: String?, settings: AppSettings) async -> MarketPriceRefreshResult {
         guard !isRefreshingMarketPrices else {
             return MarketPriceRefreshResult(wasAlreadyRunning: true)
+        }
+        // WC-LOCK1: with no dataset read there are no holdings to price, so this would burn API
+        // quota to write results into an in-memory copy that `save()` then refuses.
+        guard isLocalDataReady else {
+            return MarketPriceRefreshResult(wasAlreadyRunning: false)
         }
 
         isRefreshingMarketPrices = true
@@ -1147,6 +1221,10 @@ final class FinanceStore: ObservableObject {
         iCloudSyncError = nil
         persistenceError = nil
         localPersistenceError = nil
+        // WC-LOCK1: after a factory reset the empty in-memory dataset *is* the truth on disk, so
+        // the store is legitimately loaded — otherwise a reset performed while recovering from a
+        // load failure would leave the app stuck behind the "can't read your data" screen.
+        loadState = .loaded
         cloudSyncStatus = .disabled
         marketRefreshProgress = nil
     }
@@ -1267,6 +1345,10 @@ final class FinanceStore: ObservableObject {
             "Wealth Compass Tracker sync diagnostics",
             "version \(version) (\(build)) · \(platform) · \(os)",
             "iCloud sync: \(isICloudSyncEnabledResolved ? "on" : "off")",
+            // WC-LOCK1: the two facts that made the original report hard to read. Without them,
+            // a failed load was only inferable from a downstream sync error.
+            "local data: \(Self.loadStateDescription(loadState))",
+            "protected data: \(ProtectedDataAvailability.isAvailable ? "available" : "locked")",
             "generated \(stamp)",
             "(counts/bytes/ms + errors only — no financial data, no account info)",
             ""
@@ -1280,12 +1362,23 @@ final class FinanceStore: ObservableObject {
         return url
     }
 
+    /// Load state as a fixed, non-localized token for the diagnostics header above. Carries no
+    /// message text — a failure message can embed a file path, and that export is PII-clean by
+    /// construction.
+    private static func loadStateDescription(_ state: FinanceDataLoadState) -> String {
+        switch state {
+        case .notLoaded: "not loaded"
+        case .loaded: "loaded"
+        case .failed(_, let isLocked): isLocked ? "failed (locked)" : "failed"
+        }
+    }
+
     @discardableResult
     /// Unified import entry point: auto-detects a native JSON backup vs. a supported broker/bank CSV
     /// (Revolut / Trade Republic) by content, parses off the MainActor, then applies via `applyImport`.
     /// The UI calls this so the user never has to pick a format.
     func importFile(from url: URL, mode: FinanceImportMode, settings: AppSettings) async throws -> FinanceImportResult {
-        guard localPersistenceError == nil else {
+        guard isLocalDataReady else {
             throw FinanceImportError.localPersistenceError
         }
 
@@ -1330,7 +1423,7 @@ final class FinanceStore: ObservableObject {
         // Fail loudly if the local DB failed to load: save() is a no-op while `localPersistenceError`
         // is set, so mutating in-memory `data` and reporting success would silently discard the import
         // (deep-audit M28). Mirrors the guards in setICloudSyncEnabled / applyRemoteMutations.
-        guard localPersistenceError == nil else {
+        guard isLocalDataReady else {
             throw FinanceImportError.localPersistenceError
         }
 
@@ -1405,11 +1498,20 @@ final class FinanceStore: ObservableObject {
         )
     }
 
-    /// Loads the local DB into memory and returns the per-record snapshot that should seed
-    /// the coordinator's diff baseline (empty on a load failure, so no save is attempted
-    /// until the load error is resolved).
-    @discardableResult
-    private func load() -> [CloudSyncRecordKey: CloudSyncRecordSnapshot] {
+    /// What a load attempt produced. Deliberately separate from committing the result, because a
+    /// recovery must seed the coordinator's diff baseline *before* flipping `loadState` to
+    /// `.loaded` — the instant it flips, writes are permitted, and a write against a stale (empty)
+    /// baseline would diff empty→full and re-mark every record as changed.
+    private enum LoadOutcome {
+        case success(records: [CloudSyncRecordKey: CloudSyncRecordSnapshot])
+        case failure(Error)
+    }
+
+    /// Reads the local DB into `data` and prepares the sync metadata, returning the per-record
+    /// snapshot for the coordinator's diff baseline.
+    ///
+    /// Intentionally does **not** touch `loadState` — see `LoadOutcome`.
+    private func performLoad() -> LoadOutcome {
         do {
             let loaded = try persistence.load()
             let loadedData = loaded?.data ?? FinancialData()
@@ -1429,29 +1531,191 @@ final class FinanceStore: ObservableObject {
             self.localPersistenceError = nil
             self.iCloudSyncError = nil
 
+            // WC-LOCK1: a successful read proves protected data is available right now, which is
+            // exactly the precondition for re-stamping files created under the old, stricter
+            // protection class. Best-effort — a failure here costs nothing today.
+            persistence.upgradeProtectionClassIfNeeded()
+            syncMetadataStore.upgradeProtectionClassIfNeeded()
+            // Also the moment to un-wedge a metadata store that came up inert because *its* file
+            // was unreadable; otherwise the reconcile below would throw and sync would stay down
+            // for the rest of this launch.
+            syncMetadataStore.reloadIfUnavailable()
+
+            lastLoadedSkippedRecordKeys = skippedRecordKeys
+
             do {
                 let records = try loadedData.cloudSyncRecords()
                 try syncMetadataStore.reconcileLocalInventory(records, skipped: skippedRecordKeys)
-                return records
+                return .success(records: records)
+            } catch let error as CloudSyncMetadataStoreError {
+                // The DB is readable but the metadata file is not — the two have independent
+                // protection classes and independent failure modes, so this really happens (a
+                // relock between the two reads, or a half-applied class migration).
+                //
+                // The load itself still succeeded, so this returns `.success`: the user's data is
+                // real and must be shown. Recovery from here is `recoverSyncMetadataIfNeeded`,
+                // NOT `performLoad` — once `loadState` is `.loaded`, `retryLoadIfNeeded` never
+                // re-enters this function, so without that separate path the metadata store would
+                // stay inert for the entire process (sync down, every save reporting a spurious
+                // "could not be saved") until the app was force-quit.
+                cloudSyncStatus = .waiting(
+                    AppLocalization.string(
+                        "Sync is paused until this device is unlocked.",
+                        appLanguage: settings?.appLanguage
+                    )
+                )
+                SyncDiagnosticsLog.shared.record("WARN inventory reconcile deferred — \(DataProtection.diagnosticCode(for: error))")
+                return .success(records: (try? loadedData.cloudSyncRecords()) ?? [:])
             } catch {
                 iCloudSyncError = AppLocalization.string(
                     "Local data loaded, but iCloud sync metadata could not be prepared. \(error.localizedDescription)",
                     appLanguage: settings?.appLanguage
                 )
                 cloudSyncStatus = .error(iCloudSyncError ?? error.localizedDescription)
-                return (try? loadedData.cloudSyncRecords()) ?? [:]
+                return .success(records: (try? loadedData.cloudSyncRecords()) ?? [:])
             }
         } catch {
-            // Plain assignment, not withAnimation — see the success path above (WC-#17).
-            self.localPersistenceError = error
-            self.iCloudSyncError = error.localizedDescription
-            self.cloudSyncStatus = .error(
-                AppLocalization.string(
-                    "The local database could not be loaded. The original file was left untouched. \(error.localizedDescription)",
-                    appLanguage: settings?.appLanguage
-                )
-            )
+            return .failure(error)
+        }
+    }
+
+    /// Commits a load result to `loadState` and the error surfaces, returning the records that
+    /// should seed the coordinator's diff baseline (empty on failure, so nothing is written until
+    /// the load succeeds).
+    ///
+    /// Safe to call before seeding **only** during `init`, where the save consumer seeds as its
+    /// first action and no mutation can be interleaved. The recovery path seeds first instead.
+    @discardableResult
+    private func applyLoadOutcome(_ outcome: LoadOutcome) -> [CloudSyncRecordKey: CloudSyncRecordSnapshot] {
+        switch outcome {
+        case .success(let records):
+            loadState = .loaded
+            return records
+        case .failure(let error):
+            applyLoadFailure(error)
             return [:]
+        }
+    }
+
+    private func applyLoadFailure(_ error: Error) {
+        let isLocked = DataProtection.isPermissionDenied(error)
+        // Plain assignment, not withAnimation — see the success path above (WC-#17).
+        self.localPersistenceError = error
+        self.iCloudSyncError = error.localizedDescription
+        let message = isLocked
+            ? AppLocalization.string(
+                "Your data is protected and can't be read while this device is locked. Unlock the device to continue.",
+                appLanguage: settings?.appLanguage
+            )
+            : AppLocalization.string(
+                "The local database could not be loaded. The original file was left untouched. \(error.localizedDescription)",
+                appLanguage: settings?.appLanguage
+            )
+        self.loadState = .failed(message: message, isLocked: isLocked)
+        // A locked device is transient and self-resolving, so it must not paint sync red.
+        self.cloudSyncStatus = isLocked ? .waiting(message) : .error(message)
+        Self.logger.error("Failed to load local finance data: \(error.localizedDescription, privacy: .public)")
+        SyncDiagnosticsLog.shared.record(
+            "ERROR load failed (\(DataProtection.diagnosticCode(for: error)))\(isLocked ? " — device locked, will retry on unlock" : "")"
+        )
+    }
+
+    /// Re-attempts a load that was deferred or that failed (WC-LOCK1).
+    ///
+    /// Deliberately retries on *any* prior failure, not just a permission error: re-reading is
+    /// idempotent, a genuinely broken file simply fails again, and making recovery depend on an
+    /// error code would mean a transient IO failure never healed. Wired to
+    /// `protectedDataDidBecomeAvailable` and to every foreground transition.
+    func retryLoadIfNeeded(reason: String) async {
+        // Deliberately NOT gated on `ProtectedDataAvailability.isAvailable`: that flag is false on
+        // every lock, while our files remain readable then, so gating here would refuse retries
+        // that would have succeeded. A retry that genuinely can't read simply fails again, cheaply.
+        //
+        // Re-entrancy guard: the unlock notification and the foreground transition routinely fire
+        // together, and the `isLocalDataReady` check below cannot stop the second caller — it only
+        // becomes true after the `await` in the success path. Without this, one unlock runs two
+        // full loads and two engine starts.
+        guard !isReloading else { return }
+        isReloading = true
+        defer { isReloading = false }
+
+        guard !isLocalDataReady else {
+            // The DB loaded but the sync-metadata file may still be unreadable — they are separate
+            // files with separate failure modes. This is the *only* path that re-reads it once the
+            // store is `.loaded`, so it must not be short-circuited by the `.loaded` check.
+            await recoverSyncMetadataIfNeeded(reason: reason)
+            return
+        }
+
+        SyncDiagnosticsLog.shared.record("RETRY load (\(reason))")
+        switch performLoad() {
+        case .failure(let error):
+            applyLoadFailure(error)
+        case .success(let records):
+            // Order is load-bearing: seed the baseline first, and only then open the write path
+            // by flipping to `.loaded`. Reversed, the first edit after recovery would diff against
+            // an empty baseline and re-upload the entire dataset. Nothing can slip in during the
+            // suspension — `save()` is still refused while the state isn't `.loaded`, and the UI
+            // doesn't render (so can't mutate) either.
+            await coordinator.reseed(records)
+            loadState = .loaded
+            SyncDiagnosticsLog.shared.record("RECOVERED load ok — \(records.count) record(s)")
+            // Persist the WC-M1 currency backfill if this load was the one that discovered it.
+            if needsCurrencyBackfillSave {
+                save()
+            }
+            // The engine was held down (or never started) while data was unreadable — bring it up
+            // now that there's a real dataset behind it.
+            if isICloudSyncEnabledResolved {
+                await setICloudSyncEnabled(true, userInitiated: false)
+            }
+        }
+    }
+
+    /// Brings the sync-metadata store back once its file is readable again (WC-LOCK1).
+    ///
+    /// Separate from `retryLoadIfNeeded`'s load path because the two files fail independently: the
+    /// finance DB can be perfectly readable while `wealth-compass-cloud-sync.json` is not. In that
+    /// state the store is `.loaded` — correctly, the user's data is real — but the metadata store
+    /// is inert, which keeps the sync engine down (`CloudKitSyncService.start` refuses) and makes
+    /// every save report a spurious "could not be saved" (the DB write succeeds, the bookkeeping
+    /// after it throws). Nothing else re-reads that file, so this runs on every foreground.
+    private func recoverSyncMetadataIfNeeded(reason: String) async {
+        guard syncMetadataStore.isUnavailable else { return }
+        guard syncMetadataStore.reloadIfUnavailable() else { return }
+
+        do {
+            // Re-run the reconcile that was skipped at load time, preserving the H08 skip set —
+            // omitting it here would tombstone every record the decode couldn't read.
+            let records = try data.cloudSyncRecords()
+            try syncMetadataStore.reconcileLocalInventory(records, skipped: lastLoadedSkippedRecordKeys)
+            SyncDiagnosticsLog.shared.record("RECOVERED sync metadata usable again (\(reason))")
+            iCloudSyncError = nil
+            if isICloudSyncEnabledResolved {
+                await setICloudSyncEnabled(true, userInitiated: false)
+            } else {
+                // Clear the "paused until unlocked" status that `performLoad` left behind; with
+                // sync off there is nothing to resume and the row should read Off, not Waiting.
+                cloudSyncStatus = .disabled
+            }
+        } catch {
+            Self.logger.error("Sync metadata recovered but the inventory reconcile failed: \(error.localizedDescription, privacy: .public)")
+            SyncDiagnosticsLog.shared.record("WARN metadata recovery reconcile failed — \(DataProtection.diagnosticCode(for: error))")
+        }
+    }
+
+    /// Watches for the device becoming unlocked so a deferred/failed load can complete without the
+    /// user having to force-quit — the missing piece that made the original bug user-visible.
+    private func observeProtectedDataAvailability() {
+        guard let name = ProtectedDataAvailability.didBecomeAvailableNotification else { return }
+        protectedDataObserver = NotificationCenter.default.addObserver(
+            forName: name,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                await self?.retryLoadIfNeeded(reason: "protected data available")
+            }
         }
     }
 
@@ -1490,6 +1754,18 @@ final class FinanceStore: ObservableObject {
             if outcome.didChange {
                 await cloudSyncService.localChangesRecorded()
             }
+        } catch let error as SyncBookkeepingError {
+            // WC-LOCK1: the change IS on disk — only the CloudKit bookkeeping failed. Raising the
+            // "your change could not be saved" banner here would be a lie, and a frightening one:
+            // it would repeat on every single edit while the data was in fact being persisted
+            // correctly. Report it as a sync degradation and try to un-wedge the metadata store.
+            Self.logger.error("Saved locally, but sync bookkeeping failed: \(error.underlying.localizedDescription, privacy: .public)")
+            SyncDiagnosticsLog.shared.record("WARN saved locally but sync bookkeeping failed — \(DataProtection.diagnosticCode(for: error.underlying))")
+            iCloudSyncError = AppLocalization.string(
+                "Your change was saved on this device, but could not be queued for iCloud yet.",
+                appLanguage: settings?.appLanguage
+            )
+            await recoverSyncMetadataIfNeeded(reason: "save bookkeeping")
         } catch {
             // Do NOT crash on a disk error (H5): in DEBUG `assertionFailure` aborted the
             // app, and in release the failure was only visible in Settings. Log it and
@@ -1511,7 +1787,10 @@ final class FinanceStore: ObservableObject {
     }
 
     private func save() {
-        guard localPersistenceError == nil else {
+        // WC-LOCK1: `.notLoaded` is refused as firmly as `.failed`. Writing an in-memory snapshot
+        // that was never read from disk would persist an empty dataset over a real one — the
+        // single most destructive thing this app could do.
+        guard isLocalDataReady else {
             iCloudSyncError = AppLocalization.string(
                 "Changes cannot be saved until the local database load error is resolved.",
                 appLanguage: settings?.appLanguage
@@ -1561,7 +1840,9 @@ final class FinanceStore: ObservableObject {
 
     func setICloudSyncEnabled(_ isEnabled: Bool, userInitiated: Bool = true) async {
         if isEnabled {
-            guard localPersistenceError == nil else { return }
+            // WC-LOCK1: never start the engine against a dataset we haven't read — it would
+            // bootstrap-merge an empty local side against the server's full one.
+            guard isLocalDataReady else { return }
             // L52: an automatic (init-time restore) enable must re-check the resolved flag right before
             // starting — a factory reset that cleared it between scheduling and running this must not
             // resurrect the engine. A user-initiated enable is itself the source of truth for the flag.
@@ -1579,6 +1860,7 @@ final class FinanceStore: ObservableObject {
     /// use `requestICloudSync()` for opportunistic foreground syncing (#7).
     func ensureICloudSyncRunning() async {
         guard isICloudSyncEnabledResolved else { return }
+        guard isLocalDataReady else { return }
         await cloudSyncService.start(allowAccountReplacement: false)
     }
 
@@ -1586,6 +1868,7 @@ final class FinanceStore: ObservableObject {
     /// sync is disabled or the engine isn't running yet.
     func requestICloudSync() async {
         guard isICloudSyncEnabledResolved else { return }
+        guard isLocalDataReady else { return }
         await cloudSyncService.requestSync()
     }
 
@@ -1594,6 +1877,20 @@ final class FinanceStore: ObservableObject {
     /// means "there is a change now". No-op when sync is disabled.
     func syncForRemotePush() async {
         guard isICloudSyncEnabledResolved else { return }
+        // WC-LOCK1: this is the exact entry point that caused the original failure — a silent push
+        // cold-launching the process behind a locked screen. The gate is whether the local data was
+        // actually read, not whether the screen is locked: with the current protection class the
+        // read normally succeeds while locked, which is what lets background sync work at all.
+        // Before the first unlock since boot it won't, and then we do nothing — CKSyncEngine keeps
+        // its own server change token, so the same changes arrive on the next sync. No data loss,
+        // only latency.
+        if !isLocalDataReady {
+            await retryLoadIfNeeded(reason: "remote push")
+            guard isLocalDataReady else {
+                SyncDiagnosticsLog.shared.record("SKIP push — local data unavailable (deferred until readable)")
+                return
+            }
+        }
         await cloudSyncService.start(allowAccountReplacement: false) // idempotent; ensures the engine is up
         await cloudSyncService.synchronize()
     }
@@ -1607,7 +1904,10 @@ final class FinanceStore: ObservableObject {
     private func applyRemoteMutations(
         _ mutations: [CloudSyncRemoteMutation]
     ) async throws -> Set<CloudSyncRecordKey> {
-        guard localPersistenceError == nil else {
+        // The guard that saved the user's data in the original incident: with the DB unread,
+        // applying remote records would merge them into an empty in-memory dataset and write that
+        // back. It now also covers `.notLoaded`, where `localPersistenceError` is nil.
+        guard isLocalDataReady else {
             throw localPersistenceError ?? CloudSyncError.invalidRecord(
                 AppLocalization.string("The local database is unavailable.", appLanguage: settings?.appLanguage)
             )
@@ -1666,7 +1966,8 @@ final class FinanceStore: ObservableObject {
             iCloudSyncError = message
         // .waiting is transient, not a failure → don't raise the error flag (keeps the UI calm).
         case .disabled, .starting, .syncing, .upToDate, .waiting:
-            if localPersistenceError == nil {
+            // WC-LOCK1: also keep the error visible while data simply hasn't been read yet.
+            if isLocalDataReady {
                 iCloudSyncError = nil
             }
         }
@@ -1754,6 +2055,15 @@ extension FinancialData {
     }
 }
 
+/// Thrown when a save wrote the finance DB successfully but the CloudKit bookkeeping that follows
+/// it did not (WC-LOCK1) — in practice, an unreadable sync-metadata file.
+///
+/// It exists purely so the two halves aren't conflated in what the user is told: the data *is* on
+/// disk, so the app must not claim the change was lost. Sync is what degraded.
+struct SyncBookkeepingError: Error {
+    let underlying: Error
+}
+
 /// Serializes every local-database write off the main actor (audit M4).
 ///
 /// Owns `persistence`, `metadataStore`, and the diff baseline (`lastSavedRecords`) — the
@@ -1782,6 +2092,15 @@ actor PersistenceCoordinator {
         lastSavedRecords = records
     }
 
+    /// Replaces the diff baseline after a late load succeeded (WC-LOCK1).
+    ///
+    /// Distinct from `seed` only in intent — the store calls this once the DB it originally failed
+    /// to read has finally been read, so the baseline stops being the empty placeholder it was
+    /// initialized with. Without it, the first edit after recovery would diff every record as new.
+    func reseed(_ records: [CloudSyncRecordKey: CloudSyncRecordSnapshot]) {
+        lastSavedRecords = records
+    }
+
     /// Encodes the snapshot, diffs it against the baseline, writes it to disk, records the
     /// changeset for CloudKit, then advances the baseline. All off the main actor.
     func save(_ snapshot: FinancialData) throws -> SaveOutcome {
@@ -1791,7 +2110,15 @@ actor PersistenceCoordinator {
         let newRecords = try snapshot.cloudSyncRecords()
         let changes = CloudSyncChangeSet.difference(from: lastSavedRecords, to: newRecords)
         try persistence.save(snapshot)
-        try metadataStore.recordLocalChanges(changes, currentRecords: newRecords)
+        do {
+            try metadataStore.recordLocalChanges(changes, currentRecords: newRecords)
+        } catch {
+            // WC-LOCK1: the user's data reached disk on the line above; only the CloudKit
+            // bookkeeping failed. Distinguish it so the caller doesn't tell the user their change
+            // was lost when it wasn't. The baseline is deliberately left un-advanced, so the next
+            // save re-detects these records and re-queues them once the metadata store recovers.
+            throw SyncBookkeepingError(underlying: error)
+        }
         lastSavedRecords = newRecords
         SyncSignpost.persistence.emit("save records=\(newRecords.count) changed=\(changes.changed.count) deleted=\(changes.deleted.count) ms=\(SyncSignpost.persistence.ms(since: start))")
         return SaveOutcome(didChange: !changes.isEmpty)

@@ -836,3 +836,125 @@ which still describes the retired React/Supabase web app.
 - [2026-07-30]: App Version Bump and Release Notes Update
   - *Details*: Incremented both the Build Version (to 21) and the Marketing Version (to 1.1.5) for both iOS and macOS apps. Updated the release notes ("What's new") to feature the "new cash-flow graph".
   - *Tech Notes*: Used agvtool to bump CFBundleShortVersionString and CFBundleVersion across the .pbxproj and Info.plist files. Batch updated release_notes.txt across all localized metadata directories to "new cash-flow graph".
+
+- [2026-08-09]: WC-LOCK1 — Locked-Device Launch Corrupted Sync State and Showed a Zeroed Dashboard (iOS)
+  - *Details*: Diagnosed from a user's exported sync diagnostics (v1.1.5 b21, iOS 26.6). The app declares
+    `UIBackgroundModes: remote-notification` and syncs on silent CloudKit pushes, so iOS can cold-launch the
+    process **while the device is locked**. Every persisted JSON file was written with
+    `.completeFileProtectionUnlessOpen` — a class that permits *creating* a file while locked but not
+    *reopening* a closed one — which produced two independent failures from one cause:
+    1. **The zeroed dashboard.** `FinanceStore.init` calls `load()` exactly once; it threw
+       `NSFileReadNoPermissionError` (Cocoa 257), leaving `data` as an empty `FinancialData()`. Nothing
+       retried — there was no `protectedDataDidBecomeAvailable` observer anywhere in the project — so when
+       the user later unlocked and foregrounded that still-alive process, the dashboard rendered the empty
+       dataset faithfully as €0. Force-quitting re-ran `init` unlocked and everything returned. The
+       `ERROR synchronize:` lines in the export were the *consequence*: `applyRemoteMutations` rethrowing
+       the stored load error. That guard is why no data was lost.
+    2. **The sync-metadata wipe.** `CloudSyncMetadataStore.init` used `try? Data(contentsOf:)`, which cannot
+       distinguish "file missing" from "read denied". It started from empty metadata and the first
+       `update()` persisted that over the healthy file (the export's `metadata records=0 bytes=155` first
+       line). Losing `bootstrapCompleted` + the change token forced a full zone re-fetch — the
+       `mods=200/200/40` = 440 records in the log — of which nothing could be applied.
+  - *Tech Notes*:
+    - **New** `Sources/Shared/Persistence/DataProtection.swift`: `DataProtection.atomicWriteOptions`
+      (`[.atomic, .completeFileProtectionUntilFirstUserAuthentication]`) is now the single write policy for
+      the finance DB, sync metadata and FX cache; `isPermissionDenied`/`diagnosticCode` classifiers;
+      `upgradeProtectionClass(at:)` one-time `setAttributes` migration (a file's class is fixed at creation,
+      so changing the write option alone would never reach an install that syncs but is never edited).
+      `ProtectedDataAvailability` is the iOS/macOS shim (`isAvailable`, `didBecomeAvailableNotification`,
+      `launchContext`). The `.pre-cloudkit-backup` sidecar deliberately keeps the stricter class — it is
+      write-only and never read back.
+    - **New** `FinanceDataLoadState` (`.notLoaded` / `.loaded` / `.failed(message:isLocked:)`) on
+      `FinanceStore`. "No data" and "data we could not read" were previously the same state, which is the
+      root reason the failure was invisible. `load()` split into `performLoad()` (no state mutation) and
+      `applyLoadOutcome`/`applyLoadFailure`, plus `retryLoadIfNeeded(reason:)` wired to
+      `protectedDataDidBecomeAvailable` and to every foreground transition on both platforms. Recovery
+      seeds the new `PersistenceCoordinator.reseed` **before** flipping to `.loaded`, so a post-recovery
+      edit doesn't diff against an empty baseline and re-upload the whole dataset.
+    - Every write guard moved from `localPersistenceError == nil` to `isLocalDataReady`
+      (`loadState == .loaded`), which also covers the deferred case where no error exists because no read
+      was attempted: `save()`, `importFile` (×2), `applyRemoteMutations`, `setICloudSyncEnabled`,
+      `ensureICloudSyncRunning`, `requestICloudSync`, `syncForRemotePush`, `updateCloudSyncStatus`.
+    - `CloudSyncMetadataStore` now classifies reads as loaded/missing/corrupt/**unreadable**. Unreadable is
+      fail-closed: `unreadableError` is set, `update()` throws `CloudSyncMetadataStoreError.unavailable`
+      before touching `cached`, `CloudKitSyncService.start` refuses to bring the engine up, and
+      `reloadIfUnavailable()` adopts the on-disk state once readable. Corrupt still starts clean and heals
+      by overwriting (a corrupt file must not wedge sync permanently); `reset()` works while unavailable so
+      the factory-reset escape hatch survives.
+    - `LocalExchangeRatePersistence.load()` had the same conflation with a worse action — it `clear()`ed a
+      merely-unreadable cache. Read failures now leave the file intact; only decode/validity failures clear.
+    - **New** `Sources/Shared/UI/FinanceDataUnavailableView.swift`, rendered by both `ContentView` and
+      `MacRootView` whenever `loadState != .loaded`, ordered *before* the onboarding check so an unread DB
+      can never drop a returning user into the welcome flow.
+    - Diagnostics: launch marker (`context=fg|bg protectedData=available|locked`), load
+      failure/skip/retry/recovery lines, metadata unreadable/corrupt lines, a `local data:` +
+      `protected data:` export header, and `MM-dd` added to every timestamp (the old time-only stamps made
+      a multi-day ring ambiguous — 22:11 then 09:15 could be one night or three days).
+    - **New** `Tests/DataProtectionRecoveryTests.swift` (9 cases) reproducing the denial with `chmod 000`,
+      which yields the identical Cocoa 257 — no injected reader, no production seam added for tests.
+      Two new files wired into both app targets in `project.pbxproj`; the test file into the test target.
+  - *Verification*: `xcodebuild` is unavailable on this machine (Command Line Tools only), so:
+    `swiftc -typecheck` over all of `Sources/Shared` + `Sources/macOS` (arm64-apple-macos14.0) is clean; a
+    harness compiled against the **real** Shared sources exercises the whole fix with `chmod 000` and passes
+    37/37 checks; and the same scenarios run against the pre-fix tree at 983d7739 reproduce both defects
+    (metadata 447 bytes/1 record state → 99 bytes/0; FX cache deleted), proving the tests are not vacuous.
+    **Unverified here**: everything inside `#if os(iOS)`, all of `Sources/iOS/`, and the XCTest suite — no
+    iOS SDK and no XCTest on this machine.
+
+- [2026-08-09]: WC-LOCK1 follow-up — defects found by adversarial multi-agent review of the fix above
+  - *Details*: A 33-agent review (5 dimensions → per-finding refutation → completeness critic) raised 27
+    findings; 4 survived refutation, the critic added 5, and I acted on 3 more that were refuted but were
+    cheap to make right. Everything below is a defect in the WC-LOCK1 change itself, not in pre-existing code.
+    1. **Lockout (critical).** A *non-transient* load failure (corrupt JSON, disk full during the schema
+       migration write, a macOS permission problem) replaced the entire UI — Settings included — with a
+       screen whose only affordance was "Try Again", which would fail identically forever. Previously the
+       user landed in the app with an empty dataset and could still reach Erase Everything / import /
+       diagnostics. Delete-and-reinstall had become the only way out, destroying the data the screen was
+       simultaneously promising was intact.
+    2. **Wedged metadata store (high).** With the DB readable but `wealth-compass-cloud-sync.json` not —
+       they carry independent protection classes and fail independently — `performLoad` returned `.success`
+       and the store went `.loaded`. From that instant `reloadIfUnavailable()` was unreachable (its only
+       call site sits inside `performLoad`, which `retryLoadIfNeeded` skips once loaded), so sync stayed
+       down for the whole process and *every* edit wrote to disk successfully and then raised "Your latest
+       change could not be saved to this device" — false, and repeated forever.
+    3. **Background sync disabled (high).** `UIApplication.isProtectedDataAvailable` tracks the *complete*
+       protection class and is false on every lock; files at `completeUntilFirstUserAuthentication` stay
+       readable in exactly that window. Gating `init`/`syncForRemotePush` on it switched off all background
+       sync while the screen was locked — the capability relaxing the class was meant to buy.
+    4. **False reassurance (high).** The failure screen asserted "your data is still on this device and in
+       iCloud" unconditionally — untrue for the ~majority of users, since sync is opt-in and off by default,
+       and untrue about "unchanged" when the DB had just failed to decode.
+    5. **macOS ⌘N/⇧⌘I/⇧⌘K (high).** The editor sheet is attached outside the root view's `loadState` branch
+       and the menu commands set `appModel.editor` unconditionally, so a user could open a transaction form
+       over the "Data Unavailable" screen, fill it in, and have it silently discarded on the next load.
+    6. Plus: a vacuous test (it could not detect deletion of `coordinator.reseed`), `retryLoadIfNeeded`
+       re-entrancy, `reset()` clearing the fail-closed flag before the write that could fail, the FX cache
+       missing its protection-class migration, `reloadIfUnavailable` holding `dataLock` across disk I/O
+       (violating the WC-M3 invariant), and four comments making claims the code did not support.
+  - *Tech Notes*:
+    - `FinanceDataUnavailableView` now takes `isCloudSyncEnabled`, `exportDiagnostics` and `eraseLocalData`.
+      Non-lock failures get Export Diagnostics plus a confirmed "Erase and Start Over" that calls
+      `eraseEverything(deleteCloud: false)` — local-only, so the server copy stays as the way back. A locked
+      device still shows only Try Again: it self-resolves, and offering a destructive action there would be
+      inviting harm for a problem about to disappear. The reassurance line is now branched per case and
+      never claims a cloud copy the user doesn't have.
+    - `recoverSyncMetadataIfNeeded(reason:)` runs from `retryLoadIfNeeded` *before* the `.loaded` short-circuit
+      and from the save path, re-running `reconcileLocalInventory` with the retained `lastLoadedSkippedRecordKeys`
+      so the H08 skip set is preserved (without it, that reconcile would tombstone undecodable records account-wide).
+    - New `SyncBookkeepingError` distinguishes "the DB write succeeded, the CloudKit bookkeeping after it did
+      not" from a genuine disk failure, so the save banner stops lying. The diff baseline is still deliberately
+      left un-advanced in that case, so the next save re-detects and re-queues the records.
+    - Both `init` and `syncForRemotePush` now gate on `isLocalDataReady` (did the read actually work) rather
+      than on `isProtectedDataAvailable`. `ProtectedDataAvailability` is kept for the diagnostics launch
+      marker and the unlock notification. This is a deliberate refinement of the agreed "gate explicitly"
+      decision: the gate stays explicit, but uses a signal that is actually true.
+    - `processDueRecurringTransactions` and `refreshMarketPrices` now return early unless loaded — both are
+      driven by timers/notifications that know nothing about `loadState`, and the former would otherwise
+      report "N scheduled transactions were added" about records that could never persist.
+  - *Verification*: macOS whole-module `swiftc -typecheck` clean; the harness grew to **46/46 checks**, adding
+    section 9 (split readable-DB/unreadable-metadata: no false save banner, the edit really reaches disk,
+    recovery without relaunch) and section 10 (a correct baseline leaves already-synced records untouched;
+    an empty one re-marks everything — proving the assertion discriminates). Both new scenarios are mirrored
+    in `DataProtectionRecoveryTests`. One test failure during this pass was a bug in the *test*: `Transaction`
+    stamps fresh `createdAt`/`updatedAt` per initialization, so a baseline derived from a second sample
+    hashes differently and makes even a correct baseline look stale.

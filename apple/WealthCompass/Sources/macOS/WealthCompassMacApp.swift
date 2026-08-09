@@ -30,21 +30,29 @@ struct WealthCompassMacApp: App {
         .defaultSize(width: 1240, height: 780)
         .windowResizability(.contentMinSize)
         .commands {
+            // WC-LOCK1: these bypass the root view's `loadState` gate entirely — the editor sheet
+            // is attached outside it — so without this a ⌘N over the "Data Unavailable" screen
+            // would open a transaction form, accept everything the user typed into the in-memory
+            // dataset, and then have `save()` refuse it. The entry would vanish on the next
+            // successful load with no indication it was ever discarded.
             CommandGroup(replacing: .newItem) {
                 Button(AppLocalization.string("New Transaction", appLanguage: settings.appLanguage)) {
                     appModel.editor = .transaction
                 }
                 .keyboardShortcut("n", modifiers: .command)
+                .disabled(finance.loadState != .loaded)
 
                 Button(AppLocalization.string("New Investment", appLanguage: settings.appLanguage)) {
                     appModel.editor = .investment(nil)
                 }
                 .keyboardShortcut("i", modifiers: [.command, .shift])
+                .disabled(finance.loadState != .loaded)
 
                 Button(AppLocalization.string("New Crypto Holding", appLanguage: settings.appLanguage)) {
                     appModel.editor = .crypto(nil)
                 }
                 .keyboardShortcut("k", modifiers: [.command, .shift])
+                .disabled(finance.loadState != .loaded)
             }
 
             // A Mac app without a File-menu export feels broken, and this routes to the same

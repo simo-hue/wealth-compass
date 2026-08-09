@@ -34,13 +34,27 @@ struct LocalExchangeRatePersistence: ExchangeRatePersistence {
         migrateFromUserDefaultsIfNeeded()
 
         guard fileManager.fileExists(atPath: storageURL.path) else { return nil }
-        guard let data = try? Data(contentsOf: storageURL),
-              let snapshot = try? decoder.decode(ExchangeRateSnapshot.self, from: data),
+        // WC-LOCK1: separate "couldn't read it" from "read it and it's junk". The two used to
+        // share one `clear()`, so a locked-device read denial *deleted* a perfectly good rate
+        // cache — the same conflation that wiped sync metadata, with milder consequences.
+        let data: Data
+        do {
+            data = try Data(contentsOf: storageURL)
+        } catch {
+            Self.logger.error("Could not read cached exchange rates (leaving the file intact): \(error.localizedDescription, privacy: .public)")
+            return nil
+        }
+        // WC-LOCK1: a successful read proves the file is accessible right now, so re-stamp a cache
+        // created under the old, stricter class. Without this an existing install keeps failing to
+        // read its rates on every locked launch and falls back to the bundled offline table.
+        DataProtection.upgradeProtectionClass(at: storageURL, fileManager: fileManager)
+
+        guard let snapshot = try? decoder.decode(ExchangeRateSnapshot.self, from: data),
               snapshot.isValid else {
-            // A present-but-unreadable/invalid cache blocks the legacy migration (gated on
-            // `!fileExists`) and would fail every load until a network fetch overwrites it. Clear it
-            // proactively so the next launch can migrate / re-fetch cleanly (deep-audit L29).
-            Self.logger.error("Discarding unreadable or invalid cached exchange rates")
+            // Genuinely corrupt or expired: clearing is right and is what unblocks the legacy
+            // migration below (gated on `!fileExists`), which would otherwise never run again
+            // (deep-audit L29).
+            Self.logger.error("Discarding invalid cached exchange rates")
             clear()
             return nil
         }
@@ -52,7 +66,7 @@ struct LocalExchangeRatePersistence: ExchangeRatePersistence {
         // WC-L27: log instead of silently swallowing — a failed write means stale FX rates.
         do {
             let data = try encoder.encode(snapshot)
-            try data.write(to: storageURL, options: [.atomic, .completeFileProtectionUnlessOpen])
+            try data.write(to: storageURL, options: DataProtection.atomicWriteOptions)
         } catch {
             Self.logger.error("Failed to persist exchange-rate snapshot: \(error.localizedDescription, privacy: .public)")
         }
@@ -89,7 +103,7 @@ struct LocalExchangeRatePersistence: ExchangeRatePersistence {
         // WC-L27: only drop the legacy key once the file write succeeded, and log failures
         // rather than losing the legacy snapshot silently.
         do {
-            try legacyData.write(to: storageURL, options: [.atomic, .completeFileProtectionUnlessOpen])
+            try legacyData.write(to: storageURL, options: DataProtection.atomicWriteOptions)
             UserDefaults.standard.removeObject(forKey: legacyKey)
         } catch {
             Self.logger.error("Failed to migrate legacy exchange rates: \(error.localizedDescription, privacy: .public)")

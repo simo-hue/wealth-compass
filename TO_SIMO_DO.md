@@ -262,3 +262,53 @@ The versions and release notes for iOS and macOS have been updated locally.
 - Build and archive the updated apps (v1.1.5, build 21) via Xcode.
 - Upload the archives to App Store Connect.
 - If using Fastlane `deliver`, execute it to push the new release notes to App Store Connect.
+
+---
+### Manual Actions Required: WC-LOCK1 locked-device fix (2026-08-09)
+
+1. **Build and run the test suite on a machine with Xcode.** This machine has only Command Line Tools, so
+   `xcodebuild` cannot run and `XCTest` is unavailable. Nothing inside `#if os(iOS)` and nothing in
+   `Sources/iOS/` has been compiled, and `Tests/DataProtectionRecoveryTests.swift` has never been run:
+   ```
+   cd apple
+   xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile \
+     -destination 'platform=iOS Simulator,name=iPhone 16' test \
+     -only-testing:WealthCompassTests/DataProtectionRecoveryTests
+   ```
+   Also build the Mac scheme once — two new files were added to both targets in `project.pbxproj` by hand.
+
+2. **Sync the string catalog.** New user-facing strings were added and are English-only:
+   "Loading your data…", "Your Data Is Locked", "Data Unavailable", "Try Again", "Trying Again…",
+   "Export Diagnostics", "Share Diagnostics", "Erase and Start Over", "Erase Data on This Device?",
+   "Erase", "Cancel", plus the three branched reassurance lines in `FinanceDataUnavailableView`, the erase
+   confirmation message, "Your data is protected and can't be read while this device is locked. Unlock the
+   device to continue.", "Sync is paused until this device is unlocked.", "Your change was saved on this
+   device, but could not be queued for iCloud yet.", and "Your data is locked. Sync resumes once this
+   device is unlocked." Run the Xcode string-catalog sync and translate in
+   `Sources/Shared/Resources/Localizable.xcstrings`.
+
+3. **Decide the version bump.** `MARKETING_VERSION`/`CURRENT_PROJECT_VERSION` were deliberately left at
+   1.1.5 (21) — a release decision, not a code one. Bump to 1.1.6 (22) in `project.pbxproj` if shipping
+   this as a hotfix.
+
+4. **Verify on a real locked device** (the one thing no simulator can prove — the simulator has no data
+   protection at all): with iCloud sync on and the app force-quit, lock the phone, make a change on the
+   Mac app to trigger a silent push, wait, then unlock and open the app. Expect: the data present
+   immediately, no `ERROR synchronize` lines, and — because the fix deliberately does NOT skip work merely
+   because the screen is locked — the push should now actually *sync in the background*, so look for a
+   normal `synchronize ... result=ok` while the phone was locked. A `LAUNCH store init — context=bg` line
+   confirms the background launch happened at all. Worth repeating once straight after a reboot without
+   unlocking (before-first-unlock): there the load genuinely cannot succeed, and the expected trace is
+   `ERROR load failed (NSCocoaErrorDomain 257) — device locked, will retry on unlock` followed by
+   `RETRY load (protected data available)` / `RECOVERED load ok` after you unlock.
+
+5. **Sanity-check the new failure screen once**, since it is the only UI the user can reach when a load
+   fails and it now carries destructive actions. Easiest reproduction on the simulator: corrupt
+   `wealth-compass-local-data.json` in the app container (write `{` into it), relaunch, and confirm you get
+   "Data Unavailable" with Try Again / Export Diagnostics / Erase and Start Over, that the reassurance line
+   does NOT mention iCloud when sync is off, and that Erase returns the app to onboarding.
+
+6. **On your own device**: nothing to do. Your finance data is intact locally and in iCloud, but the sync
+   metadata really was wiped, so the next launch will re-upload roughly 440 records with no `systemFields`
+   — expect one heavy sync with "record already exists" collisions absorbed by the benign-partial-failure
+   path. Do **not** run a factory reset of sync to "fix" it.

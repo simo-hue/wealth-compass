@@ -22,6 +22,24 @@ struct MacRootView: View {
             if appLock.isLockEnabled && !appLock.isUnlocked {
                 MacLockView()
                     .frame(minWidth: 520, minHeight: 400)
+            } else if finance.loadState != .loaded {
+                // WC-LOCK1: mirrors iOS. macOS can't hit the lock-screen variant (no lock-time
+                // protection classes), but any load failure — a permissions problem, a bad disk —
+                // must never be rendered as a zeroed net worth here either. And because macOS
+                // failures are never the self-resolving kind, the recovery actions matter more
+                // here, not less.
+                FinanceDataUnavailableView(
+                    state: finance.loadState,
+                    isCloudSyncEnabled: settings.isICloudSyncEnabled,
+                    retry: { await finance.retryLoadIfNeeded(reason: "user retry") },
+                    exportDiagnostics: { try finance.exportSyncDiagnosticsURL() },
+                    eraseLocalData: {
+                        _ = try? await finance.eraseEverything(deleteCloud: false)
+                        appLock.disableLock()
+                        await MacRecurringTransactionNotificationService.shared.cancelAll()
+                    }
+                )
+                .frame(minWidth: 520, minHeight: 400)
             } else if !settings.hasSeenOnboarding {
                 MacOnboardingView()
                     .frame(minWidth: 700, minHeight: 500)
@@ -29,6 +47,7 @@ struct MacRootView: View {
                 mainSplitView
             }
         }
+        .animation(.easeInOut(duration: 0.2), value: finance.loadState)
         .overlay(alignment: .top) {
             if let persistenceError = finance.persistenceError {
                 PersistenceErrorBanner(message: persistenceError)
@@ -74,6 +93,13 @@ struct MacRootView: View {
                 // pre-filled financial form can't remain visible over the lock screen.
                 appModel.editor = nil
             }
+        }
+        .onChange(of: finance.loadState) { _, state in
+            // WC-LOCK1: the editor sheet is attached to this Group, outside the loadState branch,
+            // so it would stay on screen over the "Data Unavailable" view. Dismiss it — anything
+            // typed into it cannot be saved and would be discarded by the next successful load.
+            // Mirrors the app-lock handler above, which dismisses it for the same reason.
+            if state != .loaded { appModel.editor = nil }
         }
         .onChange(of: settings.isICloudSyncEnabled) { _, enabled in
             // M31: register for push the moment sync is enabled, so it works without a foreground round-trip.
@@ -190,6 +216,8 @@ struct MacRootView: View {
         // WC-M6: don't sync, generate recurring transactions, or surface their alert while the
         // lock screen is up; the .onChange(isUnlocked) handler re-runs this right after unlock.
         guard appLock.isUnlocked else { return }
+        // WC-LOCK1: retry a load that previously failed, mirroring iOS. No-ops once loaded.
+        await finance.retryLoadIfNeeded(reason: "foreground")
         await finance.ensureICloudSyncRunning()
         // M31: register for silent CloudKit pushes so remote changes propagate in near-real-time /
         // in the background, instead of only on the next foreground. Idempotent; only when sync is on.

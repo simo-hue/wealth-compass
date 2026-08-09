@@ -16,6 +16,27 @@ struct ContentView: View {
         Group {
             if appLock.isLockEnabled && !appLock.isUnlocked {
                 LockView()
+            } else if finance.loadState != .loaded {
+                // WC-LOCK1: ordered before onboarding because onboarding writes finance data
+                // (starting balances, the first snapshot) through the same store. Running it while
+                // the DB is unread would collect that input against an empty in-memory dataset and
+                // then refuse to save it — so the user would complete onboarding and lose it.
+                // (`hasSeenOnboarding` lives in UserDefaults, so a *returning* user is never sent
+                // back to onboarding by either ordering.)
+                FinanceDataUnavailableView(
+                    state: finance.loadState,
+                    isCloudSyncEnabled: settings.isICloudSyncEnabled,
+                    retry: { await finance.retryLoadIfNeeded(reason: "user retry") },
+                    exportDiagnostics: { try finance.exportSyncDiagnosticsURL() },
+                    eraseLocalData: {
+                        // Local-only: the iCloud copy is the user's way back if the local DB is
+                        // the broken part. Mirrors SettingsView.performErase's follow-up steps,
+                        // which are unreachable from here.
+                        _ = try? await finance.eraseEverything(deleteCloud: false)
+                        appLock.disableLock()
+                        await RecurringTransactionNotificationService.shared.cancelAll()
+                    }
+                )
             } else if !settings.hasSeenOnboarding {
                 OnboardingView()
                     .transition(.opacity)
@@ -24,6 +45,7 @@ struct ContentView: View {
                     .id(settings.appLanguage ?? "system")
             }
         }
+        .animation(.easeInOut(duration: 0.2), value: finance.loadState)
         .overlay(alignment: .top) {
             if let persistenceError = finance.persistenceError {
                 PersistenceErrorBanner(message: persistenceError)
@@ -135,6 +157,11 @@ struct ContentView: View {
         // WC-M6: don't sync, generate recurring transactions, or surface their alert while the
         // lock screen is up; the .onChange(isUnlocked) handler re-runs this right after unlock.
         guard appLock.isUnlocked else { return }
+        // WC-LOCK1: second recovery trigger, complementing the protectedDataDidBecomeAvailable
+        // observer. Covers the case that produced the original report — a process launched behind
+        // a locked screen that is still alive when the user later opens the app — plus any load
+        // failure that has nothing to do with the lock screen. No-ops once loaded.
+        await finance.retryLoadIfNeeded(reason: "foreground")
         await finance.ensureICloudSyncRunning()
         // M31: register for silent CloudKit pushes so remote changes propagate in near-real-time /
         // in the background, instead of only on the next foreground. Idempotent; only when sync is on.

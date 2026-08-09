@@ -374,7 +374,40 @@ struct LocalInventoryReconciliation: Equatable, Sendable {
     var didDiscardToken: Bool { !driftedRecordKeys.isEmpty }
 }
 
+/// Why the store has no usable metadata in memory, when it doesn't (WC-LOCK1).
+enum CloudSyncMetadataStoreError: LocalizedError {
+    /// The backing file exists but could not be read — on iOS, essentially always "the device is
+    /// locked and this file's protection class isn't available yet". The in-memory value is a
+    /// blank slate that does **not** reflect disk, so every write is refused until a re-read
+    /// succeeds; see `CloudSyncMetadataStore.reloadIfUnavailable`.
+    case unavailable(underlying: Error)
+
+    var errorDescription: String? {
+        switch self {
+        case .unavailable:
+            "Sync metadata is temporarily unreadable on this device."
+        }
+    }
+}
+
 final class CloudSyncMetadataStore: @unchecked Sendable {
+    /// Outcome of reading the metadata file, kept distinct because the right response differs
+    /// sharply per case (WC-LOCK1). Collapsing these into one `try?` is what let a locked-device
+    /// read denial masquerade as "no file yet" and overwrite healthy metadata with a blank slate.
+    private enum ReadOutcome {
+        /// Read and decoded — the normal path.
+        case loaded(CloudSyncMetadata)
+        /// No file yet (first launch, or after a factory reset). A blank slate *is* the truth.
+        case missing
+        /// Readable but not decodable: truncated, or written by a future schema. A blank slate is
+        /// the only option — there is genuinely nothing to preserve — so overwriting is correct
+        /// and self-healing.
+        case corrupt(Error)
+        /// Present but unreadable. The file may be perfectly healthy; we simply can't see it, so
+        /// nothing may be written over it.
+        case unreadable(Error)
+    }
+
     /// Guards the in-memory `cached` value only. Held briefly for reads and for the in-memory
     /// portion of an update — never across a disk write (WC-M3), so `read()` (called on the
     /// hot CloudKitSyncService actor path) never blocks on I/O.
@@ -384,9 +417,14 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
     /// writes land in the same order as the in-memory updates without holding `dataLock`
     /// across the write.
     private let writeLock = NSLock()
+    private static let logger = Logger(subsystem: "com.wealthcompass.sync", category: "SyncMetadata")
     private let fileManager: FileManager
     private let url: URL
     private var cached: CloudSyncMetadata
+    /// Set when the backing file exists but couldn't be read, meaning `cached` is a blank slate
+    /// that does not represent disk (WC-LOCK1). While true, every write is refused so the
+    /// unreadable-but-possibly-healthy file is never clobbered. Guarded by `dataLock`.
+    private var unreadableError: Error?
 
     init(
         fileManager: FileManager = .default,
@@ -402,13 +440,92 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
             .appendingPathComponent(directoryName, isDirectory: true)
             .appendingPathComponent(fileName)
 
-        if
-            let data = try? Data(contentsOf: url),
-            let decoded = try? FinanceJSONCoding.decode(CloudSyncMetadata.self, from: data)
-        {
+        switch Self.readMetadata(at: url, fileManager: fileManager) {
+        case .loaded(let decoded):
             cached = decoded
-        } else {
+            unreadableError = nil
+        case .missing:
             cached = CloudSyncMetadata()
+            unreadableError = nil
+        case .corrupt(let error):
+            // Nothing to preserve — start clean and let the next write heal the file.
+            cached = CloudSyncMetadata()
+            unreadableError = nil
+            Self.logger.error("Sync metadata is unreadable as JSON; starting from a clean slate: \(error.localizedDescription, privacy: .public)")
+            SyncDiagnosticsLog.shared.record("WARN metadata corrupt (\(DataProtection.diagnosticCode(for: error))) — starting clean")
+        case .unreadable(let error):
+            // WC-LOCK1: the file is there and may be perfectly good. Come up inert rather than
+            // overwriting it with an empty document, which is what wiped a user's sync state.
+            cached = CloudSyncMetadata()
+            unreadableError = error
+            Self.logger.error("Sync metadata could not be read; refusing to write over it: \(error.localizedDescription, privacy: .public)")
+            SyncDiagnosticsLog.shared.record("ERROR metadata unreadable (\(DataProtection.diagnosticCode(for: error))) — writes refused, file preserved")
+        }
+    }
+
+    /// Reads and classifies the metadata file. A missing file and an unreadable one are different
+    /// facts about the world and must never be conflated — see `ReadOutcome`.
+    private static func readMetadata(at url: URL, fileManager: FileManager) -> ReadOutcome {
+        let data: Data
+        do {
+            data = try Data(contentsOf: url)
+        } catch {
+            // `fileExists` is checked *after* the failure, not before, so a file that vanishes
+            // between the two isn't misreported — and so the common success path stays one syscall.
+            return fileManager.fileExists(atPath: url.path) ? .unreadable(error) : .missing
+        }
+        do {
+            return .loaded(try FinanceJSONCoding.decode(CloudSyncMetadata.self, from: data))
+        } catch {
+            return .corrupt(error)
+        }
+    }
+
+    /// True while the store is inert because its file couldn't be read. Callers use this to keep
+    /// the sync engine down rather than let it bootstrap against a blank slate.
+    var isUnavailable: Bool {
+        dataLock.withLock { unreadableError != nil }
+    }
+
+    /// Re-attempts the read that failed at init — call once protected data is available again.
+    /// Returns `true` if the store is now usable (including when it never wasn't).
+    ///
+    /// Adopts whatever is on disk, discarding the blank in-memory slate: nothing can have been
+    /// written into it, because every write was refused while unavailable.
+    @discardableResult
+    func reloadIfUnavailable() -> Bool {
+        // The read + decode happens OUTSIDE `dataLock`, preserving the WC-M3 invariant that the
+        // lock is never held across disk I/O — `read()` runs on the hot CloudKitSyncService actor
+        // path and must never block on a file. Re-checking the flag under the lock afterwards is
+        // safe: the worst a concurrent caller can do is repeat the same idempotent read.
+        guard isUnavailable else { return true }
+        let outcome = Self.readMetadata(at: url, fileManager: fileManager)
+
+        dataLock.lock()
+        defer { dataLock.unlock() }
+        guard unreadableError != nil else { return true }
+
+        switch outcome {
+        case .loaded(let decoded):
+            cached = decoded
+            unreadableError = nil
+            SyncDiagnosticsLog.shared.record("RECOVERED metadata readable again — \(decoded.records.count) record state(s) restored")
+            return true
+        case .missing:
+            // Deleted while we were locked out (a factory reset on this device, say). A blank
+            // slate is now the truth, so the store becomes usable again.
+            cached = CloudSyncMetadata()
+            unreadableError = nil
+            SyncDiagnosticsLog.shared.record("RECOVERED metadata file gone — clean slate adopted")
+            return true
+        case .corrupt(let error):
+            cached = CloudSyncMetadata()
+            unreadableError = nil
+            SyncDiagnosticsLog.shared.record("WARN metadata corrupt on retry (\(DataProtection.diagnosticCode(for: error))) — starting clean")
+            return true
+        case .unreadable(let error):
+            unreadableError = error
+            return false
         }
     }
 
@@ -418,6 +535,14 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
 
     fileprivate func update<T>(_ body: (inout CloudSyncMetadata) throws -> T) throws -> T {
         dataLock.lock()
+        // WC-LOCK1: refuse before touching anything. `cached` is a blank slate that doesn't
+        // reflect the file we couldn't read, so committing it in memory — let alone persisting it —
+        // would destroy real sync state. Throwing here is what turns a locked-device launch from
+        // "wipes the change token and re-bootstraps 440 records" into a clean no-op.
+        if let unreadableError {
+            dataLock.unlock()
+            throw CloudSyncMetadataStoreError.unavailable(underlying: unreadableError)
+        }
         var updated = cached
         let result: T
         do {
@@ -464,6 +589,16 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
     func reset() throws {
         dataLock.lock()
         cached = CloudSyncMetadata()
+        // Deliberately allowed even while unavailable: a reset's whole purpose is to replace
+        // whatever is on disk with a clean slate, so an unreadable file is nothing to protect
+        // here. Clearing the flag also un-wedges the store — the file is about to be authored
+        // by us, at the current protection class, and is readable from here on.
+        //
+        // Restored below if the write fails, though: the atomic write leaves the original file
+        // intact, so a cleared flag plus a blank `cached` would re-arm exactly the overwrite this
+        // whole class of fix exists to prevent.
+        let previousUnreadableError = unreadableError
+        unreadableError = nil
         // Same hand-over-hand discipline as `update`: wipe the in-memory value under `dataLock`,
         // then rewrite the file under `writeLock` (serialized with persists) so a concurrent write
         // can't race it, all without holding `dataLock` across I/O.
@@ -474,7 +609,14 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
         // used to leave the stale file behind to resurrect old state on the next launch; an atomic
         // write of an empty document leaves a valid clean slate instead. `persist` takes no lock, so
         // calling it while holding `writeLock` is safe.
-        try persist(CloudSyncMetadata())
+        do {
+            try persist(CloudSyncMetadata())
+        } catch {
+            // The file on disk is unchanged (atomic write), so re-arm the fail-closed state rather
+            // than leaving a blank in-memory slate free to overwrite it on the next update().
+            dataLock.withLock { unreadableError = previousUnreadableError }
+            throw error
+        }
     }
 
     func pendingRevision(for key: CloudSyncRecordKey) -> UUID? {
@@ -593,8 +735,14 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
         // No pretty-printing in production: the metadata file is rewritten on many events, so the
         // whitespace was pure I/O overhead (#12).
         let data = try FinanceJSONCoding.encode(metadata, prettyPrinted: false)
-        try data.write(to: url, options: [.atomic, .completeFileProtectionUnlessOpen])
+        try data.write(to: url, options: DataProtection.atomicWriteOptions)
         SyncSignpost.sync.emit("metadata records=\(metadata.records.count) bytes=\(data.count) ms=\(SyncSignpost.sync.ms(since: start))")
+    }
+
+    /// WC-LOCK1: re-stamps an existing metadata file with the current protection class. Called
+    /// after a successful finance-DB load, i.e. while protected data is provably available.
+    func upgradeProtectionClassIfNeeded() {
+        DataProtection.upgradeProtectionClass(at: url, fileManager: fileManager)
     }
 }
 
@@ -742,6 +890,16 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             return
         }
         guard !isStarting else {
+            return
+        }
+        // WC-LOCK1: with unreadable metadata, `metadataStore.read()` returns a blank slate — no
+        // change token, no bootstrap flag, no per-record system fields. Starting here would run a
+        // full re-bootstrap of the entire zone against state we know to be fictional. Stay down;
+        // `FinanceStore.retryLoadIfNeeded` restarts us once the files are readable again.
+        guard !metadataStore.isUnavailable else {
+            Self.logger.error("Not starting the sync engine: sync metadata is currently unreadable.")
+            SyncDiagnosticsLog.shared.record("SKIP engine start — metadata unreadable (deferred until readable)")
+            await statusHandler(.waiting("Your data is locked. Sync resumes once this device is unlocked."))
             return
         }
 
@@ -2120,7 +2278,7 @@ final class SyncDiagnosticsLog: @unchecked Sendable {
         lines.reserveCapacity(self.capacity)
     }
 
-    /// Appends one line (a `HH:mm:ss.SSS` timestamp is prepended here). Evicts the oldest lines
+    /// Appends one line (a `MM-dd HH:mm:ss.SSS` timestamp is prepended here). Evicts the oldest lines
     /// once `capacity` is exceeded, so memory stays bounded regardless of how long the app runs.
     func record(_ message: String) {
         let line = "\(Self.timestamp()) \(message)"
@@ -2145,7 +2303,11 @@ final class SyncDiagnosticsLog: @unchecked Sendable {
     private static let timestampFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "HH:mm:ss.SSS"
+        // The ring spans up to several days, so a time-only stamp made an export ambiguous:
+        // consecutive lines reading 22:11 then 09:15 could be one night or three days apart,
+        // which matters when reconstructing whether one process survived across a lock/unlock.
+        // Day-and-month is enough to disambiguate without dating the export precisely.
+        formatter.dateFormat = "MM-dd HH:mm:ss.SSS"
         return formatter
     }()
 
