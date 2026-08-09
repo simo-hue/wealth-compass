@@ -35801,6 +35801,9 @@
     "Data Summary" : {
 
     },
+    "Data Unavailable" : {
+
+    },
     "Date" : {
       "localizations" : {
         "ar" : {
@@ -46280,6 +46283,15 @@
         }
       }
     },
+    "Erase" : {
+
+    },
+    "Erase and Start Over" : {
+
+    },
+    "Erase Data on This Device?" : {
+
+    },
     "Erase Everything" : {
 
     },
@@ -49237,6 +49249,9 @@
 
     },
     "Export" : {
+
+    },
+    "Export Diagnostics" : {
 
     },
     "Export Failed" : {
@@ -66712,6 +66727,9 @@
     "Live rate" : {
 
     },
+    "Loading your data…" : {
+
+    },
     "Local" : {
       "localizations" : {
         "ar" : {
@@ -79555,6 +79573,9 @@
           }
         }
       }
+    },
+    "Nothing has been changed or deleted. Your data just can't be read until this device is unlocked." : {
+
     },
     "Notifications" : {
       "localizations" : {
@@ -98188,6 +98209,9 @@
         }
       }
     },
+    "Share Diagnostics" : {
+
+    },
     "Share Sync Diagnostics" : {
 
     },
@@ -102891,6 +102915,9 @@
         }
       }
     },
+    "Sync is paused until this device is unlocked." : {
+
+    },
     "Syncing" : {
       "localizations" : {
         "ar" : {
@@ -104986,6 +105013,9 @@
           }
         }
       }
+    },
+    "The file is still on this device and has not been deleted. iCloud sync is off, so there is no other copy — export diagnostics before erasing anything." : {
+
     },
     "The first occurrence must be in the future." : {
       "extractionState" : "manual",
@@ -107328,6 +107358,9 @@
           }
         }
       }
+    },
+    "This deletes the unreadable database on this device and returns the app to onboarding. Your iCloud copy is NOT deleted — if iCloud sync was on, turning it back on restores your data from there." : {
+
     },
     "This file isn't a Wealth Compass Tracker backup or a supported Revolut / Trade Republic statement." : {
       "localizations" : {
@@ -111851,6 +111884,12 @@
           }
         }
       }
+    },
+    "Try Again" : {
+
+    },
+    "Trying Again…" : {
+
     },
     "Turn off app protection for Wealth Compass Tracker." : {
 
@@ -119432,6 +119471,18 @@
           }
         }
       }
+    },
+    "Your change was saved on this device, but could not be queued for iCloud yet." : {
+
+    },
+    "Your data has not been deleted. iCloud sync is on, so a copy also exists in iCloud." : {
+
+    },
+    "Your Data Is Locked" : {
+
+    },
+    "Your data is protected and can't be read while this device is locked. Unlock the device to continue." : {
+
     },
     "Your data remains on this device." : {
       "localizations" : {
