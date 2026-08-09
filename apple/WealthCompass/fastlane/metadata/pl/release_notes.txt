@@ -1,1 +1,7 @@
-new cash-flow graph
+Poprawki i ulepszenia niezawodności.
+
+• Naprawiono rzadki problem, przez który aplikacja mogła otworzyć się bez żadnych danych. Twoje informacje nigdy nie zostały utracone — po prostu nie można ich było jeszcze odczytać, a teraz aplikacja czeka i wczytuje je poprawnie zamiast pokazywać puste wartości.
+
+• Bardziej niezawodna synchronizacja z iCloud, także w tle.
+
+• Jeśli danych nie da się wczytać, aplikacja wyjaśni teraz dlaczego i zaproponuje sposób odzyskania zamiast pokazywać puste sumy.

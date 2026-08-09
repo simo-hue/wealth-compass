@@ -1,1 +1,7 @@
-new cash-flow graph
+Opravy a vylepšení spolehlivosti.
+
+• Opravili jsme vzácný problém, kdy se aplikace mohla otevřít bez jakýchkoli dat. Vaše údaje se nikdy neztratily — jen je zatím nebylo možné načíst a aplikace nyní počká a načte je správně, místo aby zobrazila nulové hodnoty.
+
+• Spolehlivější synchronizace s iCloudem, i na pozadí.
+
+• Pokud data nelze načíst, aplikace nyní vysvětlí proč a nabídne způsob obnovy místo zobrazení prázdných součtů.

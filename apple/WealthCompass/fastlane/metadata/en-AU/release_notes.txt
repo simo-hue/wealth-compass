@@ -1,1 +1,7 @@
-new cash-flow graph
+Fixes and reliability improvements.
+
+• Fixed a rare issue where the app could open showing no data. Your information was never lost — it simply couldn't be read yet, and the app now waits and loads it properly instead of showing empty figures.
+
+• More reliable iCloud sync, including in the background.
+
+• If your data ever can't be loaded, the app now explains why and offers a way to recover instead of showing empty totals.

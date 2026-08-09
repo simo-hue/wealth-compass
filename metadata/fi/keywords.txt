@@ -1,1 +1,0 @@
-nettovarallisuus, budjetti, kulu, tulo, kassavirta, sijoitussalkku, sijoitus, kryptovaluutta

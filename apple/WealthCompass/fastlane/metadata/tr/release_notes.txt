@@ -1,1 +1,7 @@
-new cash-flow graph
+Hata düzeltmeleri ve güvenilirlik iyileştirmeleri.
+
+• Uygulamanın hiç veri göstermeden açılabildiği ender bir sorun giderildi. Bilgileriniz asla kaybolmadı — yalnızca henüz okunamıyordu; uygulama artık bekleyip verileri doğru şekilde yüklüyor, boş rakamlar göstermek yerine.
+
+• Arka planda da dahil olmak üzere daha güvenilir iCloud eşitlemesi.
+
+• Verileriniz yüklenemezse uygulama artık nedenini açıklıyor ve boş toplamlar göstermek yerine kurtarma yolu sunuyor.

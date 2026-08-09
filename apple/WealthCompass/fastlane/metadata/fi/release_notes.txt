@@ -1,1 +1,7 @@
-new cash-flow graph
+Korjauksia ja luotettavuusparannuksia.
+
+• Korjattu harvinainen ongelma, jossa sovellus saattoi avautua ilman tietoja. Tietosi eivät koskaan kadonneet — niitä ei vain vielä voitu lukea, ja nyt sovellus odottaa ja lataa ne oikein sen sijaan, että näyttäisi tyhjiä lukuja.
+
+• Luotettavampi iCloud-synkronointi myös taustalla.
+
+• Jos tietojasi ei jostain syystä voi ladata, sovellus kertoo nyt syyn ja tarjoaa tavan palautua sen sijaan, että näyttäisi tyhjiä summia.

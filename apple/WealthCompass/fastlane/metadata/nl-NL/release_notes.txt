@@ -1,1 +1,7 @@
-new cash-flow graph
+Oplossingen en betrouwbaarheidsverbeteringen.
+
+• Een zeldzaam probleem verholpen waarbij de app kon openen zonder gegevens te tonen. Uw gegevens zijn nooit verloren gegaan — ze konden alleen nog niet worden gelezen, en de app wacht nu en laadt ze correct in plaats van lege bedragen te tonen.
+
+• Betrouwbaardere iCloud-synchronisatie, ook op de achtergrond.
+
+• Als uw gegevens niet kunnen worden geladen, legt de app nu uit waarom en biedt een manier om te herstellen in plaats van lege totalen te tonen.

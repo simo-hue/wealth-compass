@@ -6,10 +6,12 @@ you run the checks below whenever you're at a real Mac and report anything red.
 
 ---
 
-- [ ] **Marketing URL points at your Terms of Service.** All 39 locales have
-      `marketing_url = .../terms`. It should be `.../` — the "Developer Website" link on your product
-      page currently sends people to legal boilerplate instead of the landing page.
-- [ ] **Support URL points at the FAQ, which describes the wrong product.** `/faq` currently says
+- [x] **Marketing URL points at your Terms of Service.** ~~All 39 locales have
+      `marketing_url = .../terms`.~~ **DONE 2026-08-09** — set to `.../` in all 39 locales; ships with
+      the 1.1.6 metadata push (see the 1.1.6 release section at the end of this file).
+- [x] **Support URL points at the FAQ, which describes the wrong product.** **URL DONE 2026-08-09** —
+      `support_url` is now `.../support` in all 39 locales. The `/faq` *content* problem below is still
+      open and unrelated to the URL change. `/faq` currently says
       Wealth Compass is self-hosted on Supabase, has "no official cloud SaaS version", stores data in
       "your own Supabase instance", and answers "How do I get started?" with a guide that opens
       "Node.js 18+ installed on your machine". Someone clicking Support from the store — or an App
@@ -31,9 +33,11 @@ you run the checks below whenever you're at a real Mac and report anything red.
 
 ### Factual corrections found while building
 
-- [ ] **"38 languages" is wrong.** `Localizable.xcstrings` covers **35 locales**; `metadata/` has 39
-      directories but several are regional variants of one language (en-AU/CA/GB/US, es-ES/MX,
-      fr-CA/FR, pt-BR/PT). Neither count gives 38. `README.md:28` says 38. The site will say 35.
+- [ ] **"38 languages" is wrong.** `Localizable.xcstrings` covers **35 locales**;
+      `apple/WealthCompass/fastlane/metadata/` has 39 directories but several are regional variants of
+      one language (en-AU/CA/GB/US, es-ES/MX, fr-CA/FR, pt-BR/PT). Neither count gives 38.
+      `README.md:28` says 38. The site will say 35. (Path updated 2026-08-09: the old root `metadata/`
+      duplicate has been deleted.)
 
 ### Localization bugs in the app (found while extracting real strings)
 
@@ -72,8 +76,9 @@ App Store URLs; they should all return 200 with content.
 
 ### Still needs you (unchanged from the earlier list, plus new items)
 
-- [ ] **App Store Connect**: `marketing_url` `/terms` -> `/`, and `support_url` `/faq` -> `/support`
-      (39 locales). Both still point at the wrong pages.
+- [x] **App Store Connect**: `marketing_url` `/terms` -> `/`, and `support_url` `/faq` -> `/support`
+      (39 locales). **DONE 2026-08-09** in the metadata tree; reaches the store on the next
+      `fastlane ios release` / `fastlane mac release`.
 - [ ] **Provider ID** for campaign attribution — `web-app/src/site/links.ts`, `PROVIDER_TOKEN = null`.
 - [ ] **README.md** still says "38 languages" and calls the project open source. Both are wrong: the
       catalogue has 35 locales and the licence is PolyForm Noncommercial (source-available). The
@@ -266,16 +271,20 @@ The versions and release notes for iOS and macOS have been updated locally.
 ---
 ### Manual Actions Required: WC-LOCK1 locked-device fix (2026-08-09)
 
-1. **Build and run the test suite on a machine with Xcode.** This machine has only Command Line Tools, so
-   `xcodebuild` cannot run and `XCTest` is unavailable. Nothing inside `#if os(iOS)` and nothing in
-   `Sources/iOS/` has been compiled, and `Tests/DataProtectionRecoveryTests.swift` has never been run:
+1. ~~**Build and run the test suite on a machine with Xcode.**~~ **DONE (2026-08-09).**
+   `xcodebuild test -only-testing:WealthCompassTests/DataProtectionRecoveryTests` passed on the
+   `WealthCompassMobile` scheme. Because the tests are hosted by the Mobile app, this also compiled the
+   whole iOS target — so every `#if os(iOS)` branch, all of `Sources/iOS/`, and the Mobile-target
+   `project.pbxproj` wiring for the two new files are now verified.
+
+   **Still outstanding: build the Mac scheme once.** The macOS module typechecks via `swiftc`, but the
+   `WealthCompassMac` target membership for `DataProtection.swift` and `FinanceDataUnavailableView.swift`
+   was added by hand-editing `project.pbxproj` and only a real build proves it:
    ```
    cd apple
-   xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile \
-     -destination 'platform=iOS Simulator,name=iPhone 16' test \
-     -only-testing:WealthCompassTests/DataProtectionRecoveryTests
+   xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMac \
+     -destination 'platform=macOS' build
    ```
-   Also build the Mac scheme once — two new files were added to both targets in `project.pbxproj` by hand.
 
 2. **Sync the string catalog.** New user-facing strings were added and are English-only:
    "Loading your data…", "Your Data Is Locked", "Data Unavailable", "Try Again", "Trying Again…",
@@ -312,3 +321,41 @@ The versions and release notes for iOS and macOS have been updated locally.
    metadata really was wiped, so the next launch will re-upload roughly 440 records with no `systemFields`
    — expect one heavy sync with "record already exists" collisions absorbed by the benign-partial-failure
    path. Do **not** run a factory reset of sync to "fix" it.
+
+---
+### Manual Actions Required: 1.1.6 release (2026-08-09)
+
+Version is now **1.1.6 / build 22** and all 39 locales of metadata are written. Everything below has to
+happen on the Mac with Xcode, from `apple/WealthCompass`.
+
+1. **Create the 1.1.6 version in App Store Connect — TWICE, before running any lane.**
+   Once for iOS and once for macOS: they are separate platforms on the same app record. The Deliverfile
+   sets `skip_app_version_update(true)` (deliberately — so fastlane can never create or retarget a version
+   behind your back while pushing 39 locales), which means deliver will fail with "Could not find version
+   1.1.6" if the version isn't already there.
+
+2. **Ship iOS**, then macOS:
+   ```
+   cd apple/WealthCompass
+   fastlane ios release
+   fastlane mac release
+   ```
+   Both build, upload the binary, and push metadata. Neither submits for review — `submit_for_review(false)`
+   is set on purpose. You press "Submit for Review" yourself in App Store Connect.
+
+   If you'd rather test on TestFlight first: `fastlane ios beta`, then `fastlane ios release` after.
+
+3. **Sanity-check the localized "What's New" in App Store Connect** before submitting, at least for the
+   languages you read. The release notes are newly translated for all 39 locales (1.1.5 shipped the English
+   string "new cash-flow graph" everywhere), and this is the one field a reviewer and your users both see.
+
+4. **Optional but recommended — scrub your phone number.** `apple/WealthCompass/fastlane/metadata/review_information/`
+   now lives in this repo, which is public on GitHub, and it contains your real name, email and
+   `+393347985325`. App Review needs a reachable contact, but it does not have to be committed publicly.
+   Either replace the file contents with placeholders and set the real values in App Store Connect by hand,
+   or add `fastlane/metadata/review_information/` to `.gitignore` and keep it local-only. Say the word and
+   I'll do either.
+
+5. **Nothing needs doing about the old root `metadata/` folder** — it was a stale duplicate (312 files
+   diverged, with contradictory URLs) that no tooling read, and it has been deleted. The single source of
+   truth is now `apple/WealthCompass/fastlane/metadata/`.

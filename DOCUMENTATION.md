@@ -958,3 +958,61 @@ which still describes the retired React/Supabase web app.
     in `DataProtectionRecoveryTests`. One test failure during this pass was a bug in the *test*: `Transaction`
     stamps fresh `createdAt`/`updatedAt` per initialization, so a baseline derived from a second sample
     hashes differently and makes even a correct baseline look stale.
+
+- [2026-08-09]: WC-LOCK1 — verification update
+  - *Details*: `xcodebuild test -only-testing:WealthCompassTests/DataProtectionRecoveryTests` passed on the
+    `WealthCompassMobile` scheme (run by the user; this machine has no Xcode). The two entries above listed
+    the iOS-only code as unverified — that is now stale and superseded by this note.
+  - *Tech Notes*: The test target is hosted by the Mobile app (`TEST_HOST` → `WealthCompassMobile.app`), so
+    a passing test run necessarily compiled the entire iOS target. That retires the single largest risk in
+    the change — the `#if os(iOS)` branches could not be compiled locally. Now confirmed against the real
+    iOS SDK: `UIApplication.shared.isProtectedDataAvailable`, `UIApplication.protectedDataDidBecomeAvailableNotification`
+    and `applicationState` accessed from the `@MainActor` `ProtectedDataAvailability` shim;
+    `FileProtectionType.completeUntilFirstUserAuthentication` with `FileManager.setAttributes(_:ofItemAtPath:)`
+    and the `attributesOfItem` read-back cast; `Data.WritingOptions.completeFileProtectionUntilFirstUserAuthentication`
+    on iOS as well as macOS; the `NotificationCenter` observer's `Task { @MainActor in }` hop and its weak
+    capture; `FinanceStore`'s nonisolated `deinit` touching MainActor-isolated stored properties; the
+    `FinanceDataUnavailableView(state:isCloudSyncEnabled:retry:exportDiagnostics:eraseLocalData:)` call site
+    with its `() async -> Void` closures; and the Mobile-target `project.pbxproj` wiring for both new files.
+    All 11 XCTest cases pass, including the two added after the review pass (split readable-DB/unreadable-
+    metadata recovery, and the stale-diff-baseline discrimination check).
+  - *Remaining*: a real `WealthCompassMac` build (macOS target membership was hand-edited into
+    `project.pbxproj`; `swiftc -typecheck` passes but is not a build), on-device locked-launch behaviour,
+    and a visual pass over the new failure screen. See TO_SIMO_DO.md.
+
+- [2026-08-09]: 1.1.6 Version Bump + App Store Metadata Overhaul (39 locales)
+  - *Details*: Prepares the WC-LOCK1 fix for release on iOS **and** macOS (universal purchase, same app
+    record). Beyond the version bump, an audit of the metadata turned up two pre-existing defects that were
+    live on the storefront, both fixed here.
+    1. **29 fields were literally truncated mid-word.** Six subtitles (el, es-ES, es-MX, fi, it, pt-PT) and
+       23 `promotional_text` fields ended in `..`, sitting exactly on Apple's 30/170-character limits —
+       someone had hard-cut the translations to fit rather than writing shorter ones. `Rastreador de
+       patrimonio pri..` was appearing under the app name in Spanish search results. All 29 rewritten as
+       complete phrases that fit naturally, reusing each locale's own terminology from its `description.txt`.
+    2. **`marketing_url` pointed at the Terms page** in all 39 locales. Apple surfaces this as the app's
+       marketing/developer website link.
+  - *Tech Notes*:
+    - `project.pbxproj`: `MARKETING_VERSION` 1.1.5 → **1.1.6** and `CURRENT_PROJECT_VERSION` 21 → **22**,
+      6 occurrences each (Mobile, Mac, Tests × Debug/Release) so nothing drifts between targets.
+    - `release_notes.txt` written for all **39 locales**, translated rather than English-duplicated (the
+      1.1.5 notes were the literal string "new cash-flow graph" in every language). Copy is deliberately
+      platform-neutral because `deliver` reads one metadata folder for both iOS and macOS — and it is
+      accurate for both, since the Mac app received the same recovery screen, metadata-store hardening and
+      ⌘N gating. It leads with the symptom a user would recognise and states plainly that no data was lost.
+    - URLs corrected across all 39 locales: `marketing_url` → site root, `support_url` → `/support` (a real
+      route, and the field App Review checks), `privacy_url` → `/privacy` (unchanged).
+    - **Metadata tree consolidated.** There were two diverged copies — `metadata/` at the repo root and
+      `apple/WealthCompass/fastlane/metadata/` — 312 files apart, with *contradictory* URL values. Only the
+      latter is ever read, because the Fastfile lanes run from `apple/WealthCompass`. The app-level files
+      that existed only at the root (`copyright.txt`, `primary_category.txt`, `secondary_category.txt`,
+      `review_information/`) were moved into the fastlane tree, and the root copy deleted. Verified first
+      that nothing in the repo references it. The four `*_sub_category.txt` files were dropped: they held a
+      bare newline, and App Store subcategories exist only for Games and Stickers, not Finance/Productivity.
+      The 39 empty `apple_tv_privacy_policy.txt` placeholders were dropped too (not a tvOS app).
+    - `Fastfile` header comment refreshed (it still claimed 1.1.0 / build 11) and now documents the
+      `skip_app_version_update(true)` consequence — the version must exist in App Store Connect *before*
+      the lane runs, once per platform.
+  - *Verification*: an independent post-write audit (not the script that wrote the files) confirms 39
+    locales × 9 fields present, none empty, **none over Apple's limits**, none still ending in `..`, and one
+    consistent value for each of the three URLs. 33 distinct release-note texts across 39 locales, which is
+    exactly right: en-US/GB/AU/CA share one and fr-FR/fr-CA share one.

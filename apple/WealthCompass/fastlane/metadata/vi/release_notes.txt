@@ -1,1 +1,7 @@
-new cash-flow graph
+Sửa lỗi và cải thiện độ tin cậy.
+
+• Đã khắc phục sự cố hiếm gặp khiến ứng dụng có thể mở ra mà không hiển thị dữ liệu. Thông tin của bạn chưa bao giờ bị mất — chỉ là chưa thể đọc được, và giờ đây ứng dụng sẽ chờ và tải đúng thay vì hiển thị số liệu trống.
+
+• Đồng bộ iCloud đáng tin cậy hơn, kể cả khi chạy nền.
+
+• Nếu dữ liệu không thể tải được, ứng dụng giờ sẽ giải thích lý do và đề xuất cách khôi phục thay vì hiển thị tổng bằng 0.

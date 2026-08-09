@@ -1,1 +1,7 @@
-new cash-flow graph
+Remedieri și îmbunătățiri de fiabilitate.
+
+• Am remediat o problemă rară din cauza căreia aplicația se putea deschide fără să afișeze date. Informațiile tale nu au fost niciodată pierdute — doar nu puteau fi încă citite, iar acum aplicația așteaptă și le încarcă corect în loc să afișeze valori goale.
+
+• Sincronizare iCloud mai fiabilă, inclusiv în fundal.
+
+• Dacă datele nu pot fi încărcate, aplicația explică acum motivul și oferă o cale de recuperare în loc să afișeze totaluri goale.

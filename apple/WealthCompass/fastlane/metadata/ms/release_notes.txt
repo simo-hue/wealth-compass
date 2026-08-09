@@ -1,1 +1,7 @@
-new cash-flow graph
+Pembaikan dan penambahbaikan kebolehpercayaan.
+
+• Membaiki masalah jarang berlaku apabila apl boleh dibuka tanpa memaparkan data. Maklumat anda tidak pernah hilang — ia cuma belum boleh dibaca, dan kini apl menunggu serta memuatkannya dengan betul dan bukannya memaparkan angka kosong.
+
+• Penyegerakan iCloud yang lebih dipercayai, termasuk di latar belakang.
+
+• Jika data anda tidak dapat dimuatkan, apl kini menerangkan sebabnya dan menawarkan cara pemulihan dan bukannya memaparkan jumlah kosong.

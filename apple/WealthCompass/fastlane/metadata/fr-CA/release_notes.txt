@@ -1,1 +1,7 @@
-new cash-flow graph
+Corrections et améliorations de fiabilité.
+
+• Correction d'un problème rare où l'app pouvait s'ouvrir sans afficher de données. Vos informations n'ont jamais été perdues — elles ne pouvaient simplement pas encore être lues, et l'app attend désormais et les charge correctement au lieu d'afficher des montants vides.
+
+• Synchronisation iCloud plus fiable, y compris en arrière-plan.
+
+• Si vos données ne peuvent pas être chargées, l'app explique maintenant pourquoi et propose une solution de récupération au lieu d'afficher des totaux vides.

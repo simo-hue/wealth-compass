@@ -1,1 +1,7 @@
-new cash-flow graph
+Javítások és megbízhatósági fejlesztések.
+
+• Javítottunk egy ritka hibát, amely miatt az alkalmazás adatok nélkül indulhatott el. Az adatai soha nem vesztek el — csak még nem lehetett beolvasni őket, és az alkalmazás mostantól megvárja és helyesen betölti őket, ahelyett hogy üres értékeket mutatna.
+
+• Megbízhatóbb iCloud-szinkronizálás, a háttérben is.
+
+• Ha az adatok nem tölthetők be, az alkalmazás most elmagyarázza az okát és helyreállítási lehetőséget kínál üres összesítők helyett.

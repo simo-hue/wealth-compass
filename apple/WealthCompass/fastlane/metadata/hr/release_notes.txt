@@ -1,1 +1,7 @@
-new cash-flow graph
+Ispravci i poboljšanja pouzdanosti.
+
+• Ispravljen je rijedak problem zbog kojeg se aplikacija mogla otvoriti bez prikaza podataka. Vaši podaci nikada nisu izgubljeni — samo se još nisu mogli pročitati, a aplikacija sada pričeka i ispravno ih učita umjesto da prikaže prazne iznose.
+
+• Pouzdanija iCloud sinkronizacija, i u pozadini.
+
+• Ako se podaci ne mogu učitati, aplikacija sada objašnjava zašto i nudi način oporavka umjesto prikaza praznih ukupnih iznosa.

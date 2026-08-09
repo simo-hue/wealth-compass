@@ -1,1 +1,7 @@
-new cash-flow graph
+Perbaikan dan peningkatan keandalan.
+
+• Memperbaiki masalah langka saat aplikasi bisa terbuka tanpa menampilkan data. Informasi Anda tidak pernah hilang — hanya belum dapat dibaca, dan kini aplikasi menunggu lalu memuatnya dengan benar alih-alih menampilkan angka kosong.
+
+• Sinkronisasi iCloud lebih andal, termasuk di latar belakang.
+
+• Jika data Anda tidak dapat dimuat, aplikasi kini menjelaskan alasannya dan menawarkan cara pemulihan alih-alih menampilkan total kosong.

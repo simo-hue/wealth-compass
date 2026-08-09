@@ -1,1 +1,7 @@
-new cash-flow graph
+Korrigeringar och förbättrad tillförlitlighet.
+
+• Åtgärdade ett ovanligt problem där appen kunde öppnas utan att visa någon data. Din information har aldrig gått förlorad — den kunde bara inte läsas än, och appen väntar nu in och läser in den korrekt i stället för att visa tomma siffror.
+
+• Mer tillförlitlig iCloud-synkronisering, även i bakgrunden.
+
+• Om dina uppgifter inte kan läsas in förklarar appen nu varför och erbjuder ett sätt att återställa i stället för att visa tomma summor.
