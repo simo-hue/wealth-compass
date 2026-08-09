@@ -368,3 +368,5 @@ happen on the Mac with Xcode, from `apple/WealthCompass`.
 5. **Nothing needs doing about the old root `metadata/` folder** — it was a stale duplicate (312 files
    diverged, with contradictory URLs) that no tooling read, and it has been deleted. The single source of
    truth is now `apple/WealthCompass/fastlane/metadata/`.
+
+- **Enable GitHub Actions Permissions**: To allow the new automated deployment to work, go to your repository on GitHub -> **Settings** -> **Actions** -> **General** -> **Workflow permissions**. Select **Read and write permissions** and save. Otherwise, the deployment action will fail to push to the `gh-pages` branch.

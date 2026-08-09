@@ -1016,3 +1016,6 @@ which still describes the retired React/Supabase web app.
     locales × 9 fields present, none empty, **none over Apple's limits**, none still ending in `..`, and one
     consistent value for each of the three URLs. 33 distinct release-note texts across 39 locales, which is
     exactly right: en-US/GB/AU/CA share one and fr-FR/fr-CA share one.
+- [2026-08-09 15:30]: Automated Web App Deployment
+  - *Details*: Set up a GitHub Actions workflow to automatically build and deploy the web application to GitHub Pages whenever changes are pushed to the `main` branch.
+  - *Tech Notes*: Created `.github/workflows/deploy-webapp.yml` using `peaceiris/actions-gh-pages@v4`. Updated `web-app/DEPLOYMENT.md` to reflect the new automated deployment strategy while keeping the manual `npm run deploy` method as a fallback.
