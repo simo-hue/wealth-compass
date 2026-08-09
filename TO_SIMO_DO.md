@@ -334,11 +334,20 @@ happen on the Mac with Xcode, from `apple/WealthCompass`.
    behind your back while pushing 39 locales), which means deliver will fail with "Could not find version
    1.1.6" if the version isn't already there.
 
-2. **Ship iOS**, then macOS:
+2. **Authenticate and Ship iOS**, then macOS:
+   The Apple ID requires two-factor authentication, which means `fastlane` needs an app-specific password to upload to App Store Connect.
+   - Go to [account.apple.com](https://account.apple.com), sign in, and generate an app-specific password.
+   - Then set the environment variable and run the release lanes (always using `bundle exec`):
    ```
    cd apple/WealthCompass
-   fastlane ios release
-   fastlane mac release
+   export FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD="your-app-specific-password-here"
+   bundle exec fastlane ios release
+   bundle exec fastlane mac release
+   ```
+
+   **To upload ONLY the metadata** (e.g. if the binary already uploaded or if you just want to update screenshots/text):
+   ```
+   bundle exec fastlane ios metadata
    ```
    Both build, upload the binary, and push metadata. Neither submits for review — `submit_for_review(false)`
    is set on purpose. You press "Submit for Review" yourself in App Store Connect.
