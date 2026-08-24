@@ -4467,26 +4467,26 @@
         },
         "cs" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ ČISTÉ"
           }
         },
         "da" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ NETTO"
           }
         },
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ NETTO"
           }
         },
         "el" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ ΚΑΘΑΡΟ"
           }
         },
         "en" : {
@@ -4509,8 +4509,8 @@
         },
         "fi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ NETTO"
           }
         },
         "fr" : {
@@ -4521,26 +4521,26 @@
         },
         "he" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ נטו"
           }
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ नेट"
+            "state" : "needs_review",
+            "value" : "%@ शुद्ध"
           }
         },
         "hr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ NETO"
           }
         },
         "hu" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ NETTÓ"
           }
         },
         "id" : {
@@ -4551,20 +4551,20 @@
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ RETE"
+            "state" : "needs_review",
+            "value" : "%@ NETTO"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ ネット"
+            "state" : "needs_review",
+            "value" : "%@ 純額"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ 순액"
           }
         },
         "ms" : {
@@ -4575,20 +4575,20 @@
         },
         "nb" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NETT"
+            "state" : "needs_review",
+            "value" : "%@ NETTO"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ NETTO"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ NETTO"
           }
         },
         "pt-BR" : {
@@ -4611,20 +4611,20 @@
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ СЕТЬ"
+            "state" : "needs_review",
+            "value" : "%@ НЕТТО"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ ČISTÉ"
           }
         },
         "sv" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ NETTO"
           }
         },
         "th" : {
@@ -4641,26 +4641,26 @@
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ НЕТТО"
           }
         },
         "vi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ NET"
+            "state" : "needs_review",
+            "value" : "%@ RÒNG"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 网络"
+            "state" : "needs_review",
+            "value" : "%@ 净额"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 網路"
+            "state" : "needs_review",
+            "value" : "%@ 淨額"
           }
         }
       }
@@ -9762,7 +9762,7 @@
         "ca" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "S'han afegit %lld transaccions vençudes al Flux de caixa."
+            "value" : "S'han afegit %lld transaccions programades al Flux de caixa."
           }
         },
         "cs" : {
@@ -9774,7 +9774,7 @@
         "da" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld forfaldne transaktioner blev føjet til Cash Flow."
+            "value" : "%lld planlagte transaktioner blev føjet til Cash Flow."
           }
         },
         "de" : {
@@ -9786,19 +9786,19 @@
         "el" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld οφειλόμενες συναλλαγές προστέθηκαν στην Ταμειακή ροή."
+            "value" : "%lld προγραμματισμένες συναλλαγές προστέθηκαν στην Ταμειακή ροή."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Se agregaron %lld transacciones vencidas al Flujo de Caja."
+            "value" : "Se agregaron %lld transacciones programadas al Flujo de Caja."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Se agregaron %lld transacciones vencidas al Flujo de fondos."
+            "value" : "Se agregaron %lld transacciones programadas al Flujo de fondos."
           }
         },
         "fi" : {
@@ -9810,7 +9810,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld transactions dues ont été ajoutées au flux de trésorerie."
+            "value" : "%lld transactions arrivées à échéance ont été ajoutées au flux de trésorerie."
           }
         },
         "he" : {
@@ -9846,7 +9846,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld transazioni in scadenza sono state aggiunte al Flusso di Cassa."
+            "value" : "%lld transazioni pianificate sono state aggiunte al Flusso di Cassa."
           }
         },
         "ja" : {
@@ -9864,13 +9864,13 @@
         "ms" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld transaksi matang telah ditambahkan ke Aliran Tunai."
+            "value" : "%lld transaksi berjadual telah ditambahkan ke Aliran Tunai."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld forfalte transaksjoner ble lagt til i Kontantstrøm."
+            "value" : "%lld planlagte transaksjoner ble lagt til i Kontantstrøm."
           }
         },
         "nl" : {
@@ -9888,13 +9888,13 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld transações vencidas foram adicionadas ao Fluxo de caixa."
+            "value" : "%lld transações programadas foram adicionadas ao Fluxo de caixa."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Foram adicionadas %lld transações vencidas ao Fluxo de caixa."
+            "value" : "Foram adicionadas %lld transações programadas ao Fluxo de caixa."
           }
         },
         "ro" : {
@@ -9918,7 +9918,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld förfallna transaktioner lades till i Kassaflöde."
+            "value" : "%lld planerade transaktioner lades till i Kassaflöde."
           }
         },
         "th" : {
@@ -12479,7 +12479,7 @@
         "ca" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "S'ha afegit 1 transacció vençuda al Flux de caixa."
+            "value" : "S'ha afegit 1 transacció programada al Flux de caixa."
           }
         },
         "cs" : {
@@ -12491,7 +12491,7 @@
         "da" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "1 forfalden transaktion blev føjet til Cash Flow."
+            "value" : "1 planlagt transaktion blev føjet til Cash Flow."
           }
         },
         "de" : {
@@ -12503,19 +12503,19 @@
         "el" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "1 οφειλόμενη συναλλαγή προστέθηκε στην Ταμειακή ροή."
+            "value" : "1 προγραμματισμένη συναλλαγή προστέθηκε στην Ταμειακή ροή."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Se agregó 1 transacción vencida al Flujo de Caja."
+            "value" : "Se agregó 1 transacción programada al Flujo de Caja."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Se agregó 1 transacción vencida al Flujo de fondos."
+            "value" : "Se agregó 1 transacción programada al Flujo de fondos."
           }
         },
         "fi" : {
@@ -12527,7 +12527,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "1 transaction due a été ajoutée au flux de trésorerie."
+            "value" : "1 transaction arrivée à échéance a été ajoutée au flux de trésorerie."
           }
         },
         "he" : {
@@ -12563,7 +12563,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "1 transazione in scadenza è stata aggiunta al Flusso di Cassa."
+            "value" : "1 transazione pianificata è stata aggiunta al Flusso di Cassa."
           }
         },
         "ja" : {
@@ -12581,13 +12581,13 @@
         "ms" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "1 transaksi matang telah ditambahkan ke Aliran Tunai."
+            "value" : "1 transaksi berjadual telah ditambahkan ke Aliran Tunai."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "1 forfalt transaksjon ble lagt til i Kontantstrøm."
+            "value" : "1 planlagt transaksjon ble lagt til i Kontantstrøm."
           }
         },
         "nl" : {
@@ -12605,13 +12605,13 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "1 transação vencida foi adicionada ao Fluxo de caixa."
+            "value" : "1 transação programada foi adicionada ao Fluxo de caixa."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Foi adicionada 1 transação vencida ao Fluxo de caixa."
+            "value" : "Foi adicionada 1 transação programada ao Fluxo de caixa."
           }
         },
         "ro" : {
@@ -12635,7 +12635,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "1 förfallen transaktion lades till i Kassaflöde."
+            "value" : "1 planerad transaktion lades till i Kassaflöde."
           }
         },
         "th" : {
@@ -13526,25 +13526,25 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 měs"
+            "value" : "3 měs."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 mdr"
+            "value" : "3 mdr."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 Mon"
+            "value" : "3 Mon."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 μήν"
+            "value" : "3 μήν."
           }
         },
         "en" : {
@@ -13556,13 +13556,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 m"
+            "value" : "3 meses"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 m"
+            "value" : "3 meses"
           }
         },
         "fi" : {
@@ -13592,7 +13592,7 @@
         "hr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 mj"
+            "value" : "3 mj."
           }
         },
         "hu" : {
@@ -13634,7 +13634,7 @@
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 mnd"
+            "value" : "3 mnd."
           }
         },
         "nl" : {
@@ -13646,7 +13646,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 mies"
+            "value" : "3 mies."
           }
         },
         "pt-BR" : {
@@ -13676,7 +13676,7 @@
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 mes"
+            "value" : "3 mes."
           }
         },
         "sv" : {
@@ -13688,7 +13688,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 ด."
+            "value" : "3 เดือน"
           }
         },
         "tr" : {
@@ -13700,7 +13700,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "3 міс"
+            "value" : "3 міс."
           }
         },
         "vi" : {
@@ -13741,25 +13741,25 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 měs"
+            "value" : "6 měs."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 mdr"
+            "value" : "6 mdr."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 Mon"
+            "value" : "6 Mon."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 μήν"
+            "value" : "6 μήν."
           }
         },
         "en" : {
@@ -13771,13 +13771,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 m"
+            "value" : "6 meses"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 m"
+            "value" : "6 meses"
           }
         },
         "fi" : {
@@ -13807,7 +13807,7 @@
         "hr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 mj"
+            "value" : "6 mj."
           }
         },
         "hu" : {
@@ -13849,7 +13849,7 @@
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 mnd"
+            "value" : "6 mnd."
           }
         },
         "nl" : {
@@ -13861,7 +13861,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 mies"
+            "value" : "6 mies."
           }
         },
         "pt-BR" : {
@@ -13891,7 +13891,7 @@
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 mes"
+            "value" : "6 mes."
           }
         },
         "sv" : {
@@ -13903,7 +13903,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 ด."
+            "value" : "6 เดือน"
           }
         },
         "tr" : {
@@ -13915,7 +13915,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "6 міс"
+            "value" : "6 міс."
           }
         },
         "vi" : {
@@ -14165,25 +14165,25 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 měs"
+            "value" : "12 měs."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 mdr"
+            "value" : "12 mdr."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 Mon"
+            "value" : "12 Mon."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 μήν"
+            "value" : "12 μήν."
           }
         },
         "en" : {
@@ -14195,13 +14195,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 m"
+            "value" : "12 meses"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 m"
+            "value" : "12 meses"
           }
         },
         "fi" : {
@@ -14231,7 +14231,7 @@
         "hr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 mj"
+            "value" : "12 mj."
           }
         },
         "hu" : {
@@ -14273,7 +14273,7 @@
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 mnd"
+            "value" : "12 mnd."
           }
         },
         "nl" : {
@@ -14285,7 +14285,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 mies"
+            "value" : "12 mies."
           }
         },
         "pt-BR" : {
@@ -14315,7 +14315,7 @@
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 mes"
+            "value" : "12 mes."
           }
         },
         "sv" : {
@@ -14327,7 +14327,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 ด."
+            "value" : "12 เดือน"
           }
         },
         "tr" : {
@@ -14339,7 +14339,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "12 міс"
+            "value" : "12 міс."
           }
         },
         "vi" : {
