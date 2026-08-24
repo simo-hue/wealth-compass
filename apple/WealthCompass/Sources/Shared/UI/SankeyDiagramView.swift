@@ -336,7 +336,7 @@ struct SankeyDiagramView: View {
                 .foregroundStyle(node.map(color(for:)) ?? WCColor.primary)
 
             if let node, node.role != .hub {
-                Text(verbatim: "\(node.share.formatted(.number.precision(.fractionLength(1))))%")
+                Text(verbatim: formattedPercent(node.share, locale: settings.effectiveLocale))
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(WCColor.textTertiary)
             }
@@ -467,7 +467,7 @@ struct SankeyDiagramView: View {
         guard node.role != .hub, !settings.isPrivacyMode else { return amount }
         // One interpolated key rather than concatenation, so translators control the word order
         // instead of inheriting English's.
-        let share = "\(node.share.formatted(.number.precision(.fractionLength(1))))%"
+        let share = formattedPercent(node.share, locale: settings.effectiveLocale)
         return settings.localized("\(amount), \(share) of cash flow")
     }
 

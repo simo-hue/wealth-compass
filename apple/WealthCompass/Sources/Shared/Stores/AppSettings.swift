@@ -124,7 +124,11 @@ final class AppSettings: ObservableObject {
     }
 
     /// The locale the in-app language override resolves to, falling back to the system locale.
-    private var effectiveLocale: Locale {
+    /// The locale every formatter in the app should use: the in-app override when set, otherwise
+    /// the device's. Internal rather than private so views can hand it to `formattedPercent` and
+    /// to `.formatted(...)`, both of which default to `Locale.current` and would otherwise ignore
+    /// the override.
+    var effectiveLocale: Locale {
         appLanguage.map(Locale.init(identifier:)) ?? .current
     }
 

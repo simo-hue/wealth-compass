@@ -127,7 +127,7 @@ struct MacDashboardView: View {
             .frame(maxWidth: .infinity)
             MetricCard(
                 title: "Savings Rate",
-                value: settings.isPrivacyMode ? settings.redactionToken : "\(cf.savingsRate.formatted(.number.precision(.fractionLength(1))))%",
+                value: settings.isPrivacyMode ? settings.redactionToken : formattedPercent(cf.savingsRate, locale: settings.effectiveLocale),
                 systemImage: "percent",
                 detail: "Of monthly income"
             )
@@ -841,7 +841,7 @@ struct MacDashboardView: View {
     private func privatePercent(_ value: Double) -> String {
         settings.isPrivacyMode
             ? settings.redactionToken
-            : "\(value.formatted(.number.precision(.fractionLength(1))))%"
+            : formattedPercent(value, locale: settings.effectiveLocale)
     }
 
     private func signedAmount(for transaction: Transaction) -> String {

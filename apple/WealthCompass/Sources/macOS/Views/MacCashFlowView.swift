@@ -249,7 +249,7 @@ struct MacCashFlowView: View {
                 title: "Savings Rate",
                 value: settings.isPrivacyMode
                     ? settings.redactionToken
-                    : "\(cashFlow.savingsRate.formatted(.number.precision(.fractionLength(1))))%",
+                    : formattedPercent(cashFlow.savingsRate, locale: settings.effectiveLocale),
                 systemImage: "percent"
             )
             MetricCard(

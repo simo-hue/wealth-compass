@@ -118,7 +118,7 @@ struct InvestmentsView: View {
             if !settings.isPrivacyMode {
                 MetricCard(
                     title: LocalizedStringKey("Performance"),
-                    value: "\(percent.formatted(.number.precision(.fractionLength(1))))%",
+                    value: formattedPercent(percent, locale: settings.effectiveLocale),
                     systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
                     accent: percent >= 0 ? WCColor.primary : WCColor.destructive
                 )

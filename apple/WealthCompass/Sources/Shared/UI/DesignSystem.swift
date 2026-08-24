@@ -359,13 +359,31 @@ struct EmptyState: View {
     }
 }
 
+/// A percentage, written the way the reader's locale writes percentages.
+///
+/// `value` is already a percentage (12.3 meaning 12.3%), so it is divided back out before
+/// `.percent` re-applies the factor.
+///
+/// Every site used to build this as `number.formatted(...) + "%"`, which renders `12,3%` in all 35
+/// languages. Turkish puts the sign first (`%12,3`), French separates it with a narrow no-break
+/// space (`12,3 %`), Arabic uses `٪` — and under RTL a hand-appended sign lands on the wrong side of
+/// the digits entirely. The PDF was self-contradicting: its donut legend formatted percentages
+/// correctly while the table below it printed the hand-built form.
+func formattedPercent(_ value: Double, locale: Locale, fractionDigits: Int = 1) -> String {
+    guard value.isFinite else { return "—" }
+    return (value / 100).formatted(
+        .percent.precision(.fractionLength(fractionDigits)).locale(locale)
+    )
+}
+
 struct ValueDelta: View {
+    @Environment(\.locale) private var locale
     let value: Double
     let formattedValue: String
     let percent: Double
 
     var body: some View {
-        Text("\(formattedValue) (\(percent.formatted(.number.precision(.fractionLength(1))))%)")
+        Text(verbatim: "\(formattedValue) (\(formattedPercent(percent, locale: locale)))")
             .foregroundStyle(value >= 0 ? WCColor.primary : WCColor.destructive)
             .font(.subheadline.monospacedDigit().weight(.semibold))
             .contentTransition(.numericText())
@@ -511,8 +529,7 @@ struct AllocationChart: View {
     }
 
     private func percentage(_ value: Double, total: Double) -> String {
-        let percentage = total > 0 ? value / total * 100 : 0
-        return "\(percentage.formatted(.number.precision(.fractionLength(1))))%"
+        formattedPercent(total > 0 ? value / total * 100 : 0, locale: settings.effectiveLocale)
     }
 
     /// VoiceOver value for a slice: amount + share, redacted in privacy mode.
@@ -547,7 +564,8 @@ private struct AllocationLegend: View {
                             .foregroundStyle(.white)
                         Text(settings.isPrivacyMode
                             ? settings.redactionToken
-                            : "\((total > 0 ? slice.value / total * 100 : 0).formatted(.number.precision(.fractionLength(1))))%")
+                            : formattedPercent(total > 0 ? slice.value / total * 100 : 0,
+                                               locale: settings.effectiveLocale))
                             .font(.caption2.monospacedDigit())
                             .foregroundStyle(WCColor.textFaint)
                     }

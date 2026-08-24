@@ -230,8 +230,10 @@ struct ReportDocumentBuilder {
     /// and no reader of a personal net-worth report needs basis-point precision on it.
     private func percent(_ value: Double) -> String {
         guard value.isFinite else { return "—" }
+        // The sign stays a prefix: a report reader needs the direction, and `.percent` has no
+        // "always show sign" option that also respects sign placement per locale.
         let sign = value > 0 ? "+" : ""
-        return sign + value.formatted(.number.precision(.fractionLength(0...1)).locale(context.locale)) + "%"
+        return sign + formattedPercent(value, locale: context.locale)
     }
 
     private func dateString(_ date: Date) -> String {
@@ -561,10 +563,10 @@ struct ReportDocumentBuilder {
                     return ReportRow([
                         entry.key,
                         money(entry.value),
-                        share.formatted(.number.precision(.fractionLength(1)).locale(context.locale)) + "%",
+                        formattedPercent(share, locale: context.locale),
                     ])
                 },
-                footer: ReportRow([L("Total"), money(grandTotal), "100%"], style: .subtotal))))
+                footer: ReportRow([L("Total"), money(grandTotal), formattedPercent(100, locale: context.locale)], style: .subtotal))))
         }
 
         // Recurring commitments

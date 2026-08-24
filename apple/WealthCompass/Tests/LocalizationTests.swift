@@ -64,6 +64,33 @@ final class LocalizationTests: XCTestCase {
         }
     }
 
+    // MARK: - Number and percent formatting
+
+    /// Percentages follow the locale's own convention.
+    ///
+    /// Every site built these as `number.formatted(...) + "%"`, which renders `12,3%` in all 35
+    /// languages. Turkish puts the sign first, French separates it with a narrow no-break space,
+    /// and under RTL a hand-appended sign lands on the wrong side of the digits.
+    func testPercentagesFollowTheLocaleConvention() {
+        XCTAssertTrue(
+            formattedPercent(12.3, locale: Locale(identifier: "tr_TR")).hasPrefix("%"),
+            "Turkish writes the percent sign before the number: \(formattedPercent(12.3, locale: Locale(identifier: "tr_TR")))"
+        )
+        let french = formattedPercent(12.3, locale: Locale(identifier: "fr_FR"))
+        XCTAssertTrue(french.contains(","), "French uses a decimal comma: \(french)")
+        XCTAssertNotEqual(
+            french, "12,3%",
+            "French separates the sign from the digits; a hand-appended % cannot"
+        )
+        XCTAssertEqual(formattedPercent(12.3, locale: Locale(identifier: "en_US")), "12.3%")
+    }
+
+    /// A non-finite share must not print as "nan%".
+    func testNonFinitePercentIsAnEmDash() {
+        XCTAssertEqual(formattedPercent(.nan, locale: Locale(identifier: "en_US")), "—")
+        XCTAssertEqual(formattedPercent(.infinity, locale: Locale(identifier: "en_US")), "—")
+    }
+
     // MARK: - Plural categories
 
     /// English has exactly two categories, and the singular must not read "1 due transactions".

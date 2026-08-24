@@ -627,7 +627,7 @@ struct DashboardView: View {
     private func privatePercent(_ value: Double) -> String {
         settings.isPrivacyMode
             ? settings.redactionToken
-            : "\(value.formatted(.number.precision(.fractionLength(1))))%"
+            : formattedPercent(value, locale: settings.effectiveLocale)
     }
 
     private func signedAmount(for transaction: Transaction) -> String {

@@ -150,7 +150,7 @@ struct CashFlowView: View {
             MetricCard(title: "Monthly Income", value: settings.privateCurrency(cashFlow.monthlyIncome), systemImage: "arrow.down.left", accent: WCColor.primary, detail: "This month")
             MetricCard(title: "Monthly Expenses", value: settings.privateCurrency(cashFlow.monthlyExpenses), systemImage: "arrow.up.right", accent: WCColor.destructive, detail: "This month")
             MetricCard(title: "Net Savings", value: settings.privateCurrency(cashFlow.netSavings), systemImage: "wallet.pass.fill", accent: cashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive, detail: "Income less expenses")
-            MetricCard(title: "Savings Rate", value: settings.isPrivacyMode ? settings.redactionToken : "\(cashFlow.savingsRate.formatted(.number.precision(.fractionLength(1))))%", systemImage: "percent", detail: "Of monthly income")
+            MetricCard(title: "Savings Rate", value: settings.isPrivacyMode ? settings.redactionToken : formattedPercent(cashFlow.savingsRate, locale: settings.effectiveLocale), systemImage: "percent", detail: "Of monthly income")
         }
     }
 
@@ -203,7 +203,7 @@ struct CashFlowView: View {
                                                 .foregroundStyle(.white)
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.7)
-                                            Text("\(hoveredExpenseCategory.percentage.formatted(.number.precision(.fractionLength(1))))%")
+                                            Text(verbatim: formattedPercent(hoveredExpenseCategory.percentage, locale: settings.effectiveLocale))
                                                 .font(.caption2.monospacedDigit())
                                                 .foregroundStyle(.white.opacity(0.6))
                                         } else {
@@ -259,7 +259,7 @@ struct CashFlowView: View {
                                 VStack(alignment: .trailing, spacing: 2) {
                                     Text(settings.privateCurrency(item.value))
                                         .font(.subheadline.monospacedDigit().weight(.semibold))
-                                    Text("\(item.percentage.formatted(.number.precision(.fractionLength(1))))%")
+                                    Text(verbatim: formattedPercent(item.percentage, locale: settings.effectiveLocale))
                                         .font(.caption)
                                         .foregroundStyle(WCColor.textSecondary)
                                 }
