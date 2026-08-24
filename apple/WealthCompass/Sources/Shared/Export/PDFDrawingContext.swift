@@ -108,13 +108,18 @@ struct PDFDrawingContext {
                           color: ReportColor,
                           alignment: ReportAlignment = .leading,
                           textDirection: ReportLayoutDirection? = nil,
-                          lineHeightMultiple: CGFloat = 1) -> NSAttributedString {
+                          lineHeightMultiple: CGFloat = 1,
+                          sizeScale: CGFloat = 1) -> NSAttributedString {
         // Uppercasing is a *presentational* transform; it must not be applied to scripts without
         // case (Arabic, Hebrew, CJK, Thai), where `uppercased()` is a no-op anyway, so this is safe.
         let content = role.isUppercased ? text.uppercased() : text
 
         var attributes: [NSAttributedString.Key: Any] = [
-            kCTFontAttributeName as NSAttributedString.Key: ReportFonts.font(role),
+            kCTFontAttributeName as NSAttributedString.Key: sizeScale == 1
+                ? ReportFonts.font(role)
+                : ReportFonts.font(size: role.size * sizeScale,
+                                   weight: role.weight,
+                                   tabularFigures: role.usesTabularFigures),
             kCTForegroundColorAttributeName as NSAttributedString.Key: color.cgColor,
             kCTParagraphStyleAttributeName as NSAttributedString.Key: Self.paragraphStyle(
                 alignment: Self.ctAlignment(alignment),
@@ -122,7 +127,11 @@ struct PDFDrawingContext {
                 lineHeightMultiple: lineHeightMultiple),
         ]
         if role.tracking != 0 {
-            attributes[kCTKernAttributeName as NSAttributedString.Key] = role.tracking
+            // Tracking scales with the type. It is a per-character constant, so leaving it at full
+            // size while shrinking the glyphs makes long uppercase headers un-shrinkable: Spanish
+            // "GANANCIA / PÉRDIDA" is 18 characters, i.e. 14.4pt of letter-spacing that no font-size
+            // reduction could ever recover.
+            attributes[kCTKernAttributeName as NSAttributedString.Key] = role.tracking * sizeScale
         }
         return NSAttributedString(string: content, attributes: attributes)
     }
@@ -207,11 +216,29 @@ struct PDFDrawingContext {
 
         var lineWidth = CGFloat(CTLineGetTypographicBounds(line, nil, nil, nil))
         if lineWidth > topDownRect.width {
-            let ellipsis = CTLineCreateWithAttributedString(
-                attributedString("…", role: role, color: color))
-            if let truncated = CTLineCreateTruncatedLine(line, Double(topDownRect.width), .end, ellipsis) {
-                line = truncated
+            // Truncating an amount destroys it: "1.234.56…" cannot be read back, and the money
+            // columns are exactly the figures the table exists to state. A column budget is 64.0pt
+            // at A4, which fits up to six figures but not "$1,234,567.89" (65.5pt) or German
+            // "1.234.567,89 €" (68.1pt); uppercase headers overflow far earlier, with German
+            // "GEWINN / VERLUST" at 74.0pt and Spanish "GANANCIA / PÉRDIDA" at 81.5pt — every
+            // export, at any portfolio size. A slightly smaller number is still exact, so shrink
+            // to fit before falling back to an ellipsis.
+            //
+            // Only for short, meaning-dense content. Free text (names, descriptions, categories)
+            // keeps truncating, because shrinking a long string to fit one line would make the
+            // whole table ragged for no gain.
+            if let fitted = shrunkToFit(text, role: role, color: color, alignment: resolvedAlignment,
+                                        textDirection: isNumeric ? .leftToRight : nil,
+                                        width: topDownRect.width) {
+                line = fitted
                 lineWidth = CGFloat(CTLineGetTypographicBounds(line, nil, nil, nil))
+            } else {
+                let ellipsis = CTLineCreateWithAttributedString(
+                    attributedString("…", role: role, color: color))
+                if let truncated = CTLineCreateTruncatedLine(line, Double(topDownRect.width), .end, ellipsis) {
+                    line = truncated
+                    lineWidth = CGFloat(CTLineGetTypographicBounds(line, nil, nil, nil))
+                }
             }
         }
 
@@ -228,6 +255,31 @@ struct PDFDrawingContext {
 
         cg.textPosition = CGPoint(x: x, y: flip(y: rect.minY + ascent))
         CTLineDraw(line, cg)
+    }
+
+    /// A line of `text` set small enough to fit `width`, or `nil` to fall back to truncation.
+    ///
+    /// Applies only to roles whose content is short and whose meaning does not survive an ellipsis:
+    /// numeric cells and table headers. Each role sets its own floor, below which the text would be
+    /// too small to read on paper and truncation is the honest outcome.
+    private func shrunkToFit(_ text: String,
+                             role: ReportFontRole,
+                             color: ReportColor,
+                             alignment: ReportAlignment,
+                             textDirection: ReportLayoutDirection?,
+                             width: CGFloat) -> CTLine? {
+        guard role.shrinksToFit else { return nil }
+        var scale: CGFloat = 0.96
+        while scale >= role.minimumShrinkScale {
+            let attributed = attributedString(text, role: role, color: color, alignment: alignment,
+                                              textDirection: textDirection, sizeScale: scale)
+            let candidate = CTLineCreateWithAttributedString(attributed)
+            if CGFloat(CTLineGetTypographicBounds(candidate, nil, nil, nil)) <= width {
+                return candidate
+            }
+            scale -= 0.02
+        }
+        return nil
     }
 
     // MARK: - Shapes

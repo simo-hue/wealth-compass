@@ -763,6 +763,19 @@ struct MacSettingsView: View {
     }
 
     private func importData() {
+        // Replace discards every transaction, holding, liability and snapshot on this Mac and syncs
+        // the deletion to the user's other devices. iPhone has always confirmed it before showing
+        // the file picker; the Mac ran it the moment a file was chosen, armed from a picker the user
+        // may have set minutes earlier in the same Settings visit. Confirm first, with the same
+        // wording iOS uses.
+        guard importMode != .replace else {
+            pendingDestructiveAction = .replaceImport
+            return
+        }
+        presentImportPanel()
+    }
+
+    private func presentImportPanel() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.json, .commaSeparatedText, .plainText, .pdf]
         panel.allowsMultipleSelection = false
@@ -856,6 +869,8 @@ struct MacSettingsView: View {
             Task { await performErase(deleteCloud: true) }
         case .deleteCustomCategory(let category, let type):
             settings.removeCustomTransactionCategory(category, for: type)
+        case .replaceImport:
+            presentImportPanel()
         }
         pendingDestructiveAction = nil
     }
@@ -979,6 +994,8 @@ private enum MacMarketDataCredentialKind: String, Identifiable {
 private enum MacSettingsDestructiveAction {
     case deleteAllData
     case deleteCustomCategory(category: String, type: TransactionType)
+    /// Confirmation for a Replace import, which clears the local database before importing.
+    case replaceImport
 
     func localizedTitle(appLanguage: String?) -> String {
         switch self {
@@ -986,6 +1003,8 @@ private enum MacSettingsDestructiveAction {
             AppLocalization.string("Erase Everything?", appLanguage: appLanguage)
         case .deleteCustomCategory:
             AppLocalization.string("Remove custom category?", appLanguage: appLanguage)
+        case .replaceImport:
+            AppLocalization.string("Import Data", appLanguage: appLanguage)
         }
     }
 
@@ -995,6 +1014,8 @@ private enum MacSettingsDestructiveAction {
             AppLocalization.string("This permanently deletes all finance data on this Mac and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data.", appLanguage: appLanguage)
         case .deleteCustomCategory(let category, _):
             AppLocalization.string("Existing transactions using \(category) will keep their current category label.", appLanguage: appLanguage)
+        case .replaceImport:
+            AppLocalization.string("Merge adds new records and updates matching IDs. Replace clears current local finance data before importing.", appLanguage: appLanguage)
         }
     }
 
@@ -1004,6 +1025,8 @@ private enum MacSettingsDestructiveAction {
             AppLocalization.string("Erase Everything", appLanguage: appLanguage)
         case .deleteCustomCategory(let category, _):
             AppLocalization.string("Remove \(category)", appLanguage: appLanguage)
+        case .replaceImport:
+            AppLocalization.string("Replace Existing Data", appLanguage: appLanguage)
         }
     }
 }

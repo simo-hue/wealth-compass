@@ -280,6 +280,38 @@ enum ReportFontRole: Sendable {
         }
     }
 
+    /// Roles whose content is short and whose meaning does not survive an ellipsis, so the drawing
+    /// layer shrinks them to fit rather than truncating.
+    ///
+    /// Amounts and their totals: "1.234.56…" is unreadable, and these are the figures a table exists
+    /// to state. Headers: a 64.0pt column fits "GAIN / LOSS" (46.4pt) but not German
+    /// "GEWINN / VERLUST" (74.0pt) or Spanish "GANANCIA / PÉRDIDA" (81.5pt), so translated reports
+    /// truncated their column headings on every export.
+    ///
+    /// Deliberately excludes free text — names, descriptions, categories — where shrinking one long
+    /// string would make the table ragged and truncation is the right answer.
+    var shrinksToFit: Bool {
+        switch self {
+        case .tableCell, .tableFooter, .tableHeader, .kpiValue, .chartCenterValue:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// How far `shrinksToFit` may reduce this role before giving up and truncating.
+    ///
+    /// Headers get more headroom than amounts. They are set small and semibold with letter-spacing,
+    /// so a translated heading can be half again as wide as its English source — and a heading is
+    /// read once, where an amount is read as a figure. 0.72 of 7.5pt is 5.4pt, which is dense but
+    /// normal for a financial table and unambiguously better than `GANANCIA / PÉR…`.
+    var minimumShrinkScale: CGFloat {
+        switch self {
+        case .tableHeader: return 0.72
+        default: return 0.82
+        }
+    }
+
     /// Uppercase, letter-spaced roles. Small caps-ish treatment for labels.
     var tracking: CGFloat {
         switch self {

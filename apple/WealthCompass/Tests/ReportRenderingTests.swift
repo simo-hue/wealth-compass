@@ -1,3 +1,4 @@
+import PDFKit
 import XCTest
 @testable import WealthCompassMobile
 
@@ -19,6 +20,69 @@ final class ReportPaginationTests: XCTestCase {
         let context = try XCTUnwrap(CGContext(url as CFURL, mediaBox: &box, nil))
         addTeardownBlock { try? FileManager.default.removeItem(at: url) }
         return PDFDrawingContext(cg: context, theme: theme, chrome: ReportChrome())
+    }
+
+    /// A wide amount must stay readable rather than be truncated.
+    ///
+    /// The money columns budget 64.0pt at A4. Measured at the report's own 8.8pt tabular face,
+    /// `$1,234,567.89` is 65.5pt and German `1.234.567,89 €` is 68.1pt, so both used to render as
+    /// `1.234.56…` — destroying the one figure the table exists to state, in the totals row too.
+    /// Rendering the real document and reading the text back is the only honest check: the defect
+    /// lives in the drawing layer, not in the model.
+    func testWideAmountsRenderInFullRatherThanTruncated() throws {
+        let wide = "1.234.567,89 €"
+        let table = ReportTable(
+            columns: [
+                ReportColumn("Symbol", weight: 0.9),
+                ReportColumn("Name", weight: 1.9),
+                ReportColumn("Quantity", weight: 1.1, alignment: .trailing, isNumeric: true),
+                ReportColumn("Cost Basis", weight: 1.25, alignment: .trailing, isNumeric: true),
+                ReportColumn("Value", weight: 1.25, alignment: .trailing, isNumeric: true),
+                ReportColumn("Gain / Loss", weight: 1.25, alignment: .trailing, isNumeric: true),
+                ReportColumn("%", weight: 0.85, alignment: .trailing, isNumeric: true),
+            ],
+            rows: [ReportRow(["VWCE", "Vanguard", "10", wide, wide, wide, "1,2"])],
+            footer: ReportRow(["", "", "", wide, wide, wide, ""], style: .subtotal),
+            caption: nil)
+
+        let text = try renderedText(makeDocument(table, theme: ReportTheme()))
+        XCTAssertTrue(text.contains(wide), "the amount was truncated; extracted text: \(text.prefix(400))")
+        XCTAssertFalse(text.contains("1.234.56…"), "an ellipsized amount reached the page")
+    }
+
+    /// Amounts shrink; long *translated headers* still truncate, and deliberately so.
+    ///
+    /// `GANANCIA / PÉRDIDA` is 18 characters, and at the header's 0.8pt tracking that is 14.4pt of
+    /// letter-spacing on top of roughly 81.5pt of semibold glyphs, against a 64.0pt column. Fitting
+    /// it would need about 0.65 scale — a 4.9pt heading, which is not a fix. The column budget or
+    /// the translation has to give; this test pins the current behaviour so the choice stays
+    /// visible rather than silently regressing.
+    func testOverlongTranslatedHeaderStillTruncatesRatherThanShrinkingToIllegibility() throws {
+        let table = ReportTable(
+            columns: [
+                ReportColumn("Symbol", weight: 0.9),
+                ReportColumn("Name", weight: 1.9),
+                ReportColumn("Quantity", weight: 1.1, alignment: .trailing, isNumeric: true),
+                ReportColumn("Cost Basis", weight: 1.25, alignment: .trailing, isNumeric: true),
+                ReportColumn("Value", weight: 1.25, alignment: .trailing, isNumeric: true),
+                ReportColumn("GANANCIA / PÉRDIDA", weight: 1.25, alignment: .trailing, isNumeric: true),
+                ReportColumn("%", weight: 0.85, alignment: .trailing, isNumeric: true),
+            ],
+            rows: [ReportRow(["A", "B", "1", "2", "3", "4", "5"])],
+            footer: nil, caption: nil)
+
+        let text = try renderedText(makeDocument(table, theme: ReportTheme()))
+        XCTAssertTrue(text.contains("…"), "header no longer truncates — revisit the column budget note")
+    }
+
+    /// Renders the document to a real PDF and returns every page's text.
+    private func renderedText(_ document: ReportDocument) throws -> String {
+        let url = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("wc-render-\(UUID().uuidString).pdf")
+        addTeardownBlock { try? FileManager.default.removeItem(at: url) }
+        try PDFReportRenderer.render(document: document, to: url)
+        let pdf = try XCTUnwrap(PDFDocument(url: url), "renderer produced an unopenable PDF")
+        return (0..<pdf.pageCount).compactMap { pdf.page(at: $0)?.string }.joined(separator: "\n")
     }
 
     private func makeTable(rows: Int, twoLine: Bool, caption: String?) -> ReportTable {
