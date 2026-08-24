@@ -22,6 +22,54 @@ final class SnapshotEngineTests: XCTestCase {
         return utc.date(from: comps)!
     }
 
+    /// One logical daily row keeps one identity.
+    ///
+    /// The same-day upsert replaced the row with a freshly-minted `NetWorthSnapshot`, so its UUID
+    /// changed on every write. `appendSnapshot` runs on every add, edit, delete and price refresh,
+    /// and each new id diffs as "delete the old record, create a new one" — so twenty edits in a day
+    /// produced twenty CloudKit records and nineteen permanent server tombstones, which every new
+    /// device then downloads on bootstrap.
+    func testSameDayUpsertKeepsTheRowsIdentity() {
+        let day = date(2026, 6, 22)
+        let first = engine.appendingSnapshot(to: [], totals: totals, now: day)
+        let originalID = try? XCTUnwrap(first.first?.id)
+        let originalCreatedAt = first.first?.createdAt
+
+        let updatedTotals = FinanceTotals(
+            totalLiquidity: 900, totalInvestments: 50, totalCrypto: 25,
+            totalAssets: 975, totalLiabilities: 30, netWorth: 945
+        )
+        let second = engine.appendingSnapshot(to: first, totals: updatedTotals, now: day)
+
+        XCTAssertEqual(second.count, 1)
+        XCTAssertEqual(second.first?.netWorth, 945, "the value must still update")
+        XCTAssertEqual(second.first?.id, originalID, "the row changed identity on a same-day update")
+        XCTAssertEqual(second.first?.createdAt, originalCreatedAt, "createdAt must survive the upsert")
+    }
+
+    /// A snapshot dated ahead of `now` must not defeat the same-day collapse.
+    ///
+    /// The upsert only inspected `snapshots.indices.last`, so once a future-dated row existed — from
+    /// an import, or synced from a device with a fast clock — every later save appended another row
+    /// for today instead of replacing it, growing the array by one duplicate per edit.
+    func testFutureDatedRowDoesNotDefeatTheSameDayCollapse() {
+        let today = date(2026, 6, 22)
+        var history = engine.appendingSnapshot(to: [], totals: totals, now: today)
+        history.append(NetWorthSnapshot(
+            date: date(2026, 12, 1), totalAssets: 1, totalLiabilities: 0,
+            netWorth: 1, liquidity: 1, investments: 0, crypto: 0
+        ))
+        history.sort { $0.date < $1.date }
+
+        for _ in 0..<5 {
+            history = engine.appendingSnapshot(to: history, totals: totals, now: today)
+        }
+
+        let todaysRows = history.filter { utc.isDate($0.date, inSameDayAs: today) }
+        XCTAssertEqual(todaysRows.count, 1, "duplicate rows accumulated for the same day")
+        XCTAssertEqual(history.count, 2, "history grew beyond today + the future row")
+    }
+
     func testAppendsToEmptyHistory() {
         let result = engine.appendingSnapshot(to: [], totals: totals, now: date(2026, 6, 22))
         XCTAssertEqual(result.count, 1)

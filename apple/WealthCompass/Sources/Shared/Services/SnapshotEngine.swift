@@ -21,7 +21,7 @@ struct SnapshotEngine {
         now: Date = Date()
     ) -> [NetWorthSnapshot] {
         var snapshots = snapshots
-        let snapshot = NetWorthSnapshot(
+        var snapshot = NetWorthSnapshot(
             date: now,
             totalAssets: totals.totalAssets,
             totalLiabilities: totals.totalLiabilities,
@@ -34,8 +34,26 @@ struct SnapshotEngine {
             currency: currency
         )
 
-        if let lastIndex = snapshots.indices.last, calendar.isDate(snapshots[lastIndex].date, inSameDayAs: now) {
-            snapshots[lastIndex] = snapshot
+        // Search the whole array, not just the last element. The array is sorted by date, so a row
+        // dated ahead of `now` — from an import, or synced from a device whose clock runs fast —
+        // sat at the end and hid today's row from the check, making every subsequent save append
+        // another row for today instead of replacing it.
+        let sameDay = snapshots.indices.filter { calendar.isDate(snapshots[$0].date, inSameDayAs: now) }
+
+        if let existing = sameDay.first {
+            // One logical daily row keeps one identity. Replacing it with a freshly-minted value
+            // gave it a new UUID on every write, and `appendSnapshot` runs on every add, edit,
+            // delete and price refresh — so each save diffed as "delete that record, create this
+            // one", turning a day of ordinary editing into a record per edit plus a permanent
+            // server tombstone for each, which every new device then downloads on bootstrap.
+            snapshot.id = snapshots[existing].id
+            snapshot.createdAt = snapshots[existing].createdAt
+            snapshots[existing] = snapshot
+            // Two devices can each have created a row for the same day before syncing, and nothing
+            // on this path collapsed them. Drop the extras now that one is authoritative.
+            for index in sameDay.dropFirst().reversed() {
+                snapshots.remove(at: index)
+            }
         } else {
             snapshots.append(snapshot)
         }
