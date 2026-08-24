@@ -100,11 +100,11 @@ struct ReportDocumentBuilder {
 
     /// An engine over **settled** transactions only — future-dated rows removed.
     ///
-    /// `calculateTotals()` already excludes future-dated rows from cash, but `monthlyCashFlow` and
-    /// `cashFlowTrend` do not. Feeding them the raw set produced a document that contradicted
-    /// itself on one page: an "Income This Month" KPI that counted a scheduled invoice which the
-    /// ledger directly below it printed in grey and excluded from every balance. Internal
-    /// consistency wins here — the report is read on its own, away from the app.
+    /// Kept, but no longer load-bearing: `AnalyticsEngine` now excludes future-dated rows from
+    /// `monthlyCashFlow` and `cashFlowTrend` itself, so this filters an already-filtered set. It was
+    /// written because those two counted a scheduled invoice that the ledger directly below printed
+    /// in grey and excluded from every balance — a document contradicting itself on one page. The
+    /// app had the same contradiction on screen; fixing it centrally is what made this redundant.
     private var settledAnalytics: AnalyticsEngine {
         var settled = context.data
         settled.transactions = settled.transactions.filter { !isFutureDated($0) }

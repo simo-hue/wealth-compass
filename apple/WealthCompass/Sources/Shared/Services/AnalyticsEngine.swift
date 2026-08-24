@@ -293,17 +293,16 @@ struct AnalyticsEngine {
     ///
     /// Two deliberate departures from `expensesByCategory`:
     ///
-    /// 1. Future-dated rows are clamped on *every* period, `.all` included.
-    ///    `filteredTransactions(period: .all)` returns the raw array, which would let a post-dated
-    ///    recurring occurrence widen a ribbon for money that hasn't moved — and desynchronize the
-    ///    diagram from `calculateTotals`, which has excluded the future since deep-audit L51.
-    /// 2. Percentages are of the whole diagram, not of one column, because the detail row reads
-    ///    "N% of cash flow" for income and expense nodes alike.
+    /// Percentages are of the whole diagram, not of one column, because the detail row reads
+    /// "N% of cash flow" for income and expense nodes alike.
+    ///
+    /// This used to re-clamp future-dated rows itself, because `filteredTransactions(.all)` returned
+    /// the raw array and would otherwise have widened a ribbon for money that had not moved. The
+    /// clamp now lives in `filteredTransactions` for every period, so the diagram, the category
+    /// donut and `calculateTotals` agree without this method compensating for one of them.
     func cashFlowSankey(period: AnalyticsPeriod, maxNodesPerSide: Int = 7) -> CashFlowSankey {
-        let today = calendar.startOfDay(for: now)
-        let transactions = filteredTransactions(period: period)
-            .filter { calendar.startOfDay(for: $0.date) <= today }
-        return cashFlowSankey(transactions: transactions, maxNodesPerSide: maxNodesPerSide)
+        return cashFlowSankey(transactions: filteredTransactions(period: period),
+                              maxNodesPerSide: maxNodesPerSide)
     }
 
     /// Builds the diagram from an explicit transaction set.
