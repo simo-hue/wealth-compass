@@ -154,7 +154,7 @@ struct DashboardView: View {
                                     Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
                                     Text(settings.privateCurrency(abs(rangeChange.value)))
                                     Text(privatePercent(abs(rangeChange.percentage)))
-                                    Text(timeRange.rawValue)
+                                    Text(timeRange.title)
                                         .foregroundStyle(WCColor.textTertiary)
                                 }
                                 .font(.caption.monospacedDigit().weight(.semibold))
@@ -180,7 +180,7 @@ struct DashboardView: View {
 
                     Picker("Net worth range", selection: $timeRange) {
                         ForEach(TimeRange.allCases) { range in
-                            Text(range.rawValue).tag(range)
+                            Text(range.title).tag(range)
                         }
                     }
                     .labelsHidden()

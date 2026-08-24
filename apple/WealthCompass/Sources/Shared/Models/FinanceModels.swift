@@ -173,6 +173,33 @@ enum TimeRange: String, CaseIterable, Identifiable {
     case all = "ALL"
 
     var id: String { rawValue }
+
+    /// The dual-API pair (see CLAUDE.md): `title` inside a `Text` that honors the environment
+    /// locale, `localizedTitle(appLanguage:)` wherever a resolved `String` is needed.
+    ///
+    /// `TimeRange` was the only selector enum in this file without the pair, so all four call sites
+    /// rendered `rawValue` directly: English tokens in all 35 languages, with `ALL` a plain English
+    /// word. `6M` is deliberately the same catalog key `CashFlowTimeframe` uses — both mean six
+    /// months, so sharing keeps the two selectors from drifting apart.
+    var title: LocalizedStringKey {
+        switch self {
+        case .oneWeek: "1W"
+        case .oneMonth: "1M"
+        case .sixMonths: "6M"
+        case .oneYear: "1Y"
+        case .all: "ALL"
+        }
+    }
+
+    func localizedTitle(appLanguage: String?) -> String {
+        switch self {
+        case .oneWeek: AppLocalization.string("1W", appLanguage: appLanguage)
+        case .oneMonth: AppLocalization.string("1M", appLanguage: appLanguage)
+        case .sixMonths: AppLocalization.string("6M", appLanguage: appLanguage)
+        case .oneYear: AppLocalization.string("1Y", appLanguage: appLanguage)
+        case .all: AppLocalization.string("ALL", appLanguage: appLanguage)
+        }
+    }
 }
 
 enum AnalyticsPeriod: String, CaseIterable, Identifiable {

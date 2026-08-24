@@ -261,7 +261,7 @@ struct MacDashboardView: View {
                                     Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
                                     Text(settings.privateCurrency(abs(rangeChange.value)))
                                     Text(privatePercent(abs(rangeChange.percentage)))
-                                    Text("for \(timeRange.rawValue)")
+                                    Text("for \(timeRange.localizedTitle(appLanguage: settings.appLanguage))")
                                         .foregroundStyle(WCColor.textTertiary)
                                 }
                                 .font(.subheadline.monospacedDigit().weight(.semibold))
@@ -284,7 +284,7 @@ struct MacDashboardView: View {
                         Spacer(minLength: 16)
 
                         VStack(alignment: .trailing, spacing: 12) {
-                            DashboardSegmentedPicker(selection: $timeRange, items: TimeRange.allCases) { LocalizedStringKey($0.rawValue) }
+                            DashboardSegmentedPicker(selection: $timeRange, items: TimeRange.allCases) { $0.title }
                                 .padding(.bottom, 2)
 
                             snapshotFreshness
