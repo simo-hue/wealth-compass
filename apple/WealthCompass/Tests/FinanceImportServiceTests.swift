@@ -16,6 +16,98 @@ final class FinanceImportServiceTests: XCTestCase {
         return try FinanceImportService.parse(Data(json.utf8), context: context)
     }
 
+    // MARK: - Export -> import round trip
+
+    /// A backup this app wrote must import back as the same data. The per-record `currency` field
+    /// is the one the round trip used to drop: `Transaction.currency == nil` means "legacy row,
+    /// assume base currency", so a dropped USD tag silently re-denominates $1,000 as EUR 1,000.
+    func testRoundTripPreservesPerRecordCurrency() throws {
+        let day = Date(timeIntervalSince1970: 1_780_000_000)
+
+        var transaction = Transaction(
+            type: .income, category: "Salary", amount: 1000, description: "", date: day
+        )
+        transaction.currency = .usd
+
+        var recurring = RecurringTransaction(
+            type: .expense, category: "Rent", amount: 500, description: "",
+            startDate: day, frequency: .monthly, nextDueDate: day
+        )
+        recurring.currency = .gbp
+
+        var snapshot = NetWorthSnapshot(
+            date: day, totalAssets: 10, totalLiabilities: 0,
+            netWorth: 10, liquidity: 10, investments: 0, crypto: 0
+        )
+        snapshot.currency = .chf
+
+        let exported = try FinanceJSONCoding.encode(
+            FinancialData(
+                transactions: [transaction],
+                recurringTransactions: [recurring],
+                snapshots: [snapshot]
+            )
+        )
+        // Guard the premise: the exporter really does write the field.
+        let json = String(decoding: exported, as: UTF8.self)
+        XCTAssertTrue(json.contains("USD"), "exporter dropped the transaction currency")
+
+        let settings = settings()
+        let context = FinanceImportContext(
+            displayCurrency: settings.currency, snapshot: settings.exchangeRateSnapshot
+        )
+        let result = try FinanceImportService.parse(exported, context: context)
+
+        XCTAssertEqual(result.data.transactions.first?.currency, .usd, "transaction currency lost")
+        XCTAssertEqual(result.data.recurringTransactions.first?.currency, .gbp, "recurring currency lost")
+        XCTAssertEqual(result.data.snapshots.first?.currency, .chf, "snapshot currency lost")
+    }
+
+    /// A magnitude `Decimal` cannot represent must never reach storage.
+    ///
+    /// `Decimal(Double)` yields `NSDecimalNumber.notANumber` for finite `Double`s outside its range
+    /// — verified for both `1e300` and `1e-300` — and `JSONEncoder` then writes the bare token
+    /// `NaN`, which is not valid JSON. The app would persist a database it cannot read back, and
+    /// the failure surfaces on the *next* launch with no in-app way out.
+    func testAmountsDecimalCannotHoldAreSkippedRatherThanStoredAsNaN() throws {
+        for literal in ["1e300", "-1e300", "1e-300"] {
+            let result = try parse("""
+            {"transactions":[
+              {"type":"income","amount":\(literal),"category":"X","date":"2026-01-01"},
+              {"type":"income","amount":10,"category":"Good","date":"2026-01-02"}
+            ]}
+            """)
+            XCTAssertEqual(
+                result.data.transactions.count, 1,
+                "\(literal) must be skipped, and the healthy row beside it must survive"
+            )
+            XCTAssertEqual(result.data.transactions.first?.category, "Good")
+            XCTAssertTrue(
+                result.data.transactions.allSatisfy {
+                    ($0.amount as NSDecimalNumber) != NSDecimalNumber.notANumber
+                },
+                "\(literal) produced a non-finite stored amount"
+            )
+        }
+    }
+
+    /// The consequence the test above exists to prevent: whatever an import produces has to
+    /// round-trip through the app's own encoder as valid JSON.
+    func testImportedDataAlwaysReencodesAsValidJSON() throws {
+        let result = try parse("""
+        {"transactions":[{"type":"income","amount":1e300,"category":"X","date":"2026-01-01"}],
+         "investments":[{"symbol":"A","name":"A","quantity":1e300,"currentValue":1e300}],
+         "crypto":[{"symbol":"B","name":"B","quantity":1e-300,"currentPrice":1e300}],
+         "snapshots":[{"date":"2026-01-01","netWorth":1e300}]}
+        """)
+        let encoded = try FinanceJSONCoding.encode(result.data)
+        XCTAssertNotNil(
+            try? JSONSerialization.jsonObject(with: encoded),
+            "the importer produced a database the app cannot read back: "
+            + String(decoding: encoded, as: UTF8.self).prefix(200)
+        )
+    }
+
     func testModernTransactionsShape() throws {
         let result = try parse("""
         {"transactions":[

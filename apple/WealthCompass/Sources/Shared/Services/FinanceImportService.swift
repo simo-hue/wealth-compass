@@ -142,6 +142,7 @@ private struct ImportedTransaction: Decodable {
     let amount: Double?
     let description: String?
     let date: String?
+    let currency: String?
     let createdAt: String?
     let updatedAt: String?
     let recurringTransactionID: UUID?
@@ -154,6 +155,7 @@ private struct ImportedTransaction: Decodable {
         case amount
         case description
         case date
+        case currency
         case createdAt
         case updatedAt
         case recurringTransactionID
@@ -168,6 +170,7 @@ private struct ImportedTransaction: Decodable {
         amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
         description = container.decodeImportedTextIfPresent(forKey: .description)
         date = container.decodeImportedStringIfPresent(forKey: .date)
+        currency = container.decodeImportedStringIfPresent(forKey: .currency)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
         updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
         recurringTransactionID = container.decodeUUIDIfPresent(forKey: .recurringTransactionID)
@@ -178,7 +181,7 @@ private struct ImportedTransaction: Decodable {
         guard
             let rawType = type?.lowercased(),
             let transactionType = TransactionType(rawValue: rawType),
-            let amount = amount?.positiveImportedAmount,
+            let amount = amount?.positiveImportedAmount.flatMap(importedMoney),
             let date = ImportDateParser.parseDateOnly(date)
         else {
             return nil
@@ -188,9 +191,10 @@ private struct ImportedTransaction: Decodable {
             id: id ?? UUID(),
             type: transactionType,
             category: category ?? "Other",
-            amount: Decimal(amount),
+            amount: amount,
             description: description ?? "",
             date: date,
+            currency: Currency.importedIfPresent(currency),
             createdAt: ImportDateParser.parse(createdAt) ?? date,
             updatedAt: ImportDateParser.parse(updatedAt) ?? ImportDateParser.parse(createdAt) ?? date,
             recurringTransactionID: recurringTransactionID,
@@ -209,6 +213,7 @@ private struct ImportedRecurringTransaction: Decodable {
     let frequency: String?
     let nextDueDate: String?
     let endDate: String?
+    let currency: String?
     let notificationsEnabled: Bool?
     let isActive: Bool?
     let completedAt: String?
@@ -225,6 +230,7 @@ private struct ImportedRecurringTransaction: Decodable {
         case frequency
         case nextDueDate
         case endDate
+        case currency
         case notificationsEnabled
         case isActive
         case completedAt
@@ -243,6 +249,7 @@ private struct ImportedRecurringTransaction: Decodable {
         frequency = container.decodeImportedStringIfPresent(forKey: .frequency)
         nextDueDate = container.decodeImportedStringIfPresent(forKey: .nextDueDate)
         endDate = container.decodeImportedStringIfPresent(forKey: .endDate)
+        currency = container.decodeImportedStringIfPresent(forKey: .currency)
         notificationsEnabled = container.decodeImportedBoolIfPresent(forKey: .notificationsEnabled)
         isActive = container.decodeImportedBoolIfPresent(forKey: .isActive)
         completedAt = container.decodeImportedStringIfPresent(forKey: .completedAt)
@@ -254,7 +261,7 @@ private struct ImportedRecurringTransaction: Decodable {
         guard
             let rawType = type?.lowercased(),
             let transactionType = TransactionType(rawValue: rawType),
-            let amount = amount?.positiveImportedAmount,
+            let amount = amount?.positiveImportedAmount.flatMap(importedMoney),
             let startDate = ImportDateParser.parse(startDate),
             let rawFrequency = frequency?.lowercased(),
             let frequency = RecurringTransactionFrequency(rawValue: rawFrequency),
@@ -277,12 +284,13 @@ private struct ImportedRecurringTransaction: Decodable {
             id: id ?? UUID(),
             type: transactionType,
             category: category ?? "Other",
-            amount: Decimal(amount),
+            amount: amount,
             description: description ?? "",
             startDate: startDate,
             frequency: frequency,
             nextDueDate: nextDueDate,
             endDate: parsedEndDate,
+            currency: Currency.importedIfPresent(currency),
             notificationsEnabled: notificationsEnabled ?? true,
             isActive: parsedCompletedAt == nil && (isActive ?? true),
             completedAt: parsedCompletedAt,
@@ -324,7 +332,7 @@ private struct ImportedIncomeEntry: Decodable {
 
     func transaction() -> Transaction? {
         guard
-            let amount = amount?.positiveImportedAmount,
+            let amount = amount?.positiveImportedAmount.flatMap(importedMoney),
             let date = ImportDateParser.parseDateOnly(date)
         else {
             return nil
@@ -334,7 +342,7 @@ private struct ImportedIncomeEntry: Decodable {
             id: id ?? UUID(),
             type: .income,
             category: Self.categoryName(from: type),
-            amount: Decimal(amount),
+            amount: amount,
             description: description ?? "",
             date: date,
             createdAt: ImportDateParser.parse(createdAt) ?? date,
@@ -386,7 +394,7 @@ private struct ImportedExpenseEntry: Decodable {
 
     func transaction() -> Transaction? {
         guard
-            let amount = amount?.positiveImportedAmount,
+            let amount = amount?.positiveImportedAmount.flatMap(importedMoney),
             let date = ImportDateParser.parseDateOnly(date)
         else {
             return nil
@@ -396,7 +404,7 @@ private struct ImportedExpenseEntry: Decodable {
             id: id ?? UUID(),
             type: .expense,
             category: category ?? "Other",
-            amount: Decimal(amount),
+            amount: amount,
             description: description ?? "",
             date: date,
             createdAt: ImportDateParser.parse(createdAt) ?? date,
@@ -439,7 +447,8 @@ private struct ImportedLiquidityAccount: Decodable {
         guard let balance, balance.isFinite, balance != 0 else { return nil }
 
         let sourceCurrency = Currency.imported(currency, default: context.displayCurrency)
-        let convertedAmount = context.convert(Decimal(abs(balance)), from: sourceCurrency)
+        guard let balanceValue = importedMoney(abs(balance)) else { return nil }
+        let convertedAmount = context.convert(balanceValue, from: sourceCurrency)
         guard convertedAmount > 0, convertedAmount.isFinite else { return nil }
 
         let accountName = name ?? type?.importTitleCased ?? "Liquidity Account"
@@ -532,20 +541,30 @@ private struct ImportedInvestment: Decodable {
         let currentValue = currentValue?.nonNegativeImportedAmount ?? quantity * currentPrice
         let importedUpdatedAt = ImportDateParser.parse(updatedAt) ?? ImportDateParser.parse(lastPriceUpdate) ?? Date()
 
+        guard
+            let quantityValue = importedMoney(quantity),
+            let costBasisValue = importedMoney(costBasis),
+            let currentValueValue = importedMoney(currentValue),
+            let currentPriceValue = importedMoney(currentPrice),
+            let feesValue = importedMoney(orZero: fees?.nonNegativeImportedAmount)
+        else {
+            return nil
+        }
+
         return Investment(
             id: id ?? UUID(),
             type: InvestmentType(rawValue: type?.lowercased() ?? "") ?? .other,
             symbol: symbol.uppercased(),
             name: name,
-            quantity: Decimal(quantity),
-            costBasis: Decimal(costBasis),
-            currentValue: Decimal(currentValue),
-            currentPrice: Decimal(currentPrice),
+            quantity: quantityValue,
+            costBasis: costBasisValue,
+            currentValue: currentValueValue,
+            currentPrice: currentPriceValue,
             currency: Currency.imported(currency, default: defaultCurrency),
             geography: geography ?? "Other",
             sector: sector ?? "Other",
             isin: isin?.uppercased() ?? "",
-            fees: Decimal(fees?.nonNegativeImportedAmount ?? 0),
+            fees: feesValue,
             updatedAt: importedUpdatedAt,
             createdAt: ImportDateParser.parse(createdAt) ?? importedUpdatedAt
         )
@@ -608,15 +627,24 @@ private struct ImportedCryptoHolding: Decodable {
 
         let importedUpdatedAt = ImportDateParser.parse(updatedAt) ?? ImportDateParser.parse(lastPriceUpdate) ?? Date()
 
+        guard
+            let quantityValue = importedMoney(quantity),
+            let avgBuyPriceValue = importedMoney(orZero: avgBuyPrice?.nonNegativeImportedAmount),
+            let currentPriceValue = importedMoney(orZero: currentPrice?.nonNegativeImportedAmount),
+            let feesValue = importedMoney(orZero: fees?.nonNegativeImportedAmount)
+        else {
+            return nil
+        }
+
         return CryptoHolding(
             id: id ?? UUID(),
             symbol: symbol.uppercased(),
             name: name,
-            quantity: Decimal(quantity),
-            avgBuyPrice: Decimal(avgBuyPrice?.nonNegativeImportedAmount ?? 0),
-            currentPrice: Decimal(currentPrice?.nonNegativeImportedAmount ?? 0),
+            quantity: quantityValue,
+            avgBuyPrice: avgBuyPriceValue,
+            currentPrice: currentPriceValue,
             currency: Currency.imported(currency, default: defaultCurrency),
-            fees: Decimal(fees?.nonNegativeImportedAmount ?? 0),
+            fees: feesValue,
             coinId: coinId?.lowercased() ?? "",
             updatedAt: importedUpdatedAt,
             createdAt: ImportDateParser.parse(createdAt) ?? importedUpdatedAt
@@ -658,7 +686,7 @@ private struct ImportedLiability: Decodable {
     }
 
     func model(defaultCurrency: Currency) -> Liability? {
-        guard let balance = (currentBalance ?? principal)?.nonNegativeImportedAmount else {
+        guard let balance = (currentBalance ?? principal)?.nonNegativeImportedAmount.flatMap(importedMoney) else {
             return nil
         }
 
@@ -667,7 +695,7 @@ private struct ImportedLiability: Decodable {
         return Liability(
             id: id ?? UUID(),
             name: name ?? type?.importTitleCased ?? "Liability",
-            currentBalance: Decimal(balance),
+            currentBalance: balance,
             currency: Currency.imported(currency, default: defaultCurrency),
             createdAt: ImportDateParser.parse(createdAt) ?? importedUpdatedAt,
             updatedAt: importedUpdatedAt
@@ -684,6 +712,7 @@ private struct ImportedSnapshot: Decodable {
     let liquidity: Double?
     let investments: Double?
     let crypto: Double?
+    let currency: String?
     let createdAt: String?
 
     private enum CodingKeys: String, CodingKey {
@@ -695,6 +724,7 @@ private struct ImportedSnapshot: Decodable {
         case liquidity
         case investments
         case crypto
+        case currency
         case createdAt
     }
 
@@ -708,6 +738,7 @@ private struct ImportedSnapshot: Decodable {
         liquidity = container.decodeImportedDoubleIfPresent(forKey: .liquidity)
         investments = container.decodeImportedDoubleIfPresent(forKey: .investments)
         crypto = container.decodeImportedDoubleIfPresent(forKey: .crypto)
+        currency = container.decodeImportedStringIfPresent(forKey: .currency)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
     }
 
@@ -723,15 +754,27 @@ private struct ImportedSnapshot: Decodable {
         let totalLiabilities = totalLiabilities?.finiteImportedAmount ?? 0
         let totalAssets = totalAssets?.finiteImportedAmount ?? netWorth + totalLiabilities
 
+        guard
+            let totalAssetsValue = importedMoney(totalAssets),
+            let totalLiabilitiesValue = importedMoney(totalLiabilities),
+            let netWorthValue = importedMoney(netWorth),
+            let liquidityValue = importedMoney(orZero: liquidity?.finiteImportedAmount),
+            let investmentsValue = importedMoney(orZero: investments?.finiteImportedAmount),
+            let cryptoValue = importedMoney(orZero: crypto?.finiteImportedAmount)
+        else {
+            return nil
+        }
+
         return NetWorthSnapshot(
             id: id ?? UUID(),
             date: date,
-            totalAssets: Decimal(totalAssets),
-            totalLiabilities: Decimal(totalLiabilities),
-            netWorth: Decimal(netWorth),
-            liquidity: Decimal(liquidity?.finiteImportedAmount ?? 0),
-            investments: Decimal(investments?.finiteImportedAmount ?? 0),
-            crypto: Decimal(crypto?.finiteImportedAmount ?? 0),
+            totalAssets: totalAssetsValue,
+            totalLiabilities: totalLiabilitiesValue,
+            netWorth: netWorthValue,
+            liquidity: liquidityValue,
+            investments: investmentsValue,
+            crypto: cryptoValue,
+            currency: Currency.importedIfPresent(currency),
             createdAt: ImportDateParser.parse(createdAt) ?? date
         )
     }
@@ -933,10 +976,42 @@ private extension KeyedDecodingContainer {
     }
 }
 
+/// Every money value the importer stores passes through one of these.
+///
+/// `Decimal(Double)` returns `NSDecimalNumber.notANumber` for finite `Double`s whose magnitude
+/// `Decimal` cannot hold — at *both* ends, `1e300` and `1e-300` each produce NaN. `JSONEncoder`
+/// then writes the bare token `NaN`, which is not valid JSON, so the app persists a database it
+/// cannot read back. The failure surfaces on the *next* launch, from outside the lossy-salvage
+/// path, so there is no in-app recovery: the user is stuck on "could not be loaded" for good.
+///
+/// deep-audit H9 introduced `Decimal(finite:)` and applied it to market data and FX. Import — the
+/// one path that ingests an arbitrary user-supplied file — never got it. Guarding the `Double` is
+/// necessary but not sufficient; the *result* has to be checked too.
+private func importedMoney(_ value: Double) -> Decimal? { Decimal(finite: value) }
+
+/// Absent means zero. Present-but-unrepresentable rejects the whole record rather than silently
+/// zeroing a figure the user can see on screen.
+private func importedMoney(orZero value: Double?) -> Decimal? {
+    guard let value else { return 0 }
+    return Decimal(finite: value)
+}
+
 private extension Currency {
     static func imported(_ rawValue: String?, default defaultCurrency: Currency) -> Currency {
         guard let rawValue = rawValue?.trimmedForImport else { return defaultCurrency }
         return Currency(rawValue: rawValue.uppercased()) ?? defaultCurrency
+    }
+
+    /// The optional counterpart, for the three models whose `currency` is `Currency?`.
+    ///
+    /// `nil` on those types means "a row written before the field existed, read it as the base
+    /// currency" — a meaning that must be preserved for genuinely legacy backups and must *not* be
+    /// applied to a row this app exported minutes ago. So an absent field stays `nil`, and a present
+    /// one is parsed. An unparseable code also returns `nil`, which reads identically to the
+    /// `default:` overload above (`currency ?? base`) without claiming a code we did not recognise.
+    static func importedIfPresent(_ rawValue: String?) -> Currency? {
+        guard let rawValue = rawValue?.trimmedForImport else { return nil }
+        return Currency(rawValue: rawValue.uppercased())
     }
 }
 
