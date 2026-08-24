@@ -24,13 +24,17 @@ enum SettingsViewModel {
         case .finnhub:
             let quote = try await FinnhubQuoteClient(apiKey: apiKey).testConnection()
             return AppLocalization.string(
-                "Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).",
+                // `quote.currency` rather than a hardcoded USD: `MarketPriceQuote` carries the
+                // currency the provider actually answered in precisely so callers need not guess.
+                "Finnhub returned a live AAPL quote at \(quote.price.formatted(.currency(code: (quote.currency ?? .usd).rawValue))).",
                 appLanguage: appLanguage
             )
         case .coingecko:
             let quote = try await CoinGeckoPriceClient(apiKey: apiKey).testConnection()
             return AppLocalization.string(
-                "CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: Currency.usd.rawValue))).",
+                // CoinGecko is asked for EUR (`CoinGeckoPriceClient.currencies` defaults to
+                // `[.eur]`), so formatting the answer as USD put a euro amount behind a dollar sign.
+                "CoinGecko returned a live Bitcoin price at \(quote.price.formatted(.currency(code: (quote.currency ?? .eur).rawValue))).",
                 appLanguage: appLanguage
             )
         }

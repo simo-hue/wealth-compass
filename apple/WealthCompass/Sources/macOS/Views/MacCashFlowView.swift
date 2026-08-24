@@ -230,13 +230,17 @@ struct MacCashFlowView: View {
             MetricCard(
                 title: "Monthly Income",
                 value: settings.privateCurrency(cashFlow.monthlyIncome),
-                systemImage: "arrow.up.right",
+                // Down-left is money in, up-right is money out — the convention iOS uses, the Mac
+                // Dashboard uses, and the transaction rows 500 lines below in this same file use.
+                // Only this summary strip had them inverted, so on one page an up-right arrow meant
+                // "income" at the top and "expense" in the list directly beneath it.
+                systemImage: "arrow.down.left",
                 accent: WCColor.primary
             )
             MetricCard(
                 title: "Monthly Expenses",
                 value: settings.privateCurrency(cashFlow.monthlyExpenses),
-                systemImage: "arrow.down.right",
+                systemImage: "arrow.up.right",
                 accent: WCColor.destructive
             )
             MetricCard(

@@ -616,7 +616,14 @@ final class FinanceStore: ObservableObject {
                 schedulesChanged = true
             }
 
-            data.recurringTransactions[index] = schedule
+            // Only write back when something actually changed. The assignment was unconditional, so
+            // `data`'s `didSet` bumped `dataVersion` on every pass — and the 30-second timer calls
+            // this whether or not anything is due. Every memoized total, sorted list, grouping and
+            // Sankey therefore rebuilt twice a minute on a ledger nobody had touched. `save()` was
+            // already gated; only the cache and render churn was not.
+            if data.recurringTransactions[index] != schedule {
+                data.recurringTransactions[index] = schedule
+            }
         }
 
         if generatedCount > 0 {
