@@ -23,6 +23,75 @@ final class AnalyticsEngineTests: XCTestCase {
         AnalyticsEngine(data: data, displayCurrency: .eur, calendar: utc, now: now)
     }
 
+    // MARK: - Period windows
+
+    /// "Last 7 Days" must cover seven calendar days, not eight.
+    ///
+    /// The window was built as `now - 7 days` and then compared inclusively at *both* ends, so a
+    /// span already seven days long admitted an eighth. Every relative period had the same off-by-one.
+    func testRelativePeriodsCoverExactlyTheirOwnLength() {
+        let today = date(2026, 8, 24)
+        // One expense per day for the twelve days ending today.
+        let rows = (0..<12).compactMap { offset -> Transaction? in
+            guard let day = utc.date(byAdding: .day, value: -offset, to: today) else { return nil }
+            return tx(.expense, 100, "Food", day)
+        }
+        let engine = engine(FinancialData(transactions: rows), now: today)
+
+        XCTAssertEqual(
+            engine.expensesByCategory(period: .sevenDays).first?.value, 700,
+            "Last 7 Days counted a day it should not have"
+        )
+        XCTAssertEqual(engine.expensesByCategory(period: .thirtyDays).first?.value, 1200)
+    }
+
+    /// Future-dated rows are excluded from every period — including All Time.
+    ///
+    /// `.all` returned the raw array, so the same screen showed one figure in the category donut and
+    /// another in the Money Flow diagram beside it, which re-clamps to today for exactly this reason.
+    /// `calculateTotals` has excluded them since deep-audit L51.
+    func testAllTimeExcludesFutureDatedTransactionsLikeEveryOtherPeriod() {
+        let today = date(2026, 8, 24)
+        let data = FinancialData(transactions: [
+            tx(.expense, 100, "Food", date(2026, 8, 1)),
+            tx(.expense, 900, "Rent", date(2026, 12, 1)),
+        ])
+        let engine = engine(data, now: today)
+
+        XCTAssertEqual(
+            engine.expensesByCategory(period: .all).map(\.value), [100],
+            "All Time counted spending that has not happened yet"
+        )
+        // The two views of the same period must agree.
+        let sankeyOutflow = engine.cashFlowSankey(period: .all).outflows
+            .filter { $0.role == .expense }
+            .reduce(0.0) { $0 + $1.value }
+        XCTAssertEqual(sankeyOutflow, 100, accuracy: 0.001)
+    }
+
+    /// The dashboard must not contradict itself about money that has not moved yet.
+    ///
+    /// `calculateTotals` excluded future-dated rows (deep-audit L51) while `monthlyCashFlow` and
+    /// `cashFlowTrend` counted them, so one screen showed Cash 1 000 in the header and Monthly
+    /// Income 4 000 in the card beneath it. `ReportDocumentBuilder` documented this and worked
+    /// around it with a private settled engine — for the PDF only.
+    func testMonthlyCashFlowAndTrendExcludeFutureDatedRows() {
+        let today = date(2026, 8, 24)
+        let data = FinancialData(transactions: [
+            tx(.income, 1000, "Salary", date(2026, 8, 1)),
+            tx(.income, 3000, "Invoice", date(2026, 8, 30)),
+            tx(.expense, 200, "Food", date(2026, 8, 2)),
+            tx(.expense, 500, "Rent", date(2026, 8, 31)),
+        ])
+        let engine = engine(data, now: today)
+
+        XCTAssertEqual(engine.calculateTotals().totalLiquidity, 800)
+        XCTAssertEqual(engine.monthlyCashFlow(for: today).monthlyIncome, 1000, "income card counts unsettled money")
+        XCTAssertEqual(engine.monthlyCashFlow(for: today).monthlyExpenses, 200, "expense card counts unsettled money")
+        XCTAssertEqual(engine.cashFlowTrend(months: 1).first?.income ?? 0, 1000, accuracy: 0.001)
+        XCTAssertEqual(engine.cashFlowTrend(months: 1).first?.expense ?? 0, 200, accuracy: 0.001)
+    }
+
     func testCalculateTotals() {
         let data = FinancialData(
             transactions: [tx(.income, 1000, "Salary", date(2026, 6, 1)), tx(.expense, 300, "Food", date(2026, 6, 2))],
@@ -381,11 +450,13 @@ final class AnalyticsEngineTests: XCTestCase {
     }
 
     /// `monthlyCashFlow` sums only the requested calendar month, split by type; prior/next-month
-    /// transactions are excluded.
+    /// transactions are excluded. Every row here is dated on or before `now`, so this covers month
+    /// filtering alone — settlement is covered by
+    /// `testMonthlyCashFlowAndTrendExcludeFutureDatedRows`.
     func testMonthlyCashFlowSumsOnlyTheGivenMonthByType() {
         let data = FinancialData(transactions: [
             tx(.income, 1000, "Salary", date(2026, 6, 1)),
-            tx(.income, 200, "Bonus", date(2026, 6, 28)),
+            tx(.income, 200, "Bonus", date(2026, 6, 20)),   // same month, already settled
             tx(.expense, 300, "Food", date(2026, 6, 15)),
             tx(.expense, 999, "Rent", date(2026, 5, 31)),   // previous month — excluded
             tx(.income, 500, "X", date(2026, 7, 1))          // next month — excluded

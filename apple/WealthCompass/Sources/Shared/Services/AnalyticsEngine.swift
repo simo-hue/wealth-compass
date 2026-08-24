@@ -75,11 +75,25 @@ struct AnalyticsEngine {
             || data.liabilities.contains { $0.currency != baseCurrency }
     }
 
+    /// Transactions whose day has arrived — the same rule `calculateTotals` applies (deep-audit L51).
+    ///
+    /// Every figure derived from the ledger has to agree about what has actually happened.
+    /// `monthlyCashFlow` and `cashFlowTrend` used to read the raw array while `calculateTotals` did
+    /// not, so a single invoice dated later this month put Cash at 800 in the dashboard header and
+    /// Monthly Income at 4 000 in the card directly beneath it. `ReportDocumentBuilder` had already
+    /// found this and worked around it with a private settled engine — but only for the PDF, so the
+    /// two live dashboards kept disagreeing with themselves.
+    private var settledTransactions: [Transaction] {
+        let today = calendar.startOfDay(for: now)
+        return data.transactions.filter { calendar.startOfDay(for: $0.date) <= today }
+    }
+
     func monthlyCashFlow(for month: Date) -> MonthlyCashFlow {
-        let income = data.transactions
+        let settled = settledTransactions
+        let income = settled
             .filter { $0.type == .income && calendar.isDate($0.date, equalTo: month, toGranularity: .month) }
             .reduce(Decimal(0)) { $0 + displayAmount($1) }
-        let expenses = data.transactions
+        let expenses = settled
             .filter { $0.type == .expense && calendar.isDate($0.date, equalTo: month, toGranularity: .month) }
             .reduce(Decimal(0)) { $0 + displayAmount($1) }
         return MonthlyCashFlow(monthlyIncome: income, monthlyExpenses: expenses)
@@ -221,10 +235,11 @@ struct AnalyticsEngine {
         labelFormatter.dateFormat = "MMM"
         labelFormatter.timeZone = calendar.timeZone
 
+        let settled = settledTransactions
         return stride(from: months - 1, through: 0, by: -1).compactMap { offset in
             guard let date = calendar.date(byAdding: .month, value: -offset, to: now) else { return nil }
             let monthKey = monthFormatter.string(from: date)
-            let transactions = data.transactions.filter { monthFormatter.string(from: $0.date) == monthKey }
+            let transactions = settled.filter { monthFormatter.string(from: $0.date) == monthKey }
             let income = transactions.filter { $0.type == .income }.reduce(Decimal(0)) { $0 + displayAmount($1) }
             let expense = transactions.filter { $0.type == .expense }.reduce(Decimal(0)) { $0 + displayAmount($1) }
 
@@ -580,23 +595,41 @@ struct AnalyticsEngine {
     }
 
     private func filteredTransactions(period: AnalyticsPeriod) -> [Transaction] {
-        let start: Date
-        switch period {
-        case .sevenDays:  start = calendar.date(byAdding: .day, value: -7, to: now) ?? .distantPast
-        case .thirtyDays: start = calendar.date(byAdding: .day, value: -30, to: now) ?? .distantPast
-        case .threeMonths: start = calendar.date(byAdding: .month, value: -3, to: now) ?? .distantPast
-        case .yearToDate: start = calendar.date(from: calendar.dateComponents([.year], from: now)) ?? .distantPast
-        case .all:        return data.transactions
-        }
         // Compare at calendar-day granularity in the engine's own calendar (deep-audit L05): the
         // boundaries and the startOfDay-stored transaction dates then stay aligned even after a
         // timezone/DST shift, instead of dropping day-boundary items when a raw-instant boundary
         // lands mid-day.
-        let startOfDay = calendar.startOfDay(for: start)
-        let endOfDay = calendar.startOfDay(for: now)
-        return data.transactions.filter {
-            let day = calendar.startOfDay(for: $0.date)
-            return day >= startOfDay && day <= endOfDay
+        let today = calendar.startOfDay(for: now)
+
+        // The *first day included*, so the window is exactly as long as its name.
+        //
+        // These used to be built as `now - N` and then compared inclusively at both ends, which made
+        // every relative window one day too wide: "Last 7 Days" spanned eight calendar days and
+        // reported eight days of spending. Counting back N-1 from today gives N days inclusive.
+        let firstDay: Date?
+        switch period {
+        case .sevenDays:
+            firstDay = calendar.date(byAdding: .day, value: -6, to: today)
+        case .thirtyDays:
+            firstDay = calendar.date(byAdding: .day, value: -29, to: today)
+        case .threeMonths:
+            firstDay = calendar.date(byAdding: .month, value: -3, to: today)
+                .flatMap { calendar.date(byAdding: .day, value: 1, to: $0) }
+        case .yearToDate:
+            firstDay = calendar.date(from: calendar.dateComponents([.year], from: today))
+        case .all:
+            firstDay = nil
+        }
+
+        return data.transactions.filter { transaction in
+            let day = calendar.startOfDay(for: transaction.date)
+            // Future-dated rows are excluded from *every* period, All Time included. `.all` used to
+            // return the raw array, so the category donut counted money that has not moved while
+            // `calculateTotals` (deep-audit L51) and the Money Flow diagram beside it did not —
+            // one screen, two answers for the same period.
+            guard day <= today else { return false }
+            guard let firstDay else { return true }
+            return day >= firstDay
         }
     }
 }
