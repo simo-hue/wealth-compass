@@ -13103,38 +13103,38 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3أشهر"
+            "state" : "needs_review",
+            "value" : "3 أشهر"
           }
         },
         "ca" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 m"
           }
         },
         "cs" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 měs"
           }
         },
         "da" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 mdr"
           }
         },
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 Mon"
           }
         },
         "el" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3Μ"
+            "state" : "needs_review",
+            "value" : "3 μήν"
           }
         },
         "en" : {
@@ -13145,158 +13145,158 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 m"
           }
         },
         "es-419" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 m"
           }
         },
         "fi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 kk"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 mois"
           }
         },
         "he" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 ח'"
           }
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3एम"
+            "state" : "needs_review",
+            "value" : "3 माह"
           }
         },
         "hr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 mj"
           }
         },
         "hu" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 hó"
           }
         },
         "id" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 bln"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 mesi"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3か月"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3개월"
           }
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 bln"
           }
         },
         "nb" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 mnd"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 mnd"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 mies"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 meses"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 meses"
           }
         },
         "ro" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 luni"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3М"
+            "state" : "needs_review",
+            "value" : "3 мес"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 mes"
           }
         },
         "sv" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 mån"
           }
         },
         "th" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3เอ็ม"
+            "state" : "needs_review",
+            "value" : "3 ด."
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3 milyon"
+            "state" : "needs_review",
+            "value" : "3 ay"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 міс"
           }
         },
         "vi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3 tháng"
           }
         },
         "zh-Hans" : {
@@ -13307,8 +13307,8 @@
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "3M"
+            "state" : "needs_review",
+            "value" : "3個月"
           }
         }
       }
@@ -13318,38 +13318,38 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6أشهر"
+            "state" : "needs_review",
+            "value" : "6 أشهر"
           }
         },
         "ca" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 m"
           }
         },
         "cs" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 měs"
           }
         },
         "da" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 mdr"
           }
         },
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 Mon"
           }
         },
         "el" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6 εκ"
+            "state" : "needs_review",
+            "value" : "6 μήν"
           }
         },
         "en" : {
@@ -13360,158 +13360,158 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 m"
           }
         },
         "es-419" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 m"
           }
         },
         "fi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6 milj"
+            "state" : "needs_review",
+            "value" : "6 kk"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 mois"
           }
         },
         "he" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 ח'"
           }
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6"
+            "state" : "needs_review",
+            "value" : "6 माह"
           }
         },
         "hr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 mj"
           }
         },
         "hu" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 hó"
           }
         },
         "id" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 bln"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 mesi"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6か月"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6개월"
           }
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 bln"
           }
         },
         "nb" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 mnd"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 mnd"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 mies"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6 milhões"
+            "state" : "needs_review",
+            "value" : "6 meses"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6 milhões"
+            "state" : "needs_review",
+            "value" : "6 meses"
           }
         },
         "ro" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 luni"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6М"
+            "state" : "needs_review",
+            "value" : "6 мес"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6 mil"
+            "state" : "needs_review",
+            "value" : "6 mes"
           }
         },
         "sv" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 mån"
           }
         },
         "th" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6ม"
+            "state" : "needs_review",
+            "value" : "6 ด."
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6 milyon"
+            "state" : "needs_review",
+            "value" : "6 ay"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6 міс"
           }
         },
         "vi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6 triệu"
+            "state" : "needs_review",
+            "value" : "6 tháng"
           }
         },
         "zh-Hans" : {
@@ -13522,8 +13522,8 @@
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "6M"
+            "state" : "needs_review",
+            "value" : "6個月"
           }
         }
       }
@@ -13742,38 +13742,38 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12أشهر"
+            "state" : "needs_review",
+            "value" : "12 شهرًا"
           }
         },
         "ca" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 m"
           }
         },
         "cs" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12 mil"
+            "state" : "needs_review",
+            "value" : "12 měs"
           }
         },
         "da" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 mdr"
           }
         },
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 Mon"
           }
         },
         "el" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12 εκ"
+            "state" : "needs_review",
+            "value" : "12 μήν"
           }
         },
         "en" : {
@@ -13784,158 +13784,158 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 m"
           }
         },
         "es-419" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 m"
           }
         },
         "fi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12 milj"
+            "state" : "needs_review",
+            "value" : "12 kk"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 mois"
           }
         },
         "he" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 ח'"
           }
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12एम"
+            "state" : "needs_review",
+            "value" : "12 माह"
           }
         },
         "hr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 mj"
           }
         },
         "hu" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 hó"
           }
         },
         "id" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 bln"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 mesi"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12か月"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12개월"
           }
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 bln"
           }
         },
         "nb" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 mnd"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 mnd"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 mies"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12 milhões"
+            "state" : "needs_review",
+            "value" : "12 meses"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12 milhões"
+            "state" : "needs_review",
+            "value" : "12 meses"
           }
         },
         "ro" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 luni"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12М"
+            "state" : "needs_review",
+            "value" : "12 мес"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12 miliónov"
+            "state" : "needs_review",
+            "value" : "12 mes"
           }
         },
         "sv" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 mån"
           }
         },
         "th" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12ม"
+            "state" : "needs_review",
+            "value" : "12 ด."
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12 milyon"
+            "state" : "needs_review",
+            "value" : "12 ay"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 міс"
           }
         },
         "vi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12 tháng"
           }
         },
         "zh-Hans" : {
@@ -13946,8 +13946,8 @@
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "12M"
+            "state" : "needs_review",
+            "value" : "12個月"
           }
         }
       }
