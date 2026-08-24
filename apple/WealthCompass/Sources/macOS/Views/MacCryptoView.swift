@@ -223,7 +223,7 @@ struct MacCryptoView: View {
                 .padding(.bottom, 2)
             
             let topHoldings = finance.data.crypto
-                .sorted { $0.currentValue > $1.currentValue }
+                .rankedByValue(settings.convert)
                 .prefix(6)
             
             if topHoldings.isEmpty {
@@ -255,7 +255,7 @@ struct MacCryptoView: View {
                     .padding(.top, 40)
                 } else {
                     // VIEW-10: value-ranked to match iOS + the Overview grid (was insertion order).
-                    ForEach(finance.data.crypto.sorted { $0.currentValue > $1.currentValue }) { holding in
+                    ForEach(finance.data.crypto.rankedByValue(settings.convert)) { holding in
                         holdingCard(for: holding)
                     }
                 }

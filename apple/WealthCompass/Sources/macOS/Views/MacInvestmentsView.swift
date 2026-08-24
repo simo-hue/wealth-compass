@@ -171,7 +171,7 @@ struct MacInvestmentsView: View {
                 .font(.title2.weight(.semibold))
             
             let topHoldings = finance.data.investments
-                .sorted { $0.currentValue > $1.currentValue }
+                .rankedByValue(settings.convert)
                 .prefix(5)
             
             if topHoldings.isEmpty {
@@ -204,7 +204,7 @@ struct MacInvestmentsView: View {
                     .padding(.top, 40)
                 } else {
                     // VIEW-10: value-ranked to match iOS + the Overview grid (was insertion order).
-                    ForEach(finance.data.investments.sorted { $0.currentValue > $1.currentValue }) { investment in
+                    ForEach(finance.data.investments.rankedByValue(settings.convert)) { investment in
                         investmentCard(for: investment)
                     }
                 }

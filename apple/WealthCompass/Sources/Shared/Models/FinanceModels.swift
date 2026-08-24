@@ -581,6 +581,42 @@ struct CashFlowMonth: Identifiable, Equatable {
     var expense: Double
 }
 
+/// A holding with a value denominated in its own currency.
+protocol CurrencyDenominatedHolding {
+    var currentValue: Decimal { get }
+    var currency: Currency { get }
+    /// Tie-break, so equal-valued holdings keep a stable order between renders.
+    var symbol: String { get }
+}
+
+extension Investment: CurrencyDenominatedHolding {}
+extension CryptoHolding: CurrencyDenominatedHolding {}
+
+extension Array where Element: CurrencyDenominatedHolding {
+    /// Largest first, measured in the display currency.
+    ///
+    /// Sorting the raw `currentValue` compares numbers denominated in different currencies: a
+    /// ¥1,000,000 position (≈ €6,000) outranked a €50,000 one. Every value *rendered* on those same
+    /// rows is converted, so the order visibly contradicted the figures beside it — and because the
+    /// Overview grids take only the top five or six, a genuinely larger holding could be pushed out
+    /// of "Top Holdings" altogether.
+    func rankedByValue(_ convert: (Decimal, Currency) -> Decimal) -> [Element] {
+        // Broken into explicit steps to keep the type-checker fast, as elsewhere in this file.
+        var keyed: [(holding: Element, value: Decimal)] = []
+        keyed.reserveCapacity(count)
+        for holding in self {
+            keyed.append((holding: holding, value: convert(holding.currentValue, holding.currency)))
+        }
+        keyed.sort { first, second in
+            if first.value == second.value {
+                return first.holding.symbol < second.holding.symbol
+            }
+            return first.value > second.value
+        }
+        return keyed.map { $0.holding }
+    }
+}
+
 struct CategoryTotal: Identifiable, Equatable {
     var id: String { name }
     var name: String

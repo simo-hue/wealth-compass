@@ -92,6 +92,41 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual(engine.cashFlowTrend(months: 1).first?.expense ?? 0, 200, accuracy: 0.001)
     }
 
+    /// Holdings rank by what they are worth, not by the size of their raw number.
+    ///
+    /// Sorting `currentValue` directly compares figures denominated in different currencies, so a
+    /// ¥1,000,000 position (≈ €6,000) outranked a €50,000 one — while every value rendered on those
+    /// same rows is converted, making the order contradict the numbers beside it. The Overview grids
+    /// take only the top five or six, so a genuinely larger holding could vanish from "Top Holdings".
+    func testHoldingsRankByConvertedValue() {
+        let converter = CurrencyConverter(snapshot: nil)
+        let convert: (Decimal, Currency) -> Decimal = { converter.convert($0, from: $1, to: .eur) }
+
+        let yen = Investment(type: .stock, symbol: "JPY1", name: "Yen position", quantity: 1,
+                             costBasis: 0, currentValue: 1_000_000, currentPrice: 1_000_000,
+                             currency: .jpy, geography: "JP", sector: "Tech", isin: "", fees: 0)
+        let euro = Investment(type: .stock, symbol: "EUR1", name: "Euro position", quantity: 1,
+                              costBasis: 0, currentValue: 50_000, currentPrice: 50_000,
+                              currency: .eur, geography: "EU", sector: "Tech", isin: "", fees: 0)
+
+        XCTAssertEqual(
+            [yen, euro].rankedByValue(convert).map(\.symbol), ["EUR1", "JPY1"],
+            "ranked by the raw number instead of the converted value"
+        )
+    }
+
+    /// Equal-valued holdings keep a stable order rather than shuffling between renders.
+    func testEqualValuedHoldingsBreakTiesDeterministically() {
+        let convert: (Decimal, Currency) -> Decimal = { value, _ in value }
+        let b = Investment(type: .stock, symbol: "BBB", name: "B", quantity: 1, costBasis: 0,
+                           currentValue: 100, currentPrice: 100, currency: .eur,
+                           geography: "", sector: "", isin: "", fees: 0)
+        let a = Investment(type: .stock, symbol: "AAA", name: "A", quantity: 1, costBasis: 0,
+                           currentValue: 100, currentPrice: 100, currency: .eur,
+                           geography: "", sector: "", isin: "", fees: 0)
+        XCTAssertEqual([b, a].rankedByValue(convert).map(\.symbol), ["AAA", "BBB"])
+    }
+
     func testCalculateTotals() {
         let data = FinancialData(
             transactions: [tx(.income, 1000, "Salary", date(2026, 6, 1)), tx(.expense, 300, "Food", date(2026, 6, 2))],

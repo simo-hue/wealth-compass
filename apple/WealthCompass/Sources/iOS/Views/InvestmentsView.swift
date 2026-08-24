@@ -143,7 +143,7 @@ struct InvestmentsView: View {
                     EmptyState(title: LocalizedStringKey("No investments yet"), systemImage: "chart.xyaxis.line")
                 } else {
                     VStack(spacing: 12) {
-                        ForEach(finance.data.investments.sorted { $0.currentValue > $1.currentValue }) { investment in
+                        ForEach(finance.data.investments.rankedByValue(settings.convert)) { investment in
                             investmentRow(investment)
                                 .contextMenu {
                                     Button {

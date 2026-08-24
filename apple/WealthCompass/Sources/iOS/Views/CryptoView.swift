@@ -199,7 +199,7 @@ struct CryptoView: View {
                     EmptyState(title: LocalizedStringKey("No crypto holdings yet"), systemImage: "bitcoinsign.circle")
                 } else {
                     VStack(spacing: 12) {
-                        ForEach(finance.data.crypto.sorted { $0.currentValue > $1.currentValue }) { holding in
+                        ForEach(finance.data.crypto.rankedByValue(settings.convert)) { holding in
                             holdingRow(holding)
                                 .contextMenu {
                                     Button {
