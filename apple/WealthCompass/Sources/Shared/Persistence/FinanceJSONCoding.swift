@@ -149,6 +149,13 @@ enum FinanceJSONCoding {
     }
 
     private static func migrateLegacyFinancialDataJSON(_ data: Data) throws -> Data {
+        // Detect first, with `JSONSerialization`. Building the `Decimal`-backed tree is roughly an
+        // order of magnitude more expensive (its `try?` trial decoding constructs and discards a
+        // `DecodingError` per candidate type), and this runs on the main actor during
+        // `FinanceStore.init` on *every* launch — while almost no file needs healing at all.
+        // Detection only asks whether two date keys are present, so the Double-mangled numbers
+        // `JSONSerialization` produces are irrelevant here; nothing it parses is ever written back.
+        guard needsDateHealing(data) else { return data }
         guard case .object(var root)? = try? jsonValueDecoder.decode(JSONValue.self, from: data) else {
             return data
         }
@@ -210,6 +217,27 @@ enum FinanceJSONCoding {
         return changed
     }
 
+    /// Cheap pre-check: does any record lack a usable `createdAt`/`updatedAt`?
+    private static func needsDateHealing(_ data: Data) -> Bool {
+        guard let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            // Unparseable here means the strict decode will fail too and the salvage path takes
+            // over; healing could not have helped either way.
+            return false
+        }
+        for collectionKey in healedCollections {
+            guard let records = root[collectionKey] as? [[String: Any]] else { continue }
+            let missing = records.contains { record in
+                ["createdAt", "updatedAt"].contains { record[$0] == nil || record[$0] is NSNull }
+            }
+            if missing { return true }
+        }
+        return false
+    }
+
+    private static let healedCollections = [
+        "transactions", "recurringTransactions", "investments", "crypto", "liabilities", "snapshots",
+    ]
+
     /// A JSON key that is absent, or present with an explicit `null`.
     private static func isMissingOrNull(_ value: JSONValue?) -> Bool {
         guard let value else { return true }
@@ -235,6 +263,8 @@ enum FinanceJSONCoding {
         case null
         case bool(Bool)
         case number(Decimal)
+        /// Only for numbers outside `Decimal`'s range — see `init(from:)`.
+        case double(Double)
         case string(String)
         case array([JSONValue])
         case object([String: JSONValue])
@@ -245,6 +275,15 @@ enum FinanceJSONCoding {
             // Bool before Decimal: `true`/`false` would otherwise decode as 1/0 on some platforms.
             if let value = try? container.decode(Bool.self) { self = .bool(value); return }
             if let value = try? container.decode(Decimal.self) { self = .number(value); return }
+            // `Decimal` cannot decode every JSON number: it throws for |x| >= 1e128 and for a
+            // nonzero |x| below ~1e-129, where `JSONSerialization` simply parsed. Falling through
+            // to an error would fail the *entire* document — and this type is the entry point for
+            // the H08 lossy-salvage decode, whose whole job is to rescue a file that already
+            // contains something unreadable. One runaway value would take every healthy record
+            // with it, leaving the user on the recovery screen whose only action is to erase.
+            // Keep it as a `Double`: imprecise, but no money the app could ever have stored is in
+            // that range, and the alternative is losing the file.
+            if let value = try? container.decode(Double.self) { self = .double(value); return }
             if let value = try? container.decode(String.self) { self = .string(value); return }
             if let value = try? container.decode([JSONValue].self) { self = .array(value); return }
             self = .object(try container.decode([String: JSONValue].self))
@@ -256,6 +295,7 @@ enum FinanceJSONCoding {
             case .null: try container.encodeNil()
             case .bool(let value): try container.encode(value)
             case .number(let value): try container.encode(value)
+            case .double(let value): try container.encode(value)
             case .string(let value): try container.encode(value)
             case .array(let value): try container.encode(value)
             case .object(let value): try container.encode(value)

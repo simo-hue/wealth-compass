@@ -69,6 +69,30 @@ final class PersistenceCoordinatorTests: XCTestCase {
         )
     }
 
+    /// A number outside `Decimal`'s range must not take the whole document with it.
+    ///
+    /// `Decimal` decoding throws for |x| >= 1e128 and for a nonzero |x| below ~1e-129, where
+    /// `JSONSerialization` simply parsed. Routing the salvage path through a Decimal-backed tree
+    /// therefore made one runaway value fail the *entire* file — precisely the file the salvage
+    /// path exists to rescue — leaving the user on the recovery screen whose only action erases.
+    func testOutOfRangeNumberDoesNotDefeatTheSalvagePath() throws {
+        let json = """
+        {"transactions":[
+          {"id":"11111111-1111-1111-1111-111111111111","type":"income","category":"Salary",
+           "amount":1234.56,"description":"","date":"2026-01-01T00:00:00.000Z",
+           "createdAt":"2026-01-01T00:00:00.000Z","updatedAt":"2026-01-01T00:00:00.000Z"},
+          {"id":"22222222-2222-2222-2222-222222222222","type":"NOT_A_TYPE","category":"X",
+           "amount":1e300,"description":"","date":"2026-01-02T00:00:00.000Z",
+           "createdAt":"2026-01-02T00:00:00.000Z","updatedAt":"2026-01-02T00:00:00.000Z"}
+        ]}
+        """
+        let decoded = try FinanceJSONCoding.decodeFinancialData(from: Data(json.utf8))
+
+        XCTAssertEqual(decoded.data.transactions.count, 1, "the healthy record was lost with the bad one")
+        XCTAssertEqual(decoded.data.transactions[0].amount, Decimal(string: "1234.56"))
+        XCTAssertEqual(decoded.skippedRecordKeys.count, 1)
+    }
+
     // MARK: - Coordinator
 
     func testBurstSavesPersistLastSnapshotAndAdvanceBaseline() async throws {

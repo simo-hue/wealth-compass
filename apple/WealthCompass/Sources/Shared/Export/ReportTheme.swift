@@ -284,12 +284,12 @@ enum ReportFontRole: Sendable {
     /// layer shrinks them to fit rather than truncating.
     ///
     /// Amounts and their totals: "1.234.56…" is unreadable, and these are the figures a table exists
-    /// to state. Headers: a 64.0pt column fits "GAIN / LOSS" (46.4pt) but not German
-    /// "GEWINN / VERLUST" (74.0pt) or Spanish "GANANCIA / PÉRDIDA" (81.5pt), so translated reports
-    /// truncated their column headings on every export.
+    /// to state. Headers: a 64.0pt column fits "GAIN / LOSS" but not the German or Spanish
+    /// translations, so translated reports truncated their column headings on every export.
     ///
-    /// Deliberately excludes free text — names, descriptions, categories — where shrinking one long
-    /// string would make the table ragged and truncation is the right answer.
+    /// This is necessary but not sufficient — `.tableCell` is also the role of every free-text cell
+    /// in a row, so `PDFDrawingContext` additionally requires `isNumeric` for anything but a header.
+    /// Shrinking one long name would make the table ragged; truncation is the right answer there.
     var shrinksToFit: Bool {
         switch self {
         case .tableCell, .tableFooter, .tableHeader, .kpiValue, .chartCenterValue:
@@ -301,14 +301,19 @@ enum ReportFontRole: Sendable {
 
     /// How far `shrinksToFit` may reduce this role before giving up and truncating.
     ///
-    /// Headers get more headroom than amounts. They are set small and semibold with letter-spacing,
-    /// so a translated heading can be half again as wide as its English source — and a heading is
-    /// read once, where an amount is read as a figure. 0.72 of 7.5pt is 5.4pt, which is dense but
-    /// normal for a financial table and unambiguously better than `GANANCIA / PÉR…`.
+    /// Headers get more headroom than amounts: they are set small and semibold with letter-spacing,
+    /// so a translated heading can run half again as wide as its English source, and a heading is
+    /// read once where an amount is read as a figure.
+    ///
+    /// Measured at each role's own face against a 64.0pt column: German `GEWINN / VERLUST` needs
+    /// ~0.71, so 0.70 admits it. Spanish `GANANCIA / PÉRDIDA` needs ~0.64 — a 4.8pt heading — and
+    /// is deliberately left to truncate rather than shrunk past legibility. On the numeric side an
+    /// eight-figure total (`12.345.678,90 €`) in the bold footer needs ~0.78, so that is the floor
+    /// there; seven figures, the common case this was reported for, fits well above it.
     var minimumShrinkScale: CGFloat {
         switch self {
-        case .tableHeader: return 0.72
-        default: return 0.82
+        case .tableHeader: return 0.70
+        default: return 0.78
         }
     }
 

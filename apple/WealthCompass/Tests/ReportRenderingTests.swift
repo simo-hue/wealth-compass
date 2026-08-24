@@ -72,7 +72,14 @@ final class ReportPaginationTests: XCTestCase {
             footer: nil, caption: nil)
 
         let text = try renderedText(makeDocument(table, theme: ReportTheme()))
-        XCTAssertTrue(text.contains("…"), "header no longer truncates — revisit the column budget note")
+        // Name the header specifically: asserting on any "…" anywhere in the document would pass
+        // for an ellipsis in an unrelated cell.
+        let flattened = text.filter { !$0.isWhitespace }
+        XCTAssertFalse(
+            flattened.contains("GANANCIA/PÉRDIDA"),
+            "the Spanish header now fits — revisit the column-budget note and the 0.70 floor"
+        )
+        XCTAssertTrue(flattened.contains("GANANCIA"), "the header vanished entirely rather than truncating")
     }
 
     /// Renders the document to a real PDF and returns every page's text.

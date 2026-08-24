@@ -101,21 +101,29 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
     func clear() throws {
         // Also remove the one-time pre-CloudKit migration backup: it is a verbatim copy of
         // the user's finance data, so a "real and complete" erase must not leave it behind.
-        let backupURL = storageURL.appendingPathExtension("pre-cloudkit-backup")
-        if fileManager.fileExists(atPath: backupURL.path) {
-            try fileManager.removeItem(at: backupURL)
+        // Every copy is removed independently. `wipeLocalState` calls this as `try?`, so a single
+        // throw part-way through would be swallowed *and* leave the remaining copies on disk — and
+        // if the live DB were the one left, the next launch would restore everything the user had
+        // just erased. The live DB is deleted first for the same reason: it is the copy that
+        // actually comes back.
+        var firstFailure: Error?
+        func remove(_ url: URL) {
+            guard fileManager.fileExists(atPath: url.path) else { return }
+            do { try fileManager.removeItem(at: url) } catch { firstFailure = firstFailure ?? error }
         }
+
+        remove(storageURL)
+        remove(storageURL.appendingPathExtension("pre-cloudkit-backup"))
         // The same reasoning applies to the pre-Application-Support database in `Documents/`, and
         // it was missed. `migrateLegacyFileIfNeeded` *copies* that file rather than moving it, so
         // it outlives the migration — and because the migration's guard is only "does the live file
         // exist?", leaving it here did not merely strand a plaintext copy of the user's finances on
         // disk after a full erase: the very next `load()` copied it back and restored everything
         // they had just deleted, which sync then republished.
-        for legacyURL in legacyStorageURLs where fileManager.fileExists(atPath: legacyURL.path) {
-            try fileManager.removeItem(at: legacyURL)
+        for legacyURL in legacyStorageURLs {
+            remove(legacyURL)
         }
-        guard fileManager.fileExists(atPath: storageURL.path) else { return }
-        try fileManager.removeItem(at: storageURL)
+        if let firstFailure { throw firstFailure }
     }
 
     private func createStorageDirectoryIfNeeded() throws {

@@ -229,7 +229,8 @@ struct PDFDrawingContext {
             // whole table ragged for no gain.
             if let fitted = shrunkToFit(text, role: role, color: color, alignment: resolvedAlignment,
                                         textDirection: isNumeric ? .leftToRight : nil,
-                                        width: topDownRect.width) {
+                                        isNumeric: isNumeric,
+                                        width: topDownRect.width, fullWidth: lineWidth) {
                 line = fitted
                 lineWidth = CGFloat(CTLineGetTypographicBounds(line, nil, nil, nil))
             } else {
@@ -267,9 +268,19 @@ struct PDFDrawingContext {
                              color: ReportColor,
                              alignment: ReportAlignment,
                              textDirection: ReportLayoutDirection?,
-                             width: CGFloat) -> CTLine? {
-        guard role.shrinksToFit else { return nil }
-        var scale: CGFloat = 0.96
+                             isNumeric: Bool,
+                             width: CGFloat,
+                             fullWidth: CGFloat) -> CTLine? {
+        // `.tableCell` is the role of *every* cell in a row, free text included, so the role alone
+        // cannot express "amounts and headings only" — `isNumeric` is what actually distinguishes
+        // them. Without this, a slightly-too-long Name rendered a size smaller than the cells
+        // beside it, which is exactly the ragged table this was meant to avoid.
+        guard role.shrinksToFit, isNumeric || role == .tableHeader else { return nil }
+        // Start from the ratio the text actually needs rather than walking down from 0.96: a long
+        // free-text cell would otherwise pay for every step before failing anyway. Tracking does
+        // not scale perfectly linearly, so this is a starting estimate, not an answer.
+        let estimate = fullWidth > 0 ? width / fullWidth : 1
+        var scale = min(0.98, estimate)
         while scale >= role.minimumShrinkScale {
             let attributed = attributedString(text, role: role, color: color, alignment: alignment,
                                               textDirection: textDirection, sizeScale: scale)
