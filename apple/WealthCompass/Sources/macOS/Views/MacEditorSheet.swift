@@ -199,6 +199,7 @@ private struct MacInvestmentEditor: View {
     @State private var isin: String
     @State private var type: InvestmentType
     @State private var currency: Currency
+    @State private var hasInitializedCurrency = false
     @State private var sector: String
     @State private var geography: String
     @State private var quantity: String
@@ -226,8 +227,9 @@ private struct MacInvestmentEditor: View {
         _name = State(initialValue: investment?.name ?? "")
         _isin = State(initialValue: investment?.isin ?? "")
         _type = State(initialValue: investment?.type ?? .stock)
-        // WC-A2: default a new holding to EUR, consistent with the transaction, recurring, and crypto
-        // editors (all `?? .eur`) and with iOS — the previous `.usd` was an outlier.
+        // WC-A2: `.eur` here is only a placeholder — `settings.currency` is not reachable from a
+        // `@State` initializer. A new holding adopts the user's base currency in `onAppear`, the same
+        // way the transaction, recurring and crypto editors do.
         _currency = State(initialValue: investment?.currency ?? .eur)
         _sector = State(initialValue: investment?.sector ?? "Technology")
         _geography = State(initialValue: investment?.geography ?? "US")
@@ -335,7 +337,14 @@ private struct MacInvestmentEditor: View {
                 }
             }
         }
+        .onAppear {
+            guard !hasInitializedCurrency else { return }
+            if investment == nil { currency = settings.currency }
+            hasInitializedCurrency = true
+        }
         // L23: on an existing holding, ask whether to convert the entered figures or just relabel.
+        // A new holding is exempt (`investment != nil`), so the `onAppear` seed above cannot
+        // trigger the prompt.
         .onChange(of: currency) { oldValue, newValue in
             guard investment != nil, !isProgrammaticCurrencyChange, oldValue != newValue else {
                 isProgrammaticCurrencyChange = false

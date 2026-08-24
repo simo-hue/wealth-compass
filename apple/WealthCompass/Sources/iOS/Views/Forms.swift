@@ -477,6 +477,7 @@ struct InvestmentFormView: View {
     @State private var sector: String
     @State private var geography: String
     @State private var currency: Currency
+    @State private var hasInitializedCurrency = false
     @State private var quantity: String
     @State private var avgBuyPrice: String
     @State private var currentPrice: String
@@ -499,9 +500,9 @@ struct InvestmentFormView: View {
         _type = State(initialValue: investment?.type ?? .stock)
         _sector = State(initialValue: investment?.sector ?? "Technology")
         _geography = State(initialValue: investment?.geography ?? "US")
-        // WC-A2: default a new holding to EUR, consistent with the transaction, recurring, and crypto
-        // editors (all `?? .eur`) — the previous `.usd` was an outlier. (`settings.currency` isn't
-        // reachable from a `@State` initializer, which is why every editor uses a base-currency literal.)
+        // WC-A2: `.eur` here is only a placeholder — `settings.currency` is not reachable from a
+        // `@State` initializer. A new holding adopts the user's base currency in `onAppear`, the same
+        // way the transaction, recurring and crypto editors do.
         _currency = State(initialValue: investment?.currency ?? .eur)
         _quantity = State(initialValue: investment.map { Self.formatInput($0.quantity) } ?? "")
         let rawAverage = investment.map { $0.quantity > 0 ? max(0, ($0.costBasis - $0.fees) / $0.quantity) : 0 } ?? 0
@@ -603,8 +604,14 @@ struct InvestmentFormView: View {
                 }
             }
         }
+        .onAppear {
+            guard !hasInitializedCurrency else { return }
+            if investment == nil { currency = settings.currency }
+            hasInitializedCurrency = true
+        }
         // L23: on an existing holding, a currency change is ambiguous — convert the entered
-        // figures or just relabel? Ask instead of silently re-tagging the numbers.
+        // figures or just relabel? Ask instead of silently re-tagging the numbers. A new holding
+        // is exempt (`investment != nil`), so the `onAppear` seed above cannot trigger the prompt.
         .onChange(of: currency) { oldValue, newValue in
             guard investment != nil, !isProgrammaticCurrencyChange, oldValue != newValue else {
                 isProgrammaticCurrencyChange = false
