@@ -111,7 +111,7 @@ struct InvestmentsView: View {
                 value: settings.privateCurrency(gain),
                 systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
                 accent: gain >= 0 ? WCColor.primary : WCColor.destructive,
-                detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(percent.formatted(.number.precision(.fractionLength(1))))% performance")
+                detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(percent.formatted(.number.precision(.fractionLength(1)).locale(settings.effectiveLocale)))% performance")
             )
 
             // VIEW-07: Performance % + Status (last-update recency + distinct-sector count) cards, matching macOS.
@@ -128,7 +128,7 @@ struct InvestmentsView: View {
             let sectorCountLabel = settings.isPrivacyMode ? settings.redactionToken : "\(sectorCount)"
             MetricCard(
                 verbatimTitle: settings.localized("Status • \(sectorCountLabel) Sectors"),
-                value: latestUpdate.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? settings.localized("Never"),
+                value: latestUpdate.map { settings.date($0) } ?? settings.localized("Never"),
                 systemImage: "checkmark.circle"
             )
         }
@@ -217,7 +217,7 @@ struct InvestmentsView: View {
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    Text(settings.localized("Updated \(investment.updatedAt.formatted(date: .abbreviated, time: .omitted))"))
+                    Text(settings.localized("Updated \(settings.date(investment.updatedAt))"))
                         .font(.caption2)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)

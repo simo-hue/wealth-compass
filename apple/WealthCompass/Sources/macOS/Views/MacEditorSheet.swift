@@ -315,7 +315,7 @@ private struct MacInvestmentEditor: View {
                     )
 
                     LabeledContent("Investment Fee") {
-                        Text(calculatedFee.formatted(.currency(code: currency.rawValue)))
+                        Text(calculatedFee.formatted(.currency(code: currency.rawValue).locale(settings.effectiveLocale)))
                             .monospacedDigit()
                     }
 
@@ -521,7 +521,7 @@ private struct MacCryptoEditor: View {
                     )
 
                     LabeledContent("Calculated Fee") {
-                        Text(calculatedFee.formatted(.currency(code: currency.rawValue)))
+                        Text(calculatedFee.formatted(.currency(code: currency.rawValue).locale(settings.effectiveLocale)))
                             .monospacedDigit()
                     }
                 }

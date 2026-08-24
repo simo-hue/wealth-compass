@@ -108,7 +108,7 @@ struct CryptoView: View {
                 value: settings.privateCurrency(gain),
                 systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
                 accent: gain >= 0 ? WCColor.primary : WCColor.destructive,
-                detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(percent.formatted(.number.precision(.fractionLength(1))))% performance")
+                detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(percent.formatted(.number.precision(.fractionLength(1)).locale(settings.effectiveLocale)))% performance")
             )
 
             // VIEW-07: Performance % + Status (last-update recency + distinct-coin count) cards, matching macOS.
@@ -125,7 +125,7 @@ struct CryptoView: View {
             let coinCountLabel = settings.isPrivacyMode ? settings.redactionToken : "\(coinCount)"
             MetricCard(
                 verbatimTitle: settings.localized("Status • \(coinCountLabel) Coins"),
-                value: latestUpdate.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? settings.localized("Never"),
+                value: latestUpdate.map { settings.date($0) } ?? settings.localized("Never"),
                 systemImage: "checkmark.circle"
             )
         }
@@ -266,7 +266,7 @@ struct CryptoView: View {
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    Text(settings.localized("Updated \(holding.updatedAt.formatted(date: .abbreviated, time: .omitted))"))
+                    Text(settings.localized("Updated \(settings.date(holding.updatedAt))"))
                         .font(.caption2)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)

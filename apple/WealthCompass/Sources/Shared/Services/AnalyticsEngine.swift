@@ -231,9 +231,18 @@ struct AnalyticsEngine {
         // in the same month here as it does in monthlyCashFlow's calendar-granularity comparison; an
         // unpinned formatter defaults to the system zone and diverges under an injected calendar.
         monthFormatter.timeZone = calendar.timeZone
+        // A bucketing key, never shown. Pinned to POSIX because a fixed `dateFormat` on an
+        // unpinned formatter follows the locale's calendar — under a Buddhist or Japanese-era
+        // locale "yyyy" is not the Gregorian year — and these keys are matched as plain strings.
+        monthFormatter.locale = Locale(identifier: "en_US_POSIX")
+
         let labelFormatter = DateFormatter()
         labelFormatter.dateFormat = "MMM"
         labelFormatter.timeZone = calendar.timeZone
+        // This one *is* shown, on the cash-flow chart's x-axis, so it takes the in-app language.
+        // Unpinned it followed the system locale, leaving the axis in the device language while
+        // every label around it switched (WC-L4).
+        labelFormatter.locale = AppLocalization.effectiveLocale(appLanguage: appLanguage)
 
         let settled = settledTransactions
         return stride(from: months - 1, through: 0, by: -1).compactMap { offset in

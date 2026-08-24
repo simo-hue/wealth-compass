@@ -208,7 +208,7 @@ struct DashboardView: View {
                                     .accessibilityHidden(true)
                                     .annotation(position: .top) {
                                         VStack(spacing: 4) {
-                                            Text(selectedPoint.date.formatted(date: .abbreviated, time: .omitted))
+                                            Text(settings.date(selectedPoint.date))
                                                 .font(.caption2)
                                                 .foregroundStyle(.white.opacity(0.7))
                                             Text(settings.privateCurrency(selectedPoint.value))
@@ -256,7 +256,7 @@ struct DashboardView: View {
                                 .interpolationMethod(.linear)
                                 .symbol(Circle())
                                 .symbolSize(22)
-                                .accessibilityLabel(Text(point.date.formatted(date: .abbreviated, time: .omitted)))
+                                .accessibilityLabel(Text(settings.date(point.date)))
                                 .accessibilityValue(Text(settings.privateCurrency(point.value)))
                             }
                         }
@@ -295,7 +295,7 @@ struct DashboardView: View {
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.white.opacity(0.66))
                 }
-                Text(snapshot.date.formatted(date: .abbreviated, time: .omitted))
+                Text(settings.date(snapshot.date))
                     .font(.caption2)
                     .foregroundStyle(WCColor.textFaint)
             }
@@ -598,7 +598,7 @@ struct DashboardView: View {
                                         Text(signedAmount(for: transaction))
                                             .font(.subheadline.monospacedDigit().weight(.semibold))
                                             .foregroundStyle(transaction.type == .income ? WCColor.primary : .white.opacity(0.82))
-                                        Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
+                                        Text(settings.date(transaction.date))
                                             .font(.caption2)
                                             .foregroundStyle(WCColor.textFaint)
                                     }
@@ -654,7 +654,7 @@ struct DashboardView: View {
             let d = Int(interval / (24 * 60 * 60))
             return settings.localized("\(d)d ago")
         default:
-            return date.formatted(date: .abbreviated, time: .omitted)
+            return settings.date(date)
         }
     }
 

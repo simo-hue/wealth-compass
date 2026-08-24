@@ -334,7 +334,7 @@ struct MacDashboardView: View {
                                 .interpolationMethod(.linear)
                                 .symbol(Circle())
                                 .symbolSize(22)
-                                .accessibilityLabel(Text(point.date.formatted(date: .abbreviated, time: .omitted)))
+                                .accessibilityLabel(Text(settings.date(point.date)))
                                 .accessibilityValue(Text(settings.privateCurrency(point.value)))
                             }
 
@@ -349,7 +349,7 @@ struct MacDashboardView: View {
                                         overflowResolution: .init(x: .fit(to: .chart), y: .disabled)
                                     ) {
                                         VStack(alignment: .leading, spacing: 4) {
-                                            Text(selectedPoint.date.formatted(date: .abbreviated, time: .shortened))
+                                            Text(settings.date(selectedPoint.date, time: .shortened))
                                                 .font(.caption2.weight(.medium))
                                                 .foregroundStyle(.white.opacity(0.62))
                                             Text(settings.privateCurrency(selectedPoint.value))
@@ -410,7 +410,7 @@ struct MacDashboardView: View {
                     Text("Latest snapshot \(freshnessText(snapshot.date))")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.white.opacity(0.78))
-                    Text(snapshot.date.formatted(date: .abbreviated, time: .shortened))
+                    Text(settings.date(snapshot.date, time: .shortened))
                         .font(.caption2)
                         .foregroundStyle(WCColor.textTertiary)
                 }
@@ -863,7 +863,7 @@ struct MacDashboardView: View {
         case (24 * 60 * 60)..<(7 * 24 * 60 * 60):
             return settings.localized("\(Int(interval / (24 * 60 * 60)))d ago")
         default:
-            return date.formatted(date: .abbreviated, time: .omitted)
+            return settings.date(date)
         }
     }
 
@@ -974,7 +974,9 @@ struct ActivityRow: View {
                 Text(formattedAmount)
                     .font(.subheadline.monospacedDigit().weight(.semibold))
                     .foregroundStyle(transaction.type == .income ? WCColor.primary : .white.opacity(0.8))
-                Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
+                Text(transaction.date.formatted(
+                    Date.FormatStyle(date: .abbreviated, time: .omitted)
+                        .locale(AppLocalization.effectiveLocale(appLanguage: appLanguage))))
                     .font(.caption2)
                     .foregroundStyle(WCColor.textFaint)
             }

@@ -322,7 +322,7 @@ struct MacInvestmentsView: View {
     }
 
     private func formattedUpdate(_ date: Date) -> String {
-        date.formatted(date: .abbreviated, time: .shortened)
+        settings.date(date, time: .shortened)
     }
 
     private func isNonEmpty(_ value: String) -> Bool {

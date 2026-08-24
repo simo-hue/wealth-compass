@@ -342,7 +342,7 @@ struct CashFlowView: View {
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(WCColor.primary)
                     } else if schedule.isActive {
-                        Text("Next: \(schedule.nextDueDate.formatted(date: .abbreviated, time: .shortened))")
+                        Text("Next: \(settings.date(schedule.nextDueDate, time: .shortened))")
                             .font(.caption)
                             .foregroundStyle(WCColor.textSecondary)
                     } else {
@@ -574,7 +574,7 @@ struct CashFlowView: View {
                                 .font(.caption2)
                                 .foregroundStyle(WCColor.primary)
                         }
-                        Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
+                        Text(settings.date(transaction.date))
                             .font(.caption)
                             .foregroundStyle(WCColor.textSecondary)
                     }
@@ -649,7 +649,7 @@ struct CashFlowView: View {
         case .deleteTransaction(let transaction):
             return Alert(
                 title: Text("Delete Transaction?"),
-                message: Text(settings.localized("This permanently removes the \(transaction.category) transaction from \(transaction.date.formatted(date: .abbreviated, time: .omitted)).")),
+                message: Text(settings.localized("This permanently removes the \(transaction.category) transaction from \(settings.date(transaction.date)).")),
                 primaryButton: .destructive(Text("Delete")) {
                     finance.deleteTransaction(transaction, settings: settings)
                 },

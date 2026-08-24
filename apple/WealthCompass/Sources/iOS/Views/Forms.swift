@@ -580,7 +580,7 @@ struct InvestmentFormView: View {
                     HStack {
                         Text("Investment Fee")
                         Spacer()
-                        Text(calculatedFee.formatted(.currency(code: currency.rawValue)))
+                        Text(calculatedFee.formatted(.currency(code: currency.rawValue).locale(settings.effectiveLocale)))
                             .font(.body.monospacedDigit())
                     }
                 } header: {
@@ -788,7 +788,7 @@ struct CryptoFormView: View {
                     HStack {
                         Text("Calculated Fee")
                         Spacer()
-                        Text(calculatedFee.formatted(.currency(code: currency.rawValue)))
+                        Text(calculatedFee.formatted(.currency(code: currency.rawValue).locale(settings.effectiveLocale)))
                             .font(.body.monospacedDigit())
                     }
                 }

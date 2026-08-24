@@ -404,7 +404,7 @@ struct SettingsView: View {
                 if let snapshot = settings.exchangeRateSnapshot {
                     Text("ECB")
                         .foregroundStyle(WCColor.primary)
-                    Text("· \(snapshot.effectiveDate.formatted(date: .abbreviated, time: .omitted))")
+                    Text("· \(settings.date(snapshot.effectiveDate))")
                         .foregroundStyle(WCColor.textSecondary)
                 } else {
                     Text("Offline fallback")
@@ -417,7 +417,7 @@ struct SettingsView: View {
                 HStack {
                     Text("1 \(settings.currency.rawValue)")
                     Spacer()
-                    Text("\(converted.formatted(.number.precision(.fractionLength(2...4)))) \(quoteCurrency.rawValue)")
+                    Text("\(converted.formatted(.number.precision(.fractionLength(2...4)).locale(settings.effectiveLocale))) \(quoteCurrency.rawValue)")
                         .font(.subheadline.monospacedDigit())
                         .foregroundStyle(WCColor.textSecondary)
                 }
@@ -444,7 +444,7 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(WCColor.destructive)
             } else if let snapshot = settings.exchangeRateSnapshot {
-                Text("\(snapshot.provider). Fetched \(snapshot.fetchedAt.formatted(date: .abbreviated, time: .shortened)) and cached locally.")
+                Text("\(snapshot.provider). Fetched \(settings.date(snapshot.fetchedAt, time: .shortened)) and cached locally.")
                     .font(.caption)
                     .foregroundStyle(WCColor.textSecondary)
             } else {

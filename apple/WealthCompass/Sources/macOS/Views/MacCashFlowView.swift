@@ -561,13 +561,13 @@ struct MacCashFlowView: View {
                 HStack(spacing: 10) {
                     Text(schedule.frequency.title)
                     if schedule.isActive {
-                        Text("Next \(schedule.nextDueDate.formatted(date: .abbreviated, time: .shortened))")
+                        Text("Next \(settings.date(schedule.nextDueDate, time: .shortened))")
                     } else {
                         Text("Paused")
                             .foregroundStyle(WCColor.warning)
                     }
                     if let endDate = schedule.endDate {
-                        Text("Ends \(endDate.formatted(date: .abbreviated, time: .omitted))")
+                        Text("Ends \(settings.date(endDate))")
                     } else {
                         Text("No end date")
                     }
@@ -806,7 +806,7 @@ struct MacCashFlowView: View {
                         Text("Date")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
+                        Text(settings.date(transaction.date))
                             .font(.subheadline)
                             .foregroundStyle(.white)
                     }
@@ -997,7 +997,7 @@ struct MacCashFlowView: View {
             return Alert(
                 title: Text("Delete Transaction?"),
                 message: Text(
-                    settings.localized("This permanently removes the \(transaction.category) transaction from \(transaction.date.formatted(date: .abbreviated, time: .omitted)).")
+                    settings.localized("This permanently removes the \(transaction.category) transaction from \(settings.date(transaction.date)).")
                 ),
                 primaryButton: .destructive(Text("Delete")) {
                     finance.deleteTransaction(transaction, settings: settings)

@@ -132,6 +132,21 @@ final class AppSettings: ObservableObject {
         appLanguage.map(Locale.init(identifier:)) ?? .current
     }
 
+    /// A date written in the in-app language.
+    ///
+    /// `Date.formatted(date:time:)` resolves against `Locale.current` — the *system* locale — and
+    /// not the environment locale the app sets from `appLanguage`. So switching the in-app language
+    /// re-rendered every label while transaction dates, snapshot dates, "Updated …" and month axis
+    /// labels stayed in the device language until the process restarted. `DashboardView` documented
+    /// this (WC-L4) and fixed exactly one call site; this is the rest.
+    func date(
+        _ date: Date,
+        dateStyle: Date.FormatStyle.DateStyle = .abbreviated,
+        time: Date.FormatStyle.TimeStyle = .omitted
+    ) -> String {
+        date.formatted(Date.FormatStyle(date: dateStyle, time: time).locale(effectiveLocale))
+    }
+
     func localized(_ key: String.LocalizationValue) -> String {
         AppLocalization.string(key, appLanguage: appLanguage)
     }

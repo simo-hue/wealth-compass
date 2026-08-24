@@ -309,7 +309,7 @@ struct MacSettingsView: View {
                     VStack(alignment: .trailing) {
                         Text("ECB")
                             .foregroundStyle(.primary)
-                        Text(snapshot.effectiveDate.formatted(date: .abbreviated, time: .omitted))
+                        Text(settings.date(snapshot.effectiveDate))
                             .foregroundStyle(.secondary)
                     }
                 } else {
@@ -323,7 +323,7 @@ struct MacSettingsView: View {
             ForEach(Currency.allCases.filter { $0 != settings.currency }) { quoteCurrency in
                 let converted: Double = settings.convert(1, from: settings.currency, to: quoteCurrency)
                 SettingsRow(title: "1 \(settings.currency.rawValue)") {
-                    Text("\(converted.formatted(.number.precision(.fractionLength(2...4)))) \(quoteCurrency.rawValue)")
+                    Text("\(converted.formatted(.number.precision(.fractionLength(2...4)).locale(settings.effectiveLocale))) \(quoteCurrency.rawValue)")
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
                 }
@@ -355,7 +355,7 @@ struct MacSettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.red)
             } else if let snapshot = settings.exchangeRateSnapshot {
-                Text("\(snapshot.provider). Fetched \(snapshot.fetchedAt.formatted(date: .abbreviated, time: .shortened)) and cached locally.")
+                Text("\(snapshot.provider). Fetched \(settings.date(snapshot.fetchedAt, time: .shortened)) and cached locally.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {
