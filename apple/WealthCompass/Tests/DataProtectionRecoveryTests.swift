@@ -37,6 +37,49 @@ final class DataProtectionRecoveryTests: XCTestCase {
         try super.tearDownWithError()
     }
 
+    // MARK: - Erase completeness
+
+    /// "Erase Everything" must actually erase everything.
+    ///
+    /// `migrateLegacyFileIfNeeded` copies the pre-Application-Support database out of `Documents/`
+    /// and leaves the original in place, but `clear()` only removed the live file and the
+    /// `.pre-cloudkit-backup` sidecar. So on any install old enough to have the legacy file, a
+    /// factory reset left a complete plaintext copy of the user's finances on disk — and the very
+    /// next `load()` copied it straight back, because the guard is "does the live file exist?".
+    ///
+    /// `fileName` is injected so this exercises the real `Documents/` path without colliding with
+    /// the app's own database in the shared test-host container.
+    func testEraseRemovesTheLegacyDatabaseAndDoesNotResurrectIt() throws {
+        let fileName = "wc-legacy-\(UUID().uuidString).json"
+        let documents = try XCTUnwrap(
+            FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+        )
+        let legacyURL = documents.appendingPathComponent(fileName)
+        addTeardownBlock { try? FileManager.default.removeItem(at: legacyURL) }
+
+        let seeded = FinancialData(transactions: [
+            Transaction(type: .income, category: "Salary", amount: 4_200, description: "", date: Date())
+        ])
+        try FinanceJSONCoding.encode(seeded).write(to: legacyURL)
+
+        let persistence = LocalFinancePersistence(directoryName: directoryName, fileName: fileName)
+
+        // The migration runs and the data is live.
+        let migrated = try XCTUnwrap(try persistence.load())
+        XCTAssertEqual(migrated.data.transactions.count, 1, "legacy migration did not run")
+
+        try persistence.clear()
+
+        XCTAssertFalse(
+            FileManager.default.fileExists(atPath: legacyURL.path),
+            "a complete plaintext copy of the user's finances survived a full erase"
+        )
+        XCTAssertNil(
+            try persistence.load(),
+            "erased data came back on the next launch"
+        )
+    }
+
     // MARK: - Helpers
 
     private func makeUnreadable(_ url: URL) throws {

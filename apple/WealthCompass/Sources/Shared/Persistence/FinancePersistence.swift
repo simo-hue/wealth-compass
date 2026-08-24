@@ -105,6 +105,15 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
         if fileManager.fileExists(atPath: backupURL.path) {
             try fileManager.removeItem(at: backupURL)
         }
+        // The same reasoning applies to the pre-Application-Support database in `Documents/`, and
+        // it was missed. `migrateLegacyFileIfNeeded` *copies* that file rather than moving it, so
+        // it outlives the migration — and because the migration's guard is only "does the live file
+        // exist?", leaving it here did not merely strand a plaintext copy of the user's finances on
+        // disk after a full erase: the very next `load()` copied it back and restored everything
+        // they had just deleted, which sync then republished.
+        for legacyURL in legacyStorageURLs where fileManager.fileExists(atPath: legacyURL.path) {
+            try fileManager.removeItem(at: legacyURL)
+        }
         guard fileManager.fileExists(atPath: storageURL.path) else { return }
         try fileManager.removeItem(at: storageURL)
     }
