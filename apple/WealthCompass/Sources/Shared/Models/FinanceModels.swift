@@ -236,6 +236,34 @@ enum AnalyticsPeriod: String, CaseIterable, Identifiable {
     }
 }
 
+extension AnalyticsPeriod {
+    /// The first calendar day this period includes, or `nil` for `.all`.
+    ///
+    /// One definition, shared by `AnalyticsEngine.filteredTransactions` and both platforms'
+    /// transaction lists. They used to compute it independently and drifted: the engine counted N
+    /// days while the lists counted N+1, so drilling into a Money Flow node listed more rows — and
+    /// a larger sum — than the node it was opened from. The iOS list also skipped the start-of-day
+    /// snap the Mac one had, adding a second, platform-specific disagreement on the boundary day.
+    ///
+    /// Counting back N-1 from today is what makes the window exactly N days inclusive.
+    func firstIncludedDay(relativeTo now: Date, calendar: Calendar) -> Date? {
+        let today = calendar.startOfDay(for: now)
+        switch self {
+        case .sevenDays:
+            return calendar.date(byAdding: .day, value: -6, to: today)
+        case .thirtyDays:
+            return calendar.date(byAdding: .day, value: -29, to: today)
+        case .threeMonths:
+            return calendar.date(byAdding: .month, value: -3, to: today)
+                .flatMap { calendar.date(byAdding: .day, value: 1, to: $0) }
+        case .yearToDate:
+            return calendar.date(from: calendar.dateComponents([.year], from: today))
+        case .all:
+            return nil
+        }
+    }
+}
+
 /// Selectable window for the dashboard / cash-flow trend chart. Hoisted to Shared (was macOS-only in
 /// MacDashboardView) so iOS can offer the same 3M/6M/12M selector (VIEW-03).
 enum CashFlowTimeframe: Int, CaseIterable, Identifiable {
@@ -694,8 +722,13 @@ extension Array where Element == NetWorthSnapshot {
     }
 }
 
-private extension NetWorthSnapshot {
+extension NetWorthSnapshot {
     /// Total, deterministic ordering used to pick the surviving row when two share a calendar day.
+    ///
+    /// Internal rather than fileprivate so `SnapshotEngine` uses this rule too. Its same-day upsert
+    /// had grown a second, weaker tie-break (whichever row came first in the array), which defeats
+    /// the whole point: this ordering exists so two devices independently collapse to the *same*
+    /// row instead of ping-ponging.
     func supersedesForCollapse(_ other: NetWorthSnapshot) -> Bool {
         if updatedAt != other.updatedAt { return updatedAt > other.updatedAt }
         if date != other.date { return date > other.date }

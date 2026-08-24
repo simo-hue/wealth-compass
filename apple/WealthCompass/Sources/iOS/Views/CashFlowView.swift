@@ -535,22 +535,12 @@ struct CashFlowView: View {
     }
 
 
+    /// The same window `AnalyticsEngine.filteredTransactions` uses, from the same definition.
+    ///
+    /// This was a third copy of the rule and the loosest: it neither counted back N-1 nor snapped
+    /// to the start of the day, so it disagreed with the Mac list as well as with the analytics.
     private var transactionStartDate: Date? {
-        let calendar = Calendar.current
-        let now = Date()
-
-        switch transactionPeriod {
-        case .sevenDays:
-            return calendar.date(byAdding: .day, value: -7, to: now)
-        case .thirtyDays:
-            return calendar.date(byAdding: .day, value: -30, to: now)
-        case .threeMonths:
-            return calendar.date(byAdding: .month, value: -3, to: now)
-        case .yearToDate:
-            return calendar.date(from: calendar.dateComponents([.year], from: now))
-        case .all:
-            return nil
-        }
+        transactionPeriod.firstIncludedDay(relativeTo: Date(), calendar: .current)
     }
 
     private func transactionRow(_ transaction: Transaction) -> some View {

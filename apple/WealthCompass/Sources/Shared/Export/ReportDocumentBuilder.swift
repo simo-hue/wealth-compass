@@ -548,7 +548,10 @@ struct ReportDocumentBuilder {
             blocks.append(.subheading(L("Expenses by Category"), anchor: "cashflow-categories"))
             blocks.append(.chart(.donut(
                 slices: cappedSlices(ranked.map {
-                    ReportSlice(label: $0.key, value: $0.value.doubleValue, formattedValue: money($0.value))
+                    // Category names are catalog keys for the built-ins; a custom one falls through
+                    // unchanged. Printing them raw meant the app showed "Alimentation" and the
+                    // exported report showed "Food" for the same row.
+                    ReportSlice(label: L($0.key), value: $0.value.doubleValue, formattedValue: money($0.value))
                 }),
                 centerLabel: L("Total Expenses"),
                 centerValue: money(grandTotal))))
@@ -561,7 +564,7 @@ struct ReportDocumentBuilder {
                 rows: ranked.map { entry in
                     let share = grandTotal > 0 ? (entry.value / grandTotal).doubleValue * 100 : 0
                     return ReportRow([
-                        entry.key,
+                        L(entry.key),
                         money(entry.value),
                         formattedPercent(share, locale: context.locale),
                     ])
@@ -691,7 +694,7 @@ struct ReportDocumentBuilder {
                 rows.append(ReportRow([
                     dateString(transaction.date),
                     transaction.description,
-                    transaction.category,
+                    L(transaction.category),
                     (transaction.type == .income ? "+" : "−") + money(abs(signed)),
                     future ? "—" : money(balance),
                 ], secondary: secondary.isEmpty ? nil : secondary.joined(separator: " · "),

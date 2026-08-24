@@ -127,6 +127,32 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual([b, a].rankedByValue(convert).map(\.symbol), ["AAA", "BBB"])
     }
 
+    /// The transaction lists and the analytics must agree on where a period starts.
+    ///
+    /// They were three separate copies of the rule and all three disagreed: the engine counted N
+    /// days, the Mac list N+1 snapped to midnight, the iOS list N+1 unsnapped. Drilling into a
+    /// Money Flow node therefore listed more rows, and a larger sum, than the node itself.
+    func testPeriodWindowIsOneDefinition() {
+        let now = date(2026, 8, 24)
+        XCTAssertEqual(AnalyticsPeriod.sevenDays.firstIncludedDay(relativeTo: now, calendar: utc),
+                       utc.startOfDay(for: date(2026, 8, 18)))
+        XCTAssertEqual(AnalyticsPeriod.thirtyDays.firstIncludedDay(relativeTo: now, calendar: utc),
+                       utc.startOfDay(for: date(2026, 7, 26)))
+        XCTAssertNil(AnalyticsPeriod.all.firstIncludedDay(relativeTo: now, calendar: utc))
+
+        // Year to date still starts on 1 January.
+        XCTAssertEqual(AnalyticsPeriod.yearToDate.firstIncludedDay(relativeTo: now, calendar: utc),
+                       utc.startOfDay(for: date(2026, 1, 1)))
+
+        // And the window the engine actually applies matches it, day for day.
+        let rows = (0..<10).compactMap { offset -> Transaction? in
+            utc.date(byAdding: .day, value: -offset, to: now).map { tx(.expense, 10, "Food", $0) }
+        }
+        let counted = engine(FinancialData(transactions: rows), now: now)
+            .expensesByCategory(period: .sevenDays).first?.value ?? 0
+        XCTAssertEqual(counted, 70, accuracy: 0.001, "the engine counted a different number of days")
+    }
+
     func testCalculateTotals() {
         let data = FinancialData(
             transactions: [tx(.income, 1000, "Salary", date(2026, 6, 1)), tx(.expense, 300, "Food", date(2026, 6, 2))],

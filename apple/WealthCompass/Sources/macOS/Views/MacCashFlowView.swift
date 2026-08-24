@@ -885,29 +885,13 @@ struct MacCashFlowView: View {
     }
 
 
-    /// Rolling windows are snapped to the start of the day, matching
-    /// `AnalyticsEngine.filteredTransactions`, which compares at calendar-day granularity.
+    /// The same window `AnalyticsEngine.filteredTransactions` uses, from the same definition.
     ///
-    /// Without the snap the two disagree by up to a day: transactions are stored at `startOfDay`,
-    /// so a raw `now - 30 days` instant lands mid-day and excludes the boundary day that the
-    /// analytics *do* count. Harmless while the two never met; the Money Flow drill-through now
-    /// puts them side by side, where a category could show €500 in the diagram and list €450.
+    /// This used to be a second copy of the rule, which is how it drifted: it computed `now - N`
+    /// where the engine counted N-1 back from today, so the Money Flow drill-through listed a day
+    /// more than the node it was opened from.
     private var transactionStartDate: Date? {
-        let calendar = Calendar.current
-        let now = Date()
-
-        switch transactionPeriod {
-        case .sevenDays:
-            return calendar.date(byAdding: .day, value: -7, to: now).map(calendar.startOfDay(for:))
-        case .thirtyDays:
-            return calendar.date(byAdding: .day, value: -30, to: now).map(calendar.startOfDay(for:))
-        case .threeMonths:
-            return calendar.date(byAdding: .month, value: -3, to: now).map(calendar.startOfDay(for:))
-        case .yearToDate:
-            return calendar.date(from: calendar.dateComponents([.year], from: now))
-        case .all:
-            return nil
-        }
+        transactionPeriod.firstIncludedDay(relativeTo: Date(), calendar: .current)
     }
 
     /// L17: the upper bound of the period window. Rolling windows (7/30/90 days) end at *now* — a

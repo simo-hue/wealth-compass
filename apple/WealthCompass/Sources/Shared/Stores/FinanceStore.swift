@@ -180,8 +180,15 @@ final class FinanceStore: ObservableObject {
     /// Memoized cash-flow analytics (deep-audit M27): each keyed like `cachedTotals` plus its own time
     /// window (the month itself / the current month / the current day) so the hover/resize hot path
     /// reuses them instead of re-filtering + re-grouping every frame.
-    private var cachedMonthlyCashFlow: (version: Int, currency: Currency, rateStamp: Date?, month: Date, value: MonthlyCashFlow)?
-    private var cachedCashFlowTrend: (version: Int, currency: Currency, rateStamp: Date?, months: Int, monthStamp: Date, value: [CashFlowMonth])?
+    ///
+    /// Both carry `dayStamp` because both now exclude future-dated rows, which makes their result
+    /// change at midnight with no data change. Without it, a rent payment dated the 25th would
+    /// start counting in `calculateTotals` (which does key on the day) while these two kept
+    /// returning the 24th's figures — reinstating the header-vs-card contradiction inside a
+    /// midnight window. Nothing else invalidates on a day rollover, and since the recurring timer
+    /// stopped bumping `dataVersion` on an unchanged ledger there is no incidental flush either.
+    private var cachedMonthlyCashFlow: (version: Int, currency: Currency, rateStamp: Date?, month: Date, dayStamp: Date, value: MonthlyCashFlow)?
+    private var cachedCashFlowTrend: (version: Int, currency: Currency, rateStamp: Date?, months: Int, monthStamp: Date, dayStamp: Date, value: [CashFlowMonth])?
     private var cachedExpensesByCategory: (version: Int, currency: Currency, rateStamp: Date?, period: AnalyticsPeriod, dayStamp: Date, value: [CategoryTotal])?
     /// Money Flow diagram. Keyed like the others plus `maxNodes` (the Dashboard's compact card folds
     /// at a lower threshold than the full one) and `appLanguage` — unlike every cache above it, this
@@ -1037,15 +1044,17 @@ final class FinanceStore: ObservableObject {
         // Normalize the key to the month itself: callers pass `Date()`, which would otherwise never
         // hit the cache; `monthlyCashFlow` groups by `.month` so any date in the month is equivalent.
         let monthKey = calendar.date(from: calendar.dateComponents([.year, .month], from: month)) ?? month
+        let dayStamp = Calendar.current.startOfDay(for: Date())
         if let cache = cachedMonthlyCashFlow,
            cache.version == dataVersion,
            cache.currency == settings.currency,
            cache.rateStamp == rateStamp,
-           cache.month == monthKey {
+           cache.month == monthKey,
+           cache.dayStamp == dayStamp {
             return cache.value
         }
         let result = analytics(settings).monthlyCashFlow(for: month)
-        cachedMonthlyCashFlow = (dataVersion, settings.currency, rateStamp, monthKey, result)
+        cachedMonthlyCashFlow = (dataVersion, settings.currency, rateStamp, monthKey, dayStamp, result)
         return result
     }
 
@@ -1090,16 +1099,18 @@ final class FinanceStore: ObservableObject {
         // The rolling window ends at the current month, so include it in the key (data changes within
         // the month already bump dataVersion; this catches a month rollover with no data change).
         let monthStamp = calendar.date(from: calendar.dateComponents([.year, .month], from: Date())) ?? Date()
+        let dayStamp = calendar.startOfDay(for: Date())
         if let cache = cachedCashFlowTrend,
            cache.version == dataVersion,
            cache.currency == settings.currency,
            cache.rateStamp == rateStamp,
            cache.months == months,
-           cache.monthStamp == monthStamp {
+           cache.monthStamp == monthStamp,
+           cache.dayStamp == dayStamp {
             return cache.value
         }
         let result = analytics(settings).cashFlowTrend(months: months)
-        cachedCashFlowTrend = (dataVersion, settings.currency, rateStamp, months, monthStamp, result)
+        cachedCashFlowTrend = (dataVersion, settings.currency, rateStamp, months, monthStamp, dayStamp, result)
         return result
     }
 

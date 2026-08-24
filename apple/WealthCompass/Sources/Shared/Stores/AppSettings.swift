@@ -144,7 +144,14 @@ final class AppSettings: ObservableObject {
         dateStyle: Date.FormatStyle.DateStyle = .abbreviated,
         time: Date.FormatStyle.TimeStyle = .omitted
     ) -> String {
-        date.formatted(Date.FormatStyle(date: dateStyle, time: time).locale(effectiveLocale))
+        // The calendar comes from the same locale as the month names. `Date.FormatStyle` otherwise
+        // keeps `.autoupdatingCurrent`, so a Thai-system user who picks English in-app would get
+        // English month names on a Buddhist year — locale and calendar used to be a matched pair
+        // because both followed the system.
+        var style = Date.FormatStyle(date: dateStyle, time: time).locale(effectiveLocale)
+        style.calendar = Calendar(identifier: effectiveLocale.calendar.identifier)
+        style.timeZone = .current
+        return date.formatted(style)
     }
 
     func localized(_ key: String.LocalizationValue) -> String {
@@ -323,13 +330,20 @@ final class AppSettings: ObservableObject {
     /// Single source of truth for the privacy-mode redaction glyph (L8).
     let redactionToken = "••••"
 
+    // Every formatter below pins `effectiveLocale`. `.formatted(...)` resolves against
+    // `Locale.current` — the *system* locale — so these ignored the in-app language override, and
+    // they are the formatters behind essentially every amount in the app. Once dates started
+    // honouring the override the rows became internally inconsistent: a German transaction row read
+    // "24. Aug. 2026" beside "€1,234.56" in US grouping, and the fee preview in the same form
+    // disagreed with the row it was about to write.
+
     func formatCurrency(_ value: Double, sourceCurrency: Currency? = nil) -> String {
         let converted = convert(value, from: sourceCurrency)
-        return converted.formatted(.currency(code: currency.rawValue))
+        return converted.formatted(.currency(code: currency.rawValue).locale(effectiveLocale))
     }
 
     func formatSourceCurrency(_ value: Double, currency sourceCurrency: Currency) -> String {
-        value.formatted(.currency(code: sourceCurrency.rawValue))
+        value.formatted(.currency(code: sourceCurrency.rawValue).locale(effectiveLocale))
     }
 
     func privateCurrency(_ value: Double, sourceCurrency: Currency? = nil) -> String {
@@ -338,7 +352,7 @@ final class AppSettings: ObservableObject {
 
     func privateNumber(_ value: Double, fractionDigits: Int = 2) -> String {
         guard !isPrivacyMode else { return redactionToken }
-        return value.formatted(.number.precision(.fractionLength(0...fractionDigits)))
+        return value.formatted(.number.precision(.fractionLength(0...fractionDigits)).locale(effectiveLocale))
     }
 
     // MARK: - Decimal (money) overloads (WC-A1)
@@ -355,11 +369,11 @@ final class AppSettings: ObservableObject {
     }
 
     func formatCurrency(_ value: Decimal, sourceCurrency: Currency? = nil) -> String {
-        convert(value, from: sourceCurrency).formatted(.currency(code: currency.rawValue))
+        convert(value, from: sourceCurrency).formatted(.currency(code: currency.rawValue).locale(effectiveLocale))
     }
 
     func formatSourceCurrency(_ value: Decimal, currency sourceCurrency: Currency) -> String {
-        value.formatted(.currency(code: sourceCurrency.rawValue))
+        value.formatted(.currency(code: sourceCurrency.rawValue).locale(effectiveLocale))
     }
 
     func privateCurrency(_ value: Decimal, sourceCurrency: Currency? = nil) -> String {
@@ -377,7 +391,7 @@ final class AppSettings: ObservableObject {
 
     func privateNumber(_ value: Decimal, fractionDigits: Int = 2) -> String {
         guard !isPrivacyMode else { return redactionToken }
-        return value.formatted(.number.precision(.fractionLength(0...fractionDigits)))
+        return value.formatted(.number.precision(.fractionLength(0...fractionDigits)).locale(effectiveLocale))
     }
 
     private func saveStringArray(_ values: [String], key: String) {

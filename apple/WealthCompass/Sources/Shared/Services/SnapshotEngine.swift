@@ -40,7 +40,14 @@ struct SnapshotEngine {
         // another row for today instead of replacing it.
         let sameDay = snapshots.indices.filter { calendar.isDate(snapshots[$0].date, inSameDayAs: now) }
 
-        if let existing = sameDay.first {
+        // Which row survives is decided by `supersedesForCollapse`, not by array order. That rule
+        // (latest `updatedAt`, then latest `date`, then greatest id) exists precisely so two devices
+        // independently collapse to the *same* row and don't ping-pong; picking `sameDay.first` was
+        // a second, weaker tie-break that ignored both `updatedAt` and id.
+        let survivor = sameDay.max { left, right in
+            snapshots[right].supersedesForCollapse(snapshots[left])
+        }
+        if let existing = survivor {
             // One logical daily row keeps one identity. Replacing it with a freshly-minted value
             // gave it a new UUID on every write, and `appendSnapshot` runs on every add, edit,
             // delete and price refresh — so each save diffed as "delete that record, create this
@@ -51,7 +58,7 @@ struct SnapshotEngine {
             snapshots[existing] = snapshot
             // Two devices can each have created a row for the same day before syncing, and nothing
             // on this path collapsed them. Drop the extras now that one is authoritative.
-            for index in sameDay.dropFirst().reversed() {
+            for index in sameDay.filter({ $0 != existing }).sorted(by: >) {
                 snapshots.remove(at: index)
             }
         } else {

@@ -447,9 +447,13 @@ struct AnalyticsEngine {
                 // present-but-blank one survives into the data and would draw an unlabelled box
                 // with an empty VoiceOver label. `categories` deliberately keeps the raw value so
                 // the drill-through filter still matches what is stored.
+                // Localized, like the category donut beside it. The raw value stays in
+                // `categories` below, which is what the drill-through filter matches on, so
+                // translating the label cannot break the filter. Without this, one iOS Cash Flow
+                // screen showed "Alimentation" in the donut legend and "Food" on the ribbon.
                 title: item.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                     ? localized("Uncategorized")
-                    : item.name,
+                    : localized(String.LocalizationValue(item.name)),
                 value: item.value,
                 role: role,
                 share: sankeyShare(item.value, of: total),
@@ -616,25 +620,9 @@ struct AnalyticsEngine {
         // lands mid-day.
         let today = calendar.startOfDay(for: now)
 
-        // The *first day included*, so the window is exactly as long as its name.
-        //
-        // These used to be built as `now - N` and then compared inclusively at both ends, which made
-        // every relative window one day too wide: "Last 7 Days" spanned eight calendar days and
-        // reported eight days of spending. Counting back N-1 from today gives N days inclusive.
-        let firstDay: Date?
-        switch period {
-        case .sevenDays:
-            firstDay = calendar.date(byAdding: .day, value: -6, to: today)
-        case .thirtyDays:
-            firstDay = calendar.date(byAdding: .day, value: -29, to: today)
-        case .threeMonths:
-            firstDay = calendar.date(byAdding: .month, value: -3, to: today)
-                .flatMap { calendar.date(byAdding: .day, value: 1, to: $0) }
-        case .yearToDate:
-            firstDay = calendar.date(from: calendar.dateComponents([.year], from: today))
-        case .all:
-            firstDay = nil
-        }
+        // Shared with both transaction lists so the drill-through can never disagree with the
+        // diagram it was opened from — see `AnalyticsPeriod.firstIncludedDay`.
+        let firstDay = period.firstIncludedDay(relativeTo: now, calendar: calendar)
 
         return data.transactions.filter { transaction in
             let day = calendar.startOfDay(for: transaction.date)
