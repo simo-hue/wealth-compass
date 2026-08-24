@@ -36,26 +36,17 @@ enum TabBarLabelResolver {
         preferredLanguages: [String]?
     ) -> String {
         if let appLanguage { return appLanguage }
-        let matched = Bundle.preferredLocalizations(
+        // No hand-rolled sanity check on the result. `supportedLanguages` always contains
+        // "en", and with English among the candidates `preferredLocalizations` already
+        // returns "en" for an unmatched language rather than the first candidate — verified
+        // against sw-KE, is-IS, af-ZA. An earlier version guarded this by comparing primary
+        // subtags, which defended against nothing and actively broke the cases Apple gets
+        // right: yue-Hant-HK resolves to zh-Hant and nn-NO/no-NO resolve to nb, none of
+        // which share a subtag with the match, so all three fell back to English.
+        return Bundle.preferredLocalizations(
             from: supportedLanguages,
             forPreferences: preferredLanguages
-        ).first
-        // `preferredLocalizations` falls back to the first element of `supportedLanguages`
-        // when nothing matches, which would hand an English speaker Arabic. Only trust a
-        // result the preference list actually asked for.
-        guard let matched, isRequested(matched, preferredLanguages: preferredLanguages) else {
-            return "en"
-        }
-        return matched
-    }
-
-    /// True when `language` shares a language code with something in the preference list.
-    private static func isRequested(_ language: String, preferredLanguages: [String]?) -> Bool {
-        let preferences = preferredLanguages ?? Locale.preferredLanguages
-        let code = language.split(separator: "-").first.map(String.init) ?? language
-        return preferences.contains { preference in
-            (preference.split(separator: "-").first.map(String.init) ?? preference) == code
-        }
+        ).first ?? "en"
     }
 
     private static let supportedLanguages: [String] =
