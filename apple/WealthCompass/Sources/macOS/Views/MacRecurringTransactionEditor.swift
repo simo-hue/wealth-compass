@@ -122,7 +122,7 @@ struct MacRecurringTransactionEditor: View {
                     TextField("Amount (\(currency.rawValue))", text: $amount)
                     Picker("Currency", selection: $currency) {
                         ForEach(Currency.allCases) { currencyOption in
-                            (Text(currencyOption.displayName) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
+                            (Text(currencyOption.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
                         }
                     }
                     TextField("Description", text: $note)

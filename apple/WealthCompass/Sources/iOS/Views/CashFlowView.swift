@@ -184,7 +184,7 @@ struct CashFlowView: View {
                             .foregroundStyle(by: .value("Category", item.name))
                             .cornerRadius(5)
                             .opacity(hoveredExpenseCategory == nil || hoveredExpenseCategory?.id == item.id ? 1.0 : 0.3)
-                            .accessibilityLabel(Text(item.name))
+                            .accessibilityLabel(Text(LocalizedStringKey(item.name)))
                             .accessibilityValue(Text(settings.privateCurrency(item.value)))
                         }
                         .chartLegend(.hidden)
@@ -194,7 +194,8 @@ struct CashFlowView: View {
                                     let frame = geometry[plotFrame]
                                     VStack(spacing: 3) {
                                         if let hoveredExpenseCategory {
-                                            Text(hoveredExpenseCategory.name.uppercased())
+                                            Text(LocalizedStringKey(hoveredExpenseCategory.name))
+                                                .textCase(.uppercase)
                                                 .font(.caption2.weight(.bold))
                                                 .tracking(1.3)
                                                 .foregroundStyle(.white.opacity(0.8))
@@ -253,7 +254,7 @@ struct CashFlowView: View {
                     VStack(spacing: 10) {
                         ForEach(categories.prefix(6)) { item in
                             HStack {
-                                Text(item.name)
+                                Text(LocalizedStringKey(item.name))
                                     .foregroundStyle(.white.opacity(0.88))
                                 Spacer()
                                 VStack(alignment: .trailing, spacing: 2) {
@@ -325,7 +326,7 @@ struct CashFlowView: View {
 
                 VStack(alignment: .leading, spacing: 5) {
                     HStack(spacing: 6) {
-                        Text(schedule.category)
+                        Text(LocalizedStringKey(schedule.category))
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.white)
                         Image(systemName: schedule.notificationsEnabled ? "bell.fill" : "bell.slash")
@@ -566,7 +567,7 @@ struct CashFlowView: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
-                        Text(transaction.category)
+                        Text(LocalizedStringKey(transaction.category))
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.white)
                         if transaction.recurringTransactionID != nil {

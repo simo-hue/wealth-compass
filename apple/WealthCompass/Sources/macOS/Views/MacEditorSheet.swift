@@ -84,7 +84,7 @@ private struct MacTransactionEditor: View {
                     TextField("Amount (\(currency.rawValue))", text: $amount)
                     Picker("Currency", selection: $currency) {
                         ForEach(Currency.allCases) { currencyOption in
-                            (Text(currencyOption.displayName) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
+                            (Text(currencyOption.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
                         }
                     }
                     Picker("Category", selection: $category) {
@@ -278,7 +278,7 @@ private struct MacInvestmentEditor: View {
                 Section("Classification") {
                     Picker("Currency", selection: $currency) {
                         ForEach(Currency.allCases) {
-                            (Text($0.displayName) + Text(" (\($0.rawValue))")).tag($0)
+                            (Text($0.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\($0.rawValue))")).tag($0)
                         }
                     }
                     Picker("Sector", selection: $sector) {
@@ -497,7 +497,7 @@ private struct MacCryptoEditor: View {
                 Section("Position") {
                     Picker("Currency", selection: $currency) {
                         ForEach(Currency.allCases) { currency in
-                            (Text(currency.displayName) + Text(" (\(currency.rawValue))")).tag(currency)
+                            (Text(currency.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\(currency.rawValue))")).tag(currency)
                         }
                     }
                     TextField("Quantity", text: $quantity)

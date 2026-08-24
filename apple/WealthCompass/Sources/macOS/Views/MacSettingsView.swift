@@ -253,7 +253,7 @@ struct MacSettingsView: View {
                 SettingsRow(title: "Base Currency") {
                     Picker("", selection: $settings.currency) {
                         ForEach(Currency.allCases) { currency in
-                            (Text(currency.displayName) + Text(" (\(currency.rawValue))")).tag(currency)
+                            (Text(currency.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\(currency.rawValue))")).tag(currency)
                         }
                     }
                     .labelsHidden()
@@ -603,7 +603,7 @@ struct MacSettingsView: View {
             } else {
                 ForEach(categories, id: \.self) { category in
                     HStack {
-                        Text(category)
+                        Text(LocalizedStringKey(category))
                         Spacer()
                         Button(role: .destructive) {
                             pendingDestructiveAction = .deleteCustomCategory(

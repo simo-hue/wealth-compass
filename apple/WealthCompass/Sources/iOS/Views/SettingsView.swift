@@ -47,7 +47,7 @@ struct SettingsView: View {
                     
                     Picker("Base Currency", selection: $settings.currency) {
                         ForEach(Currency.allCases) { currency in
-                            (Text(currency.displayName) + Text(" (\(currency.rawValue))")).tag(currency)
+                            (Text(currency.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\(currency.rawValue))")).tag(currency)
                         }
                     }
                 }
@@ -549,7 +549,7 @@ struct SettingsView: View {
             } else {
                 ForEach(categories, id: \.self) { category in
                     HStack {
-                        Text(category)
+                        Text(LocalizedStringKey(category))
                         Spacer()
                         Button(role: .destructive) {
                             pendingDestructiveAction = .deleteCustomCategory(category: category, type: type)

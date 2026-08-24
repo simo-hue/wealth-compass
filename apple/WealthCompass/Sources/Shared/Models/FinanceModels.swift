@@ -46,11 +46,15 @@ enum Currency: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
-    /// SwiftUI-only display name; resolves against the environment locale inside a `Text`.
-    /// Use `localizedDisplayName(appLanguage:)` everywhere a resolved `String` is needed.
-    var displayName: LocalizedStringKey {
-        LocalizedStringKey(Locale.current.localizedString(forCurrencyCode: rawValue) ?? rawValue)
-    }
+    // `displayName: LocalizedStringKey` was removed. Its doc claimed it "resolves against the
+    // environment locale inside a `Text`", which was not true: `Locale.current.localizedString`
+    // evaluates at property access, against the *system* locale, so it ignored the in-app language
+    // override entirely — and then wrapped the already-resolved name in a `LocalizedStringKey`,
+    // which performed a second, accidental catalog lookup. Euro, US Dollar, British Pound and Swiss
+    // Franc happened to collide with stale catalog keys and so did translate, leaving every picker
+    // showing four currencies in the user's language and thirty in English.
+    //
+    // `localizedDisplayName(appLanguage:)` below is the correct API for every call site.
 
     func localizedDisplayName(appLanguage: String?) -> String {
         let locale = appLanguage.map { Locale(identifier: $0) } ?? Locale.current

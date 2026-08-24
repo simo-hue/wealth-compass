@@ -545,7 +545,12 @@ struct AnalyticsEngine {
             .sorted { $0.value > $1.value }
             .enumerated()
             .map { index, item in
-                AllocationSlice(id: item.name, name: item.name, value: item.value.doubleValue, color: ColorPalette.chart[index % ColorPalette.chart.count])
+                // Localize the display name, keeping the raw value as the stable id. The sector and
+                // geography values are fixed picker constants and every one is in the catalog, so a
+                // Spanish "Asignación por sector" legend used to read Technology / Real Estate while
+                // the by-type chart beside it read Acciones / Bonos. A custom value falls through
+                // unchanged, which is the same behaviour the category pickers rely on.
+                AllocationSlice(id: item.name, name: localized(String.LocalizationValue(item.name)), value: item.value.doubleValue, color: ColorPalette.chart[index % ColorPalette.chart.count])
             }
             .filter { $0.value > 0 }
     }
@@ -585,7 +590,8 @@ struct AnalyticsEngine {
             .sorted { $0.value > $1.value }
             .enumerated()
             .map { index, item in
-                AllocationSlice(id: item.name, name: item.name, value: item.value.doubleValue, color: ColorPalette.chartGeography[index % ColorPalette.chartGeography.count])
+                // Localized for display, raw value kept as the stable id — see the sector chart above.
+                AllocationSlice(id: item.name, name: localized(String.LocalizationValue(item.name)), value: item.value.doubleValue, color: ColorPalette.chartGeography[index % ColorPalette.chartGeography.count])
             }
             .filter { $0.value > 0 }
     }

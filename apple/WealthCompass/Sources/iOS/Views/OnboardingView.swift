@@ -204,7 +204,7 @@ struct OnboardingView: View {
                         Spacer()
                         Picker("Base Currency", selection: $settings.currency) {
                             ForEach(Currency.allCases) { currency in
-                                (Text(currency.displayName) + Text(" (\(currency.rawValue))")).tag(currency)
+                                (Text(currency.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\(currency.rawValue))")).tag(currency)
                             }
                         }
                         .labelsHidden()

@@ -546,7 +546,7 @@ struct MacCashFlowView: View {
 
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 8) {
-                    Text(schedule.category)
+                    Text(LocalizedStringKey(schedule.category))
                         .font(.headline)
                     Label(
                         schedule.notificationsEnabled
@@ -765,7 +765,7 @@ struct MacCashFlowView: View {
                 HStack(alignment: .center, spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 6) {
-                            Text(transaction.category)
+                            Text(LocalizedStringKey(transaction.category))
                                 .font(.headline)
                                 .foregroundStyle(.white)
                             if transaction.recurringTransactionID != nil {
@@ -1129,7 +1129,7 @@ private struct MacCashFlowTransactionEditor: View {
                     TextField("Amount (\(currency.rawValue))", text: $amount)
                     Picker("Currency", selection: $currency) {
                         ForEach(Currency.allCases) { currencyOption in
-                            (Text(currencyOption.displayName) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
+                            (Text(currencyOption.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
                         }
                     }
                     DatePicker("Date", selection: $date, displayedComponents: .date)

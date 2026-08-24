@@ -516,7 +516,7 @@ struct DashboardView: View {
                                         .font(.caption2.monospacedDigit().weight(.bold))
                                         .foregroundStyle(WCColor.textFaint)
                                         .frame(width: 17)
-                                    Text(item.name)
+                                    Text(LocalizedStringKey(item.name))
                                         .font(.subheadline.weight(.medium))
                                         .foregroundStyle(.white.opacity(0.8))
                                         .lineLimit(1)
@@ -580,7 +580,7 @@ struct DashboardView: View {
                                         )
 
                                     VStack(alignment: .leading, spacing: 3) {
-                                        Text(transaction.category)
+                                        Text(LocalizedStringKey(transaction.category))
                                             .font(.subheadline.weight(.medium))
                                             .foregroundStyle(.white.opacity(0.84))
                                             .lineLimit(1)

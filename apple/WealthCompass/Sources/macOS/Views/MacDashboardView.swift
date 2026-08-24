@@ -958,7 +958,7 @@ struct ActivityRow: View {
                 )
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(transaction.category)
+                Text(LocalizedStringKey(transaction.category))
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(.white.opacity(0.84))
                     .lineLimit(1)
