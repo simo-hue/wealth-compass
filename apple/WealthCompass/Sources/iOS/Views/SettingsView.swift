@@ -857,7 +857,15 @@ private enum MarketDataCredentialKind: String, Identifiable {
         }
     }
 
-    var testAssetName: LocalizedStringKey {
+    /// Deliberately `String`, not `LocalizedStringKey` (and matching the macOS copy in
+    /// `MacSettingsView`). These are proper nouns that are never translated, but the type matters for
+    /// a second reason: both call sites interpolate this into a `Text("… \(testAssetName) …")`, and
+    /// interpolating a `LocalizedStringKey` into another one hits the deprecated catch-all
+    /// `appendInterpolation`, which substitutes the value's *debug description* — so the caption
+    /// rendered literally as `LocalizedStringKey(key: "Apple (AAPL)", hasFormatting: false,
+    /// arguments: [])`, in all 35 languages. As a `String` the interpolation produces `%@` and
+    /// resolves the real catalog key, which is already translated into 34.
+    var testAssetName: String {
         switch self {
         case .finnhub:
             "Apple (AAPL)"
