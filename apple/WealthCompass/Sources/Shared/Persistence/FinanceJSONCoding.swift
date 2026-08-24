@@ -72,7 +72,7 @@ enum FinanceJSONCoding {
         from data: Data,
         wasMigrated: Bool
     ) throws -> (data: FinancialData, wasMigrated: Bool, skippedRecordKeys: [CloudSyncRecordKey]) {
-        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+        guard case .object(let root)? = try? jsonValueDecoder.decode(JSONValue.self, from: data) else {
             // Not even a JSON object: nothing to salvage — surface the original strict-decode error.
             return (try decode(FinancialData.self, from: data), wasMigrated, [])
         }
@@ -84,11 +84,11 @@ enum FinanceJSONCoding {
             as type: T.Type,
             recordType: CloudSyncRecordType
         ) -> [T] {
-            guard let rawElements = root[key] as? [Any] else { return [] }
+            guard case .array(let rawElements)? = root[key] else { return [] }
             var out: [T] = []
             out.reserveCapacity(rawElements.count)
             for element in rawElements {
-                if let elementData = try? JSONSerialization.data(withJSONObject: element),
+                if let elementData = try? jsonValueEncoder.encode(element),
                    let decoded = try? decoder.decode(T.self, from: elementData) {
                     out.append(decoded)
                 } else {
@@ -110,13 +110,13 @@ enum FinanceJSONCoding {
     }
 
     private static func salvageSkippedKey(
-        from element: Any,
+        from element: JSONValue,
         recordType: CloudSyncRecordType,
         into skipped: inout [CloudSyncRecordKey]
     ) {
         guard
-            let object = element as? [String: Any],
-            let idString = object["id"] as? String,
+            case .object(let object) = element,
+            case .string(let idString)? = object["id"],
             let id = UUID(uuidString: idString)
         else {
             return
@@ -149,7 +149,7 @@ enum FinanceJSONCoding {
     }
 
     private static func migrateLegacyFinancialDataJSON(_ data: Data) throws -> Data {
-        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+        guard case .object(var root)? = try? jsonValueDecoder.decode(JSONValue.self, from: data) else {
             return data
         }
 
@@ -173,7 +173,7 @@ enum FinanceJSONCoding {
         }
 
         guard changed else { return data }
-        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        return try jsonValueEncoder.encode(JSONValue.object(root))
     }
 
     /// Fills `field` on every record in `collectionKey` that is missing or explicitly `null`, taking
@@ -182,33 +182,94 @@ enum FinanceJSONCoding {
         _ field: String,
         to collectionKey: String,
         fallbacks: [String],
-        in root: inout [String: Any]
+        in root: inout [String: JSONValue]
     ) -> Bool {
-        guard var records = root[collectionKey] as? [[String: Any]] else { return false }
+        guard case .array(let rawRecords)? = root[collectionKey] else { return false }
+        var records = rawRecords
         var changed = false
 
-        for index in records.indices where isMissingOrNull(records[index][field]) {
+        for index in records.indices {
+            guard case .object(var record) = records[index], isMissingOrNull(record[field]) else { continue }
             guard let fallbackValue = fallbacks.lazy
-                .compactMap({ key -> Any? in
-                    let value = records[index][key]
+                .compactMap({ key -> JSONValue? in
+                    let value = record[key]
                     return isMissingOrNull(value) ? nil : value
                 })
                 .first
             else {
                 continue
             }
-            records[index][field] = fallbackValue
+            record[field] = fallbackValue
+            records[index] = .object(record)
             changed = true
         }
 
         if changed {
-            root[collectionKey] = records
+            root[collectionKey] = .array(records)
         }
         return changed
     }
 
-    /// A JSON key that is absent, or present with an explicit `null` (`NSNull`) value.
-    private static func isMissingOrNull(_ value: Any?) -> Bool {
-        value == nil || value is NSNull
+    /// A JSON key that is absent, or present with an explicit `null`.
+    private static func isMissingOrNull(_ value: JSONValue?) -> Bool {
+        guard let value else { return true }
+        if case .null = value { return true }
+        return false
     }
+
+    // MARK: - Precision-preserving generic JSON
+
+    /// A generic JSON value whose numbers are `Decimal`.
+    ///
+    /// Both the date-healing migration and the H08 lossy-salvage decode used to go through
+    /// `JSONSerialization`, which parses every fractional number as a binary `Double`. That is
+    /// lossy for ordinary money: `1234.56` came back as `1234.5599999999999`, `0.1` as
+    /// `0.10000000000000001`, `99999999.99` as `99999999.989999995`. The migration then *persisted*
+    /// those values, so healing one missing `createdAt` silently rewrote every amount in the file,
+    /// changed every record's sync hash, and re-uploaded the whole dataset to CloudKit.
+    ///
+    /// `JSONDecoder`/`JSONEncoder` read and write `Decimal` from the raw token, so routing both
+    /// paths through this type keeps WC-A1's invariant — money never passes through binary
+    /// floating point outside charts and FX — true inside persistence itself.
+    indirect enum JSONValue: Codable {
+        case null
+        case bool(Bool)
+        case number(Decimal)
+        case string(String)
+        case array([JSONValue])
+        case object([String: JSONValue])
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            if container.decodeNil() { self = .null; return }
+            // Bool before Decimal: `true`/`false` would otherwise decode as 1/0 on some platforms.
+            if let value = try? container.decode(Bool.self) { self = .bool(value); return }
+            if let value = try? container.decode(Decimal.self) { self = .number(value); return }
+            if let value = try? container.decode(String.self) { self = .string(value); return }
+            if let value = try? container.decode([JSONValue].self) { self = .array(value); return }
+            self = .object(try container.decode([String: JSONValue].self))
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+            switch self {
+            case .null: try container.encodeNil()
+            case .bool(let value): try container.encode(value)
+            case .number(let value): try container.encode(value)
+            case .string(let value): try container.encode(value)
+            case .array(let value): try container.encode(value)
+            case .object(let value): try container.encode(value)
+            }
+        }
+    }
+
+    /// Deliberately plain: no date strategy, because `JSONValue` keeps dates as the strings they
+    /// already are in the file and must not reinterpret them.
+    private static let jsonValueDecoder = JSONDecoder()
+
+    private static let jsonValueEncoder: JSONEncoder = {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }()
 }

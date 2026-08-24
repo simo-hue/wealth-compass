@@ -6,6 +6,69 @@ import XCTest
 final class PersistenceCoordinatorTests: XCTestCase {
     private let fixedDate = Date(timeIntervalSince1970: 1_700_000_000)
 
+    // MARK: - Legacy date-healing migration
+
+    /// Healing a missing date must not touch the money in the file.
+    ///
+    /// The migration re-serialized the whole document through `JSONSerialization`, which parses
+    /// every fractional number as a binary `Double`. One absent `createdAt` therefore rewrote every
+    /// amount in the database — `1234.56` became `1234.5599999999999` — and `load()` persisted the
+    /// result, changing every record's sync hash and re-uploading the entire dataset.
+    func testDateHealingMigrationPreservesExactAmounts() throws {
+        // `createdAt` absent on the first row, explicitly null on the second: both trigger healing.
+        let json = """
+        {"transactions":[
+          {"id":"11111111-1111-1111-1111-111111111111","type":"income","category":"Salary",
+           "amount":1234.56,"description":"","date":"2026-01-01T00:00:00.000Z",
+           "updatedAt":"2026-01-01T00:00:00.000Z"},
+          {"id":"22222222-2222-2222-2222-222222222222","type":"expense","category":"Rent",
+           "amount":99999999.99,"description":"","date":"2026-01-02T00:00:00.000Z",
+           "updatedAt":"2026-01-02T00:00:00.000Z","createdAt":null}
+        ],
+         "crypto":[
+          {"id":"33333333-3333-3333-3333-333333333333","symbol":"BTC","name":"Bitcoin",
+           "quantity":0.12345678901234567,"avgBuyPrice":0.1,"currentPrice":1,"currency":"EUR",
+           "fees":0,"coinId":"bitcoin","updatedAt":"2026-01-01T00:00:00.000Z"}
+         ]}
+        """
+        let decoded = try FinanceJSONCoding.decodeFinancialData(from: Data(json.utf8))
+
+        XCTAssertTrue(decoded.wasMigrated, "fixture did not trigger the healing path")
+        XCTAssertEqual(decoded.data.transactions.count, 2)
+
+        XCTAssertEqual(decoded.data.transactions[0].amount, Decimal(string: "1234.56"))
+        XCTAssertEqual(decoded.data.transactions[1].amount, Decimal(string: "99999999.99"))
+        XCTAssertEqual(decoded.data.crypto.first?.quantity, Decimal(string: "0.12345678901234567"))
+        XCTAssertEqual(decoded.data.crypto.first?.avgBuyPrice, Decimal(string: "0.1"))
+
+        // And the healing itself still worked.
+        XCTAssertNotNil(decoded.data.transactions[0].createdAt)
+        XCTAssertNotNil(decoded.data.transactions[1].createdAt)
+    }
+
+    /// The H08 salvage path re-serialized each surviving record the same way, so one undecodable
+    /// record used to corrupt the money on every *good* record beside it.
+    func testLossySalvagePreservesExactAmountsOnSurvivingRecords() throws {
+        let json = """
+        {"transactions":[
+          {"id":"11111111-1111-1111-1111-111111111111","type":"income","category":"Salary",
+           "amount":1234.56,"description":"","date":"2026-01-01T00:00:00.000Z",
+           "createdAt":"2026-01-01T00:00:00.000Z","updatedAt":"2026-01-01T00:00:00.000Z"},
+          {"id":"22222222-2222-2222-2222-222222222222","type":"NOT_A_TYPE","category":"X",
+           "amount":1,"description":"","date":"2026-01-02T00:00:00.000Z",
+           "createdAt":"2026-01-02T00:00:00.000Z","updatedAt":"2026-01-02T00:00:00.000Z"}
+        ]}
+        """
+        let decoded = try FinanceJSONCoding.decodeFinancialData(from: Data(json.utf8))
+
+        XCTAssertEqual(decoded.data.transactions.count, 1, "salvage path did not run as expected")
+        XCTAssertEqual(decoded.skippedRecordKeys.count, 1, "the bad record's key must be preserved")
+        XCTAssertEqual(
+            decoded.data.transactions[0].amount, Decimal(string: "1234.56"),
+            "a healthy record's amount was corrupted while salvaging its neighbour"
+        )
+    }
+
     // MARK: - Coordinator
 
     func testBurstSavesPersistLastSnapshotAndAdvanceBaseline() async throws {
