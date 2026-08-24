@@ -9752,209 +9752,732 @@
       }
     },
     "%lld due transactions were added to Cash Flow." : {
+      "comment" : "Count of recurring transactions materialized into the ledger. One key for every count: the plural category is selected by CLDR, so locales with few/many forms (cs, sk, ru, uk, pl, hr, ro, ar) are correct at n=2..4 and n>=5, which a single form cannot be.",
       "localizations" : {
         "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "تمت إضافة %lld معاملات مستحقة إلى التدفق النقدي."
+          "variations" : {
+            "plural" : {
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لم تتم إضافة أي معاملات مجدولة إلى التدفق النقدي."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "تمت إضافة معاملة مجدولة واحدة إلى التدفق النقدي."
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "تمت إضافة معاملتين مجدولتين إلى التدفق النقدي."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "تمت إضافة %lld معاملات مجدولة إلى التدفق النقدي."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "تمت إضافة %lld معاملة مجدولة إلى التدفق النقدي."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "تمت إضافة %lld معاملة مجدولة إلى التدفق النقدي."
+                }
+              }
+            }
           }
         },
         "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "S'han afegit %lld transaccions programades al Flux de caixa."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "S'ha afegit %lld transacció programada al Flux de caixa."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "S'han afegit %lld transaccions programades al Flux de caixa."
+                }
+              }
+            }
           }
         },
         "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Do Cash Flow bylo přidáno %lld splatných transakcí."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Cash Flow byla přidána %lld naplánovaná transakce."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Cash Flow byly přidány %lld naplánované transakce."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Cash Flow bylo přidáno %lld naplánovaných transakcí."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Cash Flow bylo přidáno %lld naplánovaných transakcí."
+                }
+              }
+            }
           }
         },
         "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld planlagte transaktioner blev føjet til Cash Flow."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld planlagt transaktion blev føjet til Cash Flow."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld planlagte transaktioner blev føjet til Cash Flow."
+                }
+              }
+            }
           }
         },
         "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld fällige Transaktionen wurden zum Cashflow hinzugefügt."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld fällige Transaktion wurde zum Cashflow hinzugefügt."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld fällige Transaktionen wurden zum Cashflow hinzugefügt."
+                }
+              }
+            }
           }
         },
         "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld προγραμματισμένες συναλλαγές προστέθηκαν στην Ταμειακή ροή."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld προγραμματισμένη συναλλαγή προστέθηκε στην Ταμειακή ροή."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld προγραμματισμένες συναλλαγές προστέθηκαν στην Ταμειακή ροή."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld due transaction was added to Cash Flow."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld due transactions were added to Cash Flow."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Se agregaron %lld transacciones programadas al Flujo de Caja."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Se agregó %lld transacción programada al Flujo de Caja."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Se agregaron %lld transacciones programadas al Flujo de Caja."
+                }
+              }
+            }
           }
         },
         "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Se agregaron %lld transacciones programadas al Flujo de fondos."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Se agregó %lld transacción programada al Flujo de fondos."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Se agregaron %lld transacciones programadas al Flujo de fondos."
+                }
+              }
+            }
           }
         },
         "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld erääntynyttä tapahtumaa lisättiin Kassavirtaan."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld erääntynyt tapahtuma lisättiin Kassavirtaan."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld erääntynyttä tapahtumaa lisättiin Kassavirtaan."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld transactions arrivées à échéance ont été ajoutées au flux de trésorerie."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld transaction arrivée à échéance a été ajoutée au flux de trésorerie."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld transactions arrivées à échéance ont été ajoutées au flux de trésorerie."
+                }
+              }
+            }
           }
         },
         "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld עסקאות שהגיע מועדן נוספו לתזרים המזומנים."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "עסקה אחת שהגיע מועדה נוספה לתזרים המזומנים."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld עסקאות שהגיע מועדן נוספו לתזרים המזומנים."
+                }
+              }
+            }
           }
         },
         "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld देय लेनदेन नकदी प्रवाह में जोड़े गए।"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld देय लेनदेन नकदी प्रवाह में जोड़ा गया।"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld देय लेनदेन नकदी प्रवाह में जोड़े गए।"
+                }
+              }
+            }
           }
         },
         "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld dospjelih transakcija dodano je u Novčani tok."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "U Novčani tok dodana je %lld planirana transakcija."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "U Novčani tok dodane su %lld planirane transakcije."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "U Novčani tok dodano je %lld planiranih transakcija."
+                }
+              }
+            }
           }
         },
         "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld esedékes tranzakció hozzáadva a Pénzforgalomhoz."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld esedékes tranzakció hozzáadva a Pénzforgalomhoz."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld esedékes tranzakció hozzáadva a Pénzforgalomhoz."
+                }
+              }
+            }
           }
         },
         "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld transaksi jatuh tempo ditambahkan ke Arus Kas."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld transaksi jatuh tempo ditambahkan ke Arus Kas."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld transaksi jatuh tempo ditambahkan ke Arus Kas."
+                }
+              }
+            }
           }
         },
         "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld transazioni pianificate sono state aggiunte al Flusso di Cassa."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld transazione pianificata è stata aggiunta al Flusso di Cassa."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld transazioni pianificate sono state aggiunte al Flusso di Cassa."
+                }
+              }
+            }
           }
         },
         "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "期日を迎えた取引 %lld 件をキャッシュフローに追加しました。"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "期日を迎えた取引 %lld 件をキャッシュフローに追加しました。"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "期日を迎えた取引 %lld 件をキャッシュフローに追加しました。"
+                }
+              }
+            }
           }
         },
         "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "기한이 된 거래 %lld건이 현금흐름에 추가되었습니다."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "기한이 된 거래 %lld건이 현금흐름에 추가되었습니다."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "기한이 된 거래 %lld건이 현금흐름에 추가되었습니다."
+                }
+              }
+            }
           }
         },
         "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld transaksi berjadual telah ditambahkan ke Aliran Tunai."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld transaksi berjadual telah ditambahkan ke Aliran Tunai."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld transaksi berjadual telah ditambahkan ke Aliran Tunai."
+                }
+              }
+            }
           }
         },
         "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld planlagte transaksjoner ble lagt til i Kontantstrøm."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld planlagt transaksjon ble lagt til i Kontantstrøm."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld planlagte transaksjoner ble lagt til i Kontantstrøm."
+                }
+              }
+            }
           }
         },
         "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld vervallen transacties zijn toegevoegd aan Cashstroom."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld vervallen transactie is toegevoegd aan Cashstroom."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld vervallen transacties zijn toegevoegd aan Cashstroom."
+                }
+              }
+            }
           }
         },
         "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Do Przepływu środków pieniężnych dodano %lld wymagalnych transakcji."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Przepływu środków pieniężnych dodano %lld zaplanowaną transakcję."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Przepływu środków pieniężnych dodano %lld zaplanowane transakcje."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Przepływu środków pieniężnych dodano %lld zaplanowanych transakcji."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Przepływu środków pieniężnych dodano %lld zaplanowanych transakcji."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld transações programadas foram adicionadas ao Fluxo de caixa."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld transação programada foi adicionada ao Fluxo de caixa."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld transações programadas foram adicionadas ao Fluxo de caixa."
+                }
+              }
+            }
           }
         },
         "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Foram adicionadas %lld transações programadas ao Fluxo de caixa."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Foi adicionada %lld transação programada ao Fluxo de caixa."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Foram adicionadas %lld transações programadas ao Fluxo de caixa."
+                }
+              }
+            }
           }
         },
         "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld tranzacții scadente au fost adăugate la Fluxul de numerar."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld tranzacție programată a fost adăugată la Fluxul de numerar."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld tranzacții programate au fost adăugate la Fluxul de numerar."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld de tranzacții programate au fost adăugate la Fluxul de numerar."
+                }
+              }
+            }
           }
         },
         "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "В Денежный поток добавлено %lld транзакций с наступившим сроком."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "В Денежный поток добавлена %lld запланированная транзакция."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "В Денежный поток добавлены %lld запланированные транзакции."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "В Денежный поток добавлено %lld запланированных транзакций."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "В Денежный поток добавлено %lld запланированных транзакций."
+                }
+              }
+            }
           }
         },
         "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Do Cash Flow bolo pridaných %lld splatných transakcií."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Cash Flow bola pridaná %lld naplánovaná transakcia."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Cash Flow boli pridané %lld naplánované transakcie."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Cash Flow bolo pridaných %lld naplánovaných transakcií."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Cash Flow bolo pridaných %lld naplánovaných transakcií."
+                }
+              }
+            }
           }
         },
         "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld planerade transaktioner lades till i Kassaflöde."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld planerad transaktion lades till i Kassaflöde."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld planerade transaktioner lades till i Kassaflöde."
+                }
+              }
+            }
           }
         },
         "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "เพิ่มธุรกรรมที่ถึงกำหนด %lld รายการในกระแสเงินสดแล้ว"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "เพิ่มธุรกรรมที่ถึงกำหนด %lld รายการในกระแสเงินสดแล้ว"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "เพิ่มธุรกรรมที่ถึงกำหนด %lld รายการในกระแสเงินสดแล้ว"
+                }
+              }
+            }
           }
         },
         "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Nakit akımına vadesi gelen %lld işlem eklendi."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Nakit akımına vadesi gelen %lld işlem eklendi."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Nakit akımına vadesi gelen %lld işlem eklendi."
+                }
+              }
+            }
           }
         },
         "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "До Грошового потоку додано %lld транзакцій, строк яких настав."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "До Грошового потоку додано %lld заплановану транзакцію."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "До Грошового потоку додано %lld заплановані транзакції."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "До Грошового потоку додано %lld запланованих транзакцій."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "До Грошового потоку додано %lld запланованих транзакцій."
+                }
+              }
+            }
           }
         },
         "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Đã thêm %lld giao dịch đến hạn vào Dòng tiền."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Đã thêm %lld giao dịch đến hạn vào Dòng tiền."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Đã thêm %lld giao dịch đến hạn vào Dòng tiền."
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "已将 %lld 笔到期交易添加到现金流。"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "已将 %lld 笔到期交易添加到现金流。"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "已将 %lld 笔到期交易添加到现金流。"
+                }
+              }
+            }
           }
         },
         "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "已將 %lld 筆到期交易新增至現金週轉。"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "已將 %lld 筆到期交易新增至現金週轉。"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "已將 %lld 筆到期交易新增至現金週轉。"
+                }
+              }
+            }
           }
         }
       }
@@ -12464,214 +12987,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 %@"
-          }
-        }
-      }
-    },
-    "1 due transaction was added to Cash Flow." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "تمت إضافة معاملة مستحقة واحدة إلى التدفق النقدي."
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "S'ha afegit 1 transacció programada al Flux de caixa."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Do Cash Flow byla přidána 1 splatná transakce."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 planlagt transaktion blev føjet til Cash Flow."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 fällige Transaktion wurde zum Cashflow hinzugefügt."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 προγραμματισμένη συναλλαγή προστέθηκε στην Ταμειακή ροή."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Se agregó 1 transacción programada al Flujo de Caja."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Se agregó 1 transacción programada al Flujo de fondos."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 erääntynyt tapahtuma lisättiin Kassavirtaan."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 transaction arrivée à échéance a été ajoutée au flux de trésorerie."
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "עסקה אחת שהגיע מועדה נוספה לתזרים המזומנים."
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 देय लेनदेन नकदी प्रवाह में जोड़ा गया।"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 dospjela transakcija dodana je u Novčani tok."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 esedékes tranzakció hozzáadva a Pénzforgalomhoz."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 transaksi jatuh tempo ditambahkan ke Arus Kas."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 transazione pianificata è stata aggiunta al Flusso di Cassa."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "期日を迎えた取引 1 件をキャッシュフローに追加しました。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "기한이 된 거래 1건이 현금흐름에 추가되었습니다."
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 transaksi berjadual telah ditambahkan ke Aliran Tunai."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 planlagt transaksjon ble lagt til i Kontantstrøm."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 vervallen transactie is toegevoegd aan Cashstroom."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Do Przepływu środków pieniężnych dodano 1 wymagalną transakcję."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 transação programada foi adicionada ao Fluxo de caixa."
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Foi adicionada 1 transação programada ao Fluxo de caixa."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 tranzacție scadentă a fost adăugată la Fluxul de numerar."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "В Денежный поток добавлена 1 транзакция с наступившим сроком."
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Do Cash Flow bola pridaná 1 splatná transakcia."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 planerad transaktion lades till i Kassaflöde."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "เพิ่มธุรกรรมที่ถึงกำหนด 1 รายการในกระแสเงินสดแล้ว"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Nakit akımına vadesi gelen 1 işlem eklendi."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "До Грошового потоку додано 1 транзакцію, строк якої настав."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Đã thêm 1 giao dịch đến hạn vào Dòng tiền."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "已将 1 笔到期交易添加到现金流。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "已將 1 筆到期交易新增至現金週轉。"
           }
         }
       }

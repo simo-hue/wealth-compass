@@ -283,11 +283,15 @@ struct MacRootView: View {
         // handled by the .onChange observers), so the 30s timer doesn't churn notifications.
         guard insertedCount > 0 else { return }
         await syncRecurringNotifications()
-        // WC-L18: use two explicit keys instead of concatenating grammar fragments, so
-        // translators get full sentences (mirrors the singular/plural pattern in MacSettingsView).
-        let message = insertedCount == 1
-            ? settings.localized("1 due transaction was added to Cash Flow.")
-            : settings.localized("\(insertedCount) due transactions were added to Cash Flow.")
+        // WC-L18: a full sentence, never concatenated grammar fragments, so translators get
+        // something they can actually restructure.
+        //
+        // One key for every count, not a singular/plural pair chosen here. Branching in Swift can
+        // only express the two categories English has, and it silently imposes them on languages
+        // that have more: Czech and Slovak need a distinct form at n=2..4, and Russian, Ukrainian,
+        // Polish, Croatian and Romanian all put 21, 31, 101 back in the *singular* category. The
+        // catalog carries `variations.plural` instead, which CLDR selects per locale.
+        let message = settings.localized("\(insertedCount) due transactions were added to Cash Flow.")
         alert = MacRootAlert(
             title: settings.localized("Recurring Transactions Added"),
             message: message

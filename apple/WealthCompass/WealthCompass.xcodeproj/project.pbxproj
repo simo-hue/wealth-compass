@@ -124,6 +124,7 @@
 		AD00000000000000000000C7 /* MarketDataServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C7 /* MarketDataServiceTests.swift */; };
 		AD00000000000000000000C1 /* CurrencyConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C1 /* CurrencyConverterTests.swift */; };
 		AD00000000000000000000C2 /* SnapshotEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C2 /* SnapshotEngineTests.swift */; };
+		AD00000000000000000000FB /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000FB /* LocalizationTests.swift */; };
 		AD00000000000000000000FA /* TabBarLabelResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000FA /* TabBarLabelResolverTests.swift */; };
 		AD00000000000000000000C3 /* RecurringScheduleBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */; };
 		AD00000000000000000000C4 /* AnalyticsEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C4 /* AnalyticsEngineTests.swift */; };
@@ -227,6 +228,7 @@
 		AC00000000000000000000C7 /* MarketDataServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketDataServiceTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C1 /* CurrencyConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C2 /* SnapshotEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotEngineTests.swift; sourceTree = "<group>"; };
+		AC00000000000000000000FB /* LocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000FA /* TabBarLabelResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarLabelResolverTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringScheduleBuilderTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C4 /* AnalyticsEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsEngineTests.swift; sourceTree = "<group>"; };
@@ -486,6 +488,7 @@
 				BB10000000000000000C0001 /* DataProtectionRecoveryTests.swift */,
 				AC00000000000000000000C1 /* CurrencyConverterTests.swift */,
 				AC00000000000000000000C2 /* SnapshotEngineTests.swift */,
+				AC00000000000000000000FB /* LocalizationTests.swift */,
 				AC00000000000000000000FA /* TabBarLabelResolverTests.swift */,
 				AC00000000000000000000C3 /* RecurringScheduleBuilderTests.swift */,
 				AC00000000000000000000C4 /* AnalyticsEngineTests.swift */,
@@ -818,6 +821,7 @@
 				BB10000000000000000C0002 /* DataProtectionRecoveryTests.swift in Sources */,
 				AD00000000000000000000C1 /* CurrencyConverterTests.swift in Sources */,
 				AD00000000000000000000C2 /* SnapshotEngineTests.swift in Sources */,
+				AD00000000000000000000FB /* LocalizationTests.swift in Sources */,
 				AD00000000000000000000FA /* TabBarLabelResolverTests.swift in Sources */,
 				AD00000000000000000000C3 /* RecurringScheduleBuilderTests.swift in Sources */,
 				AD00000000000000000000C4 /* AnalyticsEngineTests.swift in Sources */,
