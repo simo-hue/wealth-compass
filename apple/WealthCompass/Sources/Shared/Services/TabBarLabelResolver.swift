@@ -11,10 +11,55 @@ enum TabBarLabelResolver {
     }
 
     static func title(for tab: Tab, appLanguage: String?) -> String {
-        let language = appLanguage ?? "en"
+        title(for: tab, appLanguage: appLanguage, preferredLanguages: nil)
+    }
+
+    /// `preferredLanguages` is a test seam. `nil` means "ask the system".
+    static func title(for tab: Tab, appLanguage: String?, preferredLanguages: [String]?) -> String {
         let table = translations[tab] ?? [:]
+        let language = resolvedLanguage(appLanguage, preferredLanguages: preferredLanguages)
         return table[language] ?? table["en"] ?? tab.rawValue
     }
+
+    /// `appLanguage` is the in-app override, and it is `nil` for every user who has never
+    /// opened the language picker — which is most of them. Mapping that `nil` to `"en"` put
+    /// the tab bar in English while `AppLocalization` (which resolves `nil` to
+    /// `Locale.current`) put the rest of the app in the device language: a French iPhone
+    /// showed French everywhere except these five labels. Resolve `nil` the same way the
+    /// rest of the app resolves it.
+    ///
+    /// Matching goes through `Bundle.preferredLocalizations` rather than
+    /// `Locale.preferredLanguages.first` so the BCP-47 folding is Apple's own: `fr-CA` folds
+    /// to `fr`, `zh-Hant-TW` selects `zh-Hant`, and `pt-BR` stays distinct from `pt-PT`.
+    private static func resolvedLanguage(
+        _ appLanguage: String?,
+        preferredLanguages: [String]?
+    ) -> String {
+        if let appLanguage { return appLanguage }
+        let matched = Bundle.preferredLocalizations(
+            from: supportedLanguages,
+            forPreferences: preferredLanguages
+        ).first
+        // `preferredLocalizations` falls back to the first element of `supportedLanguages`
+        // when nothing matches, which would hand an English speaker Arabic. Only trust a
+        // result the preference list actually asked for.
+        guard let matched, isRequested(matched, preferredLanguages: preferredLanguages) else {
+            return "en"
+        }
+        return matched
+    }
+
+    /// True when `language` shares a language code with something in the preference list.
+    private static func isRequested(_ language: String, preferredLanguages: [String]?) -> Bool {
+        let preferences = preferredLanguages ?? Locale.preferredLanguages
+        let code = language.split(separator: "-").first.map(String.init) ?? language
+        return preferences.contains { preference in
+            (preference.split(separator: "-").first.map(String.init) ?? preference) == code
+        }
+    }
+
+    private static let supportedLanguages: [String] =
+        Array(Set(translations.values.flatMap(\.keys))).sorted()
 
     private static let translations: [Tab: [String: String]] = [
         .dashboard: [
