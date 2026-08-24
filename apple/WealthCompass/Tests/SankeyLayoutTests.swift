@@ -195,7 +195,15 @@ final class SankeyLayoutTests: XCTestCase {
         assertNoOverlap(tight)
         assertHubCloses(tight, sankey)
         XCTAssertLessThan(tight.labels.count, tight.nodes.count, "labels are dropped, not overlapped")
-        XCTAssertEqual(tight.nodes.count, sankey.inflows.count + sankey.outflows.count + 1, "every bar is still drawn")
+        // The surplus is deliberately not drawn: it is the money that never left, so
+        // `SankeyLayout.resolve` withdraws it from the outflow column and renders it as the
+        // unspent tail of the hub instead. Count what the layout draws, not what the model holds.
+        let drawnOutflows = sankey.outflows.filter { $0.role != .surplus }
+        XCTAssertEqual(
+            tight.nodes.count,
+            sankey.inflows.count + drawnOutflows.count + 1,
+            "every drawn bar survives crowding"
+        )
 
         // What survives is the largest flows.
         let kept = tight.labels.compactMap { tight.node(id: $0.id) }.filter { $0.role == .expense }

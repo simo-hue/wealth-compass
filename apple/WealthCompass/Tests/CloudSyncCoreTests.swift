@@ -911,16 +911,26 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertTrue(snapshot[2].hasSuffix("line5"), "newest retained, in order")
     }
 
-    /// Each line is prefixed with an `HH:mm:ss.SSS` timestamp and preserves the message verbatim.
+    /// Each line is prefixed with an `MM-dd HH:mm:ss.SSS` timestamp and preserves the message
+    /// verbatim. The date half is load-bearing: the ring buffer spans several days, so a time-only
+    /// stamp left an export ambiguous about whether two lines were one night or three days apart.
+    ///
+    /// The shape is asserted whole rather than by counting separators. This test previously pinned
+    /// only `prefix(12)` and a decimal-point count, so when the formatter gained the `MM-dd` prefix
+    /// it began slicing `"08-24 17:14:"` and failed on a missing `.` — reporting a format change as
+    /// a punctuation bug. Matching the entire stamp says what actually broke.
     func testSyncDiagnosticsLogPrependsTimestampAndPreservesMessage() throws {
         let log = SyncDiagnosticsLog(capacity: 10)
         log.record("save records=238 changed=2 deleted=0 ms=41")
         let line = try XCTUnwrap(log.snapshot().first)
         XCTAssertTrue(line.hasSuffix("save records=238 changed=2 deleted=0 ms=41"), "message preserved")
-        let stamp = String(line.prefix(12))  // "HH:mm:ss.SSS"
-        XCTAssertEqual(stamp.count, 12)
-        XCTAssertEqual(stamp.filter { $0 == ":" }.count, 2, "timestamp has two colons")
-        XCTAssertEqual(stamp.filter { $0 == "." }.count, 1, "timestamp has one decimal point")
+        let stamp = String(line.prefix(18))  // "MM-dd HH:mm:ss.SSS"
+        XCTAssertEqual(stamp.count, 18)
+        // Digits collapse to "d" so one assertion pins separators, field widths and ordering at
+        // once. `en_US_POSIX` on the formatter is what keeps this stable on a device whose locale
+        // uses a comma decimal separator or non-ASCII numerals.
+        let shape = stamp.map { $0.isNumber ? "d" : String($0) }.joined()
+        XCTAssertEqual(shape, "dd-dd dd:dd:dd.ddd", "stamp is MM-dd HH:mm:ss.SSS, locale-independent")
     }
 
     /// `clear()` empties the buffer.
