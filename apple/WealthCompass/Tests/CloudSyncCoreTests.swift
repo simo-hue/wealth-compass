@@ -927,10 +927,14 @@ final class CloudSyncCoreTests: XCTestCase {
         let stamp = String(line.prefix(18))  // "MM-dd HH:mm:ss.SSS"
         XCTAssertEqual(stamp.count, 18)
         // Digits collapse to "d" so one assertion pins separators, field widths and ordering at
-        // once. `en_US_POSIX` on the formatter is what keeps this stable on a device whose locale
-        // uses a comma decimal separator or non-ASCII numerals.
+        // once. (The separators themselves are ICU pattern literals, so they are never
+        // locale-substituted — only the digits vary.)
         let shape = stamp.map { $0.isNumber ? "d" : String($0) }.joined()
-        XCTAssertEqual(shape, "dd-dd dd:dd:dd.ddd", "stamp is MM-dd HH:mm:ss.SSS, locale-independent")
+        XCTAssertEqual(shape, "dd-dd dd:dd:dd.ddd", "stamp is MM-dd HH:mm:ss.SSS")
+        // `Character.isNumber` is true for Arabic-Indic digits too, so the shape check alone would
+        // stay green if the formatter lost its `en_US_POSIX` locale and rendered ٠٨-٢٤ under ar_EG —
+        // leaving a support export nobody can read. This is the assertion that pins the locale.
+        XCTAssertTrue(stamp.allSatisfy { $0.isASCII }, "formatter stays pinned to en_US_POSIX")
     }
 
     /// `clear()` empties the buffer.
