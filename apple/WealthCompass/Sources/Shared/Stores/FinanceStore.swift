@@ -826,10 +826,24 @@ final class FinanceStore: ObservableObject {
                     lookups[holding.id] = coinID
                 }
             }
+            // A search *miss* and a provider *rejection* are different things, and `try?` discarded
+            // both alike. With a revoked or rate-limited key every unmapped coin resolved to
+            // nothing, `lookups` stayed empty, and the batched /simple/price call that would have
+            // surfaced the real error never ran — so the app told the user their coins do not exist
+            // and never mentioned the key. Keep the first rejection and report that instead.
+            var searchRejection: Error?
             for holding in data.crypto where lookups[holding.id] == nil {
-                // Non-fatal: a search miss/error just leaves the holding unresolved → skipped below.
-                if let resolved = try? await searchClient.searchCoinID(symbol: holding.symbol, name: holding.name) {
-                    lookups[holding.id] = resolved
+                do {
+                    if let resolved = try await searchClient.searchCoinID(symbol: holding.symbol, name: holding.name) {
+                        lookups[holding.id] = resolved
+                    }
+                } catch {
+                    if searchRejection == nil, let marketError = error as? MarketDataError {
+                        switch marketError {
+                        case .unauthorized, .rateLimited: searchRejection = error
+                        default: break
+                        }
+                    }
                 }
                 // M25: pace /search so a first-time refresh with several new coins doesn't burst past
                 // CoinGecko's demo-tier rate limit. Resolved ids are persisted (the coinId backfill in
@@ -838,9 +852,17 @@ final class FinanceStore: ObservableObject {
             }
 
             let unresolvedIDs = Set(data.crypto.map(\.id)).subtracting(lookups.keys)
-            result.skippedCrypto = data.crypto
-                .filter { unresolvedIDs.contains($0.id) }
-                .map { "\($0.symbol): no matching CoinGecko coin" }
+            let unresolved = data.crypto.filter { unresolvedIDs.contains($0.id) }
+            if let searchRejection {
+                result.failedCrypto = unresolved.map {
+                    "\($0.symbol): \(Self.errorMessage(searchRejection, appLanguage: settings.appLanguage))"
+                }
+            } else {
+                // L26: localized, not an English fragment spliced into a translated frame.
+                result.skippedCrypto = unresolved.map {
+                    settings.localized("\($0.symbol): no matching CoinGecko coin")
+                }
+            }
 
             if !lookups.isEmpty {
                 do {
@@ -854,7 +876,9 @@ final class FinanceStore: ObservableObject {
                             let coinQuote = table[coinID],
                             let resolved = coinQuote.resolved(in: holding.currency)
                         else {
-                            result.failedCrypto.append("\(holding.symbol): no CoinGecko price for \(coinID)")
+                            result.failedCrypto.append(
+                                settings.localized("\(holding.symbol): no CoinGecko price for \(coinID)")
+                            )
                             continue
                         }
                         // Store the native price + its currency; the apply loop converts once. H2:

@@ -604,6 +604,11 @@ struct MacCashFlowView: View {
                 .help(schedule.isActive
                     ? settings.localized("Pause schedule")
                     : settings.localized("Resume schedule"))
+                // `.help` is accessibility *help*, not a label: without this VoiceOver reads the SF
+                // Symbol's own name ("pause", "trash") rather than what the button does.
+                .accessibilityLabel(schedule.isActive
+                    ? settings.localized("Pause schedule")
+                    : settings.localized("Resume schedule"))
 
                 Button {
                     activeAlert = .finishRecurringTransaction(schedule)
@@ -611,6 +616,7 @@ struct MacCashFlowView: View {
                     Image(systemName: "checkmark")
                 }
                 .help("Finish schedule")
+                .accessibilityLabel(settings.localized("Finish schedule"))
 
                 Button {
                     editor = .recurring(schedule)
@@ -618,6 +624,7 @@ struct MacCashFlowView: View {
                     Image(systemName: "pencil")
                 }
                 .help("Edit schedule")
+                .accessibilityLabel(settings.localized("Edit schedule"))
 
                 Button(role: .destructive) {
                     activeAlert = .deleteRecurringTransaction(schedule)
@@ -625,6 +632,7 @@ struct MacCashFlowView: View {
                     Image(systemName: "trash")
                 }
                 .help("Delete schedule")
+                .accessibilityLabel(settings.localized("Delete schedule"))
             }
             .buttonStyle(.borderless)
             .controlSize(.small)
@@ -639,7 +647,7 @@ struct MacCashFlowView: View {
                 Text("Type")
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(.secondary)
-                Picker("", selection: $transactionTypeFilter) {
+                Picker("Type", selection: $transactionTypeFilter) {
                     ForEach(MacTransactionTypeFilter.allCases) { filter in
                         Text(filter.title).tag(filter)
                     }
@@ -678,7 +686,7 @@ struct MacCashFlowView: View {
                 Text("Period")
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(.secondary)
-                Picker("", selection: $transactionPeriod) {
+                Picker("Period", selection: $transactionPeriod) {
                     ForEach(AnalyticsPeriod.allCases) { period in
                         Text(period.title).tag(period)
                     }
@@ -823,6 +831,7 @@ struct MacCashFlowView: View {
                             Image(systemName: "pencil")
                         }
                         .help("Edit transaction")
+                        .accessibilityLabel(settings.localized("Edit transaction"))
 
                         Button(role: .destructive) {
                             activeAlert = .deleteTransaction(transaction)
@@ -830,6 +839,7 @@ struct MacCashFlowView: View {
                             Image(systemName: "trash")
                         }
                         .help("Delete transaction")
+                        .accessibilityLabel(settings.localized("Delete transaction"))
                     }
                     .buttonStyle(.borderless)
                     .controlSize(.small)

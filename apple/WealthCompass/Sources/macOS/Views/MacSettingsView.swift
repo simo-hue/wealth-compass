@@ -238,7 +238,7 @@ struct MacSettingsView: View {
         DynamicMasonryLayout(minColumnWidth: 460, spacing: 32, maxColumns: 3) {
             SettingsSection(title: "Region & Language") {
                 SettingsRow(title: "Language") {
-                    Picker("", selection: $settings.appLanguage) {
+                    Picker("Language", selection: $settings.appLanguage) {
                         Text("System").tag(String?.none)
                         ForEach(settings.availableLanguages, id: \.self) { code in
                             Text(settings.languageName(for: code)).tag(String?.some(code))
@@ -251,7 +251,7 @@ struct MacSettingsView: View {
                 Divider().background(WCColor.border)
 
                 SettingsRow(title: "Base Currency") {
-                    Picker("", selection: $settings.currency) {
+                    Picker("Base Currency", selection: $settings.currency) {
                         ForEach(Currency.allCases) { currency in
                             (Text(currency.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\(currency.rawValue))")).tag(currency)
                         }
@@ -442,7 +442,7 @@ struct MacSettingsView: View {
         DynamicMasonryLayout(minColumnWidth: 460, spacing: 32, maxColumns: 3) {
             SettingsSection(title: "Import and Export") {
                 SettingsRow(title: "Import Behavior") {
-                    Picker("", selection: $importMode) {
+                    Picker("Import Behavior", selection: $importMode) {
                         Text("Merge with local data").tag(FinanceImportMode.merge)
                         Text("Replace local data").tag(FinanceImportMode.replace)
                     }
