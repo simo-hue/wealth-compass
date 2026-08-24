@@ -139,7 +139,7 @@ private struct ImportedTransaction: Decodable {
     let id: UUID?
     let type: String?
     let category: String?
-    let amount: Double?
+    let amount: Decimal?
     let description: String?
     let date: String?
     let currency: String?
@@ -167,7 +167,7 @@ private struct ImportedTransaction: Decodable {
         id = container.decodeUUIDIfPresent(forKey: .id)
         type = container.decodeImportedStringIfPresent(forKey: .type)
         category = container.decodeImportedStringIfPresent(forKey: .category)
-        amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
+        amount = container.decodeImportedDecimalIfPresent(forKey: .amount)
         description = container.decodeImportedTextIfPresent(forKey: .description)
         date = container.decodeImportedStringIfPresent(forKey: .date)
         currency = container.decodeImportedStringIfPresent(forKey: .currency)
@@ -207,7 +207,7 @@ private struct ImportedRecurringTransaction: Decodable {
     let id: UUID?
     let type: String?
     let category: String?
-    let amount: Double?
+    let amount: Decimal?
     let description: String?
     let startDate: String?
     let frequency: String?
@@ -243,7 +243,7 @@ private struct ImportedRecurringTransaction: Decodable {
         id = container.decodeUUIDIfPresent(forKey: .id)
         type = container.decodeImportedStringIfPresent(forKey: .type)
         category = container.decodeImportedStringIfPresent(forKey: .category)
-        amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
+        amount = container.decodeImportedDecimalIfPresent(forKey: .amount)
         description = container.decodeImportedTextIfPresent(forKey: .description)
         startDate = container.decodeImportedStringIfPresent(forKey: .startDate)
         frequency = container.decodeImportedStringIfPresent(forKey: .frequency)
@@ -303,7 +303,7 @@ private struct ImportedRecurringTransaction: Decodable {
 private struct ImportedIncomeEntry: Decodable {
     let id: UUID?
     let type: String?
-    let amount: Double?
+    let amount: Decimal?
     let description: String?
     let date: String?
     let createdAt: String?
@@ -323,7 +323,7 @@ private struct ImportedIncomeEntry: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = container.decodeUUIDIfPresent(forKey: .id)
         type = container.decodeImportedStringIfPresent(forKey: .type)
-        amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
+        amount = container.decodeImportedDecimalIfPresent(forKey: .amount)
         description = container.decodeImportedTextIfPresent(forKey: .description)
         date = container.decodeImportedStringIfPresent(forKey: .date)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
@@ -365,7 +365,7 @@ private struct ImportedIncomeEntry: Decodable {
 private struct ImportedExpenseEntry: Decodable {
     let id: UUID?
     let category: String?
-    let amount: Double?
+    let amount: Decimal?
     let description: String?
     let date: String?
     let createdAt: String?
@@ -385,7 +385,7 @@ private struct ImportedExpenseEntry: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = container.decodeUUIDIfPresent(forKey: .id)
         category = container.decodeImportedStringIfPresent(forKey: .category)
-        amount = container.decodeImportedDoubleIfPresent(forKey: .amount)
+        amount = container.decodeImportedDecimalIfPresent(forKey: .amount)
         description = container.decodeImportedTextIfPresent(forKey: .description)
         date = container.decodeImportedStringIfPresent(forKey: .date)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
@@ -417,7 +417,7 @@ private struct ImportedLiquidityAccount: Decodable {
     let id: UUID?
     let type: String?
     let name: String?
-    let balance: Double?
+    let balance: Decimal?
     let currency: String?
     let updatedAt: String?
     let createdAt: String?
@@ -437,7 +437,7 @@ private struct ImportedLiquidityAccount: Decodable {
         id = container.decodeUUIDIfPresent(forKey: .id)
         type = container.decodeImportedStringIfPresent(forKey: .type)
         name = container.decodeImportedTextIfPresent(forKey: .name)
-        balance = container.decodeImportedDoubleIfPresent(forKey: .balance)
+        balance = container.decodeImportedDecimalIfPresent(forKey: .balance)
         currency = container.decodeImportedStringIfPresent(forKey: .currency)
         updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
@@ -473,15 +473,15 @@ private struct ImportedInvestment: Decodable {
     let type: String?
     let symbol: String?
     let name: String?
-    let quantity: Double?
-    let costBasis: Double?
-    let currentValue: Double?
-    let currentPrice: Double?
+    let quantity: Decimal?
+    let costBasis: Decimal?
+    let currentValue: Decimal?
+    let currentPrice: Decimal?
     let currency: String?
     let geography: String?
     let sector: String?
     let isin: String?
-    let fees: Double?
+    let fees: Decimal?
     let lastPriceUpdate: String?
     let updatedAt: String?
     let createdAt: String?
@@ -511,15 +511,15 @@ private struct ImportedInvestment: Decodable {
         type = container.decodeImportedStringIfPresent(forKey: .type)
         symbol = container.decodeImportedStringIfPresent(forKey: .symbol)
         name = container.decodeImportedTextIfPresent(forKey: .name)
-        quantity = container.decodeImportedDoubleIfPresent(forKey: .quantity)
-        costBasis = container.decodeImportedDoubleIfPresent(forKey: .costBasis)
-        currentValue = container.decodeImportedDoubleIfPresent(forKey: .currentValue)
-        currentPrice = container.decodeImportedDoubleIfPresent(forKey: .currentPrice)
+        quantity = container.decodeImportedDecimalIfPresent(forKey: .quantity)
+        costBasis = container.decodeImportedDecimalIfPresent(forKey: .costBasis)
+        currentValue = container.decodeImportedDecimalIfPresent(forKey: .currentValue)
+        currentPrice = container.decodeImportedDecimalIfPresent(forKey: .currentPrice)
         currency = container.decodeImportedStringIfPresent(forKey: .currency)
         geography = container.decodeImportedStringIfPresent(forKey: .geography)
         sector = container.decodeImportedStringIfPresent(forKey: .sector)
         isin = container.decodeImportedStringIfPresent(forKey: .isin)
-        fees = container.decodeImportedDoubleIfPresent(forKey: .fees)
+        fees = container.decodeImportedDecimalIfPresent(forKey: .fees)
         lastPriceUpdate = container.decodeImportedStringIfPresent(forKey: .lastPriceUpdate)
         updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
@@ -575,11 +575,11 @@ private struct ImportedCryptoHolding: Decodable {
     let id: UUID?
     let symbol: String?
     let name: String?
-    let quantity: Double?
-    let avgBuyPrice: Double?
-    let currentPrice: Double?
+    let quantity: Decimal?
+    let avgBuyPrice: Decimal?
+    let currentPrice: Decimal?
     let currency: String?
-    let fees: Double?
+    let fees: Decimal?
     let coinId: String?
     let lastPriceUpdate: String?
     let updatedAt: String?
@@ -605,11 +605,11 @@ private struct ImportedCryptoHolding: Decodable {
         id = container.decodeUUIDIfPresent(forKey: .id)
         symbol = container.decodeImportedStringIfPresent(forKey: .symbol)
         name = container.decodeImportedTextIfPresent(forKey: .name)
-        quantity = container.decodeImportedDoubleIfPresent(forKey: .quantity)
-        avgBuyPrice = container.decodeImportedDoubleIfPresent(forKey: .avgBuyPrice)
-        currentPrice = container.decodeImportedDoubleIfPresent(forKey: .currentPrice)
+        quantity = container.decodeImportedDecimalIfPresent(forKey: .quantity)
+        avgBuyPrice = container.decodeImportedDecimalIfPresent(forKey: .avgBuyPrice)
+        currentPrice = container.decodeImportedDecimalIfPresent(forKey: .currentPrice)
         currency = container.decodeImportedStringIfPresent(forKey: .currency)
-        fees = container.decodeImportedDoubleIfPresent(forKey: .fees)
+        fees = container.decodeImportedDecimalIfPresent(forKey: .fees)
         coinId = container.decodeImportedStringIfPresent(forKey: .coinId)
         lastPriceUpdate = container.decodeImportedStringIfPresent(forKey: .lastPriceUpdate)
         updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
@@ -656,8 +656,8 @@ private struct ImportedLiability: Decodable {
     let id: UUID?
     let type: String?
     let name: String?
-    let principal: Double?
-    let currentBalance: Double?
+    let principal: Decimal?
+    let currentBalance: Decimal?
     let currency: String?
     let updatedAt: String?
     let createdAt: String?
@@ -678,8 +678,8 @@ private struct ImportedLiability: Decodable {
         id = container.decodeUUIDIfPresent(forKey: .id)
         type = container.decodeImportedStringIfPresent(forKey: .type)
         name = container.decodeImportedTextIfPresent(forKey: .name)
-        principal = container.decodeImportedDoubleIfPresent(forKey: .principal)
-        currentBalance = container.decodeImportedDoubleIfPresent(forKey: .currentBalance)
+        principal = container.decodeImportedDecimalIfPresent(forKey: .principal)
+        currentBalance = container.decodeImportedDecimalIfPresent(forKey: .currentBalance)
         currency = container.decodeImportedStringIfPresent(forKey: .currency)
         updatedAt = container.decodeImportedStringIfPresent(forKey: .updatedAt)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
@@ -706,12 +706,12 @@ private struct ImportedLiability: Decodable {
 private struct ImportedSnapshot: Decodable {
     let id: UUID?
     let date: String?
-    let totalAssets: Double?
-    let totalLiabilities: Double?
-    let netWorth: Double?
-    let liquidity: Double?
-    let investments: Double?
-    let crypto: Double?
+    let totalAssets: Decimal?
+    let totalLiabilities: Decimal?
+    let netWorth: Decimal?
+    let liquidity: Decimal?
+    let investments: Decimal?
+    let crypto: Decimal?
     let currency: String?
     let createdAt: String?
 
@@ -732,12 +732,12 @@ private struct ImportedSnapshot: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = container.decodeUUIDIfPresent(forKey: .id)
         date = container.decodeImportedStringIfPresent(forKey: .date)
-        totalAssets = container.decodeImportedDoubleIfPresent(forKey: .totalAssets)
-        totalLiabilities = container.decodeImportedDoubleIfPresent(forKey: .totalLiabilities)
-        netWorth = container.decodeImportedDoubleIfPresent(forKey: .netWorth)
-        liquidity = container.decodeImportedDoubleIfPresent(forKey: .liquidity)
-        investments = container.decodeImportedDoubleIfPresent(forKey: .investments)
-        crypto = container.decodeImportedDoubleIfPresent(forKey: .crypto)
+        totalAssets = container.decodeImportedDecimalIfPresent(forKey: .totalAssets)
+        totalLiabilities = container.decodeImportedDecimalIfPresent(forKey: .totalLiabilities)
+        netWorth = container.decodeImportedDecimalIfPresent(forKey: .netWorth)
+        liquidity = container.decodeImportedDecimalIfPresent(forKey: .liquidity)
+        investments = container.decodeImportedDecimalIfPresent(forKey: .investments)
+        crypto = container.decodeImportedDecimalIfPresent(forKey: .crypto)
         currency = container.decodeImportedStringIfPresent(forKey: .currency)
         createdAt = container.decodeImportedStringIfPresent(forKey: .createdAt)
     }
@@ -938,17 +938,33 @@ private extension KeyedDecodingContainer {
         (try? decode(String.self, forKey: key))?.trimmedForImport
     }
 
-    func decodeImportedDoubleIfPresent(forKey key: Key) -> Double? {
+    /// Money and quantities, read as `Decimal`.
+    ///
+    /// `Decimal` first, because it reads the raw JSON token exactly. Going through `Double` stored
+    /// `1234.56` as `1234.5599999999997952` and `99999999.99` as `99999999.99000000512` — the same
+    /// corruption class the persistence layer was fixed for, and import was the last place money
+    /// crossed binary floating point outside charts and FX (WC-A1, `MoneyDecimal.swift`).
+    func decodeImportedDecimalIfPresent(forKey key: Key) -> Decimal? {
+        if let value = try? decode(Decimal.self, forKey: key) {
+            return value.finiteImportedAmount
+        }
+
+        // `Decimal` cannot decode every JSON number — it throws for |x| >= 1e128 and for a nonzero
+        // |x| below ~1e-129. Accept those through `Double` so the field still parses; they are far
+        // outside anything the app could store, and `Decimal(finite:)` rejects the unrepresentable.
         if let value = try? decode(Double.self, forKey: key), value.isFinite {
-            return value
+            return Decimal(finite: value)
         }
 
         if let value = try? decode(String.self, forKey: key) {
             let normalized = value
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .replacingOccurrences(of: ",", with: ".")
-            if let parsed = Double(normalized), parsed.isFinite {
-                return parsed
+            // Gate on `Double` to keep acceptance exactly as it was — `Decimal(string:)` is more
+            // permissive about trailing junk — but take the value from `Decimal` so it stays exact.
+            if Double(normalized) != nil,
+               let parsed = Decimal(string: normalized, locale: Locale(identifier: "en_US_POSIX")) {
+                return parsed.finiteImportedAmount
             }
         }
 
@@ -987,13 +1003,13 @@ private extension KeyedDecodingContainer {
 /// deep-audit H9 introduced `Decimal(finite:)` and applied it to market data and FX. Import — the
 /// one path that ingests an arbitrary user-supplied file — never got it. Guarding the `Double` is
 /// necessary but not sufficient; the *result* has to be checked too.
-private func importedMoney(_ value: Double) -> Decimal? { Decimal(finite: value) }
+private func importedMoney(_ value: Decimal) -> Decimal? { value.finiteImportedAmount }
 
 /// Absent means zero. Present-but-unrepresentable rejects the whole record rather than silently
 /// zeroing a figure the user can see on screen.
-private func importedMoney(orZero value: Double?) -> Decimal? {
+private func importedMoney(orZero value: Decimal?) -> Decimal? {
     guard let value else { return 0 }
-    return Decimal(finite: value)
+    return value.finiteImportedAmount
 }
 
 private extension Currency {
@@ -1028,13 +1044,22 @@ private extension Double {
     var finiteImportedAmount: Double? {
         isFinite ? self : nil
     }
+}
 
-    var positiveImportedAmount: Double? {
-        isFinite && self > 0 ? self : nil
+private extension Decimal {
+    /// `NSDecimalNumber.notANumber` is the only non-finite value a `Decimal` can hold, and it is
+    /// what `Decimal(Double)` yields for an out-of-range magnitude. Spelled out rather than using
+    /// `isFinite`, which is now ambiguous between Foundation's own member and the app's extension.
+    var finiteImportedAmount: Decimal? {
+        (self as NSDecimalNumber) == NSDecimalNumber.notANumber ? nil : self
     }
 
-    var nonNegativeImportedAmount: Double? {
-        isFinite && self >= 0 ? self : nil
+    var positiveImportedAmount: Decimal? {
+        finiteImportedAmount.flatMap { $0 > 0 ? $0 : nil }
+    }
+
+    var nonNegativeImportedAmount: Decimal? {
+        finiteImportedAmount.flatMap { $0 >= 0 ? $0 : nil }
     }
 }
 

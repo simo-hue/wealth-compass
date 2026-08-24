@@ -61,6 +61,34 @@ final class FinanceImportServiceTests: XCTestCase {
         XCTAssertEqual(result.data.transactions.first?.currency, .usd, "transaction currency lost")
         XCTAssertEqual(result.data.recurringTransactions.first?.currency, .gbp, "recurring currency lost")
         XCTAssertEqual(result.data.snapshots.first?.currency, .chf, "snapshot currency lost")
+
+        // Exactly, not approximately. Reading money through `Double` stored 1234.56 as
+        // 1234.5599999999997952, so a tolerance-based assertion would pass while the backup
+        // silently stopped being a fixed point and every record's sync hash changed.
+        XCTAssertEqual(result.data.transactions.first?.amount, Decimal(string: "1000"))
+        XCTAssertEqual(result.data.recurringTransactions.first?.amount, Decimal(string: "500"))
+    }
+
+    /// Ordinary two-decimal money has to survive import exactly. This is the same corruption class
+    /// the persistence layer was fixed for; import was the last place money crossed `Double`.
+    func testOrdinaryAmountsImportExactly() throws {
+        for literal in ["1234.56", "99999999.99", "1234567.89", "0.12345678901234567"] {
+            let result = try parse("""
+            {"transactions":[{"type":"income","amount":\(literal),"category":"X","date":"2026-01-01"}]}
+            """)
+            XCTAssertEqual(
+                result.data.transactions.first?.amount, Decimal(string: literal),
+                "\(literal) did not import exactly"
+            )
+        }
+    }
+
+    /// The same, for an amount supplied as a JSON string rather than a number.
+    func testStringAmountsImportExactly() throws {
+        let result = try parse("""
+        {"transactions":[{"type":"income","amount":"1234.56","category":"X","date":"2026-01-01"}]}
+        """)
+        XCTAssertEqual(result.data.transactions.first?.amount, Decimal(string: "1234.56"))
     }
 
     /// A magnitude `Decimal` cannot represent must never reach storage.
