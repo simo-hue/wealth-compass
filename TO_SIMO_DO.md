@@ -521,6 +521,25 @@ were written up rather than changed. Both are data-loss shaped.
 - [ ] `MarketDataService.swift:659` — `let pool = eligible.isEmpty ? candidates : eligible` widens
       symbol matching to non-equity quote types, contradicting the method's own contract.
 
+### Corrections to my own commit messages
+
+- `a710629` claims the month-subtotal label is "more in German". It isn't: the key `"subtotal"` has
+  **zero** localizations, so it renders English in all 34 locales. The truncation it fixed was real
+  (118pt of English label in a 62pt column); only the German half of the sentence was wrong.
+- The PDF report's whole vocabulary is still in that state — `subtotal`, `Appendix`, `Contents`,
+  `Closing Balance`, `Effective Date` and the rest are present in the catalog with no translations.
+  That is the single largest untranslated cluster left and it is all one screen's worth of work.
+
+### Two smaller things found while fixing the PDF
+
+- [ ] `ReportDocumentBuilder.swift:688` — with zero transactions in the selected range the ledger
+      early-returns before its Opening/Income/Expenses/Closing row, leaving the bounded export's
+      lone Net Savings tile unaccompanied. All figures are zero so nothing is wrong, but the section
+      reads oddly.
+- [x] **DONE 2026-08-25.** The Monthly Trend chart was capped at twelve bars, which silently dropped
+      months the ledger still reported — `.last12Months` spans thirteen calendar months, and a
+      multi-year export charted only its tail. Cap removed; pinned by a test.
+
 ### Notes for whoever picks this up
 
 - **`extractionState: "stale"` is not proof a key is dead.** 452 call sites localize at runtime via

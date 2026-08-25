@@ -291,6 +291,30 @@ final class ReportReconciliationTests: XCTestCase {
         XCTAssertEqual(barCount, 3, "trend should cover Mar–May 2024, not a window ending today")
     }
 
+    /// The trend must cover every month the ledger beneath it does.
+    ///
+    /// A twelve-bar readability cap silently dropped the earliest month: `.last12Months` spans
+    /// thirteen calendar months, so that month kept its ledger subtotal and lost its bar, and a
+    /// range wider than a year charted only its tail against figures covering all of it.
+    func testTrendCoversEveryMonthOfTheRange() throws {
+        let calendar = Calendar(identifier: .gregorian)
+        func date(_ y: Int, _ m: Int, _ d: Int) -> Date {
+            var c = DateComponents(); c.year = y; c.month = m; c.day = d; c.hour = 12
+            return calendar.date(from: c)!
+        }
+        // Two full years — well past the old cap.
+        let document = buildDocument(
+            sections: [.cashFlow],
+            range: .custom(start: date(2023, 1, 1), end: date(2024, 12, 31)))
+        var barCount: Int?
+        for block in document.sections.first(where: { $0.anchor == ReportSection.cashFlow.anchor })?.blocks ?? [] {
+            if case let .chart(chart) = block, case let .groupedBars(groups, _, _) = chart {
+                barCount = groups.count
+            }
+        }
+        XCTAssertEqual(barCount, 24, "the chart silently dropped months the ledger still reports")
+    }
+
     /// The running-balance column is the reader's audit trail; its final settled value is the same
     /// number as the closing-balance tile above it.
     func testFinalRunningBalanceMatchesTheClosingBalanceTile() throws {

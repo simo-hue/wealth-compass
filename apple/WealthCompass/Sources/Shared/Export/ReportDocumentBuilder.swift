@@ -332,10 +332,15 @@ struct ReportDocumentBuilder {
         return sorted.filter { $0.date >= interval.start && $0.date <= interval.end }
     }
 
-    /// Whole months an interval touches, clamped to a readable chart width.
+    /// Whole months an interval touches, inclusive of both endpoints — a 1 Jan – 31 Mar range is
+    /// three bars, not two.
     ///
-    /// Inclusive of both endpoints — a 1 Jan – 31 Mar range is three bars, not two — and capped at
-    /// twelve so a multi-year export does not produce an unreadable strip of hairlines.
+    /// Deliberately **uncapped**. An earlier version clamped this to twelve for readability, which
+    /// silently dropped data: `.last12Months` spans thirteen calendar months, so the earliest month
+    /// lost its bar while its subtotal still printed in the ledger below and its rows still fed Net
+    /// Savings, Money Flow and Total Expenses. A 2023–2024 export charted only 2024 against figures
+    /// covering both years, with nothing saying so. A dense chart is a worse-looking document; a
+    /// chart that disagrees with the table beneath it is a wrong one.
     private func monthsSpanned(_ interval: DateInterval) -> Int {
         let start = calendar.dateComponents([.year, .month], from: interval.start)
         let end = calendar.dateComponents([.year, .month], from: interval.end)
@@ -346,7 +351,7 @@ struct ReportDocumentBuilder {
         ).month else {
             return 1
         }
-        return min(max(months + 1, 1), 12)
+        return max(months + 1, 1)
     }
 
     /// Cash contribution of a transaction, in base currency and signed by type.
