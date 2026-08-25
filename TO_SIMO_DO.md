@@ -370,3 +370,159 @@ happen on the Mac with Xcode, from `apple/WealthCompass`.
    truth is now `apple/WealthCompass/fastlane/metadata/`.
 
 - **Enable GitHub Actions Permissions**: To allow the new automated deployment to work, go to your repository on GitHub -> **Settings** -> **Actions** -> **General** -> **Workflow permissions**. Select **Read and write permissions** and save. Otherwise, the deployment action will fail to push to the `gh-pages` branch.
+
+---
+
+## Deep audit — remaining findings (2026-08-25)
+
+Eight parallel read-only audits over `apple/`, then three adversarial verification rounds.
+**27 commits landed on `main`** (`50a7037`…`fd1711e`): 6 of 8 P1s, ~45 P2s. Suite went 221 → 260,
+green; both targets build. Full write-up with reasoning:
+<https://claude.ai/code/artifact/12fa859e-cab4-403d-a677-0af1585c44f9>
+
+Everything below is **audit output that I have not personally verified line-by-line**. Treat each as
+a lead with a file:line, not a verdict.
+
+### Two P1s deliberately left alone — they need your iPhone *and* your Mac
+
+Nothing on a dev machine can exercise real `CKSyncEngine` convergence, so per the agreed policy these
+were written up rather than changed. Both are data-loss shaped.
+
+- [ ] **A remote edit can be destroyed on both devices.** `CloudKitSyncService.swift:1457-1465`.
+      Post-bootstrap, a fetched remote change is discarded whenever *any* pending mutation exists
+      locally, ignoring its `origin`. An `.inventory` pending is not a user edit — it is un-uploaded
+      first-sync inventory — but it still wins, and `systemFields` is overwritten with the server's
+      current tag, so the next send raises no conflict and overwrites the server with stale data.
+      The sent-side twin (`conflictAction`, ~:1935) documents the *opposite* policy for the same
+      pending kind. Fix is to check pending **origin**, not pending presence.
+      *Repro:* device B freshly installed with imported data; let its first fetch complete but kill
+      the network before its inventory upload finishes. Edit the same record on A. Bring B back.
+- [ ] **Deleting iCloud data doesn't stick.** `CloudKitSyncService.swift:1330-1347`.
+      `CKSyncEngineFetchedZoneDeletion.reason` is never inspected, so `.purged` and
+      `.encryptedDataReset` are treated as "recreate the zone and re-upload everything". Apple's
+      header is explicit that for both you must delete local data and *not* resend it. This also
+      defeats "Erase Everything, including iCloud" from a second device.
+      *Repro:* delete the app's data from iCloud settings on one device with the other running.
+
+### Sync P2s that *are* test-provable (pure logic, no device needed)
+
+- [ ] `:1479-1480` — the bootstrap `.local` branch requeues a key without ensuring a pending
+      mutation exists, so when `pending == nil` the winning local value is enqueued but never sent.
+      Permanent silent divergence. The sibling tombstone branch 30 lines above handles exactly this.
+- [ ] `:712-718` — a delete overwrites pending state unconditionally, so a create-then-delete faster
+      than one send cycle uploads a tombstone for a record the server never held. Those are never
+      hard-deleted, so the zone accumulates them and every new device downloads them.
+- [ ] `:1526-1528` — any throw inside `handleFetchedRecordZoneChanges` abandons the whole batch, but
+      the engine is never told, so the change token advances past changes that were never applied.
+- [ ] `:1664-1665` — `case .fatal: throw` aborts the classification loop mid-way, dropping the
+      resolutions of every record not yet classified in that batch.
+- [ ] `:1196-1200` — `didFetchRecordZoneChanges.error` is discarded and `.didFetchChanges` sets
+      `bootstrapCompleted = true` unconditionally, so a fetch that failed part-way counts as a
+      completed bootstrap — which is the precondition for the first P1 above.
+
+### PDF export
+
+- [ ] `ReportDocumentBuilder.swift:497-518` — inside a custom date range, the Cash Flow KPI row and
+      the Monthly Trend chart are computed from `now`, not from `options.dateRange`, so a 2024 export
+      prints 2026 figures under a cover page stating the 2024 period. The comments two blocks below
+      state this rule and were applied to the Money Flow and category totals only.
+- [ ] `:394-399` — the allocation donut's centre is labelled `Total Assets` but carries `ringTotal`,
+      which differs whenever cash is net-negative. Two different figures under one label, one page.
+- [ ] `:524-529` — the Money Flow sums unrounded conversions while the category table sums rounded
+      ones, so the same category prints two amounts. Needs foreign-currency rows to show.
+- [ ] `:928-930` — when no FX snapshot exists the appendix prints a note saying fallback rates were
+      used and then **omits the rate table**, i.e. the one case where figures are least reproducible.
+- [ ] `:250-263` — axis magnitude suffixes `B`/`M`/`k` are raw literals in all 35 languages
+      (ja wants 万/億, de "Mio.", ru "млн").
+- [ ] `:635-639` — the future-dated note is `String(format:)`-substituted after a plain lookup, so a
+      catalog `variations.plural` entry can never fire. Also no plural handling for English.
+- [ ] `:654-660` — the month-subtotal label is written into cell 0, which is the 61.9pt Date column,
+      so every subtotal row truncates while 243pt of adjacent cells sit empty.
+- [ ] `PDFReportRenderer.swift:288-291` — every contents row is a hyperlink but destinations are only
+      registered for section anchors, so all level-1 contents links are dead (~20 of ~25 rows).
+- [ ] `PDFReportRenderer.swift:6-18` — `ReportRenderError` returns raw English; both Settings screens
+      surface it. Every sibling error type has `localizedDescription(appLanguage:)`.
+- [ ] `PDFReportRenderer.swift:453-456`, `ReportChartRenderer.swift:444-463` — `isNumeric: true` with
+      `.leading` alignment pins text to the opposite page edge in RTL, so each KPI tile reads
+      label-right / value-left / detail-right.
+- [ ] **Known and deliberate:** long translated table headers still truncate. `GANANCIA / PÉRDIDA`
+      needs ~0.65 scale (a 4.8pt heading) against a 64.0pt column. Either the column budget or the
+      translation has to give; pinned by a test so the choice stays visible.
+
+### macOS layout and lifecycle
+
+- [ ] `MacCryptoView.swift:140-150` — a fixed 400pt performance card beside the allocation donut in a
+      non-reflowing `HStack`. At the 520pt window minimum the donut gets ~48pt. `MacInvestmentsView`
+      already solved this (tag L24); Crypto was never migrated.
+- [ ] `MacCashFlowView.swift:632-726` — the Transactions filter bar is a fixed-width row needing
+      ~950pt; it clips at the default window size once the category chip is present.
+- [ ] `MacPlatformServices.swift` — no `applicationShouldTerminate`, so ⌘Q with an editor sheet open
+      discards everything typed. The codebase treats this as a bug elsewhere (tag L13).
+- [ ] `MacRootView.swift:59-66` — the inactive-window privacy shield is an overlay on the root group,
+      so a presented sheet floats above it and stays legible during app switching.
+- [ ] `MacEditorSheet.swift:282-291` — Sector/Geography pickers don't keep an out-of-list current
+      value selectable, unlike the Category picker (tag DA-H06), so an imported value shows blank.
+- [ ] `MacSettingsView.swift:158-165` — `@Published` mutated inline inside `.onChange(initial: true)`
+      during the same view update. `MacCashFlowView:457-464` defers the identical case in a `Task`.
+- [ ] `WealthCompassMacApp.swift:60-94` — ⌘E and ⌘1-5 aren't disabled during onboarding, so a stale
+      export token fires later and drops the user into Settings with the sheet open.
+- [ ] `MacDashboardView.swift:9` — default net-worth range is `.oneYear` on Mac, `.oneWeek` on iPhone.
+
+### iOS
+
+- [ ] `LockView.swift:70-78` — the one-shot biometric prompt is consumed while the app is
+      backgrounding, and the `.onChange` meant to re-arm it is registered only after `LockView`
+      mounts, i.e. after the transition it watches for. The user lands on the lock screen with no
+      prompt. (The lock itself is **not** bypassable.)
+- [ ] `SettingsView.swift:80,81,540,546` — `categoryGroup(title: String)` splices an English noun into
+      a translated sentence: German reads "Noch keine benutzerdefinierten income-Kategorien."
+- [ ] `DashboardView.swift:131` — `heldCurrenciesUsingSeedRate` is the only derived Dashboard value
+      not memoized on `dataVersion`, and it runs per frame while scrubbing the net-worth chart.
+
+### Store, services, import
+
+- [ ] `FinanceStore.swift` — there is **no** `upsertLiability` / `deleteLiability`. Liabilities count
+      in totals, allocation and sync but can only enter via import or CloudKit, and can never be
+      edited or removed in either app.
+- [ ] `FinanceStore.swift:199` — `iCloudSyncError` is written in ten places and read by no view, so
+      the WC-LOCK1 "saved locally but not queued for iCloud" message can never reach a user.
+- [ ] `FinanceStore.swift:1034-1036` — `snapshots(range:)` is unused *and* mis-wired (defaults to
+      `.eur` with a nil-rate converter). Latent P1 the moment anyone calls it.
+- [ ] `FinanceStore.swift:1732-1738` — retain cycle between the store and its save-consumer task;
+      `deinit` never runs, so tests leak a store per instance.
+- [ ] `FinanceStore.swift:982-986` / `1136-1145` — complementary currency-coverage gaps:
+      `hasForeignCurrencyExposure` omits transactions, `heldCurrenciesUsingSeedRate` omits
+      liabilities and recurring schedules.
+- [ ] `FinanceStore.swift:1232-1254` — plaintext JSON backups accumulate in `tmp/` forever;
+      `pruneStaleExports` only runs on the PDF path despite its comment claiming both.
+- [ ] `FinancePersistence.swift:72-81` — H08-skipped records are preserved on disk only until the
+      user's next edit, which rewrites the file from the lossy in-memory snapshot. With iCloud sync
+      off nothing else holds a copy.
+- [ ] `FinanceImportService.swift:936-941` — `Currency.imported` substitutes the display currency for
+      any ISO code outside the ECB set, mislabelling the money instead of skipping it. The Revolut
+      parser in the same pipeline makes the opposite (correct) choice and is locked in by a test.
+- [ ] `FinanceImportService.swift:898-913` — string amounts blindly swap `,` for `.`, so `"1,234"`
+      imports as **1.23**. `BrokerImportParsing.flexibleDecimal` in the sibling file already
+      implements the correct last-separator-wins rule and is reachable from here.
+- [ ] `BrokerStatementImportService.swift:752-764` — Revolut crypto hardcodes `.eur` while discarding
+      the currency symbol present in the cell, and stamps `updatedAt: Date()`, so every re-import
+      wins `mergedByID` and wipes user-edited `avgBuyPrice` / `coinId`.
+- [ ] `BrokerStatementImportService.swift:508,720` — broker parsers can emit two records with the
+      same deterministic UUID and never `uniquedByID()` them, so one silently vanishes at sync time
+      without incrementing `skippedRecords`. The JSON path solves this (tag WC-L7).
+- [ ] `MarketDataService.swift:659` — `let pool = eligible.isEmpty ? candidates : eligible` widens
+      symbol matching to non-equity quote types, contradicting the method's own contract.
+
+### Notes for whoever picks this up
+
+- **`extractionState: "stale"` is not proof a key is dead.** 452 call sites localize at runtime via
+  `L(…)`, `AppLocalization.string(…)` and `settings.localized(…)`, none of which Xcode's extractor
+  sees. Of 42 stale-marked keys, 10 are live.
+- **Every string written by an agent is `state: "needs_review"`**, never `"translated"`. That is how
+  you tell machine output from human-blessed values. The `PATRIMONIO NETTO` bug was invisible for
+  precisely one reason: it was marked `translated`.
+- **~43% of the UI is still untranslated per language** (mean 333 of 777 keys). Half of that is
+  *absent* keys; the other half are entries that exist, are marked `needs_review`, and hold the
+  English string verbatim — a class a naive "missing keys" count does not see.
+- **Run the suite before releasing.** It was red on `main` through the 1.1.6 release, on two stale
+  assertions, which is why nothing flagged it.
