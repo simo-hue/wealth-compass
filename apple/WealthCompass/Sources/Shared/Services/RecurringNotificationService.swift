@@ -64,21 +64,24 @@ actor RecurringNotificationService {
             return
         }
 
-        let upcoming = schedules
-            .filter { schedule in
-                schedule.isActive
-                    && !schedule.isCompleted
-                    && schedule.notificationsEnabled
-                    && schedule.nextDueDate > now
-                    && (schedule.endDate.map { schedule.nextDueDate <= $0 } ?? true)
-            }
-            .sorted { $0.nextDueDate < $1.nextDueDate }
+        // Not sorted here: `requests(for:)` orders by due date itself, because the cap it applies
+        // is what makes the order load-bearing and the two must not be able to drift apart.
+        let upcoming = schedules.filter { schedule in
+            schedule.isActive
+                && !schedule.isCompleted
+                && schedule.notificationsEnabled
+                && schedule.nextDueDate > now
+                && (schedule.endDate.map { schedule.nextDueDate <= $0 } ?? true)
+        }
 
         // Read the in-app language once, not once per schedule, and source the key from the single
         // source of truth on AppSettings rather than a brittle literal (WC-L31).
         let appLanguage = UserDefaults.standard.string(forKey: AppSettings.appLanguageDefaultsKey)
-        // Nothing stands between the builder and `center.add` — no local to write to after the
-        // fact. That is deliberate; `request(for:…)` says why.
+        // `requests(for:…)` is the **only** source of anything this actor hands to the notification
+        // centre, on both branches of Privacy Mode, and nothing stands between it and `center.add` —
+        // no local to write to after the fact. That is what makes asserting on its return value the
+        // same thing as asserting on what the lock screen will draw;
+        // `testEveryReminderReachingTheNotificationCentreComesFromOneBuilder` pins it.
         for request in Self.requests(
             for: upcoming,
             convertedAmounts: convertedAmounts,
@@ -112,6 +115,13 @@ actor RecurringNotificationService {
     /// Non-privacy behaviour is untouched, deliberately: one request per schedule, identified by
     /// its UUID, in due-date order, capped the same way. The hidden branch never even looks at
     /// `convertedAmounts`, which is the structural version of the same promise.
+    ///
+    /// The due-date sort happens **here** rather than in `sync`. It used to be the caller's, and the
+    /// doc comment promised "in due-date order" while this function did nothing to produce it: the
+    /// order only held because `sync` happened to sort one line earlier. Since the order decides
+    /// *which* schedules survive `pendingRequestLimit`, a second caller passing an unsorted array —
+    /// or a future edit dropping `sync`'s sort — would have silently truncated an arbitrary 60 of
+    /// them and dropped real reminders. The guarantee now lives with the function that documents it.
     nonisolated static func requests(
         for schedules: [RecurringTransaction],
         convertedAmounts: [UUID: Decimal],
@@ -120,8 +130,10 @@ actor RecurringNotificationService {
         appLanguage: String?,
         identifierPrefix: String
     ) -> [UNNotificationRequest] {
+        let ordered = schedules.sorted { $0.nextDueDate < $1.nextDueDate }
+
         guard !showDetails else {
-            return schedules.prefix(pendingRequestLimit).map { schedule in
+            return ordered.prefix(pendingRequestLimit).map { schedule in
                 request(
                     for: schedule,
                     convertedAmount: convertedAmounts[schedule.id],
@@ -135,7 +147,7 @@ actor RecurringNotificationService {
 
         var posted: Set<String> = []
         var coalesced: [UNNotificationRequest] = []
-        for schedule in schedules {
+        for schedule in ordered {
             let due = fireComponents(for: schedule.nextDueDate)
             let identifier = coalescedIdentifier(dueAt: due, prefix: identifierPrefix)
             guard posted.insert(identifier).inserted else { continue }
@@ -148,7 +160,17 @@ actor RecurringNotificationService {
     }
 
     /// Everything one schedule hands to the notification centre — payload, identifier and trigger —
-    /// assembled into the exact request `sync` adds.
+    /// assembled into a request `requests(for:…)` returns.
+    ///
+    /// **In production this is only ever reached with `showDetails: true`.** `requests(for:…)` sends
+    /// the Privacy Mode case to `coalescedRequest` instead, which reaches `hiddenContent` without
+    /// passing through here. That is why the lock-screen test asserts on `requests(for:…)` and not
+    /// on this: a test pinned to this function covers the branch that is allowed to describe the
+    /// schedule and says nothing at all about the branch that is not. `866b3c7` pinned this
+    /// function; `5265c96` moved the privacy path off it one commit later, and the suite stayed at
+    /// 302 passed / 0 failed with `subtitle`/`threadIdentifier` set from the schedule inside
+    /// `coalescedRequest`. `showDetails: false` still works here and is still tested, because
+    /// `cancel(scheduleID:)`, the identifier and the trigger are all per-schedule facts.
     ///
     /// It returns the `UNNotificationRequest` rather than the content, and that is the whole point.
     /// `UNMutableNotificationContent` is a **class**. While this handed one back, `sync` could keep

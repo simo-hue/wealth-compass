@@ -1949,6 +1949,23 @@ final class PrivacyRedactionTests: XCTestCase {
     /// `content` is an immutable copy taken at construction, so a request is the last thing that can
     /// still change and the first thing that cannot — which makes it the right thing to assert on.
     ///
+    /// **Which** request, though, is the second half of the lesson, and it cost a second regression.
+    /// The version that shipped with `866b3c7` asked `request(for:…)` for both branches. One commit
+    /// later `5265c96` moved the Privacy Mode production path off that function — `requests(for:…)`
+    /// now sends the hidden case to `coalescedRequest`/`hiddenContent` and only ever calls
+    /// `request(for:…)` with `showDetails: true` — so the assertions below were re-running the
+    /// *detailed* builder in a hidden costume and the branch a locked phone actually uses was
+    /// covered by nothing. Measured: injecting
+    ///
+    ///     leak.subtitle = schedule.description
+    ///     leak.threadIdentifier = schedule.category
+    ///
+    /// into `coalescedRequest`'s payload left the suite at **302 passed / 0 failed**. The hidden
+    /// half now goes through `requests(for:…)`, which is the one function `sync` calls and therefore
+    /// the last thing that is still "what the notification centre gets" no matter how the branches
+    /// are rearranged underneath it.
+    /// `testEveryReminderReachingTheNotificationCentreComesFromOneBuilder` is what keeps that true.
+    ///
     /// The payload comparison is the whole archived object rather than a list of field names, so a
     /// field this test has never heard of still fails it.
     ///
@@ -1983,6 +2000,18 @@ final class PrivacyRedactionTests: XCTestCase {
             )
         }
 
+        /// Exactly what `sync` hands to `center.add`, hidden branch included.
+        func posted(_ schedules: [RecurringTransaction], showDetails: Bool) -> [UNNotificationRequest] {
+            RecurringNotificationService.requests(
+                for: schedules,
+                convertedAmounts: Dictionary(uniqueKeysWithValues: schedules.map { ($0.id, $0.amount) }),
+                currencyCode: "EUR",
+                showDetails: showDetails,
+                appLanguage: nil,
+                identifierPrefix: Self.reminderIdentifierPrefix
+            )
+        }
+
         /// The whole payload, byte for byte, minus the one field that is meant to differ.
         ///
         /// `UNNotificationContent` is `NSSecureCoding`, so archiving it compares every property the
@@ -2010,11 +2039,13 @@ final class PrivacyRedactionTests: XCTestCase {
             "the notification rendered no text at all, so comparing it proves nothing"
         )
 
-        let hiddenRent = request(rent, showDetails: false)
-        let hiddenSalary = request(salary, showDetails: false)
+        // Through `requests(for:…)`, not `request(for:…)`: under Privacy Mode production never
+        // reaches the latter, so asserting on it covers the wrong branch. See the doc comment.
+        let hiddenRent = try XCTUnwrap(posted([rent], showDetails: false).first)
+        let hiddenSalary = try XCTUnwrap(posted([salary], showDetails: false).first)
 
         XCTAssertEqual(
-            try rendered(hiddenRent), try rendered(request(rent, showDetails: false)),
+            try rendered(hiddenRent), try rendered(try XCTUnwrap(posted([rent], showDetails: false).first)),
             """
             One schedule built twice archived to two different payloads, so the comparison below is \
             measuring the archiver and not the notification. Fall back to asserting named fields.
@@ -2053,6 +2084,35 @@ final class PrivacyRedactionTests: XCTestCase {
             hiddenRent.content.body.contains("1,450") || hiddenRent.content.body.contains("1450")
                 || hiddenRent.content.title.contains("1,450"),
             "the amount is back in the reminder"
+        )
+
+        // The pair above is two sets of one. A real sync hands over a whole batch at once, and the
+        // hidden branch builds those from a fire *moment* rather than from a schedule — so this
+        // asks the question the pair cannot: across schedules that agree on nothing and fall on
+        // different days, is there exactly one payload in the whole batch?
+        let crowd = [rent, salary] + (1...4).map { offset in
+            RecurringTransaction(
+                type: offset.isMultiple(of: 2) ? .income : .expense,
+                category: "Category \(offset)", amount: Decimal(offset * 97),
+                description: "note \(offset)", startDate: Date(),
+                frequency: offset.isMultiple(of: 2) ? .weekly : .yearly,
+                nextDueDate: Date().addingTimeInterval(Double(offset) * 86_400 + 3_600),
+                endDate: nil, currency: offset.isMultiple(of: 2) ? .gbp : .chf
+            )
+        }
+        var batch: Set<Data> = []
+        for request in posted(crowd, showDetails: false) { batch.insert(try rendered(request)) }
+        XCTAssertEqual(
+            batch.count, 1,
+            """
+            Privacy Mode produced \(batch.count) distinct payloads for \(crowd.count) schedules, so \
+            something a lock screen draws still moves with the schedule — or with which day it \
+            falls on, which is the same disclosure one step removed.
+            """
+        )
+        XCTAssertGreaterThan(
+            posted(crowd, showDetails: false).count, 1,
+            "the batch collapsed to a single request, so the comparison above had nothing to compare"
         )
     }
 
@@ -2157,11 +2217,7 @@ final class PrivacyRedactionTests: XCTestCase {
     /// schedule's UUID instead of enumerating a queue, so the second rule never fires on it, and it
     /// already called both removals.
     func testRecurringReminderTeardownClearsDeliveredBannersToo() throws {
-        let service = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("Sources/Shared/Services/RecurringNotificationService.swift")
-        let code = Self.stripped(try String(contentsOf: service, encoding: .utf8)).code
+        let code = try Self.notificationServiceCode()
 
         // Each rule reads "a body that reaches for this must also reach for that".
         let rules: [(reaches: String, mustAlsoReach: String, because: String)] = [
@@ -2175,34 +2231,20 @@ final class PrivacyRedactionTests: XCTestCase {
             ),
         ]
 
-        // A `func` line at any nesting; its body runs to the next one. Coarse, and enough — this
-        // file declares one type and nests no function inside a function.
-        let declaration = try NSRegularExpression(
-            pattern: #"^\s*(?:(?:private|fileprivate|internal|public|static|nonisolated|final|override|mutating)\s+)*func\s+(\w+)"#
-        )
-        var declarations: [(name: String, index: Int)] = []
-        for (index, line) in code.enumerated() {
-            let text = String(line)
-            let range = NSRange(text.startIndex..<text.endIndex, in: text)
-            guard let match = declaration.firstMatch(in: text, range: range),
-                  let nameRange = Range(match.range(at: 1), in: text) else { continue }
-            declarations.append((String(text[nameRange]), index))
-        }
+        let functions = try Self.functionBodies(in: code)
         XCTAssertGreaterThanOrEqual(
-            declarations.count, 5,
-            "found \(declarations.count) function(s) in RecurringNotificationService.swift — the sweep has lost the file"
+            functions.count, 5,
+            "found \(functions.count) function(s) in RecurringNotificationService.swift — the sweep has lost the file"
         )
 
         var offenders: [String] = []
         var reaches = 0
-        for (position, current) in declarations.enumerated() {
-            let end = position + 1 < declarations.count ? declarations[position + 1].index : code.count
-            let body = code[current.index..<end].map { String($0) }.joined(separator: "\n")
-            for rule in rules where body.contains(rule.reaches) {
+        for current in functions {
+            for rule in rules where current.body.contains(rule.reaches) {
                 reaches += 1
-                guard !body.contains(rule.mustAlsoReach) else { continue }
+                guard !current.body.contains(rule.mustAlsoReach) else { continue }
                 offenders.append(
-                    "  \(current.name)() at :\(current.index + 1) calls `\(rule.reaches)` "
+                    "  \(current.name)() at :\(current.line) calls `\(rule.reaches)` "
                         + "without `\(rule.mustAlsoReach)` — it \(rule.because)"
                 )
             }
@@ -2220,6 +2262,167 @@ final class PrivacyRedactionTests: XCTestCase {
             \(offenders.joined(separator: "\n"))
             """
         )
+    }
+
+    /// The stripped `code` view of the notification service, which both lints below read.
+    private static func notificationServiceCode() throws -> [[Character]] {
+        let service = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources/Shared/Services/RecurringNotificationService.swift")
+        return Self.stripped(try String(contentsOf: service, encoding: .utf8)).code
+    }
+
+    /// Every `func` line at any nesting, paired with the text from it to the next one.
+    ///
+    /// Coarse, and enough for the one file the two notification lints read: it declares a single
+    /// type and nests no function inside a function. Reading the stripped `code` view means a doc
+    /// comment naming an API cannot satisfy a rule written against it.
+    private static func functionBodies(in code: [[Character]]) throws -> [(name: String, line: Int, body: String)] {
+        let declaration = try NSRegularExpression(
+            pattern: #"^\s*(?:(?:private|fileprivate|internal|public|static|nonisolated|final|override|mutating)\s+)*func\s+(\w+)"#
+        )
+        var declarations: [(name: String, index: Int)] = []
+        for (index, line) in code.enumerated() {
+            let text = String(line)
+            let range = NSRange(text.startIndex..<text.endIndex, in: text)
+            guard let match = declaration.firstMatch(in: text, range: range),
+                  let nameRange = Range(match.range(at: 1), in: text) else { continue }
+            declarations.append((String(text[nameRange]), index))
+        }
+        return declarations.enumerated().map { position, current in
+            let end = position + 1 < declarations.count ? declarations[position + 1].index : code.count
+            return (
+                current.name,
+                current.index + 1,
+                code[current.index..<end].map { String($0) }.joined(separator: "\n")
+            )
+        }
+    }
+
+    /// Fails if anything can reach `UNUserNotificationCenter.add` other than the one builder the
+    /// lock-screen test asserts on.
+    ///
+    /// This is the rule the last two regressions broke, in both directions. `866b3c7` made the
+    /// lock-screen test assert on a whole `UNNotificationRequest` so that no later line could
+    /// rewrite a rendered field unseen — and `5265c96`, the very next commit, moved the Privacy Mode
+    /// production path onto a *second* builder the test did not call. Nothing was rewritten after
+    /// the fact; the payload simply stopped being built where the test was looking. Pinning the
+    /// return value of a function is worth nothing if production can stop calling it, and no
+    /// assertion about a returned object can notice that happening.
+    ///
+    /// So this pins the other end: whatever `sync` hands to the notification centre must have come
+    /// out of `requests(for:…)`, which is the function the lock-screen test archives. Add a second
+    /// `center.add` — or feed the existing one anything other than the loop variable — and this
+    /// fails, which is the signal to bring the new path under the same assertions rather than to
+    /// relax this.
+    ///
+    /// A source lint, and it has to be: the test host is never granted an authorization
+    /// (`authorizationStatus.rawValue == 0`) and `center.add` retains 0 of 5 requests, so `sync`
+    /// returns before its loop and no runtime observation of this is possible at all.
+    func testEveryReminderReachingTheNotificationCentreComesFromOneBuilder() throws {
+        let code = try Self.notificationServiceCode()
+        let functions = try Self.functionBodies(in: code)
+        XCTAssertGreaterThanOrEqual(
+            functions.count, 5,
+            "found \(functions.count) function(s) in RecurringNotificationService.swift — the sweep has lost the file"
+        )
+
+        let text = code.map { String($0) }.joined(separator: "\n")
+        let addSites = text.components(separatedBy: "center.add(").count - 1
+        XCTAssertEqual(
+            addSites, 1,
+            """
+            \(addSites) call(s) to `center.add(` in RecurringNotificationService.swift. The \
+            lock-screen test archives what `requests(for:…)` returns, and that is only the same \
+            thing as "what the lock screen draws" while exactly one call site posts, out of exactly \
+            that function's output.
+            """
+        )
+        XCTAssertTrue(
+            text.contains("center.add(request)"),
+            """
+            The single `center.add` no longer posts the loop variable straight from \
+            `requests(for:…)`. Whatever it posts instead is what the lock screen draws, and nothing \
+            asserts on it.
+            """
+        )
+
+        let posting = functions.filter { $0.body.contains("center.add(") }
+        XCTAssertEqual(
+            posting.map(\.name), ["sync"],
+            "the notification centre is fed from \(posting.map(\.name)) rather than from `sync` alone"
+        )
+        for function in posting {
+            XCTAssertTrue(
+                function.body.contains("for request in Self.requests("),
+                """
+                \(function.name)() at :\(function.line) posts to the notification centre without \
+                looping over `Self.requests(…)`, so it is publishing a payload no test has seen. \
+                Under Privacy Mode that payload is drawn on a locked screen.
+                """
+            )
+        }
+    }
+
+    /// Fails if the 60-request cap can drop the wrong reminders.
+    ///
+    /// `requests(for:…)` documented "in due-date order" and did nothing to produce it: the order
+    /// held only because `sync` happened to call `.sorted` on the line above. Since the order is
+    /// what decides which schedules survive `pendingRequestLimit`, an unsorted array — a second
+    /// caller, or an edit that moved `sync`'s filter around — would have posted an arbitrary 60 and
+    /// silently dropped real reminders, with the doc comment still claiming otherwise. The sort now
+    /// lives in the function that makes the promise.
+    ///
+    /// Reversed rather than shuffled so the failure is deterministic: with the sort in the caller
+    /// only, this posts the *latest* 60 of 70 and every early reminder goes missing.
+    func testTheRequestCapKeepsTheEarliestRemindersWhateverOrderTheyArriveIn() throws {
+        let calendar = Calendar.current
+        let limit = RecurringNotificationService.pendingRequestLimit
+        let start = try XCTUnwrap(calendar.date(from: DateComponents(year: 2031, month: 6, day: 15, hour: 9)))
+
+        let byDate = try (0..<(limit + 10)).map { offset in
+            RecurringTransaction(
+                type: .expense, category: "c\(offset)", amount: 100, description: "c\(offset)",
+                startDate: start, frequency: .monthly,
+                nextDueDate: try XCTUnwrap(calendar.date(byAdding: .day, value: offset, to: start)),
+                endDate: nil, currency: .eur
+            )
+        }
+        func requests(_ schedules: [RecurringTransaction], showDetails: Bool) -> [UNNotificationRequest] {
+            RecurringNotificationService.requests(
+                for: schedules,
+                convertedAmounts: Dictionary(uniqueKeysWithValues: schedules.map { ($0.id, $0.amount) }),
+                currencyCode: "EUR",
+                showDetails: showDetails,
+                appLanguage: nil,
+                identifierPrefix: Self.reminderIdentifierPrefix
+            )
+        }
+
+        let expected = byDate.prefix(limit).map {
+            RecurringNotificationService.notificationIdentifier(for: $0.id, prefix: Self.reminderIdentifierPrefix)
+        }
+        XCTAssertEqual(
+            requests(Array(byDate.reversed()), showDetails: true).map(\.identifier), expected,
+            """
+            Handed the same schedules latest-first, the cap kept a different 60 — so which reminders \
+            are posted depends on the order the caller happens to pass, and the ten it drops are not \
+            the ten furthest away.
+            """
+        )
+        XCTAssertEqual(
+            requests(byDate, showDetails: true).map(\.identifier), expected,
+            "already-sorted input no longer yields the earliest \(limit) reminders in due-date order"
+        )
+
+        // Privacy Mode caps moments rather than schedules, and picks them the same way.
+        let hidden = requests(Array(byDate.reversed()), showDetails: false).map(\.identifier)
+        XCTAssertEqual(
+            hidden, requests(byDate, showDetails: false).map(\.identifier),
+            "the coalesced set depends on the order the caller passes"
+        )
+        XCTAssertEqual(hidden.count, limit, "one moment per day, capped at \(limit)")
     }
 
     /// Fails if Privacy Mode posts one banner per schedule when several are due at the same moment.
