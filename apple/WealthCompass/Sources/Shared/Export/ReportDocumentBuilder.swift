@@ -533,8 +533,13 @@ struct ReportDocumentBuilder {
     // MARK: - Cash Flow
 
     private func buildCashFlow() -> ReportSectionContent {
-        // Both the KPI row and the trend read from the settled engine, so this section never counts
-        // a future-dated row that the ledger below it prints in grey and excludes.
+        // Nothing in this section counts a future-dated row that the ledger below it prints in grey
+        // and excludes — but the three blocks reach that guarantee by different routes, because
+        // only the Money Flow block can use one engine for both the bounded and unbounded cases.
+        // `engine` serves the *unbounded* KPI row and trend, plus the Money Flow block either way;
+        // a bounded export sums `settledRanged` inline for its KPI and re-anchors a fresh engine
+        // for its trend. `settledRanged` and that engine's data are both pre-filtered by
+        // `isFutureDated`, so the exclusion holds on every path.
         let engine = settledAnalytics
         let interval = options.dateRange.resolve(now: context.now, calendar: calendar)
         let settledRanged = rangedTransactions.filter { !isFutureDated($0) }

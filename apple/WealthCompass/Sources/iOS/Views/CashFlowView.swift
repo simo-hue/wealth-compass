@@ -526,7 +526,10 @@ struct CashFlowView: View {
         return finance.transactions.filter { transaction in
             let matchesType = transactionTypeFilter.transactionType.map { $0 == transaction.type } ?? true
             let matchesPeriod = transactionStartDate.map { transaction.date >= $0 && transaction.date <= Date() } ?? true
-            // Search matches category or description (case/diacritic-insensitive), like macOS.
+            // Search matches category or description, case-insensitively but *not* diacritic- or
+            // width-insensitively: `localizedCaseInsensitiveContains` folds case only, so "cafe"
+            // does not find "Café". `MacCashFlowView` matches the same way, so the two lists agree;
+            // moving either to `localizedStandardContains` means moving both.
             let matchesSearch = query.isEmpty
                 || transaction.category.localizedCaseInsensitiveContains(query)
                 || transaction.description.localizedCaseInsensitiveContains(query)

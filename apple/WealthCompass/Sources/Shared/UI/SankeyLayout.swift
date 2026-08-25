@@ -215,8 +215,11 @@ enum SankeyLayout {
         var labels: [Label] = []
         /// Points per unit of currency. Zero for an empty diagram.
         var scale: CGFloat = 0
-        /// True when the rect was too short to give every label its own slot, so labels are
-        /// evenly distributed and may sit off their node's centre.
+        /// True when the rect was too short to give every label its own slot, so the labels that
+        /// could not fit were **dropped** — the largest that fit are kept, and the rest are left to
+        /// the bar and the hover detail row. Spreading them all evenly is explicitly rejected: once
+        /// the run exceeds the span, an even spread still overlaps, which is the defect the pass
+        /// exists to prevent. The view uses this to say the diagram is not showing every name.
         var isCrowded: Bool = false
 
         func node(id: String) -> NodeFrame? { nodes.first { $0.id == id } }
@@ -527,18 +530,18 @@ enum SankeyLayout {
         width: CGFloat,
         in rect: CGRect,
         scale: CGFloat,
-        config: Config,
-        topY: CGFloat? = nil
+        config: Config
     ) -> [NodeFrame] {
         guard !nodes.isEmpty else { return [] }
         let flowHeights = nodes.map { max(0, CGFloat($0.value) * scale) }
         let totalHeight = flowHeights.reduce(0, +) + CGFloat(nodes.count - 1) * config.nodeSpacing
-        // `topY` pins the column instead of centring it. The spending column uses it whenever
-        // there is an unspent tail: money leaves the top of the hub, so it should arrive at the top
-        // of the column too. Centred, the ribbons dived from the hub's top edge down to a column
-        // floating in the middle, and the empty space was split top and bottom instead of reading
-        // as the one contiguous "not spent" region it actually is.
-        var cursor = topY ?? (rect.midY - totalHeight / 2)
+        // Both columns are centred in `rect`. The spending column was once pinned to the hub's top
+        // whenever there was an unspent tail, on the reasoning that money leaving the top of the
+        // hub should arrive at the top of the column. `resolve` settled the other way: the outflow
+        // ribbons now leave from a band centred on the hub, so an unspent tail reads as symmetric
+        // headroom above and below the flows rather than as a labelled thing of its own — and a
+        // centred band wants a centred column to land on.
+        var cursor = rect.midY - totalHeight / 2
 
         return zip(nodes, flowHeights).map { node, height in
             let flowRect = CGRect(x: x, y: cursor, width: width, height: height)

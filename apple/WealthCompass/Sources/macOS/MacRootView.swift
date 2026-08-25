@@ -181,7 +181,8 @@ struct MacRootView: View {
     }
 
     // Maps the persisted collapse flag to the NavigationSplitView column visibility (and back, so the
-    // native sidebar toggle / drag keeps the flag — and the floating bar's visibility — in sync).
+    // native sidebar toggle / drag keeps the flag — and the toolbar page-switcher's visibility — in
+    // sync).
     private var sidebarVisibility: Binding<NavigationSplitViewVisibility> {
         Binding(
             get: { sidebarCollapsed ? .detailOnly : .all },
@@ -319,8 +320,10 @@ private struct MacRootAlert: Identifiable {
     let message: String
 }
 
-/// Floating global page-switcher shown when the NavigationSplitView sidebar is collapsed — an
-/// icon+label pill (mirrors the MacSelectorIsland aesthetic) that reaches every page, incl. Settings.
+/// Global page-switcher shown when the NavigationSplitView sidebar is collapsed — an icon+label pill
+/// (mirrors the MacSelectorIsland aesthetic) that reaches every page, incl. Settings. It is hosted
+/// as a `ToolbarItem(placement: .principal)`, so it sits centred in the title bar rather than
+/// floating over the page; that is what keeps it clear of each page's own top selector.
 private struct MacGlobalNavBar: View {
     @Binding var selection: MacDestination?
     @Namespace private var namespace
@@ -357,7 +360,7 @@ private struct MacGlobalNavBar: View {
                 .fill(Color(white: 0.13))
                 .overlay(Capsule().stroke(Color.white.opacity(0.12), lineWidth: 1))
         )
-        // Subtle shadow — the pill now sits inside the toolbar rather than floating over content.
+        // Subtle shadow — the pill sits inside the toolbar rather than floating over content.
         .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selection)
     }

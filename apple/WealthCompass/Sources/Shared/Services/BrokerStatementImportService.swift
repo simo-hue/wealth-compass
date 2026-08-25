@@ -545,7 +545,9 @@ private enum TradeRepublicCSVParser {
         }
     }
 
-    /// Accumulates the BUY rows for one ISIN into a single holding.
+    /// Nets one ISIN's trades into a single holding: buys build the position and its average cost,
+    /// sells run it back down. A position that was fully sold (or, from a partial statement, looks
+    /// short) yields no holding at all rather than a zero-quantity row — see `investment()`.
     private struct HoldingAccumulator {
         let isin: String
         var name: String

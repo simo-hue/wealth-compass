@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-// Settings is now an in-window destination (sidebar + floating page-switcher) and the single Settings
+// Settings is now an in-window destination (sidebar + the toolbar page-switcher) and the single Settings
 // surface: the separate ⌘, Preferences scene was removed and ⌘, selects this page instead. This
 // supersedes the earlier L15 decision (which kept Settings out of the sidebar to avoid two
 // MacSettingsView instances) — there is now exactly one MacSettingsView surface.

@@ -356,8 +356,9 @@ extension ReportPaginator {
     ///
     /// A four-holding crypto export would otherwise get three pages of scaffolding around two
     /// pages of content; a single-section Cash Flow export with seventy pages of ledger needs the
-    /// navigation just as much as the full report does. So the discriminator is document length,
-    /// not section count.
+    /// navigation just as much as the full report does. So length earns a contents page on its own
+    /// — but so does having more than one section, however short each one is, because that is the
+    /// point at which the reader has somewhere to navigate *to*.
     static func needsContentsPage(bodyPageCount: Int, sectionCount: Int) -> Bool {
         sectionCount >= 2 || bodyPageCount > 4
     }

@@ -623,7 +623,8 @@ struct SettingsView: View {
     private func handleImportSelection(_ result: Result<URL, Error>) {
         switch result {
         case .success(let url):
-            // L55: importBackup is now async (parses off the MainActor).
+            // L55: `importFile` is async — it reads the file, detects the format and parses off the
+            // MainActor, and only the @Published mutations come back to it.
             Task {
                 do {
                     let result = try await finance.importFile(from: url, mode: importMode, settings: settings)

@@ -561,16 +561,22 @@ private struct CoinGeckoSearchResponse: Decodable {
     }
 }
 
-/// Keyless fallback quote source for instruments Finnhub's free (US-only) tier can't price.
+/// Keyless quote source, and for most users the primary one.
 ///
-/// The refresh pipeline calls this only when Finnhub returns `.noQuote` for a symbol — the
-/// signature of a non-US listing such as a European UCITS ETF (`VWCE`). Yahoo covers those
-/// venues and, unlike Finnhub's `/quote`, returns the listing's **currency**, so the caller
-/// can store the price in the holding's own currency instead of assuming USD.
+/// It began as the fallback for instruments Finnhub's free (US-only) tier can't price, and
+/// `FinanceStore.refreshMarketPrices` still reaches for it on `.noQuote` — the signature of a
+/// non-US listing such as a European UCITS ETF (`VWCE`) — and on `.rateLimited`. But the routing
+/// widened past that: every non-USD holding is sent straight here without asking Finnhub at all
+/// (Finnhub's `/quote` reports no currency, so a non-USD price from it would have to be guessed
+/// at), and with no Finnhub key configured this is the *only* source for every holding. Since a
+/// key is optional, that is the default configuration.
 ///
-/// This is an unofficial endpoint with no stability guarantee; it is deliberately a
-/// best-effort *fallback*, never the primary source, and a failure here leaves the holding's
-/// existing (e.g. manually entered) price untouched.
+/// So plan for load: unlike Finnhub's `/quote`, this returns the listing's **currency**, which is
+/// why the caller can store the price in the holding's own currency instead of assuming USD.
+///
+/// It remains an unofficial endpoint with no stability guarantee, which is the uncomfortable part
+/// of it having become load-bearing. A failure here leaves the holding's existing (e.g. manually
+/// entered) price untouched.
 struct YahooQuoteClient {
     var session: URLSession = .shared
 

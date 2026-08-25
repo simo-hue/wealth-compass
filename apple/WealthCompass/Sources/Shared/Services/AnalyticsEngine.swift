@@ -10,9 +10,13 @@ import SwiftUI
 /// deterministic tests.
 struct AnalyticsEngine {
     let data: FinancialData
-    // Currency context is only needed by the value/allocation methods; the cash-flow
-    // and category methods operate on raw amounts, so these carry defaults to let
-    // callers build a lightweight engine without settings.
+    // Every method needs the currency context, not just the value/allocation ones: `displayAmount`
+    // (below) is what `monthlyCashFlow`, `cashFlowTrend`, `expensesByCategory` and
+    // `sankeyCategoryTotals` sum, and `snapshots(range:)` reconverts each stored point the same
+    // way. So these defaults are a trap, not a convenience — an engine built without them prices
+    // the whole dataset as EUR at a 1:1 rate and reports it as if it were the display currency,
+    // silently and with no error anywhere. `FinanceStore.snapshots(range:)` builds one that way.
+    // Pass the real converter + currency unless the data is known to be single-currency EUR.
     var converter: CurrencyConverter = CurrencyConverter(snapshot: nil)
     var displayCurrency: Currency = .eur
     var appLanguage: String? = nil
@@ -291,10 +295,9 @@ struct AnalyticsEngine {
     /// The Money Flow model for a period: income categories → a single hub → expense categories,
     /// with the imbalance absorbed by one synthetic node so the diagram conserves flow.
     ///
-    /// Two deliberate departures from `expensesByCategory`:
-    ///
-    /// Percentages are of the whole diagram, not of one column, because the detail row reads
-    /// "N% of cash flow" for income and expense nodes alike.
+    /// One deliberate departure from `expensesByCategory`: percentages are of the whole diagram,
+    /// not of one column, because the detail row reads "N% of cash flow" for income and expense
+    /// nodes alike.
     ///
     /// This used to re-clamp future-dated rows itself, because `filteredTransactions(.all)` returned
     /// the raw array and would otherwise have widened a ribbon for money that had not moved. The
@@ -442,10 +445,14 @@ struct AnalyticsEngine {
                 // link's id is derived from its endpoints', the *ribbons* would collide too —
                 // `ForEach` would silently drop one and real money would vanish from the diagram.
                 id: "\(role.rawValue)-cat-\(item.name)",
-                // Imports only default a *nil* category to "Other" (FinanceImportService), so a
-                // present-but-blank one survives into the data and would draw an unlabelled box
-                // with an empty VoiceOver label. `categories` deliberately keeps the raw value so
-                // the drill-through filter still matches what is stored.
+                // Defensive: no current writer can produce a blank category. The JSON importer
+                // reads it through `decodeImportedStringIfPresent`, whose `trimmedForImport` maps a
+                // whitespace-only value to nil and so falls into the same `?? "Other"` a missing
+                // one does; the broker parsers only ever emit literals; and
+                // `addCustomTransactionCategory` rejects an empty name. The guard stays because a
+                // blank arriving from a hand-edited backup would draw an unlabelled box with an
+                // empty VoiceOver label. `categories` deliberately keeps the raw value so the
+                // drill-through filter still matches what is stored.
                 // Localized, like the category donut beside it. The raw value stays in
                 // `categories` below, which is what the drill-through filter matches on, so
                 // translating the label cannot break the filter. Without this, one iOS Cash Flow

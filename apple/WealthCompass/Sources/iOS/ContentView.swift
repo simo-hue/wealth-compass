@@ -17,10 +17,21 @@ struct ContentView: View {
             if appLock.isLockEnabled && !appLock.isUnlocked {
                 LockView()
             } else if finance.loadState != .loaded {
-                // WC-LOCK1: ordered before onboarding because onboarding writes finance data
-                // (starting balances, the first snapshot) through the same store. Running it while
-                // the DB is unread would collect that input against an empty in-memory dataset and
-                // then refuse to save it — so the user would complete onboarding and lose it.
+                // WC-LOCK1: ordered before onboarding so the load gate covers the setup flow too.
+                // Not because onboarding would lose data — it writes nothing through `FinanceStore`,
+                // only `settings.currency`, `settings.appLanguage`, `hasSeenOnboarding` and the
+                // Keychain API keys, none of which live in the finance DB. Two other reasons:
+                //
+                // `.notLoaded` is the state every launch starts in, so this branch is also the
+                // launch spinner. Ordered after onboarding, a first run would start the flow
+                // against a store still being read and then cross-fade out from under the user the
+                // moment that read failed, discarding whatever they had typed into it.
+                //
+                // And `FinanceDataUnavailableView` carries the only Retry / Export diagnostics /
+                // Erase local data controls in the app — it stands in for Settings as well. Behind
+                // onboarding, a user whose database is corrupt on first run would have to finish or
+                // skip setup before being told anything was wrong, or offered a way out of it.
+                //
                 // (`hasSeenOnboarding` lives in UserDefaults, so a *returning* user is never sent
                 // back to onboarding by either ordering.)
                 FinanceDataUnavailableView(

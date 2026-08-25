@@ -159,9 +159,11 @@ final class FinanceStore: ObservableObject {
     }
     /// Monotonic counter bumped on every `data` mutation; part of the analytics cache key.
     private var dataVersion: Int = 0
-    /// Memoized totals (M3). The key is the full set of inputs to `calculateTotals`
-    /// — data version + display currency + rate-snapshot timestamp — so it can never
-    /// return a stale result after a data, currency, or exchange-rate change.
+    /// Memoized totals (M3). The key is the full set of inputs to `calculateTotals` — data version
+    /// + display currency + rate-snapshot timestamp + the current day — so it can never return a
+    /// stale result after a data, currency, or exchange-rate change, nor across midnight. The day
+    /// stamp is not optional: totals exclude future-dated rows (deep-audit L51), so a transaction
+    /// dated tomorrow starts counting at midnight with no data mutation to bump `dataVersion`.
     private var cachedTotals: (version: Int, currency: Currency, rateStamp: Date?, dayStamp: Date, value: FinanceTotals)?
     /// Cache of the encoded per-entity CloudKit sync snapshot, keyed by `dataVersion` (H4).
     /// `cloudSyncRecords()` is a full-dataset JSON-encode + SHA-256 and the snapshot provider
@@ -200,8 +202,10 @@ final class FinanceStore: ObservableObject {
     /// O(n) filter re-running on every macOS cash-flow body/resize pass (and the sorted accessor).
     private var cachedMonthlyTransactionCount: (version: Int, month: Date, value: Int)?
     @Published private(set) var isRefreshingMarketPrices = false
-    /// Per-item progress of the (serial, rate-limited) Finnhub refresh, for an "x of N"
-    /// UI indicator (M7). Nil when not refreshing investments.
+    /// Per-item progress of the serial, rate-limited investment refresh, for an "x of N" UI
+    /// indicator (M7). `total` is every investment, whichever provider prices it — the loop counts
+    /// Yahoo-only holdings and the no-Finnhub-key path alike, so the indicator still runs to N when
+    /// no key is configured at all. Nil when not refreshing investments.
     @Published private(set) var marketRefreshProgress: (done: Int, total: Int)?
     @Published private(set) var iCloudSyncError: String?
     @Published private(set) var cloudSyncStatus: CloudSyncStatus = .disabled
@@ -1462,9 +1466,11 @@ final class FinanceStore: ObservableObject {
 
     /// JSON-backup–only import, retained for existing callers/tests. `importFile` supersedes it for the UI.
     func importBackup(from url: URL, mode: FinanceImportMode, settings: AppSettings) async throws -> FinanceImportResult {
-        // Fail loudly if the local DB failed to load: save() is a no-op while `localPersistenceError`
-        // is set, so mutating in-memory `data` and reporting success would silently discard the import
-        // (deep-audit M28). Mirrors the guards in setICloudSyncEnabled / applyRemoteMutations.
+        // Fail loudly if the local DB hasn't been read: `save()` refuses to write unless
+        // `isLocalDataReady`, so mutating in-memory `data` and reporting success would silently
+        // discard the import (deep-audit M28). Mirrors the guards in setICloudSyncEnabled /
+        // applyRemoteMutations — all of them check the same predicate as `save()` itself, which is
+        // the only way this guard stays honest.
         guard isLocalDataReady else {
             throw FinanceImportError.localPersistenceError
         }
