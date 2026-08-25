@@ -33,7 +33,9 @@ The core of Wealth Compass is a native Apple ecosystem implementation, ensuring 
 - 📈 **Investment Portfolio**: Real-time stock & ETF price updates via Finnhub and Yahoo Finance. Track cost basis, current value, and profit/loss.
 - ₿ **Crypto Tracker**: Live data fetching from CoinGecko. Track crypto holdings and monitor live valuations.
 - 🔒 **Privacy & Security**: All financial data is strictly stored locally in the app sandbox. Supports Face ID / Touch ID biometric locks and a quick-toggle Privacy Mode to blur sensitive amounts.
-- 🌍 **Localization**: Fully localized in 35 languages via Xcode String Catalogs.
+- 🌍 **Localization**: Localized into 35 languages via Xcode String Catalogs. Coverage varies by
+  language — the core interface is translated throughout, while some newer surfaces (notably the PDF
+  report vocabulary) still fall back to English.
 - 🔄 **Data Portability**: Easily export your data to a JSON backup or import existing backups. Private CloudKit synchronization is available to keep your iPhone and Mac in sync.
 
 ### Building the Apple Apps

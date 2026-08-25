@@ -15,25 +15,28 @@ you run the checks below whenever you're at a real Mac and report anything red.
 
 - [ ] **The repo is not open source.** `LICENSE` is PolyForm Noncommercial 1.0.0 — source-available,
       with a noncommercial field-of-use restriction, which fails the OSI definition. You chose to keep
-      the licence and fix the wording. Four places currently claim otherwise and I'll correct them in
-      pass 2: `Footer` ("Open source and privacy-first"), `FAQ.tsx:14`, `FAQ.tsx:34`,
-      `Support.tsx:23`. **`README.md` also needs the same correction** — that one is outside the web
-      app so flag it if you'd rather do it yourself.
+      the licence and fix the wording. **Exactly one place still claims otherwise**:
+      `web-app/src/components/layout/Footer.tsx:18` ("Open source and privacy-first") — and nothing
+      imports that file, so the string is not currently shipping. The rest are already correct:
+      `FAQ.tsx:14` / `:34` are a file-header comment and `Support.tsx:23` is a field on the `Topic`
+      type, and those pages now assert the opposite (`OpenSource.tsx:188` reads "Source available. Not
+      open source."). `README.md:18` and `:105-112` say it plainly too.
 
 ### Factual corrections found while building
 
-- [ ] **"38 languages" is wrong.** `Localizable.xcstrings` covers **35 locales**;
+- [x] **DONE 2026-08-25. "38 languages" was wrong.** `Localizable.xcstrings` covers **35 locales**;
       `apple/WealthCompass/fastlane/metadata/` has 39 directories but several are regional variants of
       one language (en-AU/CA/GB/US, es-ES/MX, fr-CA/FR, pt-BR/PT). Neither count gives 38.
-      `README.md:28` says 38. The site will say 35. (Path updated 2026-08-09: the old root `metadata/`
+      `README.md:36` and the site both say 35 now. (Path updated 2026-08-09: the old root `metadata/`
       duplicate has been deleted.)
 
 ### Localization bugs in the app (found while extracting real strings)
 
 Reproduced as-shipped on the site, because the site shows the app's actual translations.
 
-- [ ] **`NET WORTH` in Spanish is `PATRIMONIO NETTO`** — Italian spelling. Should be
-      `PATRIMONIO NETO`.
+- [x] **DONE 2026-08-25.** **`NET WORTH` in Spanish was `PATRIMONIO NETTO`** — Italian spelling.
+      Fixed in `a5c166d`: `es` and `es-419` both hold `PATRIMONIO NETO` now, and `PATRIMONIO NETTO`
+      survives only in the five correct `it` entries.
 - [ ] **`investments` tab label in Spanish is still the English `Investments`** in
       `TabBarLabelResolver.swift`. Regenerate via `scripts/add_tab_bar_localizations.py`.
 - [ ] Untranslated (fall back to English in-app), from
@@ -69,9 +72,11 @@ App Store URLs; they should all return 200 with content.
       (39 locales). **DONE 2026-08-09** in the metadata tree; reaches the store on the next
       `fastlane ios release` / `fastlane mac release`.
 - [ ] **Provider ID** for campaign attribution — `web-app/src/site/links.ts`, `PROVIDER_TOKEN = null`.
-- [ ] **README.md** still says "38 languages" and calls the project open source. Both are wrong: the
-      catalogue has 35 locales and the licence is PolyForm Noncommercial (source-available). The
-      website has been corrected; the README has not, because it is outside the site.
+- [ ] **`web-app/src/components/layout/Footer.tsx:18`** still reads "Open source and privacy-first" —
+      the last surviving open-source claim anywhere in the repo. Nothing imports that file, so it is
+      not shipping; correct the string or delete the file before it gets wired back in. `README.md`
+      is **not** the problem: `:36` already says 35 languages and `:18` / `:105-112` already say
+      source-available, not open source.
 
 ### One fidelity question only a device can answer
 
@@ -96,8 +101,9 @@ Plus: `Position` (de, fr), `Transport` (de, fr, ja), `Date`/`Mode`/`Performance`
 `Privacy` (it), `TOTAL` (fr, es, ja).
 Run `python3 web-app/scripts/extract-strings.py` any time for the current list.
 
-Still outstanding from before: Spanish `NET WORTH` is `PATRIMONIO NETTO` (Italian spelling), and the
-Spanish `investments` tab label is still the English `Investments` in `TabBarLabelResolver.swift`.
+Spanish `NET WORTH` (`PATRIMONIO NETTO`, Italian spelling) is **fixed** as of `a5c166d` — `es` and
+`es-419` both hold `PATRIMONIO NETO`. Still outstanding from before: the Spanish `investments` tab
+label is still the English `Investments` in `TabBarLabelResolver.swift`.
 
 ### Stale branches you may want to delete
 
@@ -138,10 +144,11 @@ because it is short and structured — the README body is long and low-signal by
       `ios`, `macos`, `local-first` or `privacy` — so for the query *"local-first personal finance app
       Mac"* the engines currently return a competitor instead of you. (Also `personal-finance-and-data-anlaysis`
       is a typo and therefore a dead classification node.)
-- [ ] **README.md**: "38 languages" → 35; add a one-line author block naming you with links to your
-      personal site and ORCID; state "source-available under PolyForm Noncommercial 1.0.0 — not open
-      source" within the first screenful. GitHub's licence detection returns `NOASSERTION` for PolyForm,
-      so there is no machine-readable licence signal at all right now.
+- [ ] **README.md**: the count (now 35, `:36`) and the "not open source" line within the first
+      screenful (`:18`) are **done**. Still to do: the author block currently names you and links your
+      personal site at `:20`, but ORCID only appears far down at `:132` — pull it into the first
+      screenful. GitHub's licence detection returns `NOASSERTION` for PolyForm, so there is no
+      machine-readable licence signal at all right now.
 - [ ] **Pin `wealth-compass`** on your GitHub profile — it currently is not pinned, and your bio
       mentions "EVOLVE" rather than this app.
 
@@ -365,7 +372,7 @@ happen on the Mac with Xcode, from `apple/WealthCompass`.
 ## Deep audit — remaining findings (2026-08-25)
 
 Eight parallel read-only audits over `apple/`, then three adversarial verification rounds.
-**27 commits landed on `main`** (`50a7037`…`fd1711e`): 6 of 8 P1s, ~45 P2s. Suite went 221 → 260,
+**38 commits landed on `main`** (`50a7037`…`15d2983`): 6 of 8 P1s, ~45 P2s. Suite went 221 → 275,
 green; both targets build. Full write-up with reasoning:
 <https://claude.ai/code/artifact/12fa859e-cab4-403d-a677-0af1585c44f9>
 
@@ -382,7 +389,7 @@ were written up rather than changed. Both are data-loss shaped.
       locally, ignoring its `origin`. An `.inventory` pending is not a user edit — it is un-uploaded
       first-sync inventory — but it still wins, and `systemFields` is overwritten with the server's
       current tag, so the next send raises no conflict and overwrites the server with stale data.
-      The sent-side twin (`conflictAction`, ~:1935) documents the *opposite* policy for the same
+      The sent-side twin (`conflictAction`, `:1921-1932`) documents the *opposite* policy for the same
       pending kind. Fix is to check pending **origin**, not pending presence.
       *Repro:* device B freshly installed with imported data; let its first fetch complete but kill
       the network before its inventory upload finishes. Edit the same record on A. Bring B back.
@@ -440,10 +447,10 @@ were written up rather than changed. Both are data-loss shaped.
 
 ### macOS layout and lifecycle
 
-- [ ] `MacCryptoView.swift:140-150` — a fixed 400pt performance card beside the allocation donut in a
-      non-reflowing `HStack`. At the 520pt window minimum the donut gets ~48pt. `MacInvestmentsView`
+- [ ] `MacCryptoView.swift:183` — a fixed 400pt performance card (`.frame(width: 400)`) beside the
+      allocation donut in a non-reflowing `HStack`. At the 520pt window minimum the donut gets ~48pt. `MacInvestmentsView`
       already solved this (tag L24); Crypto was never migrated.
-- [ ] `MacCashFlowView.swift:632-726` — the Transactions filter bar is a fixed-width row needing
+- [ ] `MacCashFlowView.swift:644-737` — the Transactions filter bar is a fixed-width row needing
       ~950pt; it clips at the default window size once the category chip is present.
 - [ ] `MacPlatformServices.swift` — no `applicationShouldTerminate`, so ⌘Q with an editor sheet open
       discards everything typed. The codebase treats this as a bug elsewhere (tag L13).
@@ -467,24 +474,29 @@ were written up rather than changed. Both are data-loss shaped.
       a translated sentence: German reads "Noch keine benutzerdefinierten income-Kategorien."
 - [ ] `DashboardView.swift:131` — `heldCurrenciesUsingSeedRate` is the only derived Dashboard value
       not memoized on `dataVersion`, and it runs per frame while scrubbing the net-worth chart.
-- [ ] `RecurringTransactionNotificationService.swift:82` — **one of the project's two remaining compiler
-      warnings** (the other is `Tests/CloudSyncCoreTests.swift:861`, a deprecated `resultsTruncated`), and the one thing blocking the Swift 6 language mode: `[AnyHashable: Any]` crossing
+- [ ] `RecurringTransactionNotificationService.swift:82` — **the project's one remaining compiler
+      warning**, and the one thing blocking the Swift 6 language mode: `[AnyHashable: Any]` crossing
       into a main-actor-isolated `didReceiveRemoteNotification`. I tried `nonisolated`,
       `@preconcurrency` on the method, and `@preconcurrency` on the conformance — the first two do
       not silence it and the third is rejected outright ("has no effect"), so I reverted rather than
       leave a guess in place. Nothing reads `userInfo` (a CloudKit silent push only signals "the zone
       changed"), so dropping the parameter or restating the requirement may be the real answer. Worth
       ten minutes with the Swift 6 migration guide rather than more guessing.
+      (The second warning is gone: the deprecated `resultsTruncated` assertion in
+      `Tests/CloudSyncCoreTests.swift` was deleted, and `:860-863` is now a comment recording that it
+      *was* the warning source. The one surviving `.resultsTruncated` reference,
+      `CloudKitSyncService.swift:2039`, is deliberate defensive handling — leave it.)
 
 ### Store, services, import
 
 - [ ] `FinanceStore.swift` — there is **no** `upsertLiability` / `deleteLiability`. Liabilities count
       in totals, allocation and sync but can only enter via import or CloudKit, and can never be
       edited or removed in either app.
-- [ ] `FinanceStore.swift:199` — `iCloudSyncError` is written in ten places and read by no view, so
+- [ ] `FinanceStore.swift:206` — `iCloudSyncError` is written in twelve places and read by no view, so
       the WC-LOCK1 "saved locally but not queued for iCloud" message can never reach a user.
-- [ ] `FinanceStore.swift:1034-1036` — `snapshots(range:)` is unused *and* mis-wired (defaults to
-      `.eur` with a nil-rate converter). Latent P1 the moment anyone calls it.
+- [ ] `FinanceStore.swift:1074-1076` — `snapshots(range:)` is unused *and* mis-wired (defaults to
+      `.eur` with a nil-rate converter); the mis-wiring itself is at `AnalyticsEngine.swift:16-17`.
+      Latent P1 the moment anyone calls it. (`:1031-1035` is now `appendSnapshot`.)
 - [ ] `FinanceStore.swift:1732-1738` — retain cycle between the store and its save-consumer task;
       `deinit` never runs, so tests leak a store per instance.
 - [ ] `FinanceStore.swift:982-986` / `1136-1145` — complementary currency-coverage gaps:
@@ -495,11 +507,12 @@ were written up rather than changed. Both are data-loss shaped.
 - [ ] `FinancePersistence.swift:72-81` — H08-skipped records are preserved on disk only until the
       user's next edit, which rewrites the file from the lossy in-memory snapshot. With iCloud sync
       off nothing else holds a copy.
-- [ ] `FinanceImportService.swift:936-941` — `Currency.imported` substitutes the display currency for
+- [ ] `FinanceImportService.swift:1015-1020` — `Currency.imported` substitutes the display currency for
       any ISO code outside the ECB set, mislabelling the money instead of skipping it. The Revolut
       parser in the same pipeline makes the opposite (correct) choice and is locked in by a test.
-- [ ] `FinanceImportService.swift:898-913` — string amounts blindly swap `,` for `.`, so `"1,234"`
-      imports as **1.23**. `BrokerImportParsing.flexibleDecimal` in the sibling file already
+- [ ] `FinanceImportService.swift:959-969` — string amounts blindly swap `,` for `.` (`:962` does
+      `.replacingOccurrences(of: ",", with: ".")`), so `"1,234"` imports as **1.234** — a thousand
+      times too small. `BrokerImportParsing.flexibleDecimal` in the sibling file already
       implements the correct last-separator-wins rule and is reachable from here.
 - [ ] `BrokerStatementImportService.swift:752-764` — Revolut crypto hardcodes `.eur` while discarding
       the currency symbol present in the cell, and stamps `updatedAt: Date()`, so every re-import
@@ -521,7 +534,7 @@ were written up rather than changed. Both are data-loss shaped.
 
 ### Two smaller things found while fixing the PDF
 
-- [ ] `ReportDocumentBuilder.swift:688` — with zero transactions in the selected range the ledger
+- [ ] `ReportDocumentBuilder.swift:718-721` — with zero transactions in the selected range the ledger
       early-returns before its Opening/Income/Expenses/Closing row, leaving the bounded export's
       lone Net Savings tile unaccompanied. All figures are zero so nothing is wrong, but the section
       reads oddly.
@@ -545,8 +558,9 @@ actually executes the test.
 - **Every string written by an agent is `state: "needs_review"`**, never `"translated"`. That is how
   you tell machine output from human-blessed values. The `PATRIMONIO NETTO` bug was invisible for
   precisely one reason: it was marked `translated`.
-- **~43% of the UI is still untranslated per language** (mean 333 of 777 keys). Half of that is
-  *absent* keys; the other half are entries that exist, are marked `needs_review`, and hold the
-  English string verbatim — a class a naive "missing keys" count does not see.
+- **~42% of the UI is still untranslated per language** — mean 327.8 of 785 keys per non-English
+  locale, i.e. 41.8%. Half of that is *absent* keys; the other half are entries that exist, are
+  marked `needs_review`, and hold the English string verbatim — a class a naive "missing keys" count
+  does not see.
 - **Run the suite before releasing.** It was red on `main` through the 1.1.6 release, on two stale
   assertions, which is why nothing flagged it.
