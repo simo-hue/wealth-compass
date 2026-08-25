@@ -2222,6 +2222,127 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    /// Fails if Privacy Mode posts one banner per schedule when several are due at the same moment.
+    ///
+    /// With the details hidden every reminder is the same two constants, so a bystander cannot read
+    /// *what* is due — and can count *how much* of it there is. Five schedules due on the same day
+    /// put five identical "Reminder / Open Wealth Compass Tracker to review." banners on the lock
+    /// screen, and five is the number of schedules. The multiplicity was the disclosure.
+    ///
+    /// Not a corner case. WC-L5 pins every date-only or imported schedule's 00:00 to 09:00 local,
+    /// so it is not "N due in the same minute" but "N date-only schedules due on the same day" —
+    /// which is what a JSON backup or a broker statement brings in.
+    ///
+    /// Unlike the rest of the lock-screen work this is directly observable: `requests(for:…)` is a
+    /// pure function of the schedule set, so the whole request set can be built and counted without
+    /// the notification centre the test host never authorizes.
+    ///
+    /// New coverage rather than a regression test — `requests(for:…)` did not exist before the fix
+    /// and there was nothing to call. What it pins is stated as separate facts on purpose: dropping
+    /// the coalescing fails the first, and getting there by changing what Privacy Mode *says* or
+    /// *when it fires* fails the others.
+    func testPrivacyModePostsOneReminderPerMomentRatherThanPerSchedule() throws {
+        let calendar = Calendar.current
+        // Mid-June, so no zone shifts its clocks across the midnight WC-L5 keys off.
+        let day = try XCTUnwrap(calendar.date(from: DateComponents(year: 2031, month: 6, day: 15)))
+        let evening = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2031, month: 6, day: 15, hour: 18, minute: 30))
+        )
+
+        func schedule(_ category: String, dueAt due: Date) -> RecurringTransaction {
+            RecurringTransaction(
+                type: .expense, category: category, amount: 100, description: category,
+                startDate: due, frequency: .monthly, nextDueDate: due, endDate: nil, currency: .eur
+            )
+        }
+        func requests(_ schedules: [RecurringTransaction], showDetails: Bool) -> [UNNotificationRequest] {
+            RecurringNotificationService.requests(
+                for: schedules,
+                convertedAmounts: Dictionary(uniqueKeysWithValues: schedules.map { ($0.id, $0.amount) }),
+                currencyCode: "EUR",
+                showDetails: showDetails,
+                appLanguage: nil,
+                identifierPrefix: Self.reminderIdentifierPrefix
+            )
+        }
+
+        // The shape an import produces: date-only schedules, all pinned to 09:00 by WC-L5.
+        let sameDay = ["Rent", "Gym", "Insurance", "Streaming", "Phone"].map { schedule($0, dueAt: day) }
+
+        let open = requests(sameDay, showDetails: true)
+        XCTAssertEqual(
+            open.count, sameDay.count,
+            "Privacy Mode OFF must still post one reminder per schedule — each of them says something different"
+        )
+        XCTAssertEqual(
+            Set(open.map(\.identifier)).count, sameDay.count,
+            """
+            With Privacy Mode off two schedules were filed under the same identifier, so one \
+            silently replaces the other and a reminder goes missing.
+            """
+        )
+
+        let hidden = requests(sameDay, showDetails: false)
+        XCTAssertEqual(
+            hidden.count, 1,
+            """
+            Privacy Mode posted \(hidden.count) identical banners for \(sameDay.count) schedules due \
+            at the same moment. Nobody can read what is due; anybody can count how many.
+            """
+        )
+        let coalesced = try XCTUnwrap(hidden.first)
+
+        // A second fire time is a second reminder. Coalescing collapses duplicates, not reminders.
+        let twoMoments = sameDay + [schedule("Rates", dueAt: evening)]
+        XCTAssertEqual(
+            Set(requests(twoMoments, showDetails: false).map(\.identifier)).count, 2,
+            "a schedule due at its own time of day lost its reminder to the 09:00 batch"
+        )
+
+        // Same schedules in, same requests out. `sync` re-runs on every schedule edit, currency
+        // change and Privacy Mode toggle; the identifiers must not churn underneath it.
+        XCTAssertEqual(
+            hidden.map(\.identifier), requests(sameDay, showDetails: false).map(\.identifier),
+            "the coalesced identifier is not a pure function of the fire time"
+        )
+
+        // The one banner says what a single hidden reminder says, and fires when it would fire.
+        let single = RecurringNotificationService.request(
+            for: sameDay[0], convertedAmount: nil, currencyCode: "EUR",
+            showDetails: false, appLanguage: nil, identifierPrefix: Self.reminderIdentifierPrefix
+        )
+        XCTAssertEqual(
+            [coalesced.content.title, coalesced.content.body],
+            [single.content.title, single.content.body],
+            "the coalesced banner and the per-schedule one no longer say the same thing"
+        )
+        XCTAssertEqual(
+            (coalesced.trigger as? UNCalendarNotificationTrigger)?.dateComponents,
+            (single.trigger as? UNCalendarNotificationTrigger)?.dateComponents,
+            "the coalesced banner fires at a different moment than the schedules it stands for"
+        )
+
+        // The cap is on requests, not schedules, so coalescing frees the budget it saves for the
+        // dates after today instead of spending it on duplicates of today.
+        let limit = RecurringNotificationService.pendingRequestLimit
+        let manyOneDay = (0..<(limit * 3)).map { schedule("c\($0)", dueAt: day) }
+        XCTAssertEqual(
+            requests(manyOneDay, showDetails: true).count, limit,
+            "the \(limit)-request cap stopped applying with Privacy Mode off; iOS keeps 64 and drops the rest"
+        )
+        XCTAssertEqual(
+            requests(manyOneDay, showDetails: false).count, 1,
+            "\(limit * 3) schedules due at one moment still produced more than one banner"
+        )
+        let manyDays = try (0..<(limit * 3)).map { offset in
+            schedule("c\(offset)", dueAt: try XCTUnwrap(calendar.date(byAdding: .day, value: offset, to: day)))
+        }
+        XCTAssertEqual(
+            requests(manyDays, showDetails: false).count, limit,
+            "distinct fire times must each get a reminder, up to the cap"
+        )
+    }
+
     // MARK: - Sweep internals
 
     /// The spellings of a percentage this codebase can produce. Anything else — a renamed wrapper,
