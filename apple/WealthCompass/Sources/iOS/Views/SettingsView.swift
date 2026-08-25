@@ -77,8 +77,8 @@ struct SettingsView: View {
                 }
 
                 Section("Custom Categories") {
-                    categoryGroup(title: "Income", type: .income, categories: settings.customIncomeCategories)
-                    categoryGroup(title: "Expense", type: .expense, categories: settings.customExpenseCategories)
+                    categoryGroup(type: .income, categories: settings.customIncomeCategories)
+                    categoryGroup(type: .expense, categories: settings.customExpenseCategories)
                 }
 
                 marketDataSection
@@ -535,8 +535,14 @@ struct SettingsView: View {
         }
     }
 
-    private func categoryGroup(title: String, type: TransactionType, categories: [String]) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+    /// The heading and its empty-state line both come from `type`, not from a raw `String`.
+    ///
+    /// The caller used to pass the literal `"Income"` / `"Expense"`, which meant the heading never
+    /// localized *and* the English noun was spliced into a translated sentence: German read
+    /// "Noch keine benutzerdefinierten income-Kategorien."
+    private func categoryGroup(type: TransactionType, categories: [String]) -> some View {
+        let title = type.localizedTitle(appLanguage: settings.appLanguage)
+        return VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.white)

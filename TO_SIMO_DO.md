@@ -478,6 +478,14 @@ were written up rather than changed. Both are data-loss shaped.
       a translated sentence: German reads "Noch keine benutzerdefinierten income-Kategorien."
 - [ ] `DashboardView.swift:131` — `heldCurrenciesUsingSeedRate` is the only derived Dashboard value
       not memoized on `dataVersion`, and it runs per frame while scrubbing the net-worth chart.
+- [ ] `RecurringTransactionNotificationService.swift:82` — **the project's only remaining compiler
+      warning**, and the one thing blocking the Swift 6 language mode: `[AnyHashable: Any]` crossing
+      into a main-actor-isolated `didReceiveRemoteNotification`. I tried `nonisolated`,
+      `@preconcurrency` on the method, and `@preconcurrency` on the conformance — the first two do
+      not silence it and the third is rejected outright ("has no effect"), so I reverted rather than
+      leave a guess in place. Nothing reads `userInfo` (a CloudKit silent push only signals "the zone
+      changed"), so dropping the parameter or restating the requirement may be the real answer. Worth
+      ten minutes with the Swift 6 migration guide rather than more guessing.
 
 ### Store, services, import
 

@@ -6,7 +6,9 @@ struct MacDashboardView: View {
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appModel: MacAppModel
 
-    @State private var timeRange: TimeRange = .oneYear
+    // Matches iPhone. The two defaults diverged, so the same account greeted the user with a
+    // different headline change figure on each machine with nothing explaining why.
+    @State private var timeRange: TimeRange = .oneWeek
     @State private var moneyFlowPeriod: AnalyticsPeriod = .thirtyDays
     @State private var selectedNetWorthDate: Date?
     @State private var cashFlowRange: CashFlowTimeframe = .sixMonths

@@ -281,12 +281,23 @@ private struct MacInvestmentEditor: View {
                             (Text($0.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\($0.rawValue))")).tag($0)
                         }
                     }
+                    // DA-H06, as on the Category picker: keep the stored value selectable even when
+                    // it isn't one of the built-in options. An imported holding can carry any string
+                    // (the JSON importer passes `sector` through unchanged), and without this the
+                    // picker renders blank, logs "selection is invalid", and the user cannot see
+                    // what the sector is without overwriting it.
                     Picker("Sector", selection: $sector) {
+                        if !sectors.contains(sector) {
+                            Text(LocalizedStringKey(sector)).tag(sector)
+                        }
                         ForEach(sectors, id: \.self) {
                             Text(LocalizedStringKey($0)).tag($0)
                         }
                     }
                     Picker("Geography", selection: $geography) {
+                        if !geographies.contains(geography) {
+                            Text(LocalizedStringKey(geography)).tag(geography)
+                        }
                         ForEach(geographies, id: \.self) {
                             Text(LocalizedStringKey($0)).tag($0)
                         }

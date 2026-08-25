@@ -161,7 +161,10 @@ struct MacSettingsView: View {
             guard request != nil else { return }
             selectedTab = .data
             exporter.presentOptions()
-            appModel.exportRequest = nil
+            // Deferred a turn: with `initial: true` this runs during the root view's own update, and
+            // mutating an `@Published` on `MacAppModel` inline would publish a change from within
+            // that update. `MacCashFlowView` defers the sibling token for the same reason.
+            Task { @MainActor in appModel.exportRequest = nil }
         }
         .sheet(isPresented: $exporter.isShowingOptions) {
             ExportOptionsView(options: $exporter.options,
