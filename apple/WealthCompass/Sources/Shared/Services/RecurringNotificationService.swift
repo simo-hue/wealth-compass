@@ -259,8 +259,11 @@ actor RecurringNotificationService {
         // Everything else `UNMutableNotificationContent` can put on a lock screen is either never
         // set here or cannot vary with the schedule: `subtitle`, `threadIdentifier`,
         // `categoryIdentifier`, `badge` and `attachments` are all left at their defaults, and
-        // `sound` is `.default` on both branches. `userInfo` carries an opaque UUID for the tap
-        // handler; it is app-private payload, it is never rendered, and it names nothing.
+        // `sound` is `.default` on both branches. `userInfo` carries the schedule's UUID: app-private
+        // payload, never rendered, and it names nothing. It was put there for a tap handler that
+        // does not exist — `AppNotificationDelegate` and `MacAppDelegate` both answer `willPresent`
+        // and `didReceive` by posting `.recurringTransactionNotificationReceived` with `object: nil`
+        // and re-deriving the work from the store, so nothing reads this key today.
         content.userInfo = ["recurringTransactionID": schedule.id.uuidString]
         return content
     }

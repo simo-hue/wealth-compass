@@ -207,4 +207,45 @@ final class LocalizationTests: XCTestCase {
             }
         }
     }
+
+    /// Every locale the catalog carries. Spelled out rather than derived, so a locale silently
+    /// dropped from the catalog fails the assertions below instead of vanishing from them.
+    private static let everyLanguage = [
+        "ar", "ca", "cs", "da", "de", "el", "en", "es", "es-419", "fi", "fr", "he", "hi", "hr",
+        "hu", "id", "it", "ja", "ko", "ms", "nb", "nl", "pl", "pt-BR", "pt-PT", "ro", "ru", "sk",
+        "sv", "th", "tr", "uk", "vi", "zh-Hans", "zh-Hant",
+    ]
+
+    /// The lock-screen reminder has to name the product, not a translation of it.
+    ///
+    /// `Reminder` / `Open Wealth Compass Tracker to review.` is everything a locked device shows
+    /// under Privacy Mode, so that one sentence is all the reader gets — and eight locales had
+    /// translated the app's own name inside it: 财富指南针, 財富指南針, Zenginlik Pusulası, Kompas
+    /// Kekayaan, kompas bohatstva, เข็มทิศความมั่งคั่ง, بوصلة الثروة, वेल्थ कंपास. A product name is not a
+    /// noun phrase; the sentence was telling people to open something that is not on their home
+    /// screen and cannot be searched for.
+    ///
+    /// Scoped to this one string on purpose. `Wealth Compass Tracker` standing alone is the app's
+    /// display name, which `de`, `es`, `fr`, `it`, `ar` and `zh-Hans` deliberately localize, and the
+    /// other sentences carrying the name are outside this audit. Those are recorded, not swept in.
+    func testTheLockScreenReminderDoesNotTranslateTheProductName() {
+        let english = AppLocalization.string("Open Wealth Compass Tracker to review.", appLanguage: "en")
+        for language in Self.everyLanguage {
+            let body = AppLocalization.string(
+                "Open Wealth Compass Tracker to review.", appLanguage: language
+            )
+            XCTAssertTrue(
+                body.contains("Wealth Compass Tracker"),
+                "\(language) translates the product name in the lock-screen reminder: \(body)"
+            )
+            guard language != "en" else { continue }
+            XCTAssertNotEqual(
+                body, english,
+                """
+                \(language) resolves the lock-screen reminder to the English source, so the check \
+                above passed on a string this reader will never understand.
+                """
+            )
+        }
+    }
 }

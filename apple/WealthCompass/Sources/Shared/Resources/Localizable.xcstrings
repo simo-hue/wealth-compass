@@ -84164,7 +84164,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "افتح بوصلة الثروة للمراجعة."
+            "value" : "افتح Wealth Compass Tracker للمراجعة."
           }
         },
         "ca" : {
@@ -84236,7 +84236,7 @@
         "hi" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "समीक्षा करने के लिए वेल्थ कंपास खोलें।"
+            "value" : "समीक्षा करने के लिए Wealth Compass Tracker खोलें।"
           }
         },
         "hr" : {
@@ -84278,7 +84278,7 @@
         "ms" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Buka Kompas Kekayaan untuk menyemak."
+            "value" : "Buka Wealth Compass Tracker untuk menyemak."
           }
         },
         "nb" : {
@@ -84326,7 +84326,7 @@
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Otvorte kompas bohatstva a skontrolujte to."
+            "value" : "Otvorte Wealth Compass Tracker a skontrolujte to."
           }
         },
         "sv" : {
@@ -84338,13 +84338,13 @@
         "th" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "เปิดเข็มทิศความมั่งคั่งเพื่อตรวจสอบ"
+            "value" : "เปิด Wealth Compass Tracker เพื่อตรวจสอบ"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "İncelemek için Zenginlik Pusulası'nı açın."
+            "value" : "İncelemek için Wealth Compass Tracker'ı açın."
           }
         },
         "uk" : {
@@ -84362,13 +84362,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "打开财富指南针进行查看。"
+            "value" : "打开 Wealth Compass Tracker 进行查看。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "打開財富指南針進行查看。"
+            "value" : "打開 Wealth Compass Tracker 進行查看。"
           }
         }
       }
