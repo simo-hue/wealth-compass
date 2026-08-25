@@ -611,7 +611,7 @@ decision is on the record instead of buried.
       back — and `ExportOptionsView.swift:91` shows a `privacySection` warning before the user commits.
       Recorded so the omission is a choice rather than an oversight.
 - [ ] **Two idioms now coexist for percentage redaction.** Most sites call `settings.privatePercent(…)`;
-      `DesignSystem.swift:453` and `:576` keep the inline `isPrivacyMode ? redactionToken : percentage(…)`
+      `DesignSystem.swift:455` and `:576` keep the inline `isPrivacyMode ? redactionToken : percentage(…)`
       form because they derive a share from a total through a local helper. Both correct. Unifying is a
       refactor, not a fix.
 - [ ] `AppSettings.privatePercent`'s doc comment still frames it as being for "the gain/loss rows". It
@@ -621,8 +621,70 @@ decision is on the record instead of buried.
 
 Worth copying next time: the first attempt shipped three tests that exercised `AppSettings.privatePercent`
 in isolation. Reverting **all six** call sites left the suite fully green — they proved nothing about the
-bug. The replacement, `testNoViewRendersAnUnguardedPercentage`, reads the view sources via `#filePath` and
-fails on any `formattedPercent(` in a `View` body not covered by an `isPrivacyMode` gate. It is a lint
-wearing a test's clothes, which is a fair criticism, but it is the only form that fails when a call site
-regresses — there is no supported way to read a rendered `Text` back. It has a hardcoded floor of 8 render
-sites against 10 present; if you delete `formattedPercent` call sites, move that floor deliberately.
+bug. The replacement, now `testWorkingTreeSourcesContainNoUnguardedPercentageRender`, reads the view
+sources via `#filePath` and fails on a percentage render in a `View` body not covered by an
+`isPrivacyMode` gate. It is a lint wearing a test's clothes, but it is the only form that fails when a
+call site regresses — there is no supported way to read a rendered `Text` back.
+
+Adversarial review then broke the first version of it: **seven live unredacted percentage renders sat in
+the tree at once with the suite fully green.** What that cost, and what the current version does about it:
+
+- It greps the **working tree, not the binary under test**. Proven by building the bundle from a leaky
+  tree, restoring the sources, and running `test-without-building` against that same leaky binary —
+  green. Any build-then-patch flow gets a false pass. Unfixable in this design; the test name and doc
+  comment now say so outright.
+- Its floor was **backwards**: routing three *more* sites through `privatePercent` — making the app
+  strictly more private — dropped the scanned count below the floor and failed the suite. Replaced with
+  checks that only trip when enumeration itself breaks (files read, lines read).
+- **Allman braces broke it**, as did a comment containing a stray `{`. A test that fails on reformatting
+  is worse than none. Now handled by a comment/string stripper.
+- Its gate check accepted **any** `isPrivacyMode` anywhere in the enclosing block, so a live percentage
+  dropped beside an unrelated privacy ternary passed green. Now the gate must cover the block header or
+  the render's own expression.
+- **The widest remaining hole, by design:** move a render into a `-> String` helper and the sweep stops
+  seeing it. Confirmed empirically. Closing it means gating at call sites the sweep cannot follow.
+
+The lesson generalises past this test: a lint over source text proves things about text. Prefer a test
+that exercises the code whenever one is possible at all.
+
+### Privacy Mode and chart geometry — one decision, nine charts (2026-08-25)
+
+Redacting a number but drawing its proportion gives the number back. The app already agrees with that in
+writing — `SankeyDiagramView.swift:50-52` refuses to redact-and-draw ("a ribbon's width *is* the
+proportion, so the shape alone still tells a bystander where the money goes") and conceals its whole
+chart, and macOS ships a component called `PrivacyChartCover` whose message is **"Values and proportions
+are hidden."** It is applied inconsistently. Full inventory so this is decided once:
+
+**Already concealed (the consistent set).** Net-worth charts `DashboardView.swift:195` /
+`MacDashboardView.swift:306`; cash-flow bars `DashboardView.swift:413` / `MacDashboardView.swift:598` /
+`MacCashFlowView.swift:297`; macOS asset donut `MacDashboardView.swift:447`; Sankey
+`SankeyDiagramView.swift:48`.
+
+- [ ] **A platform split that is a defect, not a preference.** iOS Asset Allocation
+      (`DashboardView.swift:48`) draws true proportions in Privacy Mode; the **same chart** on macOS
+      (`MacDashboardView.swift:447`) conceals behind `PrivacyChartCover`. One platform implements the
+      stated intent and the other does not. Fix iOS to match macOS — this one needs no design call.
+- [ ] **Eight rings share one view and none of them conceal.** `AllocationChart`
+      (`DesignSystem.swift:403-549`) has no `isPrivacyMode` branch on its `SectorMark` (`:425-436`); only
+      its text redacts (`:455`). Its legend (`:559-583`) also lists slices descending by value. Call
+      sites: `DashboardView.swift:48` · `InvestmentsView.swift:59,62,63` · `CryptoView.swift:60` ·
+      `MacInvestmentsView.swift:47,53,59` · `MacCryptoView.swift:141`. **A single edit at
+      `DesignSystem.swift:403` covers all eight** — which is also why it needs a deliberate decision
+      rather than a drive-by fix.
+- [ ] **The iOS expense donut** `CashFlowView.swift:178-186` — arcs at true proportions, and `:259`
+      lists the top six categories in value order.
+- [ ] **Collapsed bar, surviving ranking.** `DashboardView.swift:547` collapses its bar to
+      `width: 0` under Privacy Mode, but the leaderboard around it keeps rank badge (`:515`), category
+      name (`:519`) and value-descending order (`:490`). The bar hides; the ranking does not. iOS only.
+- [ ] **macOS allocation legend renders in Privacy Mode.** `MacDashboardView.swift:529-549` is a sibling
+      of the `ZStack` holding the privacy branch (which closes at `:526`), so the cover never reaches it.
+      Values redact at `:540`/`:543`; bucket order is fixed, so it discloses which buckets are non-zero.
+- [ ] **Ranked lists have no privacy awareness at all** — amounts redact, identity and order do not.
+      One choke point: `FinanceModels.swift:635-649` (`rankedByValue`, takes no `AppSettings`). Sites:
+      `InvestmentsView.swift:146` ↔ `MacInvestmentsView.swift:173-175,207`; `CryptoView.swift:204` ↔
+      `MacCryptoView.swift:225-227,258`. The Top Performer / Biggest Loser cards
+      (`CryptoView.swift:138-193` ↔ `MacCryptoView.swift:157-217`) are worse: their *existence* is gated
+      on `gainLossPercent > 0` / `< 0` (`:143-144`), so the card appearing at all discloses the sign.
+
+Nothing here was changed. No `Gauge`, `.trim(from:to:)`, `Canvas`, sparkline or heatmap exists anywhere,
+so this list is complete for proportional geometry.
