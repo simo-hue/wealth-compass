@@ -851,6 +851,49 @@ final class PrivacyRedactionTests: XCTestCase {
                 "    }",
                 "}",
             ], 5),
+            // The three macOS spellings of the "Hidden by Privacy Mode" cover, reverted to the
+            // order they had before `f3fac7c` / `fb5272c`. None of these was swept at all until
+            // the title pattern was added, and the macOS half has no other coverage: the test
+            // bundle hosts `WealthCompassMobile`, so nothing under `Sources/macOS` can be rendered.
+            "ContentUnavailableView cover behind emptiness": ([
+                "var body: some View {",
+                "    if topHoldings.isEmpty {",
+                "        ContentUnavailableView(",
+                "            \"No Investments\",",
+                "            systemImage: \"chart.line.uptrend.xyaxis\"",
+                "        )",
+                "    } else if settings.isPrivacyMode {",
+                "        ContentUnavailableView(",
+                "            \"Hidden by Privacy Mode\",",
+                "            systemImage: \"eye.slash\"",
+                "        )",
+                "    }",
+                "}",
+            ], 8),
+            "DashboardEmptyState cover behind emptiness": ([
+                "var body: some View {",
+                "    if transactions.isEmpty {",
+                "        DashboardEmptyState(",
+                "            title: \"No activity yet\",",
+                "            systemImage: \"clock.arrow.circlepath\"",
+                "        )",
+                "    } else if settings.isPrivacyMode {",
+                "        DashboardEmptyState(",
+                "            title: \"Hidden by Privacy Mode\",",
+                "            systemImage: \"eye.slash\"",
+                "        )",
+                "    }",
+                "}",
+            ], 8),
+            "EmptyState cover behind emptiness": ([
+                "var body: some View {",
+                "    if !hasAnyTransactions {",
+                "        EmptyState(title: \"No transactions found\", systemImage: \"tray\")",
+                "    } else if settings.isPrivacyMode, filtered.isEmpty {",
+                "        EmptyState(title: \"Hidden by Privacy Mode\", systemImage: \"eye.slash\")",
+                "    }",
+                "}",
+            ], 4),
         ]
         for (name, (fixture, line)) in emptinessFirst {
             if let opens = check(fixture, line, name) {
@@ -895,6 +938,43 @@ final class PrivacyRedactionTests: XCTestCase {
                 "    }",
                 "}",
             ], 3),
+            // The macOS spellings as the tree actually holds them: the title sits inside the
+            // constructor's parentheses, one or two lines below the `{` that opens the branch.
+            "ContentUnavailableView cover opens the chain": ([
+                "var body: some View {",
+                "    if settings.isPrivacyMode, topHoldings.isEmpty {",
+                "        ContentUnavailableView(",
+                "            \"Hidden by Privacy Mode\",",
+                "            systemImage: \"eye.slash\"",
+                "        )",
+                "    } else if topHoldings.isEmpty {",
+                "        ContentUnavailableView(\"No Investments\", systemImage: \"chart.pie\")",
+                "    }",
+                "}",
+            ], 3),
+            "DashboardEmptyState cover opens the chain": ([
+                "var body: some View {",
+                "    if settings.isPrivacyMode, transactions.isEmpty {",
+                "        DashboardEmptyState(",
+                "            title: \"Hidden by Privacy Mode\",",
+                "            systemImage: \"eye.slash\"",
+                "        )",
+                "    } else if transactions.isEmpty {",
+                "        DashboardEmptyState(title: \"No activity yet\", systemImage: \"clock\")",
+                "    }",
+                "}",
+            ], 3),
+            // The `String`-returning helper shape: `MacCashFlowView.transactionEmptyTitle` picks
+            // the table's empty title in Swift rather than in the view body, and the same rule
+            // has to reach it.
+            "cover chosen in a String helper": ([
+                "private var transactionEmptyTitle: String {",
+                "    if settings.isPrivacyMode {",
+                "        return settings.localized(\"Hidden by Privacy Mode\")",
+                "    }",
+                "    return settings.localized(\"No Transactions\")",
+                "}",
+            ], 2),
         ]
         for (name, (fixture, line)) in privacyFirst {
             if let opens = check(fixture, line, name) {
@@ -1165,11 +1245,17 @@ final class PrivacyRedactionTests: XCTestCase {
     /// whatever the data — a pass that means nothing. Every caller below therefore states the
     /// height its leak needs, and each has a control assertion that fails if that height stopped
     /// reaching it.
+    /// `cropTop` discards that many points from the top of the capture, leaving the layout
+    /// untouched — the window is still `height` tall and lays out exactly as it would without it.
+    /// It exists so a control can be made to depend on one element instead of on the whole screen:
+    /// see `testPrivacyModeConcealsWhyTheTransactionListIsEmpty`, whose control was satisfied by a
+    /// row four inches above the thing under test.
     private func renderScreen<V: View>(
         _ rootView: (FinanceStore, AppSettings) -> V,
         data: FinancialData,
         privacyMode: Bool,
-        height: CGFloat
+        height: CGFloat,
+        cropTop: CGFloat = 0
     ) -> Data {
         let settings = makeSettings()
         settings.isPrivacyMode = privacyMode
@@ -1189,8 +1275,12 @@ final class PrivacyRedactionTests: XCTestCase {
 
         let format = UIGraphicsImageRendererFormat.default()
         format.scale = 1
-        return UIGraphicsImageRenderer(bounds: bounds, format: format)
-            .image { context in host.view.layer.render(in: context.cgContext) }
+        let capture = CGRect(x: 0, y: 0, width: bounds.width, height: height - cropTop)
+        return UIGraphicsImageRenderer(bounds: capture, format: format)
+            .image { context in
+                context.cgContext.translateBy(x: 0, y: -cropTop)
+                host.view.layer.render(in: context.cgContext)
+            }
             .pngData() ?? Data()
     }
 
@@ -1375,27 +1465,29 @@ final class PrivacyRedactionTests: XCTestCase {
     /// without that parameter (measured before adding it, not assumed).
     func testPrivacyModeConcealsWhyTheTransactionListIsEmpty() throws {
         let nothingRecorded = FinancialData()
-        let filteredOut = FinancialData(transactions: [
-            WealthCompassMobile.Transaction(
-                type: .expense, category: "Food", amount: 42, description: "old",
-                date: Date().addingTimeInterval(-86_400 * 400), currency: .eur
-            )
-        ])
+        func filteredOut(_ n: Int) -> FinancialData {
+            FinancialData(transactions: (0..<n).map { i in
+                WealthCompassMobile.Transaction(
+                    type: .expense, category: "Food", amount: Decimal(42 + i), description: "old\(i)",
+                    date: Date().addingTimeInterval(-86_400 * Double(400 + i)), currency: .eur
+                )
+            })
+        }
 
-        func render(_ data: FinancialData, privacy: Bool) -> Data {
+        func render(_ data: FinancialData, privacy: Bool, cropTop: CGFloat = 0) -> Data {
             renderScreen(
                 { store, settings in
                     CashFlowView(initialTab: .transactions)
                         .environmentObject(store)
                         .environmentObject(settings)
                 },
-                data: data, privacyMode: privacy, height: 900
+                data: data, privacyMode: privacy, height: 900, cropTop: cropTop
             )
         }
 
         let concealedNothing = render(nothingRecorded, privacy: true)
         let concealedNothingAgain = render(nothingRecorded, privacy: true)
-        let concealedFiltered = render(filteredOut, privacy: true)
+        let concealedFiltered = render(filteredOut(1), privacy: true)
 
         XCTAssertGreaterThan(
             concealedNothing.count, 50_000,
@@ -1405,12 +1497,46 @@ final class PrivacyRedactionTests: XCTestCase {
             digest(concealedNothing), digest(concealedNothingAgain),
             "the same state rendered twice produced different pixels — the instrument is too unstable to conclude anything from"
         )
+
+        // The control, in three parts, because a whole-screen comparison could not do this job.
+        //
+        // The two fixtures also differ in `transactionHeader`'s "Showing 0 of 1" row: it is drawn
+        // only when `totalCount > 0`, so it is present for one fixture and absent for the other,
+        // and it is *four inches above* the card's empty state. A single whole-screen
+        // `XCTAssertNotEqual` was therefore satisfied by that row alone — this test passed every
+        // one of its own controls at 300pt, with the privacy gate deleted from `CashFlowView`,
+        // while the thing it exists to check was off-screen. The row cannot move in the concealed
+        // comparison (Privacy Mode draws `Showing •••• of ••••` either way), so it propped the
+        // control up and asserted nothing.
+        //
+        // So the control is cropped below that row and pinned from both sides. 300pt is measured,
+        // not guessed: at 260 the two `filteredOut` renders still differ, at 300 they do not.
+        let headerBand: CGFloat = 300
+        let filteredOneCropped = render(filteredOut(1), privacy: false, cropTop: headerBand)
+
         XCTAssertNotEqual(
-            digest(render(nothingRecorded, privacy: false)), digest(render(filteredOut, privacy: false)),
+            digest(render(filteredOut(1), privacy: false)), digest(render(filteredOut(2), privacy: false)),
             """
-            With Privacy Mode OFF the two kinds of empty rendered identically, so either the             transaction card is out of the viewport or the fixture no longer produces two different             states — and the assertion below can no longer fail.
+            One old transaction and two rendered the same full screen, so the "Showing 0 of N" row             is not on screen and the crop below proves nothing about it.
             """
         )
+        XCTAssertGreaterThan(
+            filteredOneCropped.count, 10_000,
+            "the cropped capture is \(filteredOneCropped.count) bytes, so the crop left nothing to compare"
+        )
+        XCTAssertEqual(
+            digest(filteredOneCropped), digest(render(filteredOut(2), privacy: false, cropTop: headerBand)),
+            """
+            Below \(Int(headerBand))pt, one old transaction and two still render differently — so the             crop has not excluded the "Showing 0 of N" row after all, and the control below is back             to being satisfied by a row that cannot move under Privacy Mode.
+            """
+        )
+        XCTAssertNotEqual(
+            digest(render(nothingRecorded, privacy: false, cropTop: headerBand)), digest(filteredOneCropped),
+            """
+            With Privacy Mode OFF the two kinds of empty render identically below \(Int(headerBand))pt.             The card's empty state is the only thing that can differ there, so either it is out of             the viewport or the fixture no longer produces two states — and the assertion below can             no longer fail.
+            """
+        )
+
         XCTAssertEqual(
             digest(concealedNothing), digest(concealedFiltered),
             """
@@ -1428,8 +1554,18 @@ final class PrivacyRedactionTests: XCTestCase {
     /// at all, on a page where every figure is already `••••`. There is no value in it to mask; the
     /// slot is the signal, so the slot goes.
     ///
-    /// 700pt on purpose. At that height the Position grid is below the fold — measured — so the
-    /// only thing that can move between these two fixtures is the card itself.
+    /// **Why nothing but the card can move here — and it is not the height.** This comment used to
+    /// say "700pt on purpose. At that height the Position grid is below the fold — measured". That
+    /// is wrong, and measuring it says so: at 700pt the grid's *first row* is on screen, low in the
+    /// viewport. Two fixtures differing by one investment render differently at 700pt even cropped
+    /// to the last 50pt, so the Investments card and its caption are inside the frame.
+    ///
+    /// What actually holds the test up is that under Privacy Mode every caption in that grid is a
+    /// fixed phrase rather than a count, and every figure is `••••` — so the visible part of the
+    /// grid cannot move for any fixture. (The Liabilities card, the one place these two fixtures
+    /// differ in count, does happen to sit below the fold at 700pt; that is a coincidence of layout
+    /// and nothing here should be read as relying on it.) The height buys nothing this test needs;
+    /// it only keeps the capture small.
     func testPrivacyModeHidesTheDashboardOnboardingCard() throws {
         let empty = FinancialData()
         let oneLiability = FinancialData(liabilities: [
@@ -2092,11 +2228,21 @@ final class PrivacyRedactionTests: XCTestCase {
 
     /// The privacy covers this codebase draws. Two are dedicated views; `MacCashFlowView` and
     /// `SankeyDiagramView` reuse `EmptyState` with the eye-slash glyph instead, so the third
-    /// spelling is an `EmptyState` whose title says so. That one is matched against `scan`, where
-    /// string bodies survive — in `code` the word "concealed" has been blanked away.
+    /// spelling is an `EmptyState` whose title says so. Those are matched against `scan`, where
+    /// string bodies survive — in `code` the titles have been blanked away.
+    ///
+    /// The last pattern matches the *title*, not the view, because `f3fac7c` and `fb5272c` drew the
+    /// same cover through four different views: `EmptyState` on iOS and macOS Cash Flow,
+    /// `ContentUnavailableView` on the macOS Investments and Crypto pages, and
+    /// `DashboardEmptyState` on the macOS Dashboard — and three of those put the title on a line of
+    /// its own, where a per-line regex anchored to the constructor cannot reach it. Matching the
+    /// string is also the honest rule: a view that says "Hidden by Privacy Mode" **is** a cover,
+    /// whatever type draws it. Before this, none of those thirteen sites was swept at all, which
+    /// left every macOS edit in that pair of commits with no coverage of any kind.
     private static let coverPatterns: [(name: String, regex: NSRegularExpression)] = [
         ("PrivacyChartCover(", try! NSRegularExpression(pattern: #"\b(?:Mobile)?PrivacyChartCover\s*\("#)),
         ("an EmptyState cover", try! NSRegularExpression(pattern: #"\bEmptyState\s*\([^)]*concealed"#)),
+        ("a \"Hidden by Privacy Mode\" cover", try! NSRegularExpression(pattern: #""Hidden by Privacy Mode""#)),
     ]
 
     /// Where a privacy cover is drawn on this line, if one is.
