@@ -273,9 +273,33 @@ final class LocalizationTests: XCTestCase {
     /// assertion is for.
     ///
     /// It reads the catalog rather than resolving through `AppLocalization`, so it covers keys with
-    /// format specifiers and keys nothing references yet — three of the 21 are unreferenced, and a
-    /// dead key is one somebody wires up later. `testTheAppNameSurvivesTheRuntimeLookup` is the
+    /// format specifiers and keys nothing references yet — **four** of the 23 are unreferenced, and
+    /// a dead key is one somebody wires up later. `testTheAppNameSurvivesTheRuntimeLookup` is the
     /// other half: that the compiled `.lproj` actually hands back what the catalog holds.
+    ///
+    /// Three things about the sweep were narrower than the sentence above, and each let a rename
+    /// through:
+    ///
+    /// - **It gated on the literal `Wealth Compass Tracker`.** The product is spelled three ways in
+    ///   this catalog — `Wealth Compass Tracker` (21 keys), `WealthCompass` (`Welcome to
+    ///   WealthCompass`, drawn on the app's **first screen** at `OnboardingView.swift:97` and
+    ///   `MacOnboardingView.swift:102`) and `Wealth Compass` (the report brand, drawn on every
+    ///   exported PDF at `ReportDocumentBuilder.swift:326`, `:332` and `:1080`). Only the first was
+    ///   swept, so `zh-Hans` was still greeting the user with `欢迎来到财富指南针` on the very first
+    ///   screen — the same rendering this sweep had deleted eleven times elsewhere. It now matches
+    ///   `Wealth\s*Compass(?:\s+Tracker)?` and requires **each rendering the English source uses** to
+    ///   survive into the translation, so a rename is caught however the name is spelled and a
+    ///   locale cannot satisfy the rule by substituting the longer name for the shorter one.
+    /// - **It read `localization["stringUnit"]` only.** A key with a `variations` block keeps its
+    ///   bodies one level further down, and there are two such keys here with 35 bodies each — 70
+    ///   translations the sweep could not see, where a renamed plural form would have been
+    ///   invisible. Both shapes are read now.
+    /// - **A key with no localizations passed by having nothing to check.** `Wealth Compass` was
+    ///   literally `{}`, which renders correctly — the fallback is the English source, and for a
+    ///   product name the English source *is* the right answer in all 34 languages. What it was not
+    ///   is *pinned*: an empty entry is an open invitation to a translation pass, and this sweep had
+    ///   nothing to say about it. It carries all 34 locales now, and the assertion on `checked`
+    ///   below is what stops that regressing to nothing.
     func testNoLocaleRenamesTheAppInTheCatalog() throws {
         let catalog = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
@@ -285,37 +309,101 @@ final class LocalizationTests: XCTestCase {
         let strings = try XCTUnwrap((parsed as? [String: Any])?["strings"] as? [String: Any])
         XCTAssertGreaterThan(strings.count, 500, "only \(strings.count) keys — the catalog has moved")
 
-        let name = "Wealth Compass Tracker"
+        /// Every spelling of the product name in one string, longest match first so
+        /// `Wealth Compass Tracker` is never read as `Wealth Compass` followed by a stray word.
+        let name = try NSRegularExpression(pattern: #"Wealth\s*Compass(?:\s+Tracker)?"#)
+        func renderings(in text: String) -> [String] {
+            let range = NSRange(text.startIndex..<text.endIndex, in: text)
+            var found: [String] = []
+            for match in name.matches(in: text, range: range) {
+                guard let matched = Range(match.range, in: text) else { continue }
+                let rendering = String(text[matched])
+                if !found.contains(rendering) { found.append(rendering) }
+            }
+            return found
+        }
+
+        /// Every translated body under one locale: the plain one, and each `variations` leaf.
+        func bodies(of localization: Any?) -> [(where: String, value: String)] {
+            guard let localization = localization as? [String: Any] else { return [] }
+            var found: [(where: String, value: String)] = []
+            if let unit = localization["stringUnit"] as? [String: Any],
+               let value = unit["value"] as? String {
+                found.append((where: "", value: value))
+            }
+            let variations = localization["variations"] as? [String: Any] ?? [:]
+            for (kind, cases) in variations.sorted(by: { $0.key < $1.key }) {
+                for (category, body) in (cases as? [String: Any] ?? [:]).sorted(by: { $0.key < $1.key }) {
+                    guard let unit = (body as? [String: Any])?["stringUnit"] as? [String: Any],
+                          let value = unit["value"] as? String else { continue }
+                    found.append((where: " [\(kind).\(category)]", value: value))
+                }
+            }
+            return found
+        }
+
         var offenders: [String] = []
         var checked = 0
         var keysNamingTheApp = 0
 
-        for (key, entry) in strings.sorted(by: { $0.key < $1.key }) where key.contains(name) {
+        for (key, entry) in strings.sorted(by: { $0.key < $1.key }) {
+            let expected = renderings(in: key)
+            guard !expected.isEmpty else { continue }
             keysNamingTheApp += 1
             let localizations = (entry as? [String: Any])?["localizations"] as? [String: Any] ?? [:]
             for (language, localization) in localizations.sorted(by: { $0.key < $1.key })
             where language != "en" {
-                guard let unit = (localization as? [String: Any])?["stringUnit"] as? [String: Any],
-                      let value = unit["value"] as? String else { continue }
-                checked += 1
-                guard !value.contains(name) else { continue }
-                offenders.append("  \(language) — \(key)\n      \(value)")
+                for body in bodies(of: localization) {
+                    checked += 1
+                    let missing = expected.filter { !body.value.contains($0) }
+                    guard !missing.isEmpty else { continue }
+                    offenders.append(
+                        "  \(language)\(body.where) — \(key)\n      \(body.value)\n      (dropped \(missing.joined(separator: ", ")))"
+                    )
+                }
             }
         }
 
         XCTAssertGreaterThanOrEqual(
-            keysNamingTheApp, 21,
+            keysNamingTheApp, 23,
             "\(keysNamingTheApp) key(s) name the app; the sweep is no longer reading the catalog"
         )
-        XCTAssertGreaterThan(checked, 300, "only \(checked) translation(s) read across those keys")
+        XCTAssertGreaterThanOrEqual(
+            checked, 556,
+            """
+            Only \(checked) translation(s) read across those keys, against 556 in the catalog this \
+            floor was written for. It is 34 above the count before `Wealth Compass` was filled in, \
+            on purpose: an entry with no localizations passes every assertion above by having \
+            nothing to check, so a floor is the only thing that notices one going empty again.
+            """
+        )
         XCTAssertEqual(
             offenders, [],
             """
             \(offenders.count) translation(s) rename the app. A product name is not a noun phrase — \
             these tell the reader to open, unlock or trust something that is not on their home \
-            screen, whose icon says "\(name)" in every locale because `CFBundleDisplayName` is \
-            hardcoded:
+            screen, whose icon says "Wealth Compass Tracker" in every locale because \
+            `CFBundleDisplayName` is hardcoded:
             \(offenders.joined(separator: "\n"))
+            """
+        )
+
+        // The `variations` reader is the part with nothing else holding it: the two keys that use
+        // that shape today carry no product name, so the loop above would read zero of those bodies
+        // and still pass if the reader were removed. This is what says it ran.
+        var variationKeys = 0
+        for entry in strings.values {
+            let localizations = (entry as? [String: Any])?["localizations"] as? [String: Any] ?? [:]
+            if localizations.values.contains(where: { ($0 as? [String: Any])?["variations"] != nil }) {
+                variationKeys += 1
+            }
+        }
+        XCTAssertGreaterThanOrEqual(
+            variationKeys, 2,
+            """
+            \(variationKeys) key(s) in the catalog use `variations`. The sweep reads that shape \
+            because a renamed plural form is otherwise invisible to it; if the catalog no longer \
+            has any, this floor is what will say so before the reader is quietly dropped.
             """
         )
     }
@@ -323,17 +411,43 @@ final class LocalizationTests: XCTestCase {
     /// The runtime half of the rule above: the compiled `.lproj` hands back the name the catalog
     /// holds.
     ///
-    /// Only the standalone key can be checked this way — every other one carries `%@` specifiers
-    /// whose arguments differ per call site — but it is the one that matters most, because it is
-    /// what the unlock screen draws next to a home-screen icon that always says the same thing.
-    /// Unlike the other translation tests here there is no "and differs from English" assertion, and
-    /// there cannot be: for this key the correct value in all 34 languages *is* the English one.
+    /// Only keys without `%@` specifiers can be checked this way — the rest need arguments that
+    /// differ per call site — which happens to be all three spellings of the product name, and each
+    /// of the three is drawn somewhere the reader has to recognise the app by name:
+    ///
+    /// - `Wealth Compass Tracker` — the unlock screen (`LockView.swift:33`) and the window title,
+    ///   next to a home-screen icon that says the same thing in every locale.
+    /// - `Wealth Compass` — the brand line, the footer and the appendix of every exported PDF
+    ///   (`ReportDocumentBuilder.swift:326`, `:332`, `:1080`).
+    /// - `Welcome to WealthCompass` — the first line of the first screen
+    ///   (`OnboardingView.swift:97`, `MacOnboardingView.swift:102`).
+    ///
+    /// The first two assert equality: for a bare product name the correct value in all 34 languages
+    /// *is* the English one, so unlike the other translation tests here there is no "and differs
+    /// from English" clause and there cannot be. The third is a sentence, so it asserts only that
+    /// the name survived inside it — which is the whole rule, and all the catalog sweep asks too.
     func testTheAppNameSurvivesTheRuntimeLookup() {
         for language in Self.everyLanguage {
-            XCTAssertEqual(
-                AppLocalization.string("Wealth Compass Tracker", appLanguage: language),
-                "Wealth Compass Tracker",
-                "\(language) draws a translated app name on the unlock screen and in the window title"
+            for name in ["Wealth Compass Tracker", "Wealth Compass"] {
+                XCTAssertEqual(
+                    AppLocalization.string(String.LocalizationValue(name), appLanguage: language),
+                    name,
+                    """
+                    \(language) renames the app: "\(name)" resolves to \
+                    "\(AppLocalization.string(String.LocalizationValue(name), appLanguage: language))". \
+                    That is drawn on the unlock screen, in the window title, and on every page of \
+                    every exported PDF, beside an icon that says "Wealth Compass Tracker".
+                    """
+                )
+            }
+            let welcome = AppLocalization.string("Welcome to WealthCompass", appLanguage: language)
+            XCTAssertTrue(
+                welcome.contains("WealthCompass"),
+                """
+                \(language) renames the app on the first line of the first screen: "\(welcome)". \
+                Everything around the name should be translated; the name itself is what the reader \
+                has to be able to recognise and search for.
+                """
             )
         }
     }

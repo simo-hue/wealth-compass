@@ -945,8 +945,12 @@ for skipping this was refuted — `sync` tears down by prefix, so cancellation w
 notification test now asserts on the whole `UNNotificationRequest` rather than a mutable class a later
 line could rewrite; and a ninth entity count was tokenised with a lint that pins the call sites.
 
-- [x] **44 product-name translations across 13 locales, in 21 keys — all fixed 2026-08-25.** `zh-Hans`
-      11, `hi` 6, `ar` 5, `ms` 5, `zh-Hant` 5, `tr` 4, plus `de/es/fr/it/pl/sk/th`. Eight locales were
+- [x] **44 product-name translations across 13 locales, in 12 keys — all fixed 2026-08-25.** `zh-Hans`
+      11, `hi` 6, `ar` 5, `ms` 5, `zh-Hant` 5, `tr` 4, plus `de/es/fr/it/pl/sk/th`. (**Corrected
+      2026-08-26:** this said "21 keys". 21 was the *sweep scope* — the keys whose English source
+      names the app. Re-parsing the `dc50b0a` diff: **12** entries changed, 44 values and 44 states.
+      The `dc50b0a` message also cites `RecurringNotificationService.swift:254` for the default
+      notification body; it is at `:401`, then and now. The message is history and stays.) Eight locales were
       renaming the app in the *notification* strings alone (the brief said two); the same defect was
       spread through the rest of the catalog. **The note that used to stand here — that the standalone
       `Wealth Compass Tracker` key "is the display name, which some locales localize deliberately — do
@@ -958,13 +962,33 @@ line could rewrite; and a ninth entity count was tokenised with a lint that pins
       All 44 now hold the product name, spliced in place and marked `needs_review`, and
       `LocalizationTests.testNoLocaleRenamesTheAppInTheCatalog` sweeps every key whose English source
       names the app rather than one sentence.
-- [ ] **Three dead catalog keys**, 35 locales each, no Swift reference (they were fixed along with the
+- [ ] **Four dead catalog keys**, 35 locales each, no Swift reference (they were fixed along with the
       rest, since a dead key is one somebody wires up later, but they can equally be deleted):
       `%@ is scheduled. Open Wealth Compass Tracker to review it.`,
-      `%@: %@. Wealth Compass Tracker records it while the app is active.` and
-      `This permanently removes all local Wealth Compass Tracker data from this device.` — the last of
-      which was **not** in the "two dead keys" this list previously named. There is also a bare
-      `Wealth Compass` key carrying no localizations at all.
+      `%@: %@. Wealth Compass Tracker records it while the app is active.`,
+      `This permanently removes all local Wealth Compass Tracker data from this device.` and
+      `%@\n\nWealth Compass Tracker will continue using %@.` — the last two of which were **not** in
+      the "two dead keys" this list originally named, and the fourth was missed by the "three dead
+      keys" correction too. Counted by matching each key against the sources with its `%@`
+      specifiers read as `\(…)` interpolations *and* its newlines read as escapes, which is what the
+      earlier passes got wrong: `…will continue using the last cached rates.` looks dead to a plain
+      substring search and is live at `ExchangeRateService.swift:69`.
+- [x] **The product name was renamed on the first screen, and unpinned on every PDF — fixed
+      2026-08-26.** The 2026-08-25 sweep gated on `key.contains("Wealth Compass Tracker")`, and the
+      product is spelled three ways in this catalog. `Welcome to WealthCompass`
+      (`OnboardingView.swift:97`, `MacOnboardingView.swift:102`) still read `欢迎来到财富指南针` in
+      `zh-Hans`, marked `translated` — the same rendering the sweep had deleted eleven times
+      elsewhere, left standing on the **first line of the first screen**. The bare `Wealth Compass`
+      key (`ReportDocumentBuilder.swift:326`, `:332`, `:1080`) was literally `{}`: it renders
+      correctly, because for a product name the English fallback is the right answer everywhere, but
+      nothing pinned it and an empty entry is an invitation to a translation pass. It now carries all
+      34 locales. The sweep matches `Wealth\s*Compass(?:\s+Tracker)?` and reads `variations` bodies
+      as well as `stringUnit`.
+- [ ] **`Welcome to WealthCompass` is untranslated in 28 of 34 locales** — the value is the English
+      sentence, marked `needs_review`, on the first line of the first screen. Only
+      `ar/de/es/fr/it/zh-Hans` say anything in the reader's language. Not a renaming defect and not
+      in scope for the sweep above, which asks only that the name survives; noted because it is the
+      first thing a new user sees.
 - [ ] **Eight bare-`String` counts in `ReportDocumentBuilder.swift`** (`:857`, `:950`, `:1070-1075`) —
       the same defect as the nine tokenised in the views: they print `1234`, not `1,234`/`1.234`, in
       every locale. In the PDF export, which the lint deliberately excludes.
