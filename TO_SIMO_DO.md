@@ -6,17 +6,6 @@ you run the checks below whenever you're at a real Mac and report anything red.
 
 ---
 
-- [x] **Marketing URL points at your Terms of Service.** ~~All 39 locales have
-      `marketing_url = .../terms`.~~ **DONE 2026-08-09** — set to `.../` in all 39 locales; ships with
-      the 1.1.6 metadata push (see the 1.1.6 release section at the end of this file).
-- [x] **Support URL points at the FAQ, which describes the wrong product.** **URL DONE 2026-08-09** —
-      `support_url` is now `.../support` in all 39 locales. The `/faq` *content* problem below is still
-      open and unrelated to the URL change. `/faq` currently says
-      Wealth Compass is self-hosted on Supabase, has "no official cloud SaaS version", stores data in
-      "your own Supabase instance", and answers "How do I get started?" with a guide that opens
-      "Node.js 18+ installed on your machine". Someone clicking Support from the store — or an App
-      Review reviewer — lands there. Move it to `.../support`, which is genuinely about the app.
-      I'll rewrite `/faq` in pass 2 either way.
 - [ ] **Provider ID for campaign links.** `web-app/src/site/links.ts` has `PROVIDER_TOKEN = null`.
       Fill it in from App Store Connect → Payments and Financial Reports → Provider ID, and the
       store links start attributing per placement (`site-hero` vs `site-footer` vs `site-mac`) in App

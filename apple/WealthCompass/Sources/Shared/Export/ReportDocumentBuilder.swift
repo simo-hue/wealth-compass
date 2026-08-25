@@ -1037,11 +1037,21 @@ struct ReportDocumentBuilder {
             rows: heldCurrencies().map { currency in
                 let live = snapshot?.unitsPerBaseCurrency(for: currency)
                 let rate = live ?? context.converter.unitsPerEuro(for: currency)
+                // The quote base converts to itself at exactly 1 — it never passes through a rate at
+                // all, live or otherwise — so labelling its row "Offline fallback rate" and greying
+                // it as approximate misdescribes the one figure on the table that is certain.
+                let isQuoteBase = currency == quoteBase
+                let source: String
+                if isQuoteBase {
+                    source = L("Quote Base")
+                } else {
+                    source = live == nil ? L("Offline fallback rate") : L("Live rate")
+                }
                 return ReportRow([
                     "\(currency.rawValue) (\(currency.symbol))",
                     rate.formatted(.number.precision(.fractionLength(0...6)).locale(context.locale)),
-                    live == nil ? L("Offline fallback rate") : L("Live rate"),
-                ], style: live == nil ? .excluded : .normal)
+                    source,
+                ], style: (live == nil && !isQuoteBase) ? .excluded : .normal)
             },
             caption: L("Rates applied to convert holdings into the base currency"))))
 
