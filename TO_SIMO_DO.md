@@ -749,12 +749,20 @@ Fallout from `e55f742`, worth one deliberate pass rather than leaving it to drif
       `testWorkingTreeChecksPrivacyBeforeEmptiness` pins it — against the pre-flip tree it reported all
       eight.
 
-### Privacy Mode leaks existence, not just values — 37 sites open (2026-08-25)
+### Privacy Mode leaks existence, not just values — CLOSED (2026-08-25)
 
 The chart work (`e55f742`, `24ffc78`) and the Dashboard label work (`b93f391`) established the rule:
 Privacy Mode must not disclose *whether* data exists, only conceal what it is. A sweep of all eight
 source directories then found **43 sites in that class; 6 are fixed, 37 are open.** They are the same
 defect repeated, in three shapes.
+
+**DONE.** Closed in `65bf189`, `fb5272c`, `f3fac7c`, `52c062a`, `96d535f` — **41 sites**, not 37. The
+counts below were undercounts and the `DashboardView`/`MacDashboardView` line numbers were stale by the
+24 lines `b93f391` inserted (anything after :149 had moved). Corrections: raw counts were **19** sites,
+not 11 — the sweep missed `DashboardView.swift:352`, `MacDashboardView.swift:142`, and both `Showing N
+of M` rows, the macOS one sitting *inside the filter bar*, which is the most direct form of the probe.
+The `Never` fallbacks were **4**, not 8; the original entry collapsed a class count onto them. Kept below
+as written, because the shapes are the useful part.
 
 The app already agrees counts are sensitive — `InvestmentsView.swift:107` redacts
 `investments.count` behind `settings.isPrivacyMode ? settings.redactionToken : …`. It just doesn't do it
@@ -809,3 +817,42 @@ three of them would have produced a vacuous test:
 It carries a control assertion that fails if the renderer ever stops reading `snapshots` — without it,
 the main assertion could silently become unfailable. Reach limit: the test bundle is iOS-hosted, so the
 **macOS half of every fix in this series rests on review, not on a test.**
+
+### Still open after the existence work (2026-08-25)
+
+Three sites of the same family that the 41-site sweep surfaced but did not close.
+
+- [ ] **A disabled control is an existence tell.** `SettingsView.swift:526` and
+      `MacSettingsView.swift:426-429`: `.disabled(isRefreshingPrices || (investments.isEmpty &&
+      crypto.isEmpty))` — *Refresh Prices* greys out precisely when the user holds no investments and no
+      crypto. Un-disabling it changes function, so this needs a decision rather than a patch (enable it
+      and no-op? always enable under Privacy Mode?).
+- [ ] **The import-summary sheet prints raw counts** — `DesignSystem.swift:1004` (`statTile`) and `:1054`
+      (`footnoteRow`): six category counts plus skipped/generated tallies, ungated. Transient and
+      user-initiated, so lower severity than a persistent screen.
+- [ ] **Sign-of-value leak via glyph and tint — 8 sites, and the card contradicts itself.**
+      `MetricCard` picks `systemImage` and `accent` from the sign of the value while the figure itself
+      reads `••••`: `DashboardView.swift:433`, `MacDashboardView.swift:131`, `CashFlowView.swift:164`,
+      `MacCashFlowView.swift:251` (Net Savings); `InvestmentsView.swift:112`, `CryptoView.swift:109`,
+      `MacInvestmentsView.swift:144`, `MacCryptoView.swift:112` (Profit/Loss). This is stronger than the
+      `ValueDelta` tint item recorded earlier: at `CryptoView.swift:109-111` the **same card** redacts its
+      `detail` to "Performance hidden" while its icon and accent still announce the sign, and the sibling
+      Performance card two lines down is behind `if !settings.isPrivacyMode`. The intent to hide
+      performance is already in the code; it is half-applied. A *value* leak, not an existence one.
+
+### What the existence work could not prove
+
+- **Every macOS change in this series rests on review, not on a test.** The bundle hosts
+  `WealthCompassMobile`, so 19 macOS-side edits — `MacSettingsView`'s six rows, `MacDashboardView`'s
+  liabilities caption / onboarding card / Recent Activity, `MacCashFlowView`'s Showing row and three
+  empty-state properties, both Mac Investments/Crypto empty states and `Never` cards, and `MacRootView`'s
+  alert — have no automated coverage at all.
+- **The list empty-states (`f3fac7c`) do not close the bit, by design.** They stop the card *saying* it is
+  empty, but the populated branch still draws rows, because ranked lists are out of scope. Measured, not
+  argued: with Privacy Mode on, `CashFlowView` captures **592,013 bytes with no recurring schedule against
+  585,887 with one**, before and after the commit alike. Closing it means covering the whole card.
+- **A `Text` overload silently dropped locale formatting** (`96d535f`). `Text(privateCount(…))` where the
+  helper returns `String` takes `Text`'s **verbatim** overload; `Text("\(count)")` takes the
+  `LocalizedStringKey` one and applies grouping separators. The redacted branch looked right, so only the
+  *visible* branch regressed — four figures of transactions lost their separator in every locale. If a
+  privacy helper feeds a `Text`, return `Text`.
