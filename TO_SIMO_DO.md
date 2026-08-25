@@ -935,14 +935,26 @@ for skipping this was refuted — `sync` tears down by prefix, so cancellation w
 notification test now asserts on the whole `UNNotificationRequest` rather than a mutable class a later
 line could rewrite; and a ninth entity count was tokenised with a lint that pins the call sites.
 
-- [ ] **44 product-name translations across 13 locales, in 21 other keys.** `zh-Hans` 11, `hi` 6, `ar` 5,
-      `ms` 5, `zh-Hant` 5, `tr` 4, plus `de/es/fr/it/pl/sk/th`. Eight locales were renaming the app in
-      the *notification* strings alone (the brief said two); the same defect is spread through the rest
-      of the catalog. Note the standalone `Wealth Compass Tracker` key **is** the display name, which
-      some locales localize deliberately — do not "fix" that one.
-- [ ] **Two dead catalog keys**, 35 locales each, no Swift reference:
-      `%@ is scheduled. Open Wealth Compass Tracker to review it.` and
-      `%@: %@. Wealth Compass Tracker records it while the app is active.`
+- [x] **44 product-name translations across 13 locales, in 21 keys — all fixed 2026-08-25.** `zh-Hans`
+      11, `hi` 6, `ar` 5, `ms` 5, `zh-Hant` 5, `tr` 4, plus `de/es/fr/it/pl/sk/th`. Eight locales were
+      renaming the app in the *notification* strings alone (the brief said two); the same defect was
+      spread through the rest of the catalog. **The note that used to stand here — that the standalone
+      `Wealth Compass Tracker` key "is the display name, which some locales localize deliberately — do
+      not fix that one" — was false.** `CFBundleDisplayName` is hardcoded (`Resources/iOS/Info.plist:7-8`,
+      `project.pbxproj:973`/`:999`) and there is no `InfoPlist.xcstrings` in the build tree, so the
+      catalog cannot reach the display name at all. That key is in-app UI text (`LockView.swift:33`,
+      `MacPlatformServices.swift:97`, `MacRootView.swift:145`): in `ar/de/es/fr/it/zh-Hans` the unlock
+      screen was showing a translated name above a home-screen icon that says "Wealth Compass Tracker".
+      All 44 now hold the product name, spliced in place and marked `needs_review`, and
+      `LocalizationTests.testNoLocaleRenamesTheAppInTheCatalog` sweeps every key whose English source
+      names the app rather than one sentence.
+- [ ] **Three dead catalog keys**, 35 locales each, no Swift reference (they were fixed along with the
+      rest, since a dead key is one somebody wires up later, but they can equally be deleted):
+      `%@ is scheduled. Open Wealth Compass Tracker to review it.`,
+      `%@: %@. Wealth Compass Tracker records it while the app is active.` and
+      `This permanently removes all local Wealth Compass Tracker data from this device.` — the last of
+      which was **not** in the "two dead keys" this list previously named. There is also a bare
+      `Wealth Compass` key carrying no localizations at all.
 - [ ] **Eight bare-`String` counts in `ReportDocumentBuilder.swift`** (`:857`, `:950`, `:1070-1075`) —
       the same defect as the nine tokenised in the views: they print `1234`, not `1,234`/`1.234`, in
       every locale. In the PDF export, which the lint deliberately excludes.

@@ -225,9 +225,11 @@ final class LocalizationTests: XCTestCase {
     /// noun phrase; the sentence was telling people to open something that is not on their home
     /// screen and cannot be searched for.
     ///
-    /// Scoped to this one string on purpose. `Wealth Compass Tracker` standing alone is the app's
-    /// display name, which `de`, `es`, `fr`, `it`, `ar` and `zh-Hans` deliberately localize, and the
-    /// other sentences carrying the name are outside this audit. Those are recorded, not swept in.
+    /// Kept as its own test because the lock screen is the surface where the cost is highest, but it
+    /// is no longer the only string covered — `testNoLocaleRenamesTheAppInTheCatalog` sweeps all 21.
+    /// The carve-out that used to stand here, exempting the standalone `Wealth Compass Tracker` key
+    /// as "the app's display name, which some locales deliberately localize", was wrong: see that
+    /// test's doc comment.
     func testTheLockScreenReminderDoesNotTranslateTheProductName() {
         let english = AppLocalization.string("Open Wealth Compass Tracker to review.", appLanguage: "en")
         for language in Self.everyLanguage {
@@ -245,6 +247,93 @@ final class LocalizationTests: XCTestCase {
                 \(language) resolves the lock-screen reminder to the English source, so the check \
                 above passed on a string this reader will never understand.
                 """
+            )
+        }
+    }
+
+    /// Fails if any locale renames the app, in any string whose English source names it.
+    ///
+    /// The rule the narrow lock-screen test above expressed for one sentence, applied to all 21 —
+    /// because the same defect was in the other 20, and because the exemption written to justify
+    /// stopping at one was false.
+    ///
+    /// That exemption said the standalone `Wealth Compass Tracker` key is the app's **display name**,
+    /// which `ar`, `de`, `es`, `fr`, `it` and `zh-Hans` localize on purpose. The display name is
+    /// `CFBundleDisplayName`, hardcoded at `Resources/iOS/Info.plist:7-8` and
+    /// `project.pbxproj:973`/`:999`, and there is no `InfoPlist.xcstrings` in the build tree — so
+    /// nothing in the catalog can reach it. That key is ordinary in-app UI text, drawn at
+    /// `LockView.swift:33`, `MacPlatformServices.swift:97` and `MacRootView.swift:145`. In those six
+    /// locales the unlock screen was therefore showing a translated name while the home-screen icon
+    /// underneath it still said "Wealth Compass Tracker" — which is the exact confusion the
+    /// lock-screen fix was about, on the screen the user reaches it from.
+    ///
+    /// A product name is not a noun phrase. Translating it tells the reader to open, unlock or trust
+    /// something that is not on their home screen and cannot be searched for. This asks only that
+    /// the name survives; everything around it must still be translated, which is what the second
+    /// assertion is for.
+    ///
+    /// It reads the catalog rather than resolving through `AppLocalization`, so it covers keys with
+    /// format specifiers and keys nothing references yet — three of the 21 are unreferenced, and a
+    /// dead key is one somebody wires up later. `testTheAppNameSurvivesTheRuntimeLookup` is the
+    /// other half: that the compiled `.lproj` actually hands back what the catalog holds.
+    func testNoLocaleRenamesTheAppInTheCatalog() throws {
+        let catalog = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources/Shared/Resources/Localizable.xcstrings")
+        let parsed = try JSONSerialization.jsonObject(with: try Data(contentsOf: catalog))
+        let strings = try XCTUnwrap((parsed as? [String: Any])?["strings"] as? [String: Any])
+        XCTAssertGreaterThan(strings.count, 500, "only \(strings.count) keys — the catalog has moved")
+
+        let name = "Wealth Compass Tracker"
+        var offenders: [String] = []
+        var checked = 0
+        var keysNamingTheApp = 0
+
+        for (key, entry) in strings.sorted(by: { $0.key < $1.key }) where key.contains(name) {
+            keysNamingTheApp += 1
+            let localizations = (entry as? [String: Any])?["localizations"] as? [String: Any] ?? [:]
+            for (language, localization) in localizations.sorted(by: { $0.key < $1.key })
+            where language != "en" {
+                guard let unit = (localization as? [String: Any])?["stringUnit"] as? [String: Any],
+                      let value = unit["value"] as? String else { continue }
+                checked += 1
+                guard !value.contains(name) else { continue }
+                offenders.append("  \(language) — \(key)\n      \(value)")
+            }
+        }
+
+        XCTAssertGreaterThanOrEqual(
+            keysNamingTheApp, 21,
+            "\(keysNamingTheApp) key(s) name the app; the sweep is no longer reading the catalog"
+        )
+        XCTAssertGreaterThan(checked, 300, "only \(checked) translation(s) read across those keys")
+        XCTAssertEqual(
+            offenders, [],
+            """
+            \(offenders.count) translation(s) rename the app. A product name is not a noun phrase — \
+            these tell the reader to open, unlock or trust something that is not on their home \
+            screen, whose icon says "\(name)" in every locale because `CFBundleDisplayName` is \
+            hardcoded:
+            \(offenders.joined(separator: "\n"))
+            """
+        )
+    }
+
+    /// The runtime half of the rule above: the compiled `.lproj` hands back the name the catalog
+    /// holds.
+    ///
+    /// Only the standalone key can be checked this way — every other one carries `%@` specifiers
+    /// whose arguments differ per call site — but it is the one that matters most, because it is
+    /// what the unlock screen draws next to a home-screen icon that always says the same thing.
+    /// Unlike the other translation tests here there is no "and differs from English" assertion, and
+    /// there cannot be: for this key the correct value in all 34 languages *is* the English one.
+    func testTheAppNameSurvivesTheRuntimeLookup() {
+        for language in Self.everyLanguage {
+            XCTAssertEqual(
+                AppLocalization.string("Wealth Compass Tracker", appLanguage: language),
+                "Wealth Compass Tracker",
+                "\(language) draws a translated app name on the unlock screen and in the window title"
             )
         }
     }

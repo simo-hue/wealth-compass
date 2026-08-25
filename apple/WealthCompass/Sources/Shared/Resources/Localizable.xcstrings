@@ -1687,8 +1687,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@\n\nسوف تستمر بوصلة الثروة في استخدام %@."
+            "state" : "needs_review",
+            "value" : "%@\n\nسوف يستمر تطبيق Wealth Compass Tracker في استخدام %@."
           }
         },
         "ca" : {
@@ -1759,8 +1759,8 @@
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@\n\nवेल्थ कम्पास %@ का उपयोग जारी रखेगा।"
+            "state" : "needs_review",
+            "value" : "%@\n\nWealth Compass Tracker %@ का उपयोग जारी रखेगा।"
           }
         },
         "hr" : {
@@ -1801,8 +1801,8 @@
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@\n\nKompas Kekayaan akan terus menggunakan %@."
+            "state" : "needs_review",
+            "value" : "%@\n\nWealth Compass Tracker akan terus menggunakan %@."
           }
         },
         "nb" : {
@@ -1861,14 +1861,14 @@
         },
         "th" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@\n\nเข็มทิศความมั่งคั่งจะใช้ %@ ต่อไป"
+            "state" : "needs_review",
+            "value" : "%@\n\nWealth Compass Tracker จะใช้ %@ ต่อไป"
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@\n\nZenginlik Pusulası %@ kullanmaya devam edecek."
+            "state" : "needs_review",
+            "value" : "%@\n\nWealth Compass Tracker %@ kullanmaya devam edecek."
           }
         },
         "uk" : {
@@ -1885,14 +1885,14 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@\n\n财富指南针将继续使用%@。"
+            "state" : "needs_review",
+            "value" : "%@\n\nWealth Compass Tracker 将继续使用 %@。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@\n\n財富指南針將繼續使用%@。"
+            "state" : "needs_review",
+            "value" : "%@\n\nWealth Compass Tracker 將繼續使用 %@。"
           }
         }
       }
@@ -4032,8 +4032,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "تمت جدولة %@. افتح بوصلة الثروة لمراجعتها."
+            "state" : "needs_review",
+            "value" : "تمت جدولة %@. افتح Wealth Compass Tracker لمراجعتها."
           }
         },
         "ca" : {
@@ -4098,8 +4098,8 @@
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ निर्धारित है. इसकी समीक्षा करने के लिए वेल्थ कंपास खोलें।"
+            "state" : "needs_review",
+            "value" : "%@ निर्धारित है. इसकी समीक्षा करने के लिए Wealth Compass Tracker खोलें।"
           }
         },
         "hr" : {
@@ -4140,8 +4140,8 @@
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ dijadualkan. Buka Kompas Kekayaan untuk menyemaknya."
+            "state" : "needs_review",
+            "value" : "%@ dijadualkan. Buka Wealth Compass Tracker untuk menyemaknya."
           }
         },
         "nb" : {
@@ -4188,8 +4188,8 @@
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ je naplánované. Otvorte kompas bohatstva a skontrolujte ho."
+            "state" : "needs_review",
+            "value" : "%@ je naplánované. Otvorte aplikáciu Wealth Compass Tracker a skontrolujte ho."
           }
         },
         "sv" : {
@@ -4200,14 +4200,14 @@
         },
         "th" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ มีกำหนดการแล้ว เปิดเข็มทิศความมั่งคั่งเพื่อตรวจสอบ"
+            "state" : "needs_review",
+            "value" : "%@ มีกำหนดการแล้ว เปิด Wealth Compass Tracker เพื่อตรวจสอบ"
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ planlandı. İncelemek için Zenginlik Pusulası'nı açın."
+            "state" : "needs_review",
+            "value" : "%@ planlandı. İncelemek için Wealth Compass Tracker'ı açın."
           }
         },
         "uk" : {
@@ -4224,14 +4224,14 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 已安排。打开财富指南针进行查看。"
+            "state" : "needs_review",
+            "value" : "%@ 已安排。打开 Wealth Compass Tracker 进行查看。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 已安排。打開財富指南針進行查看。"
+            "state" : "needs_review",
+            "value" : "%@ 已安排。打開 Wealth Compass Tracker 進行查看。"
           }
         }
       }
@@ -6426,8 +6426,8 @@
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@: %@. ऐप सक्रिय होने पर वेल्थ कंपास इसे स्वचालित रूप से रिकॉर्ड करता है।"
+            "state" : "needs_review",
+            "value" : "%@: %@. ऐप सक्रिय होने पर Wealth Compass Tracker इसे स्वचालित रूप से रिकॉर्ड करता है।"
           }
         },
         "hr" : {
@@ -6552,14 +6552,14 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@：%@。当应用程序处于活动状态时，财富指南针会自动记录它。"
+            "state" : "needs_review",
+            "value" : "%@：%@。当应用程序处于活动状态时，Wealth Compass Tracker 会自动记录它。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@：%@。當應用程式處於活動狀態時，財富指南針會自動記錄它。"
+            "state" : "needs_review",
+            "value" : "%@：%@。當應用程式處於活動狀態時，Wealth Compass Tracker 會自動記錄它。"
           }
         }
       }
@@ -6641,8 +6641,8 @@
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@: %@. ऐप सक्रिय होने पर वेल्थ कंपास इसे रिकॉर्ड करता है।"
+            "state" : "needs_review",
+            "value" : "%@: %@. ऐप सक्रिय होने पर Wealth Compass Tracker इसे रिकॉर्ड करता है।"
           }
         },
         "hr" : {
@@ -6683,8 +6683,8 @@
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@: %@. Kompas Kekayaan merekodkannya semasa apl aktif."
+            "state" : "needs_review",
+            "value" : "%@: %@. Wealth Compass Tracker merekodkannya semasa apl aktif."
           }
         },
         "nb" : {
@@ -6767,14 +6767,14 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@：%@。财富指南针会在应用程序处于活动状态时记录它。"
+            "state" : "needs_review",
+            "value" : "%@：%@。Wealth Compass Tracker 会在应用程序处于活动状态时记录它。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@：%@。財富指南針會在應用程式處於活動狀態時記錄它。"
+            "state" : "needs_review",
+            "value" : "%@：%@。Wealth Compass Tracker 會在應用程式處於活動狀態時記錄它。"
           }
         }
       }
@@ -44573,8 +44573,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "تمكين الحماية البيومترية لبوصلة الثروة."
+            "state" : "needs_review",
+            "value" : "تمكين الحماية البيومترية لتطبيق Wealth Compass Tracker."
           }
         },
         "ca" : {
@@ -44639,8 +44639,8 @@
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "वेल्थ कम्पास के लिए बायोमेट्रिक सुरक्षा सक्षम करें।"
+            "state" : "needs_review",
+            "value" : "Wealth Compass Tracker के लिए बायोमेट्रिक सुरक्षा सक्षम करें।"
           }
         },
         "hr" : {
@@ -44681,8 +44681,8 @@
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dayakan perlindungan biometrik untuk Kompas Kekayaan."
+            "state" : "needs_review",
+            "value" : "Dayakan perlindungan biometrik untuk Wealth Compass Tracker."
           }
         },
         "nb" : {
@@ -44747,8 +44747,8 @@
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zenginlik Pusulası için biyometrik korumayı etkinleştirin."
+            "state" : "needs_review",
+            "value" : "Wealth Compass Tracker için biyometrik korumayı etkinleştirin."
           }
         },
         "uk" : {
@@ -57742,8 +57742,8 @@
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "वेल्थ कम्पास में वित्तीय मूल्यों को छिपाएँ।"
+            "state" : "needs_review",
+            "value" : "Wealth Compass Tracker में वित्तीय मूल्यों को छिपाएँ।"
           }
         },
         "hr" : {
@@ -57784,8 +57784,8 @@
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sembunyikan nilai kewangan sepanjang Kompas Kekayaan."
+            "state" : "needs_review",
+            "value" : "Sembunyikan nilai kewangan sepanjang Wealth Compass Tracker."
           }
         },
         "nb" : {
@@ -57802,8 +57802,8 @@
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ukryj wartości finansowe w całym Kompasie Bogactwa."
+            "state" : "needs_review",
+            "value" : "Ukryj wartości finansowe w całej aplikacji Wealth Compass Tracker."
           }
         },
         "pt-BR" : {
@@ -57850,8 +57850,8 @@
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zenginlik Pusulası boyunca finansal değerleri gizleyin."
+            "state" : "needs_review",
+            "value" : "Wealth Compass Tracker boyunca finansal değerleri gizleyin."
           }
         },
         "uk" : {
@@ -57868,14 +57868,14 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "在财富指南针中隐藏财务价值。"
+            "state" : "needs_review",
+            "value" : "在 Wealth Compass Tracker 中隐藏财务价值。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "在財富指南針中隱藏財務價值。"
+            "state" : "needs_review",
+            "value" : "在 Wealth Compass Tracker 中隱藏財務價值。"
           }
         }
       }
@@ -92142,8 +92142,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "记录现金流量或添加头寸。财富指南针将创建快照并自动填充此仪表板。"
+            "state" : "needs_review",
+            "value" : "记录现金流量或添加头寸。Wealth Compass Tracker 将创建快照并自动填充此仪表板。"
           }
         },
         "zh-Hant" : {
@@ -110329,8 +110329,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "这将从该设备中永久删除所有本地财富指南针数据。"
+            "state" : "needs_review",
+            "value" : "这将从该设备中永久删除所有本地 Wealth Compass Tracker 数据。"
           }
         }
       }
@@ -116278,8 +116278,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "افتح بيانات بوصلة الثروة المحلية الخاصة بك."
+            "state" : "needs_review",
+            "value" : "افتح بيانات Wealth Compass Tracker المحلية الخاصة بك."
           }
         },
         "ca" : {
@@ -116470,8 +116470,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "解锁您当地的财富指南针数据。"
+            "state" : "needs_review",
+            "value" : "解锁您本地的 Wealth Compass Tracker 数据。"
           }
         },
         "zh-Hant" : {
@@ -119560,8 +119560,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "بوصلة الثروة"
+            "state" : "needs_review",
+            "value" : "Wealth Compass Tracker"
           }
         },
         "ca" : {
@@ -119584,8 +119584,8 @@
         },
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vermögenskompass"
+            "state" : "needs_review",
+            "value" : "Wealth Compass Tracker"
           }
         },
         "el" : {
@@ -119596,8 +119596,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Brújula de riqueza"
+            "state" : "needs_review",
+            "value" : "Wealth Compass Tracker"
           }
         },
         "es-419" : {
@@ -119614,8 +119614,8 @@
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Boussole de richesse"
+            "state" : "needs_review",
+            "value" : "Wealth Compass Tracker"
           }
         },
         "he" : {
@@ -119650,8 +119650,8 @@
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bussola della ricchezza"
+            "state" : "needs_review",
+            "value" : "Wealth Compass Tracker"
           }
         },
         "ja" : {
@@ -119752,8 +119752,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "财富指南针"
+            "state" : "needs_review",
+            "value" : "Wealth Compass Tracker"
           }
         },
         "zh-Hant" : {
@@ -119967,8 +119967,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "财富指南针会在应用程序处于活动状态时记录到期事件。如果应用程序已关闭，则下次打开时会自动添加错过的事件。"
+            "state" : "needs_review",
+            "value" : "Wealth Compass Tracker 会在应用程序处于活动状态时记录到期事件。如果应用程序已关闭，则下次打开时会自动添加错过的事件。"
           }
         },
         "zh-Hant" : {
@@ -121021,8 +121021,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "启用后，只要应用程序离开前台，财富指南针就会锁定。"
+            "state" : "needs_review",
+            "value" : "启用后，只要应用程序离开前台，Wealth Compass Tracker 就会锁定。"
           }
         },
         "zh-Hant" : {
