@@ -442,7 +442,7 @@ were written up rather than changed. Both are data-loss shaped.
       registered for section anchors, so all level-1 contents links are dead (~20 of ~25 rows).
 - [x] **DONE 2026-08-25.** `PDFReportRenderer.swift:6-18` — `ReportRenderError` returns raw English; both Settings screens
       surface it. Every sibling error type has `localizedDescription(appLanguage:)`.
-- [ ] `PDFReportRenderer.swift:453-456`, `ReportChartRenderer.swift:444-463` — `isNumeric: true` with
+- [x] **DONE 2026-08-25.** `PDFReportRenderer.swift:453-456`, `ReportChartRenderer.swift:444-463` — `isNumeric: true` with
       `.leading` alignment pins text to the opposite page edge in RTL, so each KPI tile reads
       label-right / value-left / detail-right.
 - [ ] **Known and deliberate:** long translated table headers still truncate. `GANANCIA / PÉRDIDA`

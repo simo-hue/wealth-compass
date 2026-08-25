@@ -283,7 +283,10 @@ enum PDFReportRenderer {
                              in: CGRect(x: metrics.marginLeading + theme.contentWidth - pageWidth,
                                         y: rowY, width: pageWidth, height: lineHeight),
                              alignment: .trailing,
-                             isNumeric: true)
+                             isNumeric: true,
+                             // A column of page numbers, so their right edges line up under each
+                             // other the way the money columns do — "7" and "112" in one list.
+                             isColumnar: true)
 
             // Whole row is clickable, not just the title.
             context.link(to: entry.anchor,
@@ -460,6 +463,9 @@ enum PDFReportRenderer {
             case .negative: valueColor = palette.negative
             case .headline, .neutral: valueColor = palette.ink
             }
+            // Not columnar: the tile stacks label, value and detail in the same rect, so the value
+            // has to hug the same edge they do. Pinned, it sat alone on the visual left of an
+            // Arabic tile with the label and detail on the right.
             context.drawLine(item.value, role: .kpiValue, color: valueColor,
                              in: CGRect(x: inset.minX + 2, y: inset.minY + 14,
                                         width: inset.width - 2, height: 19),
@@ -557,7 +563,8 @@ enum PDFReportRenderer {
             where index < frames.count && index < row.cells.count {
                 context.drawLine(row.cells[index], role: role, color: color,
                                  in: frames[index], alignment: column.alignment,
-                                 isNumeric: column.isNumeric)
+                                 isNumeric: column.isNumeric,
+                                 isColumnar: column.isNumeric)
             }
 
             if let secondary = row.secondary, !secondary.isEmpty {
@@ -579,7 +586,8 @@ enum PDFReportRenderer {
             where index < frames.count && index < footer.cells.count {
                 context.drawLine(footer.cells[index], role: .tableFooter, color: palette.ink,
                                  in: frames[index], alignment: column.alignment,
-                                 isNumeric: column.isNumeric)
+                                 isNumeric: column.isNumeric,
+                                 isColumnar: column.isNumeric)
             }
         }
     }

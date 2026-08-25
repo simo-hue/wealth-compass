@@ -126,6 +126,151 @@ final class ReportPaginationTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(root.child(at: 1)).numberOfChildren, 1)
     }
 
+    // MARK: - Right-to-left
+
+    /// In Arabic and Hebrew a KPI tile must read as one block against one edge.
+    ///
+    /// `isNumeric` used to pin the alignment of every figure. That is right for a money *column* —
+    /// pinned right, decimal separators lined up down the page — and wrong for a figure set inside
+    /// a label. The tile stacks label, value and detail into rects of the same x and width, so
+    /// mirroring the two text lines while pinning the middle one printed label-right / value-left /
+    /// detail-right: the headline figure of every tile sitting alone on the wrong side.
+    func testRightToLeftKPIValueHugsTheSameEdgeAsItsLabel() throws {
+        let pdf = try kpiDocument(direction: .rightToLeft)
+        let page = try XCTUnwrap(pdf.page(at: 1))
+        // The detail line rather than the label: `.kpiDetail` carries no tracking, so PDFKit
+        // extracts it verbatim and its box is the drawn box. `.kpiLabel`'s 0.8pt letter-spacing
+        // both splits the extracted text ("CA SH") and pushes its right edge in by the trailing kern.
+        let detail = try XCTUnwrap(drawnBounds(of: "dd", on: page, in: pdf), "the tile detail is not on the page")
+        let value = try XCTUnwrap(drawnBounds(of: "1234", on: page, in: pdf), "the tile value is not on the page")
+
+        XCTAssertEqual(value.maxX, detail.maxX, accuracy: 1,
+                       "the value is pinned to the opposite edge of the tile from its own label")
+    }
+
+    /// The same tile left-to-right, unchanged: every line of it starts at the leading edge.
+    func testLeftToRightKPIValueStillHugsTheLeadingEdge() throws {
+        let pdf = try kpiDocument(direction: .leftToRight)
+        let page = try XCTUnwrap(pdf.page(at: 1))
+        let detail = try XCTUnwrap(drawnBounds(of: "dd", on: page, in: pdf))
+        let value = try XCTUnwrap(drawnBounds(of: "1234", on: page, in: pdf))
+        XCTAssertEqual(value.minX, detail.minX, accuracy: 1)
+    }
+
+    /// A money column keeps the opt-out that was written for it.
+    ///
+    /// The column's *position* mirrors with the rest of the table, but the figures inside stay
+    /// right-aligned in every script — that is what keeps "1.234,56" and "12,00" sharing a decimal
+    /// separator down the column. Narrowing the opt-out to columns must not lose this.
+    func testRightToLeftMoneyColumnStaysRightAlignedInsideItsCell() throws {
+        let table = ReportTable(
+            columns: [
+                ReportColumn("Date", weight: 1.2),
+                ReportColumn("Description", weight: 2.8),
+                ReportColumn("Amount", weight: 1.4, alignment: .trailing, isNumeric: true),
+            ],
+            rows: [ReportRow(["d", "row", "9"]), ReportRow(["d", "row", "1234567"])],
+            footer: nil,
+            caption: nil)
+        let pdf = try renderedPDF(makeDocument(table, theme: ReportTheme(direction: .rightToLeft)))
+        let page = try XCTUnwrap(pdf.page(at: 1))
+
+        let short = try XCTUnwrap(drawnBounds(of: "9", on: page, in: pdf))
+        let long = try XCTUnwrap(drawnBounds(of: "1234567", on: page, in: pdf))
+        XCTAssertEqual(short.maxX, long.maxX, accuracy: 0.5,
+                       "the amounts stopped sharing a right edge, so the column no longer aligns")
+    }
+
+    /// A Money Flow label is two lines of one label in one rect: a category name over its amount.
+    ///
+    /// Pinning the amount put those two lines on opposite edges of that rect in RTL — measured at
+    /// 85pt apart on an A4 page — so one label read as two unrelated fragments. Which edge they
+    /// share depends on the side of the hub the node sits on, so the assertion takes either as long
+    /// as both lines agree on it.
+    func testRightToLeftSankeyLabelKeepsItsTwoLinesTogether() throws {
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = try XCTUnwrap(TimeZone(identifier: "UTC"))
+        func date(_ year: Int, _ month: Int, _ dayOfMonth: Int) throws -> Date {
+            var comps = DateComponents()
+            comps.year = year; comps.month = month; comps.day = dayOfMonth; comps.hour = 12
+            return try XCTUnwrap(utc.date(from: comps))
+        }
+
+        // Two income categories so no category's amount equals the hub total, and none of the
+        // printed figures is a substring of another — the search has to find the right label's line.
+        let sankey = AnalyticsEngine(
+            data: FinancialData(transactions: [
+                Transaction(type: .income, category: "Salary", amount: 11000, description: "",
+                            date: try date(2026, 7, 10)),
+                Transaction(type: .income, category: "Freelance", amount: 6248, description: "",
+                            date: try date(2026, 7, 10)),
+                Transaction(type: .expense, category: "Housing", amount: 9559, description: "",
+                            date: try date(2026, 7, 10)),
+            ]),
+            displayCurrency: .eur,
+            calendar: utc,
+            now: try date(2026, 7, 29)
+        ).cashFlowSankey(period: .thirtyDays)
+
+        let document = ReportDocument(
+            metadata: ReportMetadata(brandName: "B", documentTitle: "T", scopeLine: "S",
+                                     periodLine: nil, baseCurrencyLine: "EUR", generatedLine: "g",
+                                     footerNote: "f", appVersion: "1", brandMarkPNG: nil),
+            sections: [ReportSectionContent(anchor: "a", title: "Sec", blocks: [
+                .chart(.sankey(model: sankey, amountFormatter: { "\(Int($0))" })),
+            ])],
+            theme: ReportTheme(direction: .rightToLeft))
+        let pdf = try renderedPDF(document)
+        let page = try XCTUnwrap(pdf.page(at: 1))
+
+        // Salary and Freelance sit on one side of the hub, Housing on the other, so this covers
+        // both the `.leading` and the `.trailing` label columns.
+        for (title, amount) in [("Salary", "11000"), ("Freelance", "6248"), ("Housing", "9559")] {
+            let name = try XCTUnwrap(drawnBounds(of: title, on: page, in: pdf), "\(title) was not drawn")
+            let figure = try XCTUnwrap(drawnBounds(of: amount, on: page, in: pdf),
+                                       "\(title)'s amount was not drawn")
+            XCTAssertTrue(
+                abs(name.maxX - figure.maxX) <= 1 || abs(name.minX - figure.minX) <= 1,
+                "\(title)'s name and amount sit on opposite edges of one label rect: "
+                    + "name \(name.minX)…\(name.maxX), amount \(figure.minX)…\(figure.maxX)"
+            )
+        }
+    }
+
+    /// A single-tile document in the given direction. Body page 1 is its only one — the cover is
+    /// page 0 and a single section over a single page needs no contents page.
+    private func kpiDocument(direction: ReportLayoutDirection) throws -> PDFDocument {
+        let document = ReportDocument(
+            metadata: ReportMetadata(brandName: "B", documentTitle: "T", scopeLine: "S",
+                                     periodLine: nil, baseCurrencyLine: "EUR", generatedLine: "g",
+                                     footerNote: "f", appVersion: "1", brandMarkPNG: nil),
+            sections: [ReportSectionContent(anchor: "a", title: "Sec", blocks: [
+                .kpis([ReportKPI(label: "CASH", value: "1234", detail: "dd")]),
+            ])],
+            theme: ReportTheme(direction: direction))
+        return try renderedPDF(document)
+    }
+
+    /// Where PDFKit says `text` was drawn on `page`. Reading positions back out of the file is the
+    /// only honest check on alignment, since the text extracts the same however it was placed.
+    ///
+    /// `findString` rather than `characterBounds(at:)`: the latter's indices drift against
+    /// `page.string` wherever the extractor synthesises a newline, and it returned boxes spanning
+    /// most of the page height.
+    ///
+    /// The document is a parameter rather than `page.document`, which is a back-reference the page
+    /// does not keep alive: dropping the `PDFDocument` and holding only a page left every lookup
+    /// returning nil.
+    private func drawnBounds(of text: String, on page: PDFPage, in document: PDFDocument) -> CGRect? {
+        // `bounds(for:)` doubles as the page filter: a selection on another page reports an empty
+        // box here.
+        for match in document.findString(text, withOptions: [.literal]) {
+            let bounds = match.bounds(for: page)
+            if bounds.width > 0, bounds.height > 0 { return bounds }
+        }
+        return nil
+    }
+
     /// Two sections with anchored subheadings, long enough that the subsections land mid-document
     /// rather than all on one page. Two non-structural sections is what makes the renderer emit a
     /// contents page at all (`ReportPaginator.needsContentsPage`).

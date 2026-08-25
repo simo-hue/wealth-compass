@@ -101,8 +101,8 @@ struct PDFDrawingContext {
     /// callers never have to remember which labels are letter-spaced.
     ///
     /// `alignment` here is already **visual** — callers resolve logical→visual via
-    /// `direction.resolved(_:)` first, because numeric text deliberately opts out of that
-    /// mirroring (see `drawLine`).
+    /// `direction.resolved(_:)` first, because a column of figures deliberately opts out of that
+    /// mirroring (see `drawLine`'s `isColumnar`).
     func attributedString(_ text: String,
                           role: ReportFontRole,
                           color: ReportColor,
@@ -196,19 +196,25 @@ struct PDFDrawingContext {
     /// not fit. This is the table-cell primitive: cells must never wrap, or row heights stop being
     /// predictable and pagination arithmetic breaks.
     ///
-    /// - Parameter isNumeric: figures opt out of RTL alignment mirroring and are laid out with an
-    ///   LTR base direction. Numerals always render left-to-right, so an amount column stays
-    ///   *visually* right-aligned in Arabic and Hebrew exactly as it is in English — otherwise
-    ///   decimal points stop lining up down the column. The column's **position** still mirrors;
-    ///   only the alignment inside the cell is pinned.
+    /// - Parameter isNumeric: the text is a figure. Numerals always render left-to-right, so the
+    ///   run is laid out with an LTR base direction whatever the document's script, and the line
+    ///   becomes eligible for shrink-to-fit rather than truncation (see `shrunkToFit`).
+    /// - Parameter isColumnar: the figure is one cell of a **column** of figures — a table's money
+    ///   column, the contents page numbers. Only those opt out of RTL alignment mirroring: pinned
+    ///   right in every script, which is what keeps decimal separators lined up down the column
+    ///   while the column's *position* still mirrors with the rest of the table. A figure set
+    ///   inside a label is not columnar and must sit on the same edge as the words around it —
+    ///   pinning those made an Arabic KPI tile read label-right / value-left / detail-right, and
+    ///   split the Sankey's two-line label across opposite edges of one rect.
     func drawLine(_ text: String,
                   role: ReportFontRole,
                   color: ReportColor,
                   in topDownRect: CGRect,
                   alignment: ReportAlignment = .leading,
-                  isNumeric: Bool = false) {
+                  isNumeric: Bool = false,
+                  isColumnar: Bool = false) {
         guard !text.isEmpty, topDownRect.width > 0 else { return }
-        let resolvedAlignment = isNumeric ? alignment : direction.resolved(alignment)
+        let resolvedAlignment = isColumnar ? alignment : direction.resolved(alignment)
         let attributed = attributedString(text, role: role, color: color,
                                           alignment: resolvedAlignment,
                                           textDirection: isNumeric ? .leftToRight : nil)

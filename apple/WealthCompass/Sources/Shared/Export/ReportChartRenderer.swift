@@ -331,9 +331,12 @@ enum ReportChartRenderer {
                                         y: boxY,
                                         width: axisWidth - Layout.axisGap,
                                         height: labelHeight),
-                             // Pre-resolved: `isNumeric` pins the alignment as given, and the axis
-                             // column has to hug the plot on whichever side the plot mirrored to.
-                             alignment: context.direction.resolved(.trailing),
+                             // Logical trailing, mirrored like everything else: the axis column has
+                             // to hug the plot on whichever side the plot mirrored to. This used to
+                             // pre-resolve, to undo the alignment pin `isNumeric` applied to every
+                             // figure; the pin now belongs to `isColumnar`, which a tick label is
+                             // not.
+                             alignment: .trailing,
                              isNumeric: true)
         }
     }
@@ -448,6 +451,9 @@ enum ReportChartRenderer {
                 in: CGRect(x: label.rect.minX, y: label.rect.minY, width: label.rect.width, height: lineHeight),
                 alignment: alignment
             )
+            // Same `alignment` as the title above it, and mirrored the same way: these are two
+            // lines of one label in one rect. While every figure was pinned, an RTL export put the
+            // title against one edge of that rect and the amount against the other.
             context.drawLine(
                 amountFormatter(node.value),
                 role: .chartAxis,
@@ -684,7 +690,10 @@ enum ReportChartRenderer {
                                             y: textY,
                                             width: trailingWidth,
                                             height: textHeight),
-                                 alignment: context.direction.resolved(.trailing),
+                                 // Same as the axis: logical trailing, mirrored. The amount belongs
+                                 // to the legend row it shares with a swatch and a label, so it
+                                 // follows their edge rather than pinning against them.
+                                 alignment: .trailing,
                                  isNumeric: true)
             }
             y += rowHeight
