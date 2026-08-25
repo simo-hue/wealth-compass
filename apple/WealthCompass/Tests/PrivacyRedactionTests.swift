@@ -94,6 +94,8 @@ final class PrivacyRedactionTests: XCTestCase {
     /// two locales that group differently must not agree. Asserting `"1.234"` for `de` would pin
     /// this test to one CLDR release; `fr` alone has moved between a space, a no-break space and a
     /// narrow no-break space.
+    /// Pins `privateCount` itself. `testWorkingTreeRendersNoUnformattedEntityCount` below is what
+    /// keeps the call sites reaching it — this test alone cannot, and did not.
     func testCountsAreFormattedForTheReadersLocale() {
         let settings = makeSettings()
 
@@ -118,6 +120,90 @@ final class PrivacyRedactionTests: XCTestCase {
         XCTAssertEqual(
             settings.privateCount(1_234), settings.redactionToken,
             "an entity count survived Privacy Mode"
+        )
+    }
+
+    /// Fails if an entity count is rendered as a bare `String` instead of going through
+    /// `privateCount`.
+    ///
+    /// The test above only exercises the helper, and that is not the same thing. Reverting
+    /// `InvestmentsView.swift:107` to the spelling `7a92b06` replaced —
+    /// `settings.isPrivacyMode ? settings.redactionToken : "\(finance.data.investments.count)"` —
+    /// left the suite at 297 passed / 0 failed, so the eight call sites that commit fixed were
+    /// pinned by nothing. A ninth, `MacCashFlowView.swift:262`, was missed outright and stayed in
+    /// the old form with the suite green.
+    ///
+    /// A lint rather than a render, and the same shape as
+    /// `testWorkingTreeRendersNoUnguardedLastUpdatedStamp`, for the same reason: five of the nine
+    /// sites are `Sources/macOS` and the test bundle hosts `WealthCompassMobile`, so they cannot be
+    /// rendered here at all.
+    ///
+    /// What it looks for is a string literal whose whole content is an interpolated count —
+    /// `"\(somethingCount)"`. That is `String(describing:)`, it groups nothing, and it prints 1234
+    /// in every language with Privacy Mode **off**: a defect for every reader, not only the redacted
+    /// ones. `Text("\(count)")` is exempt and is the other correct spelling — handing `Text` a
+    /// `LocalizedStringKey` formats the integer for the reader's locale, which is why
+    /// `SettingsView.swift` and `MacSettingsView.swift` each keep a `Text`-returning `privateCount`.
+    ///
+    /// The report-export files are excluded here as they are from the other sweeps. They print six
+    /// counts this way, which is the same formatting defect, but an export redacts nothing by
+    /// design and they are not privacy call sites; they are recorded rather than swept in.
+    func testWorkingTreeRendersNoUnformattedEntityCount() throws {
+        let sources = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources")
+
+        // A string literal that is nothing but one interpolated count.
+        let countLiteral = try NSRegularExpression(pattern: ##""\\\([^"\n]*[Cc]ount\)""##)
+        var offenders: [PercentRender] = []
+        var renders = 0
+
+        for directory in Self.scannedDirectories {
+            let root = sources.appendingPathComponent(directory)
+            let swiftFiles = try FileManager.default
+                .subpathsOfDirectory(atPath: root.path)
+                .filter { $0.hasSuffix(".swift") }
+                .filter { !Self.excludedFiles.contains(($0 as NSString).lastPathComponent) }
+                .sorted()
+
+            for file in swiftFiles {
+                let text = try String(contentsOf: root.appendingPathComponent(file), encoding: .utf8)
+                let source = Self.stripped(text)
+                for index in source.scan.indices {
+                    let line = String(source.scan[index])
+                    let range = NSRange(line.startIndex..<line.endIndex, in: line)
+                    for match in countLiteral.matches(in: line, range: range) {
+                        renders += 1
+                        // `Text("\(count)")` picks Text's `LocalizedStringKey` overload, which does
+                        // format the integer. Only a bare `String` fails to.
+                        guard let start = Range(match.range, in: line)?.lowerBound,
+                              !line[line.startIndex..<start].hasSuffix("Text(") else { continue }
+                        offenders.append(PercentRender(
+                            file: "Sources/\(directory)/\(file)", line: index + 1,
+                            pattern: #""\(…count)""#,
+                            source: line.trimmingCharacters(in: .whitespaces)
+                        ))
+                    }
+                }
+            }
+        }
+
+        XCTAssertGreaterThanOrEqual(
+            renders, 5,
+            """
+            found \(renders) interpolated count(s) — the five correct `Text("\\(count)")` spellings \
+            alone should match, so the sweep has lost the source tree
+            """
+        )
+        XCTAssertEqual(
+            offenders.map(\.description), [],
+            """
+            \(offenders.count) entity count(s) render as a bare `String`, so every reader sees 1234 \
+            rather than 1,234 or 1.234 — with Privacy Mode off, which is most readers. Route them \
+            through `settings.privateCount(_:)`:
+            \(offenders.map { "  " + $0.description }.joined(separator: "\n"))
+            """
         )
     }
 

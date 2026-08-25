@@ -259,7 +259,7 @@ struct MacCashFlowView: View {
             )
             MetricCard(
                 title: "Transactions",
-                value: settings.isPrivacyMode ? settings.redactionToken : "\(monthlyTransactionsCount)",
+                value: settings.privateCount(monthlyTransactionsCount),
                 systemImage: "arrow.left.arrow.right"
             )
             MetricCard(
