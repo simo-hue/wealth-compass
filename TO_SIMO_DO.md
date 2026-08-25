@@ -487,7 +487,9 @@ were written up rather than changed. Both are data-loss shaped.
       `Sources/Shared/Services/RecurringNotificationService.swift`, whose line 82 is an innocent
       `content.body` assignment. And the Mac scheme never compiles `Sources/iOS/`, so a clean **macOS**
       build emits zero Swift warnings and proves nothing here. A clean `WealthCompassMobile` build
-      emits this one twice (a compile diagnostic plus a summary line); a *cached* build emits none.
+      emits it, but **how many times depends on the destination**: twice against a concrete simulator,
+      four times against `generic/platform=iOS Simulator`, which compiles arm64 and x86_64 (twice per
+      arch). A *cached* build emits none. Count distinct warnings, not lines.
       Checked 2026-08-25 — both mistakes were made that day.
       (The second warning is gone: the deprecated `resultsTruncated` assertion in
       `Tests/CloudSyncCoreTests.swift` was deleted, and `:860-863` is now a comment recording that it
@@ -702,3 +704,23 @@ branch. Same two caveats as its sibling — it greps the working tree rather tha
 sees the spelling it looks for, so a new *kind* of proportional chart needs the pattern extended. It was
 run against the pre-fix tree and reported exactly the two leaks above (and not the already-concealed
 macOS donut), so it is not vacuous.
+
+### Two near-identical privacy covers now coexist (2026-08-25)
+
+Fallout from `e55f742`, worth one deliberate pass rather than leaving it to drift:
+
+- [ ] **`MobilePrivacyChartCover` is misnamed now.** It is what the eight shared `AllocationChart` rings
+      render, so macOS Investments and macOS Crypto show a cover called *Mobile*. Meanwhile
+      `MacDashboardView.swift:448` still uses its own `PrivacyChartCover` — that card is **not** an
+      `AllocationChart` call site (grep returns 0); it inlines its own `Chart`/`SectorMark`, which is
+      why the two were never unified. They differ slightly: corner radius 15 vs 14, black .14 vs .12,
+      `textTertiary` vs `textFaint`. Unifying changes macOS pixels, so it is a decision, not a cleanup.
+      At minimum, rename the shared one — it is no longer mobile-only.
+- [ ] **`Values and proportions are hidden.` is 7/35 `translated`, 28 `needs_review`.** Pre-existing, but
+      this string went from 3 macOS-only sites to 9 charts across both platforms, so far more users now
+      read it. (`Allocation concealed` is 35/35.) Highest-value single string to get translated properly.
+- [ ] **Two conceal orderings disagree in this codebase.** `AllocationChart` and the iOS Dashboard charts
+      check emptiness *before* privacy; `SankeyDiagramView.swift:46-52` deliberately checks privacy first,
+      arguing "whether a period is empty is itself information". The Sankey's reasoning is the stronger
+      one and probably should win everywhere — an "no data in this period" state that only appears when
+      you genuinely have no data still tells a bystander something.
