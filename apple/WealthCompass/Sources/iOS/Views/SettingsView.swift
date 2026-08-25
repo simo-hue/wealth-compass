@@ -796,6 +796,7 @@ struct SettingsView: View {
         if let error = error as? CloudSyncError { return error.localizedDescription(appLanguage: appLanguage) }
         if let error = error as? ExchangeRateError { return error.localizedDescription(appLanguage: appLanguage) }
         if let error = error as? MarketDataError { return error.localizedDescription(appLanguage: appLanguage) }
+        if let error = error as? ReportRenderError { return error.localizedDescription(appLanguage: appLanguage) }
         return (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
     }
 }

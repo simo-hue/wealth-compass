@@ -179,3 +179,23 @@ private extension String {
         return output
     }
 }
+
+extension ReportRenderError {
+    /// The in-app-language message, kept out of `PDFReportRenderer` on purpose.
+    ///
+    /// That file is pure CoreGraphics/CoreText/PDFKit with no app types, so the whole renderer stays
+    /// runnable from `scripts/render_sample_report.swift` with the Command Line Tools alone —
+    /// importing `AppLocalization` there would break that. Its `errorDescription` therefore returns
+    /// raw English, and both Settings screens surfaced it verbatim; every sibling error type in the
+    /// app implements this method and is unwrapped by name in `FinanceStore.errorMessage`.
+    func localizedDescription(appLanguage: String?) -> String {
+        switch self {
+        case .couldNotCreatePDFContext:
+            AppLocalization.string("Could not create the PDF document.", appLanguage: appLanguage)
+        case .couldNotAttachOutline:
+            AppLocalization.string("Could not finalise the PDF document.", appLanguage: appLanguage)
+        case .cancelled:
+            AppLocalization.string("Export cancelled.", appLanguage: appLanguage)
+        }
+    }
+}

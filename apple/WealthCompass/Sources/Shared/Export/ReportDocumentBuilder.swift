@@ -414,7 +414,11 @@ struct ReportDocumentBuilder {
                 slices: cappedSlices(allocation.map {
                     ReportSlice(label: $0.0, value: $0.1.doubleValue, formattedValue: money($0.1))
                 }),
-                centerLabel: L("Total Assets"),
+                // Labelled for what the centre figure *is*. It was "Total Assets" while carrying
+                // `ringTotal`, which the comment above deliberately makes a different quantity
+                // whenever cash is net-negative — so the tile above and the ring below printed two
+                // different numbers under the same name, on one page.
+                centerLabel: L("Allocated"),
                 centerValue: money(ringTotal))))
 
             // Reproduces the dashboards' existing footnote: a ring cannot render a negative wedge,
@@ -726,8 +730,12 @@ struct ReportDocumentBuilder {
 
             func closeMonth() {
                 guard let month = currentMonth else { return }
+                // The label sits in Description (weight 2.8), not Date (1.2). In the Date column it
+                // had ~62pt for a string like "September 2024 subtotal" — 118pt at this face, and
+                // more in German — so every subtotal row on every ledger table truncated while the
+                // two cells beside it sat empty.
                 rows.append(ReportRow([
-                    monthLabel(month) + " " + L("subtotal"), "", "", money(monthTotal), "",
+                    "", monthLabel(month) + " " + L("subtotal"), "", money(monthTotal), "",
                 ], style: .subtotal))
                 monthTotal = 0
             }

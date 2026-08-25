@@ -422,11 +422,11 @@ were written up rather than changed. Both are data-loss shaped.
 
 ### PDF export
 
-- [ ] `ReportDocumentBuilder.swift:497-518` — inside a custom date range, the Cash Flow KPI row and
+- [x] **DONE 2026-08-25.** `ReportDocumentBuilder.swift:497-518` — inside a custom date range, the Cash Flow KPI row and
       the Monthly Trend chart are computed from `now`, not from `options.dateRange`, so a 2024 export
       prints 2026 figures under a cover page stating the 2024 period. The comments two blocks below
       state this rule and were applied to the Money Flow and category totals only.
-- [ ] `:394-399` — the allocation donut's centre is labelled `Total Assets` but carries `ringTotal`,
+- [x] **DONE 2026-08-25.** `:394-399` — the allocation donut's centre is labelled `Total Assets` but carries `ringTotal`,
       which differs whenever cash is net-negative. Two different figures under one label, one page.
 - [ ] `:524-529` — the Money Flow sums unrounded conversions while the category table sums rounded
       ones, so the same category prints two amounts. Needs foreign-currency rows to show.
@@ -436,11 +436,11 @@ were written up rather than changed. Both are data-loss shaped.
       (ja wants 万/億, de "Mio.", ru "млн").
 - [ ] `:635-639` — the future-dated note is `String(format:)`-substituted after a plain lookup, so a
       catalog `variations.plural` entry can never fire. Also no plural handling for English.
-- [ ] `:654-660` — the month-subtotal label is written into cell 0, which is the 61.9pt Date column,
+- [x] **DONE 2026-08-25.** `:654-660` — the month-subtotal label is written into cell 0, which is the 61.9pt Date column,
       so every subtotal row truncates while 243pt of adjacent cells sit empty.
 - [ ] `PDFReportRenderer.swift:288-291` — every contents row is a hyperlink but destinations are only
       registered for section anchors, so all level-1 contents links are dead (~20 of ~25 rows).
-- [ ] `PDFReportRenderer.swift:6-18` — `ReportRenderError` returns raw English; both Settings screens
+- [x] **DONE 2026-08-25.** `PDFReportRenderer.swift:6-18` — `ReportRenderError` returns raw English; both Settings screens
       surface it. Every sibling error type has `localizedDescription(appLanguage:)`.
 - [ ] `PDFReportRenderer.swift:453-456`, `ReportChartRenderer.swift:444-463` — `isNumeric: true` with
       `.leading` alignment pins text to the opposite page edge in RTL, so each KPI tile reads
