@@ -2459,13 +2459,35 @@ final class PrivacyRedactionTests: XCTestCase {
             "cancelAll() no longer routes through the unconditional teardown"
         )
         let unconditional = try XCTUnwrap(functions.first { $0.name == "clearScheduledReminders" })
-        XCTAssertFalse(
-            unconditional.body.contains("staleDelivered"),
+
+        // What the erase path removes has to be exactly what `everyReminder` named. Asking for the
+        // absence of the literal `staleDelivered` was a check about spelling, and a teardown that
+        // caches the schedules in `sync` and keeps the banners still backed by them passes it
+        // verbatim — under any name at all, which is what makes a name-based rule the wrong shape.
+        let owned = try XCTUnwrap(
+            Self.soleCallBinding(of: "Self.everyReminder", in: unconditional.body),
             """
-            The erase path consults the schedules before taking a banner down. Erase means there are \
-            no schedules, so every banner would read as one nothing stands behind — but the moment \
-            that stops being true, a factory reset leaves the user's schedules describing themselves \
-            on a wiped device, which is the bug 73e3b22 fixed.
+            The erase path no longer takes its identifier list straight from `Self.everyReminder(…)`. \
+            Either it builds the list some other way, or something is chained onto the call — and \
+            a `.filter` there is all it takes for a factory reset to leave the user's schedules \
+            describing themselves on a wiped device, which is the bug 73e3b22 fixed.
+            """
+        )
+        for removal in ["removePendingNotificationRequests", "removeDeliveredNotifications"] {
+            XCTAssertTrue(
+                Self.squeezed(unconditional.body).contains("\(removal)(withIdentifiers: \(owned))"),
+                """
+                clearScheduledReminders() calls `\(removal)` with something other than the whole \
+                list `everyReminder` returned, so the erase path is no longer all-or-nothing.
+                """
+            )
+        }
+        XCTAssertEqual(
+            unconditional.body.components(separatedBy: owned).count - 1, 3,
+            """
+            `\(owned)` is bound once and read twice; it appears a different number of times, so \
+            something in clearScheduledReminders() is narrowing or rebinding the list on its way to \
+            the two removals.
             """
         )
     }
@@ -2936,6 +2958,82 @@ final class PrivacyRedactionTests: XCTestCase {
         return Self.stripped(try String(contentsOf: service, encoding: .utf8)).code
     }
 
+    /// One line of whitespace-normalised source, so a reformat cannot change a verdict.
+    private static func squeezed(_ text: String) -> String {
+        text.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+    }
+
+    /// The index of the bracket closing the one at `open`, over a stripped `code` view.
+    ///
+    /// Only `(` / `)` and `{` / `}` are tracked, and that is enough here because the view it reads
+    /// has already blanked comments and string bodies — a brace in `let brace = "{"` cannot move a
+    /// boundary.
+    private static func closingBracket(from open: String.Index, in text: String) -> String.Index? {
+        let pairs: [Character: Character] = ["(": ")", "{": "}"]
+        guard let closer = pairs[text[open]] else { return nil }
+        let opener = text[open]
+        var depth = 0
+        var index = open
+        while index < text.endIndex {
+            if text[index] == opener { depth += 1 }
+            if text[index] == closer {
+                depth -= 1
+                if depth == 0 { return index }
+            }
+            index = text.index(after: index)
+        }
+        return nil
+    }
+
+    /// The variable and body of the first `for <name> in <callee>…{ … }`, or `nil` if there is none.
+    ///
+    /// The variable comes out of the header rather than being assumed, so a rule written against it
+    /// holds however the loop names it — and notices when the body binds that name to something
+    /// else, which is the whole point of asking.
+    private static func loopBody(over callee: String, in text: String) -> (variable: String, body: String)? {
+        guard let header = try? NSRegularExpression(pattern: #"\bfor\s+(\w+)\s+in\s+\#(NSRegularExpression.escapedPattern(for: callee))"#),
+              let match = header.firstMatch(
+                  in: text, range: NSRange(text.startIndex..<text.endIndex, in: text)
+              ),
+              let nameRange = Range(match.range(at: 1), in: text),
+              let callRange = Range(match.range, in: text)
+        else { return nil }
+
+        // `callee` ends in its own `(`, so the argument list opens on the match's last character.
+        // Stepping forward to the next `(` instead would land inside the arguments.
+        let openParen = text.index(before: callRange.upperBound)
+        guard text[openParen] == "(",
+              let closeParen = closingBracket(from: openParen, in: text),
+              let openBrace = text[closeParen...].dropFirst().firstIndex(of: "{"),
+              let closeBrace = closingBracket(from: openBrace, in: text)
+        else { return nil }
+        return (String(text[nameRange]), String(text[text.index(after: openBrace)..<closeBrace]))
+    }
+
+    /// The name a `let` binds, when its initialiser is a call to `callee` and **nothing else**.
+    ///
+    /// The "nothing else" is the substance. `let x = Self.f(…)` and
+    /// `let x = Self.f(…).filter { … }` both take their value from `f`, and a check that only asked
+    /// where a value came from would accept the second — which is exactly how an erase path is
+    /// written that consults the schedules while still routing through the unconditional helper.
+    private static func soleCallBinding(of callee: String, in body: String) -> String? {
+        guard let binding = try? NSRegularExpression(pattern: #"\blet\s+(\w+)\s*=\s*\#(NSRegularExpression.escapedPattern(for: callee))\s*\("#),
+              let match = binding.firstMatch(
+                  in: body, range: NSRange(body.startIndex..<body.endIndex, in: body)
+              ),
+              let nameRange = Range(match.range(at: 1), in: body),
+              let matched = Range(match.range, in: body)
+        else { return nil }
+
+        let open = body.index(before: matched.upperBound)
+        guard let close = closingBracket(from: open, in: body) else { return nil }
+        // Nothing may be chained onto the call: the next thing in the statement has to be the end
+        // of a line, not a `.`.
+        let rest = body[body.index(after: close)...].prefix { $0 != "\n" }
+        guard rest.allSatisfy(\.isWhitespace) else { return nil }
+        return String(body[nameRange])
+    }
+
     /// Every `func` line at any nesting, paired with the text from it to the next one.
     ///
     /// Coarse, and enough for the one file the two notification lints read: it declares a single
@@ -2983,6 +3081,25 @@ final class PrivacyRedactionTests: XCTestCase {
     /// A source lint, and it has to be: the test host is never granted an authorization
     /// (`authorizationStatus.rawValue == 0`) and `center.add` retains 0 of 5 requests, so `sync`
     /// returns before its loop and no runtime observation of this is possible at all.
+    ///
+    /// Its first version asked four questions, and three spellings walked straight through all four
+    /// while the suite stayed at 309 / 0:
+    ///
+    /// - `UNUserNotificationCenter.current().add(…)` written inside `sync` — posting the schedule's
+    ///   `description` as the subtitle and its category as the body and thread, for every schedule,
+    ///   *regardless of Privacy Mode*. The checks counted the substring `center.add(`, which that
+    ///   spelling does not contain, so the count stayed at 1 and the posting-function list stayed
+    ///   `["sync"]`. A full lock-screen leak, worse than the bug this file exists for, invisible.
+    /// - `for request in Self.requests(…) { let request = Self.tampered(request); … }` — the loop
+    ///   header is still there, the call is still `center.add(request)`, and the `request` being
+    ///   posted is a different value.
+    /// - Anything at all in another file, which the sweep did not read.
+    ///
+    /// Each hole was a *textual* assumption standing in for a semantic property, so each question is
+    /// now asked about the property. What may reach the notification centre is one call, on the
+    /// service's one handle to it, inside `sync`, whose argument is the loop variable of a loop over
+    /// `Self.requests(…)` and whose body is that call and nothing else — and no other source file
+    /// may hold a handle at all.
     func testEveryReminderReachingTheNotificationCentreComesFromOneBuilder() throws {
         let code = try Self.notificationServiceCode()
         let functions = try Self.functionBodies(in: code)
@@ -2992,40 +3109,200 @@ final class PrivacyRedactionTests: XCTestCase {
         )
 
         let text = code.map { String($0) }.joined(separator: "\n")
-        let addSites = text.components(separatedBy: "center.add(").count - 1
+        // Any receiver, any spacing: `center.add(`, `self.center.add(`,
+        // `UNUserNotificationCenter.current().add(`. The old check counted one spelling of one name.
+        let posts = try NSRegularExpression(pattern: #"\.\s*add\s*\("#)
+        let addSites = posts.numberOfMatches(
+            in: text, range: NSRange(text.startIndex..<text.endIndex, in: text)
+        )
         XCTAssertEqual(
             addSites, 1,
             """
-            \(addSites) call(s) to `center.add(` in RecurringNotificationService.swift. The \
-            lock-screen test archives what `requests(for:…)` returns, and that is only the same \
-            thing as "what the lock screen draws" while exactly one call site posts, out of exactly \
-            that function's output.
-            """
-        )
-        XCTAssertTrue(
-            text.contains("center.add(request)"),
-            """
-            The single `center.add` no longer posts the loop variable straight from \
-            `requests(for:…)`. Whatever it posts instead is what the lock screen draws, and nothing \
-            asserts on it.
+            \(addSites) call(s) to `.add(` in RecurringNotificationService.swift. The lock-screen \
+            test archives what `requests(for:…)` returns, and that is only the same thing as "what \
+            the lock screen draws" while exactly one call site posts, out of exactly that \
+            function's output.
             """
         )
 
-        let posting = functions.filter { $0.body.contains("center.add(") }
+        // One handle on the centre — the stored property. A second one is how a second post site is
+        // written without ever naming the first.
+        let handles = text.components(separatedBy: "UNUserNotificationCenter").count - 1
+        XCTAssertEqual(
+            handles, 1,
+            """
+            \(handles) reference(s) to `UNUserNotificationCenter` in the service, where there should \
+            be exactly one — the stored `center`. A second handle is a second way to post that does \
+            not have to mention the first, which is how `UNUserNotificationCenter.current().add(…)` \
+            slipped past a check counting the substring `center.add(`.
+            """
+        )
+
+        let posting = functions.filter { current in
+            posts.numberOfMatches(
+                in: current.body,
+                range: NSRange(current.body.startIndex..<current.body.endIndex, in: current.body)
+            ) > 0
+        }
         XCTAssertEqual(
             posting.map(\.name), ["sync"],
             "the notification centre is fed from \(posting.map(\.name)) rather than from `sync` alone"
         )
-        for function in posting {
-            XCTAssertTrue(
-                function.body.contains("for request in Self.requests("),
-                """
-                \(function.name)() at :\(function.line) posts to the notification centre without \
-                looping over `Self.requests(…)`, so it is publishing a payload no test has seen. \
-                Under Privacy Mode that payload is drawn on a locked screen.
-                """
-            )
+
+        // The loop, and what is inside it. Binding the variable from the header rather than
+        // expecting the name `request` means renaming it is free and rebinding it is not.
+        let loop = try XCTUnwrap(
+            Self.loopBody(over: "Self.requests(", in: text),
+            """
+            Nothing in the service loops over `Self.requests(…)` any more, so whatever the single \
+            post site is feeding the notification centre did not come from the builder the \
+            lock-screen test archives.
+            """
+        )
+        let expected = try NSRegularExpression(
+            pattern: #"^try\? await [A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*\.add\(\#(NSRegularExpression.escapedPattern(for: loop.variable))\)$"#
+        )
+        let body = Self.squeezed(loop.body)
+        XCTAssertEqual(
+            expected.numberOfMatches(in: body, range: NSRange(body.startIndex..<body.endIndex, in: body)),
+            1,
+            """
+            The loop over `Self.requests(…)` does more than post `\(loop.variable)`:
+
+              \(body)
+
+            Every statement between the builder and `add` is a statement that can rewrite the \
+            payload — `let \(loop.variable) = Self.tampered(\(loop.variable))` shadows the loop \
+            variable and satisfies every check that only asks whether the loop and the call are \
+            still spelled the same way. Under Privacy Mode what it posts instead is drawn on a \
+            locked screen.
+            """
+        )
+    }
+
+    /// Fails if any source outside the notification service can reach the notification centre.
+    ///
+    /// The lint above reads one file, so until now a post path anywhere else was out of scope by
+    /// construction — the strongest possible guarantee about `RecurringNotificationService.swift`
+    /// says nothing about a `UNUserNotificationCenter.current().add(…)` in a view.
+    ///
+    /// Scoped by *type* rather than by call, which is what keeps it from firing on everything: a
+    /// blanket sweep for `.add(` reports `engine.state.add(pendingRecordZoneChanges:)` in
+    /// `CloudKitSyncService`, which has nothing to do with notifications. What is asked instead is
+    /// which files may name `UNUserNotificationCenter` or `UNNotificationRequest` at all. Two
+    /// platform delegates have to — they assign `.delegate` on launch — and they are listed here
+    /// with the further requirement that they post nothing.
+    func testNoSourceOutsideTheNotificationServiceReachesTheNotificationCentre() throws {
+        let sources = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources")
+
+        /// The one file that builds and posts reminders, and the two that only register a delegate.
+        let builder = "Shared/Services/RecurringNotificationService.swift"
+        let delegates: Set<String> = [
+            "iOS/Services/RecurringTransactionNotificationService.swift",
+            "macOS/MacPlatformServices.swift",
+        ]
+        let posts = try NSRegularExpression(pattern: #"\.\s*add\s*\("#)
+
+        var reaching: [String] = []
+        var posting: [String] = []
+        var filesRead = 0
+
+        for directory in Self.scannedDirectories {
+            let root = sources.appendingPathComponent(directory)
+            let swiftFiles = try FileManager.default
+                .subpathsOfDirectory(atPath: root.path)
+                .filter { $0.hasSuffix(".swift") }
+                .sorted()
+
+            for file in swiftFiles {
+                filesRead += 1
+                let path = "\(directory)/\(file)"
+                let code = Self.stripped(
+                    try String(contentsOf: root.appendingPathComponent(file), encoding: .utf8)
+                ).code.map { String($0) }.joined(separator: "\n")
+                guard code.contains("UNUserNotificationCenter") || code.contains("UNNotificationRequest")
+                else { continue }
+                if path != builder, !delegates.contains(path) { reaching.append(path) }
+                let range = NSRange(code.startIndex..<code.endIndex, in: code)
+                if delegates.contains(path), posts.numberOfMatches(in: code, range: range) > 0 {
+                    posting.append(path)
+                }
+            }
         }
+
+        XCTAssertGreaterThan(
+            filesRead, 20, "only \(filesRead) Swift file(s) read — the sweep has lost the source tree"
+        )
+        XCTAssertEqual(
+            reaching, [],
+            """
+            \(reaching.count) source(s) outside the notification service reach the notification \
+            centre. Everything the lock-screen test guarantees is about payloads built in \
+            `\(builder)`; a request posted from anywhere else is drawn on the same lock screen with \
+            nothing asserting on it:
+            \(reaching.map { "  " + $0 }.joined(separator: "\n"))
+            """
+        )
+        XCTAssertEqual(
+            posting, [],
+            """
+            \(posting.count) platform delegate(s) call `.add(`. They are listed here to assign \
+            `UNUserNotificationCenter.current().delegate` on launch and for nothing else:
+            \(posting.map { "  " + $0 }.joined(separator: "\n"))
+            """
+        )
+    }
+
+    /// Fails if the erase path can be made to spare a banner.
+    ///
+    /// "Erase local data" means the schedules are gone, so no banner describing one can still be
+    /// accurate and there is nothing left to compare against — which is why this path stays
+    /// all-or-nothing while `sync`'s is scoped. The lint that used to hold it asked whether
+    /// `clearScheduledReminders`'s body contained the literal `staleDelivered`, and a teardown that
+    /// caches the schedules in `sync` and keeps the banners still backed by them satisfies that
+    /// check verbatim, under any name at all.
+    ///
+    /// So the decision is a function now, and this asserts its values. There is no parameter through
+    /// which a schedule could arrive and no actor state a `nonisolated static` could read, so making
+    /// it consult the data is a signature change this test will not compile against — which is a
+    /// stronger guarantee than any spelling of a lint over its body.
+    func testTheErasePathNamesEveryReminderItOwns() {
+        let prefix = Self.reminderIdentifierPrefix
+        let pending = ["\(prefix)\(UUID().uuidString)", "\(prefix)due-2031-6-15-9-0"]
+        let delivered = ["\(prefix)\(UUID().uuidString)", "\(prefix)due-2031-6-15-20-0"]
+        let foreign = ["wealth-compass-mac-recurring-\(UUID().uuidString)", "com.someone.else.reminder"]
+
+        XCTAssertEqual(
+            Set(RecurringNotificationService.everyReminder(
+                pending: pending + foreign, delivered: delivered + foreign, identifierPrefix: prefix
+            )),
+            Set(pending + delivered),
+            """
+            The erase path either spared a reminder this service owns — leaving the user's schedules \
+            describing themselves on a device they just wiped, which is the bug 73e3b22 fixed — or \
+            reached one it does not own.
+            """
+        )
+        XCTAssertEqual(
+            RecurringNotificationService.everyReminder(
+                pending: [], delivered: [], identifierPrefix: prefix
+            ),
+            [],
+            "the erase path invented an identifier out of two empty queues"
+        )
+        // A delivered banner is by definition no longer pending, so the two lists have to be read
+        // separately — `cancelAll` used to filter the pending queue and hand *that* list to
+        // `removeDeliveredNotifications`, which could never name a delivered banner.
+        XCTAssertEqual(
+            RecurringNotificationService.everyReminder(
+                pending: [], delivered: delivered, identifierPrefix: prefix
+            ),
+            delivered,
+            "a banner already on the lock screen is unreachable unless the delivered queue is read"
+        )
     }
 
     /// Fails if the 60-request cap can drop the wrong reminders.

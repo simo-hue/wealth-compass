@@ -674,11 +674,36 @@ actor RecurringNotificationService {
     /// the schedule write-back inside `processDueRecurringTransactions` fires
     /// `.onChange(of: finance.data.recurringTransactions)` on its own.
     private func clearScheduledReminders() async {
-        let pending = await center.pendingNotificationRequests().map(\.identifier)
-        let delivered = await center.deliveredNotifications().map(\.request.identifier)
-        let identifiers = (pending + delivered).filter { $0.hasPrefix(identifierPrefix) }
+        let identifiers = Self.everyReminder(
+            pending: await center.pendingNotificationRequests().map(\.identifier),
+            delivered: await center.deliveredNotifications().map(\.request.identifier),
+            identifierPrefix: identifierPrefix
+        )
         center.removePendingNotificationRequests(withIdentifiers: identifiers)
         center.removeDeliveredNotifications(withIdentifiers: identifiers)
+    }
+
+    /// Which of the notification centre's identifiers this service owns — the erase path's whole
+    /// decision, extracted so it can be tested as a value rather than described in a lint.
+    ///
+    /// The guard this replaces was that `clearScheduledReminders`'s body contained no literal
+    /// `staleDelivered`, which is a check about spelling. It passes verbatim against a teardown that
+    /// caches the schedules in `sync` and keeps the banners still backed by them, under any name at
+    /// all — and that is the regression it claims to guard: after "erase local data" there are no
+    /// schedules, so a banner kept is one describing data the user just wiped off the device.
+    ///
+    /// Stated as a function, the property is structural rather than textual: erase names every
+    /// reminder under this prefix, from the two queues and **nothing else**. There is no parameter
+    /// through which a schedule could arrive, and `nonisolated static` means no actor state can be
+    /// read either, so making this consult the data takes a signature change that its test will not
+    /// compile against. `testTheErasePathNamesEveryReminderItOwns` asserts the values;
+    /// `testRecurringReminderTeardownClearsDeliveredBannersToo` asserts that the erase path still
+    /// hands this function's result *straight* to both removals, with nothing filtered out in
+    /// between.
+    nonisolated static func everyReminder(
+        pending: [String], delivered: [String], identifierPrefix: String
+    ) -> [String] {
+        (pending + delivered).filter { $0.hasPrefix(identifierPrefix) }
     }
 
     /// The teardown half of one `sync`: every pending request this service owns, and every delivered
