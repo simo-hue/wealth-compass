@@ -196,37 +196,37 @@ struct SettingsView: View {
                     HStack {
                         Label("Transactions", systemImage: "arrow.left.arrow.right")
                         Spacer()
-                        Text(privateCount(finance.data.transactions.count))
+                        privateCount(finance.data.transactions.count)
                             .foregroundStyle(WCColor.textSecondary)
                     }
                     HStack {
                         Label("Recurring", systemImage: "repeat")
                         Spacer()
-                        Text(privateCount(finance.data.recurringTransactions.count))
+                        privateCount(finance.data.recurringTransactions.count)
                             .foregroundStyle(WCColor.textSecondary)
                     }
                     HStack {
                         Label("Investments", systemImage: "chart.line.uptrend.xyaxis")
                         Spacer()
-                        Text(privateCount(finance.data.investments.count))
+                        privateCount(finance.data.investments.count)
                             .foregroundStyle(WCColor.textSecondary)
                     }
                     HStack {
                         Label("Crypto", systemImage: "bitcoinsign.circle")
                         Spacer()
-                        Text(privateCount(finance.data.crypto.count))
+                        privateCount(finance.data.crypto.count)
                             .foregroundStyle(WCColor.textSecondary)
                     }
                     HStack {
                         Label("Liabilities", systemImage: "creditcard")
                         Spacer()
-                        Text(privateCount(finance.data.liabilities.count))
+                        privateCount(finance.data.liabilities.count)
                             .foregroundStyle(WCColor.textSecondary)
                     }
                     HStack {
                         Label("Snapshots", systemImage: "camera")
                         Spacer()
-                        Text(privateCount(finance.data.snapshots.count))
+                        privateCount(finance.data.snapshots.count)
                             .foregroundStyle(WCColor.textSecondary)
                     }
                 }
@@ -394,10 +394,17 @@ struct SettingsView: View {
     /// fact `b93f391` had just concealed on the Dashboard: whether this person tracks a net worth
     /// at all. Tokenising is the right shape here rather than hiding — the row exists in both data
     /// states and only its value moves, so `••••` in a slot that is always drawn discloses nothing.
-    /// Same spelling as `InvestmentsView.swift:107`, `MacInvestmentsView.privateCount` and
-    /// `MacCryptoView.privateCount`.
-    private func privateCount(_ count: Int) -> String {
-        settings.isPrivacyMode ? settings.redactionToken : "\(count)"
+    /// Same decision as `InvestmentsView.swift:107`, `MacInvestmentsView.privateCount` and
+    /// `MacCryptoView.privateCount`; those return `String` because they feed `MetricCard(value:)`,
+    /// which takes one.
+    ///
+    /// Returns `Text`, not `String`, so the visible branch keeps the exact expression it had.
+    /// `Text("\(count)")` is a `LocalizedStringKey` and formats the integer for the reader's
+    /// locale — 1,234, and Arabic-Indic digits where the locale asks for them. Handing
+    /// `Text` a `String` picks the verbatim overload instead and prints 1234 in every language.
+    /// Measured, not assumed: the two render different pixels in en, ar and hi alike.
+    private func privateCount(_ count: Int) -> Text {
+        settings.isPrivacyMode ? Text(settings.redactionToken) : Text("\(count)")
     }
 
     private func settingsStatusChip(_ title: String, systemImage: String, color: Color) -> some View {

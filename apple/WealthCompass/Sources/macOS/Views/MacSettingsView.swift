@@ -470,17 +470,17 @@ struct MacSettingsView: View {
             SettingsSection(title: "Local Storage") {
                 SettingsRow(title: "Mode") { Text("Local Only").foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Transactions") { Text(privateCount(finance.data.transactions.count)).foregroundStyle(.secondary) }
+                SettingsRow(title: "Transactions") { privateCount(finance.data.transactions.count).foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Recurring Schedules") { Text(privateCount(finance.data.recurringTransactions.count)).foregroundStyle(.secondary) }
+                SettingsRow(title: "Recurring Schedules") { privateCount(finance.data.recurringTransactions.count).foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Investments") { Text(privateCount(finance.data.investments.count)).foregroundStyle(.secondary) }
+                SettingsRow(title: "Investments") { privateCount(finance.data.investments.count).foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Crypto Holdings") { Text(privateCount(finance.data.crypto.count)).foregroundStyle(.secondary) }
+                SettingsRow(title: "Crypto Holdings") { privateCount(finance.data.crypto.count).foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Liabilities") { Text(privateCount(finance.data.liabilities.count)).foregroundStyle(.secondary) }
+                SettingsRow(title: "Liabilities") { privateCount(finance.data.liabilities.count).foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Snapshots") { Text(privateCount(finance.data.snapshots.count)).foregroundStyle(.secondary) }
+                SettingsRow(title: "Snapshots") { privateCount(finance.data.snapshots.count).foregroundStyle(.secondary) }
 
                 Divider().background(WCColor.border)
 
@@ -733,9 +733,16 @@ struct MacSettingsView: View {
     /// `finance.data.snapshots.count` — the same fact `b93f391` concealed on the Dashboard, spelled
     /// out as a number one page away. Tokenised rather than hidden: the row is drawn in both data
     /// states and only its value moves, so `••••` in a slot that always exists discloses nothing.
-    /// Same spelling as `MacInvestmentsView.privateCount` and `MacCryptoView.privateCount`.
-    private func privateCount(_ count: Int) -> String {
-        settings.isPrivacyMode ? settings.redactionToken : "\(count)"
+    /// Same decision as `MacInvestmentsView.privateCount` and `MacCryptoView.privateCount`; those
+    /// return `String` because they feed `MetricCard(value:)`, which takes one.
+    ///
+    /// Returns `Text`, not `String`, so the visible branch keeps the exact expression it had.
+    /// `Text("\(count)")` is a `LocalizedStringKey` and formats the integer for the reader's
+    /// locale — 1,234, and Arabic-Indic digits where the locale asks for them. Handing `Text` a
+    /// `String` picks the verbatim overload instead and prints 1234 in every language. Measured,
+    /// not assumed: the two render different pixels in en, ar and hi alike.
+    private func privateCount(_ count: Int) -> Text {
+        settings.isPrivacyMode ? Text(settings.redactionToken) : Text("\(count)")
     }
 
     private func storedAPIKey(for credential: KeychainCredential) throws -> String? {
