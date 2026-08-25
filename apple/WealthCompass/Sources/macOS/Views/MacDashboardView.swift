@@ -48,7 +48,13 @@ struct MacDashboardView: View {
             GeometryReader { proxy in
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        if isCompletelyEmpty {
+                        // Hidden, not tokenised: this card's *presence* is the payload. It
+                        // is drawn only when `isCompletelyEmpty` holds, so a bystander who
+                        // sees it knows this person has no transactions, no positions, no
+                        // holdings and no liabilities — the whole account, in one glance,
+                        // with every figure on the page already `••••`. There is no value
+                        // here to mask; the slot itself is the signal, so the slot goes.
+                        if !settings.isPrivacyMode, isCompletelyEmpty {
                             onboardingCard
                         }
 

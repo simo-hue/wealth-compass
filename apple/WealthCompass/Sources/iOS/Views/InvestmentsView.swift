@@ -126,9 +126,16 @@ struct InvestmentsView: View {
             let latestUpdate = finance.data.investments.map(\.updatedAt).max()
             let sectorCount = Set(finance.data.investments.map(\.sector).filter { !$0.isEmpty }).count
             let sectorCountLabel = settings.isPrivacyMode ? settings.redactionToken : "\(sectorCount)"
+            // The card's own title already redacts its count, and then its value said "Never"
+            // whenever the portfolio was empty — the same fact, in the same card, in the clear.
+            // Tokenised rather than hidden: this card is drawn in both states and only its value
+            // moves, so `••••` in a slot that always exists discloses nothing. The populated arm
+            // goes too, because a "last updated" timestamp is itself data about the account.
             MetricCard(
                 verbatimTitle: settings.localized("Status • \(sectorCountLabel) Sectors"),
-                value: latestUpdate.map { settings.date($0) } ?? settings.localized("Never"),
+                value: settings.isPrivacyMode
+                    ? settings.redactionToken
+                    : (latestUpdate.map { settings.date($0) } ?? settings.localized("Never")),
                 systemImage: "checkmark.circle"
             )
         }

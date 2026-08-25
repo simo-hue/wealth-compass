@@ -284,6 +284,13 @@ struct MacRootView: View {
         // handled by the .onChange observers), so the 30s timer doesn't churn notifications.
         guard insertedCount > 0 else { return }
         await syncRecurringNotifications()
+        // Hidden, not reworded: this alert only ever fires when `insertedCount > 0`, so its
+        // *appearance* already says a schedule came due, and its sentence then says how many.
+        // Dropping the number would leave the first half of that intact — the slot is the signal.
+        // The occurrences are still generated and still saved; only the announcement stops, and
+        // the notification path two lines up already redacts its amounts the same way
+        // (`showAmounts: !settings.isPrivacyMode`), which is why this one stood out.
+        guard !settings.isPrivacyMode else { return }
         // WC-L18: a full sentence, never concatenated grammar fragments, so translators get
         // something they can actually restructure.
         //

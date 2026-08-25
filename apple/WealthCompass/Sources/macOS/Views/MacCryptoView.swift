@@ -127,7 +127,9 @@ struct MacCryptoView: View {
             MetricCard(
                 // L19: already resolved by settings.localized — pass verbatim so Text doesn't re-localize.
                 verbatimTitle: settings.localized("Status • \(privateCount(uniqueCryptoCount)) Coins"),
-                value: latestUpdate.map(formattedUpdate) ?? settings.localized("Never"),
+                value: settings.isPrivacyMode
+                    ? settings.redactionToken
+                    : (latestUpdate.map(formattedUpdate) ?? settings.localized("Never")),
                 systemImage: "checkmark.circle"
             )
         }

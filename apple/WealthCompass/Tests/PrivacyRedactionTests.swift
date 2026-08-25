@@ -1418,6 +1418,108 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    // MARK: - Existence: announcements and fallbacks
+
+    /// Fails if Privacy Mode lets the Dashboard's onboarding card announce **an empty account**.
+    ///
+    /// The card is gated on `isCompletelyEmpty` — no transactions, no positions, no holdings, no
+    /// liabilities — so its presence alone tells a bystander that this person has no financial data
+    /// at all, on a page where every figure is already `••••`. There is no value in it to mask; the
+    /// slot is the signal, so the slot goes.
+    ///
+    /// 700pt on purpose. At that height the Position grid is below the fold — measured — so the
+    /// only thing that can move between these two fixtures is the card itself.
+    func testPrivacyModeHidesTheDashboardOnboardingCard() throws {
+        let empty = FinancialData()
+        let oneLiability = FinancialData(liabilities: [
+            Liability(name: "Loan", currentBalance: 1_000, currency: .eur)
+        ])
+
+        func render(_ data: FinancialData, privacy: Bool) -> Data {
+            renderScreen(
+                { store, settings in
+                    DashboardView(selectedTab: .constant(.dashboard))
+                        .environmentObject(store)
+                        .environmentObject(settings)
+                },
+                data: data, privacyMode: privacy, height: 700
+            )
+        }
+
+        let concealedEmpty = render(empty, privacy: true)
+        let concealedEmptyAgain = render(empty, privacy: true)
+        let concealedOne = render(oneLiability, privacy: true)
+
+        XCTAssertGreaterThan(
+            concealedEmpty.count, 50_000,
+            "captured \(concealedEmpty.count) bytes, so the window drew nothing — every assertion below is vacuous"
+        )
+        XCTAssertEqual(
+            digest(concealedEmpty), digest(concealedEmptyAgain),
+            "the same state rendered twice produced different pixels — the instrument is too unstable to conclude anything from"
+        )
+        XCTAssertNotEqual(
+            digest(render(empty, privacy: false)), digest(render(oneLiability, privacy: false)),
+            """
+            With Privacy Mode OFF the Dashboard rendered identically with an empty account and with             a liability, so the onboarding card is no longer drawn at all and the assertion below             cannot fail.
+            """
+        )
+        XCTAssertEqual(
+            digest(concealedEmpty), digest(concealedOne),
+            """
+            With Privacy Mode ON the Dashboard still shows the onboarding card, whose only entry             condition is that this person has no financial data whatsoever. Gate it on             `!settings.isPrivacyMode` — there is no value here to redact, only a slot to remove.
+            """
+        )
+    }
+
+    /// Fails if the Investments summary still says **"Never"** while Privacy Mode is on.
+    ///
+    /// The Status card's title already redacts its sector count to `••••`; its value then read
+    /// "Never" whenever the portfolio was empty and an exact timestamp whenever it was not — the
+    /// same fact, in the same card, one line apart. Tokenised rather than hidden: the card is drawn
+    /// in both states and only its value moves.
+    ///
+    /// This is the one screen where a whole-view comparison works, because the Investments tab
+    /// opens on Overview: a summary grid whose every figure redacts, and three allocation rings
+    /// that draw a cover. The position list lives on the other tab.
+    func testPrivacyModeConcealsWhenThePortfolioWasLastUpdated() throws {
+        func render(_ data: FinancialData, privacy: Bool) -> Data {
+            renderScreen(
+                { store, settings in
+                    InvestmentsView()
+                        .environmentObject(store)
+                        .environmentObject(settings)
+                },
+                data: data, privacyMode: privacy, height: 1_400
+            )
+        }
+
+        let concealedEmpty = render(FinancialData(), privacy: true)
+        let concealedEmptyAgain = render(FinancialData(), privacy: true)
+        let concealedOne = render(records(1), privacy: true)
+
+        XCTAssertGreaterThan(
+            concealedEmpty.count, 50_000,
+            "captured \(concealedEmpty.count) bytes, so the window drew nothing — every assertion below is vacuous"
+        )
+        XCTAssertEqual(
+            digest(concealedEmpty), digest(concealedEmptyAgain),
+            "the same state rendered twice produced different pixels — the instrument is too unstable to conclude anything from"
+        )
+        XCTAssertNotEqual(
+            digest(render(FinancialData(), privacy: false)), digest(render(records(1), privacy: false)),
+            """
+            With Privacy Mode OFF the Investments overview rendered identically with and without a             position, so it is no longer reading the portfolio and the assertion below cannot fail.
+            """
+        )
+        XCTAssertEqual(
+            digest(concealedEmpty), digest(concealedOne),
+            """
+            With Privacy Mode ON the Investments overview still moves with the portfolio. The Status             card is the one figure left: `latestUpdate.map { settings.date($0) } ?? "Never"` says             whether anything is held, and the populated arm prints a real timestamp besides.
+            """
+        )
+    }
+
     // MARK: - Sweep internals
 
     /// The spellings of a percentage this codebase can produce. Anything else — a renamed wrapper,

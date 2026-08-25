@@ -203,6 +203,13 @@ struct ContentView: View {
         // no longer tears down and rebuilds every notification request each tick.
         guard insertedCount > 0 else { return }
         await syncRecurringNotifications()
+        // Hidden, not reworded: this alert only ever fires when `insertedCount > 0`, so its
+        // *appearance* already says a schedule came due, and its sentence then says how many.
+        // Dropping the number would leave the first half of that intact — the slot is the signal.
+        // The occurrences are still generated and still saved; only the announcement stops, and
+        // the notification path two lines up already redacts its amounts the same way
+        // (`showAmounts: !settings.isPrivacyMode`), which is why this one stood out.
+        guard !settings.isPrivacyMode else { return }
         let message = insertedCount == 1
             ? settings.localized("1 scheduled transaction was automatically added to Cash Flow.")
             : settings.localized("\(insertedCount) scheduled transactions were automatically added to Cash Flow.")
