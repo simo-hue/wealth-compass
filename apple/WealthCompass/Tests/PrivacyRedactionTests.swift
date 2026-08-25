@@ -138,31 +138,54 @@ final class PrivacyRedactionTests: XCTestCase {
     /// sites are `Sources/macOS` and the test bundle hosts `WealthCompassMobile`, so they cannot be
     /// rendered here at all.
     ///
-    /// What it looks for is a string literal whose whole content is an interpolated count —
-    /// `"\(somethingCount)"`. That is `String(describing:)`, it groups nothing, and it prints 1234
-    /// in every language with Privacy Mode **off**: a defect for every reader, not only the redacted
-    /// ones. `Text("\(count)")` is exempt and is the other correct spelling — handing `Text` a
-    /// `LocalizedStringKey` formats the integer for the reader's locale, which is why
-    /// `SettingsView.swift` and `MacSettingsView.swift` each keep a `Text`-returning `privateCount`.
+    /// What it looks for is a count rendered where nothing will format it — a string literal whose
+    /// whole content is one interpolated count, or a `String(…)` conversion of one. That is
+    /// `String(describing:)` either way, it groups nothing, and it prints 1234 in every language
+    /// with Privacy Mode **off**: a defect for every reader, not only the redacted ones.
     ///
-    /// **The exemption is an overload test, not a prefix test.** It used to ask whether the text
-    /// before the literal ended in `Text(`, which four different spellings walk straight through:
-    /// `Text("\(count)" + " items")` and `Text("\(count)" as String)` each force the
-    /// `StringProtocol` overload — the one that formats nothing — at a real render site and were
-    /// exempt; `plainText(` and `bodyText(` also end in `Text(`; and it was asymmetric on `+`, so a
-    /// count on the left of a concatenation passed while the same count on the right failed. A
-    /// correctly-wrapped `Text(\n    "\(count)"\n)` was a false positive for the same reason. What
-    /// is asked now is whether the literal is the **entire argument** of a call whose callee is
-    /// exactly `Text` — walked over the stripped `code` view, across line breaks, in both
-    /// directions. `testTheEntityCountExemptionIsAnOverloadTestNotAPrefixTest` pins each of those
-    /// spellings against the checker itself, which is the part that had nothing holding it.
+    /// **The exemption is an overload test, not a prefix test — and there are six overloads, not
+    /// one.** It first asked whether the text before the literal ended in `Text(`, which four
+    /// spellings walked through (`Text("\(count)" + " items")`, `Text("\(count)" as String)`,
+    /// `plainText(`, `bodyText(`). Narrowing that to "the entire argument of a call whose callee is
+    /// exactly `Text`" fixed those and created the opposite defect: it reported five other correct
+    /// spellings. Measured — `AppLocalization.string("\(1234) …")` renders `1,234` in `en` and
+    /// `1.234` in `de`, while plain `String` interpolation renders `1234` — so
+    /// `settings.localized("\(count)")`, `AppLocalization.string("\(count)", …)`,
+    /// `String(localized: "\(count)")`, `let key: LocalizedStringKey = "\(count)"` and
+    /// `"\(count)" as LocalizedStringKey` are all **correct** and were all being named a defect.
+    /// That second idiom is the one this project documents at
+    /// `ReportDocumentBuilder.swift:204-212`, and the exemption did not know it existed.
     ///
-    /// Narrow on purpose, and narrower than the sentence above suggests: only a literal that is
-    /// *nothing but* the count matches at all, so `"\(visible), +\(values.count - 6) more"` is
-    /// invisible to it — that spelling shipped unformatted in `MarketDataService` and is fixed
-    /// separately, by `testAMarketRefreshSummaryGroupsItsOverflowCount`, not by widening this regex
-    /// into every string mentioning a count. `Text(_:tableName:…)` would also be reported, since the
-    /// literal is not the sole argument; nothing in this tree uses that overload.
+    /// What is asked now is whether the literal lands in a position whose parameter type is
+    /// `LocalizedStringKey` or `String.LocalizationValue` — the two `ExpressibleByStringInterpolation`
+    /// types that run an integer through the reader's locale — reached as a sole argument, a first
+    /// argument, a `localized:` label, an annotation or an `as` cast, walked over the stripped
+    /// `code` view in both directions and across line breaks. A callee that merely *takes* a
+    /// `String` is not one of them, which is the case that matters most: `L("\(count)")` in
+    /// `ReportDocumentBuilder` looks exactly like `localized("\(count)")` and formats nothing.
+    ///
+    /// The regex is wider in two places, both of which were holes rather than deliberate narrowness.
+    /// The literal pattern used to require `count)` flush against the closing quote, so
+    /// `Text("\(items.count) " as String)` — one trailing space — and
+    /// `Text("\(items.count - 1)" as String)` — one operator — were exempt, and both are the same
+    /// `as String` overload the case above pins as reportable. And `[Cc]ount` used to match anywhere
+    /// inside the interpolation, so `"\(discount)"` and `"\(account)"` were reported; `count` now
+    /// has to begin an identifier segment.
+    ///
+    /// Two shapes carry no literal at all and so were invisible to a check written against one:
+    /// `String(items.count)` and `String(format: "%d", items.count)`. Both are matched now, and
+    /// deliberately not by "any `String(` whose arguments mention a count" —
+    /// `String(text.dropFirst(tag.count))` at `BrokerStatementImportService.swift:876` is a
+    /// substring conversion, and reporting it would be the same mistake as reporting `"\(account)"`.
+    ///
+    /// Two holes stay open and are named in `unformattedCounts`' doc comment and in the probe list:
+    /// a count bound to a variable first (`let n = items.count` … `"\(n)"`), which would take a type
+    /// checker to follow, and a *sentence* containing a count (`"\(visible), +\(values.count - 6)
+    /// more"`), which is out of scope on purpose — that one shipped unformatted in
+    /// `MarketDataService` and is fixed where it is written, by
+    /// `testAMarketRefreshSummaryGroupsItsOverflowCount`, rather than by widening this into every
+    /// string mentioning a count. `Text(_:tableName:…)` would also be reported, since the literal is
+    /// not the sole argument; nothing in this tree uses that overload.
     ///
     /// The report-export files are excluded here as they are from the other sweeps. They print
     /// **eight** counts this way (`ReportDocumentBuilder.swift:857`, `:950` and `:1070-1075` — the
@@ -268,6 +291,76 @@ final class PrivacyRedactionTests: XCTestCase {
                 #"someText("\(count)")"#, true,
                 "any callee that is not exactly `Text`"
             ),
+
+            // The other localising idiom. Measured: `AppLocalization.string("\(1234) …")` renders
+            // `1,234` in `en` and `1.234` in `de`, while plain `String` interpolation renders `1234`
+            // in both — so every spelling below is correct code that the checker was reporting.
+            (
+                #"settings.localized("\(count)")"#, false,
+                "`localized(_ key: String.LocalizationValue)` formats the integer for the reader"
+            ),
+            (
+                #"AppLocalization.string("\(count)", appLanguage: language)"#, false,
+                "the same `String.LocalizationValue`, as the first of two arguments"
+            ),
+            (
+                #"String(localized: "\(count)")"#, false,
+                "the Foundation spelling of the same initialiser"
+            ),
+            (
+                #"let key: LocalizedStringKey = "\(count)""#, false,
+                "an explicit annotation reaches the localising initialiser as surely as `Text(` does"
+            ),
+            (
+                #"Text("\(count)" as LocalizedStringKey)"#, false,
+                "and so does an explicit cast — this forces the overload that formats, not the one that doesn't"
+            ),
+            (
+                #"L("\(count)")"#, true,
+                """
+                `L(_ key: String)` takes a plain `String`, so the interpolation has already happened \
+                by the time it is called and nothing is formatted — the one spelling that looks like \
+                `localized(` and behaves like bare interpolation
+                """
+            ),
+            (
+                #"let label = "\(discount)""#, false,
+                "`[Cc]ount` matched inside a word, so a discount was reported as an entity count"
+            ),
+            (
+                #"let label = "\(account)""#, false,
+                "the same, and neither is a count of anything"
+            ),
+
+            // Spellings the literal pattern used to be too tight to see. Each is the same render.
+            (
+                #"Text("\(items.count) " as String)"#, true,
+                "one trailing space defeated a pattern that required `count)` flush against the quote"
+            ),
+            (
+                #"Text("\(items.count - 1)" as String)"#, true,
+                "and so did one arithmetic operator — the same `as String` overload case #4 pins"
+            ),
+            (
+                #"let label = String(items.count)"#, true,
+                "no literal at all, so a check written against literals could not see it"
+            ),
+            (
+                #"let label = String(format: "%d", items.count)"#, true,
+                "`%d` formats for nobody; `%@` with a formatted number would be the fix"
+            ),
+            (
+                #"let separator = String(repeating: "·", count: 4)"#, false,
+                "a repeat count is an argument label, not something drawn for a reader"
+            ),
+            (
+                #"return String(text.dropFirst(tag.count))"#, false,
+                """
+                a substring conversion that happens to mention a count — reporting it would be the \
+                same class of mistake as reporting `"\\(account)"`, and it is real code in \
+                `BrokerStatementImportService.swift:876`
+                """
+            ),
         ]
 
         for probe in cases {
@@ -277,6 +370,39 @@ final class PrivacyRedactionTests: XCTestCase {
                 """
                 `\(probe.source)` was \(found.isEmpty ? "exempted" : "reported") and should have been \
                 \(probe.offends ? "reported" : "exempted") — \(probe.why).
+                """
+            )
+        }
+
+        // Holes that are open, recorded here so closing one is a test change rather than a
+        // discovery. Both are limits of matching text rather than types, and both are stated in
+        // `unformattedCounts`' doc comment.
+        let open: [(source: String, why: String)] = [
+            (
+                "let n = items.count\nlet label = \"\\(n)\"",
+                """
+                the count is bound to a variable first, so by the time the literal is written it is \
+                an `Int` named anything at all. Following it takes a type checker, not a regex.
+                """
+            ),
+            (
+                #"let label = "\(visible), +\(values.count - 6) more""#,
+                """
+                a sentence that contains a count rather than a literal that is one. Out of scope on \
+                purpose — widening into every string mentioning a count is how a lint starts \
+                reporting correct code — and fixed where it is written instead, which is what \
+                `testAMarketRefreshSummaryGroupsItsOverflowCount` does for the one site that had it.
+                """
+            ),
+        ]
+        for hole in open {
+            let found = try Self.unformattedCounts(in: Self.stripped(hole.source), path: "probe.swift")
+            XCTAssertTrue(
+                found.isEmpty,
+                """
+                `\(hole.source)` is now reported. That is an improvement, not a failure — delete this \
+                entry and move it to the list above. It was recorded as an open hole because \
+                \(hole.why)
                 """
             )
         }
@@ -307,15 +433,56 @@ final class PrivacyRedactionTests: XCTestCase {
         XCTAssertTrue(german.contains("1.234"), "German groups thousands with a point: \(german)")
     }
 
-    /// Every `"\(…count)"` literal in one source that is not the whole argument of a `Text(` call.
+    /// A reference to a count, spelled so that it is one.
+    ///
+    /// The old pattern was `[Cc]ount` anywhere inside the interpolation, which reports `"\(discount)"`
+    /// and `"\(account)"` — correct code, named a verdict. What is asked now is that `count` begins
+    /// an identifier segment: preceded by a non-identifier character (`items.count`, `(count`,
+    /// start of line) or capitalised after a lowercase or a digit (`rowCount`, `importedRecordCount`).
+    /// The trailing `(?!\s*:)` drops argument labels, so `String(repeating: "·", count: 4)` is a
+    /// repeat count and not a render.
+    private static let countReference =
+        #"(?:(?<![A-Za-z0-9_])count|(?<=[a-z0-9])Count)(?![A-Za-z0-9_])(?!\s*:)"#
+
+    /// Every entity count in one source that is rendered without being formatted for the reader.
+    ///
+    /// Two shapes, because the defect has two:
+    ///
+    /// - a string literal whose whole content is one interpolated count — `"\(items.count)"`,
+    ///   `"\(items.count) "`, `"\(items.count - 1)"` — anywhere the compiler will not pick a
+    ///   localising overload;
+    /// - `String(items.count)` and `String(format: "%d", items.count)`, which carry no literal at
+    ///   all and so were invisible to a check written against one.
     ///
     /// Split out of the sweep so the checker can be handed sources of its own — see
-    /// `testTheEntityCountExemptionIsAnOverloadTestNotAPrefixTest`.
+    /// `testTheEntityCountExemptionIsAnOverloadTestNotAPrefixTest`, which is the only thing that can
+    /// hold it, since a broken checker and a clean tree look identical from the sweep's side.
+    ///
+    /// **One hole is known and open.** A count assigned to a variable first —
+    /// `let n = items.count` … `"\(n)"` — is invisible here, because by the time the literal is
+    /// written the count is a plain `Int` named anything at all, and following that would take a
+    /// type checker rather than a regex. Recorded in the probe list rather than left implied.
+    /// A literal that is a *sentence* containing a count (`"\(visible), +\(values.count - 6) more"`)
+    /// is out of scope on purpose and by a different argument: it is fixed where it is written, as
+    /// `testAMarketRefreshSummaryGroupsItsOverflowCount` does, not by widening this into every
+    /// string that mentions a count.
     private static func unformattedCounts(
         in source: StrippedSource, path: String
     ) throws -> [PercentRender] {
-        // A string literal that is nothing but one interpolated count.
-        let countLiteral = try NSRegularExpression(pattern: ##""\\\([^"\n]*[Cc]ount\)""##)
+        // A string literal that is nothing but one interpolation, with any spacing around it. The
+        // old pattern required the interpolation to end in `count)` flush against the closing quote,
+        // so one trailing space or one arithmetic operator walked past it.
+        let countLiteral = try NSRegularExpression(pattern: ##""\s*\\\(([^"\n]*)\)\s*""##)
+        let counts = try NSRegularExpression(pattern: Self.countReference)
+        // `String(<something ending in a count>)`, optionally with arithmetic. Deliberately not
+        // "any `String(` whose arguments mention a count": `String(text.dropFirst(tag.count))` is a
+        // substring conversion, and reporting it would be the same class of mistake as `"\(account)"`.
+        let countConversion = try NSRegularExpression(
+            pattern: ##"\bString\(\s*(?:[A-Za-z_][A-Za-z0-9_.]*)?\##(Self.countReference)\s*(?:[-+*/]\s*\d+\s*)?\)"##
+        )
+        let countFormat = try NSRegularExpression(
+            pattern: ##"\bString\(\s*format\s*:[^)\n]*%(?:l{0,2}d|u)[^)\n]*\##(Self.countReference)[^)\n]*\)"##
+        )
 
         // `scan` and `code` are the same characters line for line — `stripped` writes one character
         // to each per character of input — so an offset found in one indexes the other.
@@ -324,45 +491,139 @@ final class PrivacyRedactionTests: XCTestCase {
         let lineOfOffset = { (offset: Int) -> Int in
             code[..<offset].reduce(1) { $1 == "\n" ? $0 + 1 : $0 }
         }
+        func matches(_ text: String) -> Bool {
+            counts.numberOfMatches(in: text, range: NSRange(text.startIndex..<text.endIndex, in: text)) > 0
+        }
 
         var offenders: [PercentRender] = []
-        let range = NSRange(scan.startIndex..<scan.endIndex, in: scan)
-        for match in countLiteral.matches(in: scan, range: range) {
-            guard let matched = Range(match.range, in: scan) else { continue }
-            let start = scan.distance(from: scan.startIndex, to: matched.lowerBound)
-            let end = scan.distance(from: scan.startIndex, to: matched.upperBound)
-            guard !isSoleTextArgument(from: start, to: end, in: code) else { continue }
+        func report(at start: Int, pattern: String) {
             let line = lineOfOffset(start)
             offenders.append(PercentRender(
-                file: path, line: line,
-                pattern: #""\(…count)""#,
+                file: path, line: line, pattern: pattern,
                 source: String(source.scan[line - 1]).trimmingCharacters(in: .whitespaces)
             ))
         }
-        return offenders
-    }
 
-    /// Whether the literal spanning `start..<end` is the entire argument of a call to `Text`.
-    ///
-    /// Only that shape picks `Text.init(_ key: LocalizedStringKey)`, which formats the integer for
-    /// the reader's locale. Anything else in the parentheses — a `+`, an `as String`, a second
-    /// argument — resolves to an overload that does not, and any callee other than `Text` is not
-    /// `Text` at all however its name ends.
-    private static func isSoleTextArgument(from start: Int, to end: Int, in code: [Character]) -> Bool {
-        var before = start - 1
-        while before >= 0, code[before].isWhitespace { before -= 1 }
-        guard before >= 0, code[before] == "(" else { return false }
-
-        var callee = before - 1
-        while callee >= 0, code[callee].isLetter || code[callee].isNumber || code[callee] == "_" {
-            callee -= 1
+        let range = NSRange(scan.startIndex..<scan.endIndex, in: scan)
+        for match in countLiteral.matches(in: scan, range: range) {
+            guard let matched = Range(match.range, in: scan),
+                  let interpolation = Range(match.range(at: 1), in: scan) else { continue }
+            // One interpolation, not a sentence stitched out of several.
+            let inner = String(scan[interpolation])
+            guard !inner.contains("\\("), matches(inner) else { continue }
+            let start = scan.distance(from: scan.startIndex, to: matched.lowerBound)
+            let end = scan.distance(from: scan.startIndex, to: matched.upperBound)
+            guard !isLocalizingPosition(from: start, to: end, in: code) else { continue }
+            report(at: start, pattern: #""\(…count)""#)
         }
-        guard String(code[(callee + 1)..<before]) == "Text" else { return false }
-
-        var after = end
-        while after < code.count, code[after].isWhitespace { after += 1 }
-        return after < code.count && code[after] == ")"
+        // Read over `code`, where string bodies are blanked: `String(format:)`'s specifier lives in
+        // a literal, so that one reads `scan`. Neither can be reached from inside a comment.
+        let codeText = String(code)
+        for (regex, source, pattern) in [
+            (countConversion, codeText, "String(…count)"),
+            (countFormat, scan, #"String(format: "%d", …count)"#),
+        ] {
+            for match in regex.matches(
+                in: source, range: NSRange(source.startIndex..<source.endIndex, in: source)
+            ) {
+                guard let matched = Range(match.range, in: source) else { continue }
+                report(at: source.distance(from: source.startIndex, to: matched.lowerBound), pattern: pattern)
+            }
+        }
+        return offenders.sorted { ($0.line, $0.pattern) < ($1.line, $1.pattern) }
     }
+
+    /// Whether the literal spanning `start..<end` lands somewhere the compiler formats it.
+    ///
+    /// The exemption used to be "is this the entire argument of a call whose callee is exactly
+    /// `Text`", which is one localising position out of six and reports the other five. Measured:
+    /// `AppLocalization.string("\(1234) …")` renders `1,234` in `en` and `1.234` in `de`, while
+    /// plain `String` interpolation renders `1234` in both — so `settings.localized("\(count)")` is
+    /// **correctly** formatted and was being named a defect. That second idiom is the one this
+    /// project documents at `ReportDocumentBuilder.swift:204-212`, and the exemption did not know it
+    /// existed.
+    ///
+    /// What formats, and why: `Text` and `LocalizedStringKey` take a `LocalizedStringKey`;
+    /// `AppLocalization.string`, `settings.localized(_:)` and `String(localized:)` take a
+    /// `String.LocalizationValue`. Both are `ExpressibleByStringInterpolation` types whose
+    /// interpolation runs the integer through the reader's locale. An explicit annotation or an `as`
+    /// cast to either reaches the same initialiser.
+    ///
+    /// What does not, and why: anything that forces the `StringProtocol` overload — `+`,
+    /// `as String`, a second unlabelled argument — and any callee that merely takes a `String`,
+    /// which is the case that matters most here. `L("\(count)")` in `ReportDocumentBuilder` looks
+    /// exactly like `localized("\(count)")` and formats nothing, because `L(_ key: String)` receives
+    /// a `String` that has already been interpolated. Its own doc comment says so.
+    private static func isLocalizingPosition(from start: Int, to end: Int, in code: [Character]) -> Bool {
+        func isIdentifier(_ character: Character) -> Bool {
+            character.isLetter || character.isNumber || character == "_"
+        }
+        /// A dotted identifier read backwards from `index`, e.g. `AppLocalization.string`.
+        func identifier(endingAt index: Int) -> String {
+            guard index >= 0, index < code.count else { return "" }
+            var first = index
+            while first >= 0, isIdentifier(code[first]) || code[first] == "." { first -= 1 }
+            guard first < index else { return "" }
+            return String(code[(first + 1)...index])
+        }
+        func skippingWhitespace(from index: Int, by step: Int) -> Int {
+            var index = index
+            while index >= 0, index < code.count, code[index].isWhitespace { index += step }
+            return index
+        }
+
+        // `"\(count)" as LocalizedStringKey`
+        let cast = skippingWhitespace(from: end, by: 1)
+        if cast + 2 <= code.count, cast >= 0, String(code[cast..<min(cast + 2, code.count)]) == "as",
+           cast + 2 == code.count || !isIdentifier(code[cast + 2]) {
+            var type = skippingWhitespace(from: cast + 2, by: 1)
+            let first = type
+            while type < code.count, isIdentifier(code[type]) || code[type] == "." { type += 1 }
+            return Self.localizingTypes.contains(String(code[first..<type]))
+        }
+
+        let before = skippingWhitespace(from: start - 1, by: -1)
+        guard before >= 0, before < code.count else { return false }
+
+        // `let key: LocalizedStringKey = "\(count)"`
+        if code[before] == "=", before == 0 || !"=!<>+-*/".contains(code[before - 1]) {
+            let last = skippingWhitespace(from: before - 1, by: -1)
+            let type = identifier(endingAt: last)
+            guard Self.localizingTypes.contains(type) else { return false }
+            let colon = skippingWhitespace(from: last - type.count, by: -1)
+            return colon >= 0 && code[colon] == ":"
+        }
+
+        // `String(localized: "\(count)")`
+        if code[before] == ":" {
+            let label = identifier(endingAt: before - 1)
+            guard label == "localized" else { return false }
+            let open = skippingWhitespace(from: before - 1 - label.count, by: -1)
+            guard open >= 0, code[open] == "(" else { return false }
+            return identifier(endingAt: open - 1) == "String"
+        }
+
+        guard code[before] == "(" else { return false }
+        let callee = identifier(endingAt: before - 1)
+        let after = skippingWhitespace(from: end, by: 1)
+        let soleArgument = after >= 0 && after < code.count && code[after] == ")"
+        switch callee {
+        case "Text", "LocalizedStringKey":
+            return soleArgument
+        case "AppLocalization.string":
+            // The key is the first of two arguments here, so a `,` is the shape to expect.
+            return after >= 0 && after < code.count && (code[after] == "," || code[after] == ")")
+        default:
+            // `settings.localized(_:)`, `self.localized(_:)`, a bare `localized(_:)`. Matched on the
+            // last segment, so the receiver can be anything; `L(` and `plainText(` are not this.
+            return soleArgument && (callee == "localized" || callee.hasSuffix(".localized"))
+        }
+    }
+
+    /// The types whose string interpolation runs an integer through the reader's locale.
+    private static let localizingTypes: Set<String> = [
+        "LocalizedStringKey", "String.LocalizationValue", "LocalizationValue",
+    ]
 
     func testPrivateDateRedactsWhilePrivacyModeIsOn() {
         let settings = makeSettings()
