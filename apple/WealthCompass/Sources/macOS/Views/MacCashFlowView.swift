@@ -934,7 +934,20 @@ struct MacCashFlowView: View {
         }
     }
 
+    /// The three properties below decide what the transaction table shows when it has nothing to
+    /// list, and each of them branched on `finance.transactions.isEmpty` — saying in words, in an
+    /// icon and in a sentence whether this person has *never* recorded a transaction or merely has
+    /// none matching the current filters. Every one of those filters is a control in the bar above
+    /// the table, so the pair is a probe: vary a filter, read off what exists, with every amount
+    /// already `••••`. Under Privacy Mode all three collapse to one data-independent answer, or
+    /// the distinction survives in whichever one is left un-gated.
+    ///
+    /// Only the empty arms are merged. A populated table still lists its rows — ranked lists are a
+    /// separate ruling (TO_SIMO_DO.md) — so this closes the *reason* the table is empty.
     private var transactionEmptyTitle: String {
+        if settings.isPrivacyMode {
+            return settings.localized("Hidden by Privacy Mode")
+        }
         if finance.transactions.isEmpty {
             return settings.localized("No Transactions")
         }
@@ -942,10 +955,14 @@ struct MacCashFlowView: View {
     }
 
     private var transactionEmptySystemImage: String {
-        finance.transactions.isEmpty ? "arrow.left.arrow.right" : "line.3.horizontal.decrease.circle"
+        if settings.isPrivacyMode { return "eye.slash" }
+        return finance.transactions.isEmpty ? "arrow.left.arrow.right" : "line.3.horizontal.decrease.circle"
     }
 
     private var transactionEmptyDescription: String {
+        if settings.isPrivacyMode {
+            return settings.localized("Turn off Privacy Mode to reveal this.")
+        }
         if finance.transactions.isEmpty {
             return settings.localized("Add your first income or expense.")
         }

@@ -1352,6 +1352,72 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    // MARK: - Existence: why a list is empty
+
+    /// Fails if Privacy Mode lets the transaction list say **which kind** of empty it is.
+    ///
+    /// The card drew "No transactions found" when the ledger had never held anything and "No
+    /// transactions match these filters" when it had — and every filter that produces the second
+    /// state is a control in the row directly above it. Walk the type, period and search controls
+    /// with Privacy Mode on and the pair maps out which windows and categories hold records, with
+    /// every amount on screen already `••••`. That is the probe the net-worth card
+    /// (`DashboardView.swift:202-205`) and the Sankey diagram (`SankeyDiagramView.swift:45-53`)
+    /// were both changed to refuse.
+    ///
+    /// The two fixtures are the two kinds of empty: nothing recorded at all, and one transaction
+    /// dated outside the default 30-day period filter. Under Privacy Mode the card must not be
+    /// able to tell them apart.
+    ///
+    /// It renders `CashFlowView(initialTab: .transactions)` because the tab is `@State`: setting
+    /// the UIKit segmented control's `selectedSegmentIndex` and sending `.valueChanged` moves the
+    /// pill and leaves the SwiftUI binding untouched, so the list is unreachable from outside
+    /// without that parameter (measured before adding it, not assumed).
+    func testPrivacyModeConcealsWhyTheTransactionListIsEmpty() throws {
+        let nothingRecorded = FinancialData()
+        let filteredOut = FinancialData(transactions: [
+            WealthCompassMobile.Transaction(
+                type: .expense, category: "Food", amount: 42, description: "old",
+                date: Date().addingTimeInterval(-86_400 * 400), currency: .eur
+            )
+        ])
+
+        func render(_ data: FinancialData, privacy: Bool) -> Data {
+            renderScreen(
+                { store, settings in
+                    CashFlowView(initialTab: .transactions)
+                        .environmentObject(store)
+                        .environmentObject(settings)
+                },
+                data: data, privacyMode: privacy, height: 900
+            )
+        }
+
+        let concealedNothing = render(nothingRecorded, privacy: true)
+        let concealedNothingAgain = render(nothingRecorded, privacy: true)
+        let concealedFiltered = render(filteredOut, privacy: true)
+
+        XCTAssertGreaterThan(
+            concealedNothing.count, 50_000,
+            "captured \(concealedNothing.count) bytes, so the window drew nothing — every assertion below is vacuous"
+        )
+        XCTAssertEqual(
+            digest(concealedNothing), digest(concealedNothingAgain),
+            "the same state rendered twice produced different pixels — the instrument is too unstable to conclude anything from"
+        )
+        XCTAssertNotEqual(
+            digest(render(nothingRecorded, privacy: false)), digest(render(filteredOut, privacy: false)),
+            """
+            With Privacy Mode OFF the two kinds of empty rendered identically, so either the             transaction card is out of the viewport or the fixture no longer produces two different             states — and the assertion below can no longer fail.
+            """
+        )
+        XCTAssertEqual(
+            digest(concealedNothing), digest(concealedFiltered),
+            """
+            With Privacy Mode ON the card still distinguishes "you have never recorded a             transaction" from "you have, just not these" — so a bystander can vary the filters above             it and map what exists. Both empty arms have to produce the same output under Privacy             Mode; gating only one leaves the other as the tell.
+            """
+        )
+    }
+
     // MARK: - Sweep internals
 
     /// The spellings of a percentage this codebase can produce. Anything else — a renamed wrapper,

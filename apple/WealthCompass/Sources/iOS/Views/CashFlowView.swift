@@ -27,7 +27,10 @@ private enum TransactionListTypeFilter: String, CaseIterable, Identifiable {
 
 /// Overview / Transactions split for the Cash Flow tab, mirroring the macOS selector island so iOS
 /// gets a dedicated, searchable, uncapped transactions view.
-private enum CashFlowTab: String, CaseIterable, Identifiable {
+///
+/// Internal rather than `private` so `CashFlowView(initialTab:)` can name it — see that
+/// initializer for why it exists.
+enum CashFlowTab: String, CaseIterable, Identifiable {
     case overview
     case transactions
 
@@ -51,9 +54,18 @@ struct CashFlowView: View {
     @State private var transactionPeriod: AnalyticsPeriod = .thirtyDays
     @State private var transactionTypeFilter: TransactionListTypeFilter = .all
     @State private var transactionSearch = ""
-    @State private var selectedTab: CashFlowTab = .overview
+    @State private var selectedTab: CashFlowTab
     @State private var activeAlert: CashFlowAlert?
     @State private var hoveredExpenseCategory: CategoryTotal?
+
+    /// The tab the view opens on. The app always takes the default; the parameter exists so the
+    /// transaction list can be reached from a test, which is otherwise impossible — the tab lives
+    /// in `@State`, and driving the segmented picker from outside moves the UIKit control's
+    /// selection without ever updating the SwiftUI binding (measured: the pill slides, the content
+    /// does not change). Same shape as `DashboardView(selectedTab:)`.
+    init(initialTab: CashFlowTab = .overview) {
+        _selectedTab = State(initialValue: initialTab)
+    }
 
     var body: some View {
         ScrollView {
@@ -440,7 +452,21 @@ struct CashFlowView: View {
                 transactionFilters
                 transactionSearchField
 
-                if !hasAnyTransactions {
+                // The two empty states below say different things: one that this person has never
+                // recorded a transaction, the other that they have but none match. Both are
+                // reachable from the filter row directly above — set a type, narrow the period,
+                // type a search — so a bystander can walk the controls and map which windows,
+                // categories and types hold records without a single figure being legible. That is
+                // the probe `DashboardView.swift:202-205` and `SankeyDiagramView.swift:45-53`
+                // already refuse to offer. Under Privacy Mode the distinction collapses: whichever
+                // reason the list is empty for, the card draws the same thing.
+                //
+                // Only the two empty arms are merged. The populated arm still renders its rows —
+                // ranked lists are a separate ruling (TO_SIMO_DO.md) — so this closes the *reason*
+                // the list is empty, not the fact that it is.
+                if settings.isPrivacyMode, filtered.isEmpty {
+                    EmptyState(title: "Hidden by Privacy Mode", systemImage: "eye.slash")
+                } else if !hasAnyTransactions {
                     EmptyState(title: "No transactions found", systemImage: "tray")
                 } else if filtered.isEmpty {
                     EmptyState(title: "No transactions match these filters", systemImage: "line.3.horizontal.decrease.circle")
