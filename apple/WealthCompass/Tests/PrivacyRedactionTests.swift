@@ -1054,6 +1054,304 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    // MARK: - Existence: counts
+
+    /// One of each entity, `n` times over, so two fixtures can differ **only** in how many records
+    /// exist. Every count-shaped leak in the app reads a `.count` off one of these arrays, and a
+    /// 1-vs-2 pair exercises them without ever flipping an `isEmpty` — which keeps the empty-state
+    /// branches, the onboarding card and `isCompletelyEmpty` out of the comparison, so a failure
+    /// can only be a count.
+    private func records(_ n: Int) -> FinancialData {
+        // Built step by step with explicit types on purpose: one `FinancialData(...)` literal
+        // holding six mapped closures does not type-check in reasonable time. `Transaction` is
+        // spelled out because this file imports SwiftUI, which has one of its own.
+        let day: TimeInterval = 86_400
+        let past = Date().addingTimeInterval(-day * 400)
+        let future = Date().addingTimeInterval(day * 400)
+
+        var transactions: [WealthCompassMobile.Transaction] = []
+        var schedules: [RecurringTransaction] = []
+        var investments: [Investment] = []
+        var crypto: [CryptoHolding] = []
+        var liabilities: [Liability] = []
+        var snapshots: [NetWorthSnapshot] = []
+
+        for i in 0..<n {
+            let step = Decimal(i + 1)
+            transactions.append(
+                WealthCompassMobile.Transaction(
+                    type: .expense,
+                    category: "Food",
+                    amount: step,
+                    description: "note",
+                    date: past,
+                    currency: .eur
+                )
+            )
+            schedules.append(
+                RecurringTransaction(
+                    type: .expense,
+                    category: "Food",
+                    amount: step,
+                    description: "rec",
+                    startDate: past,
+                    frequency: .monthly,
+                    nextDueDate: future,
+                    currency: .eur
+                )
+            )
+            investments.append(
+                Investment(
+                    type: .stock,
+                    symbol: "S",
+                    name: "Stock",
+                    quantity: 1,
+                    costBasis: step,
+                    currentValue: step,
+                    currentPrice: step,
+                    currency: .eur,
+                    geography: "US",
+                    sector: "Technology",
+                    isin: "",
+                    fees: 0
+                )
+            )
+            crypto.append(
+                CryptoHolding(
+                    symbol: "C",
+                    name: "Coin",
+                    quantity: 1,
+                    avgBuyPrice: step,
+                    currentPrice: step,
+                    currency: .eur,
+                    fees: 0,
+                    coinId: "coin"
+                )
+            )
+            liabilities.append(
+                Liability(name: "Loan", currentBalance: step, currency: .eur)
+            )
+            snapshots.append(
+                NetWorthSnapshot(
+                    date: past.addingTimeInterval(-day * Double(i)),
+                    totalAssets: 10_000,
+                    totalLiabilities: 0,
+                    netWorth: 10_000,
+                    liquidity: 5_000,
+                    investments: 5_000,
+                    crypto: 0,
+                    currency: .eur
+                )
+            )
+        }
+
+        return FinancialData(
+            transactions: transactions,
+            recurringTransactions: schedules,
+            investments: investments,
+            crypto: crypto,
+            liabilities: liabilities,
+            snapshots: snapshots
+        )
+    }
+
+    /// The generic half of `renderDashboard`, so the same instrument can be pointed at any screen.
+    /// Read that method's doc comment first — it records the three instruments that produce a
+    /// vacuous test here and must not be reached for again.
+    ///
+    /// `height` is load-bearing. The window is the viewport: a `List` or a `ScrollView` only
+    /// realises what fits, so a screen whose leak sits below the fold renders identically at 700pt
+    /// whatever the data — a pass that means nothing. Every caller below therefore states the
+    /// height its leak needs, and each has a control assertion that fails if that height stopped
+    /// reaching it.
+    private func renderScreen<V: View>(
+        _ rootView: (FinanceStore, AppSettings) -> V,
+        data: FinancialData,
+        privacyMode: Bool,
+        height: CGFloat
+    ) -> Data {
+        let settings = makeSettings()
+        settings.isPrivacyMode = privacyMode
+        let store = FinanceStore(
+            persistence: SeededPersistence(data),
+            settings: settings,
+            syncMetadataStore: CloudSyncMetadataStore()
+        )
+        let host = UIHostingController(rootView: rootView(store, settings))
+        let bounds = CGRect(x: 0, y: 0, width: 393, height: height)
+        let window = UIWindow(frame: bounds)
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        window.layoutIfNeeded()
+        host.view.layoutIfNeeded()
+        RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1
+        return UIGraphicsImageRenderer(bounds: bounds, format: format)
+            .image { context in host.view.layer.render(in: context.cgContext) }
+            .pngData() ?? Data()
+    }
+
+    private func renderSettings(data: FinancialData, privacyMode: Bool) -> Data {
+        // 3000pt because the Storage section is the last one on the page. At 700pt the `List` has
+        // not realised those rows at all and the capture is identical for every fixture — measured,
+        // not assumed.
+        renderScreen(
+            { store, settings in
+                SettingsView()
+                    .environmentObject(store)
+                    .environmentObject(settings)
+                    .environmentObject(AppLockStore())
+            },
+            data: data, privacyMode: privacyMode, height: 3_000
+        )
+    }
+
+    /// Fails if Privacy Mode lets Settings → Storage read out **how many records exist**.
+    ///
+    /// Six rows printed `finance.data.<entity>.count` in the clear, one of them
+    /// `finance.data.snapshots.count` — the exact number `b93f391` had just finished concealing on
+    /// the Dashboard, spelled out one screen away. The fixtures differ only in count (1 vs 2), so
+    /// nothing else on the page can move: no `isEmpty` flips, and the Refresh Prices button stays
+    /// enabled in both (it disables itself when there are no holdings, which is its own tell — see
+    /// the report, it is not fixed here).
+    func testPrivacyModeConcealsHowManyRecordsAreStored() throws {
+        let concealedOne = renderSettings(data: records(1), privacyMode: true)
+        let concealedOneAgain = renderSettings(data: records(1), privacyMode: true)
+        let concealedTwo = renderSettings(data: records(2), privacyMode: true)
+        let openOne = renderSettings(data: records(1), privacyMode: false)
+        let openTwo = renderSettings(data: records(2), privacyMode: false)
+
+        XCTAssertGreaterThan(
+            concealedOne.count, 50_000,
+            "captured \(concealedOne.count) bytes, so the window drew nothing — every assertion below is vacuous"
+        )
+        XCTAssertEqual(
+            digest(concealedOne), digest(concealedOneAgain),
+            "the same state rendered twice produced different pixels — the instrument is too unstable to conclude anything from"
+        )
+        XCTAssertNotEqual(
+            digest(openOne), digest(openTwo),
+            """
+            With Privacy Mode OFF the Settings page rendered identically for one record and for two.             The Storage rows are below the fold or no longer read `finance.data`, so the assertion             below cannot fail and must not be trusted.
+            """
+        )
+        XCTAssertEqual(
+            digest(concealedOne), digest(concealedTwo),
+            """
+            With Privacy Mode ON the Storage section still moves with the data, so a bystander can             read off exactly how many transactions, schedules, positions, holdings, liabilities and             snapshots this person has. All six rows have to go through `privateCount(_:)`.
+            """
+        )
+    }
+
+    /// Fails if Privacy Mode lets the Dashboard's Position grid read out **how many** positions,
+    /// holdings or liabilities exist.
+    ///
+    /// The three cards masked their figures to `••••` and then printed "2 positions", "2 holdings",
+    /// "2 liabilities" underneath — and "0 positions" when there were none, which is the same
+    /// disclosure `InvestmentsView.swift:107` has always refused to make.
+    ///
+    /// 1600pt: the grid sits below the hero, and at 700pt it is not in the viewport at all.
+    func testPrivacyModeConcealsHowManyPositionsTheDashboardSummarises() throws {
+        func render(_ n: Int, privacy: Bool) -> Data {
+            renderScreen(
+                { store, settings in
+                    DashboardView(selectedTab: .constant(.dashboard))
+                        .environmentObject(store)
+                        .environmentObject(settings)
+                },
+                data: records(n), privacyMode: privacy, height: 1_600
+            )
+        }
+
+        let concealedOne = render(1, privacy: true)
+        let concealedOneAgain = render(1, privacy: true)
+        let concealedTwo = render(2, privacy: true)
+
+        XCTAssertGreaterThan(
+            concealedOne.count, 50_000,
+            "captured \(concealedOne.count) bytes, so the window drew nothing — every assertion below is vacuous"
+        )
+        XCTAssertEqual(
+            digest(concealedOne), digest(concealedOneAgain),
+            "the same state rendered twice produced different pixels — the instrument is too unstable to conclude anything from"
+        )
+        XCTAssertNotEqual(
+            digest(render(1, privacy: false)), digest(render(2, privacy: false)),
+            """
+            With Privacy Mode OFF the Dashboard rendered identically for one record and for two, so             the Position grid is out of the viewport or no longer reads the counts, and the assertion             below can no longer fail.
+            """
+        )
+        XCTAssertEqual(
+            digest(concealedOne), digest(concealedTwo),
+            """
+            With Privacy Mode ON the Position grid still counts out loud. Look at the `detail:` of             the Investments, Crypto and Liabilities cards in `positionSection` — a `%lld positions`             plural key cannot be tokenised, so under Privacy Mode the caption has to be a fixed             phrase that does not move with the data.
+            """
+        )
+    }
+
+    /// Fails if Privacy Mode lets the Recorded Cash card say **whether any cash flow exists**.
+    ///
+    /// Its caption read "No activity yet" with an empty transaction list and "Income less expenses"
+    /// otherwise, directly under a figure already masked to `••••`.
+    ///
+    /// Both fixtures carry a liability so `isCompletelyEmpty` is false either way — that keeps the
+    /// onboarding card out of the comparison, so a failure here is this caption and not that card.
+    /// The transaction is **income**, because Net Savings picks its arrow and its tint from the
+    /// sign of the month's balance and an expense would flip both (a value leak, not an existence
+    /// one — reported separately, not fixed here). 1200pt keeps the ranked expense list and Recent
+    /// Activity, which do move with the data by the owner's separate ruling, below the fold.
+    func testPrivacyModeConcealsWhetherAnyCashFlowHasBeenRecorded() throws {
+        let liability = Liability(name: "Loan", currentBalance: 1_000, currency: .eur)
+        let quiet = FinancialData(liabilities: [liability])
+        let active = FinancialData(
+            transactions: [
+                WealthCompassMobile.Transaction(
+                    type: .income, category: "Salary", amount: 2_000, description: "pay",
+                    date: Date().addingTimeInterval(-3_600), currency: .eur
+                )
+            ],
+            liabilities: [liability]
+        )
+
+        func render(_ data: FinancialData, privacy: Bool) -> Data {
+            renderScreen(
+                { store, settings in
+                    DashboardView(selectedTab: .constant(.dashboard))
+                        .environmentObject(store)
+                        .environmentObject(settings)
+                },
+                data: data, privacyMode: privacy, height: 1_200
+            )
+        }
+
+        let concealedQuiet = render(quiet, privacy: true)
+        let concealedQuietAgain = render(quiet, privacy: true)
+        let concealedActive = render(active, privacy: true)
+
+        XCTAssertGreaterThan(
+            concealedQuiet.count, 50_000,
+            "captured \(concealedQuiet.count) bytes, so the window drew nothing — every assertion below is vacuous"
+        )
+        XCTAssertEqual(
+            digest(concealedQuiet), digest(concealedQuietAgain),
+            "the same state rendered twice produced different pixels — the instrument is too unstable to conclude anything from"
+        )
+        XCTAssertNotEqual(
+            digest(render(quiet, privacy: false)), digest(render(active, privacy: false)),
+            """
+            With Privacy Mode OFF the Dashboard rendered identically with and without a transaction,             so the Position grid is out of the viewport and the assertion below cannot fail.
+            """
+        )
+        XCTAssertEqual(
+            digest(concealedQuiet), digest(concealedActive),
+            """
+            With Privacy Mode ON the Recorded Cash card still announces whether any cash flow has             ever been recorded. Its `detail:` must not branch on `transactions.isEmpty`.
+            """
+        )
+    }
+
     // MARK: - Sweep internals
 
     /// The spellings of a percentage this codebase can produce. Anything else — a renamed wrapper,

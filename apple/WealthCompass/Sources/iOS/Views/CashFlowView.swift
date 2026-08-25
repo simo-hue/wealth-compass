@@ -486,7 +486,17 @@ struct CashFlowView: View {
 
             Spacer()
 
-            if totalCount > 0 {
+            // Two leaks in four lines. The numbers are exact counts of what exists and what the
+            // filters matched, and the `totalCount > 0` gate means the row itself only appears
+            // once there is something to count — so under Privacy Mode both the value and the
+            // slot had to stop moving with the data. Tokenised rather than hidden, and drawn
+            // unconditionally: `Showing •••• of ••••` is the same row in both data states, and it
+            // still tells the reader a filter is narrowing a list.
+            if settings.isPrivacyMode {
+                Text("Showing \(settings.redactionToken) of \(settings.redactionToken)")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(WCColor.textSecondary)
+            } else if totalCount > 0 {
                 Text("Showing \(shownCount) of \(totalCount)")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(WCColor.textSecondary)

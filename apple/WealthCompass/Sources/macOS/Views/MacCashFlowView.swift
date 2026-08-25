@@ -726,9 +726,23 @@ struct MacCashFlowView: View {
                 .accessibilityLabel(Text(settings.localized("Filtered to \(categoryFilter.title)")))
             }
 
-            Text("Showing \(filteredTransactions.count) of \(finance.transactions.count)")
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
+            // Exact counts of what exists and what the filters matched, sitting inside the filter
+            // bar itself — the most direct form of the walk-the-picker probe in the app: vary a
+            // filter, read off how many records fall inside it, with every amount already `••••`.
+            // Tokenised rather than hidden, because this row is drawn in both data states and
+            // only its two numbers move.
+            // Two `Text` calls rather than one with a ternary: a ternary between two string
+            // literals leaves the `Text(_:)` overload to inference, and picking the
+            // `StringProtocol` one would render the sentence verbatim in all 35 languages.
+            if settings.isPrivacyMode {
+                Text("Showing \(settings.redactionToken) of \(settings.redactionToken)")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Showing \(filteredTransactions.count) of \(finance.transactions.count)")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)

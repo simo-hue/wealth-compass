@@ -349,7 +349,15 @@ struct DashboardView: View {
                         title: "Recorded Cash",
                         value: settings.privateCurrency(totals.totalLiquidity),
                         systemImage: "banknote.fill",
-                        detail: finance.data.transactions.isEmpty ? "No activity yet" : "Income less expenses"
+                        // Privacy before emptiness. This caption flipped to "No activity yet" the
+                        // moment the transaction list was empty, so the card announced whether any
+                        // cash flow had ever been recorded while the figure above it read `••••`.
+                        // A caption that never moves with the data is the fix; hiding it would work
+                        // too, but the slot is drawn on every neighbouring card, so filling it with
+                        // the phrase this card already uses when populated keeps the grid even.
+                        detail: settings.isPrivacyMode || !finance.data.transactions.isEmpty
+                            ? "Income less expenses"
+                            : "No activity yet"
                     )
                 }
                 .buttonStyle(CardBounceButtonStyle())
@@ -362,7 +370,14 @@ struct DashboardView: View {
                         value: settings.privateCurrency(totals.totalInvestments),
                         systemImage: "chart.line.uptrend.xyaxis",
                         accent: .cyan,
-                        detail: finance.data.investments.count == 1 ? LocalizedStringKey("1 position") : LocalizedStringKey("\(finance.data.investments.count) positions")
+                        // The count is the payload, and it cannot be tokenised in place: the
+                        // catalog key is `%lld positions` with CLDR plural variations, and `••••`
+                        // has no plural category. So the caption becomes a fixed, data-independent
+                        // phrase — the one `InvestmentsView.swift:107` already prints under the
+                        // very same figure — instead of a number that also spells out `0`.
+                        detail: settings.isPrivacyMode
+                            ? LocalizedStringKey("Stocks, ETFs, and more")
+                            : (finance.data.investments.count == 1 ? LocalizedStringKey("1 position") : LocalizedStringKey("\(finance.data.investments.count) positions"))
                     )
                 }
                 .buttonStyle(CardBounceButtonStyle())
@@ -375,7 +390,11 @@ struct DashboardView: View {
                         value: settings.privateCurrency(totals.totalCrypto),
                         systemImage: "bitcoinsign.circle.fill",
                         accent: WCColor.warning,
-                        detail: finance.data.crypto.count == 1 ? LocalizedStringKey("1 holding") : LocalizedStringKey("\(finance.data.crypto.count) holdings")
+                        // As above; the fixed phrase is the one `CryptoView.swift:104` prints
+                        // under the same figure.
+                        detail: settings.isPrivacyMode
+                            ? LocalizedStringKey("Tracked assets")
+                            : (finance.data.crypto.count == 1 ? LocalizedStringKey("1 holding") : LocalizedStringKey("\(finance.data.crypto.count) holdings"))
                     )
                 }
                 .buttonStyle(CardBounceButtonStyle())
@@ -393,7 +412,11 @@ struct DashboardView: View {
                     value: settings.privateCurrency(totals.totalLiabilities),
                     systemImage: "creditcard.fill",
                     accent: WCColor.destructive,
-                    detail: finance.data.liabilities.count == 1 ? LocalizedStringKey("1 liability") : LocalizedStringKey("\(finance.data.liabilities.count) liabilities")
+                    // As above. Liabilities have no existing generic caption to borrow, so this
+                    // one is new.
+                    detail: settings.isPrivacyMode
+                        ? LocalizedStringKey("What you owe")
+                        : (finance.data.liabilities.count == 1 ? LocalizedStringKey("1 liability") : LocalizedStringKey("\(finance.data.liabilities.count) liabilities"))
                 )
 
                 Button {

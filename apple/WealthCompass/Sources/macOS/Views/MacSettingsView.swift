@@ -470,17 +470,17 @@ struct MacSettingsView: View {
             SettingsSection(title: "Local Storage") {
                 SettingsRow(title: "Mode") { Text("Local Only").foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Transactions") { Text("\(finance.data.transactions.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: "Transactions") { Text(privateCount(finance.data.transactions.count)).foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Recurring Schedules") { Text("\(finance.data.recurringTransactions.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: "Recurring Schedules") { Text(privateCount(finance.data.recurringTransactions.count)).foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Investments") { Text("\(finance.data.investments.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: "Investments") { Text(privateCount(finance.data.investments.count)).foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Crypto Holdings") { Text("\(finance.data.crypto.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: "Crypto Holdings") { Text(privateCount(finance.data.crypto.count)).foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Liabilities") { Text("\(finance.data.liabilities.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: "Liabilities") { Text(privateCount(finance.data.liabilities.count)).foregroundStyle(.secondary) }
                 Divider().background(WCColor.border)
-                SettingsRow(title: "Snapshots") { Text("\(finance.data.snapshots.count)").foregroundStyle(.secondary) }
+                SettingsRow(title: "Snapshots") { Text(privateCount(finance.data.snapshots.count)).foregroundStyle(.secondary) }
 
                 Divider().background(WCColor.border)
 
@@ -725,6 +725,17 @@ struct MacSettingsView: View {
                 message: Self.errorMessage(error, appLanguage: settings.appLanguage)
             )
         }
+    }
+
+    /// A stored-record count, redacted while Privacy Mode is on.
+    ///
+    /// The Local Storage section printed six exact entity counts in the clear, including
+    /// `finance.data.snapshots.count` — the same fact `b93f391` concealed on the Dashboard, spelled
+    /// out as a number one page away. Tokenised rather than hidden: the row is drawn in both data
+    /// states and only its value moves, so `••••` in a slot that always exists discloses nothing.
+    /// Same spelling as `MacInvestmentsView.privateCount` and `MacCryptoView.privateCount`.
+    private func privateCount(_ count: Int) -> String {
+        settings.isPrivacyMode ? settings.redactionToken : "\(count)"
     }
 
     private func storedAPIKey(for credential: KeychainCredential) throws -> String? {

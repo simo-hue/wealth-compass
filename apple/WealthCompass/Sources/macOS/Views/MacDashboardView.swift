@@ -139,7 +139,13 @@ struct MacDashboardView: View {
                 value: settings.privateCurrency(totals.totalLiabilities),
                 systemImage: "creditcard.fill",
                 accent: WCColor.destructive,
-                detail: finance.data.liabilities.count == 1 ? LocalizedStringKey("1 liability") : LocalizedStringKey("\(finance.data.liabilities.count) liabilities")
+                // The count is the payload and cannot be tokenised in place — the catalog key is
+                // `%lld liabilities` with CLDR plural variations and `••••` has no plural category
+                // — so under Privacy Mode the caption becomes a fixed, data-independent phrase
+                // rather than a number that also spells out `0`. Mirrors `DashboardView.swift`.
+                detail: settings.isPrivacyMode
+                    ? LocalizedStringKey("What you owe")
+                    : (finance.data.liabilities.count == 1 ? LocalizedStringKey("1 liability") : LocalizedStringKey("\(finance.data.liabilities.count) liabilities"))
             )
             .frame(maxWidth: .infinity)
         }
