@@ -856,3 +856,44 @@ Three sites of the same family that the 41-site sweep surfaced but did not close
   `LocalizedStringKey` one and applies grouping separators. The redacted branch looked right, so only the
   *visible* branch regressed — four figures of transactions lost their separator in every locale. If a
   privacy helper feeds a `Text`, return `Text`.
+
+### The lock screen was the worst surface, and one leak remains there (2026-08-25)
+
+`32650c7` fixed the severe one: with Privacy Mode on, the recurring reminder used to render
+**"Recurring Expense due — Rent is scheduled."** on a locked phone. `showAmounts` gated only the figure;
+`content.title` named the *type* and `content.body` named the *category*, outside the branch. Every other
+leak in this audit needed someone holding the unlocked device. This one needed a table.
+
+It is now `showDetails`, gating the whole notification — under Privacy Mode no property of the schedule
+is read at all. Two premises in my brief were wrong and the fixer corrected them:
+`MacRecurringTransactionNotificationService` is **not** a second class (it is an `enum` at
+`MacPlatformServices.swift:65` holding a configured instance of the same shared actor), so this is the
+**one place in the entire audit where a test covers macOS**; and there are **six** `sync` call sites, not
+the two I named — `SettingsView:692`, `CashFlowView:702`, `MacSettingsView:929` and `MacCashFlowView:1036`
+also pass the flag. All six pass it correctly.
+
+- [ ] **Multiplicity still leaks a count on the lock screen.** Every privacy-mode reminder is now the
+      same two constants, so N schedules due in the same minute post **N identical banners**. A bystander
+      counts them. The obvious fix — key the request identifier on the fire time so they coalesce —
+      **breaks the cancellation contract**: `deleteRecurringTransaction`, `completeRecurringTransaction`
+      and `finishRecurringTransaction` (`CashFlowView:688,725`, `MacCashFlowView:1022,1061`) call
+      `cancel(scheduleID:)` with **no following `sync`**, so a fire-time-keyed request would survive the
+      delete and fire for a schedule that no longer exists. Doing it properly means making those four
+      paths re-sync. Worth doing — it is the same class, on the most exposed surface in the app.
+- [ ] **Arrival time still correlates with the schedule** — a banner on the 1st suggests rent. Inherent
+      to having reminders at all; recorded so it is an accepted limitation rather than an oversight.
+
+### Localization facts learned the hard way (2026-08-25)
+
+- [ ] **There is no parent-locale fallback anywhere in the app.** `es-419` failed a coverage check for a
+      key that `es` has, because `AppLocalization` loads the `.lproj` directly. Any key present in `es`
+      but absent from `es-419` renders **English**, not Spanish. Worth a sweep — the same trap applies to
+      `pt-BR`/`pt-PT`, `fr-CA`/`fr-FR`, `zh-Hans`/`zh-Hant`.
+- [ ] **`Capital invested` is missing `sv`** (33 of 34). Predates this series.
+- [ ] **157 catalog keys have zero localizations.** Not investigated.
+- **A claim to stop repeating:** `ar` and `hi` render `1,234` in **Latin** digits here, not Arabic-Indic.
+  Two commit messages and several doc comments in this series asserted otherwise. Measured, not assumed.
+- **`%lld positions` and friends hold flat `stringUnit`s in all 34 locales.** Only **two** keys in the
+  whole catalog use `variations.plural`. I asserted the opposite in a brief and it caused a real
+  regression: the fixer swapped three well-translated count captions for fixed phrases that existed in
+  only 6 locales, so 28 locales read English under Privacy Mode until `997e378` back-filled them.
