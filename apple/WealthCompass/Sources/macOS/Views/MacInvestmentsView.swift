@@ -174,7 +174,18 @@ struct MacInvestmentsView: View {
                 .rankedByValue(settings.convert)
                 .prefix(5)
             
-            if topHoldings.isEmpty {
+            // Privacy before emptiness. The Positions metric on this page already redacts its
+            // count to `••••` via `privateCount(_:)`; this panel gave the same fact back in words.
+            // The populated arm still lists its cards — ranked lists are a separate ruling
+            // (TO_SIMO_DO.md) — so what stops is the page stating the portfolio is empty.
+            if settings.isPrivacyMode, topHoldings.isEmpty {
+                ContentUnavailableView(
+                    "Hidden by Privacy Mode",
+                    systemImage: "eye.slash",
+                    description: Text("Turn off Privacy Mode to reveal this.")
+                )
+                .padding(.top, 40)
+            } else if topHoldings.isEmpty {
                 ContentUnavailableView(
                     "No Investments",
                     systemImage: "chart.line.uptrend.xyaxis",
@@ -195,7 +206,15 @@ struct MacInvestmentsView: View {
     private var investmentTable: some View {
         ScrollView {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
-                if finance.data.investments.isEmpty {
+                // Privacy before emptiness, as at `topHoldingsSection` above.
+                if settings.isPrivacyMode, finance.data.investments.isEmpty {
+                    ContentUnavailableView(
+                        "Hidden by Privacy Mode",
+                        systemImage: "eye.slash",
+                        description: Text("Turn off Privacy Mode to reveal this.")
+                    )
+                    .padding(.top, 40)
+                } else if finance.data.investments.isEmpty {
                     ContentUnavailableView(
                         "No Investments",
                         systemImage: "chart.line.uptrend.xyaxis",

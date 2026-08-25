@@ -486,7 +486,13 @@ struct MacCashFlowView: View {
                     Spacer()
                 }
 
-                if transactions.isEmpty {
+                // Privacy before emptiness, as at the transaction table: "No activity yet" states
+                // that this person has never recorded a transaction. The populated arm still lists
+                // its rows (ranked lists are a separate ruling), so what stops is the sentence.
+                if settings.isPrivacyMode, transactions.isEmpty {
+                    EmptyState(title: "Hidden by Privacy Mode", systemImage: "eye.slash")
+                        .frame(maxWidth: .infinity, minHeight: 200)
+                } else if transactions.isEmpty {
                     EmptyState(title: "No activity yet", systemImage: "clock.arrow.circlepath")
                         .frame(maxWidth: .infinity, minHeight: 200)
                 } else {
@@ -528,7 +534,12 @@ struct MacCashFlowView: View {
                     }
                 }
 
-                if finance.recurringTransactions.isEmpty {
+                // Privacy before emptiness, as above: the sentence states that this person keeps
+                // no standing income or expenses.
+                if settings.isPrivacyMode, finance.recurringTransactions.isEmpty {
+                    EmptyState(title: "Hidden by Privacy Mode", systemImage: "eye.slash")
+                        .frame(maxWidth: .infinity, minHeight: 200)
+                } else if finance.recurringTransactions.isEmpty {
                     EmptyState(title: "No recurring transactions", systemImage: "repeat")
                         .frame(maxWidth: .infinity, minHeight: 200)
                 } else {

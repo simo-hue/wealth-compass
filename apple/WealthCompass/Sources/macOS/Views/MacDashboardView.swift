@@ -821,7 +821,23 @@ struct MacDashboardView: View {
                     .foregroundStyle(WCColor.primary)
                 }
 
-                if transactions.isEmpty {
+                // Privacy before emptiness, the treatment every chart on this page already has
+                // and no list had. "No activity yet" states that this person has never recorded a
+                // transaction, printed while every figure around it is `••••`. No action button in
+                // the concealed arm: "Add Transaction" is an invitation that only makes sense once
+                // the reader has been told there is nothing there.
+                //
+                // Narrower reach than at a chart, and worth stating: the populated arm still lists
+                // its rows, ranked lists being a separate ruling (TO_SIMO_DO.md). What stops is
+                // the card saying so in words.
+                if settings.isPrivacyMode, transactions.isEmpty {
+                    DashboardEmptyState(
+                        title: "Hidden by Privacy Mode",
+                        message: "Turn off Privacy Mode to reveal this.",
+                        systemImage: "eye.slash"
+                    )
+                    .frame(minHeight: 246)
+                } else if transactions.isEmpty {
                     DashboardEmptyState(
                         title: "No activity yet",
                         message: "Your latest income and expenses will appear here.",

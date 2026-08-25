@@ -324,7 +324,12 @@ struct CashFlowView: View {
                     .foregroundStyle(WCColor.primary)
                 }
 
-                if finance.recurringTransactions.isEmpty {
+                // Privacy before emptiness, as at the transaction list below: the sentence states
+                // that this person keeps no standing income or expenses. The populated arm still
+                // lists its schedules (a separate ruling), so what stops is the sentence.
+                if settings.isPrivacyMode, finance.recurringTransactions.isEmpty {
+                    EmptyState(title: "Hidden by Privacy Mode", systemImage: "eye.slash")
+                } else if finance.recurringTransactions.isEmpty {
                     EmptyState(title: "No recurring transactions", systemImage: "repeat")
                 } else {
                     VStack(spacing: 12) {

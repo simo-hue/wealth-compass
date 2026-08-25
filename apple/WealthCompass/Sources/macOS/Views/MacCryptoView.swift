@@ -226,7 +226,18 @@ struct MacCryptoView: View {
                 .rankedByValue(settings.convert)
                 .prefix(6)
             
-            if topHoldings.isEmpty {
+            // Privacy before emptiness. The Holdings metric on this page already redacts its
+            // count to `••••` via `privateCount(_:)`; this panel gave the same fact back in words.
+            // The populated arm still lists its cards (ranked lists are a separate ruling), so
+            // what stops is the page stating there are no holdings.
+            if settings.isPrivacyMode, topHoldings.isEmpty {
+                ContentUnavailableView(
+                    "Hidden by Privacy Mode",
+                    systemImage: "eye.slash",
+                    description: Text("Turn off Privacy Mode to reveal this.")
+                )
+                .padding(.top, 40)
+            } else if topHoldings.isEmpty {
                 ContentUnavailableView(
                     "No Crypto Holdings",
                     systemImage: "bitcoinsign.circle",
@@ -246,7 +257,15 @@ struct MacCryptoView: View {
     private var cryptoTable: some View {
         ScrollView {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
-                if finance.data.crypto.isEmpty {
+                // Privacy before emptiness, as at `topHoldingsSection` above.
+                if settings.isPrivacyMode, finance.data.crypto.isEmpty {
+                    ContentUnavailableView(
+                        "Hidden by Privacy Mode",
+                        systemImage: "eye.slash",
+                        description: Text("Turn off Privacy Mode to reveal this.")
+                    )
+                    .padding(.top, 40)
+                } else if finance.data.crypto.isEmpty {
                     ContentUnavailableView(
                         "No Crypto Holdings",
                         systemImage: "bitcoinsign.circle",

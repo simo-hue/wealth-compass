@@ -139,7 +139,13 @@ struct InvestmentsView: View {
             VStack(alignment: .leading, spacing: 14) {
                 SectionHeading(LocalizedStringKey("Positions"), subtitle: LocalizedStringKey("Tap a position to edit its details"))
 
-                if finance.data.investments.isEmpty {
+                // Privacy before emptiness. The Positions card above already redacts its count to
+                // `••••` (line 107); this sentence gave the same fact back in words. The populated
+                // arm still lists its rows — ranked lists are a separate ruling (TO_SIMO_DO.md) —
+                // so what stops here is the card stating the portfolio is empty.
+                if settings.isPrivacyMode, finance.data.investments.isEmpty {
+                    EmptyState(title: LocalizedStringKey("Hidden by Privacy Mode"), systemImage: "eye.slash")
+                } else if finance.data.investments.isEmpty {
                     EmptyState(title: LocalizedStringKey("No investments yet"), systemImage: "chart.xyaxis.line")
                 } else {
                     VStack(spacing: 12) {

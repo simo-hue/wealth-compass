@@ -197,7 +197,12 @@ struct CryptoView: View {
             VStack(alignment: .leading, spacing: 14) {
                 SectionHeading(LocalizedStringKey("Crypto holdings"), subtitle: LocalizedStringKey("Tap a holding to edit its details"))
 
-                if finance.data.crypto.isEmpty {
+                // Privacy before emptiness. The Holdings card above already redacts its count to
+                // `••••` (line 104); this sentence gave the same fact back in words. The populated
+                // arm still lists its rows (a separate ruling), so what stops is the sentence.
+                if settings.isPrivacyMode, finance.data.crypto.isEmpty {
+                    EmptyState(title: LocalizedStringKey("Hidden by Privacy Mode"), systemImage: "eye.slash")
+                } else if finance.data.crypto.isEmpty {
                     EmptyState(title: LocalizedStringKey("No crypto holdings yet"), systemImage: "bitcoinsign.circle")
                 } else {
                     VStack(spacing: 12) {

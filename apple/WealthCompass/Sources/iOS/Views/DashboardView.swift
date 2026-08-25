@@ -558,7 +558,19 @@ struct DashboardView: View {
                     .pickerStyle(.menu)
                 }
 
-                if expenses.isEmpty {
+                // Privacy before emptiness, the treatment every chart got in `24ffc78` and no
+                // list or table did. "No expenses for this period" is a statement about this
+                // person's finances, printed while every figure around it is already `••••` — and
+                // it sits under an `AnalyticsPeriod` picker, so a bystander can walk the periods
+                // and read off which ones hold spending.
+                //
+                // The reach is narrower than at a chart and worth stating: the ranked list below
+                // still renders its rows, ranked lists being a separate ruling (TO_SIMO_DO.md), so
+                // an empty card is still distinguishable from a full one. What stops is the card
+                // saying so in words, and the period picker answering one query per period.
+                if settings.isPrivacyMode, expenses.isEmpty {
+                    EmptyState(title: "Hidden by Privacy Mode", systemImage: "eye.slash")
+                } else if expenses.isEmpty {
                     EmptyState(title: "No expenses for this period", systemImage: "list.bullet.rectangle")
                 } else {
                     VStack(spacing: 15) {
@@ -616,7 +628,12 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 16) {
                 SectionHeading("Recent Activity", subtitle: "Your latest recorded cash movements")
 
-                if transactions.isEmpty {
+                // Privacy before emptiness, as at `topExpenses` above: "No activity yet" states
+                // that this person has never recorded a transaction. The populated arm still lists
+                // its rows (ranked lists are a separate ruling), so what stops is the sentence.
+                if settings.isPrivacyMode, transactions.isEmpty {
+                    EmptyState(title: "Hidden by Privacy Mode", systemImage: "eye.slash")
+                } else if transactions.isEmpty {
                     EmptyState(title: "No activity yet", systemImage: "clock.arrow.circlepath")
                 } else {
                     VStack(spacing: 10) {
