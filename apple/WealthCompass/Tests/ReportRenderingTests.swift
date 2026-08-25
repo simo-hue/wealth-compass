@@ -199,10 +199,11 @@ final class ReportReconciliationTests: XCTestCase {
     }
 
     private func buildDocument(sections: Set<ReportSection> = Set(ReportSection.allCases),
-                               range: ReportDateRange = .allTime) -> ReportDocument {
+                               range: ReportDateRange = .allTime,
+                               data: FinancialData? = nil) -> ReportDocument {
         ReportDocumentBuilder(
             context: ReportBuildContext(
-                data: data,
+                data: data ?? self.data,
                 converter: CurrencyConverter(snapshot: snapshot),
                 baseCurrency: .eur,
                 exchangeRateSnapshot: snapshot,
@@ -313,6 +314,56 @@ final class ReportReconciliationTests: XCTestCase {
             }
         }
         XCTAssertEqual(barCount, 24, "the chart silently dropped months the ledger still reports")
+    }
+
+    /// The Money Flow diagram and the category table beneath it must print the same figure for the
+    /// same category.
+    ///
+    /// The diagram was built by the engine, which sums unrounded conversions, while every table in
+    /// the report sums `recordValue` — rounded at the point of conversion, per `roundedMoney`. With
+    /// foreign-currency rows the two drifted, so one page carried two amounts for one category.
+    func testMoneyFlowAgreesWithTheCategoryTable() throws {
+        // Enough foreign-currency rows for the remainder to accumulate. $1,000 at 1.0842 converts to
+        // 922.33905…, so one row rounds away invisibly and the check would pass with the arithmetic
+        // wrong; a hundred of them drift by more than a euro.
+        var many = FinancialData()
+        many.transactions = (0..<100).map { index in
+            Transaction(type: .expense, category: "Rent", amount: 1000, description: "r\(index)",
+                        date: day(2026, 3, 1), currency: .usd)
+        }
+        many.transactions.append(
+            Transaction(type: .income, category: "Salary", amount: 500_000, description: "s",
+                        date: day(2026, 1, 1), currency: .eur))
+
+        let document = buildDocument(sections: [.cashFlow], data: many)
+        let blocks = try XCTUnwrap(
+            document.sections.first(where: { $0.anchor == ReportSection.cashFlow.anchor })?.blocks)
+
+        var diagram: [String: Double] = [:]
+        var table: [String: Decimal] = [:]
+        for block in blocks {
+            if case let .chart(chart) = block, case let .sankey(model, _) = chart {
+                for node in model.outflows where node.role == .expense {
+                    diagram[node.title] = node.value
+                }
+            }
+            if case let .table(reportTable) = block,
+               reportTable.columns.first?.title == "Category" {
+                for row in reportTable.rows where row.cells.count >= 2 {
+                    table[row.cells[0]] = amount(row.cells[1])
+                }
+            }
+        }
+
+        XCTAssertFalse(diagram.isEmpty, "no Money Flow diagram in the section")
+        XCTAssertFalse(table.isEmpty, "no category table in the section")
+        for (category, tabled) in table {
+            let charted = try XCTUnwrap(diagram[category], "\(category) missing from the diagram")
+            XCTAssertEqual(
+                Decimal(charted), tabled,
+                "\(category) prints a different amount on the diagram than in the table"
+            )
+        }
     }
 
     /// The running-balance column is the reader's audit trail; its final settled value is the same

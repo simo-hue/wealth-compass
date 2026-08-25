@@ -428,11 +428,11 @@ were written up rather than changed. Both are data-loss shaped.
       state this rule and were applied to the Money Flow and category totals only.
 - [x] **DONE 2026-08-25.** `:394-399` — the allocation donut's centre is labelled `Total Assets` but carries `ringTotal`,
       which differs whenever cash is net-negative. Two different figures under one label, one page.
-- [ ] `:524-529` — the Money Flow sums unrounded conversions while the category table sums rounded
+- [x] **DONE 2026-08-25.** `:524-529` — the Money Flow sums unrounded conversions while the category table sums rounded
       ones, so the same category prints two amounts. Needs foreign-currency rows to show.
 - [ ] `:928-930` — when no FX snapshot exists the appendix prints a note saying fallback rates were
       used and then **omits the rate table**, i.e. the one case where figures are least reproducible.
-- [ ] `:250-263` — axis magnitude suffixes `B`/`M`/`k` are raw literals in all 35 languages
+- [x] **DONE 2026-08-25.** `:250-263` — axis magnitude suffixes `B`/`M`/`k` are raw literals in all 35 languages
       (ja wants 万/億, de "Mio.", ru "млн").
 - [ ] `:635-639` — the future-dated note is `String(format:)`-substituted after a plain lookup, so a
       catalog `variations.plural` entry can never fire. Also no plural handling for English.
@@ -539,6 +539,14 @@ were written up rather than changed. Both are data-loss shaped.
 - [x] **DONE 2026-08-25.** The Monthly Trend chart was capped at twelve bars, which silently dropped
       months the ledger still reported — `.last12Months` spans thirteen calendar months, and a
       multi-year export charted only its tail. Cap removed; pinned by a test.
+
+### A trap worth knowing about
+
+`xcodebuild -only-testing:WealthCompassTests/<Class>/<method>` silently selected **nothing** here and
+still reported `** TEST SUCCEEDED **`. I used it three times to check that a new test fails against
+the pre-fix code, and all three checks were vacuous — an unconditional `XCTFail` inside the test
+still "passed". Run the **full suite** for before/after verification; it is about two minutes and it
+actually executes the test.
 
 ### Notes for whoever picks this up
 

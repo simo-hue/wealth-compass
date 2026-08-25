@@ -249,19 +249,19 @@ struct ReportDocumentBuilder {
     }
 
     /// Compact axis labels ("12.3k", "1.2M") so a y-axis does not consume a third of the plot.
+    ///
+    /// `.compactName` rather than hand-built suffixes. The thresholds and the letters were English
+    /// literals — `B`, `M`, `k`, plus an ASCII hyphen for the sign where `money()` two lines away
+    /// emits the locale's own minus — so every axis in the report read in English regardless of the
+    /// language: German wants "Mio.", Russian "млн", and Japanese groups by 万/億 rather than by
+    /// thousands at all, so no threshold table could have been right for it.
     private func axisLabel(_ value: Double) -> String {
         guard value.isFinite else { return "" }
-        let magnitude = abs(value)
-        let sign = value < 0 ? "-" : ""
-        func trim(_ v: Double) -> String {
-            v.formatted(.number.precision(.fractionLength(0...1)).locale(context.locale))
-        }
-        switch magnitude {
-        case 1_000_000_000...: return sign + trim(magnitude / 1_000_000_000) + "B"
-        case 1_000_000...: return sign + trim(magnitude / 1_000_000) + "M"
-        case 1_000...: return sign + trim(magnitude / 1_000) + "k"
-        default: return sign + trim(magnitude)
-        }
+        return value.formatted(
+            .number.notation(.compactName)
+                .precision(.fractionLength(0...1))
+                .locale(context.locale)
+        )
     }
 
     // MARK: - Entry point
@@ -600,7 +600,19 @@ struct ReportDocumentBuilder {
         // are: `cashFlowSankey(period:)` would impose its own window and contradict the export
         // range. Placed ahead of the category breakdown because it frames it — the donut answers
         // "how was spending split", this answers "where did the money come from and what was left".
-        let flowTransactions = rangedTransactions.filter { !isFutureDated($0) }
+        // Handed rows already converted and rounded by `recordValue`, then tagged as base currency
+        // so the engine's own conversion is a no-op. `sankeyCategoryTotals` sums unrounded
+        // conversions, which is defensible on screen but put a different figure for the same
+        // category on the ribbon and in the table below it — 200 USD rent rows at 1.0842 printed
+        // €184,467.81 on the diagram and €184,466.00 in the table. `roundedMoney`'s contract is
+        // that every accumulated figure rounds at the point of conversion; this is the one place in
+        // the report that was bypassing it.
+        let flowTransactions = rangedTransactions.filter { !isFutureDated($0) }.map { transaction -> Transaction in
+            var converted = transaction
+            converted.amount = recordValue(transaction.amount, transaction.currency)
+            converted.currency = context.baseCurrency
+            return converted
+        }
         let sankey = engine.cashFlowSankey(transactions: flowTransactions)
         if !sankey.isEmpty {
             blocks.append(.subheading(L("Money Flow"), anchor: "cashflow-money-flow"))
