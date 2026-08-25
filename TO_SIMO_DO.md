@@ -897,3 +897,47 @@ also pass the flag. All six pass it correctly.
   whole catalog use `variations.plural`. I asserted the opposite in a brief and it caused a real
   regression: the fixer swapped three well-translated count captions for fixed phrases that existed in
   only 6 locales, so 28 locales read English under Privacy Mode until `997e378` back-filled them.
+
+### The lock screen, finished (2026-08-25)
+
+`73e3b22` `866b3c7` `835415b` `5265c96` `796c2a1`. Suite 297 → **302**, green.
+
+Two bugs, both worse than the one that started this thread:
+
+- **`sync` cleared only *pending* notifications.** `cancel` and `cancelAll` both called
+  `removeDeliveredNotifications`; `sync` did not. So turning Privacy Mode on rewrote the queue and left
+  every already-delivered banner — *"Recurring Expense due / Rent: €1.450,00"* — sitting on the lock
+  screen unchanged. Enabling Privacy Mode did nothing to what was already there, which is the normal
+  case: people turn it on *because* schedules exist.
+- **`cancelAll` could never reach a delivered notification at all.** It built its identifier list from
+  `pendingNotificationRequests()`, then passed that list to `removeDeliveredNotifications` — but a
+  delivered notification is no longer pending, so its identifier was never in the list. `cancelAll` is
+  the **erase-everything** path (`SettingsView.swift:626`, `ContentView.swift:50`,
+  `MacSettingsView.swift:922`, `MacRootView.swift:39`), so a factory reset left banners standing.
+
+Both now go through one `clearScheduledReminders()` that unions pending **and** delivered identifiers.
+`sync` clears delivered *always*, not only under Privacy Mode — it is never called speculatively, so
+every call means the banner has stopped describing the data; gating it on an unrelated flag would have
+left the staleness bug for everyone else.
+
+Also fixed: banners now coalesce to **one per moment** under Privacy Mode (the previous agent's reason
+for skipping this was refuted — `sync` tears down by prefix, so cancellation was never the blocker); the
+notification test now asserts on the whole `UNNotificationRequest` rather than a mutable class a later
+line could rewrite; and a ninth entity count was tokenised with a lint that pins the call sites.
+
+- [ ] **44 product-name translations across 13 locales, in 21 other keys.** `zh-Hans` 11, `hi` 6, `ar` 5,
+      `ms` 5, `zh-Hant` 5, `tr` 4, plus `de/es/fr/it/pl/sk/th`. Eight locales were renaming the app in
+      the *notification* strings alone (the brief said two); the same defect is spread through the rest
+      of the catalog. Note the standalone `Wealth Compass Tracker` key **is** the display name, which
+      some locales localize deliberately — do not "fix" that one.
+- [ ] **Two dead catalog keys**, 35 locales each, no Swift reference:
+      `%@ is scheduled. Open Wealth Compass Tracker to review it.` and
+      `%@: %@. Wealth Compass Tracker records it while the app is active.`
+- [ ] **Eight bare-`String` counts in `ReportDocumentBuilder.swift`** (`:857`, `:950`, `:1070-1075`) —
+      the same defect as the nine tokenised in the views: they print `1234`, not `1,234`/`1.234`, in
+      every locale. In the PDF export, which the lint deliberately excludes.
+
+**Nothing about delivery can be tested here.** Measured in the test host: `authorizationStatus.rawValue
+== 0`, `center.add` retains **0 of 5** requests, `deliveredNotifications()` is callable but always empty.
+So Commit A's coverage is a source lint and says so, and the identifier/trigger and coalescing tests
+cover pure functions rather than the real queue. The lock-screen behaviour rests on reading the code.
