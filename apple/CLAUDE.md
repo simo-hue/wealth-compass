@@ -59,6 +59,28 @@ xcrun xcresulttool get test-results summary --path <path>.xcresult
 A fix is only proven when the count moves the way you predicted — one new test failing before, passing
 after, with every other test unchanged.
 
+**A run does not touch the working tree — including `Localizable.xcstrings`.** This is written down
+because the opposite was believed, and the mitigation that belief suggests is destructive. `xcodebuild`
+does **not** write the extracted strings back into the source catalog, despite `SWIFT_EMIT_LOC_STRINGS =
+YES` on all four configurations — that write-back is an Xcode IDE behaviour, not a command-line one.
+Measured five ways, checking the file's SHA **and** `git status` before and after each:
+
+| run | catalog |
+| --- | --- |
+| full `xcodebuild test`, warm DerivedData | unchanged |
+| full `xcodebuild test`, scratch `-derivedDataPath` (cold, the command above verbatim) | unchanged |
+| `xcodebuild build` (Mobile, `generic/platform=iOS Simulator`), scratch `-derivedDataPath` | unchanged |
+| the same, plus a brand-new `Text("…")` literal absent from the catalog | unchanged |
+| `xcodebuild build` (Mac, `platform=macOS`), scratch `-derivedDataPath`, same new literal | unchanged |
+
+The fourth and fifth rows are the ones that matter: a *new* string is the case that would make a
+write-back necessary, and it still does not happen.
+
+So if the catalog turns up dirty after a run, **something other than `xcodebuild` wrote it** — find out
+what before discarding it. Do not add a `git checkout -- …/Localizable.xcstrings` step to a build or
+test script: catalog edits are ordinary source changes — the commit that stopped 13 locales renaming
+the app is 88 lines of them — and a blanket restore would silently throw yours away.
+
 Signing uses `DEVELOPMENT_TEAM = 8528AN28A3`. Version numbers live in `project.pbxproj` (`MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`) — bump them there. Both app targets currently share the bundle id `com.wealthcompass.mobile`; the CloudKit container is `iCloud.com.wealthcompasstracker`.
 
 ## Source layout
