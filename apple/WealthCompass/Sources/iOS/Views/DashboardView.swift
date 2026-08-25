@@ -153,7 +153,7 @@ struct DashboardView: View {
                                 HStack(spacing: 6) {
                                     Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
                                     Text(settings.privateCurrency(abs(rangeChange.value)))
-                                    Text(privatePercent(abs(rangeChange.percentage)))
+                                    Text(settings.privatePercent(abs(rangeChange.percentage)))
                                     Text(timeRange.title)
                                         .foregroundStyle(WCColor.textTertiary)
                                 }
@@ -526,7 +526,7 @@ struct DashboardView: View {
                                         .foregroundStyle(.white)
                                     // VIEW-08: show the category's share of spending, matching macOS
                                     // (the bar already encodes it; iOS previously omitted the number).
-                                    Text(privatePercent(item.percentage))
+                                    Text(settings.privatePercent(item.percentage))
                                         .font(.caption.monospacedDigit().weight(.medium))
                                         .foregroundStyle(WCColor.textTertiary)
                                         .frame(width: 44, alignment: .trailing)
@@ -622,12 +622,6 @@ struct DashboardView: View {
 
     private func chartDomain(for points: [NetWorthPoint]) -> ClosedRange<Double> {
         AnalyticsEngine.chartYDomain(for: points)
-    }
-
-    private func privatePercent(_ value: Double) -> String {
-        settings.isPrivacyMode
-            ? settings.redactionToken
-            : formattedPercent(value, locale: settings.effectiveLocale)
     }
 
     private func signedAmount(for transaction: Transaction) -> String {

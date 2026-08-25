@@ -262,7 +262,7 @@ struct MacDashboardView: View {
                                 HStack(spacing: 7) {
                                     Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
                                     Text(settings.privateCurrency(abs(rangeChange.value)))
-                                    Text(privatePercent(abs(rangeChange.percentage)))
+                                    Text(settings.privatePercent(abs(rangeChange.percentage)))
                                     Text("for \(timeRange.localizedTitle(appLanguage: settings.appLanguage))")
                                         .foregroundStyle(WCColor.textTertiary)
                                 }
@@ -479,7 +479,7 @@ struct MacDashboardView: View {
                                                     .foregroundStyle(.white)
                                                     .lineLimit(1)
                                                     .minimumScaleFactor(0.7)
-                                                Text(privatePercent(allocationTotal > 0 ? hoveredAssetSlice.value / allocationTotal * 100 : 0))
+                                                Text(settings.privatePercent(allocationTotal > 0 ? hoveredAssetSlice.value / allocationTotal * 100 : 0))
                                                     .font(.caption2.monospacedDigit())
                                                     .foregroundStyle(.white.opacity(0.6))
                                             } else {
@@ -540,7 +540,7 @@ struct MacDashboardView: View {
                                     Text(settings.privateCurrency(slice.value))
                                         .font(.subheadline.monospacedDigit().weight(.semibold))
                                         .foregroundStyle(.white)
-                                    Text(privatePercent(allocationTotal > 0 ? slice.value / allocationTotal * 100 : 0))
+                                    Text(settings.privatePercent(allocationTotal > 0 ? slice.value / allocationTotal * 100 : 0))
                                         .font(.caption2.monospacedDigit())
                                         .foregroundStyle(WCColor.textTertiary)
                                 }
@@ -838,12 +838,6 @@ struct MacDashboardView: View {
 
     private func chartDomain(for points: [NetWorthPoint]) -> ClosedRange<Double> {
         AnalyticsEngine.chartYDomain(for: points)
-    }
-
-    private func privatePercent(_ value: Double) -> String {
-        settings.isPrivacyMode
-            ? settings.redactionToken
-            : formattedPercent(value, locale: settings.effectiveLocale)
     }
 
     private func signedAmount(for transaction: Transaction) -> String {

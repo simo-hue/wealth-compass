@@ -729,9 +729,12 @@ final class FinanceStore: ObservableObject {
         if data.investments.isEmpty {
             result.skippedInvestments = []
         } else {
-            // Finnhub is the primary quote source (US listings). Yahoo is a keyless fallback for
-            // anything Finnhub can't price (European ETFs like VWCE) and, when no Finnhub key is
-            // set at all, the sole source — so investments still auto-update without a key (I3).
+            // Finnhub prices US/USD listings, and only when a key is configured. The loop below
+            // sends every non-USD holding straight to Yahoo without asking Finnhub at all, since
+            // its `/quote` reports no currency (H13); Yahoo also takes over on `.noQuote` (European
+            // ETFs like VWCE) and on `.rateLimited`. With no key set it is the sole source for
+            // every holding — so investments still auto-update without one (I3), which, since the
+            // key is optional, is the default configuration.
             let finnhubClient: FinnhubQuoteClient?
             if let trimmedFinnhubKey, hasFinnhubKey {
                 finnhubClient = FinnhubQuoteClient(apiKey: trimmedFinnhubKey)

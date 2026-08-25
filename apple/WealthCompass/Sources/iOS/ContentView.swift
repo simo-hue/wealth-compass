@@ -27,10 +27,12 @@ struct ContentView: View {
                 // against a store still being read and then cross-fade out from under the user the
                 // moment that read failed, discarding whatever they had typed into it.
                 //
-                // And `FinanceDataUnavailableView` carries the only Retry / Export diagnostics /
-                // Erase local data controls in the app — it stands in for Settings as well. Behind
-                // onboarding, a user whose database is corrupt on first run would have to finish or
-                // skip setup before being told anything was wrong, or offered a way out of it.
+                // And this branch stands in for the whole app, Settings included, so
+                // `FinanceDataUnavailableView`'s Retry / Export diagnostics / Erase local data are
+                // the only such controls *reachable in this state* — `SettingsView` has its own
+                // Export Sync Diagnostics and Erase Everything, but nothing here can get to them.
+                // Behind onboarding, a user whose database is corrupt on first run would have to
+                // finish or skip setup before being told anything was wrong, or offered a way out.
                 //
                 // (`hasSeenOnboarding` lives in UserDefaults, so a *returning* user is never sent
                 // back to onboarding by either ordering.)
