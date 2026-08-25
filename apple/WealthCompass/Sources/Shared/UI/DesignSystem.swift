@@ -376,14 +376,23 @@ func formattedPercent(_ value: Double, locale: Locale, fractionDigits: Int = 1) 
     )
 }
 
+/// A gain/loss amount with its percentage in parentheses.
+///
+/// Both strings arrive already formatted **and already redacted**: this view lives in the shared
+/// design system and holds no `AppSettings`, so it cannot apply Privacy Mode itself. It used to take
+/// a raw `percent: Double` and format it here, which meant Privacy Mode redacted the amount to
+/// `••••` and printed the live percentage right beside it — handing back the figure it had just
+/// hidden. Call sites pass `settings.privateCurrency(…)` and `settings.privatePercent(…)`.
+///
+/// `value` stays raw because it is never displayed: it only picks the tint and drives the numeric
+/// transition.
 struct ValueDelta: View {
-    @Environment(\.locale) private var locale
     let value: Double
     let formattedValue: String
-    let percent: Double
+    let percentText: String
 
     var body: some View {
-        Text(verbatim: "\(formattedValue) (\(formattedPercent(percent, locale: locale)))")
+        Text(verbatim: "\(formattedValue) (\(percentText))")
             .foregroundStyle(value >= 0 ? WCColor.primary : WCColor.destructive)
             .font(.subheadline.monospacedDigit().weight(.semibold))
             .contentTransition(.numericText())

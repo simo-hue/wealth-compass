@@ -355,6 +355,16 @@ final class AppSettings: ObservableObject {
         return value.formatted(.number.precision(.fractionLength(0...fractionDigits)).locale(effectiveLocale))
     }
 
+    /// The percentage twin of `privateCurrency` (L8). A performance figure has to be redacted for
+    /// the same reason the amount beside it is: `••••` next to a live "+12.4%" still discloses the
+    /// portfolio — anyone who knows one position's size can divide their way back to the rest. The
+    /// summary cards already suppressed their percentage this way inline; this is that rule in one
+    /// place, so the gain/loss rows can follow it too.
+    func privatePercent(_ value: Double, fractionDigits: Int = 1) -> String {
+        guard !isPrivacyMode else { return redactionToken }
+        return formattedPercent(value, locale: effectiveLocale, fractionDigits: fractionDigits)
+    }
+
     // MARK: - Decimal (money) overloads (WC-A1)
     // Money and quantities are stored as `Decimal`; these mirror the `Double` helpers so the
     // views format and convert money without crossing back to `Double` except inside the

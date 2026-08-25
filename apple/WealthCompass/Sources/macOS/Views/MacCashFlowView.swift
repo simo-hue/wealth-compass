@@ -232,8 +232,9 @@ struct MacCashFlowView: View {
                 value: settings.privateCurrency(cashFlow.monthlyIncome),
                 // Down-left is money in, up-right is money out — the convention iOS uses, the Mac
                 // Dashboard uses, and the transaction rows 500 lines below in this same file use.
-                // Only this summary strip had them inverted, so on one page an up-right arrow meant
-                // "income" at the top and "expense" in the list directly beneath it.
+                // `recurringTransactionRow` on this same Overview tab now reads the same way, so an
+                // up-right arrow can no longer mean "expenses" in this strip and "income" in the
+                // card directly beneath it.
                 systemImage: "arrow.down.left",
                 accent: WCColor.primary
             )
@@ -540,7 +541,10 @@ struct MacCashFlowView: View {
 
     private func recurringTransactionRow(_ schedule: RecurringTransaction) -> some View {
         HStack(alignment: .center, spacing: 14) {
-            Image(systemName: schedule.type == .income ? "arrow.up.right.circle.fill" : "arrow.down.right.circle.fill")
+            // Same direction convention as the summary strip and the transaction rows: down-left is
+            // money in, up-right is money out. The `.circle.fill` variants are this row's own
+            // weight, not a different meaning.
+            Image(systemName: schedule.type == .income ? "arrow.down.left.circle.fill" : "arrow.up.right.circle.fill")
                 .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
                 .font(.title2)
 

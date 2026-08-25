@@ -132,7 +132,9 @@ struct CryptoView: View {
     }
 
     // VIEW-06: Top Performer / Biggest Loser leaderboard, matching macOS (shown only when a positive
-    // best and/or negative worst exists). Values redact in Privacy Mode via privateCurrency/ValueDelta.
+    // best and/or negative worst exists). Both halves of each row redact in Privacy Mode: the amount
+    // through `privateCurrency`, the percentage through `privatePercent`. `ValueDelta` redacts
+    // nothing itself — it renders the two strings it is handed — so the guard has to be here.
     @ViewBuilder
     private var performanceSection: some View {
         let cryptos = finance.data.crypto
@@ -182,7 +184,7 @@ struct CryptoView: View {
                     ValueDelta(
                         value: holding.gainLoss.doubleValue,
                         formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
-                        percent: holding.gainLossPercent
+                        percentText: settings.privatePercent(holding.gainLossPercent)
                     )
                 }
             }
@@ -262,7 +264,7 @@ struct CryptoView: View {
                     ValueDelta(
                         value: holding.gainLoss.doubleValue,
                         formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
-                        percent: holding.gainLossPercent
+                        percentText: settings.privatePercent(holding.gainLossPercent)
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)

@@ -213,7 +213,7 @@ struct InvestmentsView: View {
                     ValueDelta(
                         value: investment.gainLoss.doubleValue,
                         formattedValue: settings.privateCurrency(investment.gainLoss, sourceCurrency: investment.currency),
-                        percent: investment.gainLossPercent
+                        percentText: settings.privatePercent(investment.gainLossPercent)
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)

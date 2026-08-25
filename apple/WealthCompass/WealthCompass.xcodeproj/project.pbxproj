@@ -123,6 +123,7 @@
 		AD00000000000000000000C6 /* PersistenceCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C6 /* PersistenceCoordinatorTests.swift */; };
 		AD00000000000000000000C7 /* MarketDataServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C7 /* MarketDataServiceTests.swift */; };
 		AD00000000000000000000C1 /* CurrencyConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C1 /* CurrencyConverterTests.swift */; };
+		AD00000000000000000000D1 /* PrivacyRedactionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000D1 /* PrivacyRedactionTests.swift */; };
 		AD00000000000000000000C2 /* SnapshotEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000C2 /* SnapshotEngineTests.swift */; };
 		AD00000000000000000000FB /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000FB /* LocalizationTests.swift */; };
 		AD00000000000000000000FA /* TabBarLabelResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC00000000000000000000FA /* TabBarLabelResolverTests.swift */; };
@@ -227,6 +228,7 @@
 		AC00000000000000000000C6 /* PersistenceCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceCoordinatorTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C7 /* MarketDataServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketDataServiceTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C1 /* CurrencyConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterTests.swift; sourceTree = "<group>"; };
+		AC00000000000000000000D1 /* PrivacyRedactionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyRedactionTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000C2 /* SnapshotEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotEngineTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000FB /* LocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationTests.swift; sourceTree = "<group>"; };
 		AC00000000000000000000FA /* TabBarLabelResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarLabelResolverTests.swift; sourceTree = "<group>"; };
@@ -487,6 +489,7 @@
 				AC0000000000000000000050 /* CloudSyncCoreTests.swift */,
 				BB10000000000000000C0001 /* DataProtectionRecoveryTests.swift */,
 				AC00000000000000000000C1 /* CurrencyConverterTests.swift */,
+				AC00000000000000000000D1 /* PrivacyRedactionTests.swift */,
 				AC00000000000000000000C2 /* SnapshotEngineTests.swift */,
 				AC00000000000000000000FB /* LocalizationTests.swift */,
 				AC00000000000000000000FA /* TabBarLabelResolverTests.swift */,
@@ -820,6 +823,7 @@
 				AD0000000000000000000050 /* CloudSyncCoreTests.swift in Sources */,
 				BB10000000000000000C0002 /* DataProtectionRecoveryTests.swift in Sources */,
 				AD00000000000000000000C1 /* CurrencyConverterTests.swift in Sources */,
+				AD00000000000000000000D1 /* PrivacyRedactionTests.swift in Sources */,
 				AD00000000000000000000C2 /* SnapshotEngineTests.swift in Sources */,
 				AD00000000000000000000FB /* LocalizationTests.swift in Sources */,
 				AD00000000000000000000FA /* TabBarLabelResolverTests.swift in Sources */,

@@ -241,7 +241,7 @@ struct MacInvestmentsView: View {
                         ValueDelta(
                             value: investment.gainLoss.doubleValue,
                             formattedValue: settings.privateCurrency(investment.gainLoss, sourceCurrency: investment.currency),
-                            percent: investment.gainLossPercent
+                            percentText: settings.privatePercent(investment.gainLossPercent)
                         )
                     }
                 }

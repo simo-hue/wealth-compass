@@ -208,7 +208,7 @@ struct MacCryptoView: View {
                     ValueDelta(
                         value: holding.gainLoss.doubleValue,
                         formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
-                        percent: holding.gainLossPercent
+                        percentText: settings.privatePercent(holding.gainLossPercent)
                     )
                 }
             }
@@ -288,7 +288,7 @@ struct MacCryptoView: View {
                         ValueDelta(
                             value: holding.gainLoss.doubleValue,
                             formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
-                            percent: holding.gainLossPercent
+                            percentText: settings.privatePercent(holding.gainLossPercent)
                         )
                     }
                 }
