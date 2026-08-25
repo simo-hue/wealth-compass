@@ -75,28 +75,39 @@ struct MarketPriceRefreshResult: Equatable {
         }
 
         if !skippedInvestments.isEmpty {
-            lines.append(AppLocalization.string("Investments skipped: \(Self.compactList(skippedInvestments)).", appLanguage: appLanguage))
+            lines.append(AppLocalization.string("Investments skipped: \(Self.compactList(skippedInvestments, appLanguage: appLanguage)).", appLanguage: appLanguage))
         }
 
         if !skippedCrypto.isEmpty {
-            lines.append(AppLocalization.string("Crypto skipped: \(Self.compactList(skippedCrypto)).", appLanguage: appLanguage))
+            lines.append(AppLocalization.string("Crypto skipped: \(Self.compactList(skippedCrypto, appLanguage: appLanguage)).", appLanguage: appLanguage))
         }
 
         if !failedInvestments.isEmpty {
-            lines.append(AppLocalization.string("Investment failures: \(Self.compactList(failedInvestments)).", appLanguage: appLanguage))
+            lines.append(AppLocalization.string("Investment failures: \(Self.compactList(failedInvestments, appLanguage: appLanguage)).", appLanguage: appLanguage))
         }
 
         if !failedCrypto.isEmpty {
-            lines.append(AppLocalization.string("Crypto failures: \(Self.compactList(failedCrypto)).", appLanguage: appLanguage))
+            lines.append(AppLocalization.string("Crypto failures: \(Self.compactList(failedCrypto, appLanguage: appLanguage)).", appLanguage: appLanguage))
         }
 
         return lines.joined(separator: "\n\n")
     }
 
-    private static func compactList(_ values: [String]) -> String {
+    /// L49/`7a92b06`: the overflow count is an entity count and is formatted for the reader like
+    /// every other one. It used to go straight through `String` interpolation, so a large portfolio
+    /// read `+1234 more` in all 35 languages. The working-tree sweep in `PrivacyRedactionTests`
+    /// cannot see this spelling — it only matches a literal that is *nothing but* a count — so it
+    /// is pinned by a rendered test instead.
+    ///
+    /// The word "more" is still English in every language; that is a separate, pre-existing gap
+    /// (this whole helper is untranslated glue) and needs a catalog key, not a format style.
+    private static func compactList(_ values: [String], appLanguage: String?) -> String {
         let visible = values.prefix(6).joined(separator: ", ")
         guard values.count > 6 else { return visible }
-        return "\(visible), +\(values.count - 6) more"
+        let overflow = (values.count - 6).formatted(
+            .number.locale(AppLocalization.effectiveLocale(appLanguage: appLanguage))
+        )
+        return "\(visible), +\(overflow) more"
     }
 }
 

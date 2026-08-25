@@ -145,56 +145,61 @@ final class PrivacyRedactionTests: XCTestCase {
     /// `LocalizedStringKey` formats the integer for the reader's locale, which is why
     /// `SettingsView.swift` and `MacSettingsView.swift` each keep a `Text`-returning `privateCount`.
     ///
-    /// The report-export files are excluded here as they are from the other sweeps. They print six
-    /// counts this way, which is the same formatting defect, but an export redacts nothing by
-    /// design and they are not privacy call sites; they are recorded rather than swept in.
+    /// **The exemption is an overload test, not a prefix test.** It used to ask whether the text
+    /// before the literal ended in `Text(`, which four different spellings walk straight through:
+    /// `Text("\(count)" + " items")` and `Text("\(count)" as String)` each force the
+    /// `StringProtocol` overload — the one that formats nothing — at a real render site and were
+    /// exempt; `plainText(` and `bodyText(` also end in `Text(`; and it was asymmetric on `+`, so a
+    /// count on the left of a concatenation passed while the same count on the right failed. A
+    /// correctly-wrapped `Text(\n    "\(count)"\n)` was a false positive for the same reason. What
+    /// is asked now is whether the literal is the **entire argument** of a call whose callee is
+    /// exactly `Text` — walked over the stripped `code` view, across line breaks, in both
+    /// directions. `testTheEntityCountExemptionIsAnOverloadTestNotAPrefixTest` pins each of those
+    /// spellings against the checker itself, which is the part that had nothing holding it.
+    ///
+    /// Narrow on purpose, and narrower than the sentence above suggests: only a literal that is
+    /// *nothing but* the count matches at all, so `"\(visible), +\(values.count - 6) more"` is
+    /// invisible to it — that spelling shipped unformatted in `MarketDataService` and is fixed
+    /// separately, by `testAMarketRefreshSummaryGroupsItsOverflowCount`, not by widening this regex
+    /// into every string mentioning a count. `Text(_:tableName:…)` would also be reported, since the
+    /// literal is not the sole argument; nothing in this tree uses that overload.
+    ///
+    /// The report-export files are excluded here as they are from the other sweeps. They print
+    /// **eight** counts this way (`ReportDocumentBuilder.swift:857`, `:950` and `:1070-1075` — the
+    /// commit that introduced this exclusion said six and missed the first two), which is the same
+    /// formatting defect, but an export redacts nothing by design and they are not privacy call
+    /// sites; they are recorded rather than swept in.
     func testWorkingTreeRendersNoUnformattedEntityCount() throws {
         let sources = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appendingPathComponent("Sources")
 
-        // A string literal that is nothing but one interpolated count.
-        let countLiteral = try NSRegularExpression(pattern: ##""\\\([^"\n]*[Cc]ount\)""##)
         var offenders: [PercentRender] = []
-        var renders = 0
+        var filesRead = 0
 
         for directory in Self.scannedDirectories {
             let root = sources.appendingPathComponent(directory)
             let swiftFiles = try FileManager.default
                 .subpathsOfDirectory(atPath: root.path)
                 .filter { $0.hasSuffix(".swift") }
-                .filter { !Self.excludedFiles.contains(($0 as NSString).lastPathComponent) }
+                .filter { !Self.excludedFiles.contains("\(directory)/\($0)") }
                 .sorted()
 
             for file in swiftFiles {
+                filesRead += 1
                 let text = try String(contentsOf: root.appendingPathComponent(file), encoding: .utf8)
-                let source = Self.stripped(text)
-                for index in source.scan.indices {
-                    let line = String(source.scan[index])
-                    let range = NSRange(line.startIndex..<line.endIndex, in: line)
-                    for match in countLiteral.matches(in: line, range: range) {
-                        renders += 1
-                        // `Text("\(count)")` picks Text's `LocalizedStringKey` overload, which does
-                        // format the integer. Only a bare `String` fails to.
-                        guard let start = Range(match.range, in: line)?.lowerBound,
-                              !line[line.startIndex..<start].hasSuffix("Text(") else { continue }
-                        offenders.append(PercentRender(
-                            file: "Sources/\(directory)/\(file)", line: index + 1,
-                            pattern: #""\(…count)""#,
-                            source: line.trimmingCharacters(in: .whitespaces)
-                        ))
-                    }
-                }
+                offenders += try Self.unformattedCounts(
+                    in: Self.stripped(text), path: "Sources/\(directory)/\(file)"
+                )
             }
         }
 
-        XCTAssertGreaterThanOrEqual(
-            renders, 5,
-            """
-            found \(renders) interpolated count(s) — the five correct `Text("\\(count)")` spellings \
-            alone should match, so the sweep has lost the source tree
-            """
+        // The sweep read the tree. The old floor here was on *matches* — "at least the five correct
+        // `Text("\(count)")` spellings" — with no margin at all: converting one of those five to
+        // `privateCount`, which is an improvement, would have failed this.
+        XCTAssertGreaterThan(
+            filesRead, 20, "only \(filesRead) Swift file(s) read — the sweep has lost the source tree"
         )
         XCTAssertEqual(
             offenders.map(\.description), [],
@@ -205,6 +210,158 @@ final class PrivacyRedactionTests: XCTestCase {
             \(offenders.map { "  " + $0.description }.joined(separator: "\n"))
             """
         )
+    }
+
+    /// Fails if the sweep above can be walked past by spelling the same defect differently.
+    ///
+    /// The sweep is a lint over the working tree, so nothing else can check it: there is no
+    /// offending source in the tree for it to catch, which means a broken checker and a clean tree
+    /// look identical. That is exactly how the prefix test survived — it passed at 302 / 0 while
+    /// `Text("\(count)" + " items")` and `Text("\(count)" as String)` both printed an ungrouped
+    /// count at a real render site, and while `plainText(`/`bodyText(` were silently exempt.
+    ///
+    /// So this hands the checker sources of its own and asserts the verdict on each. Every case is a
+    /// spelling that actually compiles and actually renders.
+    func testTheEntityCountExemptionIsAnOverloadTestNotAPrefixTest() throws {
+        let cases: [(source: String, offends: Bool, why: String)] = [
+            (
+                #"Text("\(count)")"#, false,
+                "the one correct spelling: `Text` takes the `LocalizedStringKey` overload, which formats"
+            ),
+            (
+                "Text(\n    \"\\(count)\"\n)", false,
+                "the same call wrapped across lines was reported as an offender by the prefix test"
+            ),
+            (
+                #"Text("\(count)" + " items")"#, true,
+                "`+` forces the `StringProtocol` overload, which formats nothing — and this was exempt"
+            ),
+            (
+                #"Text("\(count)" as String)"#, true,
+                "`as String` forces the same overload, at a real render site — and this was exempt"
+            ),
+            (
+                #"Text("items " + "\(count)")"#, true,
+                "the mirror image of the `+` case, which the prefix test happened to catch"
+            ),
+            (
+                #"plainText("\(count)")"#, true,
+                "`plainText(` ends in `Text(`, so the prefix test exempted it"
+            ),
+            (
+                #"bodyText("\(count)")"#, true,
+                "`bodyText(` ends in `Text(` too"
+            ),
+            (
+                #"let label = "\(items.count)""#, true,
+                "the original defect: a bare `String`, formatted for nobody"
+            ),
+            (
+                #"Text(settings.privateCount(items.count))"#, false,
+                "the other correct spelling — the count never becomes a literal at all"
+            ),
+            (
+                #"// Text("\(count)") in a comment"#, false,
+                "comments are blanked before the sweep looks; a note about a render is not a render"
+            ),
+            (
+                #"someText("\(count)")"#, true,
+                "any callee that is not exactly `Text`"
+            ),
+        ]
+
+        for probe in cases {
+            let found = try Self.unformattedCounts(in: Self.stripped(probe.source), path: "probe.swift")
+            XCTAssertEqual(
+                !found.isEmpty, probe.offends,
+                """
+                `\(probe.source)` was \(found.isEmpty ? "exempted" : "reported") and should have been \
+                \(probe.offends ? "reported" : "exempted") — \(probe.why).
+                """
+            )
+        }
+    }
+
+    /// Fails if the market-refresh summary prints its overflow count unformatted.
+    ///
+    /// `compactList` lists the first six symbols and then says "+N more". That `N` went straight
+    /// through `String` interpolation, so a reader with a large portfolio saw `+1234 more` in every
+    /// language — the same defect the nine view sites were fixed for, in a sentence the sweep above
+    /// cannot see, because the literal is not *only* the count.
+    ///
+    /// Rendered rather than linted: `MarketPriceRefreshResult` is a value type with a plain
+    /// initializer, so unlike the view call sites this one can simply be built and read back.
+    func testAMarketRefreshSummaryGroupsItsOverflowCount() {
+        var result = MarketPriceRefreshResult()
+        result.updatedInvestments = 1
+        result.skippedInvestments = (0..<1_240).map { "SYM\($0)" }
+
+        let english = result.localizedMessage(appLanguage: "en")
+        let german = result.localizedMessage(appLanguage: "de")
+
+        XCTAssertFalse(
+            english.contains("1234"),
+            "the overflow count is printed unformatted: \(english)"
+        )
+        XCTAssertTrue(english.contains("1,234"), "English groups thousands with a comma: \(english)")
+        XCTAssertTrue(german.contains("1.234"), "German groups thousands with a point: \(german)")
+    }
+
+    /// Every `"\(…count)"` literal in one source that is not the whole argument of a `Text(` call.
+    ///
+    /// Split out of the sweep so the checker can be handed sources of its own — see
+    /// `testTheEntityCountExemptionIsAnOverloadTestNotAPrefixTest`.
+    private static func unformattedCounts(
+        in source: StrippedSource, path: String
+    ) throws -> [PercentRender] {
+        // A string literal that is nothing but one interpolated count.
+        let countLiteral = try NSRegularExpression(pattern: ##""\\\([^"\n]*[Cc]ount\)""##)
+
+        // `scan` and `code` are the same characters line for line — `stripped` writes one character
+        // to each per character of input — so an offset found in one indexes the other.
+        let scan = source.scan.map { String($0) }.joined(separator: "\n")
+        let code = Array(source.code.map { String($0) }.joined(separator: "\n"))
+        let lineOfOffset = { (offset: Int) -> Int in
+            code[..<offset].reduce(1) { $1 == "\n" ? $0 + 1 : $0 }
+        }
+
+        var offenders: [PercentRender] = []
+        let range = NSRange(scan.startIndex..<scan.endIndex, in: scan)
+        for match in countLiteral.matches(in: scan, range: range) {
+            guard let matched = Range(match.range, in: scan) else { continue }
+            let start = scan.distance(from: scan.startIndex, to: matched.lowerBound)
+            let end = scan.distance(from: scan.startIndex, to: matched.upperBound)
+            guard !isSoleTextArgument(from: start, to: end, in: code) else { continue }
+            let line = lineOfOffset(start)
+            offenders.append(PercentRender(
+                file: path, line: line,
+                pattern: #""\(…count)""#,
+                source: String(source.scan[line - 1]).trimmingCharacters(in: .whitespaces)
+            ))
+        }
+        return offenders
+    }
+
+    /// Whether the literal spanning `start..<end` is the entire argument of a call to `Text`.
+    ///
+    /// Only that shape picks `Text.init(_ key: LocalizedStringKey)`, which formats the integer for
+    /// the reader's locale. Anything else in the parentheses — a `+`, an `as String`, a second
+    /// argument — resolves to an overload that does not, and any callee other than `Text` is not
+    /// `Text` at all however its name ends.
+    private static func isSoleTextArgument(from start: Int, to end: Int, in code: [Character]) -> Bool {
+        var before = start - 1
+        while before >= 0, code[before].isWhitespace { before -= 1 }
+        guard before >= 0, code[before] == "(" else { return false }
+
+        var callee = before - 1
+        while callee >= 0, code[callee].isLetter || code[callee].isNumber || code[callee] == "_" {
+            callee -= 1
+        }
+        guard String(code[(callee + 1)..<before]) == "Text" else { return false }
+
+        var after = end
+        while after < code.count, code[after].isWhitespace { after += 1 }
+        return after < code.count && code[after] == ")"
     }
 
     func testPrivateDateRedactsWhilePrivacyModeIsOn() {
@@ -257,7 +414,7 @@ final class PrivacyRedactionTests: XCTestCase {
             let swiftFiles = try FileManager.default
                 .subpathsOfDirectory(atPath: root.path)
                 .filter { $0.hasSuffix(".swift") }
-                .filter { !Self.excludedFiles.contains(($0 as NSString).lastPathComponent) }
+                .filter { !Self.excludedFiles.contains("\(directory)/\($0)") }
                 .sorted()
 
             for file in swiftFiles {
@@ -322,9 +479,15 @@ final class PrivacyRedactionTests: XCTestCase {
     /// `:679` print live shares next to live amounts, and nothing there is masked, so there is no
     /// masked amount for a percentage to give away. `ExportOptionsView.swift:91` shows a warning
     /// before the user commits. Scanning these files would report those two lines forever.
+    ///
+    /// Full paths under `Sources/`, not basenames. Every sweep matched on `lastPathComponent`, so
+    /// any future file anywhere in the tree that happened to be called `ReportPaginator.swift` —
+    /// or `PDFDrawingContext.swift`, a name a chart or a receipt could reasonably reuse — was
+    /// silently exempt from all five sweeps, with nothing to say so.
     private static let excludedFiles: Set<String> = [
-        "ReportDocumentBuilder.swift", "ReportChartRenderer.swift",
-        "PDFReportRenderer.swift", "ReportPaginator.swift", "PDFDrawingContext.swift",
+        "Shared/Export/ReportDocumentBuilder.swift", "Shared/Export/ReportChartRenderer.swift",
+        "Shared/Export/PDFReportRenderer.swift", "Shared/Export/ReportPaginator.swift",
+        "Shared/Export/PDFDrawingContext.swift",
     ]
 
     /// Fails if any Swift under `Sources/` sits outside `scannedDirectories`.
@@ -356,6 +519,26 @@ final class PrivacyRedactionTests: XCTestCase {
             `scannedDirectories`, or say in its doc comment why it is exempt:
             \(unscanned.map { "  Sources/" + $0 }.joined(separator: "\n"))
             """
+        )
+
+        // And the exemptions name real files. The list used to be matched on `lastPathComponent`,
+        // which meant it could not be checked at all: every entry "existed" wherever a file of that
+        // name turned up, and a moved or renamed report file would have quietly stopped being
+        // exempt — or, worse, gone on exempting some unrelated future file with the same basename.
+        let missing = Self.excludedFiles.filter { !swiftFiles.contains($0) }.sorted()
+        XCTAssertEqual(
+            missing, [],
+            """
+            \(missing.count) excluded path(s) do not exist under Sources/. They must be full paths \
+            relative to Sources/, not basenames:
+            \(missing.map { "  " + $0 }.joined(separator: "\n"))
+            """
+        )
+        let unreachable = Self.excludedFiles
+            .filter { path in !Self.scannedDirectories.contains { path.hasPrefix($0 + "/") } }
+            .sorted()
+        XCTAssertEqual(
+            unreachable, [], "\(unreachable.count) excluded path(s) no sweep would have read anyway"
         )
     }
 
@@ -414,7 +597,7 @@ final class PrivacyRedactionTests: XCTestCase {
             let swiftFiles = try FileManager.default
                 .subpathsOfDirectory(atPath: root.path)
                 .filter { $0.hasSuffix(".swift") }
-                .filter { !Self.excludedFiles.contains(($0 as NSString).lastPathComponent) }
+                .filter { !Self.excludedFiles.contains("\(directory)/\($0)") }
                 .sorted()
             XCTAssertFalse(
                 swiftFiles.isEmpty,
@@ -627,7 +810,7 @@ final class PrivacyRedactionTests: XCTestCase {
             let swiftFiles = try FileManager.default
                 .subpathsOfDirectory(atPath: root.path)
                 .filter { $0.hasSuffix(".swift") }
-                .filter { !Self.excludedFiles.contains(($0 as NSString).lastPathComponent) }
+                .filter { !Self.excludedFiles.contains("\(directory)/\($0)") }
                 .sorted()
             XCTAssertFalse(
                 swiftFiles.isEmpty,
@@ -968,7 +1151,7 @@ final class PrivacyRedactionTests: XCTestCase {
             let swiftFiles = try FileManager.default
                 .subpathsOfDirectory(atPath: root.path)
                 .filter { $0.hasSuffix(".swift") }
-                .filter { !Self.excludedFiles.contains(($0 as NSString).lastPathComponent) }
+                .filter { !Self.excludedFiles.contains("\(directory)/\($0)") }
                 .sorted()
             XCTAssertFalse(
                 swiftFiles.isEmpty,
