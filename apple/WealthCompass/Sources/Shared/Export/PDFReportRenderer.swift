@@ -370,7 +370,17 @@ enum PDFReportRenderer {
             }
             context.rule(x: rect.minX, y: y + 3, width: 44, thickness: 2, color: palette.brand)
 
-        case let .subheading(title, _):
+        case let .subheading(title, anchor):
+            // The subsection's own destination, anchored at the heading rather than at the top of
+            // whatever page it landed on. Every contents row is drawn as a hyperlink, but only
+            // section anchors used to be registered, so all ~20 level-1 rows of a full report — the
+            // ledger years, the allocation and holdings subsections, the appendix blocks — were
+            // clickable rectangles pointing at a name no page defined, and a viewer resolves those
+            // to nothing at all. The PDFKit outline pass builds the sidebar from page indices
+            // instead and was never affected.
+            if let anchor {
+                context.addDestination(anchor, topDownY: rect.minY)
+            }
             context.draw(title, role: .subheading, color: palette.ink,
                          in: CGRect(x: rect.minX, y: rect.minY, width: rect.width,
                                     height: context.measure(title, role: .subheading, width: rect.width)))

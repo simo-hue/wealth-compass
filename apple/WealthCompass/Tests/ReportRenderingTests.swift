@@ -82,14 +82,86 @@ final class ReportPaginationTests: XCTestCase {
         XCTAssertTrue(flattened.contains("GANANCIA"), "the header vanished entirely rather than truncating")
     }
 
+    /// Every contents row is drawn as a hyperlink, so every one of them has to arrive somewhere.
+    ///
+    /// `context.addDestination` was called only where `LaidOutPage.sectionAnchor` was set — a
+    /// section's first page — while the paginator also emits a level-1 contents entry for every
+    /// subheading anchor. In a full report that is roughly 20 of 25 rows drawn as clickable
+    /// rectangles pointing at a name no page ever defines. The file itself shows which is which:
+    /// a resolved named destination becomes a `PDFActionGoTo` carrying a page, an unresolved one
+    /// leaves the annotation with no action at all.
+    func testEveryContentsRowLinksToARealPage() throws {
+        let document = contentsFixture()
+        let pdf = try renderedPDF(document)
+
+        var links = 0
+        var resolved = 0
+        for index in 0..<pdf.pageCount {
+            guard let page = pdf.page(at: index) else { continue }
+            for annotation in page.annotations where annotation.type == "Link" {
+                links += 1
+                if let goTo = annotation.action as? PDFActionGoTo, goTo.destination.page != nil {
+                    resolved += 1
+                }
+            }
+        }
+
+        // Two sections and three subheadings: five contents rows, five links.
+        XCTAssertEqual(links, 5, "the contents page stopped linking its rows")
+        XCTAssertEqual(resolved, links,
+                       "\(links - resolved) contents rows point at a destination no page defines")
+    }
+
+    /// The sidebar resolves entries by page index rather than by name, so it was never broken and
+    /// must not change while the in-page links are being fixed.
+    func testOutlineKeepsItsTwoLevelShape() throws {
+        let pdf = try renderedPDF(contentsFixture())
+        let root = try XCTUnwrap(pdf.outlineRoot, "the PDF lost its outline")
+
+        XCTAssertEqual(root.numberOfChildren, 2)
+        let first = try XCTUnwrap(root.child(at: 0))
+        XCTAssertEqual(first.label, "One")
+        XCTAssertEqual(first.numberOfChildren, 2, "the first section's subsections left the sidebar")
+        XCTAssertNotNil(try XCTUnwrap(first.child(at: 0)).destination?.page)
+        XCTAssertEqual(try XCTUnwrap(root.child(at: 1)).numberOfChildren, 1)
+    }
+
+    /// Two sections with anchored subheadings, long enough that the subsections land mid-document
+    /// rather than all on one page. Two non-structural sections is what makes the renderer emit a
+    /// contents page at all (`ReportPaginator.needsContentsPage`).
+    private func contentsFixture() -> ReportDocument {
+        ReportDocument(
+            metadata: ReportMetadata(brandName: "B", documentTitle: "T", scopeLine: "S",
+                                     periodLine: nil, baseCurrencyLine: "EUR", generatedLine: "g",
+                                     footerNote: "f", appVersion: "1", brandMarkPNG: nil),
+            sections: [
+                ReportSectionContent(anchor: "section-one", title: "One", blocks: [
+                    .sectionTitle("One", subtitle: nil),
+                    .subheading("Sub A", anchor: "one-a"),
+                    .table(makeTable(rows: 40, twoLine: false, caption: "A")),
+                    .subheading("Sub B", anchor: "one-b"),
+                    .table(makeTable(rows: 40, twoLine: false, caption: "B")),
+                ]),
+                ReportSectionContent(anchor: "section-two", title: "Two", blocks: [
+                    .sectionTitle("Two", subtitle: nil),
+                    .subheading("Sub C", anchor: "two-a"),
+                    .table(makeTable(rows: 10, twoLine: false, caption: "C")),
+                ]),
+            ])
+    }
+
     /// Renders the document to a real PDF and returns every page's text.
     private func renderedText(_ document: ReportDocument) throws -> String {
+        let pdf = try renderedPDF(document)
+        return (0..<pdf.pageCount).compactMap { pdf.page(at: $0)?.string }.joined(separator: "\n")
+    }
+
+    private func renderedPDF(_ document: ReportDocument) throws -> PDFDocument {
         let url = URL(fileURLWithPath: NSTemporaryDirectory())
             .appendingPathComponent("wc-render-\(UUID().uuidString).pdf")
         addTeardownBlock { try? FileManager.default.removeItem(at: url) }
         try PDFReportRenderer.render(document: document, to: url)
-        let pdf = try XCTUnwrap(PDFDocument(url: url), "renderer produced an unopenable PDF")
-        return (0..<pdf.pageCount).compactMap { pdf.page(at: $0)?.string }.joined(separator: "\n")
+        return try XCTUnwrap(PDFDocument(url: url), "renderer produced an unopenable PDF")
     }
 
     private func makeTable(rows: Int, twoLine: Bool, caption: String?) -> ReportTable {

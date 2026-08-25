@@ -438,7 +438,7 @@ were written up rather than changed. Both are data-loss shaped.
       catalog `variations.plural` entry can never fire. Also no plural handling for English.
 - [x] **DONE 2026-08-25.** `:654-660` — the month-subtotal label is written into cell 0, which is the 61.9pt Date column,
       so every subtotal row truncates while 243pt of adjacent cells sit empty.
-- [ ] `PDFReportRenderer.swift:288-291` — every contents row is a hyperlink but destinations are only
+- [x] **DONE 2026-08-25.** `PDFReportRenderer.swift:288-291` — every contents row is a hyperlink but destinations are only
       registered for section anchors, so all level-1 contents links are dead (~20 of ~25 rows).
 - [x] **DONE 2026-08-25.** `PDFReportRenderer.swift:6-18` — `ReportRenderError` returns raw English; both Settings screens
       surface it. Every sibling error type has `localizedDescription(appLanguage:)`.

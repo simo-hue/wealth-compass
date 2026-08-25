@@ -350,10 +350,15 @@ struct PDFDrawingContext {
 
     // MARK: - Navigation
 
-    /// Anchors a named destination at the top of the current page. Paired with `link(to:in:)` on
-    /// the contents page and mirrored by the PDFKit outline pass.
-    func addDestination(_ name: String) {
-        cg.addDestination(name as CFString, at: CGPoint(x: 0, y: pageSize.height))
+    /// Anchors a named destination at top-down `y` on the current page. Paired with `link(to:in:)`
+    /// on the contents page and mirrored by the PDFKit outline pass.
+    ///
+    /// A section anchors at `y = 0` — the top of its own first page — while a subsection anchors at
+    /// the heading itself, which is usually mid-page. The x stays 0 in both directions: it is the
+    /// viewer's horizontal scroll position, not a text origin, and mirroring it would scroll an
+    /// Arabic reader off the right edge of the page.
+    func addDestination(_ name: String, topDownY: CGFloat = 0) {
+        cg.addDestination(name as CFString, at: CGPoint(x: 0, y: flip(y: topDownY)))
     }
 
     /// Makes a top-down rect a clickable link to a named destination.
