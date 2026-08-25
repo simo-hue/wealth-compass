@@ -71,51 +71,62 @@ actor RecurringNotificationService {
         // source of truth on AppSettings rather than a brittle literal (WC-L31).
         let appLanguage = UserDefaults.standard.string(forKey: AppSettings.appLanguageDefaultsKey)
         for schedule in upcoming {
-            let content = Self.content(
+            // Nothing stands between the builder and `center.add` — no local to write to after the
+            // fact. That is deliberate; `request(for:…)` says why.
+            try? await center.add(Self.request(
                 for: schedule,
                 convertedAmount: convertedAmounts[schedule.id],
                 currencyCode: currencyCode,
                 showDetails: showDetails,
-                appLanguage: appLanguage
-            )
-
-            var dateComponents = Calendar.current.dateComponents(
-                [.year, .month, .day, .hour, .minute],
-                from: schedule.nextDueDate
-            )
-            // WC-L5: date-only / imported schedules carry a midnight time, which would fire the
-            // reminder at 00:00. Pin those to 9:00 local; schedules with a real time keep it.
-            if (dateComponents.hour ?? 0) == 0 && (dateComponents.minute ?? 0) == 0 {
-                dateComponents.hour = 9
-                dateComponents.minute = 0
-            }
-            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-            let request = UNNotificationRequest(
-                identifier: notificationIdentifier(for: schedule.id),
-                content: content,
-                trigger: trigger
-            )
-            try? await center.add(request)
+                appLanguage: appLanguage,
+                identifierPrefix: identifierPrefix
+            ))
         }
     }
 
-    /// Everything one schedule puts on a lock screen.
+    /// Everything one schedule hands to the notification centre — payload, identifier and trigger —
+    /// assembled into the exact request `sync` adds.
     ///
-    /// Split out of `sync` so it can be asserted on directly: `sync` itself returns early unless
-    /// `UNUserNotificationCenter` reports an authorization, which a test host is never granted, so
-    /// nothing downstream of that guard is reachable from a test. `nonisolated` for the same
-    /// reason — it reads only its arguments.
+    /// It returns the `UNNotificationRequest` rather than the content, and that is the whole point.
+    /// `UNMutableNotificationContent` is a **class**. While this handed one back, `sync` could keep
+    /// writing to that object after the builder was finished with it, and a test asserting on the
+    /// builder's return value would never see it. Measured, not supposed: injecting
     ///
-    /// With `showDetails` false **no property of `schedule` is read**, which is the property the
-    /// lock screen needs: title, body and every other rendered field are the same two constants
-    /// for every schedule, so nothing a bystander can see moves with the data.
-    nonisolated static func content(
+    ///     content.threadIdentifier = schedule.category
+    ///     content.subtitle = schedule.description
+    ///
+    /// into `sync` immediately after the old `content(...)` call left the suite at 297 passed / 0
+    /// failed — and those are precisely the two fields the lock-screen test names as ones that
+    /// "would each carry the same disclosure if a later change started setting them from
+    /// `schedule`". The refactor that made the payload testable is what let production diverge from
+    /// what the test asserts.
+    ///
+    /// `UNNotificationRequest.content` is an immutable `UNNotificationContent`, copied at
+    /// construction, so once the request exists the payload is frozen. Asserting on the request is
+    /// therefore asserting on what the lock screen will draw, wherever in the pipeline a field was
+    /// set — and it reaches the `identifier` and the `trigger` too, neither of which the old shape
+    /// exposed to a test at all.
+    ///
+    /// `nonisolated` because `sync` returns early unless `UNUserNotificationCenter` reports an
+    /// authorization the test host is never granted (measured: `authorizationStatus.rawValue == 0`,
+    /// and `center.add` retains 0 of 5 requests), so nothing below that guard is reachable from a
+    /// test. This reads only its arguments.
+    ///
+    /// With `showDetails` false **nothing the lock screen renders varies with the schedule**: title,
+    /// body and every other drawn field are the same constants whichever schedule this is. Two
+    /// things do still vary with it and neither is drawn — the `identifier`, which is the schedule's
+    /// UUID behind the platform prefix and is what `cancel(scheduleID:)` names, and the `trigger`,
+    /// which fires at the due moment, something a reminder cannot be without. An earlier version of
+    /// this comment claimed "no property of `schedule` is read", which the `userInfo` line below
+    /// contradicts; what is true is the narrower and sufficient statement above.
+    nonisolated static func request(
         for schedule: RecurringTransaction,
         convertedAmount: Decimal?,
         currencyCode: String,
         showDetails: Bool,
-        appLanguage: String?
-    ) -> UNMutableNotificationContent {
+        appLanguage: String?,
+        identifierPrefix: String
+    ) -> UNNotificationRequest {
         let content = UNMutableNotificationContent()
         if showDetails {
             content.title = AppLocalization.string("Recurring \(schedule.type.localizedTitle(appLanguage: appLanguage)) due", appLanguage: appLanguage)
@@ -144,7 +155,22 @@ actor RecurringNotificationService {
         // `sound` is `.default` on both branches. `userInfo` carries an opaque UUID for the tap
         // handler; it is app-private payload, it is never rendered, and it names nothing.
         content.userInfo = ["recurringTransactionID": schedule.id.uuidString]
-        return content
+
+        var dateComponents = Calendar.current.dateComponents(
+            [.year, .month, .day, .hour, .minute],
+            from: schedule.nextDueDate
+        )
+        // WC-L5: date-only / imported schedules carry a midnight time, which would fire the
+        // reminder at 00:00. Pin those to 9:00 local; schedules with a real time keep it.
+        if (dateComponents.hour ?? 0) == 0 && (dateComponents.minute ?? 0) == 0 {
+            dateComponents.hour = 9
+            dateComponents.minute = 0
+        }
+        return UNNotificationRequest(
+            identifier: notificationIdentifier(for: schedule.id, prefix: identifierPrefix),
+            content: content,
+            trigger: UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+        )
     }
 
     func cancel(scheduleID: UUID) {
@@ -196,7 +222,13 @@ actor RecurringNotificationService {
         center.removeDeliveredNotifications(withIdentifiers: identifiers)
     }
 
+    /// The one spelling of a reminder's identifier, so the builder and `cancel(scheduleID:)` cannot
+    /// drift apart — `cancel` can only reach a banner it can name exactly.
+    nonisolated static func notificationIdentifier(for scheduleID: UUID, prefix: String) -> String {
+        "\(prefix)\(scheduleID.uuidString)"
+    }
+
     private func notificationIdentifier(for scheduleID: UUID) -> String {
-        "\(identifierPrefix)\(scheduleID.uuidString)"
+        Self.notificationIdentifier(for: scheduleID, prefix: identifierPrefix)
     }
 }

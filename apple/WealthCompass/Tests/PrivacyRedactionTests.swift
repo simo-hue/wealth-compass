@@ -1831,6 +1831,12 @@ final class PrivacyRedactionTests: XCTestCase {
 
     // MARK: - Existence: the lock screen
 
+    /// The platform prefix the iOS service is configured with
+    /// (`RecurringTransactionNotificationService.shared`). macOS uses
+    /// `wealth-compass-mac-recurring-`; the prefix is a constructor argument, so a test can pass
+    /// either and the builder is the same code on both.
+    private static let reminderIdentifierPrefix = "wealth-compass-recurring-"
+
     /// Fails if Privacy Mode lets a recurring reminder describe the schedule **on the lock screen**.
     ///
     /// Every other disclosure in this file needs a bystander holding the device already unlocked.
@@ -1841,18 +1847,34 @@ final class PrivacyRedactionTests: XCTestCase {
     /// figure, while the title named the type on its own, outside the branch entirely.
     ///
     /// The two fixtures share no field a notification could read: different type, category,
-    /// description, amount, currency and frequency. With the cover up every rendered field has to
-    /// match, so the assertion is on the whole payload rather than on the two strings that happened
-    /// to leak — `subtitle`, `threadIdentifier` and `categoryIdentifier` are unset today and would
-    /// each carry the same disclosure if a later change started setting them from `schedule`.
+    /// description, amount, currency and frequency.
     ///
-    /// It asserts on `RecurringNotificationService.content(for:…)` rather than on `sync`, because
-    /// `sync` returns early unless `UNUserNotificationCenter` reports an authorization the test host
-    /// is never granted — measured: with `.notDetermined` the loop that builds these never runs.
-    /// Both platforms reach this through the same actor (`MacRecurringTransactionNotificationService`
-    /// is an `enum` in `MacPlatformServices.swift` holding a configured instance of it), so this
-    /// covers the macOS reminder too — the one place in this audit where it does.
-    func testPrivacyModeStopsTheRecurringReminderDescribingTheSchedule() {
+    /// It asserts on the `UNNotificationRequest` the builder returns, not on a
+    /// `UNMutableNotificationContent`, and that is what gives it reach. The earlier version called
+    /// `RecurringNotificationService.content(for:…)` and compared the object it got back — but that
+    /// object is a **class** instance, and `sync` went on holding a reference to it. Injecting
+    ///
+    ///     content.threadIdentifier = schedule.category
+    ///     content.subtitle = schedule.description
+    ///
+    /// into `sync` one line after the builder call left the suite at 297 passed / 0 failed, on
+    /// exactly the two fields the previous doc comment named as the ones that "would each carry the
+    /// same disclosure if a later change started setting them from `schedule`". A request's
+    /// `content` is an immutable copy taken at construction, so a request is the last thing that can
+    /// still change and the first thing that cannot — which makes it the right thing to assert on.
+    ///
+    /// The payload comparison is the whole archived object rather than a list of field names, so a
+    /// field this test has never heard of still fails it.
+    ///
+    /// The builder is `nonisolated static` because `sync` returns early unless
+    /// `UNUserNotificationCenter` reports an authorization the test host is never granted — measured
+    /// on this host: `authorizationStatus.rawValue == 0` (`.notDetermined`), `center.add` retains 0
+    /// of 5 requests handed to it, and `deliveredNotifications()` is permanently empty. So the loop
+    /// in `sync` that adds these never runs here, and nothing about delivery can be asserted at all.
+    /// Both platforms reach this same builder (`MacRecurringTransactionNotificationService` is an
+    /// `enum` in `MacPlatformServices.swift` holding a configured instance of the same actor), so
+    /// this covers the macOS reminder too — the one place in this audit where it does.
+    func testPrivacyModeStopsTheRecurringReminderDescribingTheSchedule() throws {
         let rent = RecurringTransaction(
             type: .expense, category: "Rent", amount: 1_450, description: "flat",
             startDate: Date(), frequency: .monthly, nextDueDate: Date().addingTimeInterval(86_400),
@@ -1864,60 +1886,164 @@ final class PrivacyRedactionTests: XCTestCase {
             endDate: nil, currency: .usd
         )
 
-        func content(_ schedule: RecurringTransaction, showDetails: Bool) -> UNMutableNotificationContent {
-            RecurringNotificationService.content(
+        func request(_ schedule: RecurringTransaction, showDetails: Bool) -> UNNotificationRequest {
+            RecurringNotificationService.request(
                 for: schedule,
                 convertedAmount: schedule.amount,
                 currencyCode: "EUR",
                 showDetails: showDetails,
-                appLanguage: nil
+                appLanguage: nil,
+                identifierPrefix: Self.reminderIdentifierPrefix
             )
         }
 
-        let openRent = content(rent, showDetails: true)
-        let openSalary = content(salary, showDetails: true)
+        /// The whole payload, byte for byte, minus the one field that is meant to differ.
+        ///
+        /// `UNNotificationContent` is `NSSecureCoding`, so archiving it compares every property the
+        /// class has — including any a later edit or a later OS adds, which a hand-written list of
+        /// field names cannot. `userInfo` is cleared first: it carries the schedule's UUID by
+        /// design, it is app-private, and it is never drawn.
+        func rendered(_ request: UNNotificationRequest) throws -> Data {
+            let payload = try XCTUnwrap(request.content.mutableCopy() as? UNMutableNotificationContent)
+            payload.userInfo = [:]
+            return try NSKeyedArchiver.archivedData(withRootObject: payload, requiringSecureCoding: true)
+        }
+
+        let openRent = request(rent, showDetails: true)
+        let openSalary = request(salary, showDetails: true)
         XCTAssertNotEqual(
-            [openRent.title, openRent.body], [openSalary.title, openSalary.body],
+            try rendered(openRent), try rendered(openSalary),
             """
-            With Privacy Mode OFF two schedules that share no field produced the same notification,             so the builder is no longer reading the schedule at all and the assertion below cannot             fail.
+            With Privacy Mode OFF two schedules that share no field produced the same payload, so \
+            the builder is no longer reading the schedule at all and the assertions below cannot \
+            fail.
             """
         )
         XCTAssertFalse(
-            openRent.title.isEmpty || openRent.body.isEmpty,
+            openRent.content.title.isEmpty || openRent.content.body.isEmpty,
             "the notification rendered no text at all, so comparing it proves nothing"
         )
 
-        let hiddenRent = content(rent, showDetails: false)
-        let hiddenSalary = content(salary, showDetails: false)
+        let hiddenRent = request(rent, showDetails: false)
+        let hiddenSalary = request(salary, showDetails: false)
 
         XCTAssertEqual(
-            hiddenRent.title, hiddenSalary.title,
+            try rendered(hiddenRent), try rendered(request(rent, showDetails: false)),
             """
-            With Privacy Mode ON `content.title` still names the *type* — "Recurring Expense due"             against "Recurring Income due" — on a surface that needs no unlock. The title is assigned             outside the branch, so redacting the body alone leaves it standing.
-            """
-        )
-        XCTAssertEqual(
-            hiddenRent.body, hiddenSalary.body,
-            """
-            With Privacy Mode ON `content.body` still names the category, so a locked phone spells             out "Rent is scheduled" to anyone walking past it.
+            One schedule built twice archived to two different payloads, so the comparison below is \
+            measuring the archiver and not the notification. Fall back to asserting named fields.
             """
         )
         XCTAssertEqual(
-            [hiddenRent.subtitle, hiddenRent.threadIdentifier, hiddenRent.categoryIdentifier],
-            [hiddenSalary.subtitle, hiddenSalary.threadIdentifier, hiddenSalary.categoryIdentifier],
+            hiddenRent.content.title, hiddenSalary.content.title,
             """
-            With Privacy Mode ON a rendered field other than title/body moves with the schedule. A             `threadIdentifier` of "expense" publishes the type exactly as the title used to.
+            With Privacy Mode ON `content.title` still names the *type* — "Recurring Expense due" \
+            against "Recurring Income due" — on a surface that needs no unlock. The title used to be \
+            assigned outside the branch, so redacting the body alone left it standing.
             """
         )
         XCTAssertEqual(
-            hiddenRent.attachments.count, 0,
+            hiddenRent.content.body, hiddenSalary.content.body,
+            """
+            With Privacy Mode ON `content.body` still names the category, so a locked phone spells \
+            out "Rent is scheduled" to anyone walking past it.
+            """
+        )
+        XCTAssertEqual(
+            try rendered(hiddenRent), try rendered(hiddenSalary),
+            """
+            With Privacy Mode ON some rendered field other than title/body moves with the schedule. \
+            This is the entire archived payload, so it does not matter which field it is, nor where \
+            in the pipeline it was set — a `threadIdentifier` of "expense" publishes the type \
+            exactly as the title used to, and a `subtitle` of the description publishes more than \
+            the title ever did.
+            """
+        )
+        XCTAssertEqual(
+            hiddenRent.content.attachments.count, 0,
             "an attachment is drawn on the lock screen; nothing here may add one under Privacy Mode"
         )
         XCTAssertFalse(
-            hiddenRent.body.contains("1,450") || hiddenRent.body.contains("1450")
-                || hiddenRent.title.contains("1,450"),
+            hiddenRent.content.body.contains("1,450") || hiddenRent.content.body.contains("1450")
+                || hiddenRent.content.title.contains("1,450"),
             "the amount is back in the reminder"
         )
+    }
+
+    /// Pins the two things a reminder carries that are *not* payload: the request `identifier` and
+    /// the `trigger`.
+    ///
+    /// The privacy test above deliberately does not require these to match across schedules —
+    /// they must not. The identifier is how `cancel(scheduleID:)` names one reminder, and a trigger
+    /// that did not move with the due date would be no reminder at all. Neither is drawn on a lock
+    /// screen. What they need is to be *right*, and until the builder returned a whole request no
+    /// test could see either of them: `sync` built both inline, below an authorization guard the
+    /// test host never clears.
+    ///
+    /// WC-L5 is the substance here. A date-only or imported schedule carries a midnight time, which
+    /// would fire the reminder at 00:00; those are pinned to 09:00 local, and a schedule with a real
+    /// time of day keeps it.
+    func testRecurringReminderCarriesItsScheduleIdentifierAndFireTime() throws {
+        let calendar = Calendar.current
+        // Mid-June, so no zone shifts its clocks across the midnight this depends on.
+        let dateOnly = try XCTUnwrap(calendar.date(from: DateComponents(year: 2031, month: 6, day: 15)))
+        let evening = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2031, month: 6, day: 15, hour: 18, minute: 30))
+        )
+
+        func schedule(dueAt due: Date) -> RecurringTransaction {
+            RecurringTransaction(
+                type: .expense, category: "Rent", amount: 1_450, description: "flat",
+                startDate: due, frequency: .monthly, nextDueDate: due, endDate: nil, currency: .eur
+            )
+        }
+        func trigger(for schedule: RecurringTransaction, prefix: String) throws -> UNCalendarNotificationTrigger {
+            let request = RecurringNotificationService.request(
+                for: schedule, convertedAmount: nil, currencyCode: "EUR",
+                showDetails: false, appLanguage: nil, identifierPrefix: prefix
+            )
+            return try XCTUnwrap(request.trigger as? UNCalendarNotificationTrigger)
+        }
+
+        let imported = schedule(dueAt: dateOnly)
+        let pinned = try trigger(for: imported, prefix: Self.reminderIdentifierPrefix).dateComponents
+        XCTAssertEqual(
+            [pinned.year, pinned.month, pinned.day, pinned.hour, pinned.minute],
+            [2031, 6, 15, 9, 0],
+            """
+            WC-L5: a date-only schedule carries a midnight time and has to be pinned to 09:00 local, \
+            or every imported schedule wakes the reader at 00:00. Got \
+            \(String(describing: pinned.hour)):\(String(describing: pinned.minute)) on \
+            \(String(describing: pinned.year))-\(String(describing: pinned.month))-\(String(describing: pinned.day)).
+            """
+        )
+
+        let timed = schedule(dueAt: evening)
+        let kept = try trigger(for: timed, prefix: Self.reminderIdentifierPrefix).dateComponents
+        XCTAssertEqual(
+            [kept.year, kept.month, kept.day, kept.hour, kept.minute], [2031, 6, 15, 18, 30],
+            "a schedule with a real time of day had its own time overwritten, so it fires at the wrong hour"
+        )
+
+        for prefix in [Self.reminderIdentifierPrefix, "wealth-compass-mac-recurring-"] {
+            let request = RecurringNotificationService.request(
+                for: imported, convertedAmount: nil, currencyCode: "EUR",
+                showDetails: false, appLanguage: nil, identifierPrefix: prefix
+            )
+            XCTAssertEqual(
+                request.identifier, "\(prefix)\(imported.id.uuidString)",
+                """
+                The reminder is filed under an identifier that is not "<platform prefix><schedule \
+                UUID>". `sync` tears down by prefix and `cancel(scheduleID:)` rebuilds this exact \
+                string, so a reminder filed under anything else can never be cancelled.
+                """
+            )
+            XCTAssertEqual(
+                request.identifier,
+                RecurringNotificationService.notificationIdentifier(for: imported.id, prefix: prefix),
+                "the builder and `cancel(scheduleID:)` no longer spell the identifier the same way"
+            )
+        }
     }
 
     /// Fails if a teardown path in `RecurringNotificationService` clears the reminders still waiting
