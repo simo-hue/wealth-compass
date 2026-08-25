@@ -50,11 +50,7 @@ actor RecurringNotificationService {
         showDetails: Bool,
         now: Date = Date()
     ) async {
-        let pendingRequests = await center.pendingNotificationRequests()
-        let recurringIdentifiers = pendingRequests
-            .map(\.identifier)
-            .filter { $0.hasPrefix(identifierPrefix) }
-        center.removePendingNotificationRequests(withIdentifiers: recurringIdentifiers)
+        await clearScheduledReminders()
 
         guard Self.isAuthorized(await center.notificationSettings().authorizationStatus) else {
             return
@@ -158,10 +154,44 @@ actor RecurringNotificationService {
     }
 
     func cancelAll() async {
-        let pendingRequests = await center.pendingNotificationRequests()
-        let identifiers = pendingRequests
-            .map(\.identifier)
-            .filter { $0.hasPrefix(identifierPrefix) }
+        await clearScheduledReminders()
+    }
+
+    /// Tears down every reminder this service owns — the ones still waiting to fire **and the ones
+    /// already sitting on the lock screen**.
+    ///
+    /// Both halves matter, and until now neither teardown path had both.
+    ///
+    /// `sync` removed pending requests only. So a reminder that had already fired — "Recurring
+    /// Expense due / Rent: €1.450,00" — stayed on the lock screen and in Notification Center after
+    /// the user turned Privacy Mode *on*. The toggle does re-run `sync`
+    /// (`ContentView.swift:119`, `MacRootView.swift:125`), which rewrote the pending set correctly
+    /// and then walked past the banner already published. That is the normal case, not the corner
+    /// one: people turn Privacy Mode on *because* schedules exist, so a fired reminder is exactly
+    /// what is on screen at that moment.
+    ///
+    /// `cancelAll` looked like it handled the delivered case and did not. It filtered
+    /// `pendingNotificationRequests()` and handed **that** list to `removeDeliveredNotifications`,
+    /// but a notification that has been delivered is by definition no longer pending, so its
+    /// identifier was never in the list and the call could not reach it. `cancelAll` is the
+    /// erase-everything path (`SettingsView.performErase`, `MacSettingsView.performErase`, and the
+    /// "erase local data" recovery action on both root views), so a factory reset was leaving the
+    /// user's schedules describing themselves on the lock screen of a wiped device.
+    ///
+    /// Delivered reminders are cleared on **every** `sync`, not only the Privacy-Mode one. `sync`
+    /// is never called speculatively: its callers are the three `.onChange` observers (schedule
+    /// set, display currency, Privacy Mode), the save/toggle handlers in the two Cash Flow views,
+    /// and `processRecurringTransactions` — which since WC-L1 only re-syncs when an occurrence was
+    /// actually generated. Every one of those means the banner on screen has stopped describing the
+    /// data: the schedule was edited or deleted, the amount is now denominated in a different
+    /// currency, or the occurrence has already been recorded and the reminder is spent. A stale
+    /// banner is wrong whether or not Privacy Mode is on, so this deliberately does not branch on
+    /// `showDetails` — the narrower "clear delivered only when hiding details" would have left the
+    /// staleness bug standing for everyone else and made correctness depend on an unrelated flag.
+    private func clearScheduledReminders() async {
+        let pending = await center.pendingNotificationRequests().map(\.identifier)
+        let delivered = await center.deliveredNotifications().map(\.request.identifier)
+        let identifiers = (pending + delivered).filter { $0.hasPrefix(identifierPrefix) }
         center.removePendingNotificationRequests(withIdentifiers: identifiers)
         center.removeDeliveredNotifications(withIdentifiers: identifiers)
     }

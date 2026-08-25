@@ -1920,6 +1920,96 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    /// Fails if a teardown path in `RecurringNotificationService` clears the reminders still waiting
+    /// to fire and leaves the ones already on the lock screen.
+    ///
+    /// Two versions of the same mistake shipped together. `sync` removed *pending* requests only, so
+    /// turning Privacy Mode **on** rewrote every reminder that had not fired yet and left the one
+    /// already published — "Recurring Expense due / Rent: €1.450,00" — exactly where it was. That is
+    /// the normal case rather than the corner one: people turn Privacy Mode on *because* schedules
+    /// exist, so a fired reminder is precisely what is on screen at that moment. And `cancelAll`,
+    /// the erase-everything path, *did* call `removeDeliveredNotifications` — with a list built by
+    /// filtering `pendingNotificationRequests()`. A delivered notification is by definition no
+    /// longer pending, so its identifier could never appear in that list and the call reached
+    /// nothing; a factory reset left the schedules describing themselves on a wiped device.
+    ///
+    /// A source lint, because none of it is observable from here. The test host reports
+    /// `authorizationStatus == .notDetermined` and `UNUserNotificationCenter.add` retains none of
+    /// the requests handed to it, so `deliveredNotifications()` is permanently empty and no
+    /// assertion against the real notification centre can tell the fixed code from the broken code.
+    /// What this pins instead is the shape that allowed both bugs: a body that reaches for one of
+    /// the two queues and not the other. It reads the stripped `code` view, so a doc comment naming
+    /// these APIs — the service's own, or this one — cannot satisfy it.
+    ///
+    /// `cancel(scheduleID:)` passes and always did: it builds its single identifier from the
+    /// schedule's UUID instead of enumerating a queue, so the second rule never fires on it, and it
+    /// already called both removals.
+    func testRecurringReminderTeardownClearsDeliveredBannersToo() throws {
+        let service = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources/Shared/Services/RecurringNotificationService.swift")
+        let code = Self.stripped(try String(contentsOf: service, encoding: .utf8)).code
+
+        // Each rule reads "a body that reaches for this must also reach for that".
+        let rules: [(reaches: String, mustAlsoReach: String, because: String)] = [
+            (
+                "removePendingNotificationRequests", "removeDeliveredNotifications",
+                "empties the pending queue and leaves the banners already on the lock screen"
+            ),
+            (
+                "pendingNotificationRequests()", "deliveredNotifications()",
+                "enumerates the pending queue alone, so no identifier list it builds can name a delivered banner"
+            ),
+        ]
+
+        // A `func` line at any nesting; its body runs to the next one. Coarse, and enough — this
+        // file declares one type and nests no function inside a function.
+        let declaration = try NSRegularExpression(
+            pattern: #"^\s*(?:(?:private|fileprivate|internal|public|static|nonisolated|final|override|mutating)\s+)*func\s+(\w+)"#
+        )
+        var declarations: [(name: String, index: Int)] = []
+        for (index, line) in code.enumerated() {
+            let text = String(line)
+            let range = NSRange(text.startIndex..<text.endIndex, in: text)
+            guard let match = declaration.firstMatch(in: text, range: range),
+                  let nameRange = Range(match.range(at: 1), in: text) else { continue }
+            declarations.append((String(text[nameRange]), index))
+        }
+        XCTAssertGreaterThanOrEqual(
+            declarations.count, 5,
+            "found \(declarations.count) function(s) in RecurringNotificationService.swift — the sweep has lost the file"
+        )
+
+        var offenders: [String] = []
+        var reaches = 0
+        for (position, current) in declarations.enumerated() {
+            let end = position + 1 < declarations.count ? declarations[position + 1].index : code.count
+            let body = code[current.index..<end].map { String($0) }.joined(separator: "\n")
+            for rule in rules where body.contains(rule.reaches) {
+                reaches += 1
+                guard !body.contains(rule.mustAlsoReach) else { continue }
+                offenders.append(
+                    "  \(current.name)() at :\(current.index + 1) calls `\(rule.reaches)` "
+                        + "without `\(rule.mustAlsoReach)` — it \(rule.because)"
+                )
+            }
+        }
+
+        XCTAssertGreaterThanOrEqual(
+            reaches, 2,
+            "\(reaches) teardown call(s) matched; the sweep is no longer reading this service at all"
+        )
+        XCTAssertEqual(
+            offenders, [],
+            """
+            \(offenders.count) teardown path(s) touch one notification queue and not the other, which \
+            is how a fired reminder survived both a Privacy Mode toggle and a factory reset:
+            \(offenders.joined(separator: "\n"))
+            """
+        )
+    }
+
     // MARK: - Sweep internals
 
     /// The spellings of a percentage this codebase can produce. Anything else — a renamed wrapper,
