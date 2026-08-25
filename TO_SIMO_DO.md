@@ -460,13 +460,13 @@ were written up rather than changed. Both are data-loss shaped.
       discards everything typed. The codebase treats this as a bug elsewhere (tag L13).
 - [ ] `MacRootView.swift:59-66` — the inactive-window privacy shield is an overlay on the root group,
       so a presented sheet floats above it and stays legible during app switching.
-- [ ] `MacEditorSheet.swift:282-291` — Sector/Geography pickers don't keep an out-of-list current
+- [x] **DONE 2026-08-25.** `MacEditorSheet.swift:282-291` — Sector/Geography pickers don't keep an out-of-list current
       value selectable, unlike the Category picker (tag DA-H06), so an imported value shows blank.
-- [ ] `MacSettingsView.swift:158-165` — `@Published` mutated inline inside `.onChange(initial: true)`
+- [x] **DONE 2026-08-25.** `MacSettingsView.swift:158-165` — `@Published` mutated inline inside `.onChange(initial: true)`
       during the same view update. `MacCashFlowView:457-464` defers the identical case in a `Task`.
 - [ ] `WealthCompassMacApp.swift:60-94` — ⌘E and ⌘1-5 aren't disabled during onboarding, so a stale
       export token fires later and drops the user into Settings with the sheet open.
-- [ ] `MacDashboardView.swift:9` — default net-worth range is `.oneYear` on Mac, `.oneWeek` on iPhone.
+- [x] **DONE 2026-08-25.** `MacDashboardView.swift:9` — default net-worth range is `.oneYear` on Mac, `.oneWeek` on iPhone.
 
 ### iOS
 
@@ -474,12 +474,12 @@ were written up rather than changed. Both are data-loss shaped.
       backgrounding, and the `.onChange` meant to re-arm it is registered only after `LockView`
       mounts, i.e. after the transition it watches for. The user lands on the lock screen with no
       prompt. (The lock itself is **not** bypassable.)
-- [ ] `SettingsView.swift:80,81,540,546` — `categoryGroup(title: String)` splices an English noun into
+- [x] **DONE 2026-08-25.** `SettingsView.swift:80,81,540,546` — `categoryGroup(title: String)` splices an English noun into
       a translated sentence: German reads "Noch keine benutzerdefinierten income-Kategorien."
 - [ ] `DashboardView.swift:131` — `heldCurrenciesUsingSeedRate` is the only derived Dashboard value
       not memoized on `dataVersion`, and it runs per frame while scrubbing the net-worth chart.
-- [ ] `RecurringTransactionNotificationService.swift:82` — **the project's only remaining compiler
-      warning**, and the one thing blocking the Swift 6 language mode: `[AnyHashable: Any]` crossing
+- [ ] `RecurringTransactionNotificationService.swift:82` — **one of the project's two remaining compiler
+      warnings** (the other is `Tests/CloudSyncCoreTests.swift:861`, a deprecated `resultsTruncated`), and the one thing blocking the Swift 6 language mode: `[AnyHashable: Any]` crossing
       into a main-actor-isolated `didReceiveRemoteNotification`. I tried `nonisolated`,
       `@preconcurrency` on the method, and `@preconcurrency` on the conformance — the first two do
       not silence it and the third is rejected outright ("has no effect"), so I reverted rather than

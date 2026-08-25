@@ -857,8 +857,12 @@ final class CloudSyncCoreTests: XCTestCase {
     /// retryable — they're routed explicitly *before* the retryable check, so this pins down
     /// that they'd otherwise fall to fatal/their own branch rather than being silently retried.
     func testIsRetryableCoversTransientErrorsOnly() {
+        // `.resultsTruncated` is deliberately absent: Apple deprecated it with "Will not be
+        // returned", so asserting on it is coverage of a branch CloudKit can no longer reach — and
+        // it was the source of one of the project's two compiler warnings. `isRetryable` still
+        // handles it defensively; only the assertion is gone.
         for code in [CKError.Code.networkUnavailable, .networkFailure, .serviceUnavailable,
-                     .requestRateLimited, .zoneBusy, .resultsTruncated, .batchRequestFailed] {
+                     .requestRateLimited, .zoneBusy, .batchRequestFailed] {
             XCTAssertTrue(CloudKitSyncService.isRetryable(ckError(code)), "\(code) should retry")
         }
         for code in [CKError.Code.notAuthenticated, .quotaExceeded, .permissionFailure,

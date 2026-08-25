@@ -600,7 +600,9 @@ struct MacSettingsView: View {
                 .font(.headline)
 
             if categories.isEmpty {
-                Text(settings.localized("No custom \(type.localizedTitle(appLanguage: settings.appLanguage).lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))) categories yet."))
+                // Not lowercased — see the matching note in the iOS Settings screen: lowercasing the
+                // *localized* noun breaks the languages that capitalize nouns.
+                Text(settings.localized("No custom \(type.localizedTitle(appLanguage: settings.appLanguage)) categories yet."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {

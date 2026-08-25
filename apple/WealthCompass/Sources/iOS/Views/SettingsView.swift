@@ -548,8 +548,12 @@ struct SettingsView: View {
                 .foregroundStyle(.white)
 
             if categories.isEmpty {
-                // L21: locale-aware lowercasing (root-locale .lowercased() mis-cases Turkish I/İ, etc.).
-                Text("No custom \(title.lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))) categories yet.")
+                // Not lowercased. L21 added locale-aware lowercasing when this was the raw English
+                // word "Income"; now that it is the *localized* noun, lowercasing is wrong in the
+                // languages that capitalize nouns — German rendered "benutzerdefinierten
+                // einkommen-Kategorien". Leaving the term as the language writes it is correct
+                // everywhere, at the cost of a capital in the middle of the English sentence.
+                Text("No custom \(title) categories yet.")
                     .font(.caption)
                     .foregroundStyle(WCColor.textSecondary)
             } else {

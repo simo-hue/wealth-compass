@@ -254,6 +254,43 @@ final class ReportReconciliationTests: XCTestCase {
         }
     }
 
+    /// A bounded export must not print figures from outside the period its cover page states.
+    ///
+    /// The KPI row read `monthlyCashFlow(for: now)` and the trend `cashFlowTrend(months: 12)` — both
+    /// anchored to today — so a 2024 export carried 2026 KPI values and twelve 2025-26 bars, under a
+    /// 2024 heading, labelled "This Month". The Money Flow and category blocks had already been
+    /// moved off their own windows for this reason.
+    func testBoundedExportKeepsTheCashFlowSectionInsidePeriod() throws {
+        let calendar = Calendar(identifier: .gregorian)
+        var comps = DateComponents(); comps.year = 2024; comps.month = 3; comps.day = 1; comps.hour = 12
+        let start = try XCTUnwrap(calendar.date(from: comps))
+        comps.month = 5; comps.day = 31
+        let end = try XCTUnwrap(calendar.date(from: comps))
+
+        let document = buildDocument(sections: [.cashFlow], range: .custom(start: start, end: end))
+        let anchor = ReportSection.cashFlow.anchor
+        let blocks = try XCTUnwrap(document.sections.first(where: { $0.anchor == anchor })?.blocks)
+
+        // "This Month" is only honest on an unbounded export.
+        for block in blocks {
+            if case let .kpis(items) = block {
+                XCTAssertFalse(
+                    items.contains { $0.label.contains("This Month") },
+                    "a bounded export still labels a KPI 'This Month'"
+                )
+            }
+        }
+
+        // The trend spans the range's own months, not twelve counted back from today.
+        var barCount: Int?
+        for block in blocks {
+            if case let .chart(chart) = block, case let .groupedBars(groups, _, _) = chart {
+                barCount = groups.count
+            }
+        }
+        XCTAssertEqual(barCount, 3, "trend should cover Mar–May 2024, not a window ending today")
+    }
+
     /// The running-balance column is the reader's audit trail; its final settled value is the same
     /// number as the closing-balance tile above it.
     func testFinalRunningBalanceMatchesTheClosingBalanceTile() throws {

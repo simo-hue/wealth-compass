@@ -332,6 +332,23 @@ struct ReportDocumentBuilder {
         return sorted.filter { $0.date >= interval.start && $0.date <= interval.end }
     }
 
+    /// Whole months an interval touches, clamped to a readable chart width.
+    ///
+    /// Inclusive of both endpoints — a 1 Jan – 31 Mar range is three bars, not two — and capped at
+    /// twelve so a multi-year export does not produce an unreadable strip of hairlines.
+    private func monthsSpanned(_ interval: DateInterval) -> Int {
+        let start = calendar.dateComponents([.year, .month], from: interval.start)
+        let end = calendar.dateComponents([.year, .month], from: interval.end)
+        guard let months = calendar.dateComponents(
+            [.month],
+            from: calendar.date(from: start) ?? interval.start,
+            to: calendar.date(from: end) ?? interval.end
+        ).month else {
+            return 1
+        }
+        return min(max(months + 1, 1), 12)
+    }
+
     /// Cash contribution of a transaction, in base currency and signed by type.
     ///
     /// Rounded to the currency's minor unit *here*, so that everything accumulated downstream
@@ -497,20 +514,71 @@ struct ReportDocumentBuilder {
         // Both the KPI row and the trend read from the settled engine, so this section never counts
         // a future-dated row that the ledger below it prints in grey and excludes.
         let engine = settledAnalytics
-        let flow = engine.monthlyCashFlow(for: context.now)
-        var blocks: [ReportBlock] = [
-            .sectionTitle(L("Cash Flow"), subtitle: L("Income, expenses, recurring commitments and the full transaction ledger")),
-            .kpis([
+        let interval = options.dateRange.resolve(now: context.now, calendar: calendar)
+        let settledRanged = rangedTransactions.filter { !isFutureDated($0) }
+
+        // The KPIs and the trend cover the period the cover page states.
+        //
+        // They used to read `monthlyCashFlow(for: context.now)` and `cashFlowTrend(months: 12)` —
+        // both anchored to *today* — so a report exported for 1 Jan – 31 Dec 2024 printed August
+        // 2026 KPI figures and twelve 2025-26 bars, under a cover page stating the 2024 period, and
+        // labelled them "This Month". The Money Flow and category blocks below were moved off their
+        // own windows for exactly this reason; these two were missed.
+        // What this row can say depends on whether the export is bounded.
+        //
+        // Unbounded, the current month is a useful at-a-glance figure and "This Month" is accurate.
+        // Bounded, it is not: this used to print August 2026 figures under a cover page stating a
+        // 2024 period. But recomputing it over the range would only restate the ledger's own
+        // Opening/Income/Expenses/Closing row further down — same numbers, same labels, twice on one
+        // page. So a bounded export keeps only the figure the ledger row does *not* carry: net
+        // savings and its rate, over the stated period.
+        let kpis: [ReportKPI]
+        if interval != nil {
+            // `signedAmount` so this accumulates from the same rounded per-row values the ledger
+            // prints, per `roundedMoney`.
+            let income = settledRanged.filter { $0.type == .income }
+                .reduce(Decimal(0)) { $0 + signedAmount($1) }
+            let expenses = settledRanged.filter { $0.type == .expense }
+                .reduce(Decimal(0)) { $0 - signedAmount($1) }
+            let flow = MonthlyCashFlow(monthlyIncome: income, monthlyExpenses: expenses)
+            kpis = [
+                ReportKPI(label: L("Net Savings"), value: money(flow.netSavings),
+                          detail: percent(flow.savingsRate) + " " + L("savings rate"),
+                          emphasis: flow.netSavings >= 0 ? .positive : .negative),
+            ]
+        } else {
+            let flow = engine.monthlyCashFlow(for: context.now)
+            kpis = [
                 ReportKPI(label: L("Income This Month"), value: money(flow.monthlyIncome), emphasis: .positive),
                 ReportKPI(label: L("Expenses This Month"), value: money(flow.monthlyExpenses), emphasis: .negative),
                 ReportKPI(label: L("Net Savings"), value: money(flow.netSavings),
                           detail: percent(flow.savingsRate) + " " + L("savings rate"),
                           emphasis: flow.netSavings >= 0 ? .positive : .negative),
-            ]),
+            ]
+        }
+
+        var blocks: [ReportBlock] = [
+            .sectionTitle(L("Cash Flow"), subtitle: L("Income, expenses, recurring commitments and the full transaction ledger")),
+            .kpis(kpis),
         ]
 
-        // Trend
-        let trend = engine.cashFlowTrend(months: 12)
+        // Trend. For a bounded export the bars end at the range's own end and span only its months,
+        // built over the ranged rows — `cashFlowTrend` counts back from its engine's `now`, so
+        // reusing the tested method with a re-anchored engine is what keeps the chart inside the
+        // stated period instead of walking back from today.
+        let trend: [CashFlowMonth]
+        if let interval {
+            let trendEngine = AnalyticsEngine(
+                data: FinancialData(transactions: settledRanged),
+                converter: context.converter,
+                displayCurrency: context.baseCurrency,
+                appLanguage: context.appLanguage,
+                calendar: context.calendar,
+                now: interval.end)
+            trend = trendEngine.cashFlowTrend(months: monthsSpanned(interval))
+        } else {
+            trend = engine.cashFlowTrend(months: 12)
+        }
         if !trend.isEmpty {
             blocks.append(.subheading(L("Monthly Trend"), anchor: "cashflow-trend"))
             blocks.append(.chart(.groupedBars(

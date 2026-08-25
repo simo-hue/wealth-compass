@@ -546,10 +546,15 @@ struct InvestmentFormView: View {
                             (Text(currency.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\(currency.rawValue))")).tag(currency)
                         }
                     }
+                    // DA-H06, as on the Category picker: an imported holding can carry any sector
+                    // string, and without keeping it selectable the picker renders blank and the
+                    // user cannot see the value without overwriting it.
                     Picker("Sector", selection: $sector) {
+                        if !sectors.contains(sector) { Text(LocalizedStringKey(sector)).tag(sector) }
                         ForEach(sectors, id: \.self) { Text(LocalizedStringKey($0)).tag($0) }
                     }
                     Picker("Geography", selection: $geography) {
+                        if !geographies.contains(geography) { Text(LocalizedStringKey(geography)).tag(geography) }
                         ForEach(geographies, id: \.self) { Text(LocalizedStringKey($0)).tag($0) }
                     }
                 }
