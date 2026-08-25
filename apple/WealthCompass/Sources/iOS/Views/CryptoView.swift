@@ -101,7 +101,7 @@ struct CryptoView: View {
 
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             MetricCard(title: LocalizedStringKey("Crypto Value"), value: settings.privateCurrency(total), systemImage: "bitcoinsign.circle.fill", accent: WCColor.warning, detail: LocalizedStringKey("Current market value"))
-            MetricCard(title: LocalizedStringKey("Holdings"), value: settings.isPrivacyMode ? settings.redactionToken : "\(finance.data.crypto.count)", systemImage: "square.stack.3d.up.fill", detail: LocalizedStringKey("Tracked assets"))
+            MetricCard(title: LocalizedStringKey("Holdings"), value: settings.privateCount(finance.data.crypto.count), systemImage: "square.stack.3d.up.fill", detail: LocalizedStringKey("Tracked assets"))
             MetricCard(title: LocalizedStringKey("Cost Basis"), value: settings.privateCurrency(costBasis), systemImage: "banknote.fill", detail: LocalizedStringKey("Capital invested"))
             MetricCard(
                 title: LocalizedStringKey("Profit / Loss"),
@@ -122,7 +122,7 @@ struct CryptoView: View {
             }
             let latestUpdate = finance.data.crypto.map(\.updatedAt).max()
             let coinCount = Set(finance.data.crypto.map(\.symbol).filter { !$0.isEmpty }).count
-            let coinCountLabel = settings.isPrivacyMode ? settings.redactionToken : "\(coinCount)"
+            let coinCountLabel = settings.privateCount(coinCount)
             // The card's own title already redacts its count, and then its value said "Never"
             // whenever the portfolio was empty — the same fact, in the same card, in the clear.
             // Tokenised rather than hidden: this card is drawn in both states and only its value

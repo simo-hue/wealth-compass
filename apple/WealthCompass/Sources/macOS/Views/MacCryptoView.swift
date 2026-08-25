@@ -98,7 +98,7 @@ struct MacCryptoView: View {
             )
             MetricCard(
                 title: LocalizedStringKey("Holdings"),
-                value: privateCount(finance.data.crypto.count),
+                value: settings.privateCount(finance.data.crypto.count),
                 systemImage: "number"
             )
             MetricCard(
@@ -126,7 +126,7 @@ struct MacCryptoView: View {
             let uniqueCryptoCount = Set(finance.data.crypto.map(\.symbol).filter(isNonEmpty)).count
             MetricCard(
                 // L19: already resolved by settings.localized — pass verbatim so Text doesn't re-localize.
-                verbatimTitle: settings.localized("Status • \(privateCount(uniqueCryptoCount)) Coins"),
+                verbatimTitle: settings.localized("Status • \(settings.privateCount(uniqueCryptoCount)) Coins"),
                 value: settings.isPrivacyMode
                     ? settings.redactionToken
                     : (latestUpdate.map(formattedUpdate) ?? settings.localized("Never")),
@@ -229,7 +229,7 @@ struct MacCryptoView: View {
                 .prefix(6)
             
             // Privacy before emptiness. The Holdings metric on this page already redacts its
-            // count to `••••` via `privateCount(_:)`; this panel gave the same fact back in words.
+            // count to `••••` via `settings.privateCount(_:)`; this panel gave the same fact back in words.
             // The populated arm still lists its cards (ranked lists are a separate ruling), so
             // what stops is the page stating there are no holdings.
             if settings.isPrivacyMode, topHoldings.isEmpty {
@@ -383,10 +383,6 @@ struct MacCryptoView: View {
                 }
             }
         )
-    }
-
-    private func privateCount(_ count: Int) -> String {
-        settings.isPrivacyMode ? settings.redactionToken : "\(count)"
     }
 
     private func formattedUpdate(_ date: Date) -> String {

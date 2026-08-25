@@ -355,6 +355,26 @@ final class AppSettings: ObservableObject {
         return value.formatted(.number.precision(.fractionLength(0...fractionDigits)).locale(effectiveLocale))
     }
 
+    /// An entity count — positions, holdings, sectors, coins — written for the reader's locale.
+    ///
+    /// The count-valued summary cards each built this inline as `"\(count)"`, which is
+    /// `String(describing:)` and groups nothing: **1234**, in every language, with Privacy Mode
+    /// *off* — so for every user, not only the redacted ones. `MetricCard.value` is a `String`
+    /// rendered through `Text(value)`, and passing a `String` to `Text` selects the verbatim
+    /// `StringProtocol` overload rather than the `LocalizedStringKey` one, so nothing downstream
+    /// was ever going to format it. Four of the eight sites could not have been fixed by handing
+    /// `Text` further down in any case: they interpolate the count into a localized sentence
+    /// (`Status • %@ Sectors`), where a `String` is the only thing that fits. Formatting the
+    /// number here fixes both shapes with one rule.
+    ///
+    /// Redacted while Privacy Mode is on, like every other `private…` helper here: these counts
+    /// are the last exact entity totals the app prints, and `b93f391` concealed the same fact on
+    /// the Dashboard.
+    func privateCount(_ count: Int) -> String {
+        guard !isPrivacyMode else { return redactionToken }
+        return count.formatted(.number.locale(effectiveLocale))
+    }
+
     /// The percentage twin of `privateCurrency` (L8). A performance figure has to be redacted for
     /// the same reason the amount beside it is: `••••` next to a live "+12.4%" still discloses the
     /// portfolio — anyone who knows one position's size can divide their way back to the rest. The

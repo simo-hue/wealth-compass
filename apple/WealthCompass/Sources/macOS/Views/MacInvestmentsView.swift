@@ -130,7 +130,7 @@ struct MacInvestmentsView: View {
             )
             MetricCard(
                 title: LocalizedStringKey("Positions"),
-                value: privateCount(finance.data.investments.count),
+                value: settings.privateCount(finance.data.investments.count),
                 systemImage: "number"
             )
             MetricCard(
@@ -158,7 +158,7 @@ struct MacInvestmentsView: View {
             let sectorCount = Set(finance.data.investments.map(\.sector).filter(isNonEmpty)).count
             MetricCard(
                 // L19: already resolved by settings.localized — pass verbatim so Text doesn't re-localize.
-                verbatimTitle: settings.localized("Status • \(privateCount(sectorCount)) Sectors"),
+                verbatimTitle: settings.localized("Status • \(settings.privateCount(sectorCount)) Sectors"),
                 value: settings.isPrivacyMode
                     ? settings.redactionToken
                     : (latestUpdate.map(formattedUpdate) ?? settings.localized("Never")),
@@ -177,7 +177,7 @@ struct MacInvestmentsView: View {
                 .prefix(5)
             
             // Privacy before emptiness. The Positions metric on this page already redacts its
-            // count to `••••` via `privateCount(_:)`; this panel gave the same fact back in words.
+            // count to `••••` via `settings.privateCount(_:)`; this panel gave the same fact back in words.
             // The populated arm still lists its cards — ranked lists are a separate ruling
             // (TO_SIMO_DO.md) — so what stops is the page stating the portfolio is empty.
             if settings.isPrivacyMode, topHoldings.isEmpty {
@@ -336,10 +336,6 @@ struct MacInvestmentsView: View {
                 }
             }
         )
-    }
-
-    private func privateCount(_ count: Int) -> String {
-        settings.isPrivacyMode ? settings.redactionToken : "\(count)"
     }
 
     private func formattedUpdate(_ date: Date) -> String {

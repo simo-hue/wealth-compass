@@ -104,7 +104,7 @@ struct InvestmentsView: View {
 
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             MetricCard(title: LocalizedStringKey("Portfolio Value"), value: settings.privateCurrency(total), systemImage: "chart.line.uptrend.xyaxis", accent: .cyan, detail: LocalizedStringKey("Current market value"))
-            MetricCard(title: LocalizedStringKey("Positions"), value: settings.isPrivacyMode ? settings.redactionToken : "\(finance.data.investments.count)", systemImage: "square.stack.3d.up.fill", detail: LocalizedStringKey("Stocks, ETFs, and more"))
+            MetricCard(title: LocalizedStringKey("Positions"), value: settings.privateCount(finance.data.investments.count), systemImage: "square.stack.3d.up.fill", detail: LocalizedStringKey("Stocks, ETFs, and more"))
             MetricCard(title: LocalizedStringKey("Cost Basis"), value: settings.privateCurrency(costBasis), systemImage: "banknote.fill", detail: LocalizedStringKey("Capital invested"))
             MetricCard(
                 title: LocalizedStringKey("Profit / Loss"),
@@ -125,7 +125,7 @@ struct InvestmentsView: View {
             }
             let latestUpdate = finance.data.investments.map(\.updatedAt).max()
             let sectorCount = Set(finance.data.investments.map(\.sector).filter { !$0.isEmpty }).count
-            let sectorCountLabel = settings.isPrivacyMode ? settings.redactionToken : "\(sectorCount)"
+            let sectorCountLabel = settings.privateCount(sectorCount)
             // The card's own title already redacts its count, and then its value said "Never"
             // whenever the portfolio was empty — the same fact, in the same card, in the clear.
             // Tokenised rather than hidden: this card is drawn in both states and only its value

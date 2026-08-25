@@ -733,14 +733,26 @@ struct MacSettingsView: View {
     /// `finance.data.snapshots.count` — the same fact `b93f391` concealed on the Dashboard, spelled
     /// out as a number one page away. Tokenised rather than hidden: the row is drawn in both data
     /// states and only its value moves, so `••••` in a slot that always exists discloses nothing.
-    /// Same decision as `MacInvestmentsView.privateCount` and `MacCryptoView.privateCount`; those
-    /// return `String` because they feed `MetricCard(value:)`, which takes one.
+    /// Same decision as the count-valued summary cards, which reach it through
+    /// `AppSettings.privateCount(_:)`.
+    ///
+    /// An earlier version of this comment cited `MacInvestmentsView.privateCount` and
+    /// `MacCryptoView.privateCount` as the model and read their `String` return as forced by
+    /// `MetricCard(value:)`. It was not forced, it was broken: those helpers built `"\(count)"`,
+    /// which groups nothing, so every reader saw 1234 with Privacy Mode *off*. Both are gone now,
+    /// folded into the one helper on `AppSettings` — and a change of type would not have covered
+    /// the four sites that interpolate the count into `Status • %@ Sectors`, where only a `String`
+    /// fits.
     ///
     /// Returns `Text`, not `String`, so the visible branch keeps the exact expression it had.
     /// `Text("\(count)")` is a `LocalizedStringKey` and formats the integer for the reader's
-    /// locale — 1,234, and Arabic-Indic digits where the locale asks for them. Handing `Text` a
-    /// `String` picks the verbatim overload instead and prints 1234 in every language. Measured,
-    /// not assumed: the two render different pixels in en, ar and hi alike.
+    /// locale — 1,234 in `en`, 1.234 in `de` — while handing `Text` a `String` picks the verbatim
+    /// overload and prints 1234 in every language.
+    ///
+    /// Measured on this platform, because the earlier version of this comment guessed and was
+    /// wrong: `ar` renders 1,234 in Latin digits, not Arabic-Indic, and so does `hi`. `pl` leaves
+    /// a four-digit count ungrouped as 1234, which is correct for `pl` and not a formatting
+    /// failure.
     private func privateCount(_ count: Int) -> Text {
         settings.isPrivacyMode ? Text(settings.redactionToken) : Text("\(count)")
     }

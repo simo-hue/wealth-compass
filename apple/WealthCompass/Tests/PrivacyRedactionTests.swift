@@ -81,6 +81,47 @@ final class PrivacyRedactionTests: XCTestCase {
         XCTAssertNotEqual(investment.gainLossPercent, 0, "the fixture has to carry a percentage worth hiding")
     }
 
+    /// Fails if an entity count is printed without being formatted for the reader's locale.
+    ///
+    /// This one is not a Privacy Mode bug at all — it fires with the cover **down**, for every
+    /// user. Eight summary cards built their count as `"\(count)"`, which is `String(describing:)`
+    /// and groups nothing, and then handed it to `MetricCard(value:)`. `MetricCard` renders
+    /// `Text(value)`, and a `String` argument selects `Text`'s verbatim `StringProtocol` overload
+    /// rather than the `LocalizedStringKey` one, so a portfolio of 1,234 positions read **1234** in
+    /// every language the app ships.
+    ///
+    /// The property, not the exact strings: a grouping locale must not render 1234 ungrouped, and
+    /// two locales that group differently must not agree. Asserting `"1.234"` for `de` would pin
+    /// this test to one CLDR release; `fr` alone has moved between a space, a no-break space and a
+    /// narrow no-break space.
+    func testCountsAreFormattedForTheReadersLocale() {
+        let settings = makeSettings()
+
+        settings.appLanguage = "en"
+        let english = settings.privateCount(1_234)
+        settings.appLanguage = "de"
+        let german = settings.privateCount(1_234)
+
+        XCTAssertNotEqual(
+            english, "1234",
+            "an entity count is printed unformatted, so every reader sees 1234 rather than 1,234"
+        )
+        XCTAssertNotEqual(
+            english, german,
+            """
+            `en` and `de` group thousands differently, and this count rendered the same in both —             so it is not being formatted for the reader at all.
+            """
+        )
+
+        settings.appLanguage = nil
+        settings.isPrivacyMode = true
+        XCTAssertEqual(
+            settings.privateCount(1_234), settings.redactionToken,
+            "an entity count survived Privacy Mode"
+        )
+    }
+
+
     // MARK: - The call sites
 
     /// Every directory under `Sources/` that holds Swift, so neither sweep can be dodged by
