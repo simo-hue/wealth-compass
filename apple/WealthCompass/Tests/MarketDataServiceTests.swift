@@ -1,9 +1,10 @@
 import XCTest
 @testable import WealthCompassMobile
 
-/// Yahoo fallback used when Finnhub's free (US-only) tier can't price a listing — the VWCE /
-/// European-ETF case. Covers the JSON decoders, the GBp(pence) normalization, and the
-/// candidate disambiguation. The network cascade itself is thin glue over these pure parts.
+/// Yahoo prices every non-USD holding outright (Finnhub's `/quote` reports no currency, H13) and
+/// takes over on `.noQuote` — the VWCE / European-ETF case. Covers the JSON decoders, the
+/// GBp(pence) normalization, and the candidate disambiguation. The network cascade itself is thin
+/// glue over these pure parts.
 final class MarketDataServiceTests: XCTestCase {
     private func json(_ string: String) -> Data { string.data(using: .utf8)! }
 

@@ -14,7 +14,7 @@ The Apple implementation is driven by a single Xcode project containing two inde
 ### Core Features
 - 📊 **Interactive Dashboard**: Visual history of your net worth over time, asset allocation breakdowns, and key performance metrics.
 - 💰 **Cash Flow Management**: Track income and expenses with categories, visual trends, and schedule recurring transaction reminders.
-- 📈 **Investment Portfolio**: Real-time stock & ETF price updates via Finnhub and Yahoo Finance — no API key required. Track cost basis, current value, and profit/loss.
+- 📈 **Investment Portfolio**: Real-time stock & ETF price updates via Yahoo Finance, which needs no API key, with optional Finnhub for US listings. Track cost basis, current value, and profit/loss.
 - ₿ **Crypto Tracker**: Live data fetching from CoinGecko. Track crypto holdings and monitor live valuations.
 - 🔒 **Privacy & Security**: All financial data is strictly stored locally in the app sandbox. Supports Face ID / Touch ID biometric locks and a quick-toggle Privacy Mode to blur sensitive amounts.
 - 🌍 **Localization**: Localized into 35 languages via Xcode String Catalogs. Coverage varies by

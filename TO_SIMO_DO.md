@@ -475,17 +475,20 @@ were written up rather than changed. Both are data-loss shaped.
 - [ ] `DashboardView.swift:131` — `heldCurrenciesUsingSeedRate` is the only derived Dashboard value
       not memoized on `dataVersion`, and it runs per frame while scrubbing the net-worth chart.
 - [ ] `Sources/iOS/Services/RecurringTransactionNotificationService.swift:82` — **the project's one
-      remaining compiler warning**,
-      ⚠️ *Two files have nearly this name.* The other is `Sources/Shared/Services/RecurringNotification`
-      `Service.swift`, whose line 82 is an innocent `content.body` assignment. Checking the wrong one —
-      or clean-building only the **Mac** scheme, which never compiles `Sources/iOS/` — makes this entry
-      look stale. It is not: a clean `WealthCompassMobile` build still emits it 4×. Verified 2026-08-25. and the one thing blocking the Swift 6 language mode: `[AnyHashable: Any]` crossing
+      remaining compiler warning**, and the one thing blocking the Swift 6 language mode: `[AnyHashable: Any]` crossing
       into a main-actor-isolated `didReceiveRemoteNotification`. I tried `nonisolated`,
       `@preconcurrency` on the method, and `@preconcurrency` on the conformance — the first two do
       not silence it and the third is rejected outright ("has no effect"), so I reverted rather than
       leave a guess in place. Nothing reads `userInfo` (a CloudKit silent push only signals "the zone
       changed"), so dropping the parameter or restating the requirement may be the real answer. Worth
       ten minutes with the Swift 6 migration guide rather than more guessing.
+      ⚠️ **Do not conclude this entry is stale without checking the right file and the right scheme.**
+      Two files have nearly this name: the one above in `Sources/iOS/Services/`, and
+      `Sources/Shared/Services/RecurringNotificationService.swift`, whose line 82 is an innocent
+      `content.body` assignment. And the Mac scheme never compiles `Sources/iOS/`, so a clean **macOS**
+      build emits zero Swift warnings and proves nothing here. A clean `WealthCompassMobile` build
+      emits this one twice (a compile diagnostic plus a summary line); a *cached* build emits none.
+      Checked 2026-08-25 — both mistakes were made that day.
       (The second warning is gone: the deprecated `resultsTruncated` assertion in
       `Tests/CloudSyncCoreTests.swift` was deleted, and `:860-863` is now a comment recording that it
       *was* the warning source. The one surviving `.resultsTruncated` reference,

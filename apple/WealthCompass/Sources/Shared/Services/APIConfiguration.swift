@@ -22,8 +22,10 @@ enum APIConfiguration {
     /// no explicit Coin ID and isn't in the built-in common map. Authenticated like /simple/price.
     static let coinGeckoSearchURL = "https://api.coingecko.com/api/v3/search"
 
-    /// Yahoo Finance chart endpoint (keyless, HTTPS). Used as a fallback for instruments
-    /// Finnhub's free tier can't price — notably European-listed ETFs (e.g. `VWCE.MI`).
+    /// Yahoo Finance chart endpoint (keyless, HTTPS). Not merely a fallback: every **non-USD**
+    /// holding is routed here directly, because Finnhub's `/quote` reports no currency (H13). It
+    /// also takes over on `.noQuote` (European-listed ETFs, e.g. `VWCE.MI`) and on `.rateLimited`,
+    /// and with no Finnhub key configured it prices every investment. See `FinanceStore.swift:732`.
     /// The resolved exchange-qualified symbol is appended to the path. Returns the live
     /// price *and* its native currency in `chart.result[0].meta`, so the refresh stores
     /// the value in the holding's own currency instead of assuming USD.
