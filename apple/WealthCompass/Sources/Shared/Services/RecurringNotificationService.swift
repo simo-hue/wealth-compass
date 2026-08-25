@@ -67,7 +67,8 @@ actor RecurringNotificationService {
             convertedAmounts: convertedAmounts,
             currencyCode: currencyCode,
             showDetails: showDetails,
-            appLanguage: appLanguage
+            appLanguage: appLanguage,
+            now: now
         )
 
         guard Self.isAuthorized(await center.notificationSettings().authorizationStatus) else {
@@ -174,30 +175,100 @@ actor RecurringNotificationService {
 
     /// A banner already on the lock screen, reduced to what deciding its fate needs: how it is
     /// filed, and what it says.
+    ///
+    /// The comparison used to be `identifier`/`title`/`subtitle`/`body` and nothing else, which
+    /// left a gap: a later edit setting `threadIdentifier` or `categoryIdentifier` from a schedule
+    /// would put the schedule's category on the lock screen — `threadIdentifier` is drawn as the
+    /// group header — and the teardown could not have noticed the category changing underneath it.
+    /// The sibling lock-screen test archives the *whole* `UNNotificationContent`
+    /// (`testPrivacyModeStopsTheRecurringReminderDescribingTheSchedule`), so it would see such a
+    /// field; this could not. Those two are now in.
+    ///
+    /// Three of `UNNotificationContent`'s remaining drawn fields are deliberately left out, and the
+    /// reason is the same in each case — a delivered banner is not the request that produced it,
+    /// and comparing a field the system rewrites on delivery would mark **every** banner stale,
+    /// which is precisely the failure this teardown exists to avoid:
+    ///
+    /// - `attachments`: the system copies the file into its own store and hands back a different
+    ///   `URL`, so a delivered attachment can never compare equal to a freshly built one. The
+    ///   lock-screen test asserts `attachments.count == 0` under Privacy Mode instead.
+    /// - `sound`: not drawn, and `UNNotificationSound` has no documented value equality — two
+    ///   `.default` instances are two objects.
+    /// - `userInfo`: app-private, never rendered, and it carries the schedule's UUID by design; the
+    ///   lock-screen test clears it before archiving for exactly that reason.
+    ///
+    /// `badge` **is** compared, and is a `String`-free exception to the "text only" reading of this
+    /// type on purpose: a badge count is the multiplicity disclosure `5265c96` closed for banners,
+    /// one surface over. Nothing sets it today.
+    ///
+    /// None of this is observable from the test host, so what pins it is
+    /// `testTheDeliveredComparisonSeesEveryFieldAScheduleCouldReach`, which moves one field at a
+    /// time and asserts the verdict — for `sound` and `userInfo` as well as for the six that are
+    /// compared, so those exclusions are recorded decisions rather than oversights. `attachments`
+    /// is the one exclusion not probed there, because building a `UNNotificationAttachment` needs a
+    /// real file on disk and a unit test that can fail on file I/O is a worse trade than the
+    /// assertion is worth; the lock-screen test pins it directly instead, with
+    /// `attachments.count == 0` under Privacy Mode.
     struct DeliveredReminder: Equatable {
         let identifier: String
         let title: String
         let subtitle: String
         let body: String
+        let threadIdentifier: String
+        let categoryIdentifier: String
+        let badge: Int?
 
-        init(identifier: String, title: String, subtitle: String = "", body: String) {
+        init(
+            identifier: String,
+            title: String,
+            subtitle: String = "",
+            body: String,
+            threadIdentifier: String = "",
+            categoryIdentifier: String = "",
+            badge: Int? = nil
+        ) {
             self.identifier = identifier
             self.title = title
             self.subtitle = subtitle
             self.body = body
+            self.threadIdentifier = threadIdentifier
+            self.categoryIdentifier = categoryIdentifier
+            self.badge = badge
+        }
+
+        init(_ content: UNNotificationContent, identifier: String) {
+            self.init(
+                identifier: identifier,
+                title: content.title,
+                subtitle: content.subtitle,
+                body: content.body,
+                threadIdentifier: content.threadIdentifier,
+                categoryIdentifier: content.categoryIdentifier,
+                badge: content.badge?.intValue
+            )
         }
 
         init(_ request: UNNotificationRequest) {
-            self.init(
-                identifier: request.identifier,
-                title: request.content.title,
-                subtitle: request.content.subtitle,
-                body: request.content.body
-            )
+            self.init(request.content, identifier: request.identifier)
         }
 
         init(_ notification: UNNotification) {
             self.init(notification.request)
+        }
+
+        /// This reminder as it would read if it were filed elsewhere: everything drawn, nothing
+        /// about where it sits. Rebuilt through the memberwise `init` rather than by listing the
+        /// fields to compare, so a field added above is carried here without a second edit.
+        func filed(as identifier: String) -> DeliveredReminder {
+            DeliveredReminder(
+                identifier: identifier,
+                title: title,
+                subtitle: subtitle,
+                body: body,
+                threadIdentifier: threadIdentifier,
+                categoryIdentifier: categoryIdentifier,
+                badge: badge
+            )
         }
     }
 
@@ -238,11 +309,54 @@ actor RecurringNotificationService {
     /// to: a delivered banner is by definition one whose fire time has passed, so filtering to
     /// future dues would find no schedule behind any of them and take down every one.
     ///
-    /// One edge is knowingly left conservative. Once `processDueRecurringTransactions` has recorded
-    /// the occurrence and advanced `nextDueDate`, a detailed banner is arguably spent, but its
-    /// identifier is the bare schedule UUID and its text is what the next reminder will say too, so
-    /// it is indistinguishable from an accurate one here and is kept. Keeping a spent banner is the
-    /// failure this is trading against dismissing a live one, and it is the smaller of the two.
+    /// **Spent banners are kept, on both branches.** Once `processDueRecurringTransactions` has
+    /// recorded the occurrence and advanced `nextDueDate`, the reminder has done its job and has not
+    /// necessarily been read. On the detailed branch that falls out for free: the identifier is the
+    /// bare schedule UUID and the text is what the next reminder will say too, so a spent banner is
+    /// indistinguishable from an accurate one and survives. On the hidden branch it did **not**, and
+    /// the difference was a live bug rather than a wrinkle. The coalesced identifier is derived from
+    /// the fire moment, so advancing `nextDueDate` renames it: nothing rebuilds
+    /// `<prefix>due-<Y-M-D-H-M>` any more, the banner reads as one nothing stands behind, and the
+    /// app takes down an unread reminder about thirty seconds after it fired — via the timer, or at
+    /// once through `didReceive` → `.recurringTransactionNotificationReceived`. And the advance is
+    /// not an edge: it is what the 30-second timer does to every schedule the moment it comes due.
+    /// Privacy Mode is the one mode where the banner is the user's only trace that anything fired,
+    /// so this was worst exactly where it mattered most.
+    ///
+    /// So a delivered banner with no rebuilt entry under its identifier is kept when all three of
+    /// these hold, and taken down otherwise:
+    ///
+    /// - Privacy Mode is still on. A hidden banner outliving the toggle is `73e3b22`'s other
+    ///   direction, already pinned, and turning details back on is the user saying they want to see
+    ///   what is due.
+    /// - Its identifier is this platform's coalesced form and names a moment at or before `now` —
+    ///   *spent*. This is the whole discriminator between an advance and a deletion, which the
+    ///   schedule set alone cannot tell apart: both leave no live schedule at that moment. A
+    ///   coalesced banner whose moment is still ahead has no business being on the lock screen at
+    ///   all, and goes.
+    /// - It says exactly what the hidden branch says. The hidden payload names no schedule, so it
+    ///   cannot have gone stale and cannot become a disclosure — but that argument only holds while
+    ///   the payload really is that payload, which is what the comparison checks. A banner filed
+    ///   under `due-…` carrying a *detailed* payload is a disclosure, and is taken down.
+    ///
+    /// The one thing this concedes is a spent hidden banner whose schedule was deleted after it
+    /// fired: it stays until the user swipes it, or until the erase path takes it. That is the same
+    /// trade the detailed branch already makes for the advance, on a banner that says two constants.
+    ///
+    /// The comparison stays sensitive to the *figure*, and that is a decision rather than an
+    /// oversight. `convertedAmounts` is computed by the caller from the current exchange rates, so a
+    /// rate refresh alone re-renders a foreign-currency schedule's body and drops an otherwise
+    /// untouched detailed banner on the next speculative `sync` — not reachable today, since every
+    /// one of the six call sites passes a conversion total over the same `schedules`, but a rate
+    /// change is enough to reach it. It is left sensitive because this function's whole question is
+    /// "does this banner still say what the app would say", and a money figure is the part of a
+    /// reminder a reader acts on; a banner quoting a number the app no longer agrees with is worse
+    /// than a reminder the reader has to fetch from the app. Making it insensitive is not a matter
+    /// of relaxing a comparison either — the two cases that must be told apart, a rate drift and the
+    /// user editing the amount, are identical here, so telling them apart means carrying the rate a
+    /// banner was delivered under, which is new persisted state for a banner whose whole content is
+    /// one sentence. Under Privacy Mode the question does not arise: the hidden branch never reads
+    /// `convertedAmounts`.
     ///
     /// Pure, and takes the delivered banners as plain values, because none of this is observable
     /// from the test host: `authorizationStatus.rawValue == 0`, `center.add` retains 0 of 5
@@ -255,7 +369,8 @@ actor RecurringNotificationService {
         currencyCode: String,
         showDetails: Bool,
         appLanguage: String?,
-        identifierPrefix: String
+        identifierPrefix: String,
+        now: Date = Date()
     ) -> [String] {
         // The overwhelmingly common case, and the one the 30-second timer drives: nothing has been
         // delivered, so there is nothing to judge. Rebuilding every live schedule's reminder to find
@@ -281,7 +396,19 @@ actor RecurringNotificationService {
             ).map(DeliveredReminder.init).map { ($0.identifier, $0) },
             uniquingKeysWith: { first, _ in first }
         )
-        return ours.filter { accurate[$0.identifier] != $0 }.map(\.identifier)
+        // Built once, and only used on the branch that needs it: what a hidden banner says, with no
+        // identifier attached, so `filed(as:)` can ask "does this say the same thing" without the
+        // filing getting in the way.
+        let hidden = DeliveredReminder(hiddenContent(appLanguage: appLanguage), identifier: "")
+        return ours.filter { delivered in
+            if let rebuilt = accurate[delivered.identifier] { return rebuilt != delivered }
+            guard !showDetails,
+                  let moment = coalescedMoment(of: delivered.identifier, prefix: identifierPrefix),
+                  moment <= now,
+                  delivered.filed(as: "") == hidden
+            else { return true }
+            return false
+        }.map(\.identifier)
     }
 
     /// Everything one schedule hands to the notification centre — payload, identifier and trigger —
@@ -451,11 +578,45 @@ actor RecurringNotificationService {
     /// the same request set. `due-` cannot collide with the per-schedule form, which is a UUID
     /// string.
     private nonisolated static func coalescedIdentifier(dueAt due: DateComponents, prefix: String) -> String {
-        let stamp = [due.year, due.month, due.day, due.hour, due.minute]
-            .map { $0.map(String.init) ?? "x" }
+        let stamp = Self.coalescedStampFields
+            .map { due[keyPath: $0].map(String.init) ?? "x" }
             .joined(separator: "-")
         return "\(prefix)due-\(stamp)"
     }
+
+    /// The moment a coalesced identifier names, or `nil` if it does not name one.
+    ///
+    /// The inverse of `coalescedIdentifier(dueAt:prefix:)`, written next to it and over the same
+    /// field list so the two cannot drift. Both stay `private`: what a test can reach is the
+    /// verdict `staleDelivered` reaches with them, and
+    /// `testASpentPrivacyModeBannerSurvivesItsScheduleAdvancing` exercises the round trip that way —
+    /// a past moment is kept, the same moment in the future is not, and a `due-` identifier whose
+    /// stamp does not parse is not.
+    ///
+    /// `staleDelivered` needs this because *spent* is the only thing that separates a schedule
+    /// advancing past its due moment from a schedule being deleted: neither leaves a live schedule
+    /// at that moment, and the identifier is the only place the moment survives. Anything that does
+    /// not parse cleanly — a foreign identifier, a per-schedule UUID, a component written as `x`
+    /// because `fireComponents` handed back a nil — returns `nil` and is judged the old way, which
+    /// is the conservative direction.
+    private nonisolated static func coalescedMoment(of identifier: String, prefix: String) -> Date? {
+        let marker = "\(prefix)due-"
+        guard identifier.hasPrefix(marker) else { return nil }
+        let stamp = identifier.dropFirst(marker.count).split(separator: "-", omittingEmptySubsequences: false)
+        guard stamp.count == Self.coalescedStampFields.count else { return nil }
+        var components = DateComponents()
+        for (field, text) in zip(Self.coalescedStampFields, stamp) {
+            guard let value = Int(text) else { return nil }
+            components[keyPath: field] = value
+        }
+        return Calendar.current.date(from: components)
+    }
+
+    /// The date components a coalesced identifier stamps, in the order it stamps them. One list,
+    /// read by the writer and the reader, so neither can gain or lose a field alone.
+    private nonisolated static let coalescedStampFields: [WritableKeyPath<DateComponents, Int?>] = [
+        \.year, \.month, \.day, \.hour, \.minute,
+    ]
 
     /// Drops one schedule's reminder, pending or already delivered.
     ///
@@ -535,7 +696,8 @@ actor RecurringNotificationService {
         convertedAmounts: [UUID: Decimal],
         currencyCode: String,
         showDetails: Bool,
-        appLanguage: String?
+        appLanguage: String?,
+        now: Date
     ) async {
         let pending = await center.pendingNotificationRequests()
             .map(\.identifier)
@@ -550,7 +712,8 @@ actor RecurringNotificationService {
             currencyCode: currencyCode,
             showDetails: showDetails,
             appLanguage: appLanguage,
-            identifierPrefix: identifierPrefix
+            identifierPrefix: identifierPrefix,
+            now: now
         ))
     }
 

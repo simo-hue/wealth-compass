@@ -2679,6 +2679,254 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    /// Fails if Privacy Mode takes down a reminder about thirty seconds after it fires.
+    ///
+    /// The coalesced identifier is derived from the fire moment, and
+    /// `processDueRecurringTransactions` **advances** `nextDueDate` the moment a schedule comes due
+    /// — writing the array back, which fires `.onChange(of: finance.data.recurringTransactions)` at
+    /// `ContentView.swift:110` and re-runs `sync`. The rebuilt set then files the schedule under its
+    /// *next* moment, nothing carries the delivered banner's identifier any more, and the teardown
+    /// read that as "nothing stands behind this". The 30-second timer reaches it, and so does
+    /// `didReceive` → `.recurringTransactionNotificationReceived`, which is the tap the user makes
+    /// on the banner itself.
+    ///
+    /// Measured against HEAD, the two branches disagreed on the same event:
+    ///
+    /// | state | detailed | Privacy Mode |
+    /// | --- | --- | --- |
+    /// | schedule advanced to its next occurrence | kept | **removed** |
+    /// | advanced, another schedule still due at that moment | — | kept |
+    ///
+    /// Privacy Mode is the one mode in which the banner is the user's only trace that something
+    /// fired, so the branch that dropped it is the branch where dropping it costs most.
+    ///
+    /// Every date here is in the past on purpose. `staleDelivered` takes `now` with a `Date()`
+    /// default and the fixtures never pass it, so this exercises the same defaulted clock production
+    /// does — and it means the test compiles unchanged against the pre-fix service, which is what
+    /// lets it be run red.
+    func testASpentPrivacyModeBannerSurvivesItsScheduleAdvancing() throws {
+        let calendar = Calendar.current
+        let june = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2020, month: 6, day: 15, hour: 9))
+        )
+        let july = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2020, month: 7, day: 15, hour: 9))
+        )
+        // Far enough ahead that no plausible clock reads it as spent.
+        let distant = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2099, month: 6, day: 15, hour: 9))
+        )
+
+        func schedule(_ category: String, dueAt due: Date) -> RecurringTransaction {
+            RecurringTransaction(
+                type: .expense, category: category, amount: 1_450, description: category,
+                startDate: due, frequency: .monthly, nextDueDate: due, endDate: nil, currency: .eur
+            )
+        }
+        func banner(
+            for schedule: RecurringTransaction, showDetails: Bool
+        ) throws -> RecurringNotificationService.DeliveredReminder {
+            let requests = RecurringNotificationService.requests(
+                for: [schedule],
+                convertedAmounts: [schedule.id: schedule.amount],
+                currencyCode: "EUR",
+                showDetails: showDetails,
+                appLanguage: nil,
+                identifierPrefix: Self.reminderIdentifierPrefix
+            )
+            return RecurringNotificationService.DeliveredReminder(try XCTUnwrap(requests.first))
+        }
+        func stale(
+            _ delivered: [RecurringNotificationService.DeliveredReminder],
+            _ schedules: [RecurringTransaction],
+            showDetails: Bool
+        ) -> [String] {
+            RecurringNotificationService.staleDelivered(
+                delivered,
+                schedules: schedules,
+                convertedAmounts: Dictionary(
+                    uniqueKeysWithValues: schedules.map { ($0.id, $0.amount) }
+                ),
+                currencyCode: "EUR",
+                showDetails: showDetails,
+                appLanguage: nil,
+                identifierPrefix: Self.reminderIdentifierPrefix
+            )
+        }
+
+        let rent = schedule("Rent", dueAt: june)
+        let hiddenBanner = try banner(for: rent, showDetails: false)
+        let detailedBanner = try banner(for: rent, showDetails: true)
+
+        // `processDueRecurringTransactions` recorded June's occurrence and moved the schedule on.
+        var advanced = rent
+        advanced.nextDueDate = july
+        advanced.updatedAt = july
+
+        XCTAssertNotEqual(
+            try banner(for: advanced, showDetails: false).identifier, hiddenBanner.identifier,
+            """
+            The advance did not rename the coalesced identifier, so the case this test is about does \
+            not exist and every assertion below is vacuous.
+            """
+        )
+        XCTAssertEqual(
+            stale([hiddenBanner], [advanced], showDetails: false), [],
+            """
+            Under Privacy Mode the app took down its own unread reminder the moment the schedule \
+            advanced past the occurrence the reminder was for. The banner had already fired; \
+            nothing about it had changed; and it says two constants, so there is nothing in it that \
+            could have gone stale. Under Privacy Mode that banner is the only trace the user has \
+            that anything was due at all.
+            """
+        )
+        XCTAssertEqual(
+            stale([detailedBanner], [advanced], showDetails: true), [],
+            "the detailed branch stopped keeping a spent banner, which is the behaviour being matched"
+        )
+
+        // Spent is the whole discriminator, so a coalesced banner whose moment is still ahead and
+        // which nothing stands behind still goes — that is the case `48c64af` pinned as removable.
+        let future = schedule("Rent", dueAt: distant)
+        let futureBanner = try banner(for: future, showDetails: false)
+        XCTAssertEqual(
+            stale([futureBanner], [], showDetails: false), [futureBanner.identifier],
+            """
+            A coalesced banner naming a moment that has not arrived, with no schedule behind it, was \
+            left on the lock screen — so the rule is "keep every hidden banner" rather than "keep a \
+            spent one".
+            """
+        )
+
+        // Nor is this "keep anything filed under `due-`". A payload that describes a schedule is a
+        // disclosure whatever it is filed under, and Privacy Mode is exactly when it must go.
+        let disguised = RecurringNotificationService.DeliveredReminder(
+            identifier: hiddenBanner.identifier,
+            title: detailedBanner.title,
+            body: detailedBanner.body
+        )
+        XCTAssertEqual(
+            stale([disguised], [advanced], showDetails: false), [disguised.identifier],
+            """
+            A banner spelling out the schedule survived Privacy Mode because it happened to be filed \
+            under a coalesced identifier. The identifier says where a banner sits; the payload is \
+            what the lock screen draws.
+            """
+        )
+        // And a `due-` identifier whose stamp is not a moment cannot be judged spent, so it is
+        // judged the old way.
+        let unparsable = RecurringNotificationService.DeliveredReminder(
+            identifier: "\(Self.reminderIdentifierPrefix)due-not-a-moment-at-all",
+            title: hiddenBanner.title,
+            body: hiddenBanner.body
+        )
+        XCTAssertEqual(
+            stale([unparsable], [advanced], showDetails: false), [unparsable.identifier],
+            "an identifier whose stamp does not read back as a moment was treated as spent anyway"
+        )
+
+        // 73e3b22's fix, restated for the spent case: turning Privacy Mode on must still take the
+        // detailed banner down, spent or not.
+        XCTAssertEqual(
+            stale([detailedBanner], [advanced], showDetails: false), [detailedBanner.identifier],
+            "a spent banner spelling out \"Rent: €1.450,00\" survived Privacy Mode being switched on"
+        )
+        XCTAssertEqual(
+            stale([hiddenBanner], [advanced], showDetails: true), [hiddenBanner.identifier],
+            "a spent coalesced banner survived Privacy Mode being switched off"
+        )
+        // Another platform's spent banner is still none of this service's business.
+        let foreign = RecurringNotificationService.DeliveredReminder(
+            identifier: "wealth-compass-mac-recurring-due-2020-6-15-9-0",
+            title: hiddenBanner.title,
+            body: hiddenBanner.body
+        )
+        XCTAssertEqual(
+            stale([foreign], [advanced], showDetails: false), [],
+            "the teardown reached a spent banner filed under another prefix"
+        )
+    }
+
+    /// Fails if a field the lock screen draws can move without the teardown noticing.
+    ///
+    /// `DeliveredReminder` decides whether a delivered banner still matches what the app would
+    /// publish, and it used to compare `identifier`/`title`/`subtitle`/`body` only. Everything else
+    /// `UNMutableNotificationContent` can carry was outside the comparison, so an edit setting
+    /// `content.threadIdentifier = schedule.category` — the exact injection the builder's own doc
+    /// comment records as having survived a green suite once already — would put the category on the
+    /// lock screen as the notification group's header and leave the teardown unable to see it
+    /// change. The sibling lock-screen test archives the whole payload and *would* see it; this
+    /// could not. That gap is now load-bearing, because `staleDelivered` keeps a spent banner on the
+    /// strength of its payload being the hidden one.
+    ///
+    /// Each case moves exactly one field away from a baseline and asserts the verdict, so the three
+    /// deliberate exclusions are recorded here as decisions rather than left to be discovered.
+    func testTheDeliveredComparisonSeesEveryFieldAScheduleCouldReach() throws {
+        func reminder(
+            _ configure: (UNMutableNotificationContent) -> Void = { _ in }
+        ) -> RecurringNotificationService.DeliveredReminder {
+            let content = UNMutableNotificationContent()
+            content.title = "Reminder"
+            content.body = "Open Wealth Compass Tracker to review."
+            content.sound = .default
+            configure(content)
+            return RecurringNotificationService.DeliveredReminder(
+                UNNotificationRequest(identifier: "wc-probe", content: content, trigger: nil)
+            )
+        }
+
+        let baseline = reminder()
+        XCTAssertEqual(baseline, reminder(), "the same payload built twice compared unequal")
+
+        // Every field here is a string the schedule could be poured into, and every one of them is
+        // rendered or filed on by the system.
+        let seen: [(name: String, mutate: (UNMutableNotificationContent) -> Void)] = [
+            ("title", { $0.title = "Recurring Expense due" }),
+            ("subtitle", { $0.subtitle = "flat" }),
+            ("body", { $0.body = "Rent: €1.450,00" }),
+            ("threadIdentifier", { $0.threadIdentifier = "Rent" }),
+            ("categoryIdentifier", { $0.categoryIdentifier = "Rent" }),
+            ("badge", { $0.badge = 7 }),
+        ]
+        for probe in seen {
+            XCTAssertNotEqual(
+                baseline, reminder(probe.mutate),
+                """
+                `content.\(probe.name)` moved and the teardown could not tell. A banner set from a \
+                schedule through this field would keep describing the old value on the lock screen \
+                after the schedule changed — and under Privacy Mode it would keep describing the \
+                schedule at all.
+                """
+            )
+        }
+
+        // The exclusions. Each is out because a *delivered* notification is not the request that
+        // produced it, and a field the system rewrites on delivery would mark every banner stale —
+        // reinstating 73e3b22's all-or-nothing sweep by accident.
+        let excluded: [(name: String, why: String, mutate: (UNMutableNotificationContent) -> Void)] = [
+            (
+                "sound",
+                "not drawn, and two `.default` sounds are two objects with no documented value equality",
+                { $0.sound = UNNotificationSound.defaultCritical }
+            ),
+            (
+                "userInfo",
+                "app-private, never rendered, and it carries the schedule's UUID by design",
+                { $0.userInfo = ["recurringTransactionID": UUID().uuidString] }
+            ),
+        ]
+        for probe in excluded {
+            XCTAssertEqual(
+                baseline, reminder(probe.mutate),
+                """
+                `content.\(probe.name)` is inside the comparison. It is meant to be outside it — \
+                \(probe.why) — so this is either a deliberate widening that should update the doc \
+                comment on `DeliveredReminder`, or a field that will now take down live banners.
+                """
+            )
+        }
+    }
+
     /// The stripped `code` view of the notification service, which both lints below read.
     private static func notificationServiceCode() throws -> [[Character]] {
         let service = URL(fileURLWithPath: #filePath)
