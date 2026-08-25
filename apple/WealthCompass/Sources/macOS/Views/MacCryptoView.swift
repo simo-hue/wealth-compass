@@ -129,7 +129,7 @@ struct MacCryptoView: View {
                 verbatimTitle: settings.localized("Status • \(settings.privateCount(uniqueCryptoCount)) Coins"),
                 value: settings.isPrivacyMode
                     ? settings.redactionToken
-                    : (latestUpdate.map(formattedUpdate) ?? settings.localized("Never")),
+                    : (latestUpdate.map { settings.privateDate($0, time: .shortened) } ?? settings.localized("Never")),
                 systemImage: "checkmark.circle"
             )
         }
@@ -339,7 +339,7 @@ struct MacCryptoView: View {
                         Text("Last Updated")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        Text(formattedUpdate(holding.updatedAt))
+                        Text(settings.privateDate(holding.updatedAt, time: .shortened))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -383,10 +383,6 @@ struct MacCryptoView: View {
                 }
             }
         )
-    }
-
-    private func formattedUpdate(_ date: Date) -> String {
-        settings.date(date, time: .shortened)
     }
 
     private func isNonEmpty(_ value: String) -> Bool {

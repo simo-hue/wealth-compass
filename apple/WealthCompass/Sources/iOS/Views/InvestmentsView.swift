@@ -230,7 +230,7 @@ struct InvestmentsView: View {
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    Text(settings.localized("Updated \(settings.date(investment.updatedAt))"))
+                    Text(settings.localized("Updated \(settings.privateDate(investment.updatedAt))"))
                         .font(.caption2)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)

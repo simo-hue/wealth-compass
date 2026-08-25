@@ -161,7 +161,7 @@ struct MacInvestmentsView: View {
                 verbatimTitle: settings.localized("Status • \(settings.privateCount(sectorCount)) Sectors"),
                 value: settings.isPrivacyMode
                     ? settings.redactionToken
-                    : (latestUpdate.map(formattedUpdate) ?? settings.localized("Never")),
+                    : (latestUpdate.map { settings.privateDate($0, time: .shortened) } ?? settings.localized("Never")),
                 systemImage: "checkmark.circle"
             )
         }
@@ -292,7 +292,7 @@ struct MacInvestmentsView: View {
                         Text("Last Updated")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        Text(formattedUpdate(investment.updatedAt))
+                        Text(settings.privateDate(investment.updatedAt, time: .shortened))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -336,10 +336,6 @@ struct MacInvestmentsView: View {
                 }
             }
         )
-    }
-
-    private func formattedUpdate(_ date: Date) -> String {
-        settings.date(date, time: .shortened)
     }
 
     private func isNonEmpty(_ value: String) -> Bool {

@@ -121,6 +121,95 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    func testPrivateDateRedactsWhilePrivacyModeIsOn() {
+        let settings = makeSettings()
+        let stamp = Date(timeIntervalSince1970: 1_700_000_000)
+
+        XCTAssertNotEqual(
+            settings.privateDate(stamp), settings.redactionToken,
+            "with Privacy Mode off the stamp has to render, or the redaction below proves nothing"
+        )
+        XCTAssertNotEqual(
+            settings.privateDate(stamp, time: .shortened), settings.privateDate(stamp),
+            "the `.shortened` time style is dropped, so the macOS rows lose their time of day"
+        )
+
+        settings.isPrivacyMode = true
+        XCTAssertEqual(
+            settings.privateDate(stamp), settings.redactionToken,
+            "a `last updated` stamp survived Privacy Mode"
+        )
+        XCTAssertEqual(
+            settings.privateDate(stamp, time: .shortened), settings.redactionToken,
+            "a `last updated` stamp survived Privacy Mode with its time of day attached"
+        )
+    }
+
+
+    /// Fails if a record's "last updated" stamp is rendered without going through `privateDate`.
+    ///
+    /// `52c062a` tokenised the Investments and Crypto **Status cards** because "a 'last updated'
+    /// timestamp is itself data about the account". It left the per-row stamps beside every
+    /// position and holding in the clear, printing the same class of fact at finer grain — the two
+    /// macOS rows carry the time of day as well as the date — directly beside a figure already
+    /// masked to `••••`.
+    ///
+    /// A lint rather than a render, because two of the four sites are `Sources/macOS` and the test
+    /// bundle hosts `WealthCompassMobile`, so they cannot be rendered here at all. It is narrow on
+    /// purpose: a *transaction's* date is shown in the clear all over the app by a separate ruling,
+    /// so this asks only about `updatedAt`, the field the Status-card decision was about.
+    func testWorkingTreeRendersNoUnguardedLastUpdatedStamp() throws {
+        let sources = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources")
+
+        var offenders: [PercentRender] = []
+        var renders = 0
+
+        for directory in Self.scannedDirectories {
+            let root = sources.appendingPathComponent(directory)
+            let swiftFiles = try FileManager.default
+                .subpathsOfDirectory(atPath: root.path)
+                .filter { $0.hasSuffix(".swift") }
+                .filter { !Self.excludedFiles.contains(($0 as NSString).lastPathComponent) }
+                .sorted()
+
+            for file in swiftFiles {
+                let text = try String(contentsOf: root.appendingPathComponent(file), encoding: .utf8)
+                let source = Self.stripped(text)
+                for index in source.scan.indices {
+                    let line = String(source.scan[index])
+                    // A line that both reads `updatedAt` and renders it. The `let latestUpdate =
+                    // …map(\.updatedAt).max()` gathering lines and the `item.updatedAt = Date()`
+                    // writes match neither half.
+                    guard line.contains("updatedAt"),
+                          line.contains("Text(") || line.contains("localized(") else { continue }
+                    renders += 1
+                    guard !line.contains("privateDate") else { continue }
+                    offenders.append(PercentRender(
+                        file: "Sources/\(directory)/\(file)", line: index + 1, pattern: "updatedAt",
+                        source: line.trimmingCharacters(in: .whitespaces)
+                    ))
+                }
+            }
+        }
+
+        XCTAssertGreaterThanOrEqual(
+            renders, 4,
+            "found \(renders) rendered `updatedAt` stamp(s) — there are four, so the sweep has lost the source tree"
+        )
+        XCTAssertEqual(
+            offenders.map(\.description), [],
+            """
+            \(offenders.count) "last updated" stamp(s) render in the clear. A bystander reads off \
+            when this account last refreshed a price — the fact `52c062a` tokenised one card away \
+            from — beside amounts that are already `••••`. Route them through \
+            `settings.privateDate(_:time:)`:
+            \(offenders.map { "  " + $0.description }.joined(separator: "\n"))
+            """
+        )
+    }
 
     // MARK: - The call sites
 

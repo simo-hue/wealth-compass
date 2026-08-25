@@ -375,6 +375,24 @@ final class AppSettings: ObservableObject {
         return count.formatted(.number.locale(effectiveLocale))
     }
 
+    /// The date twin of `privateCurrency`, for a record's "last updated" stamp.
+    ///
+    /// `52c062a` tokenised the Investments and Crypto Status cards on the grounds that "a 'last
+    /// updated' timestamp is itself data about the account" — when the last price refresh ran, and
+    /// so whether anything is held at all. The per-row stamps beside every position and holding
+    /// were left in the clear, printing the same class of fact at finer grain: the two macOS rows
+    /// carry the **time of day** as well as the date, sitting directly beside a figure already
+    /// masked to `••••`. Tokenised, not hidden, for the same reason as the card: the row is drawn
+    /// in both data states and only its value moves.
+    func privateDate(
+        _ value: Date,
+        dateStyle: Date.FormatStyle.DateStyle = .abbreviated,
+        time: Date.FormatStyle.TimeStyle = .omitted
+    ) -> String {
+        guard !isPrivacyMode else { return redactionToken }
+        return date(value, dateStyle: dateStyle, time: time)
+    }
+
     /// The percentage twin of `privateCurrency` (L8). A performance figure has to be redacted for
     /// the same reason the amount beside it is: `••••` next to a live "+12.4%" still discloses the
     /// portfolio — anyone who knows one position's size can divide their way back to the rest. The
