@@ -748,3 +748,64 @@ Fallout from `e55f742`, worth one deliberate pass rather than leaving it to drif
       could walk 1W/1M/3M/6M/12M and map which windows hold data with every figure redacted.
       `testWorkingTreeChecksPrivacyBeforeEmptiness` pins it — against the pre-flip tree it reported all
       eight.
+
+### Privacy Mode leaks existence, not just values — 37 sites open (2026-08-25)
+
+The chart work (`e55f742`, `24ffc78`) and the Dashboard label work (`b93f391`) established the rule:
+Privacy Mode must not disclose *whether* data exists, only conceal what it is. A sweep of all eight
+source directories then found **43 sites in that class; 6 are fixed, 37 are open.** They are the same
+defect repeated, in three shapes.
+
+The app already agrees counts are sensitive — `InvestmentsView.swift:107` redacts
+`investments.count` behind `settings.isPrivacyMode ? settings.redactionToken : …`. It just doesn't do it
+consistently.
+
+- [ ] **Raw counts printed with no redaction — 11 sites.** Sharpest: `SettingsView.swift:197-231` and
+      `MacSettingsView.swift:473-483` print **six** unredacted entity counts, including
+      `Text("\(finance.data.snapshots.count)")` — a direct readout of the exact fact `b93f391` just
+      concealed on the Dashboard. Also `DashboardView.swift:341/354/372` ("0 positions", "0 holdings",
+      "0 liabilities") against `InvestmentsView.swift:107`, which redacts the same number.
+- [ ] **`if <collection>.isEmpty { EmptyState }` with no privacy branch — 14 sites.** Every *chart* got
+      the privacy-first treatment; no *list or table* did. Both platforms' "No activity yet", "No
+      recurring transactions", "No investments yet", "No crypto holdings yet". Two are worse than a
+      plain empty state: `CashFlowView.swift:443-446` and `MacCashFlowView.swift:923-945` **distinguish**
+      "you have no transactions" from "you have transactions, just not these" — and both are probeable
+      through the filter controls, which is the walk-the-picker attack this codebase's own comments say
+      must not exist.
+- [ ] **Optional binding with a string fallback — 8 sites.** `?? settings.localized("Never")` appears
+      four times (`InvestmentsView.swift:135`, `CryptoView.swift:128`, and both Mac twins), each inside
+      the *same* `MetricCard` whose title already redacts a count.
+- [ ] **The onboarding card** (`DashboardView.swift:41`, `MacDashboardView.swift:51`) is gated on
+      `isCompletelyEmpty`, so its presence announces "this person has no financial data at all".
+- [ ] **The recurring-insertion alert** (`ContentView.swift:204-208`, `MacRootView.swift:285-296`) fires
+      only when `insertedCount > 0` and states the count. Notable because the same file already threads
+      `showAmounts: !settings.isPrivacyMode` into the notification service — this is the one path that
+      forgot.
+- [ ] **A boundary call left alone deliberately:** `DashboardView.swift:514`
+      `EmptyState(title: "No expenses for this period")` is separable from the ranked list that is out
+      of scope, and it sits under an `AnalyticsPeriod` picker — the walk-the-picker probe again.
+
+Fixing all 37 needs roughly **11 redaction decisions** (hide vs tokenise, per shape) and several new
+catalog strings. That is a separate change and a separate review, not a continuation of this one.
+
+**Out of scope by decision, confirmed present and untouched:** ranked lists, sort order, the iOS
+spending category list, the macOS allocation legend (`MacDashboardView.swift:537-559`), and the Crypto
+Top Performer / Biggest Loser cards.
+
+### The instrument that finally worked (2026-08-25)
+
+`testPrivacyModeConcealsWhetherSnapshotsExist` is the first privacy test here that exercises the **code**
+rather than the source text. It renders the real `DashboardView` twice under Privacy Mode, varying only
+`FinancialData.snapshots`, and requires byte-identical PNGs. Four instruments were measured first, and
+three of them would have produced a vacuous test:
+
+| instrument | result |
+|---|---|
+| `ImageRenderer(content: DashboardView(…))` | **same bytes for every input** — never draws the body |
+| `drawHierarchy(afterScreenUpdates:)` offscreen | 6 KB blank; blank == blank, so it always passes |
+| `UIAccessibility` tree walk | finds only UIKit segmented controls; SwiftUI publishes no `Text` |
+| `UIHostingController` in a key `UIWindow` + `layer.render(in:)` | ~290 KB that moves with the data ✅ |
+
+It carries a control assertion that fails if the renderer ever stops reading `snapshots` — without it,
+the main assertion could silently become unfailable. Reach limit: the test bundle is iOS-hosted, so the
+**macOS half of every fix in this series rests on review, not on a test.**
