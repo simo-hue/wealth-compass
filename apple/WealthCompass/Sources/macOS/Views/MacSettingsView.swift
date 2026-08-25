@@ -926,7 +926,7 @@ struct MacSettingsView: View {
             schedules: schedules,
             convertedAmounts: convertedAmounts,
             currencyCode: settings.currency.rawValue,
-            showAmounts: !settings.isPrivacyMode
+            showDetails: !settings.isPrivacyMode
         )
     }
 

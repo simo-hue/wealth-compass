@@ -288,8 +288,8 @@ struct MacRootView: View {
         // *appearance* already says a schedule came due, and its sentence then says how many.
         // Dropping the number would leave the first half of that intact — the slot is the signal.
         // The occurrences are still generated and still saved; only the announcement stops, and
-        // the notification path two lines up already redacts its amounts the same way
-        // (`showAmounts: !settings.isPrivacyMode`), which is why this one stood out.
+        // the notification path two lines up is gated on the same flag
+        // (`showDetails: !settings.isPrivacyMode`), which is why this one stood out.
         guard !settings.isPrivacyMode else { return }
         // WC-L18: a full sentence, never concatenated grammar fragments, so translators get
         // something they can actually restructure.
@@ -316,7 +316,7 @@ struct MacRootView: View {
             schedules: schedules,
             convertedAmounts: convertedAmounts,
             currencyCode: settings.currency.rawValue,
-            showAmounts: !settings.isPrivacyMode
+            showDetails: !settings.isPrivacyMode
         )
     }
 }

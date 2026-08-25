@@ -36,11 +36,18 @@ actor RecurringNotificationService {
         }
     }
 
+    /// - Parameter showDetails: Privacy Mode inverted (`!settings.isPrivacyMode`). It gates the
+    ///   whole notification, not just the figure. The name used to be `showAmounts`, and that was
+    ///   the leak: the amount was redacted while `content.title` still named the *type* and
+    ///   `content.body` still named the *category*, so a locked phone showed "Recurring Expense
+    ///   due — Rent is scheduled" on a surface that needs no unlock. Every other disclosure this
+    ///   audit series closed needed someone holding the device already unlocked. With the flag
+    ///   down the notification says only that the app wants attention.
     func sync(
         schedules: [RecurringTransaction],
         convertedAmounts: [UUID: Decimal],
         currencyCode: String,
-        showAmounts: Bool,
+        showDetails: Bool,
         now: Date = Date()
     ) async {
         let pendingRequests = await center.pendingNotificationRequests()
@@ -68,25 +75,13 @@ actor RecurringNotificationService {
         // source of truth on AppSettings rather than a brittle literal (WC-L31).
         let appLanguage = UserDefaults.standard.string(forKey: AppSettings.appLanguageDefaultsKey)
         for schedule in upcoming {
-            let content = UNMutableNotificationContent()
-            content.title = AppLocalization.string("Recurring \(schedule.type.localizedTitle(appLanguage: appLanguage)) due", appLanguage: appLanguage)
-            if showAmounts {
-                // `schedule.amount` is Decimal (WC-A1) in the schedule's OWN currency. The caller
-                // pre-converts it to the display currency on the @MainActor (deep-audit M20), so the
-                // number and the currency code agree; fall back to the raw amount if absent.
-                let displayAmount = convertedAmounts[schedule.id] ?? schedule.amount
-                // L49: format the amount in the in-app language's locale too, so its separators and
-                // symbol placement match the surrounding sentence (not the system locale).
-                let amount = displayAmount.formatted(
-                    .currency(code: currencyCode)
-                        .locale(AppLocalization.effectiveLocale(appLanguage: appLanguage))
-                )
-                content.body = AppLocalization.string("\(schedule.category): \(amount). Wealth Compass Tracker records it automatically when the app is active.", appLanguage: appLanguage)
-            } else {
-                content.body = AppLocalization.string("\(schedule.category) is scheduled. Open Wealth Compass Tracker to review it.", appLanguage: appLanguage)
-            }
-            content.sound = .default
-            content.userInfo = ["recurringTransactionID": schedule.id.uuidString]
+            let content = Self.content(
+                for: schedule,
+                convertedAmount: convertedAmounts[schedule.id],
+                currencyCode: currencyCode,
+                showDetails: showDetails,
+                appLanguage: appLanguage
+            )
 
             var dateComponents = Calendar.current.dateComponents(
                 [.year, .month, .day, .hour, .minute],
@@ -106,6 +101,54 @@ actor RecurringNotificationService {
             )
             try? await center.add(request)
         }
+    }
+
+    /// Everything one schedule puts on a lock screen.
+    ///
+    /// Split out of `sync` so it can be asserted on directly: `sync` itself returns early unless
+    /// `UNUserNotificationCenter` reports an authorization, which a test host is never granted, so
+    /// nothing downstream of that guard is reachable from a test. `nonisolated` for the same
+    /// reason — it reads only its arguments.
+    ///
+    /// With `showDetails` false **no property of `schedule` is read**, which is the property the
+    /// lock screen needs: title, body and every other rendered field are the same two constants
+    /// for every schedule, so nothing a bystander can see moves with the data.
+    nonisolated static func content(
+        for schedule: RecurringTransaction,
+        convertedAmount: Decimal?,
+        currencyCode: String,
+        showDetails: Bool,
+        appLanguage: String?
+    ) -> UNMutableNotificationContent {
+        let content = UNMutableNotificationContent()
+        if showDetails {
+            content.title = AppLocalization.string("Recurring \(schedule.type.localizedTitle(appLanguage: appLanguage)) due", appLanguage: appLanguage)
+            // `schedule.amount` is Decimal (WC-A1) in the schedule's OWN currency. The caller
+            // pre-converts it to the display currency on the @MainActor (deep-audit M20), so the
+            // number and the currency code agree; fall back to the raw amount if absent.
+            let displayAmount = convertedAmount ?? schedule.amount
+            // L49: format the amount in the in-app language's locale too, so its separators and
+            // symbol placement match the surrounding sentence (not the system locale).
+            let amount = displayAmount.formatted(
+                .currency(code: currencyCode)
+                    .locale(AppLocalization.effectiveLocale(appLanguage: appLanguage))
+            )
+            content.body = AppLocalization.string("\(schedule.category): \(amount). Wealth Compass Tracker records it automatically when the app is active.", appLanguage: appLanguage)
+        } else {
+            // The title has to move with the body. `Recurring %@ due` names the *type* — Expense or
+            // Income — independently of anything the body says, so redacting only the body left
+            // half the disclosure standing on a surface that needs no unlock.
+            content.title = AppLocalization.string("Reminder", appLanguage: appLanguage)
+            content.body = AppLocalization.string("Open Wealth Compass Tracker to review.", appLanguage: appLanguage)
+        }
+        content.sound = .default
+        // Everything else `UNMutableNotificationContent` can put on a lock screen is either never
+        // set here or cannot vary with the schedule: `subtitle`, `threadIdentifier`,
+        // `categoryIdentifier`, `badge` and `attachments` are all left at their defaults, and
+        // `sound` is `.default` on both branches. `userInfo` carries an opaque UUID for the tap
+        // handler; it is app-private payload, it is never rendered, and it names nothing.
+        content.userInfo = ["recurringTransactionID": schedule.id.uuidString]
+        return content
     }
 
     func cancel(scheduleID: UUID) {

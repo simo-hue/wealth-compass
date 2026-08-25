@@ -1,6 +1,7 @@
 import CryptoKit
 import SwiftUI
 import UIKit
+import UserNotifications
 import XCTest
 @testable import WealthCompassMobile
 
@@ -1517,6 +1518,97 @@ final class PrivacyRedactionTests: XCTestCase {
             """
             With Privacy Mode ON the Investments overview still moves with the portfolio. The Status             card is the one figure left: `latestUpdate.map { settings.date($0) } ?? "Never"` says             whether anything is held, and the populated arm prints a real timestamp besides.
             """
+        )
+    }
+
+    // MARK: - Existence: the lock screen
+
+    /// Fails if Privacy Mode lets a recurring reminder describe the schedule **on the lock screen**.
+    ///
+    /// Every other disclosure in this file needs a bystander holding the device already unlocked.
+    /// This one did not: the reminder posted `content.title = "Recurring Expense due"` and
+    /// `content.body = "Rent is scheduled. …"`, so a phone lying face-up on a desk published the
+    /// category and the type of a schedule to anyone walking past. The amount was already redacted,
+    /// which is what hid the rest — the flag was called `showAmounts` and it only reached the body's
+    /// figure, while the title named the type on its own, outside the branch entirely.
+    ///
+    /// The two fixtures share no field a notification could read: different type, category,
+    /// description, amount, currency and frequency. With the cover up every rendered field has to
+    /// match, so the assertion is on the whole payload rather than on the two strings that happened
+    /// to leak — `subtitle`, `threadIdentifier` and `categoryIdentifier` are unset today and would
+    /// each carry the same disclosure if a later change started setting them from `schedule`.
+    ///
+    /// It asserts on `RecurringNotificationService.content(for:…)` rather than on `sync`, because
+    /// `sync` returns early unless `UNUserNotificationCenter` reports an authorization the test host
+    /// is never granted — measured: with `.notDetermined` the loop that builds these never runs.
+    /// Both platforms reach this through the same actor (`MacRecurringTransactionNotificationService`
+    /// is an `enum` in `MacPlatformServices.swift` holding a configured instance of it), so this
+    /// covers the macOS reminder too — the one place in this audit where it does.
+    func testPrivacyModeStopsTheRecurringReminderDescribingTheSchedule() {
+        let rent = RecurringTransaction(
+            type: .expense, category: "Rent", amount: 1_450, description: "flat",
+            startDate: Date(), frequency: .monthly, nextDueDate: Date().addingTimeInterval(86_400),
+            endDate: nil, currency: .eur
+        )
+        let salary = RecurringTransaction(
+            type: .income, category: "Salary", amount: 3_800, description: "payroll",
+            startDate: Date(), frequency: .weekly, nextDueDate: Date().addingTimeInterval(172_800),
+            endDate: nil, currency: .usd
+        )
+
+        func content(_ schedule: RecurringTransaction, showDetails: Bool) -> UNMutableNotificationContent {
+            RecurringNotificationService.content(
+                for: schedule,
+                convertedAmount: schedule.amount,
+                currencyCode: "EUR",
+                showDetails: showDetails,
+                appLanguage: nil
+            )
+        }
+
+        let openRent = content(rent, showDetails: true)
+        let openSalary = content(salary, showDetails: true)
+        XCTAssertNotEqual(
+            [openRent.title, openRent.body], [openSalary.title, openSalary.body],
+            """
+            With Privacy Mode OFF two schedules that share no field produced the same notification,             so the builder is no longer reading the schedule at all and the assertion below cannot             fail.
+            """
+        )
+        XCTAssertFalse(
+            openRent.title.isEmpty || openRent.body.isEmpty,
+            "the notification rendered no text at all, so comparing it proves nothing"
+        )
+
+        let hiddenRent = content(rent, showDetails: false)
+        let hiddenSalary = content(salary, showDetails: false)
+
+        XCTAssertEqual(
+            hiddenRent.title, hiddenSalary.title,
+            """
+            With Privacy Mode ON `content.title` still names the *type* — "Recurring Expense due"             against "Recurring Income due" — on a surface that needs no unlock. The title is assigned             outside the branch, so redacting the body alone leaves it standing.
+            """
+        )
+        XCTAssertEqual(
+            hiddenRent.body, hiddenSalary.body,
+            """
+            With Privacy Mode ON `content.body` still names the category, so a locked phone spells             out "Rent is scheduled" to anyone walking past it.
+            """
+        )
+        XCTAssertEqual(
+            [hiddenRent.subtitle, hiddenRent.threadIdentifier, hiddenRent.categoryIdentifier],
+            [hiddenSalary.subtitle, hiddenSalary.threadIdentifier, hiddenSalary.categoryIdentifier],
+            """
+            With Privacy Mode ON a rendered field other than title/body moves with the schedule. A             `threadIdentifier` of "expense" publishes the type exactly as the title used to.
+            """
+        )
+        XCTAssertEqual(
+            hiddenRent.attachments.count, 0,
+            "an attachment is drawn on the lock screen; nothing here may add one under Privacy Mode"
+        )
+        XCTAssertFalse(
+            hiddenRent.body.contains("1,450") || hiddenRent.body.contains("1450")
+                || hiddenRent.title.contains("1,450"),
+            "the amount is back in the reminder"
         )
     }
 
