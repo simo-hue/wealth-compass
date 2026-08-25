@@ -79,8 +79,9 @@ write-back necessary, and it still does not happen. What those rows show is that
 only emits `.stringsdata` into DerivedData** — merging that back into the source catalog is a separate
 step, the one `xcrun xcstringstool sync <xcstrings> --stringsdata …` exposes, and a build never runs it.
 
-**`xcodebuild -exportLocalizations` runs it.** Reproduced three times, twice on a pristine tree with
-zero source changes:
+**`xcodebuild -exportLocalizations` runs it.** Run three times: once on a pristine tree with zero
+source changes, which is the row in the table below, and twice more with a handful of entries marked
+`manual` to find out what protects a key.
 
 ```
 xcodebuild -exportLocalizations -project WealthCompass/WealthCompass.xcodeproj \
@@ -100,7 +101,9 @@ verbatim. What is destroyed is 64 English key registrations — and **60 of the 
 `ReportDocumentBuilder.swift`'s**, reached through its `L(_ key: String)` wrapper (`:200`), which takes a
 plain `String` and builds the `String.LocalizationValue` at runtime. The extractor sees a `String`
 argument at those call sites, not a localizable literal, so as far as the sync is concerned those 60
-strings are used by nobody. The export says so out loud, twice, and it is easy to read past:
+strings are used by nobody. The export half-says so, twice, and it is easy to read past — though note
+what it actually names, which is `AppLocalization.string`'s own `String(localized: key, …)` and not the
+60 call sites. It tells you non-literal keys exist; it does not tell you which strings they cost you:
 
 ```
 WARNING: …/AppLocalization.swift:11:24:3 Skipping extraction of localizable string with non-literal key
