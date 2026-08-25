@@ -149,25 +149,38 @@ struct DashboardView: View {
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.58)
 
-                            if let rangeChange {
-                                HStack(spacing: 6) {
-                                    Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
-                                    Text(settings.privateCurrency(abs(rangeChange.value)))
-                                    Text(settings.privatePercent(abs(rangeChange.percentage)))
-                                    Text(timeRange.title)
+                            // Privacy before emptiness, exactly as at the chart below — and here the
+                            // rule bites on *both* arms, so the whole chain has to go behind one
+                            // gate. The `else` says in words that there is no movement to show; the
+                            // `if` says the opposite, and its arrow and tint spell the sign of that
+                            // movement while the two figures beside them are already `••••`. Under
+                            // Privacy Mode neither arm may render, or the card answers the question
+                            // the cover below it refuses to answer.
+                            if !settings.isPrivacyMode {
+                                if let rangeChange {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
+                                        Text(settings.privateCurrency(abs(rangeChange.value)))
+                                        Text(settings.privatePercent(abs(rangeChange.percentage)))
+                                        Text(timeRange.title)
+                                            .foregroundStyle(WCColor.textTertiary)
+                                    }
+                                    .font(.caption.monospacedDigit().weight(.semibold))
+                                    .foregroundStyle(rangeChange.value >= 0 ? WCColor.primary : WCColor.destructive)
+                                } else {
+                                    Text("Add another snapshot to see movement")
+                                        .font(.caption)
                                         .foregroundStyle(WCColor.textTertiary)
                                 }
-                                .font(.caption.monospacedDigit().weight(.semibold))
-                                .foregroundStyle(rangeChange.value >= 0 ? WCColor.primary : WCColor.destructive)
-                            } else {
-                                Text("Add another snapshot to see movement")
-                                    .font(.caption)
-                                    .foregroundStyle(WCColor.textTertiary)
                             }
 
                             // L40: a subtle cue that the total mixes an approximate offline rate for a
                             // held currency missing from the latest update (details in Settings).
-                            if hasIncompleteRates {
+                            // Privacy-gated on the same grounds: it appears only when the user holds a
+                            // currency other than the display one, so its presence discloses part of
+                            // the portfolio's composition — and with the total masked to `••••` there
+                            // is no longer a figure for it to qualify.
+                            if !settings.isPrivacyMode, hasIncompleteRates {
                                 Label("Rates may be incomplete", systemImage: "exclamationmark.triangle.fill")
                                     .font(.caption2.weight(.medium))
                                     .foregroundStyle(WCColor.warning)
@@ -286,9 +299,20 @@ struct DashboardView: View {
         }
     }
 
+    /// The freshness badge in the hero's top-right corner.
+    ///
+    /// Privacy before emptiness, and here the *whole* badge goes. Redacting one arm cannot work:
+    /// with no snapshots it reads "No snapshots", with snapshots it reads a relative age and a
+    /// date, and either one answers "does this person track a net worth at all" — the very
+    /// question `MobilePrivacyChartCover` is covering four lines below. Substituting the redaction
+    /// token would not help either, because a `••••` badge still only appears in one of the two
+    /// states unless it is drawn in both, and a badge drawn in both says nothing worth the space.
+    /// So the card renders the same thing either way: nothing.
     @ViewBuilder
     private var snapshotFreshness: some View {
-        if let snapshot = finance.data.snapshots.max(by: { $0.date < $1.date }) {
+        if settings.isPrivacyMode {
+            EmptyView()
+        } else if let snapshot = finance.data.snapshots.max(by: { $0.date < $1.date }) {
             VStack(alignment: .trailing, spacing: 5) {
                 HStack(spacing: 6) {
                     Circle()

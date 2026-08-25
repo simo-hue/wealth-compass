@@ -1,4 +1,6 @@
+import CryptoKit
 import SwiftUI
+import UIKit
 import XCTest
 @testable import WealthCompassMobile
 
@@ -924,6 +926,134 @@ final class PrivacyRedactionTests: XCTestCase {
         }
     }
 
+    // MARK: - Existence
+
+    /// Two snapshots inside the hero's default 1W window, so `netWorthChange` is non-nil and the
+    /// movement row has something to draw. Dated off `Date()` rather than off a fixed instant for
+    /// exactly that reason: a hard-coded 2026 date falls outside 1W within months, `rangeChange`
+    /// goes nil in *both* states, and the fixture stops exercising the branch it exists for while
+    /// the test stays green.
+    private func snapshotFixture() -> [NetWorthSnapshot] {
+        let now = Date()
+        return [
+            NetWorthSnapshot(
+                date: now.addingTimeInterval(-86_400 * 5), totalAssets: 10_000, totalLiabilities: 0,
+                netWorth: 10_000, liquidity: 5_000, investments: 5_000, crypto: 0, currency: .eur
+            ),
+            NetWorthSnapshot(
+                date: now.addingTimeInterval(-86_400 * 1), totalAssets: 12_000, totalLiabilities: 0,
+                netWorth: 12_000, liquidity: 6_000, investments: 6_000, crypto: 0, currency: .eur
+            ),
+        ]
+    }
+
+    /// Draws the real `DashboardView` — real `FinanceStore`, real `AppSettings`, real SwiftUI
+    /// layout — and returns the PNG bytes.
+    ///
+    /// `UIHostingController` in a key `UIWindow`, captured through `layer.render(in:)`. Three
+    /// other instruments were measured against this view and rejected, which is worth recording
+    /// because each looks like it should work:
+    ///
+    /// * `ImageRenderer(content: DashboardView(...))` returns *the same bytes for every input* —
+    ///   with data, without data, Privacy Mode on and off. It never draws the body.
+    /// * `window.drawHierarchy(in:afterScreenUpdates: true)` on a window that belongs to no scene
+    ///   returns a 6 KB blank, and blank compares equal to blank, so it passes this test always.
+    /// * Walking `accessibilityElements` finds only the UIKit segmented controls ("1W", "1M", …).
+    ///   SwiftUI does not publish a `Text` through that tree, so a VoiceOver-shaped assertion
+    ///   could not see the strings at issue either.
+    ///
+    /// Only `layer.render(in:)` yields real content (~290 KB) that moves when the data moves.
+    private func renderDashboard(snapshots: [NetWorthSnapshot], privacyMode: Bool) -> Data {
+        let settings = makeSettings()
+        settings.isPrivacyMode = privacyMode
+        let store = FinanceStore(
+            persistence: SeededPersistence(FinancialData(snapshots: snapshots)),
+            settings: settings,
+            syncMetadataStore: CloudSyncMetadataStore()
+        )
+        let host = UIHostingController(
+            rootView: DashboardView(selectedTab: .constant(.dashboard))
+                .environmentObject(store)
+                .environmentObject(settings)
+        )
+        let bounds = CGRect(x: 0, y: 0, width: 393, height: 700)
+        let window = UIWindow(frame: bounds)
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        window.layoutIfNeeded()
+        host.view.layoutIfNeeded()
+        // The hero animates its chart and its delta on a spring. Let the first frame settle, or
+        // two captures of the same state can disagree for reasons that have nothing to do with
+        // privacy — which `sameStateRendersIdentically` below would then report as instability.
+        RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1
+        return UIGraphicsImageRenderer(bounds: bounds, format: format)
+            .image { context in host.view.layer.render(in: context.cgContext) }
+            .pngData() ?? Data()
+    }
+
+    private func digest(_ data: Data) -> String {
+        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+
+    /// Fails if Privacy Mode lets the Dashboard disclose **whether snapshots exist**.
+    ///
+    /// The three sweeps above are lints: they read the working tree, they cannot follow
+    /// indirection, and a green run says only that the checked-out `.swift` files look clean. This
+    /// one asserts on the app instead. It renders the Dashboard twice with Privacy Mode on,
+    /// changing nothing but `FinancialData.snapshots`, and requires the two images to be
+    /// byte-identical — the owner's rule stated as a property: with the cover up, no pixel may
+    /// depend on whether there is data behind it.
+    ///
+    /// It was written against four known tells, all in `netWorthHero`, and fails on any of them:
+    /// `"Add another snapshot to see movement"` and the movement row it alternates with (whose
+    /// arrow and tint spell the *sign* of the change even though both figures beside them are
+    /// already `••••`), `"No snapshots"` and the freshness badge it alternates with.
+    ///
+    /// **The controls matter more than the assertion.** A capture that silently went blank would
+    /// satisfy byte-equality forever — that is exactly what `drawHierarchy` does here — so the
+    /// size floor, the determinism check and above all `rendererIsReadingSnapshots` are what stop
+    /// this from becoming the second vacuous test in this file's history. If the last of those
+    /// ever fails, this test is asserting nothing and must be fixed before it is trusted again.
+    ///
+    /// **Reach.** iOS only. The bundle hosts `WealthCompassMobile`, so `MacDashboardView`'s
+    /// identical pair of sites cannot be rendered here and rests on review. And it varies only
+    /// `snapshots`: every other collection on this screen has its own ungated empty state, and
+    /// those are still open.
+    func testPrivacyModeConcealsWhetherSnapshotsExist() throws {
+        let concealedWithout = renderDashboard(snapshots: [], privacyMode: true)
+        let concealedWithoutAgain = renderDashboard(snapshots: [], privacyMode: true)
+        let concealedWith = renderDashboard(snapshots: snapshotFixture(), privacyMode: true)
+        let openWithout = renderDashboard(snapshots: [], privacyMode: false)
+        let openWith = renderDashboard(snapshots: snapshotFixture(), privacyMode: false)
+
+        XCTAssertGreaterThan(
+            concealedWithout.count, 50_000,
+            "captured \(concealedWithout.count) bytes, so the window drew nothing — every assertion below is vacuous"
+        )
+
+        XCTAssertEqual(
+            digest(concealedWithout), digest(concealedWithoutAgain),
+            "the same state rendered twice produced different pixels — the instrument is too unstable to conclude anything from"
+        )
+
+        XCTAssertNotEqual(
+            digest(openWithout), digest(openWith),
+            """
+            With Privacy Mode OFF the Dashboard rendered identically with and without snapshots.             That is not a privacy result — it means the render is no longer reading             `data.snapshots`, so the assertion below can no longer fail and must not be trusted.
+            """
+        )
+
+        XCTAssertEqual(
+            digest(concealedWithout), digest(concealedWith),
+            """
+            With Privacy Mode ON the Dashboard rendered differently with and without snapshots, so             a bystander holding the device can read off whether this person tracks a net worth at             all — the one thing the cover over the chart exists to refuse. Look in `netWorthHero`:             the movement row and its "Add another snapshot to see movement" alternative, and             `snapshotFreshness` and its "No snapshots" alternative, all have to be behind the             privacy gate, not beside it.
+            """
+        )
+    }
+
     // MARK: - Sweep internals
 
     /// The spellings of a percentage this codebase can produce. Anything else — a renamed wrapper,
@@ -1536,5 +1666,32 @@ final class PrivacyRedactionTests: XCTestCase {
             i -= 1
             slice = code[i]
         }
+    }
+}
+
+
+/// An in-memory `FinancePersistence` preloaded with one dataset, so `FinanceStore.init` — which
+/// loads synchronously — comes up holding exactly the fixture the render is supposed to react to.
+private final class SeededPersistence: FinancePersistence, @unchecked Sendable {
+    private let lock = NSLock()
+    private var stored: FinancialData?
+
+    init(_ data: FinancialData) { stored = data }
+
+    var locationDescription: String { "in-memory (privacy render test)" }
+
+    func load() throws -> FinancePersistenceLoad? {
+        lock.lock(); defer { lock.unlock() }
+        return stored.map { FinancePersistenceLoad(data: $0) }
+    }
+
+    func save(_ data: FinancialData) throws {
+        lock.lock(); defer { lock.unlock() }
+        stored = data
+    }
+
+    func clear() throws {
+        lock.lock(); defer { lock.unlock() }
+        stored = nil
     }
 }
