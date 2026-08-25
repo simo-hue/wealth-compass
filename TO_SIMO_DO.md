@@ -550,6 +550,21 @@ the pre-fix code, and all three checks were vacuous — an unconditional `XCTFai
 still "passed". Run the **full suite** for before/after verification; it is about two minutes and it
 actually executes the test.
 
+### Doc-comment audit coverage (2026-08-25)
+
+Comments were audited against the code they describe, and 18 discrepancies were corrected — two of
+which turned out to be live bugs rather than stale prose. Coverage was **not** uniform:
+
+- **Read in full and verified**: all of `Sources/Shared/` — Models, Persistence, Services, Stores,
+  Export, UI (40 files).
+- **Partial**: the 21 files under `Sources/iOS/` and `Sources/macOS/` had every comment line scanned
+  and individual claims spot-checked, but were not read end to end. Stale comments may remain there,
+  particularly ones that cite point widths, column weights or SF Symbol names.
+
+Numeric claims that were checked and are still accurate, so nobody re-measures them: the 64.0pt money
+column (computes to 64.01), the ~62pt ledger Date column (61.9), "US Letter is 50pt shorter" (49.89),
+the 0.70/0.78 shrink floors, the 8-colour palette and top-7 cap arithmetic, and the 8% axis floor.
+
 ### Notes for whoever picks this up
 
 - **`extractionState: "stale"` is not proof a key is dead.** 452 call sites localize at runtime via
