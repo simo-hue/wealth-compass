@@ -336,7 +336,13 @@ struct SankeyDiagramView: View {
                 .foregroundStyle(node.map(color(for:)) ?? WCColor.primary)
 
             if let node, node.role != .hub {
-                Text(verbatim: formattedPercent(node.share, locale: settings.effectiveLocale))
+                // M30: matched to the donut and category rows in `iOS/CashFlowView`, which had the
+                // same pairing and *were* leaking. This row was not: `body` above replaces the
+                // whole diagram with a conceal state before either the amount or this share is
+                // drawn, so both are already unreachable in Privacy Mode. What this buys is that
+                // the guard no longer depends on the conceal staying total — the same reason
+                // `accessibilityValue(for:)` carries its own, one layer down.
+                Text(verbatim: settings.privatePercent(node.share))
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(WCColor.textTertiary)
             }

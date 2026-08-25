@@ -204,7 +204,9 @@ struct CashFlowView: View {
                                                 .foregroundStyle(.white)
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.7)
-                                            Text(verbatim: formattedPercent(hoveredExpenseCategory.percentage, locale: settings.effectiveLocale))
+                                            // M30: the share % also reveals the spending breakdown, so
+                                            // redact it in Privacy Mode like the amount above it.
+                                            Text(verbatim: settings.privatePercent(hoveredExpenseCategory.percentage))
                                                 .font(.caption2.monospacedDigit())
                                                 .foregroundStyle(.white.opacity(0.6))
                                         } else {
@@ -260,7 +262,9 @@ struct CashFlowView: View {
                                 VStack(alignment: .trailing, spacing: 2) {
                                     Text(settings.privateCurrency(item.value))
                                         .font(.subheadline.monospacedDigit().weight(.semibold))
-                                    Text(verbatim: formattedPercent(item.percentage, locale: settings.effectiveLocale))
+                                    // M30: same pair as the donut centre — the share reconstructs the
+                                    // amount masked above it, so both halves go at once.
+                                    Text(verbatim: settings.privatePercent(item.percentage))
                                         .font(.caption)
                                         .foregroundStyle(WCColor.textSecondary)
                                 }
