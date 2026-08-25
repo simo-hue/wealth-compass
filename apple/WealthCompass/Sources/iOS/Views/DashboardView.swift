@@ -376,10 +376,16 @@ struct DashboardView: View {
                         systemImage: "chart.line.uptrend.xyaxis",
                         accent: .cyan,
                         // The count is the payload, and it cannot be tokenised in place: the
-                        // catalog key is `%lld positions` with CLDR plural variations, and `••••`
-                        // has no plural category. So the caption becomes a fixed, data-independent
-                        // phrase — the one `InvestmentsView.swift:107` already prints under the
-                        // very same figure — instead of a number that also spells out `0`.
+                        // catalog key is `%lld positions`, whose `%lld` slot takes an integer and
+                        // will not hold `••••`. (An earlier version of this comment said the key
+                        // carries CLDR plural variations. It does not — it holds a flat
+                        // `stringUnit` in all 34 locales, and only two keys in the whole catalog
+                        // use `variations.plural`. The conclusion stands, the reason was wrong.)
+                        // A `%@`-shaped key would have taken the token — `CryptoView.swift:104`
+                        // uses that shape — but a fixed phrase says the same thing without adding
+                        // three keys, so the caption becomes the data-independent phrase
+                        // `InvestmentsView.swift:107` already prints under the very same figure,
+                        // instead of a number that also spells out `0`.
                         detail: settings.isPrivacyMode
                             ? LocalizedStringKey("Stocks, ETFs, and more")
                             : (finance.data.investments.count == 1 ? LocalizedStringKey("1 position") : LocalizedStringKey("\(finance.data.investments.count) positions"))

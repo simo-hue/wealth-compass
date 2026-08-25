@@ -1521,6 +1521,49 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    // MARK: - Existence: what the fixed captions cost
+
+    /// Fails if a caption Privacy Mode substitutes for a count is left untranslated in any locale.
+    ///
+    /// `65bf189` replaced `%lld positions` / `%lld holdings` / `%lld liabilities` — translated in
+    /// all 34 locales — with three fixed phrases that were not, and shipped it. A Polish reader
+    /// with Privacy Mode on then read "Stocks, ETFs, and more" and "Tracked assets" in English
+    /// beside a translated "Ile jesteś winien", on one grid, where all three used to be Polish.
+    /// Privacy Mode is not supposed to cost the reader their language.
+    ///
+    /// It resolves through `AppLocalization.string(_:appLanguage:)`, which is the app's own
+    /// lookup, against the built bundle rather than the catalog source — so it fails on a
+    /// translation that exists in `.xcstrings` but never reaches an `.lproj`. Equality with the
+    /// English source is the tell: no correct translation of any of these three is the English
+    /// string (checked against all 34), so a match means the lookup fell through.
+    func testEveryCaptionPrivacyModeSubstitutesForACountIsTranslated() throws {
+        // The Position grid's three privacy captions, on both platforms:
+        // `DashboardView.positionSection` and `MacDashboardView`. The first two are also the
+        // captions `InvestmentsView.swift:107` and `CryptoView.swift:104` print with Privacy Mode
+        // off, so this covers those too.
+        let captions = ["Stocks, ETFs, and more", "Tracked assets", "What you owe"]
+        let languages = Bundle.main.localizations.filter { $0 != "en" && $0 != "Base" }
+
+        XCTAssertGreaterThanOrEqual(
+            languages.count, 34,
+            "the bundle reports \(languages.count) non-English localizations, so this test is no longer sweeping them all"
+        )
+
+        for language in languages.sorted() {
+            for caption in captions {
+                let resolved = AppLocalization.string(
+                    String.LocalizationValue(stringLiteral: caption), appLanguage: language
+                )
+                XCTAssertNotEqual(
+                    resolved, caption,
+                    """
+                    `\(caption)` resolves to the English source under `\(language)`, so Privacy                     Mode drops that reader out of their own language mid-grid. Add the locale to                     the key in `Localizable.xcstrings`.
+                    """
+                )
+            }
+        }
+    }
+
     // MARK: - Existence: the lock screen
 
     /// Fails if Privacy Mode lets a recurring reminder describe the schedule **on the lock screen**.
