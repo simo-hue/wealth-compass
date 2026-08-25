@@ -571,14 +571,23 @@ struct DashboardView: View {
 
                 // Privacy before emptiness, the treatment every chart got in `24ffc78` and no
                 // list or table did. "No expenses for this period" is a statement about this
-                // person's finances, printed while every figure around it is already `••••` — and
-                // it sits under an `AnalyticsPeriod` picker, so a bystander can walk the periods
-                // and read off which ones hold spending.
+                // person's finances, printed while every figure around it is already `••••`.
                 //
-                // The reach is narrower than at a chart and worth stating: the ranked list below
-                // still renders its rows, ranked lists being a separate ruling (TO_SIMO_DO.md), so
-                // an empty card is still distinguishable from a full one. What stops is the card
-                // saying so in words, and the period picker answering one query per period.
+                // **What this does and does not buy — stated plainly, because `f3fac7c` claimed
+                // more.** That commit's message said this "stops the period picker answering one
+                // query per period". It does not, and the shape of the change says why: the cover
+                // is gated on `expenses.isEmpty`, the very condition the named empty state was
+                // gated on, so it appears in exactly the states that sentence appeared in. A
+                // bystander can still walk the `AnalyticsPeriod` picker and read off which periods
+                // hold spending — an empty card looks nothing like a card of ranked rows. All
+                // twelve sites in `f3fac7c` have this shape; every one is a rewording of the
+                // sentence, not a reduction in what can be inferred from it.
+                //
+                // That is still worth having: the card no longer names the entity or the period it
+                // is empty *for*, and it matches the vocabulary the charts use. But the only place
+                // in this series where a probe genuinely closed is `fb5272c`, where two
+                // *different* empty states — "never recorded" and "none match these filters" —
+                // collapse into one answer, so the filter row stops distinguishing them.
                 if settings.isPrivacyMode, expenses.isEmpty {
                     EmptyState(title: "Hidden by Privacy Mode", systemImage: "eye.slash")
                 } else if expenses.isEmpty {

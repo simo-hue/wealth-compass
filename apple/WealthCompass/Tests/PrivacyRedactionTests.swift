@@ -145,7 +145,6 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
-
     /// Fails if a record's "last updated" stamp is rendered without going through `privateDate`.
     ///
     /// `52c062a` tokenised the Investments and Crypto **Status cards** because "a 'last updated'
