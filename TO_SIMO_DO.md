@@ -22,6 +22,16 @@ you run the checks below whenever you're at a real Mac and report anything red.
       type, and those pages now assert the opposite (`OpenSource.tsx:188` reads "Source available. Not
       open source."). `README.md:18` and `:105-112` say it plainly too.
 
+- [ ] **`-exportLocalizations` deletes 60 report keys, and marking them `manual` would stop it.**
+      Not urgent — nothing in the build or the test path runs it, and no *translation* is at risk
+      (all 64 keys it removes carry zero localizations; the 24 translated keys it cannot find are
+      marked `stale` and kept verbatim). But it is a loaded gun: one export on a clean tree takes
+      the catalog from 791 keys to 727, and 60 of the 64 are `ReportDocumentBuilder.swift`'s,
+      reached through its `L(_ key: String)` wrapper (`:200`) which the extractor cannot see
+      through. Adding `"extractionState" : "manual"` to those 60 entries removes the hazard
+      permanently — verified: marking three of them dropped the removals to 61 and all three
+      survived. The measurements and the interim workaround are in `apple/CLAUDE.md` → Build & test.
+
 ### Factual corrections found while building
 
 - [x] **DONE 2026-08-25. "38 languages" was wrong.** `Localizable.xcstrings` covers **35 locales**;

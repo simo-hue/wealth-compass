@@ -59,11 +59,12 @@ xcrun xcresulttool get test-results summary --path <path>.xcresult
 A fix is only proven when the count moves the way you predicted — one new test failing before, passing
 after, with every other test unchanged.
 
-**A run does not touch the working tree — including `Localizable.xcstrings`.** This is written down
-because the opposite was believed, and the mitigation that belief suggests is destructive. `xcodebuild`
-does **not** write the extracted strings back into the source catalog, despite `SWIFT_EMIT_LOC_STRINGS =
-YES` on all four configurations — that write-back is an Xcode IDE behaviour, not a command-line one.
-Measured five ways, checking the file's SHA **and** `git status` before and after each:
+**`build` and `test` do not touch `Localizable.xcstrings`. `-exportLocalizations` does.** Both halves
+are load-bearing, and an earlier version of this section had the first half right for the wrong reason
+and did not mention the second at all.
+
+Building and testing leave the catalog alone, despite `SWIFT_EMIT_LOC_STRINGS = YES` on all four
+configurations. Measured five ways, checking the file's SHA **and** `git status` before and after each:
 
 | run | catalog |
 | --- | --- |
@@ -74,12 +75,59 @@ Measured five ways, checking the file's SHA **and** `git status` before and afte
 | `xcodebuild build` (Mac, `platform=macOS`), scratch `-derivedDataPath`, same new literal | unchanged |
 
 The fourth and fifth rows are the ones that matter: a *new* string is the case that would make a
-write-back necessary, and it still does not happen.
+write-back necessary, and it still does not happen. What those rows show is that **`SWIFT_EMIT_LOC_STRINGS`
+only emits `.stringsdata` into DerivedData** — merging that back into the source catalog is a separate
+step, the one `xcrun xcstringstool sync <xcstrings> --stringsdata …` exposes, and a build never runs it.
 
-So if the catalog turns up dirty after a run, **something other than `xcodebuild` wrote it** — find out
-what before discarding it. Do not add a `git checkout -- …/Localizable.xcstrings` step to a build or
-test script: catalog edits are ordinary source changes — the commit that stopped 13 locales renaming
-the app is 88 lines of them — and a blanket restore would silently throw yours away.
+**`xcodebuild -exportLocalizations` runs it.** Reproduced three times, twice on a pristine tree with
+zero source changes:
+
+```
+xcodebuild -exportLocalizations -project WealthCompass/WealthCompass.xcodeproj \
+  -localizationPath <dir> -exportLanguage en
+```
+
+| | before | after |
+| --- | --- | --- |
+| keys | 791 | **727** (64 removed) |
+| `extractionState: "stale"` | 42 | 66 (24 newly marked) |
+| translated bodies | 20558 | 20558 |
+
+Read those three rows together, because the headline number is the least important of them. **No
+translation is lost**: every one of the 64 removed keys carries zero localizations, and the 24 keys the
+sync could not find in the `.stringsdata` that *do* carry translations are marked `stale` and kept
+verbatim. What is destroyed is 64 English key registrations — and **60 of the 64 are
+`ReportDocumentBuilder.swift`'s**, reached through its `L(_ key: String)` wrapper (`:200`), which takes a
+plain `String` and builds the `String.LocalizationValue` at runtime. The extractor sees a `String`
+argument at those call sites, not a localizable literal, so as far as the sync is concerned those 60
+strings are used by nobody. The export says so out loud, twice, and it is easy to read past:
+
+```
+WARNING: …/AppLocalization.swift:11:24:3 Skipping extraction of localizable string with non-literal key
+```
+
+The effect is measured; the mechanism is inferred. `xcstringstool` does not appear anywhere in the
+export's log, so what is verified is that `-exportLocalizations` performs that sync, not that it shells
+out to that binary to do it.
+
+**So, in order of preference:**
+
+1. **Don't run `-exportLocalizations` as part of anything.** It is not a build step and not a test step;
+   nothing in this repo needs it. The catalog is hand-maintained and spliced additively.
+2. **If you need an `.xcloc` for a translator**, run it on a clean tree, then restore the catalog
+   deliberately and read the diff first — `git diff --stat` then `git checkout -- …/Localizable.xcstrings`.
+   That is a considered one-off, not a script step.
+3. **The durable fix is `"extractionState" : "manual"`** on the keys the extractor cannot see. Verified
+   both ways: marking three of the doomed report keys `manual` dropped the removals from 64 to 61 and
+   all three survived, and marking two translated report keys `manual` kept them out of the `stale`
+   sweep as well (42 → 64 rather than 42 → 66). The catalog already carries 127 `manual` keys and the
+   sync did not touch one of them. Doing this for all 60 would take the hazard off the table for good.
+
+And the warning that has not changed: **do not add a blanket `git checkout -- …/Localizable.xcstrings`
+step to a build or test script.** Catalog edits are ordinary source changes — the commit that stopped 13
+locales renaming the app is 88 lines of them — and a blanket restore would silently throw yours away.
+If the catalog turns up dirty after a `build` or a `test`, that is still the signal it always was: find
+out what wrote it before discarding anything.
 
 Signing uses `DEVELOPMENT_TEAM = 8528AN28A3`. Version numbers live in `project.pbxproj` (`MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`) — bump them there. Both app targets currently share the bundle id `com.wealthcompass.mobile`; the CloudKit container is `iCloud.com.wealthcompasstracker`.
 
