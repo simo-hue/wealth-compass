@@ -180,8 +180,13 @@ struct CashFlowView: View {
                         // net-worth and cash-flow cards use (`DashboardView.swift:195`, `:413`).
                         // The category list below stays as it is — deliberately, ranked lists are
                         // a separate open decision (TO_SIMO_DO.md).
+                        //
+                        // The title names *this* card's chart, as its two neighbours do. It used to
+                        // reuse `AllocationChart`'s "Allocation concealed" to avoid a new key, but
+                        // this card is headed "Spending analytics" and its donut is expenses by
+                        // category, not an allocation — the cover was naming a chart that is not here.
                         MobilePrivacyChartCover(
-                            title: "Allocation concealed",
+                            title: "Spending breakdown concealed",
                             message: "Values and proportions are hidden."
                         )
                         .frame(minHeight: 250, maxHeight: .infinity)

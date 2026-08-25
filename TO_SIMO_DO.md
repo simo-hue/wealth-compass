@@ -709,7 +709,7 @@ macOS donut), so it is not vacuous.
 
 Fallout from `e55f742`, worth one deliberate pass rather than leaving it to drift:
 
-- [ ] **`MobilePrivacyChartCover` is misnamed now.** It is what the eight shared `AllocationChart` rings
+- [ ] **`MobilePrivacyChartCover` is misnamed now.** It is what the nine shared `AllocationChart` rings
       render, so macOS Investments and macOS Crypto show a cover called *Mobile*. Meanwhile
       `MacDashboardView.swift:448` still uses its own `PrivacyChartCover` — that card is **not** an
       `AllocationChart` call site (grep returns 0); it inlines its own `Chart`/`SectorMark`, which is
@@ -717,8 +717,13 @@ Fallout from `e55f742`, worth one deliberate pass rather than leaving it to drif
       `textTertiary` vs `textFaint`. Unifying changes macOS pixels, so it is a decision, not a cleanup.
       At minimum, rename the shared one — it is no longer mobile-only.
 - [ ] **`Values and proportions are hidden.` is 7/35 `translated`, 28 `needs_review`.** Pre-existing, but
-      this string went from 3 macOS-only sites to 9 charts across both platforms, so far more users now
-      read it. (`Allocation concealed` is 35/35.) Highest-value single string to get translated properly.
+      this string went from **one** macOS-only site (`MacDashboardView.swift:450` — the "3" written here
+      first counted the three macOS `PrivacyChartCover` calls, only one of which carries this message) to
+      **eleven** charts across both platforms: that one, the nine `AllocationChart` rings, and the iOS
+      expense donut. Far more users now read it. Highest-value single string to get translated properly.
+- [ ] **`Spending breakdown concealed` is 1/35 `translated`, 34 `needs_review`.** Added so the iOS expense
+      donut's cover names its own chart instead of borrowing `Allocation concealed` (which is 35/35). The
+      34 are machine translations and have never been read by a speaker.
 - [ ] **Two conceal orderings disagree in this codebase.** `AllocationChart` and the iOS Dashboard charts
       check emptiness *before* privacy; `SankeyDiagramView.swift:46-52` deliberately checks privacy first,
       arguing "whether a period is empty is itself information". The Sankey's reasoning is the stronger

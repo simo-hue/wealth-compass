@@ -638,7 +638,7 @@ final class PrivacyRedactionTests: XCTestCase {
     /// exempts five lines in four declarations — `formattedPercent` itself
     /// (`DesignSystem.swift:372`, and its body's own `.formatted(.percent` at `:374`),
     /// `AppSettings.privatePercent`'s body (`AppSettings.swift:365`), `AllocationChart`'s
-    /// share-of-total helper (`DesignSystem.swift:555`) and the Sankey node's VoiceOver value
+    /// share-of-total helper (`DesignSystem.swift:563`) and the Sankey node's VoiceOver value
     /// builder (`SankeyDiagramView.swift:476`). It is also the widest hole in the sweep: move a
     /// render into a `-> String` helper and it stops being visible here.
     private static func isStringHelper(at index: Int, in code: [[Character]]) -> Bool {

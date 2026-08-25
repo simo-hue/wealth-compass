@@ -548,9 +548,15 @@ struct MacDashboardView: View {
                         }
                     }
 
-                    if let excludedCash = finance.assetAllocationExcludedCash(settings: settings) {
-                        // L33: cash is net-negative and dropped from the ring (no negative wedge), so the
-                        // ring total exceeds the net-worth header — explain the gap.
+                    // L33: cash is net-negative and dropped from the ring (no negative wedge), so the
+                    // ring total exceeds the net-worth header — explain the gap.
+                    //
+                    // Concealed with the ring, matching `AllocationChart`'s privacy branch on iOS.
+                    // Redacting the amount is not enough: the sentence's mere *presence* says the
+                    // user holds net cash liabilities, and it explains a gap in a chart the cover
+                    // has already taken away.
+                    if !settings.isPrivacyMode,
+                       let excludedCash = finance.assetAllocationExcludedCash(settings: settings) {
                         Text(settings.localized("Chart shows gross assets; \(settings.privateCurrency(excludedCash)) in net cash liabilities is excluded."))
                             .font(.caption2)
                             .foregroundStyle(WCColor.textFaint)

@@ -400,6 +400,15 @@ struct ValueDelta: View {
     }
 }
 
+/// The shared allocation donut, drawn from **nine** call sites: `DashboardView.swift:48`,
+/// `InvestmentsView.swift:59`, `:62` and `:63`, `CryptoView.swift:60`,
+/// `MacInvestmentsView.swift:47`, `:53` and `:59`, and `MacCryptoView.swift:141`.
+///
+/// Those nine, plus the iOS expense donut in `CashFlowView.swift:177`, are the **ten** charts
+/// `e55f742` put behind a privacy cover. That commit's own message said eight; it is not
+/// fixable in history, so the count is recorded here instead. macOS's Dashboard asset ring is
+/// not one of the nine — it inlines its own `Chart` / `SectorMark`
+/// (`MacDashboardView.swift:453-454`) and already concealed itself.
 struct AllocationChart: View {
     let title: LocalizedStringKey
     let slices: [AllocationSlice]
