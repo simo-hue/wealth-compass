@@ -916,9 +916,19 @@ Two bugs, both worse than the one that started this thread:
   `MacSettingsView.swift:922`, `MacRootView.swift:39`), so a factory reset left banners standing.
 
 Both now go through one `clearScheduledReminders()` that unions pending **and** delivered identifiers.
-`sync` clears delivered *always*, not only under Privacy Mode — it is never called speculatively, so
-every call means the banner has stopped describing the data; gating it on an unrelated flag would have
-left the staleness bug for everyone else.
+
+> **Corrected 2026-08-25 (“take down the stale banners, not every banner”).** The paragraph that stood here said `sync` clears delivered
+> *always* because "it is never called speculatively". **That is false.** Three paths reach `sync` with
+> nothing about the delivered banners changed: a silent CloudKit push (`FinanceStore.swift:2004`
+> assigns `data = updatedData`, and `RecurringTransaction`'s synthesised `==` covers `updatedAt` and
+> `nextDueDate`, so a remote edit — or a bare `sortedForStorage()` reorder — fires
+> `.onChange(of: finance.data.recurringTransactions)`); `processDueRecurringTransactions` returning 0
+> while still writing schedules back (the dedup advance, catch-up fast-forward and both deactivation
+> paths), which bypasses WC-L1's `guard insertedCount > 0` because the array mutation fires
+> `.onChange` by itself; and backup import (`SettingsView.swift:665`, `MacSettingsView.swift:826`),
+> which the caller list omitted entirely. The cost was that **editing one schedule dismissed every
+> other schedule's unread banner**. `sync` now tears down only the delivered banners no live schedule
+> still supports; `cancelAll` keeps the unconditional sweep.
 
 Also fixed: banners now coalesce to **one per moment** under Privacy Mode (the previous agent's reason
 for skipping this was refuted — `sync` tears down by prefix, so cancellation was never the blocker); the

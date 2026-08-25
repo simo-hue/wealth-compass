@@ -2262,6 +2262,238 @@ final class PrivacyRedactionTests: XCTestCase {
             \(offenders.joined(separator: "\n"))
             """
         )
+
+        // The erase path stays all-or-nothing. `sync`'s teardown is now scoped to the banners no
+        // live schedule still supports, which is right for a re-sync and wrong for "erase local
+        // data": after an erase there are no schedules to compare against, and a banner kept would
+        // be one describing data the user just wiped off a device.
+        let eraser = try XCTUnwrap(
+            functions.first { $0.name == "cancelAll" },
+            "`cancelAll` is gone from RecurringNotificationService — the erase path is unaccounted for"
+        )
+        XCTAssertTrue(
+            eraser.body.contains("clearScheduledReminders()"),
+            "cancelAll() no longer routes through the unconditional teardown"
+        )
+        let unconditional = try XCTUnwrap(functions.first { $0.name == "clearScheduledReminders" })
+        XCTAssertFalse(
+            unconditional.body.contains("staleDelivered"),
+            """
+            The erase path consults the schedules before taking a banner down. Erase means there are \
+            no schedules, so every banner would read as one nothing stands behind — but the moment \
+            that stops being true, a factory reset leaves the user's schedules describing themselves \
+            on a wiped device, which is the bug 73e3b22 fixed.
+            """
+        )
+    }
+
+    /// Fails if tearing down after one schedule changes takes the other schedules' unread banners
+    /// with it.
+    ///
+    /// `73e3b22` fixed a real bug — a fired reminder survived turning Privacy Mode on, and survived
+    /// a factory reset — by clearing *every* delivered banner carrying the platform prefix on every
+    /// `sync`. Its justification was that "`sync` is never called speculatively", so every call
+    /// already meant the banner had stopped describing the data. It is called speculatively, by
+    /// three paths (see `staleDelivered`'s doc comment), and the cost was that adding a "Gym"
+    /// reminder at 20:00 silently dismissed an unread "Rent: €1.450,00" banner from 09:00.
+    ///
+    /// The rule now is literal: rebuild what each live schedule's reminder *would* say, and keep a
+    /// delivered banner if and only if one of those is filed under the same identifier and says the
+    /// same thing. Everything below is a consequence of that one sentence, asserted separately so a
+    /// weaker rule that happens to satisfy one case still fails the others.
+    ///
+    /// `staleDelivered` is a pure function over plain values because nothing else is available: the
+    /// test host reports `authorizationStatus.rawValue == 0`, `center.add` retains 0 of 5 requests,
+    /// and `deliveredNotifications()` is permanently empty, so no assertion here observes a real
+    /// queue. What is checked is the decision the teardown makes, not that the system honours it.
+    /// New coverage in the same sense `requests(for:…)` was — the function it exercises did not
+    /// exist to call before the fix. Measured against a `staleDelivered` whose body is reverted to
+    /// `73e3b22`'s rule (`delivered.filter { $0.identifier.hasPrefix(identifierPrefix) }`), this
+    /// test fails and the rest of the suite does not.
+    func testTearingDownAfterOneScheduleKeepsTheOtherBanners() throws {
+        let calendar = Calendar.current
+        let nineToday = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2031, month: 6, day: 15, hour: 9))
+        )
+        let eightTonight = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2031, month: 6, day: 15, hour: 20))
+        )
+
+        func schedule(
+            _ category: String, _ amount: Decimal, dueAt due: Date
+        ) -> RecurringTransaction {
+            RecurringTransaction(
+                type: .expense, category: category, amount: amount, description: category,
+                startDate: due, frequency: .monthly, nextDueDate: due, endDate: nil, currency: .eur
+            )
+        }
+        var rent = schedule("Rent", 1_450, dueAt: nineToday)
+        let gym = schedule("Gym", 40, dueAt: eightTonight)
+
+        /// The banner `rent` put on the lock screen at 09:00, built by the service itself so the
+        /// fixture cannot drift from what production would have delivered.
+        func banner(
+            for schedule: RecurringTransaction, showDetails: Bool = true
+        ) throws -> RecurringNotificationService.DeliveredReminder {
+            let requests = RecurringNotificationService.requests(
+                for: [schedule],
+                convertedAmounts: [schedule.id: schedule.amount],
+                currencyCode: "EUR",
+                showDetails: showDetails,
+                appLanguage: nil,
+                identifierPrefix: Self.reminderIdentifierPrefix
+            )
+            return RecurringNotificationService.DeliveredReminder(try XCTUnwrap(requests.first))
+        }
+        func stale(
+            _ delivered: [RecurringNotificationService.DeliveredReminder],
+            _ schedules: [RecurringTransaction],
+            showDetails: Bool = true,
+            currencyCode: String = "EUR"
+        ) -> [String] {
+            RecurringNotificationService.staleDelivered(
+                delivered,
+                schedules: schedules,
+                convertedAmounts: Dictionary(
+                    uniqueKeysWithValues: schedules.map { ($0.id, $0.amount) }
+                ),
+                currencyCode: currencyCode,
+                showDetails: showDetails,
+                appLanguage: nil,
+                identifierPrefix: Self.reminderIdentifierPrefix
+            )
+        }
+
+        let rentBanner = try banner(for: rent)
+        XCTAssertFalse(
+            rentBanner.body.isEmpty,
+            "the fixture banner says nothing, so every comparison below is between two blanks"
+        )
+
+        // The bug, stated as a test: the Gym schedule is added and Rent's unread banner survives.
+        XCTAssertEqual(
+            stale([rentBanner], [rent, gym]), [],
+            """
+            Adding an unrelated schedule took down an unread banner that still describes its own \
+            schedule exactly. That is a reminder the reader never saw, dismissed by an edit to \
+            something else — and a silent CloudKit push, a 30-second timer tick that advanced a \
+            different schedule's nextDueDate, or a backup import all reach this same teardown while \
+            the phone is locked.
+            """
+        )
+        // Nothing at all changed: the same schedules, re-synced.
+        XCTAssertEqual(stale([rentBanner], [rent]), [], "a bare re-sync dismissed the banner")
+
+        // Deleted.
+        XCTAssertEqual(
+            stale([rentBanner], [gym]), [rentBanner.identifier],
+            "the schedule is gone and its banner stayed on the lock screen"
+        )
+
+        // The figure moved, so the banner is now quoting a number the ledger no longer holds.
+        var repriced = rent
+        repriced.amount = 1_500
+        XCTAssertEqual(
+            stale([rentBanner], [repriced, gym]), [rentBanner.identifier],
+            "the amount changed and the banner still shows the old one"
+        )
+
+        // The display currency moved. Same schedule, different sentence.
+        XCTAssertEqual(
+            stale([rentBanner], [rent, gym], currencyCode: "USD"), [rentBanner.identifier],
+            "the display currency changed and the banner still shows the old denomination"
+        )
+
+        // 73e3b22's own fix, which must not regress: turning Privacy Mode on takes down every
+        // detailed banner, because the hidden branch files under `due-<moment>` and can never
+        // match a banner filed under a schedule's UUID.
+        XCTAssertEqual(
+            stale([rentBanner], [rent, gym], showDetails: false), [rentBanner.identifier],
+            """
+            Privacy Mode was switched on and a banner spelling out "Rent: €1.450,00" stayed on the \
+            lock screen. This is the regression 73e3b22 fixed; scoping the teardown must not undo it.
+            """
+        )
+        // And the other way: a hidden banner does not survive Privacy Mode being switched off.
+        let hiddenBanner = try banner(for: rent, showDetails: false)
+        XCTAssertEqual(
+            stale([hiddenBanner], [rent, gym], showDetails: false), [],
+            "a coalesced banner was taken down while its own moment still has a schedule behind it"
+        )
+        XCTAssertEqual(
+            stale([hiddenBanner], [rent, gym]), [hiddenBanner.identifier],
+            "Privacy Mode was switched off and the coalesced banner was left standing"
+        )
+
+        // A coalesced banner stands for every schedule due at that moment, so it outlives the
+        // deletion of one of them and goes only with the last.
+        let alsoNine = schedule("Insurance", 90, dueAt: nineToday)
+        XCTAssertEqual(
+            try banner(for: alsoNine, showDetails: false).identifier, hiddenBanner.identifier,
+            "the two schedules are due at the same moment and must coalesce, or the case below is not the case"
+        )
+        XCTAssertEqual(
+            stale([hiddenBanner], [alsoNine, gym], showDetails: false), [],
+            "deleting one of two schedules due at the same moment took down the banner for both"
+        )
+        XCTAssertEqual(
+            stale([hiddenBanner], [gym], showDetails: false), [hiddenBanner.identifier],
+            "the last schedule behind a coalesced banner went and the banner stayed"
+        )
+
+        // A schedule that has stopped producing reminders at all.
+        for (name, mutate) in [
+            ("completed", { (s: inout RecurringTransaction) in s.completedAt = nineToday }),
+            ("deactivated", { (s: inout RecurringTransaction) in s.isActive = false }),
+            ("silenced", { (s: inout RecurringTransaction) in s.notificationsEnabled = false }),
+            ("ended", { (s: inout RecurringTransaction) in s.endDate = nineToday.addingTimeInterval(-86_400) }),
+        ] {
+            var changed = rent
+            mutate(&changed)
+            XCTAssertEqual(
+                stale([rentBanner], [changed, gym]), [rentBanner.identifier],
+                "a \(name) schedule left its banner on the lock screen"
+            )
+        }
+
+        // Never touch what this service does not own — another app's banner, or the other
+        // platform's, both of which `deliveredNotifications()` can hand back.
+        let foreign = RecurringNotificationService.DeliveredReminder(
+            identifier: "wealth-compass-mac-recurring-\(UUID().uuidString)",
+            title: "Recurring Expense due", body: "Rent: €1.450,00"
+        )
+        XCTAssertEqual(
+            stale([foreign, rentBanner], [rent, gym]), [],
+            "the teardown reached a banner filed under another prefix"
+        )
+        XCTAssertEqual(
+            stale([foreign], []), [],
+            "the teardown reached another prefix's banner even with no schedules of its own"
+        )
+
+        // The cap is a pending-request budget, not a statement about which banners are accurate.
+        let limit = RecurringNotificationService.pendingRequestLimit
+        let crowd = try (0..<(limit + 5)).map { offset in
+            schedule("c\(offset)", 100, dueAt: try XCTUnwrap(
+                calendar.date(byAdding: .day, value: offset, to: nineToday)
+            ))
+        }
+        let last = try XCTUnwrap(crowd.last)
+        XCTAssertEqual(
+            stale([try banner(for: last)], crowd), [],
+            """
+            A banner belonging to the \(limit + 5)th schedule was read as one nothing stands behind, \
+            because the accuracy check inherited `sync`'s \(limit)-request cap. The cap is about \
+            what may be posted, not about which schedules exist.
+            """
+        )
+
+        // The rent fixture is used unmutated throughout; this pins that.
+        rent.updatedAt = nineToday
+        XCTAssertEqual(
+            stale([rentBanner], [rent, gym]), [],
+            "an `updatedAt` bump — what a CloudKit push or a reorder produces — dismissed the banner"
+        )
     }
 
     /// The stripped `code` view of the notification service, which both lints below read.

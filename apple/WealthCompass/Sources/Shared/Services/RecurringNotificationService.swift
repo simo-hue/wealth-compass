@@ -58,7 +58,17 @@ actor RecurringNotificationService {
         showDetails: Bool,
         now: Date = Date()
     ) async {
-        await clearScheduledReminders()
+        // Read the in-app language once, not once per schedule, and source the key from the single
+        // source of truth on AppSettings rather than a brittle literal (WC-L31).
+        let appLanguage = UserDefaults.standard.string(forKey: AppSettings.appLanguageDefaultsKey)
+
+        await clearReminders(
+            supersededBy: schedules,
+            convertedAmounts: convertedAmounts,
+            currencyCode: currencyCode,
+            showDetails: showDetails,
+            appLanguage: appLanguage
+        )
 
         guard Self.isAuthorized(await center.notificationSettings().authorizationStatus) else {
             return
@@ -74,9 +84,6 @@ actor RecurringNotificationService {
                 && (schedule.endDate.map { schedule.nextDueDate <= $0 } ?? true)
         }
 
-        // Read the in-app language once, not once per schedule, and source the key from the single
-        // source of truth on AppSettings rather than a brittle literal (WC-L31).
-        let appLanguage = UserDefaults.standard.string(forKey: AppSettings.appLanguageDefaultsKey)
         // `requests(for:…)` is the **only** source of anything this actor hands to the notification
         // centre, on both branches of Privacy Mode, and nothing stands between it and `center.add` —
         // no local to write to after the fact. That is what makes asserting on its return value the
@@ -122,18 +129,24 @@ actor RecurringNotificationService {
     /// *which* schedules survive `pendingRequestLimit`, a second caller passing an unsorted array —
     /// or a future edit dropping `sync`'s sort — would have silently truncated an arbitrary 60 of
     /// them and dropped real reminders. The guarantee now lives with the function that documents it.
+    ///
+    /// - Parameter limit: how many requests may be produced. Defaults to the pending-request budget,
+    ///   which is what `sync` needs. `staleDelivered` passes `.max`: it is asking what each banner
+    ///   *would* say rather than what will be posted, and a cap there would read the 61st schedule's
+    ///   still-accurate banner as one nothing stands behind.
     nonisolated static func requests(
         for schedules: [RecurringTransaction],
         convertedAmounts: [UUID: Decimal],
         currencyCode: String,
         showDetails: Bool,
         appLanguage: String?,
-        identifierPrefix: String
+        identifierPrefix: String,
+        limit: Int = pendingRequestLimit
     ) -> [UNNotificationRequest] {
         let ordered = schedules.sorted { $0.nextDueDate < $1.nextDueDate }
 
         guard !showDetails else {
-            return ordered.prefix(pendingRequestLimit).map { schedule in
+            return ordered.prefix(limit).map { schedule in
                 request(
                     for: schedule,
                     convertedAmount: convertedAmounts[schedule.id],
@@ -154,9 +167,121 @@ actor RecurringNotificationService {
             coalesced.append(coalescedRequest(
                 dueAt: due, identifier: identifier, appLanguage: appLanguage
             ))
-            if coalesced.count == pendingRequestLimit { break }
+            if coalesced.count == limit { break }
         }
         return coalesced
+    }
+
+    /// A banner already on the lock screen, reduced to what deciding its fate needs: how it is
+    /// filed, and what it says.
+    struct DeliveredReminder: Equatable {
+        let identifier: String
+        let title: String
+        let subtitle: String
+        let body: String
+
+        init(identifier: String, title: String, subtitle: String = "", body: String) {
+            self.identifier = identifier
+            self.title = title
+            self.subtitle = subtitle
+            self.body = body
+        }
+
+        init(_ request: UNNotificationRequest) {
+            self.init(
+                identifier: request.identifier,
+                title: request.content.title,
+                subtitle: request.content.subtitle,
+                body: request.content.body
+            )
+        }
+
+        init(_ notification: UNNotification) {
+            self.init(notification.request)
+        }
+    }
+
+    /// Which delivered banners have stopped describing the data, given the schedules as they are now.
+    ///
+    /// `73e3b22` fixed a real bug — a fired reminder survived turning Privacy Mode on, and survived
+    /// a factory reset — with an all-or-nothing sweep: every delivered banner carrying this
+    /// platform's prefix, gone, on every `sync`. Its justification was that "`sync` is never called
+    /// speculatively", so every call already meant the banner had stopped being accurate. That is
+    /// not true, and the cost is that **editing one schedule dismissed the unread banner of every
+    /// other one**: add a "Gym" reminder at 20:00 and an unread "Rent: €1.450,00" from 09:00
+    /// disappears. Three paths reach `sync` with nothing about the existing banners changed:
+    ///
+    /// - A silent CloudKit push while the phone is locked. `FinanceStore.applyRemote` assigns
+    ///   `data = updatedData`, and `RecurringTransaction`'s synthesised `==` covers every stored
+    ///   property including `updatedAt` and `nextDueDate` — so a remote edit to an unrelated
+    ///   schedule, or a bare reorder from `sortedForStorage()`, fires
+    ///   `.onChange(of: finance.data.recurringTransactions)` and re-syncs. That fires *exactly* when
+    ///   a banner is sitting unread on a locked screen.
+    /// - `processDueRecurringTransactions` returning 0 while still writing schedules back. The
+    ///   dedup advance, the catch-up fast-forward, the pathological-backdate deactivation and the
+    ///   endDate deactivation all mutate the array without generating an occurrence, so WC-L1's
+    ///   `guard insertedCount > 0` never sees them — the array mutation fires `.onChange` by itself.
+    ///   Driven by the 30-second timer.
+    /// - Backup import, unconditionally, on both platforms.
+    ///
+    /// So the question a teardown has to answer is not "was `sync` called" but "does this banner
+    /// still describe its schedule". The answer here is deliberately literal: rebuild the reminder
+    /// every currently-live schedule *would* get, and keep a delivered banner if and only if one of
+    /// those is filed under the same identifier **and says the same thing**. A banner is taken down
+    /// when its schedule is gone, completed, deactivated or has its reminders switched off (no entry
+    /// under that identifier), when Privacy Mode has flipped (the hidden branch files under
+    /// `due-<moment>` and the detailed one under the schedule's UUID, so neither can match the
+    /// other), or when the amount, currency, category or language would now render differently. An
+    /// unrelated edit changes none of those, and the banner stays.
+    ///
+    /// "Live" here drops the `nextDueDate > now` clause `sync` applies to the *pending* set, and has
+    /// to: a delivered banner is by definition one whose fire time has passed, so filtering to
+    /// future dues would find no schedule behind any of them and take down every one.
+    ///
+    /// One edge is knowingly left conservative. Once `processDueRecurringTransactions` has recorded
+    /// the occurrence and advanced `nextDueDate`, a detailed banner is arguably spent, but its
+    /// identifier is the bare schedule UUID and its text is what the next reminder will say too, so
+    /// it is indistinguishable from an accurate one here and is kept. Keeping a spent banner is the
+    /// failure this is trading against dismissing a live one, and it is the smaller of the two.
+    ///
+    /// Pure, and takes the delivered banners as plain values, because none of this is observable
+    /// from the test host: `authorizationStatus.rawValue == 0`, `center.add` retains 0 of 5
+    /// requests, and `deliveredNotifications()` is always empty. What a test can check is the
+    /// decision, not the queue.
+    nonisolated static func staleDelivered(
+        _ delivered: [DeliveredReminder],
+        schedules: [RecurringTransaction],
+        convertedAmounts: [UUID: Decimal],
+        currencyCode: String,
+        showDetails: Bool,
+        appLanguage: String?,
+        identifierPrefix: String
+    ) -> [String] {
+        // The overwhelmingly common case, and the one the 30-second timer drives: nothing has been
+        // delivered, so there is nothing to judge. Rebuilding every live schedule's reminder to find
+        // that out would be the one place this teardown does more work than the prefix sweep did.
+        let ours = delivered.filter { $0.identifier.hasPrefix(identifierPrefix) }
+        guard !ours.isEmpty else { return [] }
+
+        let live = schedules.filter { schedule in
+            schedule.isActive
+                && !schedule.isCompleted
+                && schedule.notificationsEnabled
+                && (schedule.endDate.map { schedule.nextDueDate <= $0 } ?? true)
+        }
+        let accurate = Dictionary(
+            requests(
+                for: live,
+                convertedAmounts: convertedAmounts,
+                currencyCode: currencyCode,
+                showDetails: showDetails,
+                appLanguage: appLanguage,
+                identifierPrefix: identifierPrefix,
+                limit: .max
+            ).map(DeliveredReminder.init).map { ($0.identifier, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        return ours.filter { accurate[$0.identifier] != $0 }.map(\.identifier)
     }
 
     /// Everything one schedule hands to the notification centre — payload, identifier and trigger —
@@ -339,9 +464,12 @@ actor RecurringNotificationService {
     /// callers (`CashFlowView` :688 and :725, `MacCashFlowView` :1022 and :1061) mutate
     /// `finance.data.recurringTransactions` immediately before calling it, which fires
     /// `.onChange(of:)` at `ContentView.swift:110` / `MacRootView.swift:119` and re-runs `sync`.
-    /// `sync` tears down by prefix, pending and delivered both, so the coalesced banner goes with
-    /// everything else. The same is true of the per-schedule identifier, which is why this method's
-    /// removals are belt-and-braces rather than load-bearing.
+    /// `sync` tears down every pending request under this prefix, and every *delivered* banner that
+    /// no live schedule still stands behind — a deleted schedule leaves no entry under its
+    /// identifier, and a coalesced banner outlives the deletion only while some other schedule is
+    /// still due at that same moment, which is exactly when it should. The same is true of the
+    /// per-schedule identifier, which is why this method's removals are belt-and-braces rather than
+    /// load-bearing.
     func cancel(scheduleID: UUID) {
         let identifier = notificationIdentifier(for: scheduleID)
         center.removePendingNotificationRequests(withIdentifiers: [identifier])
@@ -373,22 +501,57 @@ actor RecurringNotificationService {
     /// "erase local data" recovery action on both root views), so a factory reset was leaving the
     /// user's schedules describing themselves on the lock screen of a wiped device.
     ///
-    /// Delivered reminders are cleared on **every** `sync`, not only the Privacy-Mode one. `sync`
-    /// is never called speculatively: its callers are the three `.onChange` observers (schedule
-    /// set, display currency, Privacy Mode), the save/toggle handlers in the two Cash Flow views,
-    /// and `processRecurringTransactions` — which since WC-L1 only re-syncs when an occurrence was
-    /// actually generated. Every one of those means the banner on screen has stopped describing the
-    /// data: the schedule was edited or deleted, the amount is now denominated in a different
-    /// currency, or the occurrence has already been recorded and the reminder is spent. A stale
-    /// banner is wrong whether or not Privacy Mode is on, so this deliberately does not branch on
-    /// `showDetails` — the narrower "clear delivered only when hiding details" would have left the
-    /// staleness bug standing for everyone else and made correctness depend on an unrelated flag.
+    /// This is now the **erase** path only — `cancelAll`, and nothing else. It stays all-or-nothing
+    /// deliberately: "erase local data" means the schedules are gone, so no banner describing one
+    /// can still be accurate, and there is nothing left to compare against.
+    ///
+    /// `sync` used to call this too, which is the bug `clearReminders(supersededBy:…)` fixes; its
+    /// doc comment has the argument. The claim that used to stand here — that `sync` "is never
+    /// called speculatively", with a caller list to match — was wrong twice over. The list omitted
+    /// backup import (`SettingsView.swift:665`, `MacSettingsView.swift:826`, both unconditional),
+    /// and WC-L1's `guard insertedCount > 0` does not stop the timer path from re-syncing, because
+    /// the schedule write-back inside `processDueRecurringTransactions` fires
+    /// `.onChange(of: finance.data.recurringTransactions)` on its own.
     private func clearScheduledReminders() async {
         let pending = await center.pendingNotificationRequests().map(\.identifier)
         let delivered = await center.deliveredNotifications().map(\.request.identifier)
         let identifiers = (pending + delivered).filter { $0.hasPrefix(identifierPrefix) }
         center.removePendingNotificationRequests(withIdentifiers: identifiers)
         center.removeDeliveredNotifications(withIdentifiers: identifiers)
+    }
+
+    /// The teardown half of one `sync`: every pending request this service owns, and every delivered
+    /// banner that the schedules as they now stand no longer support.
+    ///
+    /// Pending is unconditional because the whole pending set is rebuilt three lines later, so
+    /// keeping one would save nothing and risk keeping a stale one. Delivered is not: a banner
+    /// already on the lock screen is not going to be re-posted, and taking down one that still
+    /// describes its schedule is a lost reminder. `staleDelivered` is where that judgement lives.
+    ///
+    /// Two awaits, the same two `clearScheduledReminders` makes — `sync` is reentrant with a
+    /// pre-existing read → remove → await → add window and this does not widen it further.
+    private func clearReminders(
+        supersededBy schedules: [RecurringTransaction],
+        convertedAmounts: [UUID: Decimal],
+        currencyCode: String,
+        showDetails: Bool,
+        appLanguage: String?
+    ) async {
+        let pending = await center.pendingNotificationRequests()
+            .map(\.identifier)
+            .filter { $0.hasPrefix(identifierPrefix) }
+        center.removePendingNotificationRequests(withIdentifiers: pending)
+
+        let delivered = await center.deliveredNotifications().map(DeliveredReminder.init)
+        center.removeDeliveredNotifications(withIdentifiers: Self.staleDelivered(
+            delivered,
+            schedules: schedules,
+            convertedAmounts: convertedAmounts,
+            currencyCode: currencyCode,
+            showDetails: showDetails,
+            appLanguage: appLanguage,
+            identifierPrefix: identifierPrefix
+        ))
     }
 
     /// The one spelling of a reminder's identifier, so the builder and `cancel(scheduleID:)` cannot
