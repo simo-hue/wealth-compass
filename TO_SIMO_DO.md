@@ -652,40 +652,54 @@ that exercises the code whenever one is possible at all.
 ### Privacy Mode and chart geometry — one decision, nine charts (2026-08-25)
 
 Redacting a number but drawing its proportion gives the number back. The app already agrees with that in
-writing — `SankeyDiagramView.swift:49-51` refuses to redact-and-draw ("a ribbon's width *is* the
+writing — `SankeyDiagramView.swift:54-56` refuses to redact-and-draw ("a ribbon's width *is* the
 proportion, so the shape alone still tells a bystander where the money goes") and conceals its whole
 chart, and macOS ships a component called `PrivacyChartCover` whose message is **"Values and proportions
 are hidden."** It is applied inconsistently. Full inventory so this is decided once:
 
-**Already concealed (the consistent set).** Net-worth charts `DashboardView.swift:195` /
-`MacDashboardView.swift:306`; cash-flow bars `DashboardView.swift:413` / `MacDashboardView.swift:604` /
-`MacCashFlowView.swift:297`; macOS asset donut `MacDashboardView.swift:447`; Sankey
-`SankeyDiagramView.swift:48`.
+**Already concealed (the consistent set).** Net-worth charts `DashboardView.swift:193` /
+`MacDashboardView.swift:299`; cash-flow bars `DashboardView.swift:416` / `MacDashboardView.swift:604` /
+`MacCashFlowView.swift:296`; macOS asset donut `MacDashboardView.swift:440`; Sankey
+`SankeyDiagramView.swift:53`. Every one of them now checks privacy **first** — see the ordering item
+below, which was closed on the same day.
 
 - [x] **A platform split that is a defect, not a preference.** iOS Asset Allocation
       (`DashboardView.swift:48`) drew true proportions in Privacy Mode while the **same chart** on macOS
       concealed. **Fixed 2026-08-25** by the item below — the iOS Dashboard ring is one of the eight, so
-      concealing `AllocationChart` closed this with it. Note for anyone reading `MacDashboardView.swift:447`
+      concealing `AllocationChart` closed this with it. Note for anyone reading `MacDashboardView.swift:440`
       as "the macOS twin": that card is *not* an `AllocationChart` call site, it inlines its own
       `Chart`/`SectorMark`, so there was no redundant outer wrapper to collapse afterwards.
 - [x] **Eight rings share one view and none of them conceal.** **Fixed 2026-08-25.** `AllocationChart`
-      (`DesignSystem.swift:412`) now branches `empty → privacy → chart`, showing
+      (`DesignSystem.swift:412`) now branches `privacy → empty → chart`, showing
       `MobilePrivacyChartCover("Allocation concealed" / "Values and proportions are hidden.")` in place of
-      the ring — the empty-state-first order the iOS net-worth and cash-flow cards use
-      (`DashboardView.swift:195`, `:413`) and the one its macOS counterpart uses. Ring, legend and
+      the ring — the same order the iOS net-worth and cash-flow cards now use
+      (`DashboardView.swift:193`, `:416`) and the one its macOS counterpart uses. Ring, legend and
       footnote conceal together: a legend under a cover would restate the value ordering the cover just
       hid, and `DashboardView.swift:52-56`'s footnote would otherwise dangle under it. All nine call
       sites conceal: `DashboardView.swift:48` · `InvestmentsView.swift:59,62,63` · `CryptoView.swift:60` ·
       `MacInvestmentsView.swift:47,53,59` · `MacCryptoView.swift:141`.
-- [x] **The iOS expense donut** `CashFlowView.swift:177` — **fixed 2026-08-25**, same cover, same two
-      strings (no new keys). Its top-six category list below the ring (now `:270`) deliberately **stays**:
-      ranked lists are a separate decision, below.
-- [ ] **Collapsed bar, surviving ranking.** `DashboardView.swift:547` collapses its bar to
-      `width: 0` under Privacy Mode, but the leaderboard around it keeps rank badge (`:515`), category
-      name (`:519`) and value-descending order (`:490`). The bar hides; the ranking does not. iOS only.
-- [ ] **macOS allocation legend renders in Privacy Mode.** `MacDashboardView.swift:529-549` is a sibling
-      of the `ZStack` holding the privacy branch (which closes at `:526`), so the cover never reaches it.
-      Values redact at `:540`/`:543`; bucket order is fixed, so it discloses which buckets are non-zero.
+- [x] **The iOS expense donut** `CashFlowView.swift:174` — **fixed 2026-08-25**, same cover, its own
+      title (`Spending breakdown concealed`, a new key). Its top-six category list below the ring (now
+      `:275`) deliberately **stays**: ranked lists are a separate decision, below.
+- [ ] **Collapsed bar, surviving ranking.** `DashboardView.swift:553` collapses its bar to
+      `width: 0` under Privacy Mode, but the leaderboard around it keeps rank badge (`:521`), category
+      name (`:525`) and value-descending order (`:496`). The bar hides; the ranking does not. iOS only.
+      The collapsed bar itself is now pinned: dropping the `settings.isPrivacyMode ? 0 :` is reported by
+      `testWorkingTreeSourcesDrawNoUnconcealedDonut`, which matches a data-scaled `.frame`.
+- [ ] **macOS allocation legend renders in Privacy Mode.** `MacDashboardView.swift:537-559` is a sibling
+      of the privacy branch (`:440`), not part of it, so the cover never reaches it. Values redact at
+      `:549`/`:552`; bucket order is fixed, so it discloses which buckets are non-zero. Left deliberately
+      untouched by both the footnote fix and the ordering flip — closing it changes what macOS renders and
+      is a decision of its own. iOS conceals its legend with the ring.
+- [ ] **The net-worth card still says it is empty, in words, right above the cover.** Found while
+      screenshotting the fix above on a fresh simulator with Privacy Mode on: the chart is concealed,
+      and the same card prints "No snapshots" (`DashboardView.swift:307` / `MacDashboardView.swift:424`,
+      the `snapshotFreshness` header) and "Add another snapshot to see movement"
+      (`DashboardView.swift:163` / `MacDashboardView.swift:272`, the `rangeChange == nil` fallback).
+      Both appear *only* when there is no history, so between them they hand back exactly the fact the
+      ordering flip was made to hide. They are labels rather than chart branches, which is why the flip
+      did not reach them, and `testWorkingTreeChecksPrivacyBeforeEmptiness` cannot see them either —
+      it only knows about covers. Same shape as the item above it.
 - [ ] **Ranked lists have no privacy awareness at all** — amounts redact, identity and order do not.
       One choke point: `FinanceModels.swift:635-649` (`rankedByValue`, takes no `AppSettings`). Sites:
       `InvestmentsView.swift:146` ↔ `MacInvestmentsView.swift:173-175,207`; `CryptoView.swift:204` ↔
@@ -724,8 +738,13 @@ Fallout from `e55f742`, worth one deliberate pass rather than leaving it to drif
 - [ ] **`Spending breakdown concealed` is 1/35 `translated`, 34 `needs_review`.** Added so the iOS expense
       donut's cover names its own chart instead of borrowing `Allocation concealed` (which is 35/35). The
       34 are machine translations and have never been read by a speaker.
-- [ ] **Two conceal orderings disagree in this codebase.** `AllocationChart` and the iOS Dashboard charts
-      check emptiness *before* privacy; `SankeyDiagramView.swift:45-48` deliberately checks privacy first,
-      arguing "whether a period is empty is itself information". The Sankey's reasoning is the stronger
-      one and probably should win everywhere — an "no data in this period" state that only appears when
-      you genuinely have no data still tells a bystander something.
+- [x] **Two conceal orderings disagree in this codebase — RESOLVED 2026-08-25 in favour of privacy
+      first.** `SankeyDiagramView.swift:45-53` had argued it alone: "whether a period is empty is itself
+      information". Every other chart checked emptiness first, so with Privacy Mode on and no data the
+      user saw "No assets found" / "No recent cash flow" instead of a cover. Eight sites flipped:
+      `DesignSystem.swift:429` (all nine `AllocationChart` rings at once), `CashFlowView.swift:174`,
+      `DashboardView.swift:193` and `:416`, `MacDashboardView.swift:299`, `:440` and `:604`,
+      `MacCashFlowView.swift:296`. It matters most on the four cards under a range picker: a bystander
+      could walk 1W/1M/3M/6M/12M and map which windows hold data with every figure redacted.
+      `testWorkingTreeChecksPrivacyBeforeEmptiness` pins it — against the pre-flip tree it reported all
+      eight.

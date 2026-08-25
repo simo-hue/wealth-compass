@@ -291,11 +291,13 @@ struct MacCashFlowView: View {
                     DashboardSegmentedPicker(selection: $cashFlowRange, items: CashFlowTimeframe.allCases) { $0.label }
                 }
 
-                if !hasCashFlow {
-                    EmptyState(title: "No recent cash flow", systemImage: "chart.bar.xaxis")
-                        .frame(maxWidth: .infinity, minHeight: 244)
-                } else if settings.isPrivacyMode {
+                // Privacy before emptiness: this card carries its own range picker, so "No recent
+                // cash flow" appearing for some ranges and not others is itself a readout.
+                if settings.isPrivacyMode {
                     EmptyState(title: "Cash-flow chart concealed", systemImage: "eye.slash")
+                        .frame(maxWidth: .infinity, minHeight: 244)
+                } else if !hasCashFlow {
+                    EmptyState(title: "No recent cash flow", systemImage: "chart.bar.xaxis")
                         .frame(maxWidth: .infinity, minHeight: 244)
                 } else {
                     Chart(trend) { month in

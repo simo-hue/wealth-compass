@@ -186,16 +186,20 @@ struct DashboardView: View {
                     .labelsHidden()
                     .pickerStyle(.segmented)
 
-                    if points.isEmpty {
-                        EmptyState(
-                            title: "Your net-worth trail starts here",
-                            systemImage: "chart.line.uptrend.xyaxis"
-                        )
-                        .frame(height: 205)
-                    } else if settings.isPrivacyMode {
+                    // Privacy before emptiness. This card sits under a 1W/1M/3M/6M/12M picker, so
+                    // an empty state that only appears for the ranges with no snapshots lets a
+                    // bystander walk the picker and map which windows hold data — without ever
+                    // seeing a figure.
+                    if settings.isPrivacyMode {
                         MobilePrivacyChartCover(
                             title: "Net-worth history concealed",
                             message: "Turn off Privacy Mode to reveal values and movement."
+                        )
+                        .frame(height: 205)
+                    } else if points.isEmpty {
+                        EmptyState(
+                            title: "Your net-worth trail starts here",
+                            systemImage: "chart.line.uptrend.xyaxis"
                         )
                         .frame(height: 205)
                     } else {
@@ -407,15 +411,17 @@ struct DashboardView: View {
                     .fixedSize()
                 }
 
-                if !hasCashFlow {
-                    EmptyState(title: "No recent cash flow", systemImage: "chart.bar.xaxis")
-                        .frame(height: 210)
-                } else if settings.isPrivacyMode {
+                // Privacy before emptiness — the 3M/6M/12M picker above makes this the same probe
+                // the net-worth card offers.
+                if settings.isPrivacyMode {
                     MobilePrivacyChartCover(
                         title: "Cash-flow chart concealed",
                         message: "Monthly amounts and proportions are hidden."
                     )
                     .frame(height: 210)
+                } else if !hasCashFlow {
+                    EmptyState(title: "No recent cash flow", systemImage: "chart.bar.xaxis")
+                        .frame(height: 210)
                 } else {
                     Chart(trend) { month in
                         BarMark(

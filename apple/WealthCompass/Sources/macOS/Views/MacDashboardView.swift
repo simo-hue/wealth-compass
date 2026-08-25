@@ -293,7 +293,16 @@ struct MacDashboardView: View {
                         }
                     }
 
-                    if points.isEmpty {
+                    // Privacy before emptiness. The range picker above turns an empty state into a
+                    // probe: toggle the ranges and the ones that show it are the ones with no
+                    // snapshots. The cover has to win for every range.
+                    if settings.isPrivacyMode {
+                        PrivacyChartCover(
+                            title: "Net-worth history concealed",
+                            message: "Turn off Privacy Mode to reveal values and movement."
+                        )
+                        .frame(height: 238)
+                    } else if points.isEmpty {
                         DashboardEmptyState(
                             title: "Your net-worth trail starts here",
                             message: "Adding a transaction or position records a snapshot for this chart.",
@@ -302,12 +311,6 @@ struct MacDashboardView: View {
                         ) {
                             appModel.presentNewItem(for: .cashFlow)
                         }
-                        .frame(height: 238)
-                    } else if settings.isPrivacyMode {
-                        PrivacyChartCover(
-                            title: "Net-worth history concealed",
-                            message: "Turn off Privacy Mode to reveal values and movement."
-                        )
                         .frame(height: 238)
                     } else {
                         Chart {
@@ -432,7 +435,15 @@ struct MacDashboardView: View {
             VStack(alignment: .leading, spacing: 18) {
                 sectionHeading("Asset Allocation", subtitle: "How investable assets are distributed")
 
-                if slices.isEmpty {
+                // Privacy before emptiness: with the ring covered, "No assets to allocate" would be
+                // the one thing on the card still saying something about the portfolio.
+                if settings.isPrivacyMode {
+                    PrivacyChartCover(
+                        title: "Allocation concealed",
+                        message: "Values and proportions are hidden."
+                    )
+                    .frame(height: 210)
+                } else if slices.isEmpty {
                     DashboardEmptyState(
                         title: "No assets to allocate",
                         message: "Add recorded cash, an investment, or a crypto holding.",
@@ -444,88 +455,86 @@ struct MacDashboardView: View {
                     .frame(minHeight: 260)
                 } else {
                     ZStack {
-                        if settings.isPrivacyMode {
-                            PrivacyChartCover(
-                                title: "Allocation concealed",
-                                message: "Values and proportions are hidden."
+                        Chart(slices) { slice in
+                            SectorMark(
+                                angle: .value("Value", slice.value),
+                                innerRadius: .ratio(0.72),
+                                angularInset: 2.5
                             )
-                        } else {
-                            Chart(slices) { slice in
-                                SectorMark(
-                                    angle: .value("Value", slice.value),
-                                    innerRadius: .ratio(0.72),
-                                    angularInset: 2.5
-                                )
-                                .foregroundStyle(slice.color.gradient)
-                                .cornerRadius(5)
-                                .opacity(hoveredAssetSlice == nil || hoveredAssetSlice?.id == slice.id ? 1.0 : 0.3)
-                                .accessibilityLabel(Text(slice.name))
-                                .accessibilityValue(Text(settings.privateCurrency(slice.value)))
-                            }
-                            .chartLegend(.hidden)
-                            .chartBackground { proxy in
-                                GeometryReader { geometry in
-                                    if let plotFrame = proxy.plotFrame {
-                                        let frame = geometry[plotFrame]
-                                        VStack(spacing: 3) {
-                                            if let hoveredAssetSlice {
-                                                Text(hoveredAssetSlice.name)
-                                                    .textCase(.uppercase)
-                                                    .font(.caption2.weight(.bold))
-                                                    .tracking(1.3)
-                                                    .foregroundStyle(hoveredAssetSlice.color)
-                                                Text(settings.privateCurrency(hoveredAssetSlice.value))
-                                                    .font(.headline.monospacedDigit().weight(.bold))
-                                                    .foregroundStyle(.white)
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.7)
-                                                Text(settings.privatePercent(allocationTotal > 0 ? hoveredAssetSlice.value / allocationTotal * 100 : 0))
-                                                    .font(.caption2.monospacedDigit())
-                                                    .foregroundStyle(.white.opacity(0.6))
-                                            } else {
-                                                Text("ASSETS")
-                                                    .font(.caption2.weight(.bold))
-                                                    .tracking(1.3)
-                                                    .foregroundStyle(WCColor.textTertiary)
-                                                Text(settings.privateCurrency(allocationTotal))
-                                                    .font(.headline.monospacedDigit().weight(.bold))
-                                                    .foregroundStyle(.white)
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.7)
-                                            }
+                            .foregroundStyle(slice.color.gradient)
+                            .cornerRadius(5)
+                            .opacity(hoveredAssetSlice == nil || hoveredAssetSlice?.id == slice.id ? 1.0 : 0.3)
+                            .accessibilityLabel(Text(slice.name))
+                            .accessibilityValue(Text(settings.privateCurrency(slice.value)))
+                        }
+                        .chartLegend(.hidden)
+                        .chartBackground { proxy in
+                            GeometryReader { geometry in
+                                if let plotFrame = proxy.plotFrame {
+                                    let frame = geometry[plotFrame]
+                                    VStack(spacing: 3) {
+                                        if let hoveredAssetSlice {
+                                            Text(hoveredAssetSlice.name)
+                                                .textCase(.uppercase)
+                                                .font(.caption2.weight(.bold))
+                                                .tracking(1.3)
+                                                .foregroundStyle(hoveredAssetSlice.color)
+                                            Text(settings.privateCurrency(hoveredAssetSlice.value))
+                                                .font(.headline.monospacedDigit().weight(.bold))
+                                                .foregroundStyle(.white)
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.7)
+                                            Text(settings.privatePercent(allocationTotal > 0 ? hoveredAssetSlice.value / allocationTotal * 100 : 0))
+                                                .font(.caption2.monospacedDigit())
+                                                .foregroundStyle(.white.opacity(0.6))
+                                        } else {
+                                            Text("ASSETS")
+                                                .font(.caption2.weight(.bold))
+                                                .tracking(1.3)
+                                                .foregroundStyle(WCColor.textTertiary)
+                                            Text(settings.privateCurrency(allocationTotal))
+                                                .font(.headline.monospacedDigit().weight(.bold))
+                                                .foregroundStyle(.white)
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.7)
                                         }
-                                        .position(x: frame.midX, y: frame.midY)
                                     }
+                                    .position(x: frame.midX, y: frame.midY)
                                 }
                             }
-                            .chartOverlay { proxy in
-                                GeometryReader { geometry in
-                                    if let plotFrame = proxy.plotFrame {
-                                        let frame = geometry[plotFrame]
-                                        Rectangle().fill(.clear).contentShape(Rectangle())
-                                            .accessibilityHidden(true)
-                                            .onContinuousHover { phase in
-                                                switch phase {
-                                                case .active(let location):
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        hoveredAssetSlice = slice(at: location, in: frame, slices: slices)
-                                                    }
-                                                case .ended:
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        hoveredAssetSlice = nil
-                                                    }
+                        }
+                        .chartOverlay { proxy in
+                            GeometryReader { geometry in
+                                if let plotFrame = proxy.plotFrame {
+                                    let frame = geometry[plotFrame]
+                                    Rectangle().fill(.clear).contentShape(Rectangle())
+                                        .accessibilityHidden(true)
+                                        .onContinuousHover { phase in
+                                            switch phase {
+                                            case .active(let location):
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    hoveredAssetSlice = slice(at: location, in: frame, slices: slices)
+                                                }
+                                            case .ended:
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    hoveredAssetSlice = nil
                                                 }
                                             }
-                                    }
+                                        }
                                 }
                             }
-                            .animation(.spring(response: 0.5, dampingFraction: 0.8), value: slices.map(\.value))
-                            .accessibilityElement(children: .contain)
-                            .accessibilityLabel(Text("Asset Allocation"))
                         }
+                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: slices.map(\.value))
+                        .accessibilityElement(children: .contain)
+                        .accessibilityLabel(Text("Asset Allocation"))
                     }
                     .frame(height: 210)
+                }
 
+                // The legend is a sibling of all three branches, exactly as it was: it lists the
+                // slice names with redacted values under the cover. That asymmetry with iOS is
+                // recorded in TO_SIMO_DO.md and is a separate decision from this ordering.
+                if !slices.isEmpty {
                     VStack(spacing: 11) {
                         ForEach(slices) { slice in
                             HStack(spacing: 10) {
@@ -547,21 +556,21 @@ struct MacDashboardView: View {
                             }
                         }
                     }
+                }
 
-                    // L33: cash is net-negative and dropped from the ring (no negative wedge), so the
-                    // ring total exceeds the net-worth header — explain the gap.
-                    //
-                    // Concealed with the ring, matching `AllocationChart`'s privacy branch on iOS.
-                    // Redacting the amount is not enough: the sentence's mere *presence* says the
-                    // user holds net cash liabilities, and it explains a gap in a chart the cover
-                    // has already taken away.
-                    if !settings.isPrivacyMode,
-                       let excludedCash = finance.assetAllocationExcludedCash(settings: settings) {
-                        Text(settings.localized("Chart shows gross assets; \(settings.privateCurrency(excludedCash)) in net cash liabilities is excluded."))
-                            .font(.caption2)
-                            .foregroundStyle(WCColor.textFaint)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                // L33: cash is net-negative and dropped from the ring (no negative wedge), so the
+                // ring total exceeds the net-worth header — explain the gap.
+                //
+                // Concealed with the ring, matching `AllocationChart`'s privacy branch on iOS.
+                // Redacting the amount is not enough: the sentence's mere *presence* says the
+                // user holds net cash liabilities, and it explains a gap in a chart the cover
+                // has already taken away.
+                if !settings.isPrivacyMode, !slices.isEmpty,
+                   let excludedCash = finance.assetAllocationExcludedCash(settings: settings) {
+                    Text(settings.localized("Chart shows gross assets; \(settings.privateCurrency(excludedCash)) in net cash liabilities is excluded."))
+                        .font(.caption2)
+                        .foregroundStyle(WCColor.textFaint)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .frame(maxHeight: .infinity, alignment: .top)
@@ -591,7 +600,14 @@ struct MacDashboardView: View {
                     }
                 }
 
-                if !hasCashFlow {
+                // Privacy before emptiness, as on the net-worth card above.
+                if settings.isPrivacyMode {
+                    PrivacyChartCover(
+                        title: "Cash-flow chart concealed",
+                        message: "Monthly amounts and proportions are hidden."
+                    )
+                    .frame(height: 244)
+                } else if !hasCashFlow {
                     DashboardEmptyState(
                         title: "No recent cash flow",
                         message: "Record income or an expense to reveal the monthly pattern.",
@@ -600,12 +616,6 @@ struct MacDashboardView: View {
                     ) {
                         appModel.presentNewItem(for: .cashFlow)
                     }
-                    .frame(height: 244)
-                } else if settings.isPrivacyMode {
-                    PrivacyChartCover(
-                        title: "Cash-flow chart concealed",
-                        message: "Monthly amounts and proportions are hidden."
-                    )
                     .frame(height: 244)
                 } else {
                     Chart(trend) { month in

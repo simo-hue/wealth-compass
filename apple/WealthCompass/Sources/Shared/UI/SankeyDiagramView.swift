@@ -42,9 +42,14 @@ struct SankeyDiagramView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            // Privacy is checked *before* emptiness on purpose: whether a period is empty is itself
-            // information, and callers guard their own empty states on `!isPrivacyMode` expecting
-            // this branch to win.
+            // Privacy is checked *before* emptiness, here and now at every chart in the app:
+            // whether a period is empty is itself information. An empty state that appears only
+            // when there is genuinely nothing to show tells a bystander there is nothing to show,
+            // and on the cards that carry a range picker they can walk the ranges and map which
+            // windows hold data without ever seeing a figure. This diagram argued it first and was
+            // for a while the only one doing it; the rest were reordered to match. Callers still
+            // guard their own empty states on `!isPrivacyMode` expecting this branch to win
+            // (`MacDashboardView.swift:746`).
             if settings.isPrivacyMode {
                 // Full conceal, matching the cash-flow trend chart. Redacting only the amounts
                 // would be theatre here: a ribbon's width *is* the proportion, so the shape alone

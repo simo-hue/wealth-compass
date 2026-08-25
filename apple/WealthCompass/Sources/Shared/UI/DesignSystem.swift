@@ -404,11 +404,11 @@ struct ValueDelta: View {
 /// `InvestmentsView.swift:59`, `:62` and `:63`, `CryptoView.swift:60`,
 /// `MacInvestmentsView.swift:47`, `:53` and `:59`, and `MacCryptoView.swift:141`.
 ///
-/// Those nine, plus the iOS expense donut in `CashFlowView.swift:177`, are the **ten** charts
+/// Those nine, plus the iOS expense donut in `CashFlowView.swift:174`, are the **ten** charts
 /// `e55f742` put behind a privacy cover. That commit's own message said eight; it is not
 /// fixable in history, so the count is recorded here instead. macOS's Dashboard asset ring is
 /// not one of the nine — it inlines its own `Chart` / `SectorMark`
-/// (`MacDashboardView.swift:453-454`) and already concealed itself.
+/// (`MacDashboardView.swift:458-459`) and already concealed itself.
 struct AllocationChart: View {
     let title: LocalizedStringKey
     let slices: [AllocationSlice]
@@ -426,22 +426,20 @@ struct AllocationChart: View {
             VStack(alignment: .leading, spacing: 18) {
                 SectionHeading(title, subtitle: "How the portfolio is distributed")
 
-                if slices.isEmpty {
-                    EmptyState(title: "No assets found", systemImage: "chart.pie")
-                } else if settings.isPrivacyMode {
+                if settings.isPrivacyMode {
                     // A wedge's angle *is* its share of the total, so masking the labels while still
                     // drawing the ring hands the composition straight back — the same reasoning
-                    // `SankeyDiagramView.swift:49-51` gives for concealing its whole diagram, and what
+                    // `SankeyDiagramView.swift:54-56` gives for concealing its whole diagram, and what
                     // `PrivacyChartCover`'s own message ("Values and proportions are hidden") promises.
                     // Ring, legend and footnote go together: a legend under a cover would restate the
                     // value ordering the cover just hid, and the footnote's sentence would dangle.
-                    // Emptiness is still checked first, matching the net-worth and cash-flow cards
-                    // (`DashboardView.swift:195`, `:413`) and this chart's macOS twin.
                     MobilePrivacyChartCover(
                         title: "Allocation concealed",
                         message: "Values and proportions are hidden."
                     )
                     .frame(height: 200)
+                } else if slices.isEmpty {
+                    EmptyState(title: "No assets found", systemImage: "chart.pie")
                 } else {
                     let total = slices.reduce(0) { $0 + $1.value }
 

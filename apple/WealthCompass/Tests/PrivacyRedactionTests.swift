@@ -347,7 +347,7 @@ final class PrivacyRedactionTests: XCTestCase {
     /// **Why a second sweep rather than a case of the first.** Redaction and concealment are
     /// different promises. The percentage sweep asks whether a *number* is masked; this one asks
     /// whether a *shape* is drawn, because a wedge's angle is its share of the total whether or not
-    /// the label beside it says `••••`. `SankeyDiagramView.swift:49-51` states the rule in prose and
+    /// the label beside it says `••••`. `SankeyDiagramView.swift:54-56` states the rule in prose and
     /// `PrivacyChartCover`'s own message states it to the user — "Values and proportions are hidden."
     ///
     /// **What it actually checks**, with the same two caveats as the percentage sweep: it greps the
@@ -366,14 +366,14 @@ final class PrivacyRedactionTests: XCTestCase {
     ///   in the privacy branch is the same leak in a different mark. Matched.
     /// - `.trim(from:to:)` — absent today, but `Circle().trim(…).stroke(…)` over running category
     ///   shares is a donut with no `SectorMark` in it at all. Matched, so it cannot arrive unseen.
-    /// - A **data-scaled `.frame`** — `DashboardView.swift:547` sizes a `Capsule` to
+    /// - A **data-scaled `.frame`** — `DashboardView.swift:553` sizes a `Capsule` to
     ///   `geometry.size.width * <share>`, a proportional bar built out of layout rather than
     ///   Charts. Matched by shape: a measured `size.width`/`size.height` scaled by something that
     ///   is not a numeric literal. Decorative uses (`min(proxy.size.width * 0.95, 420)`, the
     ///   background-glow `.offset`s) scale by literals and are not matched.
-    /// - `Path`-based ribbons (`SankeyDiagramView.swift:178`, `:539`) and the report's `addArc`
+    /// - `Path`-based ribbons (`SankeyDiagramView.swift:183`, `:544`) and the report's `addArc`
     ///   donut (`ReportChartRenderer.swift:565-569`) are **not** matched. The Sankey conceals its
-    ///   whole diagram before it does anything else (`SankeyDiagramView.swift:45-48`) and the
+    ///   whole diagram before it does anything else (`SankeyDiagramView.swift:45-53`) and the
     ///   report files are in `excludedFiles` because an export redacts nothing by design. A new
     ///   hand-drawn `Path` proportion elsewhere would be invisible here.
     ///
@@ -489,7 +489,7 @@ final class PrivacyRedactionTests: XCTestCase {
                                 "        Circle().trim(from: 0, to: item.value / total).stroke(color)",
                                 "    }",
                                 "}"], 2),
-            // `DashboardView.swift:547` with its inline gate dropped.
+            // `DashboardView.swift:553` with its inline gate dropped.
             "a data-scaled frame": (["var body: some View {",
                                      "    GeometryReader { geometry in",
                                      "        Capsule()",
@@ -517,7 +517,7 @@ final class PrivacyRedactionTests: XCTestCase {
 
         // The conceal shapes the codebase uses — the flat `else if` chain (`AllocationChart`,
         // `CashFlowView`), the `ZStack` + inner `if` (`MacDashboardView`), the inline gate
-        // (`DashboardView.swift:547`) — each also written in Allman braces, which changes where
+        // (`DashboardView.swift:553`) — each also written in Allman braces, which changes where
         // the `{` sits and must not change the verdict.
         let concealed: [String: ([String], Int)] = [
             "else-if chain": ([
@@ -699,6 +699,228 @@ final class PrivacyRedactionTests: XCTestCase {
         if let (code, column) = match(elsewhere, 8, "other-declaration") {
             XCTAssertFalse(isSafe(code, at: 8, column: column),
                            "a conceal written in another computed property counts as this chart's gate")
+        }
+    }
+
+    // MARK: - Branch order
+
+    /// Fails if a privacy cover is not the *first* branch of the chain it sits in.
+    ///
+    /// **What emptiness gives away.** A chart card has three states — no data, concealed, drawn —
+    /// and for a long time every card but one checked them in that order. So with Privacy Mode on
+    /// and no data the user got "No assets found" or "No recent cash flow" instead of a cover, and
+    /// a bystander learned the category is empty. `SankeyDiagramView.swift:45-53` argued the other
+    /// way from the start: "whether a period is empty is itself information". That reasoning now
+    /// holds everywhere, and this is what keeps it holding.
+    ///
+    /// It bites hardest on the two cards under a range picker. Net worth and cash flow both let
+    /// anyone holding the device toggle 1W/1M/3M/6M/12M; if the empty state wins, walking the
+    /// picker maps which windows contain data, with every figure still redacted. The allocation
+    /// donuts offer no such probe, which is why those are the milder half of the same rule.
+    ///
+    /// **The rule, stated structurally.** Nothing may be evaluated ahead of the cover. It has to
+    /// open its own `if` chain — `if settings.isPrivacyMode { cover }`, never
+    /// `} else if settings.isPrivacyMode { cover }` — *and* no enclosing block, out to the
+    /// declaration, may be conditional either. Both halves are needed: `CashFlowView` and
+    /// `MacDashboardView` wrote `if categories.isEmpty { … } else { if settings.isPrivacyMode
+    /// { cover } … }`, where the privacy check does open a chain and the emptiness test is simply
+    /// one level out. Against the tree as it stood before this ordering change, the first half
+    /// alone found six of the eight sites.
+    ///
+    /// The check is deliberately blunt: it does not try to prove the earlier condition is
+    /// data-dependent, it requires there to be no earlier condition. A chain whose first branch is
+    /// some genuinely privacy-independent thing would have to be argued for here rather than
+    /// written past.
+    ///
+    /// Same caveats as the other two sweeps: it reads the working tree, not the binary, and only
+    /// the cover spellings in `coverPatterns`. A card that draws no cover at all is invisible to
+    /// it — `MacDashboardView.swift:746` is the one such site, and it makes the same guarantee by
+    /// hand with `if sankey.isEmpty && !settings.isPrivacyMode`.
+    func testWorkingTreeChecksPrivacyBeforeEmptiness() throws {
+        let sources = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources")
+
+        var offenders: [PercentRender] = []
+        var covers = 0
+
+        for directory in Self.scannedDirectories {
+            let root = sources.appendingPathComponent(directory)
+            let swiftFiles = try FileManager.default
+                .subpathsOfDirectory(atPath: root.path)
+                .filter { $0.hasSuffix(".swift") }
+                .filter { !Self.excludedFiles.contains(($0 as NSString).lastPathComponent) }
+                .sorted()
+            XCTAssertFalse(
+                swiftFiles.isEmpty,
+                "read no Swift files under \(root.path) — the sweep is not seeing the source tree"
+            )
+
+            for file in swiftFiles {
+                let text = try String(contentsOf: root.appendingPathComponent(file), encoding: .utf8)
+                let source = Self.stripped(text)
+
+                for index in source.scan.indices {
+                    guard let match = Self.coverMatch(at: index, in: source) else { continue }
+                    covers += 1
+                    guard !Self.privacyIsCheckedFirst(at: index, column: match.column, in: source.code) else { continue }
+                    offenders.append(PercentRender(
+                        file: "Sources/\(directory)/\(file)", line: index + 1, pattern: match.pattern,
+                        source: String(source.scan[index]).trimmingCharacters(in: .whitespaces)
+                    ))
+                }
+            }
+        }
+
+        XCTAssertGreaterThan(covers, 5, "only \(covers) privacy cover(s) found — the sweep lost the source tree")
+
+        XCTAssertEqual(
+            offenders.map(\.description), [],
+            """
+            \(offenders.count) privacy cover(s) sit behind another branch, so something else renders \
+            first while Privacy Mode is on. Move the privacy check to the head of the chain:
+            \(offenders.map { "  " + $0.description }.joined(separator: "\n"))
+            """
+        )
+    }
+
+    /// The alarm for the sweep above, in the shape the other two take.
+    func testBranchOrderSweepStillCatchesALeak() {
+        func check(_ fixture: [String], _ line: Int, _ name: String) -> Bool? {
+            let source = Self.stripped(fixture.joined(separator: "\n"))
+            guard let match = Self.coverMatch(at: line, in: source) else {
+                XCTFail("the sweep no longer sees a cover in the \(name) fixture")
+                return nil
+            }
+            return Self.privacyIsCheckedFirst(at: line, column: match.column, in: source.code)
+        }
+
+        // Emptiness first — what every card but the Sankey used to do.
+        let emptinessFirst: [String: ([String], Int)] = [
+            "else-if cover": ([
+                "var body: some View {",
+                "    if slices.isEmpty {",
+                "        EmptyState(title: \"No assets found\", systemImage: \"chart.pie\")",
+                "    } else if settings.isPrivacyMode {",
+                "        MobilePrivacyChartCover(title: title, message: message)",
+                "    } else {",
+                "        chart",
+                "    }",
+                "}",
+            ], 4),
+            "else-if cover, Allman": ([
+                "var body: some View {",
+                "    if slices.isEmpty",
+                "    {",
+                "        EmptyState(title: \"No assets found\", systemImage: \"chart.pie\")",
+                "    }",
+                "    else if settings.isPrivacyMode",
+                "    {",
+                "        PrivacyChartCover(title: title, message: message)",
+                "    }",
+                "}",
+            ], 7),
+            // The cover spelled as an `EmptyState`, which is what macOS Cash Flow and the Sankey use.
+            "else-if EmptyState cover": ([
+                "var body: some View {",
+                "    if !hasCashFlow {",
+                "        EmptyState(title: \"No recent cash flow\", systemImage: \"chart.bar.xaxis\")",
+                "    } else if settings.isPrivacyMode {",
+                "        EmptyState(title: \"Cash-flow chart concealed\", systemImage: \"eye.slash\")",
+                "    }",
+                "}",
+            ], 4),
+            // The nested variant: the privacy check *does* open its own chain, but that chain only
+            // runs inside the `else` of an emptiness test one level out. `CashFlowView` and
+            // `MacDashboardView` were both written this way, and a check that only reads the line
+            // above the cover calls both of them clean.
+            "privacy nested inside the non-empty branch": ([
+                "var body: some View {",
+                "    if categories.isEmpty {",
+                "        EmptyState(title: \"No expenses for this period\", systemImage: \"chart.pie\")",
+                "    } else {",
+                "        if settings.isPrivacyMode {",
+                "            MobilePrivacyChartCover(title: title, message: message)",
+                "        } else {",
+                "            chart",
+                "        }",
+                "    }",
+                "}",
+            ], 5),
+        ]
+        for (name, (fixture, line)) in emptinessFirst {
+            if let opens = check(fixture, line, name) {
+                XCTAssertFalse(opens, "a cover behind an emptiness check reads as first in its chain (\(name))")
+            }
+        }
+
+        // Privacy first — the shape the codebase now uses everywhere.
+        let privacyFirst: [String: ([String], Int)] = [
+            "cover opens the chain": ([
+                "var body: some View {",
+                "    if settings.isPrivacyMode {",
+                "        MobilePrivacyChartCover(title: title, message: message)",
+                "    } else if slices.isEmpty {",
+                "        EmptyState(title: \"No assets found\", systemImage: \"chart.pie\")",
+                "    } else {",
+                "        chart",
+                "    }",
+                "}",
+            ], 2),
+            "cover opens the chain, Allman": ([
+                "var body: some View {",
+                "    if settings.isPrivacyMode",
+                "    {",
+                "        PrivacyChartCover(title: title, message: message)",
+                "    }",
+                "    else if slices.isEmpty",
+                "    {",
+                "        EmptyState(title: \"No assets found\", systemImage: \"chart.pie\")",
+                "    }",
+                "}",
+            ], 3),
+            // `MacDashboardView`'s asset ring shape, before this ordering change reached it.
+            "inside a ZStack": ([
+                "var body: some View {",
+                "    ZStack {",
+                "        if settings.isPrivacyMode {",
+                "            PrivacyChartCover(title: title, message: message)",
+                "        } else {",
+                "            chart",
+                "        }",
+                "    }",
+                "}",
+            ], 3),
+        ]
+        for (name, (fixture, line)) in privacyFirst {
+            if let opens = check(fixture, line, name) {
+                XCTAssertTrue(opens, "the sweep would now report the \(name) shape, which is the codebase's own")
+            }
+        }
+
+        // A cover under a check that is not a privacy check is not a privacy branch at all.
+        let wrongFlag = [
+            "var body: some View {",
+            "    if isCompactLayout {",
+            "        MobilePrivacyChartCover(title: title, message: message)",
+            "    }",
+            "}",
+        ]
+        if let opens = check(wrongFlag, 2, "non-privacy gate") {
+            XCTAssertFalse(opens, "a cover under an unrelated flag reads as a privacy branch")
+        }
+
+        // …and one under a *negated* privacy check renders exactly when privacy is off.
+        let negated = [
+            "var body: some View {",
+            "    if !settings.isPrivacyMode {",
+            "        MobilePrivacyChartCover(title: title, message: message)",
+            "    }",
+            "}",
+        ]
+        if let opens = check(negated, 2, "negated gate") {
+            XCTAssertFalse(opens, "a cover under `!isPrivacyMode` reads as a privacy branch")
         }
     }
 
@@ -892,8 +1114,8 @@ final class PrivacyRedactionTests: XCTestCase {
     /// exempts five lines in four declarations — `formattedPercent` itself
     /// (`DesignSystem.swift:372`, and its body's own `.formatted(.percent` at `:374`),
     /// `AppSettings.privatePercent`'s body (`AppSettings.swift:365`), `AllocationChart`'s
-    /// share-of-total helper (`DesignSystem.swift:563`) and the Sankey node's VoiceOver value
-    /// builder (`SankeyDiagramView.swift:476`). It is also the widest hole in the sweep: move a
+    /// share-of-total helper (`DesignSystem.swift:561`) and the Sankey node's VoiceOver value
+    /// builder (`SankeyDiagramView.swift:481`). It is also the widest hole in the sweep: move a
     /// render into a `-> String` helper and it stops being visible here.
     private static func isStringHelper(at index: Int, in code: [[Character]]) -> Bool {
         guard let declaration = enclosingDeclaration(at: index, in: code) else { return false }
@@ -1055,7 +1277,7 @@ final class PrivacyRedactionTests: XCTestCase {
         // `.trimmingCharacters(` does not match: the `(` has to follow `trim` directly.
         (".trim(", try! NSRegularExpression(pattern: #"\.trim\s*\("#)),
         // A measured container length scaled by something that is not a literal — the shape of
-        // `DashboardView.swift:547`'s spending bar, and of any hand-built proportional bar. The
+        // `DashboardView.swift:553`'s spending bar, and of any hand-built proportional bar. The
         // trailing `[^0-9.\s]` is what excludes the decorative `* 0.95` / `* 0.34` cases; a
         // negative lookahead cannot, because `\s*` simply backtracks to nothing in front of it.
         ("a data-scaled .frame",
@@ -1135,6 +1357,71 @@ final class PrivacyRedactionTests: XCTestCase {
             }
         }
         return false
+    }
+
+    /// The privacy covers this codebase draws. Two are dedicated views; `MacCashFlowView` and
+    /// `SankeyDiagramView` reuse `EmptyState` with the eye-slash glyph instead, so the third
+    /// spelling is an `EmptyState` whose title says so. That one is matched against `scan`, where
+    /// string bodies survive — in `code` the word "concealed" has been blanked away.
+    private static let coverPatterns: [(name: String, regex: NSRegularExpression)] = [
+        ("PrivacyChartCover(", try! NSRegularExpression(pattern: #"\b(?:Mobile)?PrivacyChartCover\s*\("#)),
+        ("an EmptyState cover", try! NSRegularExpression(pattern: #"\bEmptyState\s*\([^)]*concealed"#)),
+    ]
+
+    /// Where a privacy cover is drawn on this line, if one is.
+    private static func coverMatch(at index: Int, in source: StrippedSource) -> (column: Int, pattern: String)? {
+        let line = String(source.scan[index])
+        let range = NSRange(line.startIndex..<line.endIndex, in: line)
+        for (name, regex) in coverPatterns {
+            guard let match = regex.firstMatch(in: line, range: range),
+                  let matched = Range(match.range, in: line) else { continue }
+            return (line.distance(from: line.startIndex, to: matched.lowerBound), name)
+        }
+        return nil
+    }
+
+    /// Whether nothing at all is evaluated ahead of this cover.
+    ///
+    /// Two things have to hold. The block the cover sits in is opened by an un-negated privacy
+    /// check that starts its own chain — not `} else if settings.isPrivacyMode {`, because whatever
+    /// the chain tested first renders while Privacy Mode is on. And no *enclosing* block may be
+    /// conditional either: `CashFlowView` and `MacDashboardView` both used to nest the privacy
+    /// check inside the `else` of an emptiness test, which reads as a chain-opening `if` when you
+    /// only look at the line above the cover, and hides the same leak one level out.
+    private static func privacyIsCheckedFirst(at index: Int, column: Int, in code: [[Character]]) -> Bool {
+        let declaration = enclosingDeclaration(at: index, in: code) ?? 0
+        var opener = enclosingBlockOpener(at: index, column: column, in: code)
+        let header = blockHeader(openedAt: opener, in: code)
+        guard let gate = privacyGate(in: header.map { String(code[$0]) }.joined(separator: " ")),
+              !gate.isNegated,
+              !isBranchContinuation(header, in: code) else { return false }
+
+        for _ in 0..<24 {
+            guard opener > declaration else { return true }
+            let line = String(code[opener])
+            guard let brace = line.firstIndex(of: "{") else { return true }
+            opener = enclosingBlockOpener(
+                at: opener, column: line.distance(from: line.startIndex, to: brace), in: code
+            )
+            guard opener > declaration else { return true }
+            if isConditionalHeader(blockHeader(openedAt: opener, in: code), in: code) { return false }
+        }
+        return true
+    }
+
+    /// Statement keywords that make a block conditional on something. `ForEach { }` is a call, not
+    /// one of these — a cover inside one would be a different mistake and is not what this asks.
+    private static let conditionalKeywords = ["if ", "if(", "else", "guard ", "switch ", "case ", "default:", "for ", "while "]
+
+    private static func isConditionalHeader(_ header: ClosedRange<Int>, in code: [[Character]]) -> Bool {
+        if isBranchContinuation(header, in: code) { return true }
+        let head = String(code[header.lowerBound]).trimmingCharacters(in: .whitespaces)
+        return conditionalKeywords.contains { head.hasPrefix($0) }
+    }
+
+    private static func isBranchContinuation(_ header: ClosedRange<Int>, in code: [[Character]]) -> Bool {
+        let head = String(code[header.lowerBound]).trimmingCharacters(in: .whitespaces)
+        return head.hasPrefix("}") || head.hasPrefix("else")
     }
 
     private static let elsePattern = try! NSRegularExpression(pattern: #"\belse\b"#)
