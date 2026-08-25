@@ -431,7 +431,7 @@ struct AllocationChart: View {
                 } else if settings.isPrivacyMode {
                     // A wedge's angle *is* its share of the total, so masking the labels while still
                     // drawing the ring hands the composition straight back — the same reasoning
-                    // `SankeyDiagramView.swift:50-52` gives for concealing its whole diagram, and what
+                    // `SankeyDiagramView.swift:49-51` gives for concealing its whole diagram, and what
                     // `PrivacyChartCover`'s own message ("Values and proportions are hidden") promises.
                     // Ring, legend and footnote go together: a legend under a cover would restate the
                     // value ordering the cover just hid, and the footnote's sentence would dangle.

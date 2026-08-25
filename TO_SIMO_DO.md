@@ -652,13 +652,13 @@ that exercises the code whenever one is possible at all.
 ### Privacy Mode and chart geometry — one decision, nine charts (2026-08-25)
 
 Redacting a number but drawing its proportion gives the number back. The app already agrees with that in
-writing — `SankeyDiagramView.swift:50-52` refuses to redact-and-draw ("a ribbon's width *is* the
+writing — `SankeyDiagramView.swift:49-51` refuses to redact-and-draw ("a ribbon's width *is* the
 proportion, so the shape alone still tells a bystander where the money goes") and conceals its whole
 chart, and macOS ships a component called `PrivacyChartCover` whose message is **"Values and proportions
 are hidden."** It is applied inconsistently. Full inventory so this is decided once:
 
 **Already concealed (the consistent set).** Net-worth charts `DashboardView.swift:195` /
-`MacDashboardView.swift:306`; cash-flow bars `DashboardView.swift:413` / `MacDashboardView.swift:598` /
+`MacDashboardView.swift:306`; cash-flow bars `DashboardView.swift:413` / `MacDashboardView.swift:604` /
 `MacCashFlowView.swift:297`; macOS asset donut `MacDashboardView.swift:447`; Sankey
 `SankeyDiagramView.swift:48`.
 
@@ -669,12 +669,12 @@ are hidden."** It is applied inconsistently. Full inventory so this is decided o
       as "the macOS twin": that card is *not* an `AllocationChart` call site, it inlines its own
       `Chart`/`SectorMark`, so there was no redundant outer wrapper to collapse afterwards.
 - [x] **Eight rings share one view and none of them conceal.** **Fixed 2026-08-25.** `AllocationChart`
-      (`DesignSystem.swift:403`) now branches `empty → privacy → chart`, showing
+      (`DesignSystem.swift:412`) now branches `empty → privacy → chart`, showing
       `MobilePrivacyChartCover("Allocation concealed" / "Values and proportions are hidden.")` in place of
       the ring — the empty-state-first order the iOS net-worth and cash-flow cards use
       (`DashboardView.swift:195`, `:413`) and the one its macOS counterpart uses. Ring, legend and
       footnote conceal together: a legend under a cover would restate the value ordering the cover just
-      hid, and `DashboardView.swift:53-57`'s footnote would otherwise dangle under it. All eight call
+      hid, and `DashboardView.swift:52-56`'s footnote would otherwise dangle under it. All nine call
       sites conceal: `DashboardView.swift:48` · `InvestmentsView.swift:59,62,63` · `CryptoView.swift:60` ·
       `MacInvestmentsView.swift:47,53,59` · `MacCryptoView.swift:141`.
 - [x] **The iOS expense donut** `CashFlowView.swift:177` — **fixed 2026-08-25**, same cover, same two
@@ -725,7 +725,7 @@ Fallout from `e55f742`, worth one deliberate pass rather than leaving it to drif
       donut's cover names its own chart instead of borrowing `Allocation concealed` (which is 35/35). The
       34 are machine translations and have never been read by a speaker.
 - [ ] **Two conceal orderings disagree in this codebase.** `AllocationChart` and the iOS Dashboard charts
-      check emptiness *before* privacy; `SankeyDiagramView.swift:46-52` deliberately checks privacy first,
+      check emptiness *before* privacy; `SankeyDiagramView.swift:45-48` deliberately checks privacy first,
       arguing "whether a period is empty is itself information". The Sankey's reasoning is the stronger
       one and probably should win everywhere — an "no data in this period" state that only appears when
       you genuinely have no data still tells a bystander something.

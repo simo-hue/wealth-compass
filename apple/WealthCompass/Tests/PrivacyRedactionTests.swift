@@ -347,7 +347,7 @@ final class PrivacyRedactionTests: XCTestCase {
     /// **Why a second sweep rather than a case of the first.** Redaction and concealment are
     /// different promises. The percentage sweep asks whether a *number* is masked; this one asks
     /// whether a *shape* is drawn, because a wedge's angle is its share of the total whether or not
-    /// the label beside it says `••••`. `SankeyDiagramView.swift:50-52` states the rule in prose and
+    /// the label beside it says `••••`. `SankeyDiagramView.swift:49-51` states the rule in prose and
     /// `PrivacyChartCover`'s own message states it to the user — "Values and proportions are hidden."
     ///
     /// **What it actually checks**, with the same two caveats as the percentage sweep: it greps the
@@ -373,7 +373,7 @@ final class PrivacyRedactionTests: XCTestCase {
     ///   background-glow `.offset`s) scale by literals and are not matched.
     /// - `Path`-based ribbons (`SankeyDiagramView.swift:178`, `:539`) and the report's `addArc`
     ///   donut (`ReportChartRenderer.swift:565-569`) are **not** matched. The Sankey conceals its
-    ///   whole diagram before it does anything else (`SankeyDiagramView.swift:46-48`) and the
+    ///   whole diagram before it does anything else (`SankeyDiagramView.swift:45-48`) and the
     ///   report files are in `excludedFiles` because an export redacts nothing by design. A new
     ///   hand-drawn `Path` proportion elsewhere would be invisible here.
     ///
