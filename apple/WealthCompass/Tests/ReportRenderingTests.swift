@@ -198,10 +198,17 @@ final class ReportReconciliationTests: XCTestCase {
         return data
     }
 
+    /// `usesLiveRates: false` is the export that runs before the first rate refresh has landed.
+    /// The snapshot is withheld from the converter *and* the context together, because
+    /// `FinanceStore.exportReport` fills both from `AppSettings.exchangeRateSnapshot` — a document
+    /// converted at live rates while describing fallback ones cannot occur in the app, and must not
+    /// be constructible here either.
     private func buildDocument(sections: Set<ReportSection> = Set(ReportSection.allCases),
                                range: ReportDateRange = .allTime,
-                               data: FinancialData? = nil) -> ReportDocument {
-        ReportDocumentBuilder(
+                               data: FinancialData? = nil,
+                               usesLiveRates: Bool = true) -> ReportDocument {
+        let snapshot = usesLiveRates ? self.snapshot : nil
+        return ReportDocumentBuilder(
             context: ReportBuildContext(
                 data: data ?? self.data,
                 converter: CurrencyConverter(snapshot: snapshot),
@@ -412,6 +419,60 @@ final class ReportReconciliationTests: XCTestCase {
         // 3000 - 500 + 922.34 - 230.58 + 2000 - 700, with the 412.90 future expense left out.
         XCTAssertEqual(amount(try XCTUnwrap(kpi(document, section: anchor, label: "Closing Balance"))),
                        Decimal(string: "4491.76"))
+    }
+
+    /// The offline export must disclose the rates it converted at, not just admit that it used
+    /// some.
+    ///
+    /// `heldCurrencies()` and the rate table both sat inside `if let snapshot`, so the one export
+    /// whose figures are least reproducible — every foreign amount converted at an approximate
+    /// built-in seed — was also the only one that printed no rates at all. A reader given
+    /// "€922.34" and told merely that "fallback rates were approximate" cannot check a single
+    /// figure in the document.
+    func testAppendixDisclosesFallbackRatesWhenNoSnapshotExists() throws {
+        let document = buildDocument(usesLiveRates: false)
+        let appendix = try XCTUnwrap(document.sections.first { $0.title == "Appendix" })
+
+        var rateTable: ReportTable?
+        for block in appendix.blocks {
+            if case let .table(table) = block, table.columns.first?.title == "Currency" {
+                rateTable = table
+            }
+        }
+        let table = try XCTUnwrap(rateTable, "the appendix disclosed no exchange rates at all")
+
+        // Without a snapshot the seeds are units per EUR by construction, so the column has to say
+        // so rather than inherit a quote base from a snapshot that does not exist.
+        XCTAssertEqual(table.columns[1].title, "Units per EUR")
+
+        let usd = try XCTUnwrap(table.rows.first { $0.cells[0].hasPrefix("USD") },
+                                "USD is held by the dataset but missing from the rate table")
+        XCTAssertEqual(usd.cells[2], "Offline fallback rate")
+        XCTAssertEqual(usd.style, .excluded, "an approximate rate must be marked as one")
+        XCTAssertEqual(
+            usd.cells[1],
+            Currency.usd.fallbackUnitsPerEuro.formatted(
+                .number.precision(.fractionLength(0...6)).locale(locale)),
+            "the printed rate is not the one the conversions went through"
+        )
+    }
+
+    /// With a snapshot the same table must still name the live rates as live — the fallback path
+    /// above shares its construction, so a regression there would otherwise relabel every export.
+    func testAppendixMarksLiveRatesAsLive() throws {
+        let document = buildDocument()
+        let appendix = try XCTUnwrap(document.sections.first { $0.title == "Appendix" })
+
+        var rateTable: ReportTable?
+        for block in appendix.blocks {
+            if case let .table(table) = block, table.columns.first?.title == "Currency" {
+                rateTable = table
+            }
+        }
+        let table = try XCTUnwrap(rateTable)
+        let usd = try XCTUnwrap(table.rows.first { $0.cells[0].hasPrefix("USD") })
+        XCTAssertEqual(usd.cells[2], "Live rate")
+        XCTAssertEqual(usd.cells[1], "1.0842")
     }
 
     /// The report books each posting at its rounded value; `AnalyticsEngine` sums unrounded

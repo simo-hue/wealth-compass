@@ -430,7 +430,7 @@ were written up rather than changed. Both are data-loss shaped.
       which differs whenever cash is net-negative. Two different figures under one label, one page.
 - [x] **DONE 2026-08-25.** `:524-529` — the Money Flow sums unrounded conversions while the category table sums rounded
       ones, so the same category prints two amounts. Needs foreign-currency rows to show.
-- [ ] `:928-930` — when no FX snapshot exists the appendix prints a note saying fallback rates were
+- [x] **DONE 2026-08-25.** `:928-930` — when no FX snapshot exists the appendix prints a note saying fallback rates were
       used and then **omits the rate table**, i.e. the one case where figures are least reproducible.
 - [x] **DONE 2026-08-25.** `:250-263` — axis magnitude suffixes `B`/`M`/`k` are raw literals in all 35 languages
       (ja wants 万/億, de "Mio.", ru "млн").

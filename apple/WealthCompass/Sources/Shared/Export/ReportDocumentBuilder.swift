@@ -996,36 +996,45 @@ struct ReportDocumentBuilder {
             .subheading(L("Exchange Rates"), anchor: "appendix-rates"),
         ]
 
-        if let snapshot = context.exchangeRateSnapshot {
+        let snapshot = context.exchangeRateSnapshot
+        if let snapshot {
             blocks.append(.keyValues([
                 ReportKeyValue(L("Provider"), snapshot.provider),
                 ReportKeyValue(L("Effective Date"), dateString(snapshot.effectiveDate)),
                 ReportKeyValue(L("Retrieved"), dateTimeString(snapshot.fetchedAt)),
                 ReportKeyValue(L("Quote Base"), snapshot.baseCurrency.rawValue),
             ]))
+        }
 
-            let held = heldCurrencies()
-            blocks.append(.table(ReportTable(
-                columns: [
-                    ReportColumn(L("Currency"), weight: 1.4),
-                    ReportColumn(L("Units per %@").replacingOccurrences(of: "%@", with: snapshot.baseCurrency.rawValue),
-                                 weight: 1.6, alignment: .trailing, isNumeric: true),
-                    ReportColumn(L("Source"), weight: 1.6),
-                ],
-                rows: held.map { currency in
-                    let live = snapshot.unitsPerBaseCurrency(for: currency)
-                    let rate = live ?? currency.fallbackUnitsPerEuro
-                    return ReportRow([
-                        "\(currency.rawValue) (\(currency.symbol))",
-                        rate.formatted(.number.precision(.fractionLength(0...6)).locale(context.locale)),
-                        live == nil ? L("Offline fallback rate") : L("Live rate"),
-                    ], style: live == nil ? .excluded : .normal)
-                },
-                caption: L("Rates applied to convert holdings into the base currency"))))
-            blocks.append(.note(L("Every figure in this report is expressed in the base currency, converted at the rates above. Amounts shown in a holding's own currency are unconverted.")))
-        } else {
+        // The table is emitted with or without a snapshot. It used to sit inside the `if let`
+        // above, so the export whose figures are *least* reproducible — the offline one, converted
+        // at approximate seed rates — was the only one that disclosed no rates at all: it printed
+        // the "fallback rates were used" note and then left the reader with no way to check a
+        // single converted figure. `unitsPerEuro(for:)` is what the conversions themselves went
+        // through, so the quote base without a snapshot is EUR by construction.
+        let quoteBase = snapshot?.baseCurrency ?? .eur
+        blocks.append(.table(ReportTable(
+            columns: [
+                ReportColumn(L("Currency"), weight: 1.4),
+                ReportColumn(L("Units per %@").replacingOccurrences(of: "%@", with: quoteBase.rawValue),
+                             weight: 1.6, alignment: .trailing, isNumeric: true),
+                ReportColumn(L("Source"), weight: 1.6),
+            ],
+            rows: heldCurrencies().map { currency in
+                let live = snapshot?.unitsPerBaseCurrency(for: currency)
+                let rate = live ?? context.converter.unitsPerEuro(for: currency)
+                return ReportRow([
+                    "\(currency.rawValue) (\(currency.symbol))",
+                    rate.formatted(.number.precision(.fractionLength(0...6)).locale(context.locale)),
+                    live == nil ? L("Offline fallback rate") : L("Live rate"),
+                ], style: live == nil ? .excluded : .normal)
+            },
+            caption: L("Rates applied to convert holdings into the base currency"))))
+
+        if snapshot == nil {
             blocks.append(.note(L("No exchange rate snapshot had been retrieved when this report was generated. Foreign-currency amounts were converted using the app's built-in offline fallback rates, which are approximate.")))
         }
+        blocks.append(.note(L("Every figure in this report is expressed in the base currency, converted at the rates above. Amounts shown in a holding's own currency are unconverted.")))
 
         blocks.append(.subheading(L("Data Summary"), anchor: "appendix-data"))
         blocks.append(.keyValues([
