@@ -434,7 +434,7 @@ were written up rather than changed. Both are data-loss shaped.
       used and then **omits the rate table**, i.e. the one case where figures are least reproducible.
 - [x] **DONE 2026-08-25.** `:250-263` — axis magnitude suffixes `B`/`M`/`k` are raw literals in all 35 languages
       (ja wants 万/億, de "Mio.", ru "млн").
-- [ ] `:635-639` — the future-dated note is `String(format:)`-substituted after a plain lookup, so a
+- [x] **DONE 2026-08-25.** `:635-639` — the future-dated note is `String(format:)`-substituted after a plain lookup, so a
       catalog `variations.plural` entry can never fire. Also no plural handling for English.
 - [x] **DONE 2026-08-25.** `:654-660` — the month-subtotal label is written into cell 0, which is the 61.9pt Date column,
       so every subtotal row truncates while 243pt of adjacent cells sit empty.

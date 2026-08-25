@@ -633,6 +633,18 @@ final class ReportReconciliationTests: XCTestCase {
         }
         XCTAssertEqual(excludedRows, 1, "the future-dated row must still be printed, marked excluded")
 
+        // ...and the note beneath the ledger has to agree with the one row it is describing. The
+        // note was a plain lookup with the count substituted afterwards by `String(format:)`, so
+        // the catalog's plural variations could never be reached and every export read
+        // "1 future-dated entries are listed in grey".
+        var note: String?
+        for block in document.sections.first(where: { $0.anchor == anchor })?.blocks ?? [] {
+            if case let .note(text) = block, text.contains("future-dated") { note = text }
+        }
+        XCTAssertTrue(try XCTUnwrap(note, "the ledger stopped noting its future-dated rows")
+                        .hasPrefix("1 future-dated entry is listed in grey."),
+                      note ?? "")
+
         // 3000 - 500 + 922.34 - 230.58 + 2000 - 700, with the 412.90 future expense left out.
         XCTAssertEqual(amount(try XCTUnwrap(kpi(document, section: anchor, label: "Closing Balance"))),
                        Decimal(string: "4491.76"))

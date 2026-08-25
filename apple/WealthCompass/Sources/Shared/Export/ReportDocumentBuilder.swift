@@ -202,6 +202,19 @@ struct ReportDocumentBuilder {
         AppLocalization.string(String.LocalizationValue(key), appLanguage: context.appLanguage)
     }
 
+    /// For strings that carry a value into the lookup, so the catalog can vary on it.
+    ///
+    /// `L(_:)` builds its `String.LocalizationValue` from a runtime `String`, which is a key and
+    /// nothing else: the resolved value comes back with the specifier still in it and any argument
+    /// has to be substituted afterwards with `String(format:)`. A `variations.plural` entry can
+    /// never fire that way, because the plural category is chosen during the lookup from arguments
+    /// the lookup never received. Interpolating into the `LocalizationValue` — the same shape as
+    /// `settings.localized("\(count) due transactions were added to Cash Flow.")` — passes the
+    /// count through, so CLDR picks the form.
+    private func localized(_ key: String.LocalizationValue) -> String {
+        AppLocalization.string(key, appLanguage: context.appLanguage)
+    }
+
     // MARK: - Formatting
 
     private func money(_ value: Decimal) -> String {
@@ -727,9 +740,10 @@ struct ReportDocumentBuilder {
             blocks.append(.note(L("Cash in this app is the running total of every income minus every expense, so the closing balance above is the cash figure as at the end of this period. The opening balance carries forward all activity before it.")))
         }
         if futureCount > 0 {
-            blocks.append(.note(String(
-                format: L("%lld future-dated entries are listed in grey. They are excluded from the balances and subtotals above, matching how the app itself reports current cash."),
-                futureCount)))
+            // Resolved with the count inside the lookup, not substituted after it: a single ledger
+            // row otherwise read "1 future-dated entries are listed in grey", and the eight
+            // languages with a third and fourth plural category had no way to express theirs at all.
+            blocks.append(.note(localized("\(futureCount) future-dated entries are listed in grey. They are excluded from the balances and subtotals above, matching how the app itself reports current cash.")))
         }
 
         // One table per calendar year, with a subtotal row closing each month. Splitting by year

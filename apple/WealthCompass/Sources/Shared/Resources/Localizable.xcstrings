@@ -10061,7 +10061,735 @@
       }
     },
     "%lld future-dated entries are listed in grey. They are excluded from the balances and subtotals above, matching how the app itself reports current cash." : {
-
+      "comment" : "Ledger footnote in the exported PDF: how many future-dated rows are printed in grey and held out of every balance and subtotal. One key for every count: the plural category is selected by CLDR, so locales with few/many forms (cs, sk, ru, uk, pl, hr, ro, ar) are correct at n=2..4 and n>=5, which a single form cannot be.",
+      "localizations" : {
+        "ar" : {
+          "variations" : {
+            "plural" : {
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لا تتضمن هذه الفترة أي إدخالات بتواريخ مستقبلية."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "يُدرج إدخال واحد بتاريخ مستقبلي باللون الرمادي. وهو مستبعد من الأرصدة والمجاميع الفرعية أعلاه، بما يطابق طريقة عرض التطبيق للنقد الحالي."
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "يُدرج إدخالان بتاريخ مستقبلي باللون الرمادي. وهما مستبعدان من الأرصدة والمجاميع الفرعية أعلاه، بما يطابق طريقة عرض التطبيق للنقد الحالي."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "تُدرج %lld إدخالات بتواريخ مستقبلية باللون الرمادي. وهي مستبعدة من الأرصدة والمجاميع الفرعية أعلاه، بما يطابق طريقة عرض التطبيق للنقد الحالي."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "يُدرج %lld إدخالاً بتواريخ مستقبلية باللون الرمادي. وهي مستبعدة من الأرصدة والمجاميع الفرعية أعلاه، بما يطابق طريقة عرض التطبيق للنقد الحالي."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "يُدرج %lld إدخال بتواريخ مستقبلية باللون الرمادي. وهي مستبعدة من الأرصدة والمجاميع الفرعية أعلاه، بما يطابق طريقة عرض التطبيق للنقد الحالي."
+                }
+              }
+            }
+          }
+        },
+        "ca" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld entrada amb data futura apareix en gris. Queda exclosa dels saldos i subtotals anteriors, igual que l'aplicació informa de l'efectiu actual."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld entrades amb data futura apareixen en gris. Queden excloses dels saldos i subtotals anteriors, igual que l'aplicació informa de l'efectiu actual."
+                }
+              }
+            }
+          }
+        },
+        "cs" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld položka s budoucím datem je uvedena šedě. Je vyloučena ze zůstatků a mezisoučtů výše, stejně jako aplikace vykazuje aktuální hotovost."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld položky s budoucím datem jsou uvedeny šedě. Jsou vyloučeny ze zůstatků a mezisoučtů výše, stejně jako aplikace vykazuje aktuální hotovost."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld položek s budoucím datem je uvedeno šedě. Jsou vyloučeny ze zůstatků a mezisoučtů výše, stejně jako aplikace vykazuje aktuální hotovost."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld položek s budoucím datem je uvedeno šedě. Jsou vyloučeny ze zůstatků a mezisoučtů výše, stejně jako aplikace vykazuje aktuální hotovost."
+                }
+              }
+            }
+          }
+        },
+        "da" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld fremtidsdateret postering vises i gråt. Den er holdt uden for saldi og subtotaler ovenfor, ligesom appen selv opgør den aktuelle kontantbeholdning."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld fremtidsdaterede posteringer vises i gråt. De er holdt uden for saldi og subtotaler ovenfor, ligesom appen selv opgør den aktuelle kontantbeholdning."
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld Buchung mit künftigem Datum ist grau dargestellt. Sie ist von den Salden und Zwischensummen oben ausgenommen – so, wie die App selbst den aktuellen Bestand ausweist."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld Buchungen mit künftigem Datum sind grau dargestellt. Sie sind von den Salden und Zwischensummen oben ausgenommen – so, wie die App selbst den aktuellen Bestand ausweist."
+                }
+              }
+            }
+          }
+        },
+        "el" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld μελλοντική εγγραφή εμφανίζεται με γκρι. Εξαιρείται από τα υπόλοιπα και τα μερικά σύνολα παραπάνω, όπως ακριβώς η εφαρμογή αναφέρει τα τρέχοντα μετρητά."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld μελλοντικές εγγραφές εμφανίζονται με γκρι. Εξαιρούνται από τα υπόλοιπα και τα μερικά σύνολα παραπάνω, όπως ακριβώς η εφαρμογή αναφέρει τα τρέχοντα μετρητά."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld future-dated entry is listed in grey. It is excluded from the balances and subtotals above, matching how the app itself reports current cash."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld future-dated entries are listed in grey. They are excluded from the balances and subtotals above, matching how the app itself reports current cash."
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld apunte con fecha futura aparece en gris. Queda excluido de los saldos y subtotales anteriores, igual que la app calcula el efectivo actual."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld apuntes con fecha futura aparecen en gris. Quedan excluidos de los saldos y subtotales anteriores, igual que la app calcula el efectivo actual."
+                }
+              }
+            }
+          }
+        },
+        "es-419" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld movimiento con fecha futura aparece en gris. Queda excluido de los saldos y subtotales anteriores, igual que la aplicación calcula el efectivo actual."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld movimientos con fecha futura aparecen en gris. Quedan excluidos de los saldos y subtotales anteriores, igual que la aplicación calcula el efectivo actual."
+                }
+              }
+            }
+          }
+        },
+        "fi" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld tulevalle päivälle kirjattu tapahtuma näkyy harmaana. Se on jätetty pois yllä olevista saldoista ja välisummista, samoin kuin sovellus itse raportoi nykyiset käteisvarat."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld tulevalle päivälle kirjattua tapahtumaa näkyy harmaana. Ne on jätetty pois yllä olevista saldoista ja välisummista, samoin kuin sovellus itse raportoi nykyiset käteisvarat."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld écriture postdatée est affichée en gris. Elle est exclue des soldes et des sous-totaux ci-dessus, comme l'application calcule elle-même la trésorerie actuelle."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld écritures postdatées sont affichées en gris. Elles sont exclues des soldes et des sous-totaux ci-dessus, comme l'application calcule elle-même la trésorerie actuelle."
+                }
+              }
+            }
+          }
+        },
+        "he" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld רשומה בתאריך עתידי מוצגת באפור. היא אינה נכללת ביתרות ובסיכומי הביניים שלמעלה, בדיוק כפי שהאפליקציה מדווחת על המזומן הנוכחי."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld רשומות בתאריך עתידי מוצגות באפור. הן אינן נכללות ביתרות ובסיכומי הביניים שלמעלה, בדיוק כפי שהאפליקציה מדווחת על המזומן הנוכחי."
+                }
+              }
+            }
+          }
+        },
+        "hi" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld भावी-दिनांकित प्रविष्टि धूसर रंग में दिखाई गई है। यह ऊपर के शेष और उप-योगों से बाहर रखी गई है, ठीक वैसे ही जैसे ऐप मौजूदा नकदी दर्शाता है।"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld भावी-दिनांकित प्रविष्टियाँ धूसर रंग में दिखाई गई हैं। ये ऊपर के शेष और उप-योगों से बाहर रखी गई हैं, ठीक वैसे ही जैसे ऐप मौजूदा नकदी दर्शाता है।"
+                }
+              }
+            }
+          }
+        },
+        "hr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld stavka s budućim datumom prikazana je sivo. Isključena je iz stanja i međuzbrojeva iznad, jednako kao što aplikacija prikazuje trenutačni novac."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld stavke s budućim datumom prikazane su sivo. Isključene su iz stanja i međuzbrojeva iznad, jednako kao što aplikacija prikazuje trenutačni novac."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld stavki s budućim datumom prikazano je sivo. Isključene su iz stanja i međuzbrojeva iznad, jednako kao što aplikacija prikazuje trenutačni novac."
+                }
+              }
+            }
+          }
+        },
+        "hu" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld jövőbeli dátumú tétel szürkével jelenik meg. Nem számít bele a fenti egyenlegekbe és részösszegekbe, ahogyan az alkalmazás is jelenti az aktuális készpénzt."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld jövőbeli dátumú tétel szürkével jelenik meg. Ezek nem számítanak bele a fenti egyenlegekbe és részösszegekbe, ahogyan az alkalmazás is jelenti az aktuális készpénzt."
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld entri bertanggal mendatang ditampilkan dengan warna abu-abu. Entri ini tidak termasuk dalam saldo dan subtotal di atas, sesuai cara aplikasi melaporkan kas saat ini."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld entri bertanggal mendatang ditampilkan dengan warna abu-abu. Entri tersebut tidak termasuk dalam saldo dan subtotal di atas, sesuai cara aplikasi melaporkan kas saat ini."
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld movimento con data futura è indicato in grigio. È escluso dai saldi e dai subtotali qui sopra, come l'app stessa calcola la liquidità attuale."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld movimenti con data futura sono indicati in grigio. Sono esclusi dai saldi e dai subtotali qui sopra, come l'app stessa calcola la liquidità attuale."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "将来日付の項目 %lld 件をグレーで表示しています。アプリが現在の現金を集計する方法と同じく、上記の残高と小計からは除外されています。"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "将来日付の項目 %lld 件をグレーで表示しています。アプリが現在の現金を集計する方法と同じく、上記の残高と小計からは除外されています。"
+                }
+              }
+            }
+          }
+        },
+        "ko" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "미래 날짜 항목 %lld개가 회색으로 표시되어 있습니다. 앱이 현재 현금을 집계하는 방식과 동일하게 위의 잔액과 소계에서 제외됩니다."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "미래 날짜 항목 %lld개가 회색으로 표시되어 있습니다. 앱이 현재 현금을 집계하는 방식과 동일하게 위의 잔액과 소계에서 제외됩니다."
+                }
+              }
+            }
+          }
+        },
+        "ms" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld entri bertarikh hadapan disenaraikan dengan warna kelabu. Ia dikecualikan daripada baki dan jumlah kecil di atas, sepadan dengan cara apl melaporkan tunai semasa."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld entri bertarikh hadapan disenaraikan dengan warna kelabu. Semuanya dikecualikan daripada baki dan jumlah kecil di atas, sepadan dengan cara apl melaporkan tunai semasa."
+                }
+              }
+            }
+          }
+        },
+        "nb" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld fremtidsdatert postering vises i grått. Den holdes utenfor saldoene og delsummene ovenfor, slik appen selv rapporterer nåværende kontanter."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld fremtidsdaterte posteringer vises i grått. De holdes utenfor saldoene og delsummene ovenfor, slik appen selv rapporterer nåværende kontanter."
+                }
+              }
+            }
+          }
+        },
+        "nl" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld boeking met toekomstige datum staat in grijs. Deze telt niet mee in de saldi en subtotalen hierboven, net zoals de app zelf het huidige kassaldo berekent."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld boekingen met toekomstige datum staan in grijs. Deze tellen niet mee in de saldi en subtotalen hierboven, net zoals de app zelf het huidige kassaldo berekent."
+                }
+              }
+            }
+          }
+        },
+        "pl" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld pozycja z przyszłą datą jest wyświetlona na szaro. Jest wyłączona z powyższych sald i sum częściowych, tak samo jak aplikacja liczy bieżącą gotówkę."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld pozycje z przyszłą datą są wyświetlone na szaro. Są wyłączone z powyższych sald i sum częściowych, tak samo jak aplikacja liczy bieżącą gotówkę."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld pozycji z przyszłą datą jest wyświetlonych na szaro. Są wyłączone z powyższych sald i sum częściowych, tak samo jak aplikacja liczy bieżącą gotówkę."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld pozycji z przyszłą datą jest wyświetlonych na szaro. Są wyłączone z powyższych sald i sum częściowych, tak samo jak aplikacja liczy bieżącą gotówkę."
+                }
+              }
+            }
+          }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld lançamento com data futura aparece em cinza. Ele fica fora dos saldos e subtotais acima, do mesmo modo como o app apura o caixa atual."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld lançamentos com data futura aparecem em cinza. Eles ficam fora dos saldos e subtotais acima, do mesmo modo como o app apura o caixa atual."
+                }
+              }
+            }
+          }
+        },
+        "pt-PT" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld movimento com data futura aparece a cinzento. Fica excluído dos saldos e subtotais acima, tal como a aplicação apura o dinheiro atual."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld movimentos com data futura aparecem a cinzento. Ficam excluídos dos saldos e subtotais acima, tal como a aplicação apura o dinheiro atual."
+                }
+              }
+            }
+          }
+        },
+        "ro" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld înregistrare cu dată viitoare este afișată cu gri. Este exclusă din soldurile și subtotalurile de mai sus, la fel cum aplicația raportează numerarul curent."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld înregistrări cu dată viitoare sunt afișate cu gri. Sunt excluse din soldurile și subtotalurile de mai sus, la fel cum aplicația raportează numerarul curent."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld de înregistrări cu dată viitoare sunt afișate cu gri. Sunt excluse din soldurile și subtotalurile de mai sus, la fel cum aplicația raportează numerarul curent."
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld запись с будущей датой показана серым. Она исключена из остатков и промежуточных итогов выше — так же, как приложение считает текущие наличные."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld записи с будущей датой показаны серым. Они исключены из остатков и промежуточных итогов выше — так же, как приложение считает текущие наличные."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld записей с будущей датой показано серым. Они исключены из остатков и промежуточных итогов выше — так же, как приложение считает текущие наличные."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld записей с будущей датой показано серым. Они исключены из остатков и промежуточных итогов выше — так же, как приложение считает текущие наличные."
+                }
+              }
+            }
+          }
+        },
+        "sk" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld položka s budúcim dátumom je uvedená sivou. Je vylúčená zo zostatkov a medzisúčtov vyššie, rovnako ako aplikácia vykazuje aktuálnu hotovosť."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld položky s budúcim dátumom sú uvedené sivou. Sú vylúčené zo zostatkov a medzisúčtov vyššie, rovnako ako aplikácia vykazuje aktuálnu hotovosť."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld položiek s budúcim dátumom je uvedených sivou. Sú vylúčené zo zostatkov a medzisúčtov vyššie, rovnako ako aplikácia vykazuje aktuálnu hotovosť."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld položiek s budúcim dátumom je uvedených sivou. Sú vylúčené zo zostatkov a medzisúčtov vyššie, rovnako ako aplikácia vykazuje aktuálnu hotovosť."
+                }
+              }
+            }
+          }
+        },
+        "sv" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld post med framtida datum visas i grått. Den hålls utanför saldona och delsummorna ovan, precis som appen själv räknar aktuella likvida medel."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld poster med framtida datum visas i grått. De hålls utanför saldona och delsummorna ovan, precis som appen själv räknar aktuella likvida medel."
+                }
+              }
+            }
+          }
+        },
+        "th" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "รายการลงวันที่ล่วงหน้า %lld รายการแสดงเป็นสีเทา โดยไม่ถูกนับรวมในยอดคงเหลือและยอดรวมย่อยด้านบน เช่นเดียวกับที่แอปรายงานเงินสดปัจจุบัน"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "รายการลงวันที่ล่วงหน้า %lld รายการแสดงเป็นสีเทา โดยไม่ถูกนับรวมในยอดคงเหลือและยอดรวมย่อยด้านบน เช่นเดียวกับที่แอปรายงานเงินสดปัจจุบัน"
+                }
+              }
+            }
+          }
+        },
+        "tr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "İleri tarihli %lld kayıt gri renkte listelenmiştir. Uygulamanın güncel nakdi bildirme biçimiyle aynı şekilde, yukarıdaki bakiyelerin ve ara toplamların dışında tutulur."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "İleri tarihli %lld kayıt gri renkte listelenmiştir. Uygulamanın güncel nakdi bildirme biçimiyle aynı şekilde, yukarıdaki bakiyelerin ve ara toplamların dışında tutulurlar."
+                }
+              }
+            }
+          }
+        },
+        "uk" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld запис із майбутньою датою показано сірим. Його виключено з наведених вище залишків і проміжних підсумків — так само, як застосунок обліковує поточну готівку."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld записи із майбутньою датою показано сірим. Їх виключено з наведених вище залишків і проміжних підсумків — так само, як застосунок обліковує поточну готівку."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld записів із майбутньою датою показано сірим. Їх виключено з наведених вище залишків і проміжних підсумків — так само, як застосунок обліковує поточну готівку."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld записів із майбутньою датою показано сірим. Їх виключено з наведених вище залишків і проміжних підсумків — так само, як застосунок обліковує поточну готівку."
+                }
+              }
+            }
+          }
+        },
+        "vi" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld mục có ngày trong tương lai được hiển thị màu xám. Mục này không được tính vào số dư và tổng phụ ở trên, giống như cách ứng dụng báo cáo tiền mặt hiện tại."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld mục có ngày trong tương lai được hiển thị màu xám. Các mục này không được tính vào số dư và tổng phụ ở trên, giống như cách ứng dụng báo cáo tiền mặt hiện tại."
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld 条未来日期的记录以灰色显示。与应用统计当前现金的方式一致，这些记录不计入上方的余额和小计。"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld 条未来日期的记录以灰色显示。与应用统计当前现金的方式一致，这些记录不计入上方的余额和小计。"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hant" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld 筆未來日期的記錄以灰色顯示。與應用程式統計目前現金的方式一致，這些記錄不計入上方的餘額與小計。"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld 筆未來日期的記錄以灰色顯示。與應用程式統計目前現金的方式一致，這些記錄不計入上方的餘額與小計。"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "%lld holdings" : {
       "localizations" : {

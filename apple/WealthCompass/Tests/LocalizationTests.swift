@@ -129,6 +129,72 @@ final class LocalizationTests: XCTestCase {
         XCTAssertTrue(toast(25, "ro").contains(" de tranzac"), toast(25, "ro"))
     }
 
+    /// The exported ledger's future-dated footnote, resolved the way `ReportDocumentBuilder`
+    /// resolves it. The count goes *into* the lookup; substituting it afterwards leaves the plural
+    /// category unchosen.
+    private func futureNote(_ count: Int, _ language: String) -> String {
+        AppLocalization.string(
+            "\(count) future-dated entries are listed in grey. They are excluded from the balances and subtotals above, matching how the app itself reports current cash.",
+            appLanguage: language
+        )
+    }
+
+    /// One future-dated row is the common case — a single scheduled invoice — and it must not read
+    /// "1 future-dated entries".
+    func testFutureDatedNoteHasAnEnglishSingular() {
+        XCTAssertTrue(futureNote(1, "en").hasPrefix("1 future-dated entry is listed in grey."),
+                      futureNote(1, "en"))
+        XCTAssertTrue(futureNote(4, "en").hasPrefix("4 future-dated entries are listed in grey."),
+                      futureNote(4, "en"))
+    }
+
+    /// The eight languages with more than two categories must get more than two *wordings*. The
+    /// counts are chosen per language to land in different CLDR buckets: Romanian only leaves `few`
+    /// at 20, and Arabic's dual is n = 2 alone.
+    ///
+    /// The count is masked before comparing. Without a catalog entry the lookup returns the key
+    /// with the specifier filled in, so every count already yields a different *string* while the
+    /// sentence around it never changes — comparing raw strings would pass on no translation at all.
+    func testFutureDatedNoteUsesTheLanguagesOwnPluralCategories() {
+        let probes: [String: [Int]] = [
+            "cs": [1, 3, 8], "sk": [1, 3, 8], "ru": [1, 3, 8], "uk": [1, 3, 8],
+            "pl": [1, 3, 8], "hr": [1, 3, 8], "ro": [1, 3, 25], "ar": [1, 2, 3],
+        ]
+        for (language, counts) in probes.sorted(by: { $0.key < $1.key }) {
+            let wordings = Set(counts.map {
+                futureNote($0, language).replacingOccurrences(of: "\($0)", with: "#")
+            })
+            XCTAssertEqual(wordings.count, counts.count,
+                           "\(language) uses one wording for n = \(counts): \(wordings)")
+        }
+    }
+
+    /// Every locale must say something of its own, or the note ships in English inside an otherwise
+    /// translated report.
+    func testFutureDatedNoteIsTranslatedEverywhereTheToastIs() {
+        for language in ["ar", "ca", "cs", "da", "de", "el", "es", "es-419", "fi", "fr", "he", "hi",
+                         "hr", "hu", "id", "it", "ja", "ko", "ms", "nb", "nl", "pl", "pt-BR",
+                         "pt-PT", "ro", "ru", "sk", "sv", "th", "tr", "uk", "vi", "zh-Hans",
+                         "zh-Hant"] {
+            XCTAssertNotEqual(futureNote(3, language), futureNote(3, "en"),
+                              "\(language) falls back to English")
+        }
+    }
+
+    /// A category whose value dropped the specifier would print a sentence with no quantity in it.
+    /// Arabic is excluded the same way it is from the toast's own check: its one/two forms name the
+    /// quantity in words, which is what the language actually does.
+    func testEveryFutureDatedCategoryStillPrintsTheCount() {
+        for language in ["en", "cs", "sk", "ru", "uk", "pl", "hr", "ro", "it", "de", "ja"] {
+            for count in [1, 2, 3, 5, 11, 21, 101] {
+                XCTAssertTrue(
+                    futureNote(count, language).contains("\(count)"),
+                    "\(language) n=\(count) lost the count: \(futureNote(count, language))"
+                )
+            }
+        }
+    }
+
     /// Whatever the count or language, the number itself must appear — a category whose value
     /// dropped the specifier would silently print a sentence with no quantity in it.
     func testEveryCategoryStillPrintsTheCount() {
