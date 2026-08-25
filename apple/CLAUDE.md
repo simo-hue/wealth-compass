@@ -33,16 +33,31 @@ Tests are hosted by the Mobile app (`TEST_HOST` → `WealthCompassMobile.app`, `
 ```bash
 # Run all tests (use a concrete simulator name/id that exists on this machine)
 xcodebuild test -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
+  -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
+
+A destination that doesn't exist on the machine exits **70** with "Unable to find a device matching the
+provided destination specifier" — check `xcrun simctl list devices available` rather than assuming a name.
 
 ⚠️ **Do not narrow with `-only-testing:` in this project.** The per-method form
 `-only-testing:WealthCompassTests/<Class>/<method>` selects **zero** tests here and still prints
 `** TEST SUCCEEDED **` — a test containing an unconditional `XCTFail` "passes" under it. Any
 before/after check run that way is vacuous. **Run the full suite** for every verification, especially
 for proving a new test fails against the pre-fix code; it takes about two minutes and it actually
-executes the tests. (The class-level form is no safer to trust — verify against the reported test
-count, not the exit status.) See `TO_SIMO_DO.md` → "A trap worth knowing about".
+executes the tests. (The class-level form is no safer to trust.) See `TO_SIMO_DO.md` → "A trap worth
+knowing about".
+
+⚠️ **Trust the test count, not the exit status, and not the log.** Both other signals have been caught
+lying on this project: a run with a genuine failure **exited 0 while printing `** TEST FAILED **`**, and
+individual `Test case … passed` lines drop intermittently from the output, so scraping the log has twice
+read 277 against a true 278. Get the authoritative numbers from the result bundle:
+
+```bash
+xcrun xcresulttool get test-results summary --path <path>.xcresult
+```
+
+A fix is only proven when the count moves the way you predicted — one new test failing before, passing
+after, with every other test unchanged.
 
 Signing uses `DEVELOPMENT_TEAM = 8528AN28A3`. Version numbers live in `project.pbxproj` (`MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`) — bump them there. Both app targets currently share the bundle id `com.wealthcompass.mobile`; the CloudKit container is `iCloud.com.wealthcompasstracker`.
 
@@ -69,7 +84,7 @@ Each app's `@main` App constructs `AppSettings` first, then `FinanceStore(settin
 `CloudKitSyncService` is an `actor` implementing `CKSyncEngineDelegate`: one CloudKit record per entity (record types `WCTransaction`, `WCInvestment`, … in custom zone `WealthCompassZone`), tombstones for deletes, a bootstrap merge with deterministic conflict resolution (`bootstrapDecision`), and account-change protection that disables sync if the iCloud user changes. Sync metadata persists in `wealth-compass-cloud-sync.json`. Toggled by `AppSettings.isICloudSyncEnabled`; remote mutations are applied back through a `@MainActor` handler on `FinanceStore`. Design notes and remaining work are in `WealthCompass/TO_IMPROVE.md`.
 
 ### External data is fetched directly from the providers
-`ExchangeRateService` and `MarketDataService` call Frankfurter (`/v2/rates`, base EUR), Finnhub (`/quote`), CoinGecko (`/simple/price`), and Yahoo (`yahooChartURL` / `yahooSearchURL`, `APIConfiguration.swift:30,34`) **directly** from the device — see `APIConfiguration` for the endpoints. Yahoo is the **keyless fallback quote source** (`FinanceStore.swift:728-742`), which is why quotes still work with no Finnhub key (documented in `apple/README.md:17`). There is no intermediary proxy. Finnhub/CoinGecko keys are user-entered and stored in the Keychain via `KeychainCredentialStore` (service `com.wealthcompass.mobile.marketdata`) — they are **never** synced to iCloud and travel only as request headers over HTTPS to the issuing provider. Exchange rates auto-refresh on a 12h staleness window with exponential backoff, persisted via `ExchangeRatePersistence`. (The old `../proxy/` Cloudflare Worker is retired and no longer used by the app.)
+`ExchangeRateService` and `MarketDataService` call Frankfurter (`/v2/rates`, base EUR), Finnhub (`/quote`), CoinGecko (`/simple/price`), and Yahoo (`yahooChartURL` / `yahooSearchURL`, `APIConfiguration.swift:30,34`) **directly** from the device — see `APIConfiguration` for the endpoints. Quote routing is **not** "Finnhub first, Yahoo on failure" (`FinanceStore.swift:732-737`): Finnhub prices USD listings and only with a key configured, every **non-USD** holding goes straight to Yahoo without asking Finnhub at all (its `/quote` reports no currency, tag H13), and Yahoo additionally takes over on `.noQuote` and `.rateLimited`. With no Finnhub key set Yahoo is the sole source for every holding, which is why quotes still work keyless (tag I3, and `apple/README.md:17`). There is no intermediary proxy. Finnhub/CoinGecko keys are user-entered and stored in the Keychain via `KeychainCredentialStore` (service `com.wealthcompass.mobile.marketdata`) — they are **never** synced to iCloud and travel only as request headers over HTTPS to the issuing provider. Exchange rates auto-refresh on a 12h staleness window with exponential backoff, persisted via `ExchangeRatePersistence`. (The old `../proxy/` Cloudflare Worker is retired and no longer used by the app.)
 
 ### Localization — the dual-API pattern (important)
 The app supports an **in-app language override** (`AppSettings.appLanguage`) that is independent of the system language. Because of this, model enums expose strings two ways and you must pick the right one:

@@ -474,8 +474,12 @@ were written up rather than changed. Both are data-loss shaped.
       a translated sentence: German reads "Noch keine benutzerdefinierten income-Kategorien."
 - [ ] `DashboardView.swift:131` — `heldCurrenciesUsingSeedRate` is the only derived Dashboard value
       not memoized on `dataVersion`, and it runs per frame while scrubbing the net-worth chart.
-- [ ] `RecurringTransactionNotificationService.swift:82` — **the project's one remaining compiler
-      warning**, and the one thing blocking the Swift 6 language mode: `[AnyHashable: Any]` crossing
+- [ ] `Sources/iOS/Services/RecurringTransactionNotificationService.swift:82` — **the project's one
+      remaining compiler warning**,
+      ⚠️ *Two files have nearly this name.* The other is `Sources/Shared/Services/RecurringNotification`
+      `Service.swift`, whose line 82 is an innocent `content.body` assignment. Checking the wrong one —
+      or clean-building only the **Mac** scheme, which never compiles `Sources/iOS/` — makes this entry
+      look stale. It is not: a clean `WealthCompassMobile` build still emits it 4×. Verified 2026-08-25. and the one thing blocking the Swift 6 language mode: `[AnyHashable: Any]` crossing
       into a main-actor-isolated `didReceiveRemoteNotification`. I tried `nonisolated`,
       `@preconcurrency` on the method, and `@preconcurrency` on the conformance — the first two do
       not silence it and the third is rejected outright ("has no effect"), so I reverted rather than
@@ -579,3 +583,43 @@ the 0.70/0.78 shrink floors, the 8-colour palette and top-7 cap arithmetic, and 
   does not see.
 - **Run the suite before releasing.** It was red on `main` through the 1.1.6 release, on two stale
   assertions, which is why nothing flagged it.
+
+### Deliberately not fixed — your call to overrule (2026-08-25)
+
+Each of these was found by adversarial review, confirmed real, and left alone because fixing it means
+changing a working feature's design rather than correcting a wrong implementation. Listed so the
+decision is on the record instead of buried.
+
+- [ ] **Privacy Mode still discloses the *sign* of a gain.** `DesignSystem.swift:396` tints `ValueDelta`
+      with `value >= 0 ? WCColor.primary : WCColor.destructive`, so a fully redacted row still reads
+      `•••• (••••)` in green or red. Same is true of the Profit/Loss cards' `accent:`. Masking it is a
+      real design cost — a delta row with no colour reads as broken — so it needs a decision, not a
+      patch.
+- [ ] **`arrow.up.right` carries two meanings on the Dashboard.** `MacDashboardView.swift:263` uses it
+      green for a net-worth *gain*; `:117` uses it red for Monthly *Expenses*, ~100pt below, and `:953`
+      red for an expense in the activity list. Same on iOS (`DashboardView.swift:154` vs `:573`). The
+      reviewer called this the same collision the arrow fix removed from `MacCashFlowView`. Counter-
+      argument, and why it is still here: trend-sign and money-flow are different semantic families,
+      colour separates them consistently within each, and the two never share a row. Changing dashboard
+      iconography is a visual design decision.
+- [ ] **PDF export is entirely unredacted, by design.** `ReportDocumentBuilder.swift` and
+      `ReportChartRenderer.swift` render every amount and percentage with no `isPrivacyMode` check.
+      This is not the same bug as the on-screen leaks — nothing is masked there, so nothing is given
+      back — and `ExportOptionsView.swift:91` shows a `privacySection` warning before the user commits.
+      Recorded so the omission is a choice rather than an oversight.
+- [ ] **Two idioms now coexist for percentage redaction.** Most sites call `settings.privatePercent(…)`;
+      `DesignSystem.swift:453` and `:576` keep the inline `isPrivacyMode ? redactionToken : percentage(…)`
+      form because they derive a share from a total through a local helper. Both correct. Unifying is a
+      refactor, not a fix.
+- [ ] `AppSettings.privatePercent`'s doc comment still frames it as being for "the gain/loss rows". It
+      now serves 14 sites. Narrow, not wrong.
+
+### How the privacy leak was actually pinned (2026-08-25)
+
+Worth copying next time: the first attempt shipped three tests that exercised `AppSettings.privatePercent`
+in isolation. Reverting **all six** call sites left the suite fully green — they proved nothing about the
+bug. The replacement, `testNoViewRendersAnUnguardedPercentage`, reads the view sources via `#filePath` and
+fails on any `formattedPercent(` in a `View` body not covered by an `isPrivacyMode` gate. It is a lint
+wearing a test's clothes, which is a fair criticism, but it is the only form that fails when a call site
+regresses — there is no supported way to read a rendered `Text` back. It has a hardcoded floor of 8 render
+sites against 10 present; if you delete `formattedPercent` call sites, move that floor deliberately.
