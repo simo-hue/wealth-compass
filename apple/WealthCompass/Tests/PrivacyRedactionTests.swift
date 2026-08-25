@@ -268,6 +268,186 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    // MARK: - Chart geometry
+
+    /// Fails if any scanned source draws a donut that Privacy Mode does not conceal.
+    ///
+    /// **Why a second sweep rather than a case of the first.** Redaction and concealment are
+    /// different promises. The percentage sweep asks whether a *number* is masked; this one asks
+    /// whether a *shape* is drawn, because a wedge's angle is its share of the total whether or not
+    /// the label beside it says `••••`. `SankeyDiagramView.swift:50-52` states the rule in prose and
+    /// `PrivacyChartCover`'s own message states it to the user — "Values and proportions are hidden."
+    ///
+    /// **What it actually checks**, with the same two caveats as the percentage sweep: it greps the
+    /// working tree via `#filePath`, not the binary under test, and it is a lint, so it only sees
+    /// the one spelling it looks for. `SectorMark` is the only proportional-geometry primitive in
+    /// this codebase — there is no `Gauge`, `.trim(from:to:)` arc, `Canvas` ring or sparkline
+    /// anywhere — so the spelling is complete today and would need extending alongside a new kind
+    /// of chart.
+    ///
+    /// **The gate a donut has to sit under** is an enclosing `isPrivacyMode` branch: `isConcealed`
+    /// walks outward through the block headers around the mark, resolving `} else {` back to the
+    /// `if` it belongs to, and stops at the enclosing declaration so a conceal written in some
+    /// other computed property never counts as this one's.
+    func testWorkingTreeSourcesDrawNoUnconcealedDonut() throws {
+        let sources = URL(fileURLWithPath: #filePath)   // …/Tests/PrivacyRedactionTests.swift
+            .deletingLastPathComponent()                // …/Tests
+            .deletingLastPathComponent()                // …/WealthCompass
+            .appendingPathComponent("Sources")
+
+        var offenders: [PercentRender] = []
+        var filesRead = 0
+
+        for directory in Self.scannedDirectories {
+            let root = sources.appendingPathComponent(directory)
+            let swiftFiles = try FileManager.default
+                .subpathsOfDirectory(atPath: root.path)
+                .filter { $0.hasSuffix(".swift") }
+                .filter { !Self.excludedFiles.contains(($0 as NSString).lastPathComponent) }
+                .sorted()
+
+            for file in swiftFiles {
+                let text = try String(contentsOf: root.appendingPathComponent(file), encoding: .utf8)
+                let source = Self.stripped(text)
+                filesRead += 1
+
+                for index in source.code.indices {
+                    guard let column = Self.donutMatch(at: index, in: source.code) else { continue }
+                    guard !Self.isConcealed(at: index, column: column, in: source.code) else { continue }
+                    offenders.append(PercentRender(
+                        file: "Sources/\(directory)/\(file)", line: index + 1, pattern: "SectorMark(",
+                        source: String(source.code[index]).trimmingCharacters(in: .whitespaces)
+                    ))
+                }
+            }
+        }
+
+        XCTAssertGreaterThan(filesRead, 20, "only \(filesRead) Swift files enumerated — the sweep lost the source tree")
+
+        XCTAssertEqual(
+            offenders.map(\.description), [],
+            """
+            \(offenders.count) donut(s) draw true proportions while Privacy Mode is on. Conceal the \
+            chart behind a privacy branch instead of redacting only its labels:
+            \(offenders.map { "  " + $0.description }.joined(separator: "\n"))
+            """
+        )
+    }
+
+    /// The alarm for the sweep above, in the shape `testPercentageSweepStillCatchesALeak` takes: a
+    /// source sweep that quietly matches nothing, or calls everything gated, is worse than no sweep.
+    func testDonutSweepStillCatchesALeak() {
+        // Ungated, in both spellings that compile.
+        for (name, call) in ["plain": "SectorMark(angle: .value(\"Value\", slice.value))",
+                             "space before paren": "SectorMark (angle: .value(\"Value\", slice.value))"] {
+            let fixture = [
+                "var body: some View {",
+                "    Chart(slices) { slice in",
+                "        " + call,
+                "    }",
+                "}",
+            ]
+            let code = Self.stripped(fixture.joined(separator: "\n")).code
+            guard let column = Self.donutMatch(at: 2, in: code) else {
+                XCTFail("the sweep no longer sees a donut in the \(name) fixture: \(call)")
+                continue
+            }
+            XCTAssertFalse(
+                Self.isConcealed(at: 2, column: column, in: code),
+                "the sweep called an unconcealed \(name) donut concealed"
+            )
+        }
+
+        // The two conceal shapes the codebase uses: the flat `else if` chain (`AllocationChart`,
+        // `CashFlowView`) and the `ZStack` + inner `if` (`MacDashboardView`).
+        let concealed: [String: ([String], Int)] = [
+            "else-if chain": ([
+                "var body: some View {",
+                "    if slices.isEmpty {",
+                "        EmptyState(title: \"No assets found\", systemImage: \"chart.pie\")",
+                "    } else if settings.isPrivacyMode {",
+                "        MobilePrivacyChartCover(",
+                "            title: \"Allocation concealed\",",
+                "            message: \"Values and proportions are hidden.\"",
+                "        )",
+                "    } else {",
+                "        Chart(slices) { slice in",
+                "            SectorMark(angle: .value(\"Value\", slice.value))",
+                "        }",
+                "    }",
+                "}",
+            ], 10),
+            "ZStack with inner if": ([
+                "var body: some View {",
+                "    ZStack {",
+                "        if settings.isPrivacyMode {",
+                "            PrivacyChartCover(title: title, message: message)",
+                "        } else {",
+                "            Chart(slices) { slice in",
+                "                SectorMark(angle: .value(\"Value\", slice.value))",
+                "            }",
+                "        }",
+                "    }",
+                "}",
+            ], 6),
+        ]
+        for (name, (fixture, line)) in concealed {
+            let code = Self.stripped(fixture.joined(separator: "\n")).code
+            guard let column = Self.donutMatch(at: line, in: code) else {
+                XCTFail("the sweep no longer sees the donut in the \(name) fixture")
+                continue
+            }
+            XCTAssertTrue(
+                Self.isConcealed(at: line, column: column, in: code),
+                "the sweep would now report the \(name) conceal, which is the codebase's own"
+            )
+        }
+
+        // A privacy check on a sibling statement is not this chart's gate — the same hole the
+        // percentage sweep had to close.
+        let sibling = [
+            "var body: some View {",
+            "    VStack {",
+            "        Text(settings.isPrivacyMode ? settings.redactionToken : total)",
+            "        Chart(slices) { slice in",
+            "            SectorMark(angle: .value(\"Value\", slice.value))",
+            "        }",
+            "    }",
+            "}",
+        ]
+        let siblingCode = Self.stripped(sibling.joined(separator: "\n")).code
+        guard let siblingColumn = Self.donutMatch(at: 4, in: siblingCode) else {
+            return XCTFail("the sweep no longer sees the sibling-gate fixture's donut")
+        }
+        XCTAssertFalse(
+            Self.isConcealed(at: 4, column: siblingColumn, in: siblingCode),
+            "a privacy check on a sibling row counts as the chart's gate"
+        )
+
+        // …and a conceal in a *different* declaration is not this chart's gate either.
+        let elsewhere = [
+            "var cover: some View {",
+            "    if settings.isPrivacyMode {",
+            "        MobilePrivacyChartCover(title: title, message: message)",
+            "    }",
+            "}",
+            "",
+            "var ring: some View {",
+            "    Chart(slices) { slice in",
+            "        SectorMark(angle: .value(\"Value\", slice.value))",
+            "    }",
+            "}",
+        ]
+        let elsewhereCode = Self.stripped(elsewhere.joined(separator: "\n")).code
+        guard let elsewhereColumn = Self.donutMatch(at: 8, in: elsewhereCode) else {
+            return XCTFail("the sweep no longer sees the other-declaration fixture's donut")
+        }
+        XCTAssertFalse(
+            Self.isConcealed(at: 8, column: elsewhereColumn, in: elsewhereCode),
+            "a conceal written in another computed property counts as this chart's gate"
+        )
+    }
+
     // MARK: - Sweep internals
 
     /// The spellings of a percentage this codebase can produce. Anything else — a renamed wrapper,
@@ -458,7 +638,7 @@ final class PrivacyRedactionTests: XCTestCase {
     /// exempts five lines in four declarations — `formattedPercent` itself
     /// (`DesignSystem.swift:372`, and its body's own `.formatted(.percent` at `:374`),
     /// `AppSettings.privatePercent`'s body (`AppSettings.swift:365`), `AllocationChart`'s
-    /// share-of-total helper (`DesignSystem.swift:541`) and the Sankey node's VoiceOver value
+    /// share-of-total helper (`DesignSystem.swift:555`) and the Sankey node's VoiceOver value
     /// builder (`SankeyDiagramView.swift:476`). It is also the widest hole in the sweep: move a
     /// render into a `-> String` helper and it stops being visible here.
     private static func isStringHelper(at index: Int, in code: [[Character]]) -> Bool {
@@ -501,6 +681,53 @@ final class PrivacyRedactionTests: XCTestCase {
             expression += " " + (start.line + 1...index).map { String(code[$0]) }.joined(separator: " ")
         }
         return expression.contains(gateToken)
+    }
+
+    /// The only proportional-geometry primitive this codebase draws. `SectorMark (` with a space
+    /// compiles and draws the same wedge as without, so the space is part of the spelling.
+    private static let donutPattern = try! NSRegularExpression(pattern: #"\bSectorMark\s*\("#)
+
+    /// Where a donut wedge is drawn on this line, if it is.
+    private static func donutMatch(at index: Int, in code: [[Character]]) -> Int? {
+        let line = String(code[index])
+        let range = NSRange(line.startIndex..<line.endIndex, in: line)
+        guard let match = donutPattern.firstMatch(in: line, range: range),
+              let matched = Range(match.range, in: line) else { return nil }
+        return line.distance(from: line.startIndex, to: matched.lowerBound)
+    }
+
+    /// Whether a Privacy-Mode conceal branch encloses this chart.
+    ///
+    /// Deliberately more generous than `isPrivacyGated`, and for a reason that is specific to
+    /// charts. A percentage's gate belongs on the percentage, so looking past its own block is how
+    /// a sibling's check gets mistaken for its own. A chart's gate cannot sit that close: the mark
+    /// is inside `Chart { … }`, which is inside the `else` of `if settings.isPrivacyMode { cover }
+    /// else { chart }`, so the flag is always two or more blocks out. So this walks outward through
+    /// the enclosing *block headers* — never sibling statements, which is what keeps the sibling
+    /// hole closed — and resolves a `} else {` opener back to the `if` that opened the chain, since
+    /// that is the line naming the flag. It stops at the enclosing declaration: a conceal written in
+    /// a different computed property is not this chart's.
+    private static func isConcealed(at index: Int, column: Int, in code: [[Character]]) -> Bool {
+        let declaration = enclosingDeclaration(at: index, in: code) ?? 0
+        var opener = enclosingBlockOpener(at: index, column: column, in: code)
+
+        for _ in 0..<24 {
+            if blockHeader(openedAt: opener, in: code).contains(where: { String(code[$0]).contains(gateToken) }) {
+                return true
+            }
+            guard opener > declaration else { return false }
+
+            let line = String(code[opener])
+            if line.trimmingCharacters(in: .whitespaces).hasPrefix("}") {
+                // `} else {` / `} else if … {`: step to the `if` this chain hangs off.
+                opener = enclosingBlockOpener(at: opener, column: 0, in: code)
+            } else if let brace = line.firstIndex(of: "{") {
+                opener = enclosingBlockOpener(at: opener, column: line.distance(from: line.startIndex, to: brace), in: code)
+            } else {
+                return false
+            }
+        }
+        return false
     }
 
     /// The line carrying the `{` that opens the block this render sits in, found by walking upwards

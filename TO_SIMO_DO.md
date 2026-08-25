@@ -611,7 +611,7 @@ decision is on the record instead of buried.
       back — and `ExportOptionsView.swift:91` shows a `privacySection` warning before the user commits.
       Recorded so the omission is a choice rather than an oversight.
 - [ ] **Two idioms now coexist for percentage redaction.** Most sites call `settings.privatePercent(…)`;
-      `DesignSystem.swift:455` and `:576` keep the inline `isPrivacyMode ? redactionToken : percentage(…)`
+      `DesignSystem.swift:469` and `:588` keep the inline `isPrivacyMode ? redactionToken : percentage(…)`
       form because they derive a share from a total through a local helper. Both correct. Unifying is a
       refactor, not a fix.
 - [ ] `AppSettings.privatePercent`'s doc comment still frames it as being for "the gain/loss rows". It
@@ -660,19 +660,24 @@ are hidden."** It is applied inconsistently. Full inventory so this is decided o
 `MacCashFlowView.swift:297`; macOS asset donut `MacDashboardView.swift:447`; Sankey
 `SankeyDiagramView.swift:48`.
 
-- [ ] **A platform split that is a defect, not a preference.** iOS Asset Allocation
-      (`DashboardView.swift:48`) draws true proportions in Privacy Mode; the **same chart** on macOS
-      (`MacDashboardView.swift:447`) conceals behind `PrivacyChartCover`. One platform implements the
-      stated intent and the other does not. Fix iOS to match macOS — this one needs no design call.
-- [ ] **Eight rings share one view and none of them conceal.** `AllocationChart`
-      (`DesignSystem.swift:403-549`) has no `isPrivacyMode` branch on its `SectorMark` (`:425-436`); only
-      its text redacts (`:455`). Its legend (`:559-583`) also lists slices descending by value. Call
-      sites: `DashboardView.swift:48` · `InvestmentsView.swift:59,62,63` · `CryptoView.swift:60` ·
-      `MacInvestmentsView.swift:47,53,59` · `MacCryptoView.swift:141`. **A single edit at
-      `DesignSystem.swift:403` covers all eight** — which is also why it needs a deliberate decision
-      rather than a drive-by fix.
-- [ ] **The iOS expense donut** `CashFlowView.swift:178-186` — arcs at true proportions, and `:259`
-      lists the top six categories in value order.
+- [x] **A platform split that is a defect, not a preference.** iOS Asset Allocation
+      (`DashboardView.swift:48`) drew true proportions in Privacy Mode while the **same chart** on macOS
+      concealed. **Fixed 2026-08-25** by the item below — the iOS Dashboard ring is one of the eight, so
+      concealing `AllocationChart` closed this with it. Note for anyone reading `MacDashboardView.swift:447`
+      as "the macOS twin": that card is *not* an `AllocationChart` call site, it inlines its own
+      `Chart`/`SectorMark`, so there was no redundant outer wrapper to collapse afterwards.
+- [x] **Eight rings share one view and none of them conceal.** **Fixed 2026-08-25.** `AllocationChart`
+      (`DesignSystem.swift:403`) now branches `empty → privacy → chart`, showing
+      `MobilePrivacyChartCover("Allocation concealed" / "Values and proportions are hidden.")` in place of
+      the ring — the empty-state-first order the iOS net-worth and cash-flow cards use
+      (`DashboardView.swift:195`, `:413`) and the one its macOS counterpart uses. Ring, legend and
+      footnote conceal together: a legend under a cover would restate the value ordering the cover just
+      hid, and `DashboardView.swift:53-57`'s footnote would otherwise dangle under it. All eight call
+      sites conceal: `DashboardView.swift:48` · `InvestmentsView.swift:59,62,63` · `CryptoView.swift:60` ·
+      `MacInvestmentsView.swift:47,53,59` · `MacCryptoView.swift:141`.
+- [x] **The iOS expense donut** `CashFlowView.swift:177` — **fixed 2026-08-25**, same cover, same two
+      strings (no new keys). Its top-six category list below the ring (now `:270`) deliberately **stays**:
+      ranked lists are a separate decision, below.
 - [ ] **Collapsed bar, surviving ranking.** `DashboardView.swift:547` collapses its bar to
       `width: 0` under Privacy Mode, but the leaderboard around it keeps rank badge (`:515`), category
       name (`:519`) and value-descending order (`:490`). The bar hides; the ranking does not. iOS only.
@@ -686,5 +691,14 @@ are hidden."** It is applied inconsistently. Full inventory so this is decided o
       (`CryptoView.swift:138-193` ↔ `MacCryptoView.swift:157-217`) are worse: their *existence* is gated
       on `gainLossPercent > 0` / `< 0` (`:143-144`), so the card appearing at all discloses the sign.
 
-Nothing here was changed. No `Gauge`, `.trim(from:to:)`, `Canvas`, sparkline or heatmap exists anywhere,
-so this list is complete for proportional geometry.
+The three ticked items were fixed on 2026-08-25 (owner's call: conceal every ring). The three open ones
+were left deliberately — ranked lists, their ordering and the Top Performer / Biggest Loser cards stay as
+they are for now. No `Gauge`, `.trim(from:to:)`, `Canvas`, sparkline or heatmap exists anywhere, so this
+list is complete for proportional geometry.
+
+`SectorMark` is now pinned by `PrivacyRedactionTests.testWorkingTreeSourcesDrawNoUnconcealedDonut`, a
+second source sweep beside the percentage one: it reports any donut not enclosed by an `isPrivacyMode`
+branch. Same two caveats as its sibling — it greps the working tree rather than the binary, and it only
+sees the spelling it looks for, so a new *kind* of proportional chart needs the pattern extended. It was
+run against the pre-fix tree and reported exactly the two leaks above (and not the already-concealed
+macOS donut), so it is not vacuous.

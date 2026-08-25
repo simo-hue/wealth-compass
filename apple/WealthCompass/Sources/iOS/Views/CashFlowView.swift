@@ -174,84 +174,97 @@ struct CashFlowView: View {
                 if categories.isEmpty {
                     EmptyState(title: "No expenses for this period", systemImage: "chart.pie")
                 } else {
-                    ZStack {
-                        Chart(categories) { item in
-                            SectorMark(
-                                angle: .value("Expense", item.value),
-                                innerRadius: .ratio(0.62),
-                                angularInset: 2
-                            )
-                            .foregroundStyle(by: .value("Category", item.name))
-                            .cornerRadius(5)
-                            .opacity(hoveredExpenseCategory == nil || hoveredExpenseCategory?.id == item.id ? 1.0 : 0.3)
-                            .accessibilityLabel(Text(LocalizedStringKey(item.name)))
-                            .accessibilityValue(Text(settings.privateCurrency(item.value)))
-                        }
-                        .chartLegend(.hidden)
-                        .chartBackground { proxy in
-                            GeometryReader { geometry in
-                                if let plotFrame = proxy.plotFrame {
-                                    let frame = geometry[plotFrame]
-                                    VStack(spacing: 3) {
-                                        if let hoveredExpenseCategory {
-                                            Text(LocalizedStringKey(hoveredExpenseCategory.name))
-                                                .textCase(.uppercase)
-                                                .font(.caption2.weight(.bold))
-                                                .tracking(1.3)
-                                                .foregroundStyle(.white.opacity(0.8))
-                                            Text(settings.privateCurrency(hoveredExpenseCategory.value))
-                                                .font(.headline.monospacedDigit().weight(.bold))
-                                                .foregroundStyle(.white)
-                                                .lineLimit(1)
-                                                .minimumScaleFactor(0.7)
-                                            // M30: the share % also reveals the spending breakdown, so
-                                            // redact it in Privacy Mode like the amount above it.
-                                            Text(verbatim: settings.privatePercent(hoveredExpenseCategory.percentage))
-                                                .font(.caption2.monospacedDigit())
-                                                .foregroundStyle(.white.opacity(0.6))
-                                        } else {
-                                            Text("EXPENSES")
-                                                .font(.caption2.weight(.bold))
-                                                .tracking(1.3)
-                                                .foregroundStyle(WCColor.textTertiary)
-                                            Text(settings.privateCurrency(totalExpenses))
-                                                .font(.headline.monospacedDigit().weight(.bold))
-                                                .foregroundStyle(.white)
-                                                .lineLimit(1)
-                                                .minimumScaleFactor(0.7)
+                    if settings.isPrivacyMode {
+                        // The arcs are the proportions: leaving the donut drawn while its labels
+                        // redact still shows a bystander how the spending splits. Same conceal the
+                        // net-worth and cash-flow cards use (`DashboardView.swift:195`, `:413`).
+                        // The category list below stays as it is — deliberately, ranked lists are
+                        // a separate open decision (TO_SIMO_DO.md).
+                        MobilePrivacyChartCover(
+                            title: "Allocation concealed",
+                            message: "Values and proportions are hidden."
+                        )
+                        .frame(minHeight: 250, maxHeight: .infinity)
+                    } else {
+                        ZStack {
+                            Chart(categories) { item in
+                                SectorMark(
+                                    angle: .value("Expense", item.value),
+                                    innerRadius: .ratio(0.62),
+                                    angularInset: 2
+                                )
+                                .foregroundStyle(by: .value("Category", item.name))
+                                .cornerRadius(5)
+                                .opacity(hoveredExpenseCategory == nil || hoveredExpenseCategory?.id == item.id ? 1.0 : 0.3)
+                                .accessibilityLabel(Text(LocalizedStringKey(item.name)))
+                                .accessibilityValue(Text(settings.privateCurrency(item.value)))
+                            }
+                            .chartLegend(.hidden)
+                            .chartBackground { proxy in
+                                GeometryReader { geometry in
+                                    if let plotFrame = proxy.plotFrame {
+                                        let frame = geometry[plotFrame]
+                                        VStack(spacing: 3) {
+                                            if let hoveredExpenseCategory {
+                                                Text(LocalizedStringKey(hoveredExpenseCategory.name))
+                                                    .textCase(.uppercase)
+                                                    .font(.caption2.weight(.bold))
+                                                    .tracking(1.3)
+                                                    .foregroundStyle(.white.opacity(0.8))
+                                                Text(settings.privateCurrency(hoveredExpenseCategory.value))
+                                                    .font(.headline.monospacedDigit().weight(.bold))
+                                                    .foregroundStyle(.white)
+                                                    .lineLimit(1)
+                                                    .minimumScaleFactor(0.7)
+                                                // M30: the share % also reveals the spending breakdown, so
+                                                // redact it in Privacy Mode like the amount above it.
+                                                Text(verbatim: settings.privatePercent(hoveredExpenseCategory.percentage))
+                                                    .font(.caption2.monospacedDigit())
+                                                    .foregroundStyle(.white.opacity(0.6))
+                                            } else {
+                                                Text("EXPENSES")
+                                                    .font(.caption2.weight(.bold))
+                                                    .tracking(1.3)
+                                                    .foregroundStyle(WCColor.textTertiary)
+                                                Text(settings.privateCurrency(totalExpenses))
+                                                    .font(.headline.monospacedDigit().weight(.bold))
+                                                    .foregroundStyle(.white)
+                                                    .lineLimit(1)
+                                                    .minimumScaleFactor(0.7)
+                                            }
                                         }
+                                        .position(x: frame.midX, y: frame.midY)
                                     }
-                                    .position(x: frame.midX, y: frame.midY)
                                 }
                             }
-                        }
-                        .chartOverlay { proxy in
-                            GeometryReader { geometry in
-                                if let plotFrame = proxy.plotFrame {
-                                    let frame = geometry[plotFrame]
-                                    Rectangle().fill(.clear).contentShape(Rectangle())
-                                        .accessibilityHidden(true)
-                                        .gesture(
-                                            DragGesture(minimumDistance: 0)
-                                                .onChanged { value in
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        hoveredExpenseCategory = categorySlice(at: value.location, in: frame, categories: categories)
+                            .chartOverlay { proxy in
+                                GeometryReader { geometry in
+                                    if let plotFrame = proxy.plotFrame {
+                                        let frame = geometry[plotFrame]
+                                        Rectangle().fill(.clear).contentShape(Rectangle())
+                                            .accessibilityHidden(true)
+                                            .gesture(
+                                                DragGesture(minimumDistance: 0)
+                                                    .onChanged { value in
+                                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                                            hoveredExpenseCategory = categorySlice(at: value.location, in: frame, categories: categories)
+                                                        }
                                                     }
-                                                }
-                                                .onEnded { _ in
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        hoveredExpenseCategory = nil
+                                                    .onEnded { _ in
+                                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                                            hoveredExpenseCategory = nil
+                                                        }
                                                     }
-                                                }
-                                        )
+                                            )
+                                    }
                                 }
                             }
+                            .animation(.spring(response: 0.5, dampingFraction: 0.8), value: categories.map(\.value))
+                            .accessibilityElement(children: .contain)
+                            .accessibilityLabel(Text("Spending analytics"))
                         }
-                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: categories.map(\.value))
-                        .accessibilityElement(children: .contain)
-                        .accessibilityLabel(Text("Spending analytics"))
+                        .frame(minHeight: 250, maxHeight: .infinity)
                     }
-                    .frame(minHeight: 250, maxHeight: .infinity)
 
                     VStack(spacing: 10) {
                         ForEach(categories.prefix(6)) { item in
