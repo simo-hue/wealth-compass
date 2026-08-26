@@ -207,15 +207,45 @@ final class FinanceImportServiceTests: XCTestCase {
         }
     }
 
+    /// Separators where a number cannot have them are junk, not a number.
+    ///
+    /// The grouped-thousands fallback reuses `BrokerImportParsing.flexibleDecimal`, which is
+    /// deliberately permissive: it feeds a CSV tokenizer that has already decided the column holds
+    /// money, so it strips separators it cannot explain rather than refusing. This decoder has no
+    /// such column to lean on. Without a layout check it read `"1.2.3"` as **123** and
+    /// `"12.34.56"` as **123456** — inventing a figure out of a malformed cell, which is worse
+    /// than misreading one, because the record used to be *counted* and the user was told.
+    func testMalformedSeparatorLayoutIsSkippedRatherThanInvented() throws {
+        let junk = ["1.2.3", "12.34.56", "1.2.3.4", "1,2,3", "9.9.9.9.9", "1..2", "...1...", ",,,5,,,", "0x10"]
+        for literal in junk {
+            let result = try parse("""
+            {"snapshots":[{"date":"2026-01-01","netWorth":"\(literal)"}]}
+            """)
+            XCTAssertTrue(
+                result.data.snapshots.isEmpty,
+                "\"\(literal)\" was invented into a net worth of \(result.data.snapshots.first?.netWorth.description ?? "?")"
+            )
+            XCTAssertEqual(result.skippedRecords, 1, "\"\(literal)\" was dropped without being reported")
+        }
+    }
+
     /// The forms the grouped-thousands fix must leave exactly as they were.
     ///
     /// * A bare `"1,234"` stays **1.234**. It is genuinely ambiguous (1234 in en-US, 1.234 in
-    ///   de-DE) and the whole codebase resolves a lone separator as a decimal point — see
-    ///   `BrokerImportParsing.flexibleDecimal`, which the fallback below reuses. Reading it as
-    ///   1234 instead would turn every ISO `"1.234"` share quantity in the Trade Republic export
-    ///   into 1234, i.e. trade one 1000x error for another in a path that is currently correct.
+    ///   de-DE), and a lone separator is resolved as a decimal point everywhere in this codebase —
+    ///   `BrokerImportParsing.flexibleDecimal`, which the fallback reuses, does the same. Keeping
+    ///   the two in agreement is the point: two normalizers that disagree about what a string
+    ///   means is how this class of bug returns.
+    ///   (An earlier version of this comment justified the choice by claiming the alternative would
+    ///   misread Trade Republic share quantities. That was wrong twice over — those go through
+    ///   `BrokerImportParsing.plainDecimal` and never reach this decoder, and `flexibleDecimal`
+    ///   reads `"1.234"` as 1.234 regardless. The choice stands; that reason never held.)
     /// * Exponent notation keeps working. JavaScript's `String(0.0000001)` is `"1e-7"`, so a web
-    ///   backup really can carry it, and a last-separator-wins normalizer would read it as 17.
+    ///   backup really can carry it, and only the plain form reads it — which is why the plain form
+    ///   must stay first. (It is *not* true that the fallback would misread `"1e-7"` as 17;
+    ///   measured, `flexibleDecimal("1e-7")` is **1**, and `"1E5"` is **15**. With the charset gate
+    ///   in place the fallback rejects both outright. The ordering is still required; the danger
+    ///   was overstated.)
     func testAmbiguousAndExponentStringAmountsKeepTheirExistingMeaning() throws {
         let pinned: [(literal: String, expected: String)] = [
             ("1,234", "1.234"),

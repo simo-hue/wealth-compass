@@ -977,7 +977,16 @@ private extension KeyedDecodingContainer {
             // This form stays first because it is the only one that reads exponent notation, which
             // a web backup really can carry: JavaScript's `String(0.0000001)` is `"1e-7"`, and a
             // separator-based normalizer would strip the `e` and read that as 17.
-            if Double(normalized) != nil,
+            //
+            // The charset check is the other half of that gate. `Double` also reads *hex-float* and
+            // *infinity* spellings, which `Decimal(string:)` does not — and rather than both
+            // failing, the two disagree silently: `Double("0x10")` is 16 while
+            // `Decimal(string: "0x10")` is **0**, and `Double("-inf")` is -inf while
+            // `Decimal(string: "-inf")` is **0** too. Each stored a real, spendable zero for a cell
+            // that says nothing of the kind. Restricting the gate to the characters a decimal
+            // literal is made of leaves every actual number untouched and sends those to the skip.
+            if normalized.allSatisfy(isDecimalLiteralCharacter),
+               Double(normalized) != nil,
                let parsed = Decimal(string: normalized, locale: Locale(identifier: "en_US_POSIX")) {
                 return parsed.finiteImportedAmount
             }
@@ -997,9 +1006,20 @@ private extension KeyedDecodingContainer {
             // without this a bare separator parses as a real zero. A transaction survives that
             // (it needs a positive amount) but a snapshot's `netWorth` only has to be finite, and
             // a meaningless cell would become an on-screen net worth of zero.
+            //
+            // And the separators have to sit where a number's separators sit —
+            // `hasNumericSeparatorLayout`. The digit check alone let `"1.2.3"` through as **123**
+            // and `"9.9.9.9.9"` through as **99999**: `flexibleDecimal` is deliberately permissive
+            // because it feeds a CSV tokenizer that has already decided the column is money, so it
+            // strips separators it cannot explain instead of refusing. This decoder has no such
+            // column to lean on, and inventing a number out of a malformed cell is the same defect
+            // as misreading one — worse, because the record used to be *counted* as skipped and the
+            // user was told. The layout check is the call-site gate that buys the reuse back;
+            // `flexibleDecimal` itself stays exactly as permissive as its broker callers need.
             let unsigned = (trimmed.hasPrefix("-") || trimmed.hasPrefix("+")) ? String(trimmed.dropFirst()) : trimmed
             guard unsigned.contains(where: { $0.isASCII && $0.isWholeNumber }),
-                  unsigned.allSatisfy({ $0.isASCII && ($0.isWholeNumber || $0 == "." || $0 == ",") })
+                  unsigned.allSatisfy({ $0.isASCII && ($0.isWholeNumber || $0 == "." || $0 == ",") }),
+                  hasNumericSeparatorLayout(unsigned)
             else {
                 return nil
             }
@@ -1028,6 +1048,68 @@ private extension KeyedDecodingContainer {
             return nil
         }
     }
+}
+
+/// The characters a decimal literal can be made of, once commas have been folded to dots.
+///
+/// Everything `Double(_: String)` accepts *beyond* this set is a spelling `Decimal(string:)` reads
+/// differently rather than not at all — see `decodeImportedDecimalIfPresent`.
+private func isDecimalLiteralCharacter(_ character: Character) -> Bool {
+    guard character.isASCII else { return false }
+    return character.isWholeNumber || character == "." || character == "+" || character == "-"
+        || character == "e" || character == "E"
+}
+
+/// Whether `unsigned` — already known to be ASCII digits and `.` / `,` only, with at least one
+/// digit — has the separator layout of an actual number.
+///
+/// Resolved exactly the way `BrokerImportParsing.flexibleDecimal` resolves it, so the two never
+/// disagree about what a string means: when both separators appear the later one is the decimal
+/// point and the other groups thousands; a lone `,` or `.` is a decimal point; a repeated one
+/// groups. On top of that resolution this asks the question `flexibleDecimal` deliberately does not:
+///
+/// * the decimal separator occurs **at most once** — `"1,2.3.4"` names two decimal points, and
+/// * the grouping separator splits the integer part into **1–3 digits then groups of exactly 3** —
+///   `"1,234,567"` does, `"1.2.3"` and `",,,5,,,"` do not.
+///
+/// Deliberately Western-only. Indian lakh grouping (`"12,34,567.89"`) is rejected, as it was before
+/// the grouped-thousands fallback existed; a wrongly-grouped cell is reported as skipped rather than
+/// guessed at, which is the whole point of the check.
+private func hasNumericSeparatorLayout(_ unsigned: String) -> Bool {
+    let dotCount = unsigned.reduce(0) { $1 == "." ? $0 + 1 : $0 }
+    let commaCount = unsigned.reduce(0) { $1 == "," ? $0 + 1 : $0 }
+
+    let decimalSeparator: Character?
+    let groupingSeparator: Character?
+    if dotCount > 0, commaCount > 0 {
+        if (unsigned.lastIndex(of: ".") ?? unsigned.startIndex) > (unsigned.lastIndex(of: ",") ?? unsigned.startIndex) {
+            guard dotCount == 1 else { return false }
+            (decimalSeparator, groupingSeparator) = (".", ",")
+        } else {
+            guard commaCount == 1 else { return false }
+            (decimalSeparator, groupingSeparator) = (",", ".")
+        }
+    } else if commaCount > 1 {
+        (decimalSeparator, groupingSeparator) = (nil, ",")
+    } else if dotCount > 1 {
+        (decimalSeparator, groupingSeparator) = (nil, ".")
+    } else {
+        (decimalSeparator, groupingSeparator) = (commaCount == 1 ? "," : (dotCount == 1 ? "." : nil), nil)
+    }
+
+    var integerPart = Substring(unsigned)
+    if let decimalSeparator, let index = unsigned.firstIndex(of: decimalSeparator) {
+        integerPart = unsigned[unsigned.startIndex..<index]
+        // A trailing decimal separator is fine (`"1.234,"` is a European `1234,`); the plain form
+        // already accepts the ungrouped `"1,"`.
+        guard unsigned[unsigned.index(after: index)...].allSatisfy(\.isWholeNumber) else { return false }
+    }
+
+    guard let groupingSeparator else { return integerPart.allSatisfy(\.isWholeNumber) }
+    let groups = integerPart.split(separator: groupingSeparator, omittingEmptySubsequences: false)
+    guard groups.count > 1, let first = groups.first, (1...3).contains(first.count) else { return false }
+    return groups.allSatisfy { $0.allSatisfy(\.isWholeNumber) }
+        && groups.dropFirst().allSatisfy { $0.count == 3 }
 }
 
 /// Every money value the importer stores passes through one of these.
