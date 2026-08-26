@@ -288,8 +288,32 @@ final class LocalizationTests: XCTestCase {
     ///   swept, so `zh-Hans` was still greeting the user with `欢迎来到财富指南针` on the very first
     ///   screen — the same rendering this sweep had deleted eleven times elsewhere. It now matches
     ///   `Wealth\s*Compass(?:\s+Tracker)?` and requires **each rendering the English source uses** to
-    ///   survive into the translation, so a rename is caught however the name is spelled and a
-    ///   locale cannot satisfy the rule by substituting the longer name for the shorter one.
+    ///   survive into the translation, so a rename is caught however the name is spelled.
+    ///
+    ///   That last clause used to end "and a locale cannot satisfy the rule by substituting the
+    ///   longer name for the shorter one", which was backwards. The check was substring containment,
+    ///   so it caught only the substitution that *removes* text: a key saying `Wealth Compass
+    ///   Tracker` answered with `Wealth Compass` fails the containment, while a key saying `Wealth
+    ///   Compass` answered with `Wealth Compass Tracker` **passed**, because the longer string
+    ///   contains the shorter one.
+    ///
+    ///   How much that cost, exactly, because the honest answer is "nothing yet". Only a rendering
+    ///   that some other rendering contains is substitutable at all, which is `Wealth Compass`
+    ///   alone — `Wealth Compass Tracker` is the longest, and `WealthCompass` has no space, so
+    ///   neither is a substring of anything. Of the 23 keys that name the app, **21 render `Wealth
+    ///   Compass Tracker`, one renders `WealthCompass`, and exactly one renders `Wealth Compass`**:
+    ///   the bare report-brand key. That one key is also one of the two
+    ///   `testTheAppNameSurvivesTheRuntimeLookup` pins with equality rather than containment, so the
+    ///   suite as a whole did catch it — measured, by substituting `Wealth Compass Tracker` into the
+    ///   `de` body of `Wealth Compass`: the sweep below reports it, and so does that test.
+    ///
+    ///   The gap was therefore in this sweep, not in the suite, and it becomes live the moment
+    ///   somebody adds a *sentence* key using the short brand — a new PDF footer, say — which the
+    ///   runtime test cannot check, because keys carrying `%@` need per-call-site arguments. Both
+    ///   directions are asked now: every rendering the key uses must survive, **and** the
+    ///   translation may not introduce one the key does not use. Across the catalog's 556 bodies the
+    ///   added question reports the same zero offenders as the old one, so it strengthens the rule
+    ///   without moving today's verdict.
     /// - **It read `localization["stringUnit"]` only.** A key with a `variations` block keeps its
     ///   bodies one level further down, and there are two such keys here with 35 bodies each — 70
     ///   translations the sweep could not see, where a renamed plural form would have been
@@ -355,10 +379,21 @@ final class LocalizationTests: XCTestCase {
             where language != "en" {
                 for body in bodies(of: localization) {
                     checked += 1
+                    // Two questions, because containment alone only answers one of them. `missing`
+                    // catches a rendering the English source uses and the translation dropped;
+                    // `substituted` catches a rendering the translation invented. Without the
+                    // second, a body reading `Wealth Compass Tracker` where the key says
+                    // `Wealth Compass` passes by containing it — the app renamed, undetected.
                     let missing = expected.filter { !body.value.contains($0) }
-                    guard !missing.isEmpty else { continue }
+                    let substituted = renderings(in: body.value).filter { !expected.contains($0) }
+                    guard !missing.isEmpty || !substituted.isEmpty else { continue }
+                    var complaint: [String] = []
+                    if !missing.isEmpty { complaint.append("dropped \(missing.joined(separator: ", "))") }
+                    if !substituted.isEmpty {
+                        complaint.append("substituted \(substituted.joined(separator: ", "))")
+                    }
                     offenders.append(
-                        "  \(language)\(body.where) — \(key)\n      \(body.value)\n      (dropped \(missing.joined(separator: ", ")))"
+                        "  \(language)\(body.where) — \(key)\n      \(body.value)\n      (\(complaint.joined(separator: "; ")))"
                     )
                 }
             }

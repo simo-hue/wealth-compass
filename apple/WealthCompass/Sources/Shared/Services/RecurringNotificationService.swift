@@ -331,7 +331,9 @@ actor RecurringNotificationService {
     /// every currently-live schedule *would* get, and keep a delivered banner if and only if one of
     /// those is filed under the same identifier **and says the same thing**. A banner is taken down
     /// when its schedule is gone, completed, deactivated or has its reminders switched off (no entry
-    /// under that identifier), when Privacy Mode has flipped (the hidden branch files under
+    /// under that identifier) — that is the detailed branch; the hidden branch keeps a *spent*
+    /// banner through all four, and the five-case list further down is what that costs — when
+    /// Privacy Mode has flipped (the hidden branch files under
     /// `due-<moment>` and the detailed one under the schedule's UUID, so neither can match the
     /// other), or when the amount, currency, category or language would now render differently. An
     /// unrelated edit changes none of those, and the banner stays.
@@ -370,9 +372,31 @@ actor RecurringNotificationService {
     ///   the payload really is that payload, which is what the comparison checks. A banner filed
     ///   under `due-…` carrying a *detailed* payload is a disclosure, and is taken down.
     ///
-    /// The one thing this concedes is a spent hidden banner whose schedule was deleted after it
-    /// fired: it stays until the user swipes it, or until the erase path takes it. That is the same
-    /// trade the detailed branch already makes for the advance, on a banner that says two constants.
+    /// What this concedes is wider than an earlier version of this comment admitted. That version
+    /// said "a spent hidden banner whose schedule was **deleted** after it fired", as though
+    /// deletion were the way in. It is not the way in, it is one of five. The keep turns on there
+    /// being *no rebuilt entry* under the identifier, and every route to that lands in the same
+    /// place. Measured one case at a time, against a spent hidden banner and a schedule set that no
+    /// longer covers its moment:
+    ///
+    /// - the schedule was **deleted**;
+    /// - it was **completed** (`completedAt` set, so `isCompleted`);
+    /// - it was **deactivated** (`!isActive`);
+    /// - its **reminders were switched off** (`!notificationsEnabled`);
+    /// - it ran **past its `endDate`**.
+    ///
+    /// All five drop it from `live`, so all five leave `accurate` with no entry under that
+    /// identifier, so all five keep the banner. Nor is there a recency bound: `moment <= now` is as
+    /// satisfied by a stamp from 2001 as by one from a minute ago, so a hidden banner is kept however
+    /// long ago it fired. `testASpentHiddenBannerIsKeptWhateverSilencedItsSchedule` holds the list,
+    /// so it cannot quietly become six.
+    ///
+    /// It stays a concession rather than a leak, and that is why the width is tolerable: the third
+    /// condition checks that the payload is exactly the two constants `hiddenContent` builds, so in
+    /// none of the five is anything about the schedule on the screen. What the user is left with is
+    /// a banner to swipe. What the other choice would cost them is an unread reminder — which under
+    /// Privacy Mode is the only trace they have that anything fired at all. It is the same trade the
+    /// detailed branch already makes for the advance, on a banner that says two constants.
     ///
     /// The comparison stays sensitive to the *figure*, and that is a decision rather than an
     /// oversight. `convertedAmounts` is computed by the caller from the current exchange rates, so a

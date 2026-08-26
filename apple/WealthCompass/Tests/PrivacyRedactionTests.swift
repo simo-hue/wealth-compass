@@ -3130,6 +3130,112 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    /// Fails if the set of ways a spent Privacy Mode banner outlives its schedule changes size.
+    ///
+    /// `staleDelivered`'s doc comment used to concede one case — "a spent hidden banner whose
+    /// schedule was **deleted** after it fired". Deletion is not the way in, it is one of five: the
+    /// keep turns on there being no rebuilt entry under the identifier, and every route to that
+    /// lands in the same branch. This enumerates them so the concession cannot quietly become six,
+    /// and so the doc comment's list is checked rather than asserted.
+    ///
+    /// None of the five is a leak — the third condition checks the payload is exactly the two
+    /// constants `hiddenContent` builds, which is what the last case here is for. What is being
+    /// pinned is the *width* of a trade, not its safety.
+    func testASpentHiddenBannerIsKeptWhateverSilencedItsSchedule() throws {
+        let calendar = Calendar.current
+        let due = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2020, month: 6, day: 15, hour: 9))
+        )
+        let prefix = Self.reminderIdentifierPrefix
+
+        var base = RecurringTransaction(
+            type: .expense, category: "Rent", amount: 1_450, description: "flat",
+            startDate: due, frequency: .monthly, nextDueDate: due, endDate: nil, currency: .eur
+        )
+        base.updatedAt = due
+
+        let banner = RecurringNotificationService.DeliveredReminder(try XCTUnwrap(
+            RecurringNotificationService.requests(
+                for: [base], convertedAmounts: [:], currencyCode: "EUR", showDetails: false,
+                appLanguage: nil, identifierPrefix: prefix
+            ).first
+        ))
+        func stale(
+            _ delivered: [RecurringNotificationService.DeliveredReminder],
+            _ schedules: [RecurringTransaction]
+        ) -> [String] {
+            RecurringNotificationService.staleDelivered(
+                delivered,
+                schedules: schedules,
+                convertedAmounts: Dictionary(uniqueKeysWithValues: schedules.map { ($0.id, $0.amount) }),
+                currencyCode: "EUR",
+                showDetails: false,
+                appLanguage: nil,
+                identifierPrefix: prefix
+            )
+        }
+
+        // The five routes to "no live schedule rebuilds this identifier".
+        var completed = base
+        completed.completedAt = due
+        var deactivated = base
+        deactivated.isActive = false
+        var silenced = base
+        silenced.notificationsEnabled = false
+        var ended = base
+        ended.endDate = due.addingTimeInterval(-86_400)
+
+        let cases: [(name: String, schedules: [RecurringTransaction])] = [
+            ("deleted", []),
+            ("completed", [completed]),
+            ("deactivated", [deactivated]),
+            ("notifications switched off", [silenced]),
+            ("past its endDate", [ended]),
+        ]
+        for probe in cases {
+            XCTAssertEqual(
+                stale([banner], probe.schedules), [],
+                """
+                A spent Privacy Mode banner was taken down because its schedule was \
+                \(probe.name). All five routes to "no rebuilt entry under this identifier" are meant \
+                to keep it — the banner has already fired, says two constants, and under Privacy \
+                Mode is the user's only trace that anything was due. If this is now deliberate, \
+                `staleDelivered`'s doc comment lists the five and has to lose one.
+                """
+            )
+        }
+        XCTAssertEqual(
+            cases.count, 5,
+            "the enumeration has changed size; `staleDelivered`'s doc comment names five cases"
+        )
+
+        // And no recency bound: `moment <= now` is as true of a stamp from 2001 as of one from a
+        // minute ago, so age alone never takes a hidden banner down.
+        let ancient = RecurringNotificationService.DeliveredReminder(
+            identifier: "\(prefix)due-0",
+            title: banner.title,
+            subtitle: banner.subtitle,
+            body: banner.body
+        )
+        XCTAssertEqual(
+            stale([ancient], []), [],
+            "a hidden banner stamped at the reference date was taken down for its age alone"
+        )
+        // The payload is still the whole of the safety argument, in every one of those cases.
+        let disclosing = RecurringNotificationService.DeliveredReminder(
+            identifier: banner.identifier,
+            title: "Recurring Expense due",
+            body: "Rent: €1.450,00"
+        )
+        XCTAssertEqual(
+            stale([disclosing], []), [disclosing.identifier],
+            """
+            A banner spelling out the schedule was kept by the same branch that keeps the spent \
+            hidden ones. The five-case concession is tolerable only because the payload is checked.
+            """
+        )
+    }
+
     /// Fails if a coalesced identifier is a calendar *rendering* of the fire moment rather than the
     /// moment itself.
     ///

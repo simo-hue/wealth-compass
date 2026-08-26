@@ -90,18 +90,30 @@ xcodebuild -exportLocalizations -project WealthCompass/WealthCompass.xcodeproj \
 
 | | before | after |
 | --- | --- | --- |
-| keys | 791 | **727** (64 removed) |
-| `extractionState: "stale"` | 42 | 66 (24 newly marked) |
-| translated bodies | 20558 | 20558 |
+| keys | 791 | **728** (63 removed) |
+| `extractionState: "stale"` | 42 | 67 (25 newly marked) |
+| translated bodies (non-empty, all locales) | 20558 | 20558 |
+
+**Re-measured at `44b8b1f`, in a throwaway clone.** The row used to read 727 / 64 removed and 42 → 66,
+which is what `2c69e7e` measured and was true when it did. What moved it is `01d3198`, one commit
+later: it filled in the `Wealth Compass` key, which until then was literally `{}`. A key with no
+localizations has nothing to preserve, so the sync deletes it; a key that carries translations is kept
+and marked `stale` instead. Filling it therefore moved it from one side of the partition to the other
+and from *both* rows at once — one fewer removed, one more `stale`. **The 88 keys the sync cannot find
+in the `.stringsdata` are the same 88 they always were** (63 + 25); only the split between "deleted"
+and "kept but flagged" changed. Expect this table to shift again, by exactly one in each row, every
+time an empty key is given a body.
 
 Read those three rows together, because the headline number is the least important of them. **No
-translation is lost**: every one of the 64 removed keys carries zero localizations, and the 24 keys the
+translation is lost**: every one of the 63 removed keys carries zero localizations, and the 25 keys the
 sync could not find in the `.stringsdata` that *do* carry translations are marked `stale` and kept
-verbatim. What is destroyed is 64 English key registrations — and **60 of the 64 are
+verbatim. What is destroyed is 63 English key registrations — and **59 of the 63 are
 `ReportDocumentBuilder.swift`'s**, reached through its `L(_ key: String)` wrapper (`:200`), which takes a
-plain `String` and builds the `String.LocalizationValue` at runtime. The extractor sees a `String`
-argument at those call sites, not a localizable literal, so as far as the sync is concerned those 60
-strings are used by nobody. The export half-says so, twice, and it is easy to read past — though note
+plain `String` and builds the `String.LocalizationValue` at runtime. (The other four are `Custom Range`,
+`Last 12 Months`, `This Year` and the iCloud "still preparing your sync data" notice.) The extractor
+sees a `String` argument at those call sites, not a localizable literal, so as far as the sync is
+concerned those 59 strings are used by nobody. The export half-says so, twice, and it is easy to read
+past — though note
 what it actually names, which is `AppLocalization.string`'s own `String(localized: key, …)` and not the
 60 call sites. It tells you non-literal keys exist; it does not tell you which strings they cost you:
 
@@ -123,8 +135,11 @@ out to that binary to do it.
 3. **The durable fix is `"extractionState" : "manual"`** on the keys the extractor cannot see. Verified
    both ways: marking three of the doomed report keys `manual` dropped the removals from 64 to 61 and
    all three survived, and marking two translated report keys `manual` kept them out of the `stale`
-   sweep as well (42 → 64 rather than 42 → 66). The catalog already carries 127 `manual` keys and the
-   sync did not touch one of them. Doing this for all 60 would take the hazard off the table for good.
+   sweep as well (42 → 64 rather than 42 → 66). Those two sub-experiments were run against the
+   pre-`01d3198` tree, so they are quoted against that tree's 64 / 66 baseline rather than today's
+   63 / 67 — the effect they measure is the mechanism, not the absolute count. The catalog already
+   carries 127 `manual` keys and the sync did not touch one of them. Doing this for all 59 would take
+   the hazard off the table for good.
 
 And the warning that has not changed: **do not add a blanket `git checkout -- …/Localizable.xcstrings`
 step to a build or test script.** Catalog edits are ordinary source changes — the commit that stopped 13
