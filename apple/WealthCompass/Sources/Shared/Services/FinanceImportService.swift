@@ -178,11 +178,13 @@ private struct ImportedTransaction: Decodable {
     }
 
     func model() -> Transaction? {
+        let currencyCode = Currency.importedCode(currency)
         guard
             let rawType = type?.lowercased(),
             let transactionType = TransactionType(rawValue: rawType),
             let amount = amount?.positiveImportedAmount.flatMap(importedMoney),
-            let date = ImportDateParser.parseDateOnly(date)
+            let date = ImportDateParser.parseDateOnly(date),
+            currencyCode.isRepresentable
         else {
             return nil
         }
@@ -194,7 +196,7 @@ private struct ImportedTransaction: Decodable {
             amount: amount,
             description: description ?? "",
             date: date,
-            currency: Currency.importedIfPresent(currency),
+            currency: currencyCode.optionalValue,
             createdAt: ImportDateParser.parse(createdAt) ?? date,
             updatedAt: ImportDateParser.parse(updatedAt) ?? ImportDateParser.parse(createdAt) ?? date,
             recurringTransactionID: recurringTransactionID,
@@ -258,6 +260,7 @@ private struct ImportedRecurringTransaction: Decodable {
     }
 
     func model() -> RecurringTransaction? {
+        let currencyCode = Currency.importedCode(currency)
         guard
             let rawType = type?.lowercased(),
             let transactionType = TransactionType(rawValue: rawType),
@@ -265,7 +268,8 @@ private struct ImportedRecurringTransaction: Decodable {
             let startDate = ImportDateParser.parse(startDate),
             let rawFrequency = frequency?.lowercased(),
             let frequency = RecurringTransactionFrequency(rawValue: rawFrequency),
-            let nextDueDate = ImportDateParser.parse(nextDueDate)
+            let nextDueDate = ImportDateParser.parse(nextDueDate),
+            currencyCode.isRepresentable
         else {
             return nil
         }
@@ -290,7 +294,7 @@ private struct ImportedRecurringTransaction: Decodable {
             frequency: frequency,
             nextDueDate: nextDueDate,
             endDate: parsedEndDate,
-            currency: Currency.importedIfPresent(currency),
+            currency: currencyCode.optionalValue,
             notificationsEnabled: notificationsEnabled ?? true,
             isActive: parsedCompletedAt == nil && (isActive ?? true),
             completedAt: parsedCompletedAt,
@@ -446,7 +450,9 @@ private struct ImportedLiquidityAccount: Decodable {
     func transaction(context: FinanceImportContext) -> Transaction? {
         guard let balance, balance.isFinite, balance != 0 else { return nil }
 
-        let sourceCurrency = Currency.imported(currency, default: context.displayCurrency)
+        guard let sourceCurrency = Currency.importedCode(currency).resolved(default: context.displayCurrency) else {
+            return nil
+        }
         guard let balanceValue = importedMoney(abs(balance)) else { return nil }
         let convertedAmount = context.convert(balanceValue, from: sourceCurrency)
         guard convertedAmount > 0, convertedAmount.isFinite else { return nil }
@@ -529,7 +535,8 @@ private struct ImportedInvestment: Decodable {
         guard
             let symbol,
             let name,
-            let quantity = quantity?.positiveImportedAmount
+            let quantity = quantity?.positiveImportedAmount,
+            let resolvedCurrency = Currency.importedCode(currency).resolved(default: defaultCurrency)
         else {
             return nil
         }
@@ -560,7 +567,7 @@ private struct ImportedInvestment: Decodable {
             costBasis: costBasisValue,
             currentValue: currentValueValue,
             currentPrice: currentPriceValue,
-            currency: Currency.imported(currency, default: defaultCurrency),
+            currency: resolvedCurrency,
             geography: geography ?? "Other",
             sector: sector ?? "Other",
             isin: isin?.uppercased() ?? "",
@@ -631,7 +638,8 @@ private struct ImportedCryptoHolding: Decodable {
             let quantityValue = importedMoney(quantity),
             let avgBuyPriceValue = importedMoney(orZero: avgBuyPrice?.nonNegativeImportedAmount),
             let currentPriceValue = importedMoney(orZero: currentPrice?.nonNegativeImportedAmount),
-            let feesValue = importedMoney(orZero: fees?.nonNegativeImportedAmount)
+            let feesValue = importedMoney(orZero: fees?.nonNegativeImportedAmount),
+            let resolvedCurrency = Currency.importedCode(currency).resolved(default: defaultCurrency)
         else {
             return nil
         }
@@ -643,7 +651,7 @@ private struct ImportedCryptoHolding: Decodable {
             quantity: quantityValue,
             avgBuyPrice: avgBuyPriceValue,
             currentPrice: currentPriceValue,
-            currency: Currency.imported(currency, default: defaultCurrency),
+            currency: resolvedCurrency,
             fees: feesValue,
             coinId: coinId?.lowercased() ?? "",
             updatedAt: importedUpdatedAt,
@@ -686,7 +694,10 @@ private struct ImportedLiability: Decodable {
     }
 
     func model(defaultCurrency: Currency) -> Liability? {
-        guard let balance = (currentBalance ?? principal)?.nonNegativeImportedAmount.flatMap(importedMoney) else {
+        guard
+            let balance = (currentBalance ?? principal)?.nonNegativeImportedAmount.flatMap(importedMoney),
+            let resolvedCurrency = Currency.importedCode(currency).resolved(default: defaultCurrency)
+        else {
             return nil
         }
 
@@ -696,7 +707,7 @@ private struct ImportedLiability: Decodable {
             id: id ?? UUID(),
             name: name ?? type?.importTitleCased ?? "Liability",
             currentBalance: balance,
-            currency: Currency.imported(currency, default: defaultCurrency),
+            currency: resolvedCurrency,
             createdAt: ImportDateParser.parse(createdAt) ?? importedUpdatedAt,
             updatedAt: importedUpdatedAt
         )
@@ -743,10 +754,12 @@ private struct ImportedSnapshot: Decodable {
     }
 
     func model() -> NetWorthSnapshot? {
+        let currencyCode = Currency.importedCode(currency)
         guard
             let date = ImportDateParser.parse(date),
             let netWorth,
-            netWorth.isFinite
+            netWorth.isFinite,
+            currencyCode.isRepresentable
         else {
             return nil
         }
@@ -774,7 +787,7 @@ private struct ImportedSnapshot: Decodable {
             liquidity: liquidityValue,
             investments: investmentsValue,
             crypto: cryptoValue,
-            currency: Currency.importedIfPresent(currency),
+            currency: currencyCode.optionalValue,
             createdAt: ImportDateParser.parse(createdAt) ?? date
         )
     }
@@ -1033,22 +1046,59 @@ private func importedMoney(orZero value: Decimal?) -> Decimal? {
     return value.finiteImportedAmount
 }
 
-private extension Currency {
-    static func imported(_ rawValue: String?, default defaultCurrency: Currency) -> Currency {
-        guard let rawValue = rawValue?.trimmedForImport else { return defaultCurrency }
-        return Currency(rawValue: rawValue.uppercased()) ?? defaultCurrency
+/// What a record's `currency` field turned out to be. Three outcomes, because the two that used to
+/// be collapsed together mean opposite things: an *absent* field is a legacy row, while a *present*
+/// code outside the modelled set is a row whose money this app cannot represent.
+private enum ImportedCurrencyCode {
+    /// No field, or a blank one — a row written before the field existed.
+    case absent
+    /// A code this app models.
+    case known(Currency)
+    /// A real code outside `Currency`. The record must be skipped, never relabelled.
+    case unrepresentable
+
+    /// For the four models whose `currency` is non-optional. `nil` means "skip this record".
+    ///
+    /// Falling back to the display currency here kept the number and changed its meaning — an
+    /// `AED 5,000` row silently became `EUR 5,000`, which is worse than dropping it because
+    /// nothing tells the user it happened. Skipping routes the row into `skippedRecords`, so the
+    /// import summary reports it. This is the choice the Revolut parser already makes for an
+    /// unrepresentable account section (`sectionCurrency` → `.unsupported` → the rows are skipped
+    /// and counted rather than inheriting the previous section's currency).
+    func resolved(default defaultCurrency: Currency) -> Currency? {
+        switch self {
+        case .absent: defaultCurrency
+        case .known(let currency): currency
+        case .unrepresentable: nil
+        }
     }
 
-    /// The optional counterpart, for the three models whose `currency` is `Currency?`.
+    /// For the three models whose `currency` is `Currency?`.
     ///
     /// `nil` on those types means "a row written before the field existed, read it as the base
     /// currency" — a meaning that must be preserved for genuinely legacy backups and must *not* be
-    /// applied to a row this app exported minutes ago. So an absent field stays `nil`, and a present
-    /// one is parsed. An unparseable code also returns `nil`, which reads identically to the
-    /// `default:` overload above (`currency ?? base`) without claiming a code we did not recognise.
-    static func importedIfPresent(_ rawValue: String?) -> Currency? {
-        guard let rawValue = rawValue?.trimmedForImport else { return nil }
-        return Currency(rawValue: rawValue.uppercased())
+    /// applied to a row this app exported minutes ago. So `.absent` stays `nil` and `.known` is
+    /// carried through. `.unrepresentable` also maps to `nil` here, which is why callers must check
+    /// `isRepresentable` and skip the record first: reaching this for an unknown code would be the
+    /// same silent re-denomination, just spelled `currency ?? base` downstream.
+    var optionalValue: Currency? {
+        switch self {
+        case .absent, .unrepresentable: nil
+        case .known(let currency): currency
+        }
+    }
+
+    var isRepresentable: Bool {
+        if case .unrepresentable = self { return false }
+        return true
+    }
+}
+
+private extension Currency {
+    static func importedCode(_ rawValue: String?) -> ImportedCurrencyCode {
+        guard let rawValue = rawValue?.trimmedForImport else { return .absent }
+        guard let currency = Currency(rawValue: rawValue.uppercased()) else { return .unrepresentable }
+        return .known(currency)
     }
 }
 

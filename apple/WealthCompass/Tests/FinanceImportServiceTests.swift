@@ -218,6 +218,66 @@ final class FinanceImportServiceTests: XCTestCase {
         }
     }
 
+    /// An ISO code this app does not model must skip the row, not relabel it.
+    ///
+    /// Falling back to the display currency kept the number and changed its meaning — an AED 5,000
+    /// row silently became EUR 5,000, with nothing on screen to say so. That is worse than dropping
+    /// it. The Revolut parser already makes the opposite choice for an unrepresentable account
+    /// section (`sectionCurrency` → `.unsupported` → skipped and counted); this is the same choice
+    /// for a JSON backup, across all seven places a currency code is read.
+    func testUnrepresentableCurrencyCodeSkipsTheRecordInsteadOfRelabellingIt() throws {
+        let result = try parse("""
+        {"transactions":[
+           {"type":"income","amount":5000,"category":"X","date":"2026-01-01","currency":"AED"},
+           {"type":"income","amount":10,"category":"Good","date":"2026-01-02","currency":"USD"}
+         ],
+         "recurringTransactions":[
+           {"type":"expense","amount":5000,"category":"Rent","startDate":"2026-01-01",
+            "frequency":"monthly","nextDueDate":"2026-02-01","currency":"AED"}
+         ],
+         "investments":[{"symbol":"A","name":"A","quantity":1,"currentValue":5000,"currency":"AED"}],
+         "crypto":[{"symbol":"B","name":"B","quantity":1,"currentPrice":5000,"currency":"AED"}],
+         "liabilities":[{"name":"L","currentBalance":5000,"currency":"AED"}],
+         "snapshots":[{"date":"2026-01-01","netWorth":5000,"currency":"AED"}],
+         "liquidity":[{"name":"Acct","balance":5000,"currency":"AED"}]}
+        """)
+        XCTAssertEqual(result.data.transactions.count, 1, "an AED transaction or liquidity row was kept")
+        XCTAssertEqual(result.data.transactions.first?.currency, .usd, "the healthy row beside it must survive")
+        XCTAssertEqual(result.data.transactions.first?.amount, Decimal(string: "10"))
+        XCTAssertTrue(result.data.recurringTransactions.isEmpty)
+        XCTAssertTrue(result.data.investments.isEmpty)
+        XCTAssertTrue(result.data.crypto.isEmpty)
+        XCTAssertTrue(result.data.liabilities.isEmpty)
+        XCTAssertTrue(result.data.snapshots.isEmpty)
+        // Seven rows carried AED; the user has to be told about every one of them.
+        XCTAssertEqual(result.skippedRecords, 7, "unrepresentable rows were dropped without being reported")
+    }
+
+    /// The legacy meaning the skip must not break: an **absent** currency field is a row written
+    /// before the field existed. It stays `nil` on the three optional-currency models (read as base
+    /// currency downstream) and takes the display currency on the four non-optional ones — and in
+    /// neither case does the record get dropped.
+    func testAbsentCurrencyIsLegacyNotUnrepresentable() throws {
+        let result = try parse("""
+        {"transactions":[{"type":"income","amount":10,"category":"X","date":"2026-01-01"}],
+         "recurringTransactions":[
+           {"type":"expense","amount":20,"category":"Rent","startDate":"2026-01-01",
+            "frequency":"monthly","nextDueDate":"2026-02-01"}
+         ],
+         "investments":[{"symbol":"A","name":"A","quantity":1,"currentValue":30}],
+         "crypto":[{"symbol":"B","name":"B","quantity":1,"currentPrice":40}],
+         "liabilities":[{"name":"L","currentBalance":50}],
+         "snapshots":[{"date":"2026-01-01","netWorth":60}]}
+        """)
+        XCTAssertNil(result.data.transactions.first?.currency)
+        XCTAssertNil(result.data.recurringTransactions.first?.currency)
+        XCTAssertNil(result.data.snapshots.first?.currency)
+        XCTAssertEqual(result.data.investments.first?.currency, .eur)
+        XCTAssertEqual(result.data.crypto.first?.currency, .eur)
+        XCTAssertEqual(result.data.liabilities.first?.currency, .eur)
+        XCTAssertEqual(result.skippedRecords, 0)
+    }
+
     func testMultipleDateFormatsBothParse() throws {
         let result = try parse("""
         {"transactions":[
