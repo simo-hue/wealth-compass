@@ -1000,6 +1000,11 @@ private func loneSeparatorThousandsReading(_ trimmed: String) -> Decimal? {
 
     let groups = unsigned.split(separator: dotCount == 1 ? "." : ",", omittingEmptySubsequences: false)
     guard groups.count == 2, (1...3).contains(groups[0].count), groups[1].count == 3 else { return nil }
+    // A grouped number never carries a leading zero in its first group — grouping only appears at
+    // a thousand and above, so `1,000` is written that way and `0,001` never is. Without this the
+    // rule read `"0,001"` as 1 and `"0,500"` as 500, which is the same 1000x error it exists to
+    // prevent, pointed the other way: `0,500` is half a unit written European-style.
+    guard !groups[0].hasPrefix("0") else { return nil }
     // ASCII digits only, so this never hands `Decimal(string:)` something it reads differently —
     // the same restriction the grouped-thousands fallback makes.
     guard groups.allSatisfy({ $0.allSatisfy { $0.isASCII && $0.isWholeNumber } }) else { return nil }

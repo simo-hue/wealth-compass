@@ -357,6 +357,41 @@ final class FinanceImportServiceTests: XCTestCase {
     /// **The accepted cost**, stated by the owner and not to be solved by sniffing the currency
     /// code: a three-decimal currency (BHD, KWD, OMR) writes 1.5 dinar as `"1,500"`, and that now
     /// imports as 1500.
+    /// A leading zero in the first group means the separator was never a grouping separator.
+    ///
+    /// Grouping only appears at a thousand and above, so `1,000` is written that way and `0,001`
+    /// never is — the leading zero is exactly what tells the two apart. Reading digits without
+    /// asking that question turned `"0,001"` into 1 and `"0,500"` into 500, which is the same
+    /// 1000x error the thousands rule exists to prevent, pointed the other way: `0,500` is half a
+    /// unit written European-style, and a three-decimal currency writes small change like this.
+    func testLeadingZeroMeansDecimalNotThousands() throws {
+        let pinned: [(literal: String, expected: String)] = [
+            ("0,001", "0.001"),
+            ("0.001", "0.001"),
+            ("0,500", "0.5"),
+            ("00,001", "0.001")
+        ]
+        for (literal, expected) in pinned {
+            let result = try parse("""
+            {"transactions":[{"type":"income","amount":"\(literal)","category":"X","date":"2026-01-01"}]}
+            """)
+            XCTAssertEqual(
+                result.data.transactions.first?.amount, Decimal(string: expected),
+                "\"\(literal)\" was read as a grouped thousand instead of a decimal"
+            )
+        }
+
+        // The negative goes through a snapshot rather than a transaction: a transaction needs a
+        // positive amount, so a negative one is skipped before its parsed value can be asserted on.
+        let negative = try parse("""
+        {"snapshots":[{"date":"2026-01-01","netWorth":"-0,001"}]}
+        """)
+        XCTAssertEqual(
+            negative.data.snapshots.first?.netWorth, Decimal(string: "-0.001"),
+            "\"-0,001\" was read as a grouped thousand instead of a decimal"
+        )
+    }
+
     func testLoneSeparatorWithThreeDigitsIsThousandsInMoneyFields() throws {
         let pinned: [(literal: String, expected: String)] = [
             ("1,000", "1000"),
@@ -365,9 +400,7 @@ final class FinanceImportServiceTests: XCTestCase {
             ("1.234", "1234"),
             ("12,345", "12345"),
             ("123,456", "123456"),
-            ("999.999", "999999"),
-            // The rule counts digits, not value: a leading zero groups the same way.
-            ("0,001", "1")
+            ("999.999", "999999")
         ]
         for (literal, expected) in pinned {
             let result = try parse("""
