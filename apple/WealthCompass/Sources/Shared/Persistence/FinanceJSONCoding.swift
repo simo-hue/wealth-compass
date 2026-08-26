@@ -114,14 +114,76 @@ enum FinanceJSONCoding {
         recordType: CloudSyncRecordType,
         into skipped: inout [CloudSyncRecordKey]
     ) {
-        guard
-            case .object(let object) = element,
-            case .string(let idString)? = object["id"],
-            let id = UUID(uuidString: idString)
-        else {
-            return
-        }
+        guard let id = recordID(of: element) else { return }
         skipped.append(CloudSyncRecordKey(type: recordType, id: id))
+    }
+
+    private static func recordID(of element: JSONValue) -> UUID? {
+        guard case .object(let object) = element, case .string(let idString)? = object["id"] else {
+            return nil
+        }
+        return UUID(uuidString: idString)
+    }
+
+    /// The JSON key each syncable collection lives under. `decodeFinancialDataLossily` walks the
+    /// same six, in the same order; the two lists must not drift apart.
+    private static let syncableCollections: [(key: String, recordType: CloudSyncRecordType)] = [
+        ("transactions", .transaction),
+        ("recurringTransactions", .recurringTransaction),
+        ("investments", .investment),
+        ("crypto", .crypto),
+        ("liabilities", .liability),
+        ("snapshots", .snapshot)
+    ]
+
+    /// Encodes `data`, then splices back — verbatim — the records in `existing` that the matching
+    /// load had to skip (deep-audit H08).
+    ///
+    /// `load()` refuses to rewrite the file when anything was skipped, so an undecodable record
+    /// survives on disk for a future build that can read it. `save` writing the lossy in-memory
+    /// snapshot over that file undid the whole protection on the user's very first edit, and with
+    /// iCloud sync off nothing else holds a copy. This completes the load's intent rather than
+    /// contradicting it: the file keeps both the new snapshot and the records it cannot model.
+    ///
+    /// The preserved records are carried across as the exact `JSONValue` subtrees the file holds —
+    /// re-encoding is not an option, since there is no in-memory model to re-encode them from. A
+    /// key whose record is now present in `data` (a newer build learned to read it, or sync
+    /// replaced it) is left alone, so the splice can never duplicate a record.
+    static func encodeFinancialData(
+        _ data: FinancialData,
+        preserving skippedRecordKeys: [CloudSyncRecordKey],
+        from existing: Data
+    ) throws -> Data {
+        let encoded = try encode(data, prettyPrinted: true)
+        guard !skippedRecordKeys.isEmpty else { return encoded }
+        guard
+            case .object(var root)? = try? jsonValueDecoder.decode(JSONValue.self, from: encoded),
+            case .object(let previous)? = try? jsonValueDecoder.decode(JSONValue.self, from: existing)
+        else {
+            // Nothing to splice into, or nothing to splice from. The snapshot is still the user's
+            // real data and has to reach disk — refusing the write to protect an unreadable record
+            // would lose the edit they just made, which is the worse of the two trades.
+            return encoded
+        }
+
+        var changed = false
+        for (key, recordType) in syncableCollections {
+            let wanted = Set(skippedRecordKeys.lazy.filter { $0.type == recordType }.map(\.id))
+            guard !wanted.isEmpty, case .array(let previousElements)? = previous[key] else { continue }
+            var elements: [JSONValue] = []
+            if case .array(let current)? = root[key] { elements = current }
+            let alreadyPresent = Set(elements.compactMap(recordID(of:)))
+            for element in previousElements {
+                guard let id = recordID(of: element), wanted.contains(id), !alreadyPresent.contains(id) else {
+                    continue
+                }
+                elements.append(element)
+                changed = true
+            }
+            root[key] = .array(elements)
+        }
+        guard changed else { return encoded }
+        return try jsonValueEncoder.encode(JSONValue.object(root))
     }
 
     // WC-M4: cache the ISO-8601 formatters instead of allocating one per date value.

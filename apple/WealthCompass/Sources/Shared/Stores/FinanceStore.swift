@@ -338,7 +338,7 @@ final class FinanceStore: ObservableObject {
         // Started unconditionally: the consumer seeds the coordinator baseline as its very first
         // action, so a later recovery can hand it a fresh baseline through `reseed` without the
         // pipeline having to be torn down and rebuilt.
-        startSaveConsumer(seedRecords: seedRecords)
+        startSaveConsumer(seedRecords: seedRecords, skippedRecordKeys: lastLoadedSkippedRecordKeys)
         // Persist the WC-M1 currency backfill (if any) now that the save pipeline exists; it
         // diffs against the on-disk baseline seeded above, so only the stamped rows are written.
         if needsCurrencyBackfillSave {
@@ -1708,7 +1708,7 @@ final class FinanceStore: ObservableObject {
             // an empty baseline and re-upload the entire dataset. Nothing can slip in during the
             // suspension — `save()` is still refused while the state isn't `.loaded`, and the UI
             // doesn't render (so can't mutate) either.
-            await coordinator.reseed(records)
+            await coordinator.reseed(records, preserving: lastLoadedSkippedRecordKeys)
             loadState = .loaded
             SyncDiagnosticsLog.shared.record("RECOVERED load ok — \(records.count) record(s)")
             // Persist the WC-M1 currency backfill if this load was the one that discovered it.
@@ -1774,7 +1774,10 @@ final class FinanceStore: ObservableObject {
     /// `bufferingNewest(1)` coalesces bursts: while one save runs, only the most recent
     /// queued tick survives, and the consumer always reads the latest `data` (last write
     /// wins).
-    private func startSaveConsumer(seedRecords: [CloudSyncRecordKey: CloudSyncRecordSnapshot]) {
+    private func startSaveConsumer(
+        seedRecords: [CloudSyncRecordKey: CloudSyncRecordSnapshot],
+        skippedRecordKeys: [CloudSyncRecordKey]
+    ) {
         let (stream, continuation) = AsyncStream.makeStream(
             of: Int.self,
             bufferingPolicy: .bufferingNewest(1)
@@ -1782,7 +1785,7 @@ final class FinanceStore: ObservableObject {
         saveContinuation = continuation
         saveConsumerTask = Task { [weak self] in
             guard let self else { return }
-            await self.coordinator.seed(seedRecords)
+            await self.coordinator.seed(seedRecords, preserving: skippedRecordKeys)
             for await generation in stream {
                 await self.processSave(generation: generation)
             }
@@ -2133,15 +2136,25 @@ actor PersistenceCoordinator {
     /// The per-record snapshot of what is currently on disk; the baseline every save diffs
     /// against. Advanced only after a successful write, so a failed write cannot corrupt it.
     private var lastSavedRecords: [CloudSyncRecordKey: CloudSyncRecordSnapshot] = [:]
+    /// H08: keys the load could not decode. They are absent from every snapshot this coordinator
+    /// will ever be handed, so without carrying them the first write erases them from the file the
+    /// load deliberately left alone. Set alongside the baseline, because they describe the same
+    /// on-disk state the baseline does.
+    private var preservedRecordKeys: [CloudSyncRecordKey] = []
 
     init(persistence: FinancePersistence, metadataStore: CloudSyncMetadataStore) {
         self.persistence = persistence
         self.metadataStore = metadataStore
     }
 
-    /// Seeds the diff baseline from the records loaded at startup.
-    func seed(_ records: [CloudSyncRecordKey: CloudSyncRecordSnapshot]) {
+    /// Seeds the diff baseline from the records loaded at startup, plus the keys that load had to
+    /// skip (H08) so the first write does not erase them.
+    func seed(
+        _ records: [CloudSyncRecordKey: CloudSyncRecordSnapshot],
+        preserving skippedRecordKeys: [CloudSyncRecordKey] = []
+    ) {
         lastSavedRecords = records
+        preservedRecordKeys = skippedRecordKeys
     }
 
     /// Replaces the diff baseline after a late load succeeded (WC-LOCK1).
@@ -2149,8 +2162,12 @@ actor PersistenceCoordinator {
     /// Distinct from `seed` only in intent — the store calls this once the DB it originally failed
     /// to read has finally been read, so the baseline stops being the empty placeholder it was
     /// initialized with. Without it, the first edit after recovery would diff every record as new.
-    func reseed(_ records: [CloudSyncRecordKey: CloudSyncRecordSnapshot]) {
+    func reseed(
+        _ records: [CloudSyncRecordKey: CloudSyncRecordSnapshot],
+        preserving skippedRecordKeys: [CloudSyncRecordKey] = []
+    ) {
         lastSavedRecords = records
+        preservedRecordKeys = skippedRecordKeys
     }
 
     /// Encodes the snapshot, diffs it against the baseline, writes it to disk, records the
@@ -2161,7 +2178,7 @@ actor PersistenceCoordinator {
         defer { SyncSignpost.persistence.end("save", interval) }
         let newRecords = try snapshot.cloudSyncRecords()
         let changes = CloudSyncChangeSet.difference(from: lastSavedRecords, to: newRecords)
-        try persistence.save(snapshot)
+        try persistence.save(snapshot, preserving: preservedRecordKeys)
         do {
             try metadataStore.recordLocalChanges(changes, currentRecords: newRecords)
         } catch {
@@ -2181,7 +2198,7 @@ actor PersistenceCoordinator {
     /// engine has already updated its own metadata for these records.
     func applyRemote(_ snapshot: FinancialData) throws {
         let newRecords = try snapshot.cloudSyncRecords()
-        try persistence.save(snapshot)
+        try persistence.save(snapshot, preserving: preservedRecordKeys)
         lastSavedRecords = newRecords
     }
 }

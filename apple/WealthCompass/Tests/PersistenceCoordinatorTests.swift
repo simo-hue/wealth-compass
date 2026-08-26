@@ -93,6 +93,87 @@ final class PersistenceCoordinatorTests: XCTestCase {
         XCTAssertEqual(decoded.skippedRecordKeys.count, 1)
     }
 
+    /// H08's other half: what `load()` protects, `save()` has to keep protecting.
+    ///
+    /// `load()` deliberately refuses to rewrite the file when anything was skipped, so an
+    /// undecodable record — an unknown enum value written by a newer build and synced back —
+    /// survives on disk for a version that can read it. But `save` wrote the lossy in-memory
+    /// snapshot straight over the file, so the user's very first edit erased exactly what the load
+    /// had gone out of its way to keep. With iCloud sync off, nothing else holds a copy.
+    func testSavePreservesRecordsTheLoadHadToSkip() throws {
+        let directoryName = "WealthCompassTests-\(UUID().uuidString)"
+        let persistence = LocalFinancePersistence(directoryName: directoryName, fileName: "db.json")
+        defer { try? persistence.clear() }
+
+        let unreadableID = "22222222-2222-2222-2222-222222222222"
+        let json = """
+        {"transactions":[
+          {"id":"11111111-1111-1111-1111-111111111111","type":"income","category":"Salary",
+           "amount":1234.56,"description":"","date":"2026-01-01T00:00:00.000Z",
+           "createdAt":"2026-01-01T00:00:00.000Z","updatedAt":"2026-01-01T00:00:00.000Z"},
+          {"id":"\(unreadableID)","type":"NOT_A_TYPE","category":"Mystery",
+           "amount":4321.99,"description":"","date":"2026-01-02T00:00:00.000Z",
+           "createdAt":"2026-01-02T00:00:00.000Z","updatedAt":"2026-01-02T00:00:00.000Z"}
+        ]}
+        """
+        let fileURL = try writeDatabase(json, directoryName: directoryName, fileName: "db.json")
+
+        let loaded = try XCTUnwrap(try persistence.load())
+        XCTAssertEqual(loaded.data.transactions.count, 1, "fixture did not exercise the salvage path")
+        XCTAssertEqual(loaded.skippedRecordKeys.count, 1)
+
+        // The user edits something; the store saves the snapshot the load produced.
+        var edited = loaded.data
+        edited.transactions[0].amount = Decimal(string: "2000")!
+        try persistence.save(edited, preserving: loaded.skippedRecordKeys)
+
+        let rewritten = String(decoding: try Data(contentsOf: fileURL), as: UTF8.self)
+        XCTAssertTrue(rewritten.contains(unreadableID), "the first edit erased the record load had protected")
+        XCTAssertTrue(rewritten.contains("NOT_A_TYPE"), "the record was kept but no longer verbatim")
+        XCTAssertTrue(rewritten.contains("4321.99"), "the unreadable record's amount was rewritten")
+        XCTAssertTrue(rewritten.contains("2000"), "the user's edit was not saved")
+
+        // And it is still exactly one skipped record — not duplicated by the splice.
+        let reloaded = try XCTUnwrap(try persistence.load())
+        XCTAssertEqual(reloaded.data.transactions.count, 1)
+        XCTAssertEqual(reloaded.data.transactions[0].amount, Decimal(string: "2000"))
+        XCTAssertEqual(reloaded.skippedRecordKeys.count, 1, "the preserved record was duplicated")
+    }
+
+    /// The common path must not change: with nothing skipped, `save` writes the snapshot and only
+    /// the snapshot — no stale record resurrected from whatever the file used to hold.
+    func testSaveWithNothingSkippedWritesOnlyTheSnapshot() throws {
+        let directoryName = "WealthCompassTests-\(UUID().uuidString)"
+        let persistence = LocalFinancePersistence(directoryName: directoryName, fileName: "db.json")
+        defer { try? persistence.clear() }
+
+        let json = """
+        {"transactions":[
+          {"id":"11111111-1111-1111-1111-111111111111","type":"income","category":"Salary",
+           "amount":1234.56,"description":"","date":"2026-01-01T00:00:00.000Z",
+           "createdAt":"2026-01-01T00:00:00.000Z","updatedAt":"2026-01-01T00:00:00.000Z"}
+        ]}
+        """
+        let fileURL = try writeDatabase(json, directoryName: directoryName, fileName: "db.json")
+
+        let loaded = try XCTUnwrap(try persistence.load())
+        XCTAssertTrue(loaded.skippedRecordKeys.isEmpty)
+        try persistence.save(FinancialData(), preserving: loaded.skippedRecordKeys)
+
+        let rewritten = String(decoding: try Data(contentsOf: fileURL), as: UTF8.self)
+        XCTAssertFalse(rewritten.contains("11111111-1111-1111-1111-111111111111"), "a deleted record came back")
+    }
+
+    private func writeDatabase(_ json: String, directoryName: String, fileName: String) throws -> URL {
+        let directory = try XCTUnwrap(
+            FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+        ).appendingPathComponent(directoryName, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let fileURL = directory.appendingPathComponent(fileName)
+        try Data(json.utf8).write(to: fileURL)
+        return fileURL
+    }
+
     // MARK: - Coordinator
 
     func testBurstSavesPersistLastSnapshotAndAdvanceBaseline() async throws {

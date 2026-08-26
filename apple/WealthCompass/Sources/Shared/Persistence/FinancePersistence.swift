@@ -18,6 +18,17 @@ protocol FinancePersistence: Sendable {
 
     func load() throws -> FinancePersistenceLoad?
     func save(_ data: FinancialData) throws
+
+    /// Writes `data`, keeping the records the matching `load()` had to skip (deep-audit H08).
+    ///
+    /// `load()` refuses to rewrite the file when anything was skipped, so an undecodable record —
+    /// an unknown enum value written by a newer build and synced back — survives on disk for a
+    /// version that can read it. Plain `save` then wrote the lossy in-memory snapshot straight over
+    /// it, so the user's first edit erased exactly what the load had gone out of its way to keep;
+    /// with iCloud sync off, nothing else holds a copy. Pass the keys the load reported and the
+    /// store keeps protecting them.
+    func save(_ data: FinancialData, preserving skippedRecordKeys: [CloudSyncRecordKey]) throws
+
     func clear() throws
 
     /// Brings an already-existing store up to the current data-protection class (WC-LOCK1).
@@ -28,6 +39,12 @@ protocol FinancePersistence: Sendable {
 extension FinancePersistence {
     /// No-op default so in-memory / test doubles don't have to care about on-disk protection.
     func upgradeProtectionClassIfNeeded() {}
+
+    /// Default for stores with nothing on disk to preserve — an in-memory double never produced a
+    /// skipped key in the first place, because it never decoded anything.
+    func save(_ data: FinancialData, preserving skippedRecordKeys: [CloudSyncRecordKey]) throws {
+        try save(data)
+    }
 }
 
 /// Stateless file writer (it only holds immutable configuration), so it is safe to hand to
@@ -73,6 +90,9 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
         // decode drops undecodable records from `decoded.data`, so persisting it here would erase
         // those records from disk. Leaving the file untouched preserves them for a future app
         // version that can read them; the harmless date-healing migration just re-runs next load.
+        //
+        // The other half of that protection is `save(_:preserving:)` — this refusal only defers the
+        // erase to the user's next edit unless the write path carries the same keys across.
         if decoded.wasMigrated && decoded.skippedRecordKeys.isEmpty {
             // Best-effort: a failed pre-CloudKit backup must not abort an otherwise-successful load
             // (deep-audit L30). The migrated-data write below stays fatal — that one must succeed.
@@ -83,8 +103,12 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
     }
 
     func save(_ data: FinancialData) throws {
+        try save(data, preserving: [])
+    }
+
+    func save(_ data: FinancialData, preserving skippedRecordKeys: [CloudSyncRecordKey]) throws {
         try createStorageDirectoryIfNeeded()
-        try write(data)
+        try write(data, preserving: skippedRecordKeys)
     }
 
     /// WC-LOCK1: re-stamps **only the live finance DB** with the current protection class, so an
@@ -158,7 +182,22 @@ struct LocalFinancePersistence: FinancePersistence, @unchecked Sendable {
     }
 
     private func write(_ data: FinancialData) throws {
-        let encoded = try FinanceJSONCoding.encode(data, prettyPrinted: true)
+        try write(data, preserving: [])
+    }
+
+    private func write(_ data: FinancialData, preserving skippedRecordKeys: [CloudSyncRecordKey]) throws {
+        let encoded: Data
+        if skippedRecordKeys.isEmpty {
+            // The overwhelmingly common case, byte-for-byte what it always was: no extra read.
+            encoded = try FinanceJSONCoding.encode(data, prettyPrinted: true)
+        } else {
+            // H08: carry the records the load could not decode across into the new file. Reading
+            // the old one back is the only place they exist — `data` is the lossy snapshot.
+            let existing = (try? Data(contentsOf: storageURL)) ?? Data()
+            encoded = try FinanceJSONCoding.encodeFinancialData(
+                data, preserving: skippedRecordKeys, from: existing
+            )
+        }
         try encoded.write(to: storageURL, options: DataProtection.atomicWriteOptions)
     }
 }
