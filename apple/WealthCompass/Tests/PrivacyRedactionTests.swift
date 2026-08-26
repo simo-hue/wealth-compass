@@ -187,11 +187,30 @@ final class PrivacyRedactionTests: XCTestCase {
     /// string mentioning a count. `Text(_:tableName:…)` would also be reported, since the literal is
     /// not the sole argument; nothing in this tree uses that overload.
     ///
-    /// The report-export files are excluded here as they are from the other sweeps. They print
-    /// **eight** counts this way (`ReportDocumentBuilder.swift:857`, `:950` and `:1070-1075` — the
-    /// commit that introduced this exclusion said six and missed the first two), which is the same
-    /// formatting defect, but an export redacts nothing by design and they are not privacy call
-    /// sites; they are recorded rather than swept in.
+    /// **This sweep alone reads the report-export files.** It used to skip them with the other four,
+    /// and the exemption was borrowed rather than reasoned: `excludedFiles` exists because an export
+    /// redacts nothing by design, so a redaction sweep would report the same live shares forever.
+    /// That answers a privacy question. This one is not a privacy check — its own subject is a
+    /// number that reads wrong "with Privacy Mode **off**, which is most readers", so the reason the
+    /// other sweeps look away has never applied to it.
+    ///
+    /// What the borrowed exemption cost: **eight** counts printed unformatted
+    /// (`ReportDocumentBuilder.swift:857`, `:950` and `:1070-1075` — the commit that introduced the
+    /// exclusion said six and missed the first two), recorded in this comment for two commits and
+    /// pinned by nothing. They are fixed now, routed through the builder's own `count(_:)`, and
+    /// `ReportCountFormattingTests` renders them in `de_DE` and `fr_FR`. With them fixed the sweep
+    /// reads all five export files and reports zero, so nothing is being exempted to keep it green.
+    ///
+    /// The other four sweeps keep the full `excludedFiles`, which is why this reads the directory
+    /// itself rather than sharing their filter. `swept` is what says so: drop the export files back
+    /// out and this test fails on the assertion below rather than quietly narrowing again.
+    ///
+    /// Two integers in those files are **not** offenders and this sweep is right not to report them.
+    /// `ReportDocumentBuilder.swift:761` renders a calendar year with `String(year)`, which must not
+    /// be grouped — `2.024` is not a year. `PDFReportRenderer.swift:343` interpolates page numbers
+    /// into `Page %1$@ of %2$@`; page numbers are ungrouped by typographic convention. Neither
+    /// mentions a `count`, so neither is matched, but the reason they are correct is not the reason
+    /// they are unmatched, and a future reader should not have to rediscover that.
     func testWorkingTreeRendersNoUnformattedEntityCount() throws {
         let sources = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
@@ -199,18 +218,17 @@ final class PrivacyRedactionTests: XCTestCase {
             .appendingPathComponent("Sources")
 
         var offenders: [PercentRender] = []
-        var filesRead = 0
+        var swept: Set<String> = []
 
         for directory in Self.scannedDirectories {
             let root = sources.appendingPathComponent(directory)
             let swiftFiles = try FileManager.default
                 .subpathsOfDirectory(atPath: root.path)
                 .filter { $0.hasSuffix(".swift") }
-                .filter { !Self.excludedFiles.contains("\(directory)/\($0)") }
                 .sorted()
 
             for file in swiftFiles {
-                filesRead += 1
+                swept.insert("\(directory)/\(file)")
                 let text = try String(contentsOf: root.appendingPathComponent(file), encoding: .utf8)
                 offenders += try Self.unformattedCounts(
                     in: Self.stripped(text), path: "Sources/\(directory)/\(file)"
@@ -222,14 +240,30 @@ final class PrivacyRedactionTests: XCTestCase {
         // `Text("\(count)")` spellings" — with no margin at all: converting one of those five to
         // `privateCount`, which is an improvement, would have failed this.
         XCTAssertGreaterThan(
-            filesRead, 20, "only \(filesRead) Swift file(s) read — the sweep has lost the source tree"
+            swept.count, 20,
+            "only \(swept.count) Swift file(s) read — the sweep has lost the source tree"
+        )
+        // And it read the files the other four sweeps skip. Without this, re-adding the
+        // `excludedFiles` filter above would take the export back out with the suite still green,
+        // which is exactly how the eight counts survived two commits in the first place.
+        let unswept = Self.excludedFiles.subtracting(swept).sorted()
+        XCTAssertEqual(
+            unswept, [],
+            """
+            \(unswept.count) report-export file(s) went unread. This sweep deliberately does not \
+            take the redaction exemption — an ungrouped count is wrong for every reader, redacted \
+            or not:
+            \(unswept.map { "  Sources/" + $0 }.joined(separator: "\n"))
+            """
         )
         XCTAssertEqual(
             offenders.map(\.description), [],
             """
             \(offenders.count) entity count(s) render as a bare `String`, so every reader sees 1234 \
             rather than 1,234 or 1.234 — with Privacy Mode off, which is most readers. Route them \
-            through `settings.privateCount(_:)`:
+            through `settings.privateCount(_:)`, or, under `Shared/Export`, the builder's own \
+            `count(_:)` — a report is deliberately unredacted, so `privateCount` is the wrong \
+            helper there and would mask a figure the export exists to print:
             \(offenders.map { "  " + $0.description }.joined(separator: "\n"))
             """
         )
@@ -789,6 +823,11 @@ final class PrivacyRedactionTests: XCTestCase {
     /// any future file anywhere in the tree that happened to be called `ReportPaginator.swift` —
     /// or `PDFDrawingContext.swift`, a name a chart or a receipt could reasonably reuse — was
     /// silently exempt from all five sweeps, with nothing to say so.
+    ///
+    /// **Four sweeps, not five.** `testWorkingTreeRendersNoUnformattedEntityCount` opts out and
+    /// reads these files: the exemption above is an argument about redaction, and an ungrouped
+    /// count is wrong with Privacy Mode off. It borrowed this list once and eight unformatted
+    /// counts shipped behind it. That test's doc comment carries the reasoning.
     private static let excludedFiles: Set<String> = [
         "Shared/Export/ReportDocumentBuilder.swift", "Shared/Export/ReportChartRenderer.swift",
         "Shared/Export/PDFReportRenderer.swift", "Shared/Export/ReportPaginator.swift",

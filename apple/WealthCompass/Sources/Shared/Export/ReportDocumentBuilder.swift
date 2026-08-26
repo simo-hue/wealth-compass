@@ -239,6 +239,21 @@ struct ReportDocumentBuilder {
         value.formatted(.number.precision(.fractionLength(0...digits)).locale(context.locale))
     }
 
+    /// An entity count — how many holdings, how many transactions — grouped for the reader.
+    ///
+    /// The in-app twin is `AppSettings.privateCount(_:)`, which this deliberately does not call: it
+    /// redacts under Privacy Mode, and the export redacts nothing by design (`ExportOptionsView`
+    /// warns before the user commits). What carries over is only the formatting half.
+    ///
+    /// Every one of the eight call sites used to interpolate the `Int` straight into a `String`,
+    /// which is `String(describing:)` and groups nothing, so the appendix printed `1234` in all 35
+    /// languages. `.locale(context.locale)` rather than the ambient one for the same reason every
+    /// other formatter here takes it: the document is built on a detached task, and its locale is
+    /// the reader's in-app language, not the process's.
+    private func count(_ value: Int) -> String {
+        value.formatted(.number.locale(context.locale))
+    }
+
     /// One decimal place: two makes a gain percentage overflow its column in the holdings tables,
     /// and no reader of a personal net-worth report needs basis-point precision on it.
     private func percent(_ value: Double) -> String {
@@ -854,7 +869,7 @@ struct ReportDocumentBuilder {
                 ReportKPI(label: L("Cost Basis"), value: money(totalCost)),
                 ReportKPI(label: L("Gain / Loss"), value: money(gain), detail: percent(gainPercent),
                           emphasis: gain >= 0 ? .positive : .negative),
-                ReportKPI(label: L("Holdings"), value: "\(holdings.count)"),
+                ReportKPI(label: L("Holdings"), value: count(holdings.count)),
                 ReportKPI(label: L("Fees Paid"), value: money(totalFees)),
             ]),
         ]
@@ -947,7 +962,7 @@ struct ReportDocumentBuilder {
                 ReportKPI(label: L("Cost Basis"), value: money(totalCost)),
                 ReportKPI(label: L("Gain / Loss"), value: money(gain), detail: percent(gainPercent),
                           emphasis: gain >= 0 ? .positive : .negative),
-                ReportKPI(label: L("Holdings"), value: "\(holdings.count)"),
+                ReportKPI(label: L("Holdings"), value: count(holdings.count)),
                 ReportKPI(label: L("Fees Paid"), value: money(totalFees)),
             ]),
         ]
@@ -1067,12 +1082,12 @@ struct ReportDocumentBuilder {
 
         blocks.append(.subheading(L("Data Summary"), anchor: "appendix-data"))
         blocks.append(.keyValues([
-            ReportKeyValue(L("Transactions"), "\(context.data.transactions.count)"),
-            ReportKeyValue(L("Recurring Rules"), "\(context.data.recurringTransactions.count)"),
-            ReportKeyValue(L("Investments"), "\(context.data.investments.count)"),
-            ReportKeyValue(L("Crypto Holdings"), "\(context.data.crypto.count)"),
-            ReportKeyValue(L("Liabilities"), "\(context.data.liabilities.count)"),
-            ReportKeyValue(L("Net Worth Snapshots"), "\(context.data.snapshots.count)"),
+            ReportKeyValue(L("Transactions"), count(context.data.transactions.count)),
+            ReportKeyValue(L("Recurring Rules"), count(context.data.recurringTransactions.count)),
+            ReportKeyValue(L("Investments"), count(context.data.investments.count)),
+            ReportKeyValue(L("Crypto Holdings"), count(context.data.crypto.count)),
+            ReportKeyValue(L("Liabilities"), count(context.data.liabilities.count)),
+            ReportKeyValue(L("Net Worth Snapshots"), count(context.data.snapshots.count)),
         ]))
 
         blocks.append(.subheading(L("Document"), anchor: "appendix-document"))

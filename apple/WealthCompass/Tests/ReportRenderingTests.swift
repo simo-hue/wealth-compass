@@ -724,3 +724,148 @@ final class ReportReconciliationTests: XCTestCase {
         XCTAssertLessThanOrEqual(abs(reported - engineCash), Decimal(string: "0.01")! * foreignRecords)
     }
 }
+
+/// Every entity count the exported report prints, read in a locale that groups thousands.
+///
+/// The in-app sites were swept by `AppSettings.privateCount(_:)` and are pinned by
+/// `PrivacyRedactionTests.testWorkingTreeRendersNoUnformattedEntityCount`. The export was excluded
+/// from that lint — the exemption is about redaction, and an export redacts nothing by design — so
+/// its eight counts kept interpolating straight into a `String` and printed `1234` for every
+/// reader, in every language.
+///
+/// **Why the locale and the language are set apart here.** `FinanceStore.exportReport` derives
+/// `context.locale` from `AppLocalization.effectiveLocale(appLanguage:)`, which is `.current` when
+/// no in-app override is set. `appLanguage: nil` with `locale: de_DE` is therefore not a contrived
+/// pairing but the ordinary case: a reader in Germany who never opened the language picker. It also
+/// keeps every label in English so this can find the rows by their English text while the numbers
+/// are formatted for Germany, which is the only thing under test.
+final class ReportCountFormattingTests: XCTestCase {
+
+    private let calendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        return calendar
+    }()
+
+    private var now: Date {
+        var components = DateComponents()
+        components.year = 2026; components.month = 7; components.day = 27; components.hour = 12
+        return calendar.date(from: components)!
+    }
+
+    /// 1,234 of everything: the smallest count that separates a grouped rendering from a bare one
+    /// in every locale this app ships, and the value the in-app twin
+    /// (`PrivacyRedactionTests.testCountsAreFormattedForTheReadersLocale`) already uses.
+    private static let population = 1_234
+
+    private func makeData() -> FinancialData {
+        var data = FinancialData()
+        data.transactions = (0..<Self.population).map { index in
+            Transaction(type: index.isMultiple(of: 2) ? .income : .expense, category: "Salary",
+                        amount: 10, description: "t\(index)", date: now, currency: .eur)
+        }
+        data.recurringTransactions = (0..<Self.population).map { index in
+            RecurringTransaction(
+                type: .expense, category: "Rent", amount: 5, description: "r\(index)",
+                startDate: now, frequency: .monthly, nextDueDate: now, endDate: nil,
+                notificationsEnabled: false, isActive: true, completedAt: nil,
+                createdAt: now, updatedAt: now)
+        }
+        data.investments = (0..<Self.population).map { index in
+            Investment(type: .stock, symbol: "S\(index)", name: "n\(index)", quantity: 1,
+                       costBasis: 10, currentValue: 12, currentPrice: 12, currency: .eur,
+                       geography: "US", sector: "Tech", isin: "", fees: 0)
+        }
+        data.crypto = (0..<Self.population).map { index in
+            CryptoHolding(symbol: "C\(index)", name: "c\(index)", quantity: 1, avgBuyPrice: 10,
+                          currentPrice: 12, currency: .eur, fees: 0, coinId: "")
+        }
+        data.liabilities = (0..<Self.population).map { index in
+            Liability(name: "l\(index)", currentBalance: 100, currency: .eur)
+        }
+        data.snapshots = (0..<Self.population).map { index in
+            NetWorthSnapshot(date: calendar.date(byAdding: .day, value: -index, to: now)!,
+                             totalAssets: 100, totalLiabilities: 0, netWorth: 100,
+                             liquidity: 100, investments: 0, crypto: 0)
+        }
+        return data
+    }
+
+    private func buildDocument(locale: Locale) -> ReportDocument {
+        ReportDocumentBuilder(
+            context: ReportBuildContext(
+                data: makeData(),
+                converter: CurrencyConverter(snapshot: nil),
+                baseCurrency: .eur,
+                exchangeRateSnapshot: nil,
+                appLanguage: nil,
+                locale: locale,
+                calendar: calendar,
+                now: now,
+                appVersion: "1", appBuild: "1", platformName: "test",
+                brandMarkPNG: nil,
+                paper: .a4,
+                direction: .leftToRight),
+            options: ReportExportOptions(format: .pdf,
+                                         sections: Set(ReportSection.allCases),
+                                         dateRange: .allTime)).build()
+    }
+
+    /// Every count the document prints, by the label it is printed against.
+    private func printedCounts(_ document: ReportDocument) -> [String: String] {
+        var found: [String: String] = [:]
+        for section in document.sections {
+            for block in section.blocks {
+                switch block {
+                case let .kpis(items):
+                    for item in items where item.label == "Holdings" {
+                        // The two `Holdings` tiles are identical in label and, here, in value; key
+                        // them by section so neither can silently stand in for the other.
+                        found["\(section.title) · Holdings"] = item.value
+                    }
+                case let .keyValues(rows):
+                    for row in rows { found[row.label] = row.value }
+                default:
+                    break
+                }
+            }
+        }
+        return found
+    }
+
+    /// The eight sites, all of them, by the label the reader sees.
+    private static let countLabels = [
+        "Investments · Holdings", "Crypto · Holdings",
+        "Transactions", "Recurring Rules", "Investments", "Crypto Holdings",
+        "Liabilities", "Net Worth Snapshots",
+    ]
+
+    func testEveryPrintedEntityCountIsGroupedForTheReadersLocale() throws {
+        let german = printedCounts(buildDocument(locale: Locale(identifier: "de_DE")))
+        let french = printedCounts(buildDocument(locale: Locale(identifier: "fr_FR")))
+
+        // Not asserted against a hardcoded "1 234": the French group separator is U+202F in current
+        // CLDR and was U+00A0 before it, and pinning that would make this a test of ICU's data
+        // rather than of the report. What the report owes the reader is the locale's own rendering.
+        let expectedGerman = Self.population.formatted(.number.locale(Locale(identifier: "de_DE")))
+        let expectedFrench = Self.population.formatted(.number.locale(Locale(identifier: "fr_FR")))
+        XCTAssertEqual(expectedGerman, "1.234", "the German rendering has moved under the test")
+        XCTAssertNotEqual(expectedFrench, expectedGerman, "the two locales must differ to be a test")
+
+        for label in Self.countLabels {
+            let printed = try XCTUnwrap(german[label], "no count printed against \"\(label)\"")
+            XCTAssertNotEqual(
+                printed, "1234",
+                """
+                "\(label)" prints \(Self.population) unformatted, so a German reader sees 1234 \
+                rather than 1.234 — and so does every other reader, in every language.
+                """
+            )
+            XCTAssertEqual(printed, expectedGerman, "\"\(label)\" is not grouped the German way")
+            XCTAssertEqual(
+                try XCTUnwrap(french[label]), expectedFrench,
+                "\"\(label)\" ignores the reader's locale — it renders the same in de and fr"
+            )
+        }
+    }
+}
