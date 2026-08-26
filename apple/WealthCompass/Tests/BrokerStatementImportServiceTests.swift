@@ -77,6 +77,40 @@ final class BrokerStatementImportServiceTests: XCTestCase {
         XCTAssertEqual(merged.investments.count, first.investments.count)
     }
 
+    /// Two genuinely distinct rows that share a stable key must both survive.
+    ///
+    /// Two identical purchases on the same day with no `transaction_id` produce the same
+    /// `date|description|amount` key, hence the same deterministic UUID. Nothing deduped them, so
+    /// one silently disappeared the moment the import was stored — and `skippedRecords` stayed 0,
+    /// which is the part that makes it a loss rather than a report.
+    func testTradeRepublicIdenticalCashRowsWithoutTransactionIDBothSurvive() throws {
+        let header = "\"datetime\",\"date\",\"account_type\",\"category\",\"type\",\"asset_class\",\"name\",\"symbol\",\"shares\",\"price\",\"amount\",\"fee\",\"tax\",\"currency\""
+        let row = "\"2026-02-01T10:00:00.000Z\",\"2026-02-01\",\"DEFAULT\",\"CASH\",\"CARD_TRANSACTION\",\"\",\"Coffee\",\"\",\"\",\"\",\"-4.50\",\"\",\"\",\"EUR\""
+        let out = try parse(header + "\n" + row + "\n" + row)
+        let data = out.normalized.data
+
+        XCTAssertEqual(data.transactions.count, 2, "one of two identical purchases vanished")
+        XCTAssertEqual(Set(data.transactions.map(\.id)).count, 2, "both rows hashed to the same UUID")
+        XCTAssertEqual(
+            data.transactions.reduce(Decimal(0)) { $0 + $1.amount }, Decimal(9),
+            "money went missing between the file and the import"
+        )
+        XCTAssertEqual(out.normalized.skippedRecords, 0, "both rows are real; neither is a skip")
+
+        // The first occurrence keeps the seed it has always had. Changing it would give every row
+        // already imported on a user's device a new id, and re-importing would duplicate the lot.
+        let firstSeed = "tr:2026-02-01|Coffee|\(Decimal(string: "-4.50")!)"
+        XCTAssertTrue(
+            data.transactions.contains { $0.id == BrokerImportParsing.deterministicUUID(firstSeed) },
+            "the first occurrence's id changed"
+        )
+
+        // Still idempotent: the same file imported twice lands on the same two ids.
+        let again = try parse(header + "\n" + row + "\n" + row).normalized.data
+        XCTAssertEqual(Set(data.transactions.map(\.id)), Set(again.transactions.map(\.id)))
+        XCTAssertEqual(data.merged(with: again).transactions.count, 2, "a re-import duplicated the rows")
+    }
+
     func testTradeRepublicCategoryMapping() throws {
         let data = try parse(tradeRepublicCSV).normalized.data
         XCTAssertTrue(data.transactions.contains { $0.category == "Rewards" && $0.type == .income })     // STOCKPERK
@@ -230,6 +264,25 @@ final class BrokerStatementImportServiceTests: XCTestCase {
         // …and the statement still updates the two things it actually carries.
         XCTAssertEqual(holding.quantity, Decimal(string: "1234.56"))
         XCTAssertEqual(holding.currentPrice, Decimal(string: "0.10"))
+    }
+
+    /// A repeated crypto symbol is one holding, not two — but the drop has to be reported.
+    ///
+    /// `rev-crypto:` seeds from the symbol alone, so two rows for the same asset (a statement
+    /// spanning two year-end sections) produced one id twice. Collapsing is the right answer here —
+    /// disambiguating them would double-count the holding in net worth — but it must go through
+    /// `uniquedByID` and land in `skippedRecords` rather than vanishing at storage time.
+    func testRevolutRepeatedCryptoSymbolCollapsesAndIsCounted() throws {
+        let csv = """
+        "Current Accounts Summaries",,,,,,,
+        "End of Year holding statement",,,,,,,
+        "Description & symbol","Units held","Unit price","Value held",,,,
+        TESTA,1.0,€10.00,€10.00,,,,
+        TESTA,2.0,€10.00,€20.00,,,,
+        """
+        let out = try parse(csv)
+        XCTAssertEqual(out.normalized.data.crypto.count, 1, "two rows share one deterministic id")
+        XCTAssertEqual(out.normalized.skippedRecords, 1, "the dropped row vanished without being counted")
     }
 
     func testRevolutSkipsUnsupportedCurrencySection() throws {

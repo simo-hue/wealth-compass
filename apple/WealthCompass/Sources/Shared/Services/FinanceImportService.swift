@@ -1102,15 +1102,6 @@ private extension Currency {
     }
 }
 
-private extension Array where Element: Identifiable, Element.ID == UUID {
-    func uniquedByID() -> [Element] {
-        var seen = Set<UUID>()
-        return filter { item in
-            seen.insert(item.id).inserted
-        }
-    }
-}
-
 private extension Double {
     var finiteImportedAmount: Double? {
         isFinite ? self : nil

@@ -26,6 +26,12 @@ import PDFKit
 ///   `transaction_id`, an ISIN, a crypto symbol, or `section+date+description+amount+balance`). Re-importing
 ///   the same file — or a later export that repeats rows — updates in place via `FinancialData.mergedByID`
 ///   instead of duplicating.
+/// * **Collisions.** A stable key is not unique: two identical purchases on the same day with no
+///   `transaction_id` produce the same key and so the same id. For *transactions*, where a repeat is a
+///   second event, `SeedDisambiguator` numbers occurrences after the first so both survive (the first
+///   keeps its historical, unsuffixed id). For *holdings*, where a repeat is one asset restated,
+///   `uniquedByID` collapses them — and every parser reports what it collapsed in `skippedRecords`, so
+///   a record can never disappear between the file and the database without the user being told.
 /// * Holdings carry the **ISIN** (brokers don't export a ticker), so live-price refresh won't fire until
 ///   the user adds a ticker. Values are cost-based until then.
 enum BrokerStatementImportService {
@@ -240,6 +246,32 @@ enum BrokerImportParsing {
         return UUID(uuid: uuid)
     }
 
+    /// Disambiguates a stable key that a source file repeats.
+    ///
+    /// Two genuinely distinct rows can share a stable key — the same amount, the same description,
+    /// the same day, no `transaction_id`. Two identical purchases really happen, and they hashed to
+    /// the same deterministic UUID: both reached storage, and one then lost silently at sync time
+    /// (`cloudSyncRecords()` is keyed by id) without incrementing `skippedRecords`.
+    ///
+    /// The FIRST occurrence keeps the unsuffixed seed, so every id already on a user's device is
+    /// unchanged and a re-import still lands in place. Later occurrences are numbered by position,
+    /// which is stable for a given file, so re-importing it is still idempotent.
+    ///
+    /// Only for records where a repeat means a second *event*. A repeated crypto symbol or ISIN is
+    /// one holding restated, so those seeds stay collision-prone on purpose and the duplicate is
+    /// collapsed by `uniquedByID` and counted instead.
+    struct SeedDisambiguator {
+        private var occurrences: [String: Int] = [:]
+
+        init() {}
+
+        mutating func callAsFunction(_ seed: String) -> String {
+            let count = (occurrences[seed] ?? 0) + 1
+            occurrences[seed] = count
+            return count == 1 ? seed : "\(seed)#\(count)"
+        }
+    }
+
     /// Parses a numeric string tolerant of BOTH English (`1,234.56`) and European (`1.234,56`) formats,
     /// stripping currency symbols / letter codes / spaces. Rule: when both `.` and `,` appear, the LATER
     /// one is the decimal point and the other groups thousands; a lone separator is a decimal point when it
@@ -429,6 +461,7 @@ private enum TradeRepublicCSVParser {
         var transactions: [Transaction] = []
         var holdings: [String: HoldingAccumulator] = [:]
         var skipped = 0
+        var seed = BrokerImportParsing.SeedDisambiguator()
 
         for row in rows.dropFirst() {
             // Skip structurally empty rows without counting them as malformed.
@@ -487,7 +520,7 @@ private enum TradeRepublicCSVParser {
                 let cashDelta = isBuy ? -(tradeValue + fee) : (tradeValue - fee)
                 if cashDelta != 0 {
                     transactions.append(Transaction(
-                        id: BrokerImportParsing.deterministicUUID("tr-cash:\(tradeKey)"),
+                        id: BrokerImportParsing.deterministicUUID(seed("tr-cash:\(tradeKey)")),
                         type: cashDelta > 0 ? .income : .expense,
                         category: "Investments",
                         amount: abs(cashDelta),
@@ -507,7 +540,7 @@ private enum TradeRepublicCSVParser {
 
             let stableKey = transactionID ?? "\(rawDate)|\(description)|\(amount)"
             transactions.append(Transaction(
-                id: BrokerImportParsing.deterministicUUID("tr:\(stableKey)"),
+                id: BrokerImportParsing.deterministicUUID(seed("tr:\(stableKey)")),
                 type: amount > 0 ? .income : .expense,
                 category: categoryName(for: type),
                 amount: abs(amount),
@@ -519,9 +552,15 @@ private enum TradeRepublicCSVParser {
             ))
         }
 
+        // `tr-holding:` seeds from the ISIN and the accumulator is already keyed by it, so an
+        // investment collision is impossible here — the pass is the WC-L7 guarantee, not a fix.
         let investments = holdings.values.compactMap { $0.investment() }
-        let data = FinancialData(transactions: transactions, investments: investments)
-        return NormalizedFinanceImport(data: data, skippedRecords: skipped)
+        let uniqueTransactions = transactions.uniquedByID()
+        let uniqueInvestments = investments.uniquedByID()
+        let dropped = (transactions.count - uniqueTransactions.count)
+            + (investments.count - uniqueInvestments.count)
+        let data = FinancialData(transactions: uniqueTransactions, investments: uniqueInvestments)
+        return NormalizedFinanceImport(data: data, skippedRecords: skipped + dropped)
     }
 
     /// Maps a Trade Republic `type` to a friendly cash-flow category.
@@ -641,6 +680,7 @@ private enum RevolutStatementCSVParser {
         var transactions: [Transaction] = []
         var crypto: [CryptoHolding] = []
         var skipped = 0
+        var seed = BrokerImportParsing.SeedDisambiguator()
 
         var mode: Mode = .scanning
         // Optional: nil while inside a section whose currency isn't representable (see sectionCurrency).
@@ -721,7 +761,7 @@ private enum RevolutStatementCSVParser {
                 let balance = cell(row, balanceIdx)
                 let stableKey = "\(currency.rawValue)|\(cell(row, dateIdx))|\(description)|\(cell(row, moneyIdx))|\(balance)"
                 transactions.append(Transaction(
-                    id: BrokerImportParsing.deterministicUUID("rev:\(stableKey)"),
+                    id: BrokerImportParsing.deterministicUUID(seed("rev:\(stableKey)")),
                     type: amount > 0 ? .income : .expense,
                     category: categoryLabel.isEmpty ? "Other" : categoryLabel,
                     amount: abs(amount),
@@ -787,8 +827,14 @@ private enum RevolutStatementCSVParser {
             }
         }
 
-        let data = FinancialData(transactions: transactions, crypto: crypto)
-        return NormalizedFinanceImport(data: data, skippedRecords: skipped)
+        // `rev-crypto:` seeds from the symbol alone. A repeat is the same holding restated (a
+        // statement spanning two year-end sections), so it collapses rather than being numbered —
+        // two records would double-count it in net worth — but the drop is reported, not silent.
+        let uniqueTransactions = transactions.uniquedByID()
+        let uniqueCrypto = crypto.uniquedByID()
+        let dropped = (transactions.count - uniqueTransactions.count) + (crypto.count - uniqueCrypto.count)
+        let data = FinancialData(transactions: uniqueTransactions, crypto: uniqueCrypto)
+        return NormalizedFinanceImport(data: data, skippedRecords: skipped + dropped)
     }
 
     private enum SectionCurrency {
@@ -847,6 +893,7 @@ private enum TradeRepublicAccountPDFParser {
     static func parse(text: String) -> NormalizedFinanceImport {
         var transactions: [Transaction] = []
         var skipped = 0
+        var seed = BrokerImportParsing.SeedDisambiguator()
 
         let summary = BrokerImportParsing.between(text, from: "ESTRATTO CONTO", to: "TRANSAZIONI SUL CONTO") ?? ""
         var running: Decimal? = BrokerImportParsing.euroAmounts(in: summary).first
@@ -878,7 +925,7 @@ private enum TradeRepublicAccountPDFParser {
             let (tipo, description) = splitTipo(rawDescription)
 
             transactions.append(Transaction(
-                id: BrokerImportParsing.deterministicUUID("tr-pdf-acct:\(dateString)|\(description)|\(balance)"),
+                id: BrokerImportParsing.deterministicUUID(seed("tr-pdf-acct:\(dateString)|\(description)|\(balance)")),
                 type: type,
                 category: category(forTipo: tipo, description: description),
                 amount: shown,
@@ -889,7 +936,14 @@ private enum TradeRepublicAccountPDFParser {
                 updatedAt: date
             ))
         }
-        return NormalizedFinanceImport(data: FinancialData(transactions: transactions), skippedRecords: skipped)
+        // The running balance moves with every non-zero row, so two same-day rows can only share a
+        // seed if the statement reprints one; the pass is the WC-L7 guarantee either way.
+        let uniqueTransactions = transactions.uniquedByID()
+        let dropped = transactions.count - uniqueTransactions.count
+        return NormalizedFinanceImport(
+            data: FinancialData(transactions: uniqueTransactions),
+            skippedRecords: skipped + dropped
+        )
     }
 
     private static let datePattern = "\\d{1,2}\\s+(?i:gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic)\\s+\\d{4}"

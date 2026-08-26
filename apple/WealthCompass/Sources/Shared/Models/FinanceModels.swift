@@ -699,6 +699,22 @@ extension Array where Element: MergeableRecord {
     }
 }
 
+extension Array where Element: Identifiable, Element.ID == UUID {
+    /// Keeps the first record for each id and drops the rest (WC-L7).
+    ///
+    /// Deterministic ids are hashed from a stable key, so two source rows that share that key
+    /// share an id. Without this, both reach storage and one of them silently loses at sync time —
+    /// `FinancialData.cloudSyncRecords()` is keyed by record id — with nothing added to
+    /// `skippedRecords` to say a record was lost. Callers take `count` before and after and report
+    /// the difference, so a collision is always either disambiguated upstream or reported here.
+    func uniquedByID() -> [Element] {
+        var seen = Set<UUID>()
+        return filter { item in
+            seen.insert(item.id).inserted
+        }
+    }
+}
+
 extension Array where Element == CryptoHolding {
     /// `mergedByID`, except an incoming row never blanks a field it does not carry.
     ///
