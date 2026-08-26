@@ -3579,6 +3579,13 @@ final class PrivacyRedactionTests: XCTestCase {
         guard text[openParen] == "(",
               let closeParen = closingBracket(from: openParen, in: text),
               let openBrace = text[closeParen...].dropFirst().firstIndex(of: "{"),
+              // Nothing may sit between the call and the loop's brace. Taking the brace as "the
+              // next `{`" accepted anything chained onto the call that contains no brace of its
+              // own: `for request in Self.requests(…).map(Self.tampered) { … }` still produced a
+              // body reading `try? await center.add(request)`, and every check below passed while
+              // the value posted came from `tampered`. A trailing *closure* was caught only by
+              // accident — its own `{` became this one — so the rule was never about chaining.
+              text[text.index(after: closeParen)..<openBrace].allSatisfy(\.isWhitespace),
               let closeBrace = closingBracket(from: openBrace, in: text)
         else { return nil }
         return (String(text[nameRange]), String(text[text.index(after: openBrace)..<closeBrace]))
@@ -3669,11 +3676,33 @@ final class PrivacyRedactionTests: XCTestCase {
     ///   posted is a different value.
     /// - Anything at all in another file, which the sweep did not read.
     ///
+    /// A later round found two more, both measured, both leaving the suite at 313 / 0:
+    ///
+    /// - `for request in Self.requests(…).map(Self.tampered) { … }` — a **named** transform between
+    ///   the builder and the loop. `loopBody` took the body's opening brace as the next `{` after
+    ///   the call, so anything chained on that contains no brace was stepped over and the extracted
+    ///   body still read `try? await center.add(request)`. A trailing closure was caught only
+    ///   because its own `{` became the one found; the rule was never about chaining. `loopBody` now
+    ///   requires whitespace and nothing else between the call and the brace.
+    /// - `let backdoor = center; let post = backdoor.add; try? await post(…)` — a **method
+    ///   reference**. The pattern was `\.\s*add\s*\(`, which wants a paren straight after `add` and
+    ///   so does not match `backdoor.add` on its own line; and the second-handle check counts the
+    ///   text `UNUserNotificationCenter`, which `let backdoor = center` never spells. The same
+    ///   spelling worked inside `RecurringTransactionNotificationService.swift`, which is on the
+    ///   sibling lint's allow-list and policed by the same pattern. Both now match `\.\s*add\b`:
+    ///   `add` cannot be called or referenced without being named after a dot, whatever holds it.
+    ///
     /// Each hole was a *textual* assumption standing in for a semantic property, so each question is
     /// now asked about the property. What may reach the notification centre is one call, on the
     /// service's one handle to it, inside `sync`, whose argument is the loop variable of a loop over
     /// `Self.requests(…)` and whose body is that call and nothing else — and no other source file
     /// may hold a handle at all.
+    ///
+    /// **These are still textual checks, and one class of evasion stays open**: a post site written
+    /// without the token `add` after a dot — a `@dynamicMemberLookup` shim, a key path, an
+    /// Objective-C selector, a C function pointer. Nothing in this project is shaped that way and
+    /// none of it is idiomatic, but a regex cannot rule it out, and the honest statement of what
+    /// this lint buys is "no *ordinary* second post site", not "no second post site".
     func testEveryReminderReachingTheNotificationCentreComesFromOneBuilder() throws {
         let code = try Self.notificationServiceCode()
         let functions = try Self.functionBodies(in: code)
@@ -3685,7 +3714,7 @@ final class PrivacyRedactionTests: XCTestCase {
         let text = code.map { String($0) }.joined(separator: "\n")
         // Any receiver, any spacing: `center.add(`, `self.center.add(`,
         // `UNUserNotificationCenter.current().add(`. The old check counted one spelling of one name.
-        let posts = try NSRegularExpression(pattern: #"\.\s*add\s*\("#)
+        let posts = try NSRegularExpression(pattern: #"\.\s*add\b"#)
         let addSites = posts.numberOfMatches(
             in: text, range: NSRange(text.startIndex..<text.endIndex, in: text)
         )
@@ -3728,9 +3757,11 @@ final class PrivacyRedactionTests: XCTestCase {
         let loop = try XCTUnwrap(
             Self.loopBody(over: "Self.requests(", in: text),
             """
-            Nothing in the service loops over `Self.requests(…)` any more, so whatever the single \
-            post site is feeding the notification centre did not come from the builder the \
-            lock-screen test archives.
+            Nothing in the service loops over `Self.requests(…)` directly any more, so whatever the \
+            single post site is feeding the notification centre did not come from the builder the \
+            lock-screen test archives. This also fires when something is *chained* onto the call — \
+            `Self.requests(…).map(Self.tampered)` — because the loop is then over the transform's \
+            output and the builder's return value is no longer what reaches the lock screen.
             """
         )
         let expected = try NSRegularExpression(
@@ -3778,7 +3809,7 @@ final class PrivacyRedactionTests: XCTestCase {
             "iOS/Services/RecurringTransactionNotificationService.swift",
             "macOS/MacPlatformServices.swift",
         ]
-        let posts = try NSRegularExpression(pattern: #"\.\s*add\s*\("#)
+        let posts = try NSRegularExpression(pattern: #"\.\s*add\b"#)
 
         var reaching: [String] = []
         var posting: [String] = []
@@ -3840,9 +3871,23 @@ final class PrivacyRedactionTests: XCTestCase {
     /// check verbatim, under any name at all.
     ///
     /// So the decision is a function now, and this asserts its values. There is no parameter through
-    /// which a schedule could arrive and no actor state a `nonisolated static` could read, so making
-    /// it consult the data is a signature change this test will not compile against — which is a
-    /// stronger guarantee than any spelling of a lint over its body.
+    /// which a schedule could arrive, so no caller can feed it one.
+    ///
+    /// This test's doc comment used to add "and no actor state a `nonisolated static` could read, so
+    /// making it consult the data is a signature change this test will not compile against — which
+    /// is a stronger guarantee than any spelling of a lint over its body". That is **false about
+    /// Swift**. `nonisolated` excludes the actor's *instance* state and nothing more; static storage
+    /// is not instance state. A `nonisolated(unsafe) static var lastSyncedSchedules`, written in
+    /// `sync` and read by `everyReminder` to filter identifiers out, compiles, changes no signature,
+    /// and passes every assertion below — the schedule list is empty in these fixtures, so the
+    /// filter does nothing here and everything in production, where erase runs against the banners
+    /// of data the user has just wiped.
+    ///
+    /// So the signature is only half of it, and the other half is the storage check at the end: this
+    /// type may declare no mutable static or file-scope storage for such a cache to live in. That is
+    /// a textual check over one file, with the limits every textual check in this suite has — it
+    /// does not reach a cache parked in another file, and it is recorded as a known hole rather than
+    /// dressed up as a structural guarantee.
     func testTheErasePathNamesEveryReminderItOwns() {
         let prefix = Self.reminderIdentifierPrefix
         let pending = ["\(prefix)\(UUID().uuidString)", "\(prefix)due-2031-6-15-9-0"]
@@ -3876,6 +3921,46 @@ final class PrivacyRedactionTests: XCTestCase {
             ),
             delivered,
             "a banner already on the lock screen is unreachable unless the delivered queue is read"
+        )
+
+        // The half the signature does not give. `everyReminder` is pure only while there is nowhere
+        // for a cache to live: a `nonisolated(unsafe) static var lastSyncedSchedules` set in `sync`
+        // and read here would filter the still-backed banners out of erase without changing one
+        // signature. So the service may declare no mutable static or file-scope storage at all.
+        //
+        // Read over the stripped `code` view, so a doc comment naming `static var` cannot fail this.
+        // Function-local `var`s are fine and are what the indentation test lets through — they
+        // cannot survive between two calls, which is the whole property being bought.
+        let lines = try! Self.notificationServiceCode().map { String($0) }
+        let mutableStorage = try! NSRegularExpression(pattern: #"\bstatic\b[^\n]{0,60}?\bvar\b"#)
+        let unsafeGlobal = try! NSRegularExpression(pattern: #"\bnonisolated\s*\(\s*unsafe\s*\)"#)
+        let fileScopeVar = try! NSRegularExpression(pattern: #"^(?!\s)(?:[A-Za-z@(){},\s]*\s)?var\s"#)
+
+        var storage: [String] = []
+        for (index, line) in lines.enumerated() {
+            let range = NSRange(line.startIndex..<line.endIndex, in: line)
+            let why = [
+                (mutableStorage, "mutable static storage"),
+                (unsafeGlobal, "`nonisolated(unsafe)`"),
+                (fileScopeVar, "a file-scope `var`"),
+            ].filter { $0.0.numberOfMatches(in: line, range: range) > 0 }.map(\.1)
+            guard !why.isEmpty else { continue }
+            storage.append("  :\(index + 1) — \(why.joined(separator: ", "))\n      \(line.trimmingCharacters(in: .whitespaces))")
+        }
+        XCTAssertGreaterThan(
+            lines.count, 200, "only \(lines.count) line(s) of service read — the sweep has lost the file"
+        )
+        XCTAssertEqual(
+            storage, [],
+            """
+            \(storage.count) place(s) in RecurringNotificationService.swift where state could \
+            survive between two calls. `everyReminder` decides what "erase local data" removes, and \
+            it is trustworthy only while there is nowhere for the schedules to be cached behind its \
+            back — a `nonisolated(unsafe) static var` set in `sync` and read there filters the \
+            still-backed banners out of erase, changing no signature and passing every assertion \
+            above, which leaves the user's wiped data describing itself on the lock screen:
+            \(storage.joined(separator: "\n"))
+            """
         )
     }
 

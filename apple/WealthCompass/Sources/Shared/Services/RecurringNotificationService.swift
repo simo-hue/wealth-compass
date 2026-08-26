@@ -807,11 +807,28 @@ actor RecurringNotificationService {
     /// all — and that is the regression it claims to guard: after "erase local data" there are no
     /// schedules, so a banner kept is one describing data the user just wiped off the device.
     ///
-    /// Stated as a function, the property is structural rather than textual: erase names every
-    /// reminder under this prefix, from the two queues and **nothing else**. There is no parameter
-    /// through which a schedule could arrive, and `nonisolated static` means no actor state can be
-    /// read either, so making this consult the data takes a signature change that its test will not
-    /// compile against. `testTheErasePathNamesEveryReminderItOwns` asserts the values;
+    /// Stated as a function, erase names every reminder under this prefix, from the two queues and
+    /// **nothing else**. There is no parameter through which a schedule could arrive, so no caller
+    /// can feed it one.
+    ///
+    /// An earlier version of this comment went further and was **wrong about Swift**: it said
+    /// "`nonisolated static` means no actor state can be read either, so making this consult the
+    /// data takes a signature change that its test will not compile against". `nonisolated` excludes
+    /// the actor's *instance* state — there is no `self` here — and that is all it excludes. Static
+    /// storage is not instance state. A `nonisolated(unsafe) static var lastSyncedSchedules` written
+    /// by `sync` and read here compiles, needs no signature change, and lets erase spare every
+    /// banner still backed by a cached schedule — after "erase local data", which is precisely the
+    /// regression this was claimed to make impossible. The false sentence was load-bearing: it was
+    /// the reason nobody was looking.
+    ///
+    /// What actually holds it is weaker and worth naming as such: the parameter list, plus
+    /// `testTheErasePathNamesEveryReminderItOwns` asserting that this type declares no mutable
+    /// static or file-scope storage for such a cache to live in. That second half is a *textual*
+    /// check over this file — the same kind of check as the notification pins, with the same kind of
+    /// limit — and it does not reach a cache parked in another file. Erase is all-or-nothing by
+    /// construction here and by lint everywhere else.
+    ///
+    /// `testTheErasePathNamesEveryReminderItOwns` asserts the values;
     /// `testRecurringReminderTeardownClearsDeliveredBannersToo` asserts that the erase path still
     /// hands this function's result *straight* to both removals, with nothing filtered out in
     /// between.
