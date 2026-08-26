@@ -381,6 +381,47 @@ happen on the Mac with Xcode, from `apple/WealthCompass`.
 
 ## Deep audit — remaining findings (2026-08-25)
 
+### What is actually left — read this first (2026-08-26)
+
+All 58 audit-era checkboxes below were re-checked against current source. **10 were already done** and
+are now ticked with the commit that did them. The other 48 split four ways.
+
+**Needs your hardware — 2.** Both CloudKit P1s (`CloudKitSyncService.swift:1457`, `:1330`). Data-loss
+shaped, unprovable on a dev machine; wants a real iPhone *and* Mac signed into iCloud.
+
+**Decided, not broken — 11.** Ranked lists and their order, Crypto Top Performer / Biggest Loser, the
+macOS allocation legend, the collapsed-bar leaderboard, the `ValueDelta` + 8 `MetricCard` sign tints, the
+unredacted PDF, the two percentage idioms, the narrow `privatePercent` doc, truncating translated table
+headers, reminder arrival time. Each is prefixed **DECIDED** below. Confirmed still present *on purpose* —
+**do not "fix" them.**
+
+**Real work, nobody has started — 35**, roughly by user impact:
+1. **Money wrong or lost (5).** `"1,234"` imports as **1.234** (`FinanceImportService.swift:962`); non-ECB
+   codes mislabelled (`:1016`); Revolut re-import wipes edited crypto (`BrokerStatementImportService.swift:754`);
+   duplicate UUIDs vanish silently (`:508,720`); H08 records erased by the next save (`FinancePersistence.swift:72`).
+2. **Sync divergence (5)** — pure logic, provable by test today: `CloudKitSyncService.swift:1479`, `:712`, `:1526`, `:1664`, `:1196`.
+3. **Liabilities can never be edited or removed in either app (1)** — no `upsertLiability`/`deleteLiability`.
+4. **Bugs a user hits (6).** No biometric prompt on the iOS lock screen (`LockView.swift:70`); ⌘Q with an
+   editor sheet open discards everything typed; a sheet floats over the macOS privacy shield; ⌘E/⌘1-5 stay
+   live during onboarding; store retain cycle; `iCloudSyncError` written 12× and read by no view.
+5. **Localization (6).** No parent-locale fallback, so `es-419`/`pt-BR`/`fr-CA` fall through to **English**;
+   156 keys with zero localizations; two privacy-cover strings still English in 28–34 locales; `Capital
+   invested` missing `sv`; four dead keys to delete.
+6. **Polish and two undecided privacy leaks (12).** *Refresh Prices* greys out only when the user holds
+   nothing, and the import-summary sheet prints raw counts — both need a decision, not a patch. Then:
+   macOS layout clipping, per-frame Dashboard recompute, misnamed privacy cover, PDF empty-ledger row,
+   unpruned JSON backups, the mis-wired `snapshots(range:)`, the one Swift 6 warning.
+
+**Hazards — these bite whoever touches a tool or file next.** Never run `xcodebuild -exportLocalizations`:
+it rewrites `Localizable.xcstrings` and drops 60 report keys, and stops being a hazard only once those
+entries carry `"extractionState" : "manual"` (the open item near the top of this file). `build` and `test`
+do not touch the catalog. `-only-testing:` selects **nothing** here and still prints `** TEST SUCCEEDED **`
+— run the full suite. The privacy "tests" are source lints over the *working tree*, not the binary, so any
+build-then-patch flow passes falsely. The one compiler warning is iOS-only and its count varies by
+destination. `needs_review` is the house mark for agent-written strings, not a missing translation, and
+`extractionState: "stale"` is not proof a key is dead. A privacy helper returning `String` into `Text(…)`
+takes the verbatim overload and silently drops locale digit grouping — return `Text`.
+
 Eight parallel read-only audits over `apple/`, then three adversarial verification rounds.
 **38 commits landed on `main`** (`50a7037`…`15d2983`): 6 of 8 P1s, ~45 P2s. Suite went 221 → 275,
 green; both targets build. Full write-up with reasoning:
@@ -394,7 +435,8 @@ a lead with a file:line, not a verdict.
 Nothing on a dev machine can exercise real `CKSyncEngine` convergence, so per the agreed policy these
 were written up rather than changed. Both are data-loss shaped.
 
-- [ ] **A remote edit can be destroyed on both devices.** `CloudKitSyncService.swift:1457-1465`.
+- [ ] **NEEDS HARDWARE — iPhone *and* Mac on iCloud. Not fixable or provable here.**
+      **A remote edit can be destroyed on both devices.** `CloudKitSyncService.swift:1457-1465`.
       Post-bootstrap, a fetched remote change is discarded whenever *any* pending mutation exists
       locally, ignoring its `origin`. An `.inventory` pending is not a user edit — it is un-uploaded
       first-sync inventory — but it still wins, and `systemFields` is overwritten with the server's
@@ -403,7 +445,8 @@ were written up rather than changed. Both are data-loss shaped.
       pending kind. Fix is to check pending **origin**, not pending presence.
       *Repro:* device B freshly installed with imported data; let its first fetch complete but kill
       the network before its inventory upload finishes. Edit the same record on A. Bring B back.
-- [ ] **Deleting iCloud data doesn't stick.** `CloudKitSyncService.swift:1330-1347`.
+- [ ] **NEEDS HARDWARE — iPhone *and* Mac on iCloud. Not fixable or provable here.**
+      **Deleting iCloud data doesn't stick.** `CloudKitSyncService.swift:1330-1347`.
       `CKSyncEngineFetchedZoneDeletion.reason` is never inspected, so `.purged` and
       `.encryptedDataReset` are treated as "recreate the zone and re-upload everything". Apple's
       header is explicit that for both you must delete local data and *not* resend it. This also
@@ -451,20 +494,20 @@ were written up rather than changed. Both are data-loss shaped.
 - [x] **DONE 2026-08-25.** `PDFReportRenderer.swift:453-456`, `ReportChartRenderer.swift:444-463` — `isNumeric: true` with
       `.leading` alignment pins text to the opposite page edge in RTL, so each KPI tile reads
       label-right / value-left / detail-right.
-- [ ] **Known and deliberate:** long translated table headers still truncate. `GANANCIA / PÉRDIDA`
+- [ ] **DECIDED — accepted, and pinned by a test. Do not "fix".** **Known and deliberate:** long translated table headers still truncate. `GANANCIA / PÉRDIDA`
       needs ~0.65 scale (a 4.8pt heading) against a 64.0pt column. Either the column budget or the
       translation has to give; pinned by a test so the choice stays visible.
 
 ### macOS layout and lifecycle
 
-- [ ] `MacCryptoView.swift:183` — a fixed 400pt performance card (`.frame(width: 400)`) beside the
+- [ ] `MacCryptoView.swift:185` — a fixed 400pt performance card (`.frame(width: 400)`) beside the
       allocation donut in a non-reflowing `HStack`. At the 520pt window minimum the donut gets ~48pt. `MacInvestmentsView`
       already solved this (tag L24); Crypto was never migrated.
-- [ ] `MacCashFlowView.swift:644-737` — the Transactions filter bar is a fixed-width row needing
+- [ ] `MacCashFlowView.swift:661-737` (`transactionFilters`) — the Transactions filter bar is a fixed-width row needing
       ~950pt; it clips at the default window size once the category chip is present.
 - [ ] `MacPlatformServices.swift` — no `applicationShouldTerminate`, so ⌘Q with an editor sheet open
       discards everything typed. The codebase treats this as a bug elsewhere (tag L13).
-- [ ] `MacRootView.swift:59-66` — the inactive-window privacy shield is an overlay on the root group,
+- [ ] `MacRootView.swift:62-70` — the inactive-window privacy shield is an overlay on the root group,
       so a presented sheet floats above it and stays legible during app switching.
 - [x] **DONE 2026-08-25.** `MacEditorSheet.swift:282-291` — Sector/Geography pickers don't keep an out-of-list current
       value selectable, unlike the Category picker (tag DA-H06), so an imported value shows blank.
@@ -482,7 +525,7 @@ were written up rather than changed. Both are data-loss shaped.
       prompt. (The lock itself is **not** bypassable.)
 - [x] **DONE 2026-08-25.** `SettingsView.swift:80,81,540,546` — `categoryGroup(title: String)` splices an English noun into
       a translated sentence: German reads "Noch keine benutzerdefinierten income-Kategorien."
-- [ ] `DashboardView.swift:131` — `heldCurrenciesUsingSeedRate` is the only derived Dashboard value
+- [ ] `DashboardView.swift:136` — `heldCurrenciesUsingSeedRate` is the only derived Dashboard value
       not memoized on `dataVersion`, and it runs per frame while scrubbing the net-worth chart.
 - [ ] `Sources/iOS/Services/RecurringTransactionNotificationService.swift:82` — **the project's one
       remaining compiler warning**, and the one thing blocking the Swift 6 language mode: `[AnyHashable: Any]` crossing
@@ -511,35 +554,42 @@ were written up rather than changed. Both are data-loss shaped.
 - [ ] `FinanceStore.swift` — there is **no** `upsertLiability` / `deleteLiability`. Liabilities count
       in totals, allocation and sync but can only enter via import or CloudKit, and can never be
       edited or removed in either app.
-- [ ] `FinanceStore.swift:206` — `iCloudSyncError` is written in twelve places and read by no view, so
+- [ ] `FinanceStore.swift:210` — `iCloudSyncError` is written in twelve places and read by no view, so
       the WC-LOCK1 "saved locally but not queued for iCloud" message can never reach a user.
-- [ ] `FinanceStore.swift:1074-1076` — `snapshots(range:)` is unused *and* mis-wired (defaults to
-      `.eur` with a nil-rate converter); the mis-wiring itself is at `AnalyticsEngine.swift:16-17`.
-      Latent P1 the moment anyone calls it. (`:1031-1035` is now `appendSnapshot`.)
-- [ ] `FinanceStore.swift:1732-1738` — retain cycle between the store and its save-consumer task;
+- [ ] `FinanceStore.swift:1081-1083` — `snapshots(range:)` is unused *and* mis-wired (defaults to
+      `.eur` with a nil-rate converter); the mis-wiring itself is at `AnalyticsEngine.swift:20-21`,
+      under the warning comment at `:13-19`. Latent P1 the moment anyone calls it.
+      (`appendSnapshot` is now `:1038`.)
+- [ ] `FinanceStore.swift:1783-1790` — retain cycle between the store and its save-consumer task;
       `deinit` never runs, so tests leak a store per instance.
-- [ ] `FinanceStore.swift:982-986` / `1136-1145` — complementary currency-coverage gaps:
+      ⚠️ **This looks fixed and is not.** The closure captures `[weak self]` (since `fc0c11c`, June,
+      pre-audit) and there *is* a `deinit` at `:364`. But `guard let self else { return }` on the very
+      next line re-binds `self` **strongly for the whole `for await` loop**, and that loop only ends
+      when `saveContinuation` is finished — which only `deinit` does. Cycle intact. Verified 2026-08-26.
+- [ ] `FinanceStore.swift:1027-1031` / `1185-1194` — complementary currency-coverage gaps:
       `hasForeignCurrencyExposure` omits transactions, `heldCurrenciesUsingSeedRate` omits
       liabilities and recurring schedules.
-- [ ] `FinanceStore.swift:1232-1254` — plaintext JSON backups accumulate in `tmp/` forever;
-      `pruneStaleExports` only runs on the PDF path despite its comment claiming both.
+- [ ] `FinanceStore.swift:1281-1294` (`exportBackupURL`) — plaintext JSON backups accumulate in `tmp/`
+      forever; `pruneStaleExports` is called only from the PDF path (`:1318`) despite its comment at
+      `:1352-1353` claiming both formats are cleaned up.
 - [ ] `FinancePersistence.swift:72-81` — H08-skipped records are preserved on disk only until the
       user's next edit, which rewrites the file from the lossy in-memory snapshot. With iCloud sync
       off nothing else holds a copy.
-- [ ] `FinanceImportService.swift:1015-1020` — `Currency.imported` substitutes the display currency for
+- [ ] `FinanceImportService.swift:1016-1019` — `Currency.imported` substitutes the display currency for
       any ISO code outside the ECB set, mislabelling the money instead of skipping it. The Revolut
       parser in the same pipeline makes the opposite (correct) choice and is locked in by a test.
 - [ ] `FinanceImportService.swift:959-969` — string amounts blindly swap `,` for `.` (`:962` does
       `.replacingOccurrences(of: ",", with: ".")`), so `"1,234"` imports as **1.234** — a thousand
       times too small. `BrokerImportParsing.flexibleDecimal` in the sibling file already
       implements the correct last-separator-wins rule and is reachable from here.
-- [ ] `BrokerStatementImportService.swift:752-764` — Revolut crypto hardcodes `.eur` while discarding
+- [ ] `BrokerStatementImportService.swift:754-766` — Revolut crypto hardcodes `.eur` while discarding
       the currency symbol present in the cell, and stamps `updatedAt: Date()`, so every re-import
       wins `mergedByID` and wipes user-edited `avgBuyPrice` / `coinId`.
 - [ ] `BrokerStatementImportService.swift:508,720` — broker parsers can emit two records with the
       same deterministic UUID and never `uniquedByID()` them, so one silently vanishes at sync time
       without incrementing `skippedRecords`. The JSON path solves this (tag WC-L7).
-- [ ] `MarketDataService.swift:659` — `let pool = eligible.isEmpty ? candidates : eligible` widens
+      (`uniquedByID` still does not appear anywhere in that file — checked 2026-08-26.)
+- [ ] `MarketDataService.swift:676` — `let pool = eligible.isEmpty ? candidates : eligible` widens
       symbol matching to non-equity quote types, contradicting the method's own contract.
 
 ### Corrections to my own commit messages
@@ -553,7 +603,7 @@ were written up rather than changed. Both are data-loss shaped.
 
 ### Two smaller things found while fixing the PDF
 
-- [ ] `ReportDocumentBuilder.swift:718-721` — with zero transactions in the selected range the ledger
+- [ ] `ReportDocumentBuilder.swift:738-740` — with zero transactions in the selected range the ledger
       early-returns before its Opening/Income/Expenses/Closing row, leaving the bounded export's
       lone Net Savings tile unaccompanied. All figures are zero so nothing is wrong, but the section
       reads oddly.
@@ -605,29 +655,30 @@ Each of these was found by adversarial review, confirmed real, and left alone be
 changing a working feature's design rather than correcting a wrong implementation. Listed so the
 decision is on the record instead of buried.
 
-- [ ] **Privacy Mode still discloses the *sign* of a gain.** `DesignSystem.swift:396` tints `ValueDelta`
+- [ ] **DECIDED — owner's call, deliberately open. Do not "fix" without him.** **Privacy Mode still discloses the *sign* of a gain.** `DesignSystem.swift:396` tints `ValueDelta`
       with `value >= 0 ? WCColor.primary : WCColor.destructive`, so a fully redacted row still reads
       `•••• (••••)` in green or red. Same is true of the Profit/Loss cards' `accent:`. Masking it is a
       real design cost — a delta row with no colour reads as broken — so it needs a decision, not a
       patch.
-- [ ] **`arrow.up.right` carries two meanings on the Dashboard.** `MacDashboardView.swift:263` uses it
+- [ ] **DECIDED — owner's call, deliberately open. Do not "fix" without him.** **`arrow.up.right` carries two meanings on the Dashboard.** `MacDashboardView.swift:263` uses it
       green for a net-worth *gain*; `:117` uses it red for Monthly *Expenses*, ~100pt below, and `:953`
       red for an expense in the activity list. Same on iOS (`DashboardView.swift:154` vs `:573`). The
       reviewer called this the same collision the arrow fix removed from `MacCashFlowView`. Counter-
       argument, and why it is still here: trend-sign and money-flow are different semantic families,
       colour separates them consistently within each, and the two never share a row. Changing dashboard
       iconography is a visual design decision.
-- [ ] **PDF export is entirely unredacted, by design.** `ReportDocumentBuilder.swift` and
+- [ ] **DECIDED — by design, and the export sheet warns first. Do not "fix".** **PDF export is entirely unredacted, by design.** `ReportDocumentBuilder.swift` and
       `ReportChartRenderer.swift` render every amount and percentage with no `isPrivacyMode` check.
       This is not the same bug as the on-screen leaks — nothing is masked there, so nothing is given
       back — and `ExportOptionsView.swift:91` shows a `privacySection` warning before the user commits.
       Recorded so the omission is a choice rather than an oversight.
-- [ ] **Two idioms now coexist for percentage redaction.** Most sites call `settings.privatePercent(…)`;
-      `DesignSystem.swift:469` and `:588` keep the inline `isPrivacyMode ? redactionToken : percentage(…)`
+- [ ] **DECIDED — both idioms are correct; unifying is a refactor, not a fix.** **Two idioms now coexist for percentage redaction.** Most sites call `settings.privatePercent(…)`;
+      `DesignSystem.swift:476` and `:595` keep the inline `isPrivacyMode ? redactionToken : percentage(…)`
       form because they derive a share from a total through a local helper. Both correct. Unifying is a
       refactor, not a fix.
-- [ ] `AppSettings.privatePercent`'s doc comment still frames it as being for "the gain/loss rows". It
-      now serves 14 sites. Narrow, not wrong.
+- [ ] **DECIDED — narrow, not wrong; a one-line doc edit whenever someone is in the file.**
+      `AppSettings.privatePercent`'s doc comment (`AppSettings.swift:396-401`) still frames it as
+      being for "the gain/loss rows". It now serves 14 sites. Narrow, not wrong.
 
 ### How the privacy leak was actually pinned (2026-08-25)
 
@@ -691,17 +742,17 @@ below, which was closed on the same day.
 - [x] **The iOS expense donut** `CashFlowView.swift:174` — **fixed 2026-08-25**, same cover, its own
       title (`Spending breakdown concealed`, a new key). Its top-six category list below the ring (now
       `:275`) deliberately **stays**: ranked lists are a separate decision, below.
-- [ ] **Collapsed bar, surviving ranking.** `DashboardView.swift:553` collapses its bar to
-      `width: 0` under Privacy Mode, but the leaderboard around it keeps rank badge (`:521`), category
-      name (`:525`) and value-descending order (`:496`). The bar hides; the ranking does not. iOS only.
+- [ ] **DECIDED — ranked lists are out of scope by the owner's ruling. Do not "fix".** **Collapsed bar, surviving ranking.** `DashboardView.swift:632` collapses its bar to
+      `width: 0` under Privacy Mode, but the leaderboard around it keeps rank badge (`:600`), category
+      name (`:604`) and value-descending order (`:554`). The bar hides; the ranking does not. iOS only.
       The collapsed bar itself is now pinned: dropping the `settings.isPrivacyMode ? 0 :` is reported by
       `testWorkingTreeSourcesDrawNoUnconcealedDonut`, which matches a data-scaled `.frame`.
-- [ ] **macOS allocation legend renders in Privacy Mode.** `MacDashboardView.swift:537-559` is a sibling
-      of the privacy branch (`:440`), not part of it, so the cover never reaches it. Values redact at
-      `:549`/`:552`; bucket order is fixed, so it discloses which buckets are non-zero. Left deliberately
+- [ ] **DECIDED — out of scope by the owner's ruling. Do not "fix".** **macOS allocation legend renders in Privacy Mode.** `MacDashboardView.swift:576-598` is a sibling
+      of the privacy branch (`:480`), not part of it, so the cover never reaches it. Values redact at
+      `:588`/`:591`; bucket order is fixed, so it discloses which buckets are non-zero. Left deliberately
       untouched by both the footnote fix and the ordering flip — closing it changes what macOS renders and
       is a decision of its own. iOS conceals its legend with the ring.
-- [ ] **The net-worth card still says it is empty, in words, right above the cover.** Found while
+- [x] **DONE `b93f391`.** **The net-worth card still says it is empty, in words, right above the cover.** Found while
       screenshotting the fix above on a fresh simulator with Privacy Mode on: the chart is concealed,
       and the same card prints "No snapshots" (`DashboardView.swift:307` / `MacDashboardView.swift:424`,
       the `snapshotFreshness` header) and "Add another snapshot to see movement"
@@ -710,14 +761,21 @@ below, which was closed on the same day.
       ordering flip was made to hide. They are labels rather than chart branches, which is why the flip
       did not reach them, and `testWorkingTreeChecksPrivacyBeforeEmptiness` cannot see them either —
       it only knows about covers. Same shape as the item above it.
-- [ ] **Ranked lists have no privacy awareness at all** — amounts redact, identity and order do not.
+      **Verified 2026-08-26 against source:** both arms are behind one gate now —
+      `DashboardView.swift:164` / `MacDashboardView.swift:283` wrap the whole `rangeChange`
+      chain in `if !settings.isPrivacyMode`, and `snapshotFreshness` renders `EmptyView()` under
+      Privacy Mode (`DashboardView.swift:318-320`, `MacDashboardView.swift:445-447`).
+- [ ] **DECIDED — ranked lists, their order and the Top Performer / Biggest Loser cards are out of
+      scope by the owner's ruling. Do not "fix".** **Ranked lists have no privacy awareness at all** — amounts redact, identity and order do not.
       One choke point: `FinanceModels.swift:635-649` (`rankedByValue`, takes no `AppSettings`). Sites:
-      `InvestmentsView.swift:146` ↔ `MacInvestmentsView.swift:173-175,207`; `CryptoView.swift:204` ↔
-      `MacCryptoView.swift:225-227,258`. The Top Performer / Biggest Loser cards
+      `InvestmentsView.swift:159` ↔ `MacInvestmentsView.swift:176,228`; `CryptoView.swift:216` ↔
+      `MacCryptoView.swift:228,279`. The Top Performer / Biggest Loser cards
       (`CryptoView.swift:138-193` ↔ `MacCryptoView.swift:157-217`) are worse: their *existence* is gated
-      on `gainLossPercent > 0` / `< 0` (`:143-144`), so the card appearing at all discloses the sign.
+      on `gainLossPercent > 0` / `< 0` (`CryptoView.swift:150-151`, `MacCryptoView.swift:165-166`), so the
+      card appearing at all discloses the sign.
 
-The three ticked items were fixed on 2026-08-25 (owner's call: conceal every ring). The three open ones
+The four ticked items were fixed on 2026-08-25 — three by the owner's call to conceal every ring, and
+the net-worth card's wording by `b93f391`. The three open ones
 were left deliberately — ranked lists, their ordering and the Top Performer / Biggest Loser cards stay as
 they are for now. No `Gauge`, `.trim(from:to:)`, `Canvas`, sparkline or heatmap exists anywhere, so this
 list is complete for proportional geometry.
@@ -735,17 +793,21 @@ Fallout from `e55f742`, worth one deliberate pass rather than leaving it to drif
 
 - [ ] **`MobilePrivacyChartCover` is misnamed now.** It is what the nine shared `AllocationChart` rings
       render, so macOS Investments and macOS Crypto show a cover called *Mobile*. Meanwhile
-      `MacDashboardView.swift:448` still uses its own `PrivacyChartCover` — that card is **not** an
+      `MacDashboardView.swift:480` still uses its own `PrivacyChartCover` (the type is at `:1105`;
+      the shared one is `DesignSystem.swift:683`) — that card is **not** an
       `AllocationChart` call site (grep returns 0); it inlines its own `Chart`/`SectorMark`, which is
       why the two were never unified. They differ slightly: corner radius 15 vs 14, black .14 vs .12,
       `textTertiary` vs `textFaint`. Unifying changes macOS pixels, so it is a decision, not a cleanup.
       At minimum, rename the shared one — it is no longer mobile-only.
-- [ ] **`Values and proportions are hidden.` is 7/35 `translated`, 28 `needs_review`.** Pre-existing, but
+- [ ] **`Values and proportions are hidden.` is 7/35 `translated`, 28 `needs_review`.** Re-measured
+      2026-08-26 and unchanged — and worse than the states suggest: **29 of 35 locales hold the
+      verbatim English sentence**, so those readers see English, not a machine translation. Pre-existing, but
       this string went from **one** macOS-only site (`MacDashboardView.swift:450` — the "3" written here
       first counted the three macOS `PrivacyChartCover` calls, only one of which carries this message) to
       **eleven** charts across both platforms: that one, the nine `AllocationChart` rings, and the iOS
       expense donut. Far more users now read it. Highest-value single string to get translated properly.
-- [ ] **`Spending breakdown concealed` is 1/35 `translated`, 34 `needs_review`.** Added so the iOS expense
+- [ ] **`Spending breakdown concealed` is 1/35 `translated`, 34 `needs_review`.** Re-measured 2026-08-26,
+      unchanged. Added so the iOS expense
       donut's cover names its own chart instead of borrowing `Allocation concealed` (which is 35/35). The
       34 are machine translations and have never been read by a speaker.
 - [x] **Two conceal orderings disagree in this codebase — RESOLVED 2026-08-25 in favour of privacy
@@ -778,30 +840,41 @@ The app already agrees counts are sensitive — `InvestmentsView.swift:107` reda
 `investments.count` behind `settings.isPrivacyMode ? settings.redactionToken : …`. It just doesn't do it
 consistently.
 
-- [ ] **Raw counts printed with no redaction — 11 sites.** Sharpest: `SettingsView.swift:197-231` and
+- [x] **DONE `65bf189`** (+ `96d535f` locale formatting, `835415b` the ninth count). **Raw counts printed with no redaction — 11 sites.** Sharpest: `SettingsView.swift:197-231` and
       `MacSettingsView.swift:473-483` print **six** unredacted entity counts, including
       `Text("\(finance.data.snapshots.count)")` — a direct readout of the exact fact `b93f391` just
       concealed on the Dashboard. Also `DashboardView.swift:341/354/372` ("0 positions", "0 holdings",
       "0 liabilities") against `InvestmentsView.swift:107`, which redacts the same number.
-- [ ] **`if <collection>.isEmpty { EmptyState }` with no privacy branch — 14 sites.** Every *chart* got
+      **Verified 2026-08-26:** all six Settings rows go through `privateCount` on both platforms
+      (`SettingsView.swift:199-229`, `MacSettingsView.swift:473-483`).
+- [x] **DONE `f3fac7c`** (twelve list/table states) **+ `fb5272c`** (the two filter-probeable ones). **`if <collection>.isEmpty { EmptyState }` with no privacy branch — 14 sites.** Every *chart* got
       the privacy-first treatment; no *list or table* did. Both platforms' "No activity yet", "No
       recurring transactions", "No investments yet", "No crypto holdings yet". Two are worse than a
       plain empty state: `CashFlowView.swift:443-446` and `MacCashFlowView.swift:923-945` **distinguish**
       "you have no transactions" from "you have transactions, just not these" — and both are probeable
       through the filter controls, which is the walk-the-picker attack this codebase's own comments say
       must not exist.
-- [ ] **Optional binding with a string fallback — 8 sites.** `?? settings.localized("Never")` appears
+      **Read `DashboardView.swift:571-594` before reopening this:** the fix is a rewording, not a
+      probe closure, and the code comment there says so. Only `fb5272c` genuinely collapses a probe.
+- [x] **DONE `52c062a`.** **Optional binding with a string fallback — 8 sites.** `?? settings.localized("Never")` appears
       four times (`InvestmentsView.swift:135`, `CryptoView.swift:128`, and both Mac twins), each inside
       the *same* `MetricCard` whose title already redacts a count.
-- [ ] **The onboarding card** (`DashboardView.swift:41`, `MacDashboardView.swift:51`) is gated on
+      **Verified 2026-08-26:** all four now read `settings.isPrivacyMode ? settings.redactionToken : (…)`
+      — `InvestmentsView.swift:136-138`, `CryptoView.swift:133-135`, `MacInvestmentsView.swift:162-164`,
+      `MacCryptoView.swift:130-132`.
+- [x] **DONE `52c062a`.** **The onboarding card** (`DashboardView.swift:41`, `MacDashboardView.swift:51`) is gated on
       `isCompletelyEmpty`, so its presence announces "this person has no financial data at all".
-- [ ] **The recurring-insertion alert** (`ContentView.swift:204-208`, `MacRootView.swift:285-296`) fires
+- [x] **DONE `52c062a`.** **The recurring-insertion alert** (`ContentView.swift:204-208`, `MacRootView.swift:285-296`) fires
       only when `insertedCount > 0` and states the count. Notable because the same file already threads
       `showAmounts: !settings.isPrivacyMode` into the notification service — this is the one path that
       forgot.
-- [ ] **A boundary call left alone deliberately:** `DashboardView.swift:514`
+- [x] **DONE `f3fac7c`** — it was *not* left alone in the end. **A boundary call left alone deliberately:** `DashboardView.swift:514`
       `EmptyState(title: "No expenses for this period")` is separable from the ranked list that is out
       of scope, and it sits under an `AnalyticsPeriod` picker — the walk-the-picker probe again.
+      **Verified 2026-08-26:** now `DashboardView.swift:592-594`, with a
+      `if settings.isPrivacyMode, expenses.isEmpty` arm showing `Hidden by Privacy Mode` first. The
+      picker probe itself is *not* closed and the comment at `:571-590` says so — but that is the
+      ranked-list decision, not this line.
 
 Fixing all 37 needs roughly **11 redaction decisions** (hide vs tokenise, per shape) and several new
 catalog strings. That is a separate change and a separate review, not a continuation of this one.
@@ -832,15 +905,16 @@ the main assertion could silently become unfailable. Reach limit: the test bundl
 
 Three sites of the same family that the 41-site sweep surfaced but did not close.
 
-- [ ] **A disabled control is an existence tell.** `SettingsView.swift:526` and
+- [ ] **A disabled control is an existence tell.** `SettingsView.swift:537` and
       `MacSettingsView.swift:426-429`: `.disabled(isRefreshingPrices || (investments.isEmpty &&
       crypto.isEmpty))` — *Refresh Prices* greys out precisely when the user holds no investments and no
       crypto. Un-disabling it changes function, so this needs a decision rather than a patch (enable it
       and no-op? always enable under Privacy Mode?).
-- [ ] **The import-summary sheet prints raw counts** — `DesignSystem.swift:1004` (`statTile`) and `:1054`
+- [ ] **The import-summary sheet prints raw counts** — `DesignSystem.swift:992` (`statTile`) and `:1043`
       (`footnoteRow`): six category counts plus skipped/generated tallies, ungated. Transient and
       user-initiated, so lower severity than a persistent screen.
-- [ ] **Sign-of-value leak via glyph and tint — 8 sites, and the card contradicts itself.**
+- [ ] **DECIDED — left for the owner to rule on. Confirmed still present 2026-08-26; do not "fix"
+      unilaterally.** **Sign-of-value leak via glyph and tint — 8 sites, and the card contradicts itself.**
       `MetricCard` picks `systemImage` and `accent` from the sign of the value while the figure itself
       reads `••••`: `DashboardView.swift:433`, `MacDashboardView.swift:131`, `CashFlowView.swift:164`,
       `MacCashFlowView.swift:251` (Net Savings); `InvestmentsView.swift:112`, `CryptoView.swift:109`,
@@ -882,7 +956,7 @@ is read at all. Two premises in my brief were wrong and the fixer corrected them
 the two I named — `SettingsView:692`, `CashFlowView:702`, `MacSettingsView:929` and `MacCashFlowView:1036`
 also pass the flag. All six pass it correctly.
 
-- [ ] **Multiplicity still leaks a count on the lock screen.** Every privacy-mode reminder is now the
+- [x] **DONE `5265c96`.** **Multiplicity still leaks a count on the lock screen.** Every privacy-mode reminder is now the
       same two constants, so N schedules due in the same minute post **N identical banners**. A bystander
       counts them. The obvious fix — key the request identifier on the fire time so they coalesce —
       **breaks the cancellation contract**: `deleteRecurringTransaction`, `completeRecurringTransaction`
@@ -890,17 +964,25 @@ also pass the flag. All six pass it correctly.
       `cancel(scheduleID:)` with **no following `sync`**, so a fire-time-keyed request would survive the
       delete and fire for a schedule that no longer exists. Doing it properly means making those four
       paths re-sync. Worth doing — it is the same class, on the most exposed surface in the app.
-- [ ] **Arrival time still correlates with the schedule** — a banner on the 1st suggests rent. Inherent
+      **Verified 2026-08-26:** `RecurringNotificationService.swift:163-175` coalesces by
+      `coalescedIdentifier(at: fireMoment(for:))` — one request per moment. The cancellation blocker
+      named above was refuted, not fixed: `sync` tears down by prefix, so the four
+      `cancel(scheduleID:)` sites (`CashFlowView:688,725`, `MacCashFlowView:1022,1061`) still have no
+      following `sync` and that is now harmless. `4e45288` and `1121604` hardened the identifier and
+      the delivered-field comparison afterwards.
+- [ ] **DECIDED — inherent to having reminders at all; recorded as an accepted limitation.** **Arrival time still correlates with the schedule** — a banner on the 1st suggests rent. Inherent
       to having reminders at all; recorded so it is an accepted limitation rather than an oversight.
 
 ### Localization facts learned the hard way (2026-08-25)
 
 - [ ] **There is no parent-locale fallback anywhere in the app.** `es-419` failed a coverage check for a
-      key that `es` has, because `AppLocalization` loads the `.lproj` directly. Any key present in `es`
+      key that `es` has, because `AppLocalization` loads the `.lproj` directly
+      (`AppLocalization.swift:38`, `Bundle.main.path(forResource: appLanguage, ofType: "lproj")`). Any key present in `es`
       but absent from `es-419` renders **English**, not Spanish. Worth a sweep — the same trap applies to
       `pt-BR`/`pt-PT`, `fr-CA`/`fr-FR`, `zh-Hans`/`zh-Hant`.
 - [ ] **`Capital invested` is missing `sv`** (33 of 34). Predates this series.
-- [ ] **157 catalog keys have zero localizations.** Not investigated.
+- [ ] **156 catalog keys have zero localizations.** Not investigated. (Counted 2026-08-26; the
+      "157" written here was measured before `a9a8b2f`/`01d3198` back-filled one of them.)
 - **A claim to stop repeating:** `ar` and `hi` render `1,234` in **Latin** digits here, not Arabic-Indic.
   Two commit messages and several doc comments in this series asserted otherwise. Measured, not assumed.
 - **`%lld positions` and friends hold flat `stringUnit`s in all 34 locales.** Only **two** keys in the
@@ -962,7 +1044,8 @@ line could rewrite; and a ninth entity count was tokenised with a lint that pins
       All 44 now hold the product name, spliced in place and marked `needs_review`, and
       `LocalizationTests.testNoLocaleRenamesTheAppInTheCatalog` sweeps every key whose English source
       names the app rather than one sentence.
-- [ ] **Four dead catalog keys**, 35 locales each, no Swift reference (they were fixed along with the
+- [ ] **Four dead catalog keys**, 35 locales each, no Swift reference — all four still present in the
+      catalog as of 2026-08-26 (they were fixed along with the
       rest, since a dead key is one somebody wires up later, but they can equally be deleted):
       `%@ is scheduled. Open Wealth Compass Tracker to review it.`,
       `%@: %@. Wealth Compass Tracker records it while the app is active.`,
@@ -984,12 +1067,15 @@ line could rewrite; and a ninth entity count was tokenised with a lint that pins
       nothing pinned it and an empty entry is an invitation to a translation pass. It now carries all
       34 locales. The sweep matches `Wealth\s*Compass(?:\s+Tracker)?` and reads `variations` bodies
       as well as `stringUnit`.
-- [ ] **`Welcome to WealthCompass` is untranslated in 28 of 34 locales** — the value is the English
+- [x] **DONE `a9a8b2f`.** **`Welcome to WealthCompass` is untranslated in 28 of 34 locales** — the value is the English
       sentence, marked `needs_review`, on the first line of the first screen. Only
       `ar/de/es/fr/it/zh-Hans` say anything in the reader's language. Not a renaming defect and not
       in scope for the sweep above, which asks only that the name survives; noted because it is the
       first thing a new user sees.
-- [ ] **Eight bare-`String` counts in `ReportDocumentBuilder.swift`** (`:857`, `:950`, `:1070-1075`) —
+      **Verified 2026-08-26 by parsing the catalog, not the commit message:** **0 of 34** locales now
+      hold the verbatim English string. 5 read `translated`, 29 `needs_review` — which is the house
+      convention for agent-written values, not a sign the work is missing. No speaker has read the 29.
+- [x] **DONE `a5572bf`.** **Eight bare-`String` counts in `ReportDocumentBuilder.swift`** (`:857`, `:950`, `:1070-1075`) —
       the same defect as the nine tokenised in the views: they print `1234`, not `1,234`/`1.234`, in
       every locale. In the PDF export, which the lint deliberately excludes.
 
