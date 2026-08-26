@@ -1082,9 +1082,14 @@ private func isDecimalLiteralCharacter(_ character: Character) -> Bool {
 /// resolves all of them to the correct value, and `NumberFormatter(.decimal)` produces them for 51
 /// locale identifiers, one of which (`hi`) this app ships. The Western-only argument also applied
 /// verbatim to `"1,234.56"`, which was deliberately kept, so it never picked lakh grouping out in
-/// the first place. Measured over every ASCII digit/separator string up to 8 characters (488,280 of
-/// them): the widened rule accepts everything the narrow one did, accepts nothing the pre-gate code
-/// rejected, and never changes a value — the only shape it adds is `1-2-3`.
+/// the first place.
+///
+/// Measured two ways — every ASCII digit/separator string up to 8 characters (488,280 of them), and
+/// every group-size tuple up to 6 groups of up to 5 digits in both separator spellings, with and
+/// without a fraction (78,100 of them). In both sweeps the widened rule accepts everything the
+/// narrow one did, accepts nothing the pre-gate code rejected, and never disagrees with
+/// `flexibleDecimal` about a value. The shapes it adds are exactly those carrying a middle group of
+/// **2** — `1-2-3`, `2-2-3`, `1-2-2-3` and their mixtures with 3s. Nothing else moves.
 private func hasNumericSeparatorLayout(_ unsigned: String) -> Bool {
     let dotCount = unsigned.reduce(0) { $1 == "." ? $0 + 1 : $0 }
     let commaCount = unsigned.reduce(0) { $1 == "," ? $0 + 1 : $0 }
