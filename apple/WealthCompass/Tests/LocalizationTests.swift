@@ -486,4 +486,46 @@ final class LocalizationTests: XCTestCase {
             )
         }
     }
+
+    /// The other half of the rule above, which on its own only ever asked for *less*.
+    ///
+    /// `testTheAppNameSurvivesTheRuntimeLookup` asserts the product name survives into every
+    /// translation of `Welcome to WealthCompass`. A body left as the untouched English source
+    /// satisfies that perfectly — it contains the name — and 28 of the 34 locales did exactly that:
+    /// `ca cs da el es-419 fi he hi hr hu id ja ko ms nb nl pl pt-BR pt-PT ro ru sk sv th tr uk vi
+    /// zh-Hant` all greeted the reader in English on the first line of the first screen, with the
+    /// suite at 315 / 0. Containment cannot notice that, and neither can the catalog sweep: an
+    /// untranslated body is the one thing that passes a rename check by definition.
+    ///
+    /// So this asks the opposite question — that the sentence *around* the name moved. The two
+    /// together bracket the rule: `WealthCompass` stays, everything else goes.
+    ///
+    /// Resolved through `AppLocalization.string`, the same path `OnboardingView.swift:97` and
+    /// `MacOnboardingView.swift:102` reach under `.appLanguage`, so this is the compiled `.lproj`
+    /// in the built product answering and not the catalog being re-read.
+    ///
+    /// **`es-419` is not covered by `es`.** `AppLocalization.bundle(for:)` resolves a language to
+    /// `Bundle.main.path(forResource:ofType: "lproj")` and falls back to `.main` — the English base
+    /// — so there is no parent-locale inheritance anywhere in this app. Latin American Spanish
+    /// needs its own body and gets a different one (`Te damos la bienvenida a`) from the peninsular
+    /// `Bienvenido a`; both are listed in `everyLanguage` and both are checked here.
+    func testTheWelcomeScreenIsTranslatedInEveryLanguage() {
+        let english = AppLocalization.string("Welcome to WealthCompass", appLanguage: "en")
+        XCTAssertEqual(english, "Welcome to WealthCompass", "the English source has moved")
+
+        var untranslated: [String] = []
+        for language in Self.everyLanguage where language != "en" {
+            let welcome = AppLocalization.string("Welcome to WealthCompass", appLanguage: language)
+            if welcome == english { untranslated.append("\(language) — \"\(welcome)\"") }
+        }
+        XCTAssertEqual(
+            untranslated, [],
+            """
+            \(untranslated.count) of \(Self.everyLanguage.count - 1) languages hold the English \
+            source verbatim on the first line of the first screen. The product name is not \
+            localised, but the greeting carrying it is:
+            \(untranslated.map { "  " + $0 }.joined(separator: "\n"))
+            """
+        )
+    }
 }
