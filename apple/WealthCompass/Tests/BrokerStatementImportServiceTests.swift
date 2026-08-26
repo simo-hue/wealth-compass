@@ -157,6 +157,45 @@ final class BrokerStatementImportServiceTests: XCTestCase {
         XCTAssertEqual(cashOuts.reduce(Decimal(0)) { $0 + $1.amount }.doubleValue, 1500.0, accuracy: 0.001)
     }
 
+    /// A `currency` column holding an ISO code this app does not model must skip the row, not
+    /// relabel it as the display currency.
+    ///
+    /// The fallback kept the number and changed its meaning — an AED 5,000 row silently became
+    /// EUR 5,000, with nothing on screen to say so — and because Trade Republic prints the code on
+    /// *every* row, a whole export could be re-denominated at once. That is worse than dropping the
+    /// rows. This is the same call `ae1482c` made for the JSON backup importer and the one the
+    /// Revolut parser already makes for an unrepresentable account section
+    /// (`sectionCurrency` → `.unsupported` → skipped and counted).
+    func testTradeRepublicSkipsUnrepresentableCurrencyInsteadOfRelabellingIt() throws {
+        let csv = trHeader + "\n"
+            + "\"2026-01-05T10:00:00.000Z\",\"2026-01-05\",\"DEFAULT\",\"CASH\",\"CUSTOMER_INBOUND\",\"\",\"Dubai top up\",\"\",\"\",\"\",\"5000.00\",\"\",\"\",\"AED\",\"\",\"\",\"\",\"Top up\",\"c1\",\"\",\"\",\"\",\"\"\n"
+            + "\"2026-01-06T10:00:00.000Z\",\"2026-01-06\",\"DEFAULT\",\"TRADING\",\"BUY\",\"STOCK\",\"DubaiCo\",\"AE0000000001\",\"1\",\"5000.00\",\"-5000.00\",\"\",\"\",\"AED\",\"\",\"\",\"\",\"buy\",\"c2\",\"\",\"\",\"\",\"\"\n"
+            + "\"2026-01-07T10:00:00.000Z\",\"2026-01-07\",\"DEFAULT\",\"CASH\",\"CARD_TRANSACTION\",\"\",\"Coffee\",\"\",\"\",\"\",\"-4.50\",\"\",\"\",\"EUR\",\"\",\"\",\"\",\"Coffee shop\",\"c3\",\"\",\"\",\"\",\"\""
+        let out = try parse(csv)
+        let data = out.normalized.data
+
+        XCTAssertEqual(data.transactions.count, 1, "an AED row was kept, relabelled as the display currency")
+        XCTAssertEqual(data.transactions.first?.currency, .eur, "the healthy row beside it must survive")
+        XCTAssertEqual(data.transactions.first?.amount, Decimal(string: "4.50"))
+        XCTAssertTrue(data.investments.isEmpty, "an AED holding was kept, relabelled as the display currency")
+        // Both AED rows are dropped, and the user has to be told about each of them.
+        XCTAssertEqual(out.normalized.skippedRecords, 2, "unrepresentable rows were dropped without being reported")
+    }
+
+    /// The meaning the skip must not break: an **absent** currency column is not an unrepresentable
+    /// one. A blank cell still falls back to the display currency and the row is still imported.
+    func testTradeRepublicAbsentCurrencyStillFallsBackToTheDisplayCurrency() throws {
+        let csv = trHeader + "\n"
+            + "\"2026-01-05T10:00:00.000Z\",\"2026-01-05\",\"DEFAULT\",\"CASH\",\"CUSTOMER_INBOUND\",\"\",\"Top up\",\"\",\"\",\"\",\"1000.00\",\"\",\"\",\"\",\"\",\"\",\"\",\"Top up\",\"d1\",\"\",\"\",\"\",\"\""
+        let out = try parse(csv, display: .usd)
+        let data = out.normalized.data
+
+        XCTAssertEqual(data.transactions.count, 1, "a legacy row with no currency column must still import")
+        XCTAssertEqual(data.transactions.first?.currency, .usd)
+        XCTAssertEqual(data.transactions.first?.amount, Decimal(string: "1000.00"))
+        XCTAssertEqual(out.normalized.skippedRecords, 0)
+    }
+
     // MARK: - Revolut (multi-section consolidated statement)
 
     private let revolutCSV = """

@@ -371,9 +371,24 @@ enum BrokerImportParsing {
         return isoDate(value)
     }
 
-    static func currency(_ code: String?, default fallback: Currency) -> Currency {
+    /// The currency a statement row is denominated in. Three outcomes, because the two that used to
+    /// be collapsed together mean opposite things:
+    ///
+    /// * **absent / blank** → `fallback`. A column the export left empty is not a statement about
+    ///   currency, so the row is still imported — the documented, unchanged meaning.
+    /// * **a code this app models** → that currency.
+    /// * **a real code outside `Currency`** → `nil`, meaning *skip this row*. Callers must fail the
+    ///   record's guard so it lands in `skippedRecords` and the import summary reports it.
+    ///
+    /// Falling back in the third case kept the number and changed its meaning — an `AED 5,000` row
+    /// silently became `EUR 5,000`, with nothing on screen to say so — and a broker prints the code
+    /// on *every* row, so one unmodelled code re-denominates a whole export. That is worse than
+    /// dropping the rows. Same call `Currency.importedCode` makes for a JSON backup, and the one
+    /// `sectionCurrency` already makes here for an unrepresentable Revolut account section
+    /// (`.unsupported` → the rows are skipped and counted rather than inheriting a currency).
+    static func currency(_ code: String?, default fallback: Currency) -> Currency? {
         guard let code = code?.trimmingCharacters(in: .whitespacesAndNewlines), !code.isEmpty else { return fallback }
-        return Currency(rawValue: code.uppercased()) ?? fallback
+        return Currency(rawValue: code.uppercased())
     }
 
     // MARK: - Trade Republic PDF helpers (Italian statements)
@@ -469,7 +484,6 @@ private enum TradeRepublicCSVParser {
 
             let category = (field(row, "category") ?? "").uppercased()
             let type = (field(row, "type") ?? "").uppercased()
-            let currency = BrokerImportParsing.currency(field(row, "currency"), default: context.displayCurrency)
             let date = BrokerImportParsing.isoDate(field(row, "date")) ?? BrokerImportParsing.isoDate(field(row, "datetime"))
             let createdAt = BrokerImportParsing.isoDate(field(row, "datetime")) ?? date
             // Raw (tz-independent) date string for dedup seeds — never `date.timeIntervalSince1970`, which
@@ -479,8 +493,15 @@ private enum TradeRepublicCSVParser {
             let name = field(row, "name")
             let description = field(row, "description") ?? name ?? field(row, "counterparty_name") ?? ""
 
-            guard let amount = BrokerImportParsing.plainDecimal(field(row, "amount")), let date else {
-                // A row we recognized but couldn't make sense of (no amount/date) is a genuine skip.
+            guard
+                let amount = BrokerImportParsing.plainDecimal(field(row, "amount")),
+                let date,
+                // An unmodelled ISO code fails the row here rather than being relabelled as the
+                // display currency — see `BrokerImportParsing.currency`.
+                let currency = BrokerImportParsing.currency(field(row, "currency"), default: context.displayCurrency)
+            else {
+                // A row we recognized but couldn't make sense of (no amount/date, or money this app
+                // cannot represent) is a genuine skip.
                 skipped += 1
                 continue
             }
