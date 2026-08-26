@@ -1,9 +1,33 @@
 import Foundation
 
 enum FinanceJSONCoding {
+    /// One escaping rule for every encoder in this file, `.withoutEscapingSlashes` included.
+    ///
+    /// Which encoder writes the database is decided by whether a record happens to be decodable —
+    /// `encodeFinancialData(_:preserving:from:)` on the save after a skipped-record load, this one
+    /// otherwise — and that condition flips when a newer build syncs a record back and flips again
+    /// when this build learns to read it. Any option the two do not share therefore shows up as the
+    /// file changing shape on its own. It has happened twice: `.prettyPrinted` collapsed the whole
+    /// file to one line, and `.withoutEscapingSlashes` flipped every user string containing a `/`
+    /// between `Rent 01\/02` and `Rent 01/02`. Both are valid JSON and the app never noticed, but
+    /// the file is user-inspectable and the flapping reads like corruption.
+    ///
+    /// Slashes are left unescaped rather than the reverse, on three grounds: `\/` exists only to
+    /// keep `</script>` out of inline HTML, which is not a context this app has; the interchange
+    /// partner writes them unescaped, since JavaScript's `JSON.stringify` does not escape `/`, and
+    /// the JSON backup format is shared with the web app; and the two files a user can actually
+    /// open — the database and the exported backup — read correctly. `\/` and `/` decode to the
+    /// same character, so nothing already on disk changes meaning.
+    ///
+    /// One consequence worth knowing: `CloudSyncRecordSnapshot.payload` is this encoder's compact
+    /// output and `payloadHash` is its SHA256, so records whose strings contain a `/` hash
+    /// differently than they did and are re-sent once. The records are value-identical, so this
+    /// costs one upload each and nothing else.
     static func makeEncoder(prettyPrinted: Bool = false) -> JSONEncoder {
         let encoder = JSONEncoder()
-        encoder.outputFormatting = prettyPrinted ? [.prettyPrinted, .sortedKeys] : [.sortedKeys]
+        encoder.outputFormatting = prettyPrinted
+            ? [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+            : [.sortedKeys, .withoutEscapingSlashes]
         encoder.dateEncodingStrategy = .custom { date, encoder in
             var container = encoder.singleValueContainer()
             try container.encode(format(date))
@@ -146,6 +170,10 @@ enum FinanceJSONCoding {
     /// `/`. Nothing this app stores is near any of those edges, and the point of H08 is to keep a
     /// record readable by a future build rather than to reproduce a byte stream — but a future
     /// reader should not have to discover the difference.
+    ///
+    /// That last entry was also the unread half of a bug. `\/` → `/` is only harmless because the
+    /// *ordinary* save now writes `/` too; while it escaped, this line was recording one side of a
+    /// file that flapped between the two spellings on every save. See `makeEncoder`.
     ///
     /// `load()` refuses to rewrite the file when anything was skipped, so an undecodable record
     /// survives on disk for a future build that can read it. `save` writing the lossy in-memory
@@ -383,14 +411,17 @@ enum FinanceJSONCoding {
         return encoder
     }()
 
-    /// The same encoder for the one path whose output lands on disk **as written**.
+    /// The one `JSONValue` rewrite whose output lands on disk **as written**, so its formatting has
+    /// to match `makeEncoder(prettyPrinted: true)` option for option.
     ///
-    /// `encodeFinancialData(_:preserving:from:)` is the only `JSONValue` rewrite that becomes the
-    /// database file verbatim; ordinary saves go through `encode(_:prettyPrinted: true)`, so
-    /// without this the first save after a skipped-record load collapsed the whole file to one
-    /// line and it sprang back to pretty as soon as the record became decodable. Valid JSON either
-    /// way and the app never noticed, but the file is user-inspectable and the flapping reads like
-    /// corruption.
+    /// `encodeFinancialData(_:preserving:from:)` becomes the database file directly; ordinary saves
+    /// go through `encode(_:prettyPrinted: true)`, and the two alternate according to whether a
+    /// record is currently decodable. Every option they do not share is a way for the file to
+    /// change shape on its own — see `makeEncoder`, which carries the reasoning and the history.
+    /// The options are spelled out here rather than reusing `prettyEncoder` because that one
+    /// installs a date strategy, and a `JSONValue` must never reinterpret the date strings the file
+    /// already holds. `JSONValue` has no `Date` case, so today the strategy could not fire; relying
+    /// on that to stay true is a sharper edge than repeating three options.
     ///
     /// `migrateLegacyFinancialDataJSON` deliberately keeps the compact encoder: its output is an
     /// intermediate that is decoded and then re-encoded by `write(_:)`, so it never reaches disk.

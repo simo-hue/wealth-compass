@@ -140,6 +140,83 @@ final class PersistenceCoordinatorTests: XCTestCase {
         XCTAssertEqual(reloaded.skippedRecordKeys.count, 1, "the preserved record was duplicated")
     }
 
+    /// A spliced save and an ordinary save must write the same bytes for the same data.
+    ///
+    /// The database file flaps whenever the two encoders disagree, because which one runs depends
+    /// on whether a record happens to be decodable — a condition that flips when a newer build
+    /// syncs a record back, and flips again when the app learns to read it. `33d40e0` fixed one
+    /// half: the splice re-encoded without `.prettyPrinted`, so the first save after a
+    /// skipped-record load collapsed the whole file to one line. It shipped without a test, and it
+    /// left the other half in place — the splice encoder also carries `.withoutEscapingSlashes`
+    /// and the ordinary save's did not. Measured on the same record before this fix:
+    ///
+    ///     ordinary save : "description" : "Rent 01\/02 landlord",
+    ///     spliced  save : "description" : "Rent 01/02 landlord",
+    ///
+    /// So every user string containing a `/` — a free-text description, an imported Revolut or
+    /// Trade Republic memo — still flipped on exactly the same trigger. Both halves are pinned
+    /// here: the first two lines pin pretty-printing, the description line pins the escaping.
+    func testSplicedSaveWritesTheSameBytesAsAnOrdinarySave() throws {
+        let goodID = "11111111-1111-1111-1111-111111111111"
+        let unreadableID = "22222222-2222-2222-2222-222222222222"
+        func fixture(includingUnreadableRecord: Bool) -> Data {
+            let unreadable = """
+            ,{"id":"\(unreadableID)","type":"NOT_A_TYPE","category":"Mystery",
+              "amount":4321.99,"description":"","date":"2026-01-02T00:00:00.000Z",
+              "createdAt":"2026-01-02T00:00:00.000Z","updatedAt":"2026-01-02T00:00:00.000Z"}
+            """
+            return Data("""
+            {"transactions":[
+              {"id":"\(goodID)","type":"expense","category":"Rent",
+               "amount":1234.56,"description":"Rent 01/02 landlord","date":"2026-01-01T00:00:00.000Z",
+               "createdAt":"2026-01-01T00:00:00.000Z","updatedAt":"2026-01-01T00:00:00.000Z"}\
+            \(includingUnreadableRecord ? unreadable : "")
+            ]}
+            """.utf8)
+        }
+
+        // The salvage path: one record survives, one is preserved as the subtree the file holds.
+        let existing = fixture(includingUnreadableRecord: true)
+        let decoded = try FinanceJSONCoding.decodeFinancialData(from: existing)
+        XCTAssertEqual(decoded.data.transactions.count, 1, "fixture did not exercise the salvage path")
+        XCTAssertEqual(decoded.skippedRecordKeys.count, 1)
+
+        let spliced = String(decoding: try FinanceJSONCoding.encodeFinancialData(
+            decoded.data, preserving: decoded.skippedRecordKeys, from: existing
+        ), as: UTF8.self)
+
+        // The same data, saved the ordinary way — what the very next save writes once the record
+        // becomes decodable, or once sync replaces it.
+        let clean = try FinanceJSONCoding.decodeFinancialData(from: fixture(includingUnreadableRecord: false))
+        XCTAssertTrue(clean.skippedRecordKeys.isEmpty)
+        XCTAssertEqual(clean.data.transactions, decoded.data.transactions, "the two paths must see identical data")
+        let ordinary = String(decoding: try FinanceJSONCoding.encode(clean.data, prettyPrinted: true), as: UTF8.self)
+
+        let splicedLines = spliced.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+        let ordinaryLines = ordinary.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+
+        // Pretty-printing, without hardcoding Foundation's exact spacing: a compact splice is one
+        // line, so it cannot match the ordinary save's opening two.
+        XCTAssertGreaterThan(splicedLines.count, 2, "the spliced save collapsed the file")
+        XCTAssertEqual(Array(splicedLines.prefix(2)), Array(ordinaryLines.prefix(2)))
+
+        // Escaping. `landlord` occurs only in the record both files share — the preserved record's
+        // description is empty — so this is one line on each side.
+        func descriptionLine(_ lines: [String], _ label: String) throws -> String {
+            let matches = lines.filter { $0.contains("landlord") }
+            XCTAssertEqual(matches.count, 1, "\(label): expected exactly one line for the shared record")
+            return try XCTUnwrap(matches.first).trimmingCharacters(in: .whitespaces)
+        }
+        XCTAssertEqual(
+            try descriptionLine(splicedLines, "spliced"),
+            try descriptionLine(ordinaryLines, "ordinary"),
+            "the same description is written differently depending on whether a record was spliced"
+        )
+        // And the direction the tie was broken: this app does not escape slashes anywhere.
+        XCTAssertFalse(ordinary.contains(#"\/"#), "an ordinary save still escapes slashes")
+        XCTAssertFalse(spliced.contains(#"\/"#), "a spliced save still escapes slashes")
+    }
+
     /// The common path must not change: with nothing skipped, `save` writes the snapshot and only
     /// the snapshot — no stale record resurrected from whatever the file used to hold.
     func testSaveWithNothingSkippedWritesOnlyTheSnapshot() throws {
