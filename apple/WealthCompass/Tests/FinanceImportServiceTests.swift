@@ -191,6 +191,22 @@ final class FinanceImportServiceTests: XCTestCase {
         }
     }
 
+    /// A separator with no digits beside it is not zero.
+    ///
+    /// `Decimal(string: ".")` returns **0**, not nil, so routing string amounts through the
+    /// grouped-thousands fallback made `"."` and `","` parse as a real zero. A transaction still
+    /// gets dropped — it needs a positive amount — but a snapshot's `netWorth` only has to be
+    /// finite, so a meaningless cell became an on-screen net-worth reading of zero.
+    func testSeparatorOnlyStringAmountIsSkippedNotReadAsZero() throws {
+        for literal in [".", ",", ".,", "-."] {
+            let result = try parse("""
+            {"snapshots":[{"date":"2026-01-01","netWorth":"\(literal)"}]}
+            """)
+            XCTAssertTrue(result.data.snapshots.isEmpty, "\"\(literal)\" was read as a zero net worth")
+            XCTAssertEqual(result.skippedRecords, 1, "\"\(literal)\" was neither imported nor reported")
+        }
+    }
+
     /// The forms the grouped-thousands fix must leave exactly as they were.
     ///
     /// * A bare `"1,234"` stays **1.234**. It is genuinely ambiguous (1234 in en-US, 1.234 in

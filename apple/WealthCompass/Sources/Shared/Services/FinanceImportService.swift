@@ -993,8 +993,12 @@ private extension KeyedDecodingContainer {
             // separators only — because `flexibleDecimal` discards every other character, and
             // widening this decoder that far would read a stray "2026-01-01" in an amount field
             // as 2026 rather than skipping the record.
+            // At least one digit is required: `Decimal(string: ".")` returns **0**, not nil, so
+            // without this a bare separator parses as a real zero. A transaction survives that
+            // (it needs a positive amount) but a snapshot's `netWorth` only has to be finite, and
+            // a meaningless cell would become an on-screen net worth of zero.
             let unsigned = (trimmed.hasPrefix("-") || trimmed.hasPrefix("+")) ? String(trimmed.dropFirst()) : trimmed
-            guard !unsigned.isEmpty,
+            guard unsigned.contains(where: { $0.isASCII && $0.isWholeNumber }),
                   unsigned.allSatisfy({ $0.isASCII && ($0.isWholeNumber || $0 == "." || $0 == ",") })
             else {
                 return nil
