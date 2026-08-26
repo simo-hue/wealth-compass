@@ -3363,6 +3363,58 @@ final class PrivacyRedactionTests: XCTestCase {
                 """
             )
         }
+
+        // The other half of the decision to compare `threadIdentifier`, `categoryIdentifier` and
+        // `badge`: **nothing sets them today**. `DeliveredReminder`'s doc comment rests on that, and
+        // until now it was a claim rather than a check.
+        //
+        // The lock-screen test cannot supply this. It asks whether the *hidden* branch's payloads
+        // are identical across schedules, and a `threadIdentifier` set from the schedule on the
+        // **detailed** branch leaves that assertion untouched — detailed payloads are supposed to
+        // differ. Measured, not supposed: injecting `content.threadIdentifier = schedule.category`
+        // into `content(for:…)` leaves the lock-screen test green and fails only here.
+        let probe = RecurringTransaction(
+            type: .expense, category: "Rent", amount: 1_450, description: "flat",
+            startDate: Date(), frequency: .monthly,
+            nextDueDate: Date().addingTimeInterval(86_400), endDate: nil, currency: .eur
+        )
+        for showDetails in [true, false] {
+            let built = RecurringNotificationService.requests(
+                for: [probe],
+                convertedAmounts: [probe.id: probe.amount],
+                currencyCode: "EUR",
+                showDetails: showDetails,
+                appLanguage: nil,
+                identifierPrefix: Self.reminderIdentifierPrefix
+            )
+            let branch = showDetails ? "detailed" : "Privacy Mode"
+            XCTAssertEqual(built.count, 1, "the \(branch) branch built no request to check")
+            for request in built {
+                XCTAssertEqual(
+                    request.content.threadIdentifier, "",
+                    """
+                    The \(branch) branch sets `threadIdentifier`, which the lock screen draws as the \
+                    notification group's header. Whatever is in it is published; if it came from the \
+                    schedule that is a disclosure under Privacy Mode and a value the teardown has to \
+                    track under the other branch. Re-read `DeliveredReminder`'s doc comment before \
+                    relaxing this — the comparison already covers the field, but the decision to \
+                    compare it was taken on the strength of nothing setting it.
+                    """
+                )
+                XCTAssertEqual(
+                    request.content.categoryIdentifier, "",
+                    "the \(branch) branch sets `categoryIdentifier`; see the message above"
+                )
+                XCTAssertNil(
+                    request.content.badge,
+                    """
+                    The \(branch) branch sets `badge`. A count on the app icon is the multiplicity \
+                    disclosure 5265c96 closed for banners, on the one surface that survives the \
+                    banner being dismissed.
+                    """
+                )
+            }
+        }
     }
 
     /// The stripped `code` view of the notification service, which both lints below read.

@@ -186,22 +186,51 @@ actor RecurringNotificationService {
     /// (`testPrivacyModeStopsTheRecurringReminderDescribingTheSchedule`), so it would see such a
     /// field; this could not. Those two are now in.
     ///
-    /// Three of `UNNotificationContent`'s remaining drawn fields are deliberately left out, and the
-    /// reason is the same in each case — a delivered banner is not the request that produced it,
-    /// and comparing a field the system rewrites on delivery would mark **every** banner stale,
-    /// which is precisely the failure this teardown exists to avoid:
+    /// What is in and what is out follows **one** rule, and an earlier version of this comment
+    /// stated it too broadly — broadly enough that the type appeared to contradict itself once
+    /// `81c2fca` added three more fields. It is *not* "leave out anything the system might rewrite
+    /// on delivery". That would exclude `title`, `subtitle` and `body`, which are the entire point
+    /// of the comparison, so it cannot be the rule and never was. This teardown irreducibly assumes
+    /// what `UserNotifications` documents: `UNNotification.request` is the archived request, so the
+    /// fields of its content come back as they were submitted. Reading `userInfo` straight off
+    /// `deliveredNotifications()` is that same assumption, and it is a relied-on pattern.
     ///
-    /// - `attachments`: the system copies the file into its own store and hands back a different
-    ///   `URL`, so a delivered attachment can never compare equal to a freshly built one. The
-    ///   lock-screen test asserts `attachments.count == 0` under Privacy Mode instead.
-    /// - `sound`: not drawn, and `UNNotificationSound` has no documented value equality — two
-    ///   `.default` instances are two objects.
-    /// - `userInfo`: app-private, never rendered, and it carries the schedule's UUID by design; the
-    ///   lock-screen test clears it before archiving for exactly that reason.
+    /// The rule is the narrower one: **compare every field the lock screen draws whose type has
+    /// value equality and whose value the system does not replace with one of its own.** Three
+    /// fields fail it, each for a reason particular to that field, and no one of those reasons
+    /// generalises to another:
     ///
-    /// `badge` **is** compared, and is a `String`-free exception to the "text only" reading of this
-    /// type on purpose: a badge count is the multiplicity disclosure `5265c96` closed for banners,
-    /// one surface over. Nothing sets it today.
+    /// - `attachments`: not a round-trip question but a *value* one. The system copies the file into
+    ///   its own store and hands back a different `URL`, so a delivered attachment can never compare
+    ///   equal to a freshly built one. The lock-screen test asserts `attachments.count == 0` under
+    ///   Privacy Mode instead.
+    /// - `sound`: a *type* question. `UNNotificationSound` has no documented value equality — two
+    ///   `.default` instances are two objects — so comparing it would compare identities. It is not
+    ///   drawn either.
+    /// - `userInfo`: `[AnyHashable: Any]` is not `Equatable` at all, so it could not join an
+    ///   `Equatable` struct without a hand-written comparison; it is app-private, never rendered,
+    ///   and it carries the schedule's UUID by design. The lock-screen test clears it before
+    ///   archiving for exactly that reason.
+    ///
+    /// `threadIdentifier`, `categoryIdentifier` and `badge` pass that test — plain `String` and
+    /// `Int?`, read off the same archived object `title` is read off — so they are in. `81c2fca`
+    /// added them against a real gap: an edit setting `content.threadIdentifier = schedule.category`
+    /// draws the category as the notification group's header, and the comparison could not have seen
+    /// it change. `badge` is in for the same reason one surface over — a badge count is the
+    /// multiplicity disclosure `5265c96` closed for banners.
+    ///
+    /// The cost if the assumption is wrong is worth stating plainly, because it is the failure this
+    /// teardown exists to avoid: a field the system does not return verbatim marks **every**
+    /// delivered banner stale, and the detailed branch is then swept on every `sync` — `73e3b22`'s
+    /// over-sweep. Dropping these three would not buy protection from that, only a smaller share of
+    /// it, because `title`, `subtitle` and `body` carry the identical assumption and cannot be
+    /// dropped without dropping the teardown. So the three stay, and the assumption is stated once,
+    /// here, instead of being half-denied in a list of exclusions.
+    ///
+    /// Nothing sets the three today. That is checked rather than claimed —
+    /// `testTheDeliveredComparisonSeesEveryFieldAScheduleCouldReach` asserts the builder leaves all
+    /// three at their defaults on both branches — so an edit that starts pouring a schedule into one
+    /// of them fails there and is sent back to re-read this.
     ///
     /// None of this is observable from the test host, so what pins it is
     /// `testTheDeliveredComparisonSeesEveryFieldAScheduleCouldReach`, which moves one field at a
