@@ -349,9 +349,40 @@ final class PrivacyRedactionTests: XCTestCase {
                 #"let label = String(format: "%d", items.count)"#, true,
                 "`%d` formats for nobody; `%@` with a formatted number would be the fix"
             ),
+            // Five more spellings of the same two renders. None of them ships — they are here
+            // because "no source spells it that way today" is what the previous two roundings of
+            // this pattern were resting on, and both were wrong within a commit or two.
+            (
+                #"let label = String(format: "%i", items.count)"#, true,
+                "`%i` is `%d` under another name; the alternation accepted `d` and `u` only"
+            ),
+            (
+                #"let label = String(format: "%zd", items.count)"#, true,
+                "`%zd` is what a `count` naturally reaches for, being word-sized"
+            ),
+            (
+                #"let label = String(format: "%D", items.count)"#, true,
+                "`%D` is the Foundation spelling of `%d`, and formats for nobody in the same way"
+            ),
+            (
+                #"let label = String(describing: items.count)"#, true,
+                "`String(describing:)` is the bare conversion with a label — 1234 in every language"
+            ),
+            (
+                #"let label = String(items.count, radix: 10)"#, true,
+                "the same conversion; the pattern wanted the count flush against the closing paren"
+            ),
             (
                 #"let separator = String(repeating: "·", count: 4)"#, false,
                 "a repeat count is an argument label, not something drawn for a reader"
+            ),
+            (
+                #"let text = String(describing: error)"#, false,
+                """
+                `describing:` widened the conversion pattern, so the one call site that uses it — \
+                `MarketDataService.swift:880`, describing an error into a log line — has to stay \
+                exempt. It is not a count and nothing draws it for a reader.
+                """
             ),
             (
                 #"return String(text.dropFirst(tag.count))"#, false,
@@ -454,6 +485,13 @@ final class PrivacyRedactionTests: XCTestCase {
     /// - `String(items.count)` and `String(format: "%d", items.count)`, which carry no literal at
     ///   all and so were invisible to a check written against one.
     ///
+    /// Both halves have now been rounded twice, each time for the same reason: the pattern spelled
+    /// out the shapes that happened to exist rather than the shape of the defect. The conversion
+    /// wanted the count flush against the closing paren, so `String(describing: items.count)` and
+    /// `String(items.count, radix: 10)` walked through; the specifier was the alternation
+    /// `%(?:l{0,2}d|u)`, so `%i`, `%zd` and `%D` walked through. None of the five ships — which is
+    /// precisely the state the previous two roundings were in until somebody wrote one.
+    ///
     /// Split out of the sweep so the checker can be handed sources of its own — see
     /// `testTheEntityCountExemptionIsAnOverloadTestNotAPrefixTest`, which is the only thing that can
     /// hold it, since a broken checker and a clean tree look identical from the sweep's side.
@@ -477,11 +515,17 @@ final class PrivacyRedactionTests: XCTestCase {
         // `String(<something ending in a count>)`, optionally with arithmetic. Deliberately not
         // "any `String(` whose arguments mention a count": `String(text.dropFirst(tag.count))` is a
         // substring conversion, and reporting it would be the same class of mistake as `"\(account)"`.
+        // `describing:` is a conversion like the bare one, and a trailing `, radix: 10` is still a
+        // conversion of the same count — the old pattern wanted the count flush against the closing
+        // paren, so both walked past it.
         let countConversion = try NSRegularExpression(
-            pattern: ##"\bString\(\s*(?:[A-Za-z_][A-Za-z0-9_.]*)?\##(Self.countReference)\s*(?:[-+*/]\s*\d+\s*)?\)"##
+            pattern: ##"\bString\(\s*(?:describing\s*:\s*)?(?:[A-Za-z_][A-Za-z0-9_.]*)?\##(Self.countReference)\s*(?:[-+*/]\s*\d+\s*)?(?:,[^)\n]*)?\)"##
         )
+        // Every integer conversion specifier, not the three that were spelled out. `%i`, `%zd` and
+        // `%D` format an integer for nobody exactly as `%d` does; the old alternation
+        // `%(?:l{0,2}d|u)` accepted `%d`, `%ld`, `%lld` and `%u` and nothing else.
         let countFormat = try NSRegularExpression(
-            pattern: ##"\bString\(\s*format\s*:[^)\n]*%(?:l{0,2}d|u)[^)\n]*\##(Self.countReference)[^)\n]*\)"##
+            pattern: ##"\bString\(\s*format\s*:[^)\n]*%[-+ #0]*\d*(?:h{1,2}|l{1,2}|z|t|j|q)?[diuDU][^)\n]*\##(Self.countReference)[^)\n]*\)"##
         )
 
         // `scan` and `code` are the same characters line for line — `stripped` writes one character
