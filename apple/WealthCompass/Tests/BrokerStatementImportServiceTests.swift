@@ -178,6 +178,60 @@ final class BrokerStatementImportServiceTests: XCTestCase {
         XCTAssertEqual(a.currency, .eur)
     }
 
+    /// The crypto row must take its currency from the price cell, not assume EUR.
+    ///
+    /// The importer hardcoded `.eur` while throwing away the symbol printed right next to the
+    /// number, so a dollar-denominated holding statement produced a EUR holding — the same
+    /// keep-the-number-change-the-meaning failure as an unrepresentable ISO code.
+    func testRevolutCryptoTakesCurrencyFromThePriceCell() throws {
+        let csv = """
+        "Current Accounts Summaries",,,,,,,
+        "Crypto Summaries",,,,,,,
+        "End of Year holding statement",,,,,,,
+        "Description & symbol","Units held","Unit price","Value held",,,,
+        TESTC,2.0,$40.00,$80.00,,,,
+        Total,,,$80.00,,,,
+        """
+        let data = try parse(csv, display: .eur).normalized.data
+        let holding = try XCTUnwrap(data.crypto.first { $0.symbol == "TESTC" })
+        XCTAssertEqual(holding.currency, .usd, "the cell's currency symbol was discarded")
+        XCTAssertEqual(holding.currentPrice, Decimal(string: "40"))
+    }
+
+    /// Re-importing a statement must not erase what only the user knows.
+    ///
+    /// The row carries `avgBuyPrice: 0` and `coinId: ""` because a holding statement has neither,
+    /// and stamps `updatedAt: Date()` so it always wins `mergedByID` — which replaced the record
+    /// wholesale and took the user's cost basis, CoinGecko id, name, fees and creation date with
+    /// it, on every single re-import. What the statement genuinely knows must still update.
+    func testRevolutCryptoReimportKeepsUserEnteredFields() throws {
+        var edited = try XCTUnwrap(try parse(revolutCSV).normalized.data.crypto.first { $0.symbol == "TESTA" })
+        edited.avgBuyPrice = Decimal(string: "0.08")!
+        edited.coinId = "testa-coin"
+        edited.name = "Test Alpha"
+        edited.fees = Decimal(string: "1.25")!
+        edited.createdAt = Date(timeIntervalSince1970: 1_700_000_000)
+        // Pin the user's record firmly in the past so the fresh import unambiguously wins the merge.
+        edited.updatedAt = Date(timeIntervalSince1970: 1_700_000_000)
+        let existing = FinancialData(crypto: [edited])
+
+        let merged = existing.merged(with: try parse(revolutCSV).normalized.data)
+        XCTAssertEqual(merged.crypto.count, 2, "TESTA merged in place, TESTB appended")
+        let holding = try XCTUnwrap(merged.crypto.first { $0.symbol == "TESTA" })
+
+        XCTAssertEqual(holding.avgBuyPrice, Decimal(string: "0.08"), "re-import flattened the cost basis")
+        XCTAssertEqual(holding.coinId, "testa-coin", "re-import erased the CoinGecko id")
+        XCTAssertEqual(holding.name, "Test Alpha", "re-import reverted the name to the ticker")
+        XCTAssertEqual(holding.fees, Decimal(string: "1.25"), "re-import erased the fees")
+        XCTAssertEqual(
+            holding.createdAt, Date(timeIntervalSince1970: 1_700_000_000),
+            "re-import reset the holding's creation date"
+        )
+        // …and the statement still updates the two things it actually carries.
+        XCTAssertEqual(holding.quantity, Decimal(string: "1234.56"))
+        XCTAssertEqual(holding.currentPrice, Decimal(string: "0.10"))
+    }
+
     func testRevolutSkipsUnsupportedCurrencySection() throws {
         // AED isn't in `Currency`; its rows must be skipped, not mislabeled with the EUR section's currency.
         let csv = """

@@ -751,6 +751,25 @@ private enum RevolutStatementCSVParser {
                     continue
                 }
                 let unitPrice = BrokerImportParsing.statementDecimal(cell(row, 2)) ?? 0
+                // The currency is printed right next to the number; hardcoding EUR while throwing
+                // that away turned a dollar-denominated holding into a euro one.
+                let holdingCurrency: Currency
+                switch cellCurrency(cell(row, 2)) ?? cellCurrency(cell(row, 3)) {
+                case .known(let resolved):
+                    holdingCurrency = resolved
+                case .unsupported:
+                    // Priced in a currency this app can't represent — skip rather than relabel, the
+                    // same call `sectionCurrency` makes for an unrepresentable account section.
+                    skipped += 1
+                    continue
+                case nil:
+                    // The cell names no currency at all: fall back to the user's base currency,
+                    // which is what every other importer does for an absent code.
+                    holdingCurrency = context.displayCurrency
+                }
+                // `avgBuyPrice`, `coinId` and `fees` are zero/empty because a holding statement has
+                // none of them — not because they are zero. `mergedByIDKeepingUnstatedFields` is
+                // what stops a re-import reading them as an instruction to erase the user's values.
                 crypto.append(CryptoHolding(
                     id: BrokerImportParsing.deterministicUUID("rev-crypto:\(symbol)"),
                     symbol: symbol,
@@ -758,7 +777,7 @@ private enum RevolutStatementCSVParser {
                     quantity: units,
                     avgBuyPrice: 0,
                     currentPrice: unitPrice,
-                    currency: .eur,
+                    currency: holdingCurrency,
                     fees: 0,
                     coinId: "",
                     updatedAt: Date(),
@@ -775,6 +794,31 @@ private enum RevolutStatementCSVParser {
     private enum SectionCurrency {
         case known(Currency)
         case unsupported
+    }
+
+    /// The currency a money cell is denominated in. Revolut prints either a leading symbol
+    /// (`€0.10`, `£12.34`, `$40.00`) or the ISO code beside the number (`0.00 AED`). Returns nil
+    /// when the cell names no currency at all — the caller then falls back rather than guessing.
+    ///
+    /// `$` is read as USD. The symbol is ambiguous across a dozen currencies, but a statement
+    /// prints the symbol of the account it is denominated in, and Revolut's dollar accounts are USD.
+    private static func cellCurrency(_ raw: String) -> SectionCurrency? {
+        // Only the leading token is the native amount; a "(€…)" parenthetical is the EUR equivalent.
+        let head = raw.split(separator: "(", maxSplits: 1, omittingEmptySubsequences: false).first.map(String.init) ?? raw
+        let letters = head.filter { $0.isLetter && $0.isASCII }
+        if letters.count == 3 {
+            if let resolved = Currency(rawValue: letters.uppercased()) { return .known(resolved) }
+            return .unsupported
+        }
+        for character in head {
+            switch character {
+            case "€": return .known(.eur)
+            case "$": return .known(.usd)
+            case "£": return .known(.gbp)
+            default: continue
+            }
+        }
+        return nil
     }
 
     /// Classifies a section title by its trailing "(XXX)" account-currency code. Any 3-ASCII-letter

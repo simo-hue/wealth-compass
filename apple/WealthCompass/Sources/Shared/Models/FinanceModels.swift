@@ -699,6 +699,51 @@ extension Array where Element: MergeableRecord {
     }
 }
 
+extension Array where Element == CryptoHolding {
+    /// `mergedByID`, except an incoming row never blanks a field it does not carry.
+    ///
+    /// A broker holding statement knows a symbol, a quantity and a unit price, and nothing else —
+    /// so the rows `BrokerStatementImportService` builds carry `avgBuyPrice: 0`, `coinId: ""`,
+    /// `fees: 0` and a fresh `createdAt`. None of those mean "the user's value is zero"; they mean
+    /// "this file has no such value in it". Under wholesale replacement each re-import erased the
+    /// cost basis and the CoinGecko id the user had typed, taking the holding's gain/loss and its
+    /// ability to fetch its own price with them — and because the row also stamps `updatedAt` with
+    /// the moment of import, the fresh record won that merge every single time.
+    ///
+    /// Only the merge import goes through here. `replace` still overwrites, which is what it is for.
+    func mergedByIDKeepingUnstatedFields(with incoming: [CryptoHolding]) -> [CryptoHolding] {
+        var merged = self
+        for item in incoming {
+            guard let index = merged.firstIndex(where: { $0.id == item.id }) else {
+                merged.append(item)
+                continue
+            }
+            guard item.updatedAt > merged[index].updatedAt else { continue }
+            merged[index] = item.keepingUnstatedFields(of: merged[index])
+        }
+        return merged
+    }
+}
+
+extension CryptoHolding {
+    /// Fills the fields an incoming record leaves unstated from the record it is replacing.
+    /// `quantity`, `currentPrice` and `currency` are deliberately absent: those are exactly what a
+    /// statement does know, and a re-import is supposed to update them.
+    func keepingUnstatedFields(of existing: CryptoHolding) -> CryptoHolding {
+        var result = self
+        if result.avgBuyPrice == 0 { result.avgBuyPrice = existing.avgBuyPrice }
+        if result.coinId.isEmpty { result.coinId = existing.coinId }
+        if result.fees == 0 { result.fees = existing.fees }
+        if result.feeMode == nil { result.feeMode = existing.feeMode }
+        if result.feeInput == nil { result.feeInput = existing.feeInput }
+        // A name identical to the ticker is the importer's placeholder, not information.
+        if result.name == result.symbol { result.name = existing.name }
+        // The holding was created when it was created; the earlier of the two is the true instant.
+        result.createdAt = Swift.min(result.createdAt, existing.createdAt)
+        return result
+    }
+}
+
 extension Array where Element == NetWorthSnapshot {
     /// Collapses to at most one snapshot per calendar day (deep-audit H14). The app keeps a single
     /// snapshot per day (`SnapshotEngine.appendingSnapshot` upserts same-day), so two same-day rows
@@ -742,7 +787,7 @@ extension FinancialData {
             transactions: transactions.mergedByID(with: incoming.transactions),
             recurringTransactions: recurringTransactions.mergedByID(with: incoming.recurringTransactions),
             investments: investments.mergedByID(with: incoming.investments),
-            crypto: crypto.mergedByID(with: incoming.crypto),
+            crypto: crypto.mergedByIDKeepingUnstatedFields(with: incoming.crypto),
             liabilities: liabilities.mergedByID(with: incoming.liabilities),
             snapshots: snapshots.mergedByID(with: incoming.snapshots)
         )
