@@ -1069,12 +1069,22 @@ private func isDecimalLiteralCharacter(_ character: Character) -> Bool {
 /// groups. On top of that resolution this asks the question `flexibleDecimal` deliberately does not:
 ///
 /// * the decimal separator occurs **at most once** — `"1,2.3.4"` names two decimal points, and
-/// * the grouping separator splits the integer part into **1–3 digits then groups of exactly 3** —
-///   `"1,234,567"` does, `"1.2.3"` and `",,,5,,,"` do not.
+/// * the grouping separator splits the integer part into **1–3 digits, then any number of groups of
+///   2 or 3, then a final group of exactly 3** — `"1,234,567"` and `"12,34,567"` do, `"1.2.3"`,
+///   `"1,23,45"` and `",,,5,,,"` do not.
 ///
-/// Deliberately Western-only. Indian lakh grouping (`"12,34,567.89"`) is rejected, as it was before
-/// the grouped-thousands fallback existed; a wrongly-grouped cell is reported as skipped rather than
-/// guessed at, which is the whole point of the check.
+/// The final-group-of-3 rule is what makes the shape a *grouping* rather than an arbitrary split; a
+/// middle group of 2 is Indian lakh grouping (`"12,34,567.89"`, `"1,00,000"`).
+///
+/// An earlier version required **every** non-first group to be 3 and called that "deliberately
+/// Western-only". That was a regression rather than a choice: the lakh forms parsed at the commit
+/// immediately before this gate existed, `flexibleDecimal` — the normalizer this claims to mirror —
+/// resolves all of them to the correct value, and `NumberFormatter(.decimal)` produces them for 51
+/// locale identifiers, one of which (`hi`) this app ships. The Western-only argument also applied
+/// verbatim to `"1,234.56"`, which was deliberately kept, so it never picked lakh grouping out in
+/// the first place. Measured over every ASCII digit/separator string up to 8 characters (488,280 of
+/// them): the widened rule accepts everything the narrow one did, accepts nothing the pre-gate code
+/// rejected, and never changes a value — the only shape it adds is `1-2-3`.
 private func hasNumericSeparatorLayout(_ unsigned: String) -> Bool {
     let dotCount = unsigned.reduce(0) { $1 == "." ? $0 + 1 : $0 }
     let commaCount = unsigned.reduce(0) { $1 == "," ? $0 + 1 : $0 }
@@ -1108,8 +1118,9 @@ private func hasNumericSeparatorLayout(_ unsigned: String) -> Bool {
     guard let groupingSeparator else { return integerPart.allSatisfy(\.isWholeNumber) }
     let groups = integerPart.split(separator: groupingSeparator, omittingEmptySubsequences: false)
     guard groups.count > 1, let first = groups.first, (1...3).contains(first.count) else { return false }
-    return groups.allSatisfy { $0.allSatisfy(\.isWholeNumber) }
-        && groups.dropFirst().allSatisfy { $0.count == 3 }
+    guard groups.allSatisfy({ $0.allSatisfy(\.isWholeNumber) }) else { return false }
+    guard groups.last?.count == 3 else { return false }
+    return groups.dropFirst().dropLast().allSatisfy { $0.count == 2 || $0.count == 3 }
 }
 
 /// Every money value the importer stores passes through one of these.

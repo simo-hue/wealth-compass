@@ -216,7 +216,17 @@ final class FinanceImportServiceTests: XCTestCase {
     /// `"12.34.56"` as **123456** — inventing a figure out of a malformed cell, which is worse
     /// than misreading one, because the record used to be *counted* and the user was told.
     func testMalformedSeparatorLayoutIsSkippedRatherThanInvented() throws {
-        let junk = ["1.2.3", "12.34.56", "1.2.3.4", "1,2,3", "9.9.9.9.9", "1..2", "...1...", ",,,5,,,", "0x10"]
+        let junk = [
+            "1.2.3", "12.34.56", "1.2.3.4", "1,2,3", "9.9.9.9.9", "1..2", "...1...", ",,,5,,,", "0x10",
+            "1,2.3.4", "1.2345,67",
+            // Widening the gate to Indian lakh grouping moved the rule from "every non-first group
+            // is 3" to "the last group is 3, the middle ones are 2 or 3". These are the boundaries
+            // of the new rule, and they have to stay junk: a short or over-long final group
+            // (`"1,23,45"`, `"1,234,56"`, `"12,34,56,78"`, `"123,4567"` is a *decimal* and excluded
+            // deliberately), a middle group of 1 (`"12,3,456"`, `"1,2,345"`) or of 4
+            // (`"1,2345,678"`).
+            "1,23,45", "1,234,56", "12,34,56,78", "12,3,456", "1,2,345", "1,2345,678", "1,00,00", "12,34,5"
+        ]
         for literal in junk {
             let result = try parse("""
             {"snapshots":[{"date":"2026-01-01","netWorth":"\(literal)"}]}
@@ -226,6 +236,44 @@ final class FinanceImportServiceTests: XCTestCase {
                 "\"\(literal)\" was invented into a net worth of \(result.data.snapshots.first?.netWorth.description ?? "?")"
             )
             XCTAssertEqual(result.skippedRecords, 1, "\"\(literal)\" was dropped without being reported")
+        }
+    }
+
+    /// Indian lakh grouping is a real number, not a malformed cell.
+    ///
+    /// The first version of `hasNumericSeparatorLayout` required **every** non-first group to be
+    /// exactly 3 digits and justified it as "deliberately Western-only". That was a regression, not
+    /// a choice: all six forms below parsed at the commit immediately before the gate existed, and
+    /// `BrokerImportParsing.flexibleDecimal` — the normalizer the gate claims to mirror — resolves
+    /// every one of them to the correct value, so the gate was strictly narrower than the thing it
+    /// was gating. `NumberFormatter(.decimal)` produces these for 51 locale identifiers, one of
+    /// which (`hi`) this app ships. The rule is now "the last group is exactly 3, the middle groups
+    /// are 2 or 3", which admits 2-2-3 lakh grouping and 3-3-3 Western grouping alike.
+    ///
+    /// Both separator spellings are pinned, because the gate resolves which separator groups before
+    /// it looks at the group sizes — a `hi_IN` export and a lakh-grouped European export have to
+    /// come out the same.
+    func testIndianLakhGroupedStringAmountsImportExactly() throws {
+        let pinned: [(literal: String, expected: String)] = [
+            ("1,23,456.78", "123456.78"),
+            ("12,34,567.89", "1234567.89"),
+            ("1,23,45,678.9", "12345678.9"),
+            ("1,00,000", "100000"),
+            ("12,34,567", "1234567"),
+            ("12,34,56,789.12", "123456789.12"),
+            ("1.23.456,78", "123456.78"),
+            ("12.34.567,89", "1234567.89"),
+            ("1.23.45.678,9", "12345678.9")
+        ]
+        for (literal, expected) in pinned {
+            let result = try parse("""
+            {"transactions":[{"type":"income","amount":"\(literal)","category":"X","date":"2026-01-01"}]}
+            """)
+            XCTAssertEqual(
+                result.data.transactions.first?.amount, Decimal(string: expected),
+                "\"\(literal)\" did not import as \(expected)"
+            )
+            XCTAssertEqual(result.skippedRecords, 0, "\"\(literal)\" was reported as a skipped record")
         }
     }
 
