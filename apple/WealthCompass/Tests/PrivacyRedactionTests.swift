@@ -3130,6 +3130,161 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    /// Fails if a coalesced identifier is a calendar *rendering* of the fire moment rather than the
+    /// moment itself.
+    ///
+    /// The identifier used to stamp `due-<Y-M-D-H-M>` and read it back with
+    /// `Calendar.current.date(from:)` — the calendar and time zone **at read time**, not the ones
+    /// that wrote it. A string that has to be interpreted by a calendar names different instants to
+    /// different readers, and both consequences were measured with a probe replicating the two
+    /// functions verbatim:
+    ///
+    /// - `due-2026-9-1-9-0` stamped in Tokyo names 2026-09-01T00:00Z; read in London the same string
+    ///   names 2026-09-01T08:00Z. Thirty seconds after the banner fires, `moment <= now` flips from
+    ///   true to false and `staleDelivered` takes down a banner that has just arrived — `81c2fca`'s
+    ///   thirty-second take-down, back again while travelling. Up to ±26 h across the offset range.
+    /// - Under a Chinese `Calendar.current` a leap month and the ordinary month of the same number
+    ///   render to the same five numbers, so two schedules a leap month apart collided in
+    ///   `posted.insert(identifier)` and the second reminder was never posted at all.
+    ///
+    /// Neither is reachable from this host — `Calendar.current` is what it is, and there is no
+    /// supported way to make the test bundle read another one — so what is asserted here is the
+    /// property that makes both impossible rather than either symptom: **the stamp is a number of
+    /// seconds, so reading it consults no calendar.** A reader with no calendar cannot disagree with
+    /// the writer, and two distinct instants cannot share a stamp.
+    ///
+    /// The last block is the mechanism the leap-month half leans on, pinned because it is Foundation
+    /// behaviour this code depends on silently: `dateComponents(_:from:)` fills in `isLeapMonth`
+    /// even though `fireComponents` does not ask for it, and `date(from:)` honours it. That is what
+    /// makes the *moment* distinct in the case where the five numbers are not.
+    func testACoalescedIdentifierNamesAnInstantRatherThanACalendarRendering() throws {
+        let calendar = Calendar.current
+        let prefix = Self.reminderIdentifierPrefix
+        let marker = "\(prefix)due-"
+
+        func schedule(_ category: String, dueAt due: Date) -> RecurringTransaction {
+            RecurringTransaction(
+                type: .expense, category: category, amount: 1_450, description: category,
+                startDate: due, frequency: .monthly, nextDueDate: due, endDate: nil, currency: .eur
+            )
+        }
+        func identifiers(_ schedules: [RecurringTransaction]) -> [String] {
+            RecurringNotificationService.requests(
+                for: schedules,
+                convertedAmounts: [:],
+                currencyCode: "EUR",
+                showDetails: false,
+                appLanguage: nil,
+                identifierPrefix: prefix
+            ).map(\.identifier)
+        }
+
+        let due = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2026, month: 9, day: 1, hour: 9, minute: 0))
+        )
+        // The instant the trigger fires, built the way the service builds it. `fireComponents` is
+        // what carries WC-L5's 00:00 → 09:00 pin, so the moment has to come through it.
+        let fireInstant = try XCTUnwrap(
+            calendar.date(from: RecurringNotificationService.fireComponents(for: due))
+        )
+
+        let identifier = try XCTUnwrap(identifiers([schedule("Rent", dueAt: due)]).first)
+        let stamp = String(identifier.dropFirst(marker.count))
+        XCTAssertTrue(identifier.hasPrefix(marker), "\(identifier) is not a coalesced identifier")
+        XCTAssertEqual(
+            stamp, String(Int(fireInstant.timeIntervalSinceReferenceDate.rounded())),
+            """
+            The coalesced identifier stamps \"\(stamp)\" where the fire instant is \
+            \(fireInstant.timeIntervalSinceReferenceDate) seconds after the reference date. A stamp \
+            that is not the instant is a rendering of it, and a rendering has to be read back \
+            through a calendar — the calendar the reader happens to have, which is how the same \
+            string came to name 00:00Z in Tokyo and 08:00Z in London.
+            """
+        )
+        XCTAssertNotNil(
+            Int(stamp),
+            """
+            The stamp \"\(stamp)\" does not read as a whole number of seconds, so something has to \
+            interpret it. Whatever does the interpreting is a time zone and a calendar the writer \
+            did not choose.
+            """
+        )
+
+        // Coalescing is the property the stamp exists to provide, and it has to survive the change:
+        // same moment, one banner; different moments, two.
+        let together = identifiers([schedule("Rent", dueAt: due), schedule("Gym", dueAt: due)])
+        XCTAssertEqual(
+            together.count, 1, "two schedules due at the same moment stopped sharing one banner"
+        )
+        let apart = identifiers([
+            schedule("Rent", dueAt: due),
+            schedule("Gym", dueAt: due.addingTimeInterval(3_600)),
+        ])
+        XCTAssertEqual(
+            Set(apart).count, 2, "two schedules due an hour apart collapsed into one banner"
+        )
+
+        // Migration. Banners delivered under the old form are on lock screens now and their
+        // identifiers cannot be rewritten, so the reader still has to understand one — an old stamp
+        // that fails to parse would be judged stale and swept, which would make the upgrade itself
+        // take down the unread Privacy Mode banners this teardown exists to spare.
+        let legacy = RecurringNotificationService.DeliveredReminder(
+            identifier: "\(marker)2020-6-15-9-0",
+            title: AppLocalization.string("Reminder", appLanguage: nil),
+            body: AppLocalization.string("Open Wealth Compass Tracker to review.", appLanguage: nil)
+        )
+        XCTAssertEqual(
+            RecurringNotificationService.staleDelivered(
+                [legacy],
+                schedules: [],
+                convertedAmounts: [:],
+                currencyCode: "EUR",
+                showDetails: false,
+                appLanguage: nil,
+                identifierPrefix: prefix
+            ),
+            [],
+            """
+            A spent banner stamped under the superseded `<Y-M-D-H-M>` form was swept. Those banners \
+            exist on real lock screens and cannot be re-identified, so the reader has to keep \
+            understanding the old form until they age out.
+            """
+        )
+
+        // Why the leap-month collision is gone: the components already carry the distinction, so
+        // resolving them to an instant keeps it even though the five stamped numbers did not.
+        var chinese = Calendar(identifier: .chinese)
+        chinese.timeZone = try XCTUnwrap(TimeZone(identifier: "Asia/Shanghai"))
+        var ordinary = DateComponents()
+        ordinary.era = 78
+        ordinary.year = 42
+        ordinary.month = 6
+        ordinary.day = 8
+        ordinary.hour = 9
+        ordinary.minute = 0
+        ordinary.isLeapMonth = false
+        var leapMonth = ordinary
+        leapMonth.isLeapMonth = true
+        let ordinaryDate = try XCTUnwrap(chinese.date(from: ordinary))
+        let leapDate = try XCTUnwrap(chinese.date(from: leapMonth))
+        XCTAssertNotEqual(ordinaryDate, leapDate, "the fixture is not a leap-month pair")
+        // Exactly the field set `fireComponents` asks for — and `isLeapMonth` comes back anyway.
+        let fields: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+        for (name, date) in [("ordinary", ordinaryDate), ("leap", leapDate)] {
+            let components = chinese.dateComponents(fields, from: date)
+            XCTAssertEqual(
+                chinese.date(from: components), date,
+                """
+                A \(name) Chinese-calendar date did not survive the round trip through the field \
+                set `fireComponents` extracts. The coalesced identifier is the resolved instant, so \
+                if that round trip stops being exact the leap-month collision comes back — two \
+                schedules a leap month apart sharing one identifier, and the second reminder never \
+                posted.
+                """
+            )
+        }
+    }
+
     /// Fails if a field the lock screen draws can move without the teardown noticing.
     ///
     /// `DeliveredReminder` decides whether a delivered banner still matches what the app would

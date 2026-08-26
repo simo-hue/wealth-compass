@@ -163,7 +163,9 @@ actor RecurringNotificationService {
         var coalesced: [UNNotificationRequest] = []
         for schedule in ordered {
             let due = fireComponents(for: schedule.nextDueDate)
-            let identifier = coalescedIdentifier(dueAt: due, prefix: identifierPrefix)
+            let identifier = coalescedIdentifier(
+                at: fireMoment(for: schedule.nextDueDate), prefix: identifierPrefix
+            )
             guard posted.insert(identifier).inserted else { continue }
             coalesced.append(coalescedRequest(
                 dueAt: due, identifier: identifier, appLanguage: appLanguage
@@ -316,7 +318,7 @@ actor RecurringNotificationService {
     /// indistinguishable from an accurate one and survives. On the hidden branch it did **not**, and
     /// the difference was a live bug rather than a wrinkle. The coalesced identifier is derived from
     /// the fire moment, so advancing `nextDueDate` renames it: nothing rebuilds
-    /// `<prefix>due-<Y-M-D-H-M>` any more, the banner reads as one nothing stands behind, and the
+    /// `<prefix>due-<moment>` any more, the banner reads as one nothing stands behind, and the
     /// app takes down an unread reminder about thirty seconds after it fired — via the timer, or at
     /// once through `didReceive` → `.recurringTransactionNotificationReceived`. And the advance is
     /// not an edge: it is what the 30-second timer does to every schedule the moment it comes due.
@@ -572,23 +574,69 @@ actor RecurringNotificationService {
         return components
     }
 
-    /// The identifier a coalesced reminder is filed under: the fire time, not a schedule.
+    /// The instant a reminder for `dueDate` fires: `fireComponents` resolved against the calendar
+    /// and time zone in force **now**, which is what `UNCalendarNotificationTrigger` will match.
+    ///
+    /// Resolving through the components rather than adjusting the date is what carries WC-L5's
+    /// 00:00 → 09:00 pin, and it is also what keeps this in step with the trigger: the same
+    /// components produce both, so the identifier can never name a moment the banner does not fire
+    /// at. The components already distinguish everything the calendar distinguishes —
+    /// `Calendar.dateComponents` fills in `isLeapMonth` whether or not it is asked for, and
+    /// `date(from:)` honours it — so this separates a Chinese leap month from the ordinary month of
+    /// the same number, which the *stamp* below could not.
+    ///
+    /// `?? dueDate` rather than a constant: an unresolvable component set must still give distinct
+    /// schedules distinct moments, or the coalescing would collapse them into one banner.
+    nonisolated static func fireMoment(for dueDate: Date) -> Date {
+        Calendar.current.date(from: fireComponents(for: dueDate)) ?? dueDate
+    }
+
+    /// The identifier a coalesced reminder is filed under: the fire **moment**, not a schedule and
+    /// not a rendering of one.
     ///
     /// A pure function of the moment, so re-running `sync` over an unchanged schedule set produces
     /// the same request set. `due-` cannot collide with the per-schedule form, which is a UUID
     /// string.
-    private nonisolated static func coalescedIdentifier(dueAt due: DateComponents, prefix: String) -> String {
-        let stamp = Self.coalescedStampFields
-            .map { due[keyPath: $0].map(String.init) ?? "x" }
-            .joined(separator: "-")
-        return "\(prefix)due-\(stamp)"
+    ///
+    /// The stamp used to be `<Y-M-D-H-M>`, read back with `Calendar.current.date(from:)` — the
+    /// calendar and time zone **at read time**, not the ones that wrote it. That made the
+    /// identifier a *calendar rendering* of an instant, and a rendering means different instants to
+    /// different readers:
+    ///
+    /// - **A time-zone change moved it by the offset difference, up to ±26 h.** Measured with a
+    ///   probe replicating both functions verbatim: `due-2026-9-1-9-0` stamped in Tokyo names
+    ///   2026-09-01T00:00Z, and read in London the same string names 2026-09-01T08:00Z. Against a
+    ///   `now` thirty seconds after the banner fired, `moment <= now` flips from true to false and
+    ///   `staleDelivered` takes down a banner that had just arrived — the thirty-second take-down
+    ///   `81c2fca` fixed, back again while travelling.
+    /// - **Under a Chinese `Calendar.current` it lost a reminder outright.** A leap-month date and
+    ///   the ordinary month of the same number render to the *same* five numbers, because
+    ///   `isLeapMonth` was not among the fields stamped. Two schedules a leap month apart therefore
+    ///   collided in `posted.insert(identifier)` and the second was never posted. (Measured and not
+    ///   affected: japanese, buddhist, roc, islamic-umalqura, hebrew, persian, coptic and indian all
+    ///   round-trip exactly.)
+    ///
+    /// So the stamp is now the instant itself — whole seconds since the reference date — and the
+    /// reader parses it with **no calendar at all**. There is nothing left for a reader's locale to
+    /// disagree with. The coalescing property is unchanged and for the same reason it always held:
+    /// two schedules due at the same moment produce the same `fireMoment` and therefore the same
+    /// string, and `fireComponents`' minute resolution is what makes "the same moment" the right
+    /// grain.
+    ///
+    /// What this does *not* fix: the trigger is a wall-clock rule, so a device that changes time
+    /// zone between the last `sync` and the fire delivers the banner at a different instant than the
+    /// one stamped. In practice `sync` re-stamps the whole pending set on the 30-second timer and on
+    /// every data change, so the stamp a *delivered* banner carries is the instant it actually fired
+    /// unless the app never ran between the change and the fire. Bounded by the offset difference,
+    /// and in the same direction as the DST fall-back drift that was always here.
+    private nonisolated static func coalescedIdentifier(at moment: Date, prefix: String) -> String {
+        "\(prefix)due-\(Int(moment.timeIntervalSinceReferenceDate.rounded()))"
     }
 
     /// The moment a coalesced identifier names, or `nil` if it does not name one.
     ///
-    /// The inverse of `coalescedIdentifier(dueAt:prefix:)`, written next to it and over the same
-    /// field list so the two cannot drift. Both stay `private`: what a test can reach is the
-    /// verdict `staleDelivered` reaches with them, and
+    /// The inverse of `coalescedIdentifier(at:prefix:)`, written next to it. Both stay `private`:
+    /// what a test can reach is the verdict `staleDelivered` reaches with them, and
     /// `testASpentPrivacyModeBannerSurvivesItsScheduleAdvancing` exercises the round trip that way —
     /// a past moment is kept, the same moment in the future is not, and a `due-` identifier whose
     /// stamp does not parse is not.
@@ -596,25 +644,39 @@ actor RecurringNotificationService {
     /// `staleDelivered` needs this because *spent* is the only thing that separates a schedule
     /// advancing past its due moment from a schedule being deleted: neither leaves a live schedule
     /// at that moment, and the identifier is the only place the moment survives. Anything that does
-    /// not parse cleanly — a foreign identifier, a per-schedule UUID, a component written as `x`
-    /// because `fireComponents` handed back a nil — returns `nil` and is judged the old way, which
-    /// is the conservative direction.
+    /// not parse cleanly — a foreign identifier, a per-schedule UUID, a stamp that is not a number —
+    /// returns `nil` and is judged the old way, which is the conservative direction.
+    ///
+    /// **The `<Y-M-D-H-M>` branch is migration and nothing else.** Nothing writes that form any
+    /// more, but banners delivered under it are on lock screens right now, and the identifier of a
+    /// delivered banner cannot be rewritten. Dropping the branch would make every one of them
+    /// unparsable, and an unparsable `due-` identifier is judged stale and taken down — so the
+    /// upgrade itself would sweep the very unread Privacy Mode banners this teardown exists to
+    /// spare. Read the old form the old way instead: for a banner stamped under the old scheme that
+    /// is exactly the behaviour it was stamped for, drift and all, so no banner is worse off than it
+    /// is today and none is orphaned into never being torn down. The branch dies out on its own, as
+    /// the banners behind it are swiped or superseded; the two forms cannot be confused, because a
+    /// seconds stamp never splits into five fields and five fields never parse as one `Int`.
     private nonisolated static func coalescedMoment(of identifier: String, prefix: String) -> Date? {
         let marker = "\(prefix)due-"
         guard identifier.hasPrefix(marker) else { return nil }
-        let stamp = identifier.dropFirst(marker.count).split(separator: "-", omittingEmptySubsequences: false)
-        guard stamp.count == Self.coalescedStampFields.count else { return nil }
+        let stamp = identifier.dropFirst(marker.count)
+        if let seconds = Int(stamp) {
+            return Date(timeIntervalSinceReferenceDate: TimeInterval(seconds))
+        }
+        let fields = stamp.split(separator: "-", omittingEmptySubsequences: false)
+        guard fields.count == Self.legacyStampFields.count else { return nil }
         var components = DateComponents()
-        for (field, text) in zip(Self.coalescedStampFields, stamp) {
+        for (field, text) in zip(Self.legacyStampFields, fields) {
             guard let value = Int(text) else { return nil }
             components[keyPath: field] = value
         }
         return Calendar.current.date(from: components)
     }
 
-    /// The date components a coalesced identifier stamps, in the order it stamps them. One list,
-    /// read by the writer and the reader, so neither can gain or lose a field alone.
-    private nonisolated static let coalescedStampFields: [WritableKeyPath<DateComponents, Int?>] = [
+    /// The date components the **superseded** identifier form stamped, in the order it stamped them.
+    /// Read only by `coalescedMoment`'s migration branch; nothing writes this shape any more.
+    private nonisolated static let legacyStampFields: [WritableKeyPath<DateComponents, Int?>] = [
         \.year, \.month, \.day, \.hour, \.minute,
     ]
 
