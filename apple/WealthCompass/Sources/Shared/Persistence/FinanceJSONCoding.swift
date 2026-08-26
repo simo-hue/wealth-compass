@@ -136,8 +136,16 @@ enum FinanceJSONCoding {
         ("snapshots", .snapshot)
     ]
 
-    /// Encodes `data`, then splices back — verbatim — the records in `existing` that the matching
-    /// load had to skip (deep-audit H08).
+    /// Encodes `data`, then splices back the records in `existing` that the matching load had to
+    /// skip (deep-audit H08).
+    ///
+    /// The splice preserves the record's **value**, not its bytes — an earlier version of this
+    /// comment said "verbatim", which overstates it. Measured: exact to 38 significant digits and
+    /// silently rounding at 39+; trailing zeros normalize (`2.50` → `2.5`, `-0.0` → `0`); `1e2`
+    /// becomes `100`; a duplicate JSON key collapses to the **first** occurrence; and `\/` becomes
+    /// `/`. Nothing this app stores is near any of those edges, and the point of H08 is to keep a
+    /// record readable by a future build rather than to reproduce a byte stream — but a future
+    /// reader should not have to discover the difference.
     ///
     /// `load()` refuses to rewrite the file when anything was skipped, so an undecodable record
     /// survives on disk for a future build that can read it. `save` writing the lossy in-memory
@@ -183,7 +191,7 @@ enum FinanceJSONCoding {
             root[key] = .array(elements)
         }
         guard changed else { return encoded }
-        return try jsonValueEncoder.encode(JSONValue.object(root))
+        return try jsonValueFileEncoder.encode(JSONValue.object(root))
     }
 
     // WC-M4: cache the ISO-8601 formatters instead of allocating one per date value.
@@ -372,6 +380,23 @@ enum FinanceJSONCoding {
     private static let jsonValueEncoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }()
+
+    /// The same encoder for the one path whose output lands on disk **as written**.
+    ///
+    /// `encodeFinancialData(_:preserving:from:)` is the only `JSONValue` rewrite that becomes the
+    /// database file verbatim; ordinary saves go through `encode(_:prettyPrinted: true)`, so
+    /// without this the first save after a skipped-record load collapsed the whole file to one
+    /// line and it sprang back to pretty as soon as the record became decodable. Valid JSON either
+    /// way and the app never noticed, but the file is user-inspectable and the flapping reads like
+    /// corruption.
+    ///
+    /// `migrateLegacyFinancialDataJSON` deliberately keeps the compact encoder: its output is an
+    /// intermediate that is decoded and then re-encoded by `write(_:)`, so it never reaches disk.
+    private static let jsonValueFileEncoder: JSONEncoder = {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         return encoder
     }()
 }
