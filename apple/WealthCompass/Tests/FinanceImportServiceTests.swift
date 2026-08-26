@@ -155,9 +155,67 @@ final class FinanceImportServiceTests: XCTestCase {
     }
 
     func testCommaDecimalAmountIsParsed() throws {
-        // The parser swaps "," for "." (decimal comma); it does NOT strip thousands separators.
+        // A lone "," is the decimal separator. Exact, not approximate — the `accuracy:` form this
+        // assertion used to carry would have passed on a value that had round-tripped through
+        // `Double`, which is the whole thing WC-A1 exists to prevent.
         let result = try parse(#"{"transactions":[{"type":"expense","amount":"1234,56","category":"Rent","date":"2026-06-03"}]}"#)
-        XCTAssertEqual((result.data.transactions.first?.amount ?? 0).doubleValue, 1234.56, accuracy: 0.001)
+        XCTAssertEqual(result.data.transactions.first?.amount, Decimal(string: "1234.56"))
+    }
+
+    /// A grouped-thousands amount must not make the record vanish.
+    ///
+    /// The old normalizer swapped *every* "," for "." before gating on `Double`, so an English
+    /// `"1,234.56"` and a European `"1.234,56"` both became `"1.234.56"`, both failed the gate,
+    /// and the field decoded to `nil` — which drops the entire transaction. The two spellings are
+    /// the same amount and must import as the same exact `Decimal`.
+    func testGroupedThousandsStringAmountsSurviveAndAgree() throws {
+        for literal in ["1,234.56", "1.234,56"] {
+            let result = try parse("""
+            {"transactions":[{"type":"income","amount":"\(literal)","category":"X","date":"2026-01-01"}]}
+            """)
+            XCTAssertEqual(result.data.transactions.count, 1, "\(literal) dropped the whole record")
+            XCTAssertEqual(
+                result.data.transactions.first?.amount, Decimal(string: "1234.56"),
+                "\(literal) did not import as 1234.56"
+            )
+        }
+        // Repeated groups with no fractional part: both spellings still agree.
+        for literal in ["1,234,567", "1.234.567"] {
+            let result = try parse("""
+            {"transactions":[{"type":"income","amount":"\(literal)","category":"X","date":"2026-01-01"}]}
+            """)
+            XCTAssertEqual(
+                result.data.transactions.first?.amount, Decimal(string: "1234567"),
+                "\(literal) did not import as 1234567"
+            )
+        }
+    }
+
+    /// The forms the grouped-thousands fix must leave exactly as they were.
+    ///
+    /// * A bare `"1,234"` stays **1.234**. It is genuinely ambiguous (1234 in en-US, 1.234 in
+    ///   de-DE) and the whole codebase resolves a lone separator as a decimal point — see
+    ///   `BrokerImportParsing.flexibleDecimal`, which the fallback below reuses. Reading it as
+    ///   1234 instead would turn every ISO `"1.234"` share quantity in the Trade Republic export
+    ///   into 1234, i.e. trade one 1000x error for another in a path that is currently correct.
+    /// * Exponent notation keeps working. JavaScript's `String(0.0000001)` is `"1e-7"`, so a web
+    ///   backup really can carry it, and a last-separator-wins normalizer would read it as 17.
+    func testAmbiguousAndExponentStringAmountsKeepTheirExistingMeaning() throws {
+        let pinned: [(literal: String, expected: String)] = [
+            ("1,234", "1.234"),
+            ("1.234", "1.234"),
+            ("1e-7", "0.0000001"),
+            ("2.5e3", "2500")
+        ]
+        for (literal, expected) in pinned {
+            let result = try parse("""
+            {"transactions":[{"type":"income","amount":"\(literal)","category":"X","date":"2026-01-01"}]}
+            """)
+            XCTAssertEqual(
+                result.data.transactions.first?.amount, Decimal(string: expected),
+                "\(literal) no longer imports as \(expected)"
+            )
+        }
     }
 
     func testMultipleDateFormatsBothParse() throws {

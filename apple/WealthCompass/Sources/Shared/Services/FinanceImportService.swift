@@ -957,15 +957,36 @@ private extension KeyedDecodingContainer {
         }
 
         if let value = try? decode(String.self, forKey: key) {
-            let normalized = value
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .replacingOccurrences(of: ",", with: ".")
+            let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            let normalized = trimmed.replacingOccurrences(of: ",", with: ".")
             // Gate on `Double` to keep acceptance exactly as it was — `Decimal(string:)` is more
             // permissive about trailing junk — but take the value from `Decimal` so it stays exact.
+            // This form stays first because it is the only one that reads exponent notation, which
+            // a web backup really can carry: JavaScript's `String(0.0000001)` is `"1e-7"`, and a
+            // separator-based normalizer would strip the `e` and read that as 17.
             if Double(normalized) != nil,
                let parsed = Decimal(string: normalized, locale: Locale(identifier: "en_US_POSIX")) {
                 return parsed.finiteImportedAmount
             }
+            // Grouped thousands — the case the form above cannot express, and used to *drop*.
+            // Swapping every "," for "." turned an English "1,234.56" and a European "1.234,56"
+            // alike into "1.234.56", which fails the gate, so the field decoded to nil and the
+            // whole record went with it. `BrokerImportParsing.flexibleDecimal` is this codebase's
+            // one last-separator-wins normalizer (it already backs the Trade Republic and Revolut
+            // parsers); reused rather than written a second time, because two normalizers that
+            // disagree is how this class of bug comes back.
+            //
+            // Restricted to a bare number — optional leading sign, then ASCII digits and
+            // separators only — because `flexibleDecimal` discards every other character, and
+            // widening this decoder that far would read a stray "2026-01-01" in an amount field
+            // as 2026 rather than skipping the record.
+            let unsigned = (trimmed.hasPrefix("-") || trimmed.hasPrefix("+")) ? String(trimmed.dropFirst()) : trimmed
+            guard !unsigned.isEmpty,
+                  unsigned.allSatisfy({ $0.isASCII && ($0.isWholeNumber || $0 == "." || $0 == ",") })
+            else {
+                return nil
+            }
+            return BrokerImportParsing.flexibleDecimal(trimmed)?.finiteImportedAmount
         }
 
         return nil
