@@ -154,10 +154,21 @@ final class FinanceImportServiceTests: XCTestCase {
         XCTAssertEqual(result.data.transactions.first?.amount, 2000)
     }
 
+    /// A lone `","` is the decimal separator — with one exception that this literal deliberately
+    /// sits outside of.
+    ///
+    /// The comment here used to read, flatly, "a lone ',' is the decimal separator". That is no
+    /// longer the whole rule: in a **money** field a lone separator followed by *exactly three*
+    /// digits now groups thousands, so `"1,000"` is 1000 (see
+    /// `testLoneSeparatorWithThreeDigitsIsThousandsInMoneyFields`). `"1234,56"` has two digits
+    /// after the separator, so it is untouched by that rule and still means 1234.56 — which is why
+    /// this test keeps its literal and its expectation unchanged. It pins the *other* side of the
+    /// boundary: the ordinary two-decimal European amount that must not move.
+    ///
+    /// Exact, not approximate — the `accuracy:` form this assertion used to carry would have
+    /// passed on a value that had round-tripped through `Double`, which is the whole thing WC-A1
+    /// exists to prevent.
     func testCommaDecimalAmountIsParsed() throws {
-        // A lone "," is the decimal separator. Exact, not approximate — the `accuracy:` form this
-        // assertion used to carry would have passed on a value that had round-tripped through
-        // `Double`, which is the whole thing WC-A1 exists to prevent.
         let result = try parse(#"{"transactions":[{"type":"expense","amount":"1234,56","category":"Rent","date":"2026-06-03"}]}"#)
         XCTAssertEqual(result.data.transactions.first?.amount, Decimal(string: "1234.56"))
     }
@@ -277,27 +288,39 @@ final class FinanceImportServiceTests: XCTestCase {
         }
     }
 
-    /// The forms the grouped-thousands fix must leave exactly as they were.
+    /// The string forms the money rule must leave exactly as they were.
     ///
-    /// * A bare `"1,234"` stays **1.234**. It is genuinely ambiguous (1234 in en-US, 1.234 in
-    ///   de-DE), and a lone separator is resolved as a decimal point everywhere in this codebase —
-    ///   `BrokerImportParsing.flexibleDecimal`, which the fallback reuses, does the same. Keeping
-    ///   the two in agreement is the point: two normalizers that disagree about what a string
-    ///   means is how this class of bug returns.
-    ///   (An earlier version of this comment justified the choice by claiming the alternative would
-    ///   misread Trade Republic share quantities. That was wrong twice over — those go through
-    ///   `BrokerImportParsing.plainDecimal` and never reach this decoder, and `flexibleDecimal`
-    ///   reads `"1.234"` as 1.234 regardless. The choice stands; that reason never held.)
-    /// * Exponent notation keeps working. JavaScript's `String(0.0000001)` is `"1e-7"`, so a web
-    ///   backup really can carry it, and only the plain form reads it — which is why the plain form
-    ///   must stay first. (It is *not* true that the fallback would misread `"1e-7"` as 17;
-    ///   measured, `flexibleDecimal("1e-7")` is **1**, and `"1E5"` is **15**. With the charset gate
-    ///   in place the fallback rejects both outright. The ordering is still required; the danger
-    ///   was overstated.)
-    func testAmbiguousAndExponentStringAmountsKeepTheirExistingMeaning() throws {
+    /// **This test used to pin `("1,234", "1.234")` and `("1.234", "1.234")` and it no longer
+    /// does** — those two moved to `testLoneSeparatorWithThreeDigitsIsThousandsInMoneyFields`,
+    /// where a money field now reads them as **1234**. What survives here is everything the new
+    /// rule does *not* touch, which is the boundary that keeps it from over-reaching:
+    ///
+    /// * **Two digits after a lone separator is still a decimal point.** `"1,50"` is 1.50. This is
+    ///   the ordinary European money spelling and the reason the rule counts digits at all rather
+    ///   than declaring every lone separator a grouping.
+    /// * **Four or more digits, likewise.** `"1,2345"` is 1.2345. No grouping produces a group of
+    ///   four.
+    /// * **A 4-digit part before the separator, likewise.** `"1234,567"` is 1234.567 — a
+    ///   deliberate narrowing of "a lone separator plus three digits". Genuine grouped output
+    ///   writes a million as `"1,234,567"`, never `"1234,567"`, so reading that as 1234567 would
+    ///   buy nothing and add a 1000× over-read in the mirror direction. The 1–3 digit first group
+    ///   is the same rule `hasNumericSeparatorLayout` already applies to every other grouped form.
+    /// * **Exponent notation keeps working.** JavaScript's `String(0.0000001)` is `"1e-7"`, so a
+    ///   web backup really can carry it, and only the plain form reads it — which is why the plain
+    ///   form must stay ahead of the grouped fallback. (It is *not* true that the fallback would
+    ///   misread `"1e-7"` as 17; measured, `flexibleDecimal("1e-7")` is **1**, and `"1E5"` is
+    ///   **15**. With the charset gate in place the fallback rejects both outright. The ordering is
+    ///   still required; the danger was overstated.) `"2.5e3"` is worth pinning specifically: its
+    ///   lone `"."` is followed by exactly three *characters*, so it is the shape the money rule
+    ///   would grab if it counted characters instead of digits.
+    func testStringAmountsOutsideTheThousandsRuleKeepTheirExistingMeaning() throws {
         let pinned: [(literal: String, expected: String)] = [
-            ("1,234", "1.234"),
-            ("1.234", "1.234"),
+            ("1,50", "1.50"),
+            ("1.50", "1.50"),
+            ("1,2345", "1.2345"),
+            ("1.2345", "1.2345"),
+            ("1234,567", "1234.567"),
+            ("1234.567", "1234.567"),
             ("1e-7", "0.0000001"),
             ("2.5e3", "2500")
         ]
@@ -309,6 +332,201 @@ final class FinanceImportServiceTests: XCTestCase {
                 result.data.transactions.first?.amount, Decimal(string: expected),
                 "\(literal) no longer imports as \(expected)"
             )
+            XCTAssertEqual(result.skippedRecords, 0, "\(literal) was reported as a skipped record")
+        }
+    }
+
+    /// A lone separator followed by exactly three digits is grouped thousands **in a money field**.
+    ///
+    /// This reverses an earlier decision, deliberately. Until now the decoder resolved a lone
+    /// separator as a decimal point everywhere, so an imported `"1,000"` became **1** and so did
+    /// `"1.000"` — the two commonest ways a thousand is written down, both read 1000× small, on the
+    /// single most likely malformed cell a user can hand a JSON backup. Nothing is skipped and
+    /// nothing is counted when that happens: the figure just quietly becomes a different, entirely
+    /// plausible figure.
+    ///
+    /// **The rule diverges from `BrokerImportParsing.flexibleDecimal` on purpose.** That normalizer
+    /// still reads `"1,000"` as 1, and the grouped-thousands fallback in this decoder still
+    /// delegates to it; the money reading is applied *before* either sees the string. The two are
+    /// allowed to disagree here because they read different things: `flexibleDecimal` parses broker
+    /// CSV cells from Trade Republic and Revolut exports, which always print a fractional part, so
+    /// a lone separator there really is a decimal point and changing it would misread every
+    /// `"1,50"` in a statement. If you came here because the two gave you different numbers for the
+    /// same string — that is the design, and this is the note saying so.
+    ///
+    /// **The accepted cost**, stated by the owner and not to be solved by sniffing the currency
+    /// code: a three-decimal currency (BHD, KWD, OMR) writes 1.5 dinar as `"1,500"`, and that now
+    /// imports as 1500.
+    func testLoneSeparatorWithThreeDigitsIsThousandsInMoneyFields() throws {
+        let pinned: [(literal: String, expected: String)] = [
+            ("1,000", "1000"),
+            ("1.000", "1000"),
+            ("1,234", "1234"),
+            ("1.234", "1234"),
+            ("12,345", "12345"),
+            ("123,456", "123456"),
+            ("999.999", "999999"),
+            // The rule counts digits, not value: a leading zero groups the same way.
+            ("0,001", "1")
+        ]
+        for (literal, expected) in pinned {
+            let result = try parse("""
+            {"transactions":[{"type":"income","amount":"\(literal)","category":"X","date":"2026-01-01"}]}
+            """)
+            XCTAssertEqual(
+                result.data.transactions.first?.amount, Decimal(string: expected),
+                "\"\(literal)\" did not import as \(expected)"
+            )
+            XCTAssertEqual(result.skippedRecords, 0, "\"\(literal)\" was reported as a skipped record")
+        }
+    }
+
+    /// Every money field, not just `transactions[].amount`.
+    ///
+    /// The split is made at the call site rather than sniffed from the key name, which means it can
+    /// be got wrong one field at a time — and a field in the wrong family is a silent 1000× error
+    /// in exactly the direction this rule exists to prevent. So each family of `Imported*` decoder
+    /// gets its own record here, including the two **per-unit prices** that sit beside a quantity
+    /// (`Investment.currentPrice`, `CryptoHolding.avgBuyPrice`): those are money per share, not a
+    /// count of shares.
+    func testEveryMoneyFieldReadsGroupedThousandsIncludingPerUnitPrices() throws {
+        let result = try parse("""
+        {"transactions":[{"type":"income","amount":"1,000","category":"Salary","date":"2026-01-01"}],
+         "recurringTransactions":[
+           {"type":"expense","amount":"1,000","category":"Rent","startDate":"2026-01-01",
+            "frequency":"monthly","nextDueDate":"2026-02-01"}
+         ],
+         "income":[{"type":"dividends","amount":"2,000","date":"2026-01-02"}],
+         "expenses":[{"category":"Food","amount":"3,000","date":"2026-01-03"}],
+         "liquidity":[{"name":"Acct","balance":"4,000","updatedAt":"2026-01-04"}],
+         "investments":[
+           {"symbol":"A","name":"A","quantity":2,"currentPrice":"1,000","costBasis":"5,000","fees":"1,500"}
+         ],
+         "crypto":[{"symbol":"B","name":"B","quantity":2,"avgBuyPrice":"1,000","currentPrice":"2,000","fees":"1,500"}],
+         "liabilities":[{"name":"L","principal":"9,000","currentBalance":"8,000"}],
+         "snapshots":[
+           {"date":"2026-01-05","netWorth":"1,000","totalAssets":"2,000","totalLiabilities":"1,000",
+            "liquidity":"3,000","investments":"4,000","crypto":"5,000"}
+         ]}
+        """)
+
+        func transaction(category: String) -> Transaction? {
+            result.data.transactions.first { $0.category == category }
+        }
+        XCTAssertEqual(transaction(category: "Salary")?.amount, Decimal(string: "1000"), "transactions[].amount")
+        XCTAssertEqual(result.data.recurringTransactions.first?.amount, Decimal(string: "1000"), "recurring amount")
+        XCTAssertEqual(transaction(category: "Dividends")?.amount, Decimal(string: "2000"), "legacy income amount")
+        XCTAssertEqual(transaction(category: "Food")?.amount, Decimal(string: "3000"), "legacy expense amount")
+        XCTAssertEqual(transaction(category: "Liquidity")?.amount, Decimal(string: "4000"), "liquidity balance")
+
+        let investment = try XCTUnwrap(result.data.investments.first)
+        XCTAssertEqual(investment.currentPrice, Decimal(string: "1000"), "investment currentPrice")
+        XCTAssertEqual(investment.costBasis, Decimal(string: "5000"), "investment costBasis")
+        XCTAssertEqual(investment.fees, Decimal(string: "1500"), "investment fees")
+        // Absent `currentValue` is derived as quantity x price, so the price rule reaches it too.
+        XCTAssertEqual(investment.currentValue, Decimal(string: "2000"), "investment currentValue")
+
+        let holding = try XCTUnwrap(result.data.crypto.first)
+        XCTAssertEqual(holding.avgBuyPrice, Decimal(string: "1000"), "crypto avgBuyPrice")
+        XCTAssertEqual(holding.currentPrice, Decimal(string: "2000"), "crypto currentPrice")
+        XCTAssertEqual(holding.fees, Decimal(string: "1500"), "crypto fees")
+
+        XCTAssertEqual(result.data.liabilities.first?.currentBalance, Decimal(string: "8000"), "liability currentBalance")
+
+        let snapshot = try XCTUnwrap(result.data.snapshots.first)
+        XCTAssertEqual(snapshot.netWorth, Decimal(string: "1000"), "snapshot netWorth")
+        XCTAssertEqual(snapshot.totalAssets, Decimal(string: "2000"), "snapshot totalAssets")
+        XCTAssertEqual(snapshot.totalLiabilities, Decimal(string: "1000"), "snapshot totalLiabilities")
+        XCTAssertEqual(snapshot.liquidity, Decimal(string: "3000"), "snapshot liquidity")
+        XCTAssertEqual(snapshot.investments, Decimal(string: "4000"), "snapshot investments")
+        XCTAssertEqual(snapshot.crypto, Decimal(string: "5000"), "snapshot crypto")
+
+        XCTAssertEqual(result.skippedRecords, 0, "a grouped-thousands cell dropped a record")
+    }
+
+    /// `principal` is money too — reachable only when `currentBalance` is absent.
+    func testLiabilityPrincipalReadsGroupedThousandsWhenItIsTheOnlyFigure() throws {
+        let result = try parse(#"{"liabilities":[{"name":"L","principal":"7,000"}]}"#)
+        XCTAssertEqual(result.data.liabilities.first?.currentBalance, Decimal(string: "7000"))
+        XCTAssertEqual(result.skippedRecords, 0)
+    }
+
+    /// The two families genuinely differ: **the same literal, in one record, landing on two
+    /// different numbers.**
+    ///
+    /// `Investment.quantity` and `CryptoHolding.quantity` are the only two `.quantity` fields in
+    /// the importer, and this is the assertion that would catch either of them being flipped to
+    /// money — or, in the other direction, a money field being mis-filed as a quantity. Reading a
+    /// quantity as thousands would turn 0.001 BTC into 1 BTC, which is the same defect class as the
+    /// money under-read, pointing the other way.
+    func testTheSameLiteralMeansDifferentThingsInMoneyAndQuantityFields() throws {
+        let result = try parse("""
+        {"investments":[{"symbol":"A","name":"A","quantity":"1,000","currentPrice":"1,000"}],
+         "crypto":[{"symbol":"B","name":"B","quantity":"1,000","avgBuyPrice":"1,000"}]}
+        """)
+
+        let investment = try XCTUnwrap(result.data.investments.first)
+        XCTAssertEqual(investment.quantity, Decimal(string: "1"), #""1,000" shares must stay 1"#)
+        XCTAssertEqual(investment.currentPrice, Decimal(string: "1000"), #""1,000" per share must be 1000"#)
+
+        let holding = try XCTUnwrap(result.data.crypto.first)
+        XCTAssertEqual(holding.quantity, Decimal(string: "1"), #""1,000" coins must stay 1"#)
+        XCTAssertEqual(holding.avgBuyPrice, Decimal(string: "1000"), #""1,000" per coin must be 1000"#)
+
+        XCTAssertNotEqual(investment.quantity, investment.currentPrice, "the two families collapsed into one")
+        XCTAssertEqual(result.skippedRecords, 0)
+    }
+
+    /// Quantities keep the old rule, whole: a lone separator is a decimal point whatever follows it.
+    ///
+    /// A sub-unit crypto holding is ordinary — `"0,001"` BTC is a thousandth of a coin, not one —
+    /// and there is no widely-written "1,000 shares" grouping in a backup field that already holds
+    /// fractional share counts. This is the old behaviour, pinned where it still applies.
+    func testQuantityFieldsStillReadALoneSeparatorAsADecimalPoint() throws {
+        let pinned: [(literal: String, expected: String)] = [
+            ("0,001", "0.001"),
+            ("0.001", "0.001"),
+            ("1,000", "1"),
+            ("1.000", "1"),
+            ("1,234", "1.234"),
+            ("2,5", "2.5")
+        ]
+        for (literal, expected) in pinned {
+            let result = try parse("""
+            {"investments":[{"symbol":"A","name":"A","quantity":"\(literal)","currentPrice":10}],
+             "crypto":[{"symbol":"B","name":"B","quantity":"\(literal)","currentPrice":10}]}
+            """)
+            XCTAssertEqual(
+                result.data.investments.first?.quantity, Decimal(string: expected),
+                "investment quantity \"\(literal)\" did not stay \(expected)"
+            )
+            XCTAssertEqual(
+                result.data.crypto.first?.quantity, Decimal(string: expected),
+                "crypto quantity \"\(literal)\" did not stay \(expected)"
+            )
+            XCTAssertEqual(result.skippedRecords, 0, "\"\(literal)\" was reported as a skipped record")
+        }
+    }
+
+    /// The money rule must not change *which* records import, only what they say.
+    ///
+    /// It runs ahead of the plain form and the grouped fallback both, so a bug in it could reject a
+    /// string those two used to accept — and a previously-importing record landing in
+    /// `skippedRecords` is the regression this series has already shipped once (the Indian lakh
+    /// grouping, fixed in `5070f57`). Every literal below imported before the rule existed and has
+    /// to keep importing.
+    func testTheMoneyRuleNeverTurnsAnImportableAmountIntoASkippedRecord() throws {
+        let literals = [
+            "1,000", "1.000", "1,50", "1.2345", "1234,567", "1,234.56", "1.234,56",
+            "1,234,567", "1.234.567", "1,23,456.78", "1,00,000", "12,34,567.89",
+            "1e-7", "2.5e3", "1000", "0.5", "1,", ",5", "1."
+        ]
+        for literal in literals {
+            let result = try parse("""
+            {"transactions":[{"type":"income","amount":"\(literal)","category":"X","date":"2026-01-01"}]}
+            """)
+            XCTAssertEqual(result.data.transactions.count, 1, "\"\(literal)\" stopped importing")
+            XCTAssertEqual(result.skippedRecords, 0, "\"\(literal)\" was newly reported as skipped")
         }
     }
 

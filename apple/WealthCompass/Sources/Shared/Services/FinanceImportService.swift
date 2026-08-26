@@ -517,7 +517,9 @@ private struct ImportedInvestment: Decodable {
         type = container.decodeImportedStringIfPresent(forKey: .type)
         symbol = container.decodeImportedStringIfPresent(forKey: .symbol)
         name = container.decodeImportedTextIfPresent(forKey: .name)
-        quantity = container.decodeImportedDecimalIfPresent(forKey: .quantity)
+        // One of exactly two `.quantity` fields in this file — a share count, not money. Everything
+        // below it here is money, per-unit `currentPrice` included.
+        quantity = container.decodeImportedDecimalIfPresent(forKey: .quantity, family: .quantity)
         costBasis = container.decodeImportedDecimalIfPresent(forKey: .costBasis)
         currentValue = container.decodeImportedDecimalIfPresent(forKey: .currentValue)
         currentPrice = container.decodeImportedDecimalIfPresent(forKey: .currentPrice)
@@ -612,7 +614,9 @@ private struct ImportedCryptoHolding: Decodable {
         id = container.decodeUUIDIfPresent(forKey: .id)
         symbol = container.decodeImportedStringIfPresent(forKey: .symbol)
         name = container.decodeImportedTextIfPresent(forKey: .name)
-        quantity = container.decodeImportedDecimalIfPresent(forKey: .quantity)
+        // The other `.quantity` field — a coin count, where `"0,001"` BTC is a thousandth and
+        // reading it as 1 would be the mirror of the money bug. `avgBuyPrice` beside it is money.
+        quantity = container.decodeImportedDecimalIfPresent(forKey: .quantity, family: .quantity)
         avgBuyPrice = container.decodeImportedDecimalIfPresent(forKey: .avgBuyPrice)
         currentPrice = container.decodeImportedDecimalIfPresent(forKey: .currentPrice)
         currency = container.decodeImportedStringIfPresent(forKey: .currency)
@@ -922,6 +926,90 @@ private enum ImportDateParser {
     }
 }
 
+/// Which of the two number families a decoded field belongs to.
+///
+/// The families exist for exactly one rule — `loneSeparatorThousandsReading`, the money-only
+/// reading of `"1,000"` as 1000 rather than 1. Everything else about the decode is identical, and
+/// no other rule should be hung off this without the same kind of argument.
+///
+/// **`.money` is the default on purpose.** A field added later and decoded without thinking about
+/// this must land in the family where a mistake reads a grouped thousand correctly, not the one
+/// where it silently divides a figure by 1000. There are only ever a handful of `.quantity` fields
+/// and each one is an explicit opt-out at its call site; `.money` is everything else, forever.
+private enum ImportedNumberFamily {
+    /// A currency figure: an amount, a balance, a total, or a per-unit price. Per-unit prices
+    /// (`avgBuyPrice`, `currentPrice`) belong here even though they sit beside a quantity — they
+    /// are money per share, not a count of shares.
+    case money
+    /// A count of units held: `Investment.quantity` and `CryptoHolding.quantity`, and nothing
+    /// else. Sub-unit holdings are ordinary here (`"0,001"` BTC), so a lone separator stays a
+    /// decimal point.
+    case quantity
+}
+
+/// The money-only reading of a lone separator followed by **exactly three digits**: `"1,000"` and
+/// `"1.000"` are 1000, `"1,234"` is 1234.
+///
+/// Returns nil for every other shape, which is how the caller falls through to the unchanged
+/// decimal-point reading: `"1,50"` (two digits) is 1.50 and `"1,2345"` (four) is 1.2345.
+///
+/// **Why money diverges here.** A lone separator is genuinely ambiguous — `"1,000"` is a thousand
+/// to an en-US reader and one to a de-DE one — and until this existed the decoder resolved it as a
+/// decimal point in both families, so an imported `"1,000"` *and* `"1.000"` both became **1**.
+/// Those are the two most common ways a thousand is written down, which made that resolution a
+/// silent 1000× under-read on the single most likely malformed cell a user can hand this app. A
+/// figure that reads 1000× small is indistinguishable from a real small figure once it is stored:
+/// nothing is skipped, nothing is counted, and no screen says anything is wrong.
+///
+/// **Accepted cost, and it is a real one.** A three-decimal currency — BHD, KWD, OMR — writes 1.5
+/// dinar as `"1,500"`, and that now imports as **1500**. The owner has weighed that against the
+/// under-read above and chosen this side; do not try to solve it by sniffing the record's currency
+/// code. (`"0,001"` in a money field reads as **1** by the same rule, for the same reason.)
+///
+/// **The divergence a future reader will trip over.** `BrokerImportParsing.flexibleDecimal` still
+/// resolves a lone separator as a decimal point, so it reads `"1,000"` as 1 — and the fallback at
+/// the bottom of `decodeImportedDecimalIfPresent` still delegates to it. The two now deliberately
+/// disagree for money, and that is not the accident it looks like: `flexibleDecimal` parses broker
+/// CSV cells whose column a tokenizer has already identified, from Trade Republic and Revolut
+/// exports that always print a fractional part, so a lone separator there really is a decimal
+/// point and changing it would misread every `"1,50"` in a statement. This decoder reads an
+/// arbitrary hand-rolled JSON backup with no column to lean on. Same string, two contexts, two
+/// answers — stated here rather than left for someone to discover from a wrong total.
+///
+/// **Narrower than "a lone separator plus three digits" by one deliberate step**: the part before
+/// the separator has to be 1–3 digits, the same first-group rule `hasNumericSeparatorLayout`
+/// applies to every other grouped form. `"1234,567"` therefore keeps its old reading of 1234.567.
+/// Genuine grouped output never produces a 4-digit first group (it would be `"1,234,567"`), while
+/// a 4-digit integer part followed by three decimals is an ordinary European figure — so widening
+/// this would buy nothing and add a 1000× *over*-read in the mirror direction.
+///
+/// **This must only ever change a value, never whether a record imports.** Measured by sweeping the
+/// whole string branch, with and without this rule, over every string up to 7 characters drawn from
+/// `0 1 2 5 9 . , - +` — 5,380,839 of them: **0 newly rejected, 0 newly accepted**, 53,736 values
+/// changed, and every one of those 53,736 is a string this function itself accepts. A
+/// previously-importing record landing in `skippedRecords` is the regression this series already
+/// shipped once (Indian lakh grouping, `5070f57`), which is why the sweep is the check rather than
+/// the argument.
+private func loneSeparatorThousandsReading(_ trimmed: String) -> Decimal? {
+    let negative = trimmed.hasPrefix("-")
+    let unsigned = (negative || trimmed.hasPrefix("+")) ? String(trimmed.dropFirst()) : trimmed
+
+    let dotCount = unsigned.reduce(0) { $1 == "." ? $0 + 1 : $0 }
+    let commaCount = unsigned.reduce(0) { $1 == "," ? $0 + 1 : $0 }
+    guard dotCount + commaCount == 1 else { return nil }
+
+    let groups = unsigned.split(separator: dotCount == 1 ? "." : ",", omittingEmptySubsequences: false)
+    guard groups.count == 2, (1...3).contains(groups[0].count), groups[1].count == 3 else { return nil }
+    // ASCII digits only, so this never hands `Decimal(string:)` something it reads differently —
+    // the same restriction the grouped-thousands fallback makes.
+    guard groups.allSatisfy({ $0.allSatisfy { $0.isASCII && $0.isWholeNumber } }) else { return nil }
+
+    return Decimal(
+        string: (negative ? "-" : "") + groups[0] + groups[1],
+        locale: Locale(identifier: "en_US_POSIX")
+    )
+}
+
 private extension KeyedDecodingContainer {
     func decodeLossyArrayIfPresent<Element: Decodable>(_ type: Element.Type, forKey key: Key) -> LossyArray<Element> {
         (try? decode(LossyArray<Element>.self, forKey: key)) ?? LossyArray<Element>()
@@ -957,7 +1045,16 @@ private extension KeyedDecodingContainer {
     /// `1234.56` as `1234.5599999999997952` and `99999999.99` as `99999999.99000000512` — the same
     /// corruption class the persistence layer was fixed for, and import was the last place money
     /// crossed binary floating point outside charts and FX (WC-A1, `MoneyDecimal.swift`).
-    func decodeImportedDecimalIfPresent(forKey key: Key) -> Decimal? {
+    ///
+    /// `family` picks the one rule the two number families do not share: a **string** whose lone
+    /// separator is followed by exactly three digits reads as grouped thousands for `.money` and
+    /// as a decimal point for `.quantity`, so `"1,000"` is 1000 in an `amount` and 1 in a
+    /// `quantity`. See `loneSeparatorThousandsReading` for why, and for what it costs. The default
+    /// is `.money` deliberately — see `ImportedNumberFamily`.
+    ///
+    /// Only the string form is affected. A JSON *number* `1.000` is not ambiguous — JSON has one
+    /// spelling for a decimal point — so it stays exactly 1 in both families.
+    func decodeImportedDecimalIfPresent(forKey key: Key, family: ImportedNumberFamily = .money) -> Decimal? {
         if let value = try? decode(Decimal.self, forKey: key) {
             return value.finiteImportedAmount
         }
@@ -971,6 +1068,14 @@ private extension KeyedDecodingContainer {
 
         if let value = try? decode(String.self, forKey: key) {
             let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            // Money's lone-separator-plus-three-digits reading, and it has to come first: both
+            // `"1,000"` and `"1.000"` sail through the plain form below as **1**, which is the
+            // 1000× under-read this branch exists to stop. It only ever *returns a different
+            // number* — every string it declines falls through untouched, so nothing that used to
+            // import starts landing in `skippedRecords`.
+            if family == .money, let thousands = loneSeparatorThousandsReading(trimmed) {
+                return thousands.finiteImportedAmount
+            }
             let normalized = trimmed.replacingOccurrences(of: ",", with: ".")
             // Gate on `Double` to keep acceptance exactly as it was — `Decimal(string:)` is more
             // permissive about trailing junk — but take the value from `Decimal` so it stays exact.
@@ -1066,7 +1171,10 @@ private func isDecimalLiteralCharacter(_ character: Character) -> Bool {
 /// Resolved exactly the way `BrokerImportParsing.flexibleDecimal` resolves it, so the two never
 /// disagree about what a string means: when both separators appear the later one is the decimal
 /// point and the other groups thousands; a lone `,` or `.` is a decimal point; a repeated one
-/// groups. On top of that resolution this asks the question `flexibleDecimal` deliberately does not:
+/// groups. (The one place this file *does* diverge from `flexibleDecimal` is upstream of here and
+/// applies to money only — see `loneSeparatorThousandsReading`, which resolves a lone separator
+/// followed by exactly three digits before either of these two ever sees the string.) On top of
+/// that resolution this asks the question `flexibleDecimal` deliberately does not:
 ///
 /// * the decimal separator occurs **at most once** — `"1,2.3.4"` names two decimal points, and
 /// * the grouping separator splits the integer part into **1–3 digits, then any number of groups of
