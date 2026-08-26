@@ -475,6 +475,9 @@ private enum TradeRepublicCSVParser {
 
         var transactions: [Transaction] = []
         var holdings: [String: HoldingAccumulator] = [:]
+        /// ISINs with at least one trade row this parser had to drop — their accumulated quantity
+        /// is short by those legs, so no holding is published for them.
+        var isinsWithUnreadableTrades: Set<String> = []
         var skipped = 0
         var seed = BrokerImportParsing.SeedDisambiguator()
 
@@ -493,20 +496,45 @@ private enum TradeRepublicCSVParser {
             let name = field(row, "name")
             let description = field(row, "description") ?? name ?? field(row, "counterparty_name") ?? ""
 
+            let isTrade = (category == "TRADING") && (type == "BUY" || type == "SELL")
+
             guard
                 let amount = BrokerImportParsing.plainDecimal(field(row, "amount")),
-                let date,
-                // An unmodelled ISO code fails the row here rather than being relabelled as the
-                // display currency — see `BrokerImportParsing.currency`.
-                let currency = BrokerImportParsing.currency(field(row, "currency"), default: context.displayCurrency)
+                let date
             else {
-                // A row we recognized but couldn't make sense of (no amount/date, or money this app
-                // cannot represent) is a genuine skip.
+                // A row we recognized but couldn't make sense of — no amount, or no date — is a
+                // genuine skip.
                 skipped += 1
                 continue
             }
 
-            if category == "TRADING", type == "BUY" || type == "SELL" {
+            // Zero-amount bookkeeping rows (e.g. a €0.00 tax optimisation) are intentional
+            // no-ops, not malformed — skip them silently so they don't inflate the "skipped" count.
+            // Decided *before* the currency, because a row that moves no money says nothing about
+            // whether this app can represent its currency: letting the guard below fire first
+            // turned a `0.00 AED` row into a counted skip and contradicted this very rule. Trades
+            // are excluded — a zero-value trade still carries shares, and the holding it feeds is
+            // denominated in the currency below.
+            if !isTrade, amount == 0 { continue }
+
+            // An unmodelled ISO code fails the row here rather than being relabelled as the
+            // display currency — see `BrokerImportParsing.currency`.
+            guard
+                let currency = BrokerImportParsing.currency(field(row, "currency"), default: context.displayCurrency)
+            else {
+                // Money this app cannot represent.
+                skipped += 1
+                // A *trade* dropped here also takes its shares with it, and the accumulator for
+                // that ISIN keeps adding up the rest — so the holding would be published with a
+                // quantity short by the dropped legs, silently wrong on screen while only a count
+                // says anything. Remember the ISIN and drop the whole holding below.
+                if isTrade, let isin = field(row, "symbol")?.uppercased(), !isin.isEmpty {
+                    isinsWithUnreadableTrades.insert(isin)
+                }
+                continue
+            }
+
+            if isTrade {
                 // Securities trade → holding change + a matching cash movement so liquidity stays correct.
                 // BUY: cash out (value + fee) and add shares. SELL: cash in (value − fee) and remove shares.
                 let isBuy = (type == "BUY")
@@ -555,10 +583,7 @@ private enum TradeRepublicCSVParser {
                 continue
             }
 
-            // Cash movement. Zero-amount bookkeeping rows (e.g. a €0.00 tax optimisation) are intentional
-            // no-ops, not malformed — skip them silently so they don't inflate the "skipped" count.
-            if amount == 0 { continue }
-
+            // Cash movement. (Its zero-amount no-op is handled above, ahead of the currency guard.)
             let stableKey = transactionID ?? "\(rawDate)|\(description)|\(amount)"
             transactions.append(Transaction(
                 id: BrokerImportParsing.deterministicUUID(seed("tr:\(stableKey)")),
@@ -571,6 +596,16 @@ private enum TradeRepublicCSVParser {
                 createdAt: createdAt ?? date,
                 updatedAt: createdAt ?? date
             ))
+        }
+
+        // A holding assembled from only some of its ISIN's trades would show a share count that is
+        // simply wrong, and net worth is computed from it. Drop it and count it, the same call this
+        // parser makes for the trade row itself. Only reachable when one ISIN is traded in both a
+        // modelled and an unmodelled currency; Trade Republic prints one currency per account, so
+        // this is a guard rather than a fix for an observed export.
+        for isin in isinsWithUnreadableTrades {
+            guard holdings.removeValue(forKey: isin) != nil else { continue }
+            skipped += 1
         }
 
         // `tr-holding:` seeds from the ISIN and the accumulator is already keyed by it, so an

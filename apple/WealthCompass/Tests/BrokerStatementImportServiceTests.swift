@@ -182,6 +182,65 @@ final class BrokerStatementImportServiceTests: XCTestCase {
         XCTAssertEqual(out.normalized.skippedRecords, 2, "unrepresentable rows were dropped without being reported")
     }
 
+    /// A zero-amount bookkeeping row is a silent no-op in **any** currency.
+    ///
+    /// The parser states the rule itself: "Zero-amount bookkeeping rows (e.g. a €0.00 tax
+    /// optimisation) are intentional no-ops, not malformed — skip them silently so they don't
+    /// inflate the skipped count." `4e7a843` put the currency guard ahead of that line, so a
+    /// `0.00 AED` tax-optimisation row started counting as skipped. The row carries no money either
+    /// way, so an ISO code this app cannot model says nothing about it — and a user told "1 record
+    /// skipped" has no way to find out it was nothing.
+    func testTradeRepublicZeroAmountRowIsASilentNoOpInAnyCurrency() throws {
+        let csv = trHeader + "\n"
+            + "\"2026-01-10T10:00:00.000Z\",\"2026-01-10\",\"DEFAULT\",\"CASH\",\"TAX_OPTIMIZATION\",\"\",\"\",\"\",\"\",\"\",\"0.00\",\"\",\"\",\"AED\",\"\",\"\",\"\",\"Tax\",\"e1\",\"\",\"\",\"\",\"\"\n"
+            + "\"2026-01-11T10:00:00.000Z\",\"2026-01-11\",\"DEFAULT\",\"CASH\",\"CARD_TRANSACTION\",\"\",\"Coffee\",\"\",\"\",\"\",\"-4.50\",\"\",\"\",\"EUR\",\"\",\"\",\"\",\"Coffee shop\",\"e2\",\"\",\"\",\"\",\"\""
+        let out = try parse(csv)
+
+        XCTAssertEqual(out.normalized.data.transactions.count, 1, "the zero-amount row became a transaction")
+        XCTAssertEqual(out.normalized.data.transactions.first?.amount, Decimal(string: "4.50"))
+        XCTAssertEqual(
+            out.normalized.skippedRecords, 0,
+            "a zero-amount bookkeeping row inflated the skipped count because of its currency"
+        )
+    }
+
+    /// A holding must never be published from a subset of its own trades.
+    ///
+    /// Skipping an unrepresentable-currency row is right for cash, but a **trade** row also carries
+    /// shares. Drop one and the surviving holding keeps accumulating the rest, so its quantity is
+    /// short by the dropped legs — a wrong share count on screen, feeding net worth, with only
+    /// "1 record skipped" to hint at it. Before `4e7a843` the row was relabelled and the quantity
+    /// was at least right; the skip is still the better call for the money, but the holding it
+    /// leaves behind has to go with it.
+    ///
+    /// Trade Republic prints one currency per account, so this needs a hand-made or third-party
+    /// export to reach. It is a guard, not a reproduction.
+    func testTradeRepublicDropsAHoldingWhoseTradesWereNotAllReadable() throws {
+        let csv = trHeader + "\n"
+            + "\"2026-01-05T10:00:00.000Z\",\"2026-01-05\",\"DEFAULT\",\"TRADING\",\"BUY\",\"STOCK\",\"MixedCo\",\"XX0000000001\",\"1\",\"100.00\",\"-100.00\",\"\",\"\",\"EUR\",\"\",\"\",\"\",\"buy\",\"f1\",\"\",\"\",\"\",\"\"\n"
+            + "\"2026-01-06T10:00:00.000Z\",\"2026-01-06\",\"DEFAULT\",\"TRADING\",\"BUY\",\"STOCK\",\"MixedCo\",\"XX0000000001\",\"3\",\"100.00\",\"-300.00\",\"\",\"\",\"AED\",\"\",\"\",\"\",\"buy\",\"f2\",\"\",\"\",\"\",\"\"\n"
+            + "\"2026-01-07T10:00:00.000Z\",\"2026-01-07\",\"DEFAULT\",\"TRADING\",\"BUY\",\"STOCK\",\"CleanCo\",\"XX0000000002\",\"2\",\"50.00\",\"-100.00\",\"\",\"\",\"EUR\",\"\",\"\",\"\",\"buy\",\"f3\",\"\",\"\",\"\",\"\""
+        let out = try parse(csv)
+        let data = out.normalized.data
+
+        XCTAssertNil(
+            data.investments.first { $0.isin == "XX0000000001" },
+            "a holding was published with a quantity short by its dropped AED leg"
+        )
+        // The ISIN whose trades were all readable is untouched.
+        let clean = try XCTUnwrap(data.investments.first { $0.isin == "XX0000000002" })
+        XCTAssertEqual(clean.quantity, Decimal(string: "2"))
+        XCTAssertEqual(clean.costBasis, Decimal(string: "100"))
+        // The EUR leg's cash movement still stands — that money did leave the account.
+        XCTAssertEqual(data.transactions.count, 2)
+        XCTAssertEqual(
+            data.transactions.compactMap { $0.category == "Investments" ? $0.amount : nil }.reduce(0, +),
+            Decimal(string: "200")
+        )
+        // One AED row, plus the holding it made untrustworthy.
+        XCTAssertEqual(out.normalized.skippedRecords, 2, "the dropped holding was not reported")
+    }
+
     /// The meaning the skip must not break: an **absent** currency column is not an unrepresentable
     /// one. A blank cell still falls back to the display currency and the row is still imported.
     func testTradeRepublicAbsentCurrencyStillFallsBackToTheDisplayCurrency() throws {
