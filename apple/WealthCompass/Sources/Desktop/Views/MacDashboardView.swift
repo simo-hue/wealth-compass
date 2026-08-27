@@ -102,11 +102,20 @@ struct MacDashboardView: View {
     }
 
     // VIEW-01: a responsive cash-flow row — Monthly Income / Expenses / Net Savings / Savings Rate
-    // (this month) plus total Liabilities — that fills the window width, splitting evenly into
-    // 5 / 3 / 2 / 1 flexible columns as the pane narrows.
+    // (this month) plus total Liabilities and Total Cash — that fills the window width, splitting
+    // evenly into 6 / 3 / 2 / 1 flexible columns as the pane narrows.
+    //
+    // Every tier divides six exactly, and that is the point rather than a coincidence. The row held
+    // five cards against 5 / 3 / 2 / 1 tiers, so at any width below the top tier the last row was
+    // short one card and the grid showed a hole. A four-column tier would put the hole back (4 + 2),
+    // which is why there isn't one: 6, 3, 2 and 1 are the only counts that leave no gap.
+    //
+    // The six-column threshold is 1296 rather than the old 1080 because 1296 / 6 is 216pt — the
+    // same minimum card width five columns had at 1080. Widening the row without raising the
+    // threshold would have bought the sixth card by making all six too narrow to read.
     private func keyMetrics(width: CGFloat) -> some View {
         let cf = currentMonthCashFlow
-        let count = width >= 1_080 ? 5 : (width >= 820 ? 3 : (width >= 560 ? 2 : 1))
+        let count = width >= 1_296 ? 6 : (width >= 820 ? 3 : (width >= 560 ? 2 : 1))
         let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: count)
         return LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
             MetricCard(
@@ -155,6 +164,18 @@ struct MacDashboardView: View {
                 detail: settings.isPrivacyMode
                     ? LocalizedStringKey("What you owe")
                     : (finance.data.liabilities.count == 1 ? LocalizedStringKey("1 liability") : LocalizedStringKey("\(finance.data.liabilities.count) liabilities"))
+            )
+            .frame(maxWidth: .infinity)
+            // Same figure, icon and accent the Cash Flow page already draws for it, so the two
+            // pages cannot disagree about what "Total Cash" means. It differs from Net Savings
+            // two cards over only by period — that is all-time, this is the current month — so
+            // the caption is the period rather than another restatement of the arithmetic.
+            MetricCard(
+                title: "Total Cash",
+                value: settings.privateCurrency(totals.totalLiquidity),
+                systemImage: "banknote",
+                accent: totals.totalLiquidity >= 0 ? WCColor.primary : WCColor.destructive,
+                detail: "All Time"
             )
             .frame(maxWidth: .infinity)
         }
