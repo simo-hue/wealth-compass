@@ -171,13 +171,25 @@ Signing uses `DEVELOPMENT_TEAM = 8528AN28A3`. Version numbers live in `project.p
 
 `Sources/Desktop/` is shared source, not a copy. `WealthCompassMobileApp` picks the UI by **device idiom** — `UIDevice.current.userInterfaceIdiom == .pad` → `MacRootView`, otherwise `ContentView`. Idiom, not size class, on purpose: a size-class test would swap the whole app between two UIs as the user dragged a Split View divider. `NavigationSplitView` already collapses to a stack when narrow.
 
-The whole macOS/iPadOS difference is five seams, and all of them live in `Sources/Shared/Platform/DesktopPlatform.swift` except the last two:
+The whole macOS/iPadOS difference is six seams, and all of them live in `Sources/Shared/Platform/DesktopPlatform.swift` except the last two:
 
 1. `DesktopPlatform.registerForRemoteNotifications()` — `NSApplication` vs `UIApplication`.
 2. `typealias MacAppLockStore` / `MacRecurringTransactionNotificationService` — aliased *toward* the Mac names so the Desktop layer needed no renaming. On iPad they resolve to the iOS lock store and notification service, so a device never keeps two lock settings or two sets of reminders.
 3. `desktopWindowSize` / `desktopFixedSize` / `desktopCardWidth` — Mac window floors, no-ops on iPad where a 520pt floor inside a 320pt Slide Over would push content off-screen.
-4. `MacSettingsView` file I/O — `NSOpenPanel`/`NSSavePanel` on macOS, `.fileImporter`/`.fileExporter` on iPad. Both modifiers are attached unconditionally; macOS never sets their state, so they stay inert there.
-5. `DesktopCommands` — one `Commands` struct for both. Its `isEnabled` flag keeps the menus off iPhone, where nothing observes `MacAppModel` and ⌘N would be a dead key.
+4. `desktopMenuLabelStyle()` — `NSMenu` sizes to its content; UIKit caps a toolbar menu at ~250pt, which broke "One-Time Transaction" *mid-word*. Drops the icon on iPad only, which returns the ~36pt the title needed.
+5. `MacSettingsView` file I/O — `NSOpenPanel`/`NSSavePanel` on macOS, `.fileImporter`/`.fileExporter` on iPad. Both modifiers are attached unconditionally; macOS never sets their state, so they stay inert there.
+6. `DesktopCommands` — one `Commands` struct for both. Its `isEnabled` flag keeps the menus off iPhone, where nothing observes `MacAppModel` and ⌘N would be a dead key.
+
+**A Desktop-layer row of fixed-width controls needs a `ViewThatFits` ladder.** The Mac window and an
+iPad in landscape have ~960pt of detail column; the same iPad in *portrait* has ~657pt, and an iPad
+mini in portrait ~474pt. A plain `HStack` does not shrink gracefully into that — it takes the missing
+width out of whichever child is flexible, which is how the transaction count rendered as
+"Show-/ing 0 of 0" and the dashboard's action pills as "Cas h Flo w". Two rules, both load-bearing:
+give the fixed controls `.fixedSize()` so they cannot be the ones that shrink, and offer
+`ViewThatFits` a candidate for each width tier (one row / two rows / one control per row).
+`ViewThatFits` measures each candidate's *ideal* size, and a paragraph's ideal width is its
+**single-line** width — so a candidate containing body text needs an explicit `idealWidth` or it
+reports ~900pt and never wins, even on a Mac (see `MacDashboardView.onboardingCard`).
 
 **When adding a user-facing string to the Desktop layer, check it does not name a platform.** "this Mac", "the macOS Keychain" and similar now render on an iPad. The fix is two literals behind `#if os(macOS)` (the string catalog only extracts *literal* keys, so an interpolated device name registers neither), reusing the "this device" wording iOS already ships wherever it exists.
 

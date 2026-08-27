@@ -121,3 +121,21 @@ extension Color {
         #endif
     }
 }
+
+extension View {
+    /// Label style for an item inside a `Menu`.
+    ///
+    /// `NSMenu` sizes itself to its content, so the Mac shows icon + title at any length. UIKit
+    /// caps a toolbar menu at ~250pt, which leaves roughly 150pt for the title once the icon and
+    /// insets are taken — and "One-Time Transaction" needs ~175pt, so iPadOS broke it *mid-word*
+    /// ("One-Time Transac-/tion"). Dropping the icon returns those ~36pt and the title fits on one
+    /// line. The icon is decorative here; the wrapped word was not.
+    @ViewBuilder
+    func desktopMenuLabelStyle() -> some View {
+        #if os(macOS)
+        self
+        #else
+        labelStyle(.titleOnly)
+        #endif
+    }
+}

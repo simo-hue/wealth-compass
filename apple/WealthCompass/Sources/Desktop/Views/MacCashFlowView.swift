@@ -154,12 +154,14 @@ struct MacCashFlowView: View {
                         editor = .transaction(nil)
                     } label: {
                         Label("One-Time Transaction", systemImage: "plus.circle")
+                            .desktopMenuLabelStyle()
                     }
 
                     Button {
                         editor = .recurring(nil)
                     } label: {
                         Label("Recurring Transaction", systemImage: "repeat.circle")
+                            .desktopMenuLabelStyle()
                     }
                 } label: {
                     Label("Add Transaction", systemImage: "plus")
