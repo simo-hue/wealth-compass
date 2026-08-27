@@ -659,100 +659,43 @@ struct MacCashFlowView: View {
     }
 
     private var transactionFilters: some View {
-        HStack(spacing: 24) {
-            HStack(spacing: 10) {
-                Text("Type")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.secondary)
-                Picker("Type", selection: $transactionTypeFilter) {
-                    ForEach(MacTransactionTypeFilter.allCases) { filter in
-                        Text(filter.title).tag(filter)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .frame(width: 220)
+        // The controls are all fixed-width — Type 220, Search 200, Period 160, plus their labels
+        // and spacing — so the row wants ~880pt. A Mac window and an iPad in landscape have that;
+        // an iPad held in portrait has ~657pt after the sidebar, and the only flexible thing in
+        // the row is the count, which is why it used to render hyphenated as "Show-/ing 0 of 0".
+        // Wrapping to two rows keeps every control at its designed size instead.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 24) {
+                typeFilterControl
+                searchFieldControl
+                periodFilterControl
+                categoryFilterChip
+                transactionCountLabel
             }
 
-            HStack(spacing: 10) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
-                TextField("Search", text: $searchText)
-                    .textFieldStyle(.plain)
-                
-                if !searchText.isEmpty {
-                    Button {
-                        searchText = ""
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.secondary)
-                            .imageScale(.small)
-                    }
-                    .buttonStyle(.plain)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 24) {
+                    typeFilterControl
+                    periodFilterControl
+                }
+                HStack(spacing: 24) {
+                    searchFieldControl
+                    categoryFilterChip
+                    transactionCountLabel
                 }
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Color.desktopControlBackground.opacity(0.5))
-            }
-            .frame(width: 200)
 
-            HStack(spacing: 10) {
-                Text("Period")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.secondary)
-                Picker("Period", selection: $transactionPeriod) {
-                    ForEach(AnalyticsPeriod.allCases) { period in
-                        Text(period.title).tag(period)
-                    }
+            // An iPad mini in portrait leaves the detail column ~474pt of usable width, and the
+            // two pickers plus their labels want ~524pt, so even the two-row form was over budget
+            // and crushed the "Type" and "Period" labels down to slivers. One control per row.
+            VStack(alignment: .leading, spacing: 12) {
+                typeFilterControl
+                periodFilterControl
+                HStack(spacing: 24) {
+                    searchFieldControl
+                    categoryFilterChip
+                    transactionCountLabel
                 }
-                .labelsHidden()
-                .frame(width: 160)
-            }
-
-            // Only present when you arrived here from the Money Flow diagram; the bar is otherwise
-            // exactly what it has always been.
-            if let categoryFilter {
-                HStack(spacing: 6) {
-                    Text(categoryFilter.title)
-                        .font(.caption.weight(.medium))
-                        .lineLimit(1)
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.15)) { self.categoryFilter = nil }
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .imageScale(.small)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Clear category filter")
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .foregroundStyle(WCColor.primary)
-                .background(Capsule().fill(WCColor.primary.opacity(0.14)))
-                .overlay(Capsule().stroke(WCColor.primary.opacity(0.34), lineWidth: 1))
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel(Text(settings.localized("Filtered to \(categoryFilter.title)")))
-            }
-
-            // Exact counts of what exists and what the filters matched, sitting inside the filter
-            // bar itself — the most direct form of the walk-the-picker probe in the app: vary a
-            // filter, read off how many records fall inside it, with every amount already `••••`.
-            // Tokenised rather than hidden, because this row is drawn in both data states and
-            // only its two numbers move.
-            // Two `Text` calls rather than one with a ternary: a ternary between two string
-            // literals leaves the `Text(_:)` overload to inference, and picking the
-            // `StringProtocol` one would render the sentence verbatim in all 35 languages.
-            if settings.isPrivacyMode {
-                Text("Showing \(settings.redactionToken) of \(settings.redactionToken)")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
-            } else {
-                Text("Showing \(filteredTransactions.count) of \(finance.transactions.count)")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
             }
         }
         .padding(.horizontal, 20)
@@ -766,6 +709,121 @@ struct MacCashFlowView: View {
                 )
         }
         .frame(maxWidth: .infinity, alignment: .center)
+    }
+
+    private var typeFilterControl: some View {
+        HStack(spacing: 10) {
+            Text("Type")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.secondary)
+                .fixedSize()
+            Picker("Type", selection: $transactionTypeFilter) {
+                ForEach(MacTransactionTypeFilter.allCases) { filter in
+                    Text(filter.title).tag(filter)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .frame(width: 220)
+        }
+    }
+
+    private var searchFieldControl: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(.secondary)
+            TextField("Search", text: $searchText)
+                .textFieldStyle(.plain)
+
+            if !searchText.isEmpty {
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                        .imageScale(.small)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color.desktopControlBackground.opacity(0.5))
+        }
+        .frame(width: 200)
+    }
+
+    private var periodFilterControl: some View {
+        HStack(spacing: 10) {
+            Text("Period")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.secondary)
+                .fixedSize()
+            Picker("Period", selection: $transactionPeriod) {
+                ForEach(AnalyticsPeriod.allCases) { period in
+                    Text(period.title).tag(period)
+                }
+            }
+            .labelsHidden()
+            .frame(width: 160)
+        }
+    }
+
+    /// Only present when you arrived here from the Money Flow diagram; the bar is otherwise
+    /// exactly what it has always been.
+    @ViewBuilder
+    private var categoryFilterChip: some View {
+        if let categoryFilter {
+            HStack(spacing: 6) {
+                Text(categoryFilter.title)
+                    .font(.caption.weight(.medium))
+                    .lineLimit(1)
+                Button {
+                    withAnimation(.easeInOut(duration: 0.15)) { self.categoryFilter = nil }
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .imageScale(.small)
+                }
+                .buttonStyle(.plain)
+                .help("Clear category filter")
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .foregroundStyle(WCColor.primary)
+            .background(Capsule().fill(WCColor.primary.opacity(0.14)))
+            .overlay(Capsule().stroke(WCColor.primary.opacity(0.34), lineWidth: 1))
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(Text(settings.localized("Filtered to \(categoryFilter.title)")))
+        }
+    }
+
+    /// Exact counts of what exists and what the filters matched, sitting inside the filter bar
+    /// itself — the most direct form of the walk-the-picker probe in the app: vary a filter, read
+    /// off how many records fall inside it, with every amount already `••••`. Tokenised rather than
+    /// hidden, because this row is drawn in both data states and only its two numbers move.
+    ///
+    /// Two `Text` calls rather than one with a ternary: a ternary between two string literals
+    /// leaves the `Text(_:)` overload to inference, and picking the `StringProtocol` one would
+    /// render the sentence verbatim in all 35 languages.
+    ///
+    /// `.fixedSize()` because this is the one flexible item in the bar: whatever width the row is
+    /// short by came out of this label, and a count that has been hyphenated in half tells the
+    /// reader nothing.
+    @ViewBuilder
+    private var transactionCountLabel: some View {
+        Group {
+            if settings.isPrivacyMode {
+                Text("Showing \(settings.redactionToken) of \(settings.redactionToken)")
+            } else {
+                Text("Showing \(filteredTransactions.count) of \(finance.transactions.count)")
+            }
+        }
+        .font(.caption.monospacedDigit())
+        .foregroundStyle(.secondary)
+        .lineLimit(1)
+        .fixedSize()
     }
 
     private var transactionTable: some View {

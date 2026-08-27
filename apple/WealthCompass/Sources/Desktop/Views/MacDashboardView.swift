@@ -222,44 +222,30 @@ struct MacDashboardView: View {
 
     private var onboardingCard: some View {
         DashboardGlassCard(padding: 0) {
-            HStack(spacing: 24) {
-                VStack(alignment: .leading, spacing: 10) {
-                    Label("Build your first financial view", systemImage: "sparkles")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(.white)
-                    Text("Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically.")
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.64))
-                        .fixedSize(horizontal: false, vertical: true)
+            ViewThatFits(in: .horizontal) {
+                // Side by side, when there is room for the copy at a readable width *and* the
+                // whole action row. `idealWidth` is what makes this candidate measurable at all:
+                // a paragraph's natural ideal width is its single-line width, so without it this
+                // branch reports an ideal of ~900pt and never fits — the card would stack even on
+                // a Mac. Pinning the ideal to 340 puts the switch-over at 340 + 24 + ~385 ≈ 750pt.
+                HStack(spacing: 24) {
+                    onboardingCopy
+                        .frame(idealWidth: 340, maxWidth: .infinity, alignment: .leading)
+                    onboardingActionRow
                 }
 
-                Spacer(minLength: 8)
-
-                // `.fixedSize()` is what stops the squeeze. A `Label` inside a `Button` is
-                // horizontally flexible, so the enclosing `HStack` treats these three as
-                // compressible and shares width with the paragraph on its left — which on an
-                // iPad in portrait left them hyphenated mid-word ("Cas h Flo w"). Pinned to
-                // their intrinsic width, the paragraph wraps instead, which is what it is for.
-                //
-                // The vertical fallback then covers the case `.fixedSize()` alone would break:
-                // three rigid buttons are ~385pt, wider than the detail column of an iPad in
-                // Slide Over, and a fixed-size row does overflow its parent rather than clip.
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 10) {
-                        onboardingActions
-                    }
-                    .fixedSize()
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        onboardingActions
-                    }
-                    .fixedSize(horizontal: true, vertical: false)
+                // An iPad held in portrait, Slide Over, or a narrowed Mac window. The copy gets
+                // the full width and the actions sit beneath it. The alternative — which is what
+                // this replaced — was the two of them fighting over ~700pt and leaving the
+                // paragraph in a five-line ribbon next to the buttons.
+                VStack(alignment: .leading, spacing: 16) {
+                    onboardingCopy
+                    onboardingActionRow
                 }
-                // Laid out before the paragraph. Without this the `HStack` sizes both children by
-                // flexibility, and `ViewThatFits` reports the *vertical* candidate's narrow width
-                // as its minimum — so the paragraph took the width and the actions stacked even in
-                // a 1032pt window, where the row fits with room to spare.
-                .layoutPriority(1)
+                // Fill the card, don't shrink to the copy. Without this the stacked candidate
+                // sizes to its widest child and the card renders ~33pt narrower than every other
+                // card in the column — a visible ragged edge down the dashboard.
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(22)
             .background(
@@ -269,6 +255,41 @@ struct MacDashboardView: View {
                     endPoint: .bottomTrailing
                 )
             )
+        }
+    }
+
+    private var onboardingCopy: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Build your first financial view", systemImage: "sparkles")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(.white)
+            Text("Record cash flow or add a position. Wealth Compass Tracker will create snapshots and fill this dashboard automatically.")
+                .font(.subheadline)
+                .foregroundStyle(.white.opacity(0.64))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    /// The three actions, pinned to their intrinsic width.
+    ///
+    /// `.fixedSize()` is what stops the squeeze: a `Label` inside a `Button` is horizontally
+    /// flexible, so an enclosing `HStack` treats these three as compressible and shares width with
+    /// whatever sits beside them — which is how they ended up hyphenated mid-word ("Cas h Flo w").
+    ///
+    /// The vertical fallback then covers what `.fixedSize()` alone would break: three rigid buttons
+    /// are ~385pt, wider than the detail column of an iPad in Slide Over, and a fixed-size row
+    /// overflows its parent rather than clipping.
+    private var onboardingActionRow: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 10) {
+                onboardingActions
+            }
+            .fixedSize()
+
+            VStack(alignment: .leading, spacing: 8) {
+                onboardingActions
+            }
+            .fixedSize(horizontal: true, vertical: false)
         }
     }
 
