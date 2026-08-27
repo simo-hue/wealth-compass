@@ -6,7 +6,7 @@ Wealth Compass is a comprehensive, privacy-focused personal finance dashboard de
 
 The Apple implementation is driven by a single Xcode project containing two independent, fully native application targets:
 
-- **WealthCompassMobile**: Built with SwiftUI for iPhone, requiring iOS 17 or later.
+- **WealthCompassMobile**: Built with SwiftUI for iPhone and iPad, requiring iOS/iPadOS 17 or later. One binary, two UIs: iPhone renders the `TabView`, while iPad renders the same desktop-class sidebar interface the Mac uses (`Sources/Desktop/`, shared source rather than a copy).
 - **WealthCompassMac**: Built with native SwiftUI for macOS 14 or later. 
 
 *(Note: The macOS target does **not** use Mac Catalyst. It is built directly against the macOS SDK to leverage authentic desktop navigation, tables, menus, keyboard shortcuts, AppKit file panels, an in-window Settings page, sandbox entitlements, and Mac icon assets.)*
@@ -20,7 +20,7 @@ The Apple implementation is driven by a single Xcode project containing two inde
 - 🌍 **Localization**: Localized into 35 languages via Xcode String Catalogs. Coverage varies by
   language — the core interface is translated throughout, while some newer surfaces (notably the PDF
   report vocabulary) still fall back to English.
-- 🔄 **Data Portability**: Easily export your data to a JSON backup or import existing backups. Private CloudKit synchronization is available to keep your iPhone and Mac in sync.
+- 🔄 **Data Portability**: Easily export your data to a JSON backup or import existing backups. Private CloudKit synchronization is available to keep your iPhone, iPad and Mac in sync.
 
 ### Project Layout
 

@@ -10,9 +10,9 @@
   </a>
 </p>
 
-Wealth Compass is a local-first net-worth tracker for **iPhone and Mac**. Cash, investments, crypto
+Wealth Compass is a local-first net-worth tracker for **iPhone, iPad and Mac**. Cash, investments, crypto
 and debts go in one place, on your device, and it works out what they add up to. It is free, one
-universal App Store purchase covers both platforms, there is no account to create, and Apple's privacy
+universal App Store purchase covers every platform, there is no account to create, and Apple's privacy
 label on the listing reads **Data Not Collected**.
 
 The source is public but **not open source** — see [Licence](#-licence) below.
@@ -24,7 +24,7 @@ Product site: <https://simo-hue.github.io/wealth-compass/>
 
 The core of Wealth Compass is a native Apple ecosystem implementation, ensuring secure, local-first tracking on your devices.
 
-- **WealthCompassMobile**: Built with SwiftUI for iPhone, requiring iOS 17 or later.
+- **WealthCompassMobile**: Built with SwiftUI for iPhone and iPad, requiring iOS/iPadOS 17 or later. iPad runs the desktop-class sidebar UI rather than the iPhone tab bar.
 - **WealthCompassMac**: Built with native SwiftUI for macOS 14 or later (built directly against the macOS SDK, not Mac Catalyst).
 
 ### Core Features
@@ -36,12 +36,12 @@ The core of Wealth Compass is a native Apple ecosystem implementation, ensuring 
 - 🌍 **Localization**: Localized into 35 languages via Xcode String Catalogs. Coverage varies by
   language — the core interface is translated throughout, while some newer surfaces (notably the PDF
   report vocabulary) still fall back to English.
-- 🔄 **Data Portability**: Easily export your data to a JSON backup or import existing backups. Private CloudKit synchronization is available to keep your iPhone and Mac in sync.
+- 🔄 **Data Portability**: Easily export your data to a JSON backup or import existing backups. Private CloudKit synchronization is available to keep your iPhone, iPad and Mac in sync.
 
 ### Building the Apple Apps
 
 Open `apple/WealthCompass/WealthCompass.xcodeproj` and select:
-- `WealthCompassMobile` for the iPhone app
+- `WealthCompassMobile` for the iPhone and iPad app
 - `WealthCompassMac` for the native macOS app
 
 For architecture and detailed build instructions, see [`apple/README.md`](./apple/README.md).
@@ -53,11 +53,12 @@ share the JSON backup format, but no code.
 
 ```text
 wealth-compass/
-├── apple/                       Native iOS and macOS apps — see apple/README.md
+├── apple/                       Native iOS, iPadOS and macOS apps — see apple/README.md
 │   └── WealthCompass/
-│       ├── Sources/Shared/      Shared iPhone and Mac domain code
-│       ├── Sources/iOS/         iPhone application and views
-│       ├── Sources/macOS/       Native macOS application and views
+│       ├── Sources/Shared/      Domain code shared by every platform
+│       ├── Sources/iOS/         iPhone application, views, and the iOS entry point
+│       ├── Sources/Desktop/     Desktop-class UI — the Mac app, and what iPad runs
+│       ├── Sources/macOS/       macOS-only lifecycle (entry point + app delegate)
 │       ├── Resources/iOS/
 │       ├── Resources/macOS/
 │       └── WealthCompass.xcodeproj

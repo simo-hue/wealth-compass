@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This directory (`apple/`) is the **native Apple implementation** of Wealth Compass, a personal net-worth / finance tracker. It is one Xcode project with two independent native app targets plus a test target:
 
-- `WealthCompassMobile` — SwiftUI, iPhone, iOS 17+
+- `WealthCompassMobile` — SwiftUI, **iPhone and iPad**, iOS/iPadOS 17+ (`TARGETED_DEVICE_FAMILY = "1,2"`). The two devices run *different UIs from the same binary*: iPhone gets the `TabView` in `Sources/iOS/`, iPad gets the desktop-class sidebar UI in `Sources/Desktop/` — see "One binary, two UIs" below.
 - `WealthCompassMac` — native SwiftUI for macOS 14+ (no Mac Catalyst; built against the macOS SDK with sidebar navigation, tables, menus, keyboard shortcuts, an in-window Settings page, and sandbox entitlements)
 - `WealthCompassTests` — XCTest unit tests
 
@@ -23,9 +23,18 @@ All `xcodebuild` commands assume the current directory is `apple/` (this folder)
 xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMac \
   -destination 'platform=macOS' build
 
-# Build iOS
+# Build iOS (covers iPhone and iPad — one target, one binary)
 xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile \
   -destination 'generic/platform=iOS Simulator' build
+```
+
+A `generic/platform=iOS Simulator` build proves both idioms compile, but it renders neither. The iPad
+UI is a different code path from the iPhone one, so **verify iPad changes on an iPad simulator** — a
+green build says nothing about whether `MacRootView` laid out:
+
+```bash
+xcodebuild -project WealthCompass/WealthCompass.xcodeproj -scheme WealthCompassMobile \
+  -destination 'platform=iOS Simulator,name=iPad Pro 13-inch (M5)' build
 ```
 
 Tests are hosted by the Mobile app (`TEST_HOST` → `WealthCompassMobile.app`, `@testable import WealthCompassMobile`) and are wired only into the **WealthCompassMobile** scheme, so they run on an iOS Simulator:
@@ -151,11 +160,26 @@ Signing uses `DEVELOPMENT_TEAM = 8528AN28A3`. Version numbers live in `project.p
 
 ## Source layout
 
-- `Sources/Shared/` — the brain: `Models/`, `Persistence/`, `Services/`, `Stores/`, `UI/`. All finance calculations, persistence, sync, networking, and reusable views live here and compile into both apps.
-- `Sources/iOS/` — mobile lifecycle + `TabView` UI.
-- `Sources/macOS/` — desktop lifecycle + sidebar/table/menu UI, `MacAppModel` navigation, and `MacSettingsView` (an in-window Settings destination, not a separate Settings scene).
+- `Sources/Shared/` — the brain: `Models/`, `Persistence/`, `Services/`, `Stores/`, `UI/`, `Platform/`. All finance calculations, persistence, sync, networking, and reusable views live here and compile into both apps.
+- `Sources/iOS/` — iPhone lifecycle + `TabView` UI, plus the `@main` App both iOS devices share.
+- `Sources/Desktop/` — the desktop-class UI: sidebar/menu/editor views, `MacAppModel` navigation, `DesktopCommands`, and `MacSettingsView` (an in-window Settings destination, not a separate Settings scene). **Compiles into both app targets** — it is the macOS app, and it is what an iPad runs. Types here keep their historical `Mac*` names.
+- `Sources/macOS/` — Mac-only lifecycle, and nothing else: the `@main` `WealthCompassMacApp` and `MacAppDelegate` (which also owns `MacAppLockStore` and the Mac notification-service instance).
 
 ## Architecture (the parts that span multiple files)
+
+### One binary, two UIs (iPhone vs iPad)
+
+`Sources/Desktop/` is shared source, not a copy. `WealthCompassMobileApp` picks the UI by **device idiom** — `UIDevice.current.userInterfaceIdiom == .pad` → `MacRootView`, otherwise `ContentView`. Idiom, not size class, on purpose: a size-class test would swap the whole app between two UIs as the user dragged a Split View divider. `NavigationSplitView` already collapses to a stack when narrow.
+
+The whole macOS/iPadOS difference is five seams, and all of them live in `Sources/Shared/Platform/DesktopPlatform.swift` except the last two:
+
+1. `DesktopPlatform.registerForRemoteNotifications()` — `NSApplication` vs `UIApplication`.
+2. `typealias MacAppLockStore` / `MacRecurringTransactionNotificationService` — aliased *toward* the Mac names so the Desktop layer needed no renaming. On iPad they resolve to the iOS lock store and notification service, so a device never keeps two lock settings or two sets of reminders.
+3. `desktopWindowSize` / `desktopFixedSize` / `desktopCardWidth` — Mac window floors, no-ops on iPad where a 520pt floor inside a 320pt Slide Over would push content off-screen.
+4. `MacSettingsView` file I/O — `NSOpenPanel`/`NSSavePanel` on macOS, `.fileImporter`/`.fileExporter` on iPad. Both modifiers are attached unconditionally; macOS never sets their state, so they stay inert there.
+5. `DesktopCommands` — one `Commands` struct for both. Its `isEnabled` flag keeps the menus off iPhone, where nothing observes `MacAppModel` and ⌘N would be a dead key.
+
+**When adding a user-facing string to the Desktop layer, check it does not name a platform.** "this Mac", "the macOS Keychain" and similar now render on an iPad. The fix is two literals behind `#if os(macOS)` (the string catalog only extracts *literal* keys, so an interpolated device name registers neither), reusing the "this device" wording iOS already ships wherever it exists.
 
 ### State: two `@MainActor` stores injected as environment objects
 Each app's `@main` App constructs `AppSettings` first, then `FinanceStore(settings:)`, and injects them (plus a platform `AppLock`, and `MacAppModel` on Mac) via `.environmentObject`.
