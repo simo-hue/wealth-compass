@@ -221,7 +221,7 @@ struct MacRecurringTransactionEditor: View {
                 }
             }
         }
-        .frame(minWidth: 500, idealWidth: 600, minHeight: 540, idealHeight: 660)
+        .desktopWindowSize(minWidth: 500, idealWidth: 600, minHeight: 540, idealHeight: 660)
     }
 
     private func saveSchedule() {

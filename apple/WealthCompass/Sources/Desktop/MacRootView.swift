@@ -20,7 +20,7 @@ struct MacRootView: View {
         Group {
             if appLock.isLockEnabled && !appLock.isUnlocked {
                 MacLockView()
-                    .frame(minWidth: 520, minHeight: 400)
+                    .desktopWindowSize(minWidth: 520, minHeight: 400)
             } else if finance.loadState != .loaded {
                 // WC-LOCK1: mirrors iOS. macOS can't hit the lock-screen variant (no lock-time
                 // protection classes), but any load failure — a permissions problem, a bad disk —
@@ -38,10 +38,10 @@ struct MacRootView: View {
                         await MacRecurringTransactionNotificationService.shared.cancelAll()
                     }
                 )
-                .frame(minWidth: 520, minHeight: 400)
+                .desktopWindowSize(minWidth: 520, minHeight: 400)
             } else if !settings.hasSeenOnboarding {
                 MacOnboardingView()
-                    .frame(minWidth: 700, minHeight: 500)
+                    .desktopWindowSize(minWidth: 700, minHeight: 500)
             } else {
                 mainSplitView
             }
@@ -145,7 +145,7 @@ struct MacRootView: View {
             .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 280)
         } detail: {
             detail
-                .frame(minWidth: 520, minHeight: 400)
+                .desktopWindowSize(minWidth: 520, minHeight: 400)
                 // When the sidebar is collapsed, the page-switcher lives in the toolbar (below) and its
                 // highlighted segment already names the current page, so blank the window title then;
                 // when expanded, the sidebar does the navigating, so show the page name as the title.

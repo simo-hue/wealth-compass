@@ -246,7 +246,7 @@ struct MacSettingsView: View {
                 importSummary = nil
                 importSummaryNote = nil
             }
-            .frame(width: 460, height: 580)
+            .desktopFixedSize(width: 460, height: 580)
         }
         .alert(item: $settingsAlert) { alert in
             Alert(
@@ -1237,7 +1237,7 @@ private struct MacMarketDataCredentialEditor: View {
             }
             .padding()
         }
-        .frame(width: 520, height: 270)
+        .desktopFixedSize(width: 520, height: 270)
         .alert(item: $alert) { alert in
             Alert(
                 title: Text(alert.title),

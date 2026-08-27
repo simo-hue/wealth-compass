@@ -45,7 +45,7 @@ struct MacLockView: View {
                 }
                 .padding(24)
             }
-            .frame(width: 430)
+            .desktopCardWidth(430)
         }
         .task {
             guard !hasAutoPrompted else { return }

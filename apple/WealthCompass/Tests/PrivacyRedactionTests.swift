@@ -134,9 +134,13 @@ final class PrivacyRedactionTests: XCTestCase {
     /// the old form with the suite green.
     ///
     /// A lint rather than a render, and the same shape as
-    /// `testWorkingTreeRendersNoUnguardedLastUpdatedStamp`, for the same reason: five of the nine
-    /// sites are `Sources/macOS` and the test bundle hosts `WealthCompassMobile`, so they cannot be
-    /// rendered here at all.
+    /// `testWorkingTreeRendersNoUnguardedLastUpdatedStamp`. The original reason was that five of
+    /// the nine sites were `Sources/macOS`, which the `WealthCompassMobile` test host could not
+    /// render. That reason expired when those files moved to `Sources/Desktop` and began compiling
+    /// into this host so an iPad could run them — they are renderable here now. The lint stays
+    /// because its actual value was never the platform argument: it reads the *working tree*, so it
+    /// catches a tenth site the day someone writes it, which a render test only covers once
+    /// somebody remembers to instantiate the new view.
     ///
     /// What it looks for is a count rendered where nothing will format it — a string literal whose
     /// whole content is one interpolated count, or a `String(…)` conversion of one. That is
@@ -735,9 +739,11 @@ final class PrivacyRedactionTests: XCTestCase {
     /// macOS rows carry the time of day as well as the date — directly beside a figure already
     /// masked to `••••`.
     ///
-    /// A lint rather than a render, because two of the four sites are `Sources/macOS` and the test
-    /// bundle hosts `WealthCompassMobile`, so they cannot be rendered here at all. It is narrow on
-    /// purpose: a *transaction's* date is shown in the clear all over the app by a separate ruling,
+    /// A lint rather than a render. Two of the four sites used to be unrenderable here — they were
+    /// `Sources/macOS`, and the test bundle hosts `WealthCompassMobile` — but they now live in
+    /// `Sources/Desktop` and compile into this host, because an iPad runs them. The lint is kept
+    /// for the reason given on `testWorkingTreeSourcesContainNoUnformattedEntityCount`: it sweeps
+    /// the working tree, so a fifth site is caught the day it appears. It is narrow on purpose: a *transaction's* date is shown in the clear all over the app by a separate ruling,
     /// so this asks only about `updatedAt`, the field the Status-card decision was about.
     func testWorkingTreeRendersNoUnguardedLastUpdatedStamp() throws {
         let sources = URL(fileURLWithPath: #filePath)
@@ -808,7 +814,7 @@ final class PrivacyRedactionTests: XCTestCase {
     /// is the only directory left out, and it holds no Swift at all — the per-directory
     /// `XCTAssertFalse` below is what stops a real one from being quietly dropped from this list.
     private static let scannedDirectories = [
-        "iOS", "macOS",
+        "iOS", "macOS", "Desktop", "Shared/Platform",
         "Shared/UI", "Shared/Stores", "Shared/Export",
         "Shared/Models", "Shared/Services", "Shared/Persistence",
     ]
@@ -1593,10 +1599,12 @@ final class PrivacyRedactionTests: XCTestCase {
                 "    }",
                 "}",
             ], 5),
-            // The three macOS spellings of the "Hidden by Privacy Mode" cover, reverted to the
+            // The three desktop spellings of the "Hidden by Privacy Mode" cover, reverted to the
             // order they had before `f3fac7c` / `fb5272c`. None of these was swept at all until
-            // the title pattern was added, and the macOS half has no other coverage: the test
-            // bundle hosts `WealthCompassMobile`, so nothing under `Sources/macOS` can be rendered.
+            // the title pattern was added. They had no other coverage back when they lived in
+            // `Sources/macOS`, which the `WealthCompassMobile` test host could not render; since
+            // the move to `Sources/Desktop` they compile into this host, so that is no longer the
+            // reason they are pinned here — the sweep is.
             "ContentUnavailableView cover behind emptiness": ([
                 "var body: some View {",
                 "    if topHoldings.isEmpty {",
@@ -2502,7 +2510,7 @@ final class PrivacyRedactionTests: XCTestCase {
     /// of 5 requests handed to it, and `deliveredNotifications()` is permanently empty. So the loop
     /// in `sync` that adds these never runs here, and nothing about delivery can be asserted at all.
     /// Both platforms reach this same builder (`MacRecurringTransactionNotificationService` is an
-    /// `enum` in `MacPlatformServices.swift` holding a configured instance of the same actor), so
+    /// `enum` in `macOS/MacAppDelegate.swift` holding a configured instance of the same actor), so
     /// this covers the macOS reminder too — the one place in this audit where it does.
     func testPrivacyModeStopsTheRecurringReminderDescribingTheSchedule() throws {
         let rent = RecurringTransaction(
@@ -3890,7 +3898,7 @@ final class PrivacyRedactionTests: XCTestCase {
         let builder = "Shared/Services/RecurringNotificationService.swift"
         let delegates: Set<String> = [
             "iOS/Services/RecurringTransactionNotificationService.swift",
-            "macOS/MacPlatformServices.swift",
+            "macOS/MacAppDelegate.swift",
         ]
         let posts = try NSRegularExpression(pattern: #"\.\s*add\b"#)
 

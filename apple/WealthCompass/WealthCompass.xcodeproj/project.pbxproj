@@ -117,6 +117,17 @@
 		AD0000000000000000000061 /* MacLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000061 /* MacLockView.swift */; };
 		AD0000000000000000000062 /* MacAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000062 /* MacAppDelegate.swift */; };
 		AD0000000000000000000070 /* DesktopPlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000060 /* DesktopPlatform.swift */; };
+		AD0000000000000000000071 /* MacAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000021 /* MacAppModel.swift */; };
+		AD0000000000000000000072 /* MacRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000022 /* MacRootView.swift */; };
+		AD0000000000000000000073 /* MacLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000061 /* MacLockView.swift */; };
+		AD0000000000000000000074 /* MacDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000023 /* MacDashboardView.swift */; };
+		AD0000000000000000000075 /* MacCashFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000024 /* MacCashFlowView.swift */; };
+		AD0000000000000000000076 /* MacInvestmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000025 /* MacInvestmentsView.swift */; };
+		AD0000000000000000000077 /* MacCryptoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000026 /* MacCryptoView.swift */; };
+		AD0000000000000000000078 /* MacEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000027 /* MacEditorSheet.swift */; };
+		AD0000000000000000000079 /* MacRecurringTransactionEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC000000000000000000002A /* MacRecurringTransactionEditor.swift */; };
+		AD000000000000000000007A /* MacSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000028 /* MacSettingsView.swift */; };
+		AD000000000000000000007B /* MacOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CED77C7238F3CB0FAFA197 /* MacOnboardingView.swift */; };
 		AD000000000000000000003A /* MacRecurringTransactionEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC000000000000000000002A /* MacRecurringTransactionEditor.swift */; };
 		AD0000000000000000000040 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000030 /* Assets.xcassets */; };
 		AD0000000000000000000041 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000031 /* PrivacyInfo.xcprivacy */; };
@@ -757,6 +768,17 @@
 				AD0000000000000000000006 /* MarketDataService.swift in Sources */,
 				AD0000000000000000000007 /* DesignSystem.swift in Sources */,
 				AD0000000000000000000070 /* DesktopPlatform.swift in Sources */,
+				AD0000000000000000000071 /* MacAppModel.swift in Sources */,
+				AD0000000000000000000072 /* MacRootView.swift in Sources */,
+				AD0000000000000000000073 /* MacLockView.swift in Sources */,
+				AD0000000000000000000074 /* MacDashboardView.swift in Sources */,
+				AD0000000000000000000075 /* MacCashFlowView.swift in Sources */,
+				AD0000000000000000000076 /* MacInvestmentsView.swift in Sources */,
+				AD0000000000000000000077 /* MacCryptoView.swift in Sources */,
+				AD0000000000000000000078 /* MacEditorSheet.swift in Sources */,
+				AD0000000000000000000079 /* MacRecurringTransactionEditor.swift in Sources */,
+				AD000000000000000000007A /* MacSettingsView.swift in Sources */,
+				AD000000000000000000007B /* MacOnboardingView.swift in Sources */,
 				AD0000000000000000000008 /* FinanceJSONCoding.swift in Sources */,
 				AD0000000000000000000009 /* CloudKitSyncService.swift in Sources */,
 				AD00000000000000000000F3 /* AppLocalization.swift in Sources */,
@@ -955,7 +977,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -980,7 +1002,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1051,7 +1073,7 @@
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WealthCompassMobile.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WealthCompassMobile";
 			};
 			name = Debug;
@@ -1071,7 +1093,7 @@
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WealthCompassMobile.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WealthCompassMobile";
 			};
 			name = Release;

@@ -141,7 +141,7 @@ private struct MacTransactionEditor: View {
                 }
             }
         }
-        .frame(minWidth: 460, idealWidth: 520, minHeight: 380, idealHeight: 460)
+        .desktopWindowSize(minWidth: 460, idealWidth: 520, minHeight: 380, idealHeight: 460)
     }
 
     private func save() {
@@ -378,7 +378,7 @@ private struct MacInvestmentEditor: View {
         } message: {
             Text("Convert the entered amounts from \(pendingConversionFrom?.rawValue ?? "") to \(currency.rawValue) at today's exchange rate, or keep the numbers and just relabel them?")
         }
-        .frame(minWidth: 500, idealWidth: 580, minHeight: 580, idealHeight: 700)
+        .desktopWindowSize(minWidth: 500, idealWidth: 580, minHeight: 580, idealHeight: 700)
     }
 
     // L23: convert the money fields between currencies (percentage fee is currency-agnostic).
@@ -578,7 +578,7 @@ private struct MacCryptoEditor: View {
         } message: {
             Text("Convert the entered amounts from \(pendingConversionFrom?.rawValue ?? "") to \(currency.rawValue) at today's exchange rate, or keep the numbers and just relabel them?")
         }
-        .frame(minWidth: 480, idealWidth: 560, minHeight: 440, idealHeight: 560)
+        .desktopWindowSize(minWidth: 480, idealWidth: 560, minHeight: 440, idealHeight: 560)
     }
 
     // L23: convert the money fields between currencies (percentage fee is currency-agnostic).

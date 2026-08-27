@@ -695,7 +695,7 @@ struct MacCashFlowView: View {
             .padding(.vertical, 6)
             .background {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Color(nsColor: .controlBackgroundColor).opacity(0.5))
+                    .fill(Color.desktopControlBackground.opacity(0.5))
             }
             .frame(width: 200)
 

@@ -57,3 +57,67 @@ extension Notification.Name {
         .recurringTransactionNotificationReceived
 }
 #endif
+
+import SwiftUI
+
+extension View {
+    /// A Mac window/sheet size floor, applied only on macOS.
+    ///
+    /// These numbers exist because a Mac window is the *user's* to drag, and the content needs a
+    /// floor below which it stops working. An iPad window is sized by the system instead, and the
+    /// sizes it hands out include a 320pt Slide Over — where a 520pt floor does not protect the
+    /// layout, it pushes it off the screen. Off macOS this is a no-op and the platform's own
+    /// sheet and window sizing wins.
+    @ViewBuilder
+    func desktopWindowSize(
+        minWidth: CGFloat,
+        idealWidth: CGFloat? = nil,
+        minHeight: CGFloat,
+        idealHeight: CGFloat? = nil
+    ) -> some View {
+        #if os(macOS)
+        frame(minWidth: minWidth, idealWidth: idealWidth, minHeight: minHeight, idealHeight: idealHeight)
+        #else
+        self
+        #endif
+    }
+
+    /// A fixed Mac card width that becomes a cap on iPad, where the window itself can be narrower
+    /// than the card the Mac always has room for.
+    @ViewBuilder
+    func desktopCardWidth(_ width: CGFloat) -> some View {
+        #if os(macOS)
+        frame(width: width)
+        #else
+        frame(maxWidth: width)
+        #endif
+    }
+
+    /// A fixed Mac sheet size, applied only on macOS. Same reasoning as `desktopWindowSize`; on
+    /// iPad these sheets take the system form-sheet size, which is close to the Mac's ideal anyway.
+    @ViewBuilder
+    func desktopFixedSize(width: CGFloat, height: CGFloat) -> some View {
+        #if os(macOS)
+        frame(width: width, height: height)
+        #else
+        self
+        #endif
+    }
+}
+
+extension Color {
+    /// AppKit's `controlBackgroundColor`, which has no UIKit counterpart.
+    ///
+    /// Both apps force `.preferredColorScheme(.dark)`, so there is exactly one appearance to
+    /// match and the iPad value can be the literal dark-aqua one — measured, not guessed:
+    /// `NSColor.controlBackgroundColor` resolves to sRGB #1E1E1E (0.117647 grey) under
+    /// `NSAppearance(named: .darkAqua)`. macOS keeps reading the dynamic system colour so it
+    /// still follows any future appearance change there.
+    static var desktopControlBackground: Color {
+        #if os(macOS)
+        Color(nsColor: .controlBackgroundColor)
+        #else
+        Color(white: 0.117647)
+        #endif
+    }
+}

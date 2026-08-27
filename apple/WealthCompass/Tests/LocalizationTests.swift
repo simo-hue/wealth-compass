@@ -262,7 +262,7 @@ final class LocalizationTests: XCTestCase {
     /// `CFBundleDisplayName`, hardcoded at `Resources/iOS/Info.plist:7-8` and
     /// `project.pbxproj:973`/`:999`, and there is no `InfoPlist.xcstrings` in the build tree — so
     /// nothing in the catalog can reach it. That key is ordinary in-app UI text, drawn at
-    /// `LockView.swift:33`, `MacPlatformServices.swift:97` and `MacRootView.swift:145`. In those six
+    /// `LockView.swift:33`, `MacLockView.swift:21` and `MacRootView.swift:144`. In those six
     /// locales the unlock screen was therefore showing a translated name while the home-screen icon
     /// underneath it still said "Wealth Compass Tracker" — which is the exact confusion the
     /// lock-screen fix was about, on the screen the user reaches it from.
