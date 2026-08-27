@@ -214,11 +214,31 @@ struct MacDashboardView: View {
 
                 Spacer(minLength: 8)
 
-                HStack(spacing: 10) {
-                    onboardingButton("Cash Flow", systemImage: "arrow.left.arrow.right", destination: .cashFlow)
-                    onboardingButton("Investment", systemImage: "chart.line.uptrend.xyaxis", destination: .investments)
-                    onboardingButton("Crypto", systemImage: "bitcoinsign.circle", destination: .crypto)
+                // `.fixedSize()` is what stops the squeeze. A `Label` inside a `Button` is
+                // horizontally flexible, so the enclosing `HStack` treats these three as
+                // compressible and shares width with the paragraph on its left — which on an
+                // iPad in portrait left them hyphenated mid-word ("Cas h Flo w"). Pinned to
+                // their intrinsic width, the paragraph wraps instead, which is what it is for.
+                //
+                // The vertical fallback then covers the case `.fixedSize()` alone would break:
+                // three rigid buttons are ~385pt, wider than the detail column of an iPad in
+                // Slide Over, and a fixed-size row does overflow its parent rather than clip.
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 10) {
+                        onboardingActions
+                    }
+                    .fixedSize()
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        onboardingActions
+                    }
+                    .fixedSize(horizontal: true, vertical: false)
                 }
+                // Laid out before the paragraph. Without this the `HStack` sizes both children by
+                // flexibility, and `ViewThatFits` reports the *vertical* candidate's narrow width
+                // as its minimum — so the paragraph took the width and the actions stacked even in
+                // a 1032pt window, where the row fits with room to spare.
+                .layoutPriority(1)
             }
             .padding(22)
             .background(
@@ -229,6 +249,13 @@ struct MacDashboardView: View {
                 )
             )
         }
+    }
+
+    @ViewBuilder
+    private var onboardingActions: some View {
+        onboardingButton("Cash Flow", systemImage: "arrow.left.arrow.right", destination: .cashFlow)
+        onboardingButton("Investment", systemImage: "chart.line.uptrend.xyaxis", destination: .investments)
+        onboardingButton("Crypto", systemImage: "bitcoinsign.circle", destination: .crypto)
     }
 
     private func onboardingButton(

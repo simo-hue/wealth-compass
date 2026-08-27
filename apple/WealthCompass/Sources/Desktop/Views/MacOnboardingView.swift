@@ -8,6 +8,23 @@ struct MacOnboardingView: View {
     @StateObject private var viewModel = OnboardingViewModel()
     @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 34
     
+    /// The privacy paragraph, in the wording that matches the machine it is being read on.
+    ///
+    /// Two literals rather than one string with an interpolated device name: the string catalog
+    /// only extracts *literal* keys, so an interpolated version would register neither. The
+    /// "your device" wording is the key iOS onboarding already ships, so the iPad inherits
+    /// whatever translations that key has instead of opening a 35-locale hole.
+    ///
+    /// Typed `Text` rather than `some View` so the caller can still chain `.font` onto it — a
+    /// `#if` cannot sit mid-chain in a modifier list.
+    private var privacyParagraph: Text {
+        #if os(macOS)
+        Text("Your financial data stays on your Mac and in your private iCloud — there's no Wealth Compass Tracker server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests.")
+        #else
+        Text("Your financial data stays on your device and in your private iCloud — there's no Wealth Compass Tracker server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests.")
+        #endif
+    }
+
     var body: some View {
         ZStack {
             ScreenBackground()
@@ -233,7 +250,7 @@ struct MacOnboardingView: View {
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                 
-                Text("Your financial data stays on your Mac and in your private iCloud — there's no Wealth Compass Tracker server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests.")
+                privacyParagraph
                     .font(.title3)
                     .foregroundStyle(WCColor.textSecondary)
                     .multilineTextAlignment(.center)

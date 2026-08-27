@@ -135,6 +135,10 @@ struct MacSettingsView: View {
     // ever sets them, so the Mac keeps its modal panels and these never present.
     @State private var showingFileImporter = false
     @State private var pendingExport: DesktopPendingExport?
+    /// Held separately from `pendingExport` because dismissing `.fileExporter` clears that one
+    /// through its `isPresented` binding *before* `onCompletion` runs — reading the title off it
+    /// there produced a titleless alert showing only a bare path.
+    @State private var pendingExportSuccessTitle = ""
 
     var body: some View {
         VStack(spacing: 0) {
@@ -183,12 +187,10 @@ struct MacSettingsView: View {
             contentType: pendingExport?.document.contentType ?? .json,
             defaultFilename: pendingExport?.filename
         ) { result in
-            // Captured before clearing: the alert's title depends on which export this was.
-            let successTitle = pendingExport?.successTitle
             pendingExport = nil
             switch result {
             case .success(let url):
-                settingsAlert = MacSettingsAlert(title: successTitle ?? "", message: url.path)
+                settingsAlert = MacSettingsAlert(title: pendingExportSuccessTitle, message: url.path)
             case .failure(let error):
                 settingsAlert = MacSettingsAlert(
                     title: settings.localized("Export Failed"),
@@ -477,7 +479,7 @@ struct MacSettingsView: View {
             }
             .padding(.top, 8)
 
-            Text("API keys are verified against a live quote before they are stored in the macOS Keychain.")
+            keychainVerificationNote
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -759,7 +761,7 @@ struct MacSettingsView: View {
             refreshMarketDataKeyStatus()
             settingsAlert = MacSettingsAlert(
                 title: settings.localized("\(credential.localizedTitle(appLanguage: settings.appLanguage)) Removed"),
-                message: settings.localized("The API key was removed from the macOS Keychain.")
+                message: removedFromKeychainMessage
             )
         } catch {
             credentialEditorAlert = MacSettingsAlert(
@@ -840,7 +842,7 @@ struct MacSettingsView: View {
     }
 
     private func importData() {
-        // Replace discards every transaction, holding, liability and snapshot on this Mac and syncs
+        // Replace discards every transaction, holding, liability and snapshot on this device and syncs
         // the deletion to the user's other devices. iPhone has always confirmed it before showing
         // the file picker; the Mac ran it the moment a file was chosen, armed from a picker the user
         // may have set minutes earlier in the same Settings visit. Confirm first, with the same
@@ -850,6 +852,27 @@ struct MacSettingsView: View {
             return
         }
         presentImportPanel()
+    }
+
+    /// Keychain is the service's name on every Apple platform; only the "macOS" qualifier has to
+    /// go on iPad. Each of these keeps both literals rather than interpolating an OS name, because
+    /// the string catalog extracts literal keys only — an interpolated one would register neither
+    /// and silently drop the 34-35 locales the macOS wording already carries.
+    private var keychainVerificationNote: Text {
+        #if os(macOS)
+        Text("API keys are verified against a live quote before they are stored in the macOS Keychain.")
+        #else
+        Text("API keys are verified against a live quote before they are stored in Keychain.")
+        #endif
+    }
+
+    private var removedFromKeychainMessage: String {
+        #if os(macOS)
+        settings.localized("The API key was removed from the macOS Keychain.")
+        #else
+        // The wording iPhone Settings already uses, so a household with both sees one sentence.
+        settings.localized("The API key was removed from Keychain.")
+        #endif
     }
 
     private func presentImportPanel() {
@@ -926,13 +949,13 @@ struct MacSettingsView: View {
                 try Data(contentsOf: temporaryURL).write(to: destination, options: .atomic)
                 settingsAlert = MacSettingsAlert(title: successTitle, message: destination.path)
                 #else
+                pendingExportSuccessTitle = successTitle
                 pendingExport = DesktopPendingExport(
                     document: DesktopExportDocument(
                         data: try Data(contentsOf: temporaryURL),
                         contentType: isPDF ? .pdf : .json
                     ),
-                    filename: temporaryURL.lastPathComponent,
-                    successTitle: successTitle
+                    filename: temporaryURL.lastPathComponent
                 )
                 #endif
             } catch {
@@ -957,13 +980,13 @@ struct MacSettingsView: View {
             try Data(contentsOf: temporaryURL).write(to: destination, options: .atomic)
             settingsAlert = MacSettingsAlert(title: successTitle, message: destination.path)
             #else
+            pendingExportSuccessTitle = successTitle
             pendingExport = DesktopPendingExport(
                 document: DesktopExportDocument(
                     data: try Data(contentsOf: temporaryURL),
                     contentType: .plainText
                 ),
-                filename: temporaryURL.lastPathComponent,
-                successTitle: successTitle
+                filename: temporaryURL.lastPathComponent
             )
             #endif
         } catch {
@@ -1035,9 +1058,6 @@ struct MacSettingsView: View {
 private struct DesktopPendingExport {
     let document: DesktopExportDocument
     let filename: String
-    /// Resolved at build time, not save time — the pending export is cleared before the alert is
-    /// composed, and the title differs per export kind.
-    let successTitle: String
 }
 
 /// Carries the bytes of a finished export into `.fileExporter`. Reports and JSON backups are small
@@ -1157,7 +1177,13 @@ private enum MacSettingsDestructiveAction {
     func localizedMessage(appLanguage: String?) -> String {
         switch self {
         case .deleteAllData:
+            // Same reason as the onboarding privacy paragraph: two literals so both keys stay
+            // extractable, and the "this device" wording is iOS SettingsView's existing key.
+            #if os(macOS)
             AppLocalization.string("This permanently deletes all finance data on this Mac and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data.", appLanguage: appLanguage)
+            #else
+            AppLocalization.string("This permanently deletes all finance data on this device and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data.", appLanguage: appLanguage)
+            #endif
         case .deleteCustomCategory(let category, _):
             AppLocalization.string("Existing transactions using \(category) will keep their current category label.", appLanguage: appLanguage)
         case .replaceImport:
@@ -1188,6 +1214,15 @@ private struct MacMarketDataCredentialEditor: View {
     let onSave: () -> Void
     let onRemove: () -> Void
     @State private var showingRemoveConfirmation = false
+
+    /// See `MacSettingsView.keychainVerificationNote` for why this is two literals.
+    static var deleteFromKeychainWarning: Text {
+        #if os(macOS)
+        Text("The stored credential will be deleted from the macOS Keychain.")
+        #else
+        Text("The stored credential will be deleted from Keychain.")
+        #endif
+    }
 
     private var canSave: Bool {
         !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isSaving
@@ -1251,7 +1286,7 @@ private struct MacMarketDataCredentialEditor: View {
         ) {
             Button("Remove Key", role: .destructive, action: onRemove)
         } message: {
-            Text("The stored credential will be deleted from the macOS Keychain.")
+            Self.deleteFromKeychainWarning
         }
     }
 }

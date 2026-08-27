@@ -21055,6 +21055,9 @@
         }
       }
     },
+    "API keys are verified against a live quote before they are stored in Keychain." : {
+
+    },
     "API keys are verified against a live quote before they are stored in the macOS Keychain." : {
       "localizations" : {
         "ar" : {

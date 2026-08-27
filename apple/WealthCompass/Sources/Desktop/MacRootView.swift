@@ -146,14 +146,22 @@ struct MacRootView: View {
         } detail: {
             detail
                 .desktopWindowSize(minWidth: 520, minHeight: 400)
-                // When the sidebar is collapsed, the page-switcher lives in the toolbar (below) and its
-                // highlighted segment already names the current page, so blank the window title then;
-                // when expanded, the sidebar does the navigating, so show the page name as the title.
-                .navigationTitle(sidebarCollapsed ? "" : (appModel.selection ?? .dashboard).title)
+                // iPad puts the page-switcher along the bottom edge (see `bottomNavBar`), so the
+                // title bar is free and the page name goes back into it. On macOS the switcher
+                // still fills the title bar itself, and its highlighted segment already names the
+                // current page — so blank the title there to avoid saying it twice. Either way,
+                // with the sidebar expanded it is the sidebar that navigates and the title stands.
+                .navigationTitle(
+                    sidebarCollapsed && !DesktopPlatform.isPad
+                        ? "" : (appModel.selection ?? .dashboard).title
+                )
+                .safeAreaInset(edge: .bottom, spacing: 0) { bottomNavBar }
                 .toolbar {
-                    // Collapsed-only global page-switcher, centered in the toolbar — it fills the
-                    // otherwise-empty title bar and no longer overlaps each page's own top selector.
-                    if sidebarCollapsed {
+                    // Collapsed-only global page-switcher, centered in the toolbar. macOS only:
+                    // a title-bar segment is the desktop idiom, whereas reaching the top of a
+                    // 13-inch iPad to change page is not — there it sits under the thumbs
+                    // instead, where iPhone's tab bar is.
+                    if sidebarCollapsed, !DesktopPlatform.isPad {
                         ToolbarItem(placement: .principal) {
                             MacGlobalNavBar(selection: $appModel.selection)
                         }
@@ -177,6 +185,22 @@ struct MacRootView: View {
         // WC-M5: force the language re-render here (post-onboarding) instead of at the
         // app root, so changing language never resets the onboarding flow.
         .id(settings.appLanguage ?? "system")
+    }
+
+    /// iPad's page-switcher, pinned along the bottom edge in place of the macOS title-bar segment.
+    ///
+    /// A `safeAreaInset` rather than an overlay, so each page's own scroll view ends above the
+    /// pill instead of running underneath it — the same contract iPhone's tab bar has with the
+    /// views behind it. Shown on exactly the same condition as the macOS toolbar version: with the
+    /// sidebar open it is the sidebar that navigates, and two page-switchers on screen at once
+    /// would just be asking the same question twice.
+    @ViewBuilder
+    private var bottomNavBar: some View {
+        if sidebarCollapsed, DesktopPlatform.isPad {
+            MacGlobalNavBar(selection: $appModel.selection)
+                .padding(.top, 8)
+                .padding(.bottom, 4)
+        }
     }
 
     // Maps the persisted collapse flag to the NavigationSplitView column visibility (and back, so the

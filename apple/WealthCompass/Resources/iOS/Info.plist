@@ -40,10 +40,16 @@
 	</dict>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Use Face ID to unlock your local Wealth Compass Tracker data.</string>
+	<!-- Single-window, deliberately. The Mac app is already effectively single-window — its
+	     CommandGroup(replacing: .newItem) rebinds Cmd-N to New Transaction, so it offers no New
+	     Window — and the iPad runs that same UI. It also avoids a real defect: ContentView and
+	     MacRootView both drive appLock.lock() from scenePhase, and with two scenes, sending one
+	     window to the background would lock the window the user is still reading. Split View and
+	     Slide Over alongside OTHER apps are unaffected by this key. -->
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
-		<true/>
+		<false/>
 		<key>UISceneConfigurations</key>
 		<dict/>
 	</dict>
@@ -57,9 +63,19 @@
 	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
+	<!-- iPhone stays portrait-only: its TabView layout was designed for one orientation. iPad
+	     takes all four, because landscape is the ordinary way to hold one — and the sidebar UI it
+	     runs was built for a landscape-shaped Mac window in the first place. -->
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 </dict>
 </plist>
