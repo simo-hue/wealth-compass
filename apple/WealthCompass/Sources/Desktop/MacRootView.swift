@@ -1,4 +1,3 @@
-import AppKit
 import SwiftUI
 
 struct MacRootView: View {
@@ -103,7 +102,7 @@ struct MacRootView: View {
         }
         .onChange(of: settings.isICloudSyncEnabled) { _, enabled in
             // M31: register for push the moment sync is enabled, so it works without a foreground round-trip.
-            if enabled { NSApplication.shared.registerForRemoteNotifications() }
+            if enabled { DesktopPlatform.registerForRemoteNotifications() }
         }
         .onReceive(recurringCheckTimer) { _ in
             guard scenePhase == .active, appLock.isUnlocked else { return }
@@ -223,7 +222,7 @@ struct MacRootView: View {
         // M31: register for silent CloudKit pushes so remote changes propagate in near-real-time /
         // in the background, instead of only on the next foreground. Idempotent; only when sync is on.
         if settings.isICloudSyncEnabled {
-            NSApplication.shared.registerForRemoteNotifications()
+            DesktopPlatform.registerForRemoteNotifications()
         }
         await finance.requestICloudSync()
         await processRecurringTransactions()
