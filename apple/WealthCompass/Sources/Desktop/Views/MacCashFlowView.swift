@@ -830,15 +830,20 @@ struct MacCashFlowView: View {
 
     private var transactionTable: some View {
         ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
-                if filteredTransactions.isEmpty {
-                    ContentUnavailableView(
-                        transactionEmptyTitle,
-                        systemImage: transactionEmptySystemImage,
-                        description: Text(transactionEmptyDescription)
-                    )
-                    .padding(.top, 40)
-                } else {
+            if filteredTransactions.isEmpty {
+                    // Outside the grid on purpose. As a grid *cell* this occupied the first
+                    // column and read as left-aligned wherever the layout had two or more; an
+                    // empty state speaks for the whole list, so it spans the whole width.
+                ContentUnavailableView(
+                    transactionEmptyTitle,
+                    systemImage: transactionEmptySystemImage,
+                    description: Text(transactionEmptyDescription)
+                )
+                .padding(.top, 40)
+                .frame(maxWidth: .infinity)
+                .padding(24)
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
                     ForEach(filteredTransactions) { transaction in
                         transactionCard(for: transaction)
                             .contentShape(Rectangle())
@@ -852,9 +857,9 @@ struct MacCashFlowView: View {
                             .accessibilityAction { editor = .transaction(transaction) }
                     }
                 }
+                .padding(24)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(24)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 

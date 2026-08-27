@@ -187,6 +187,7 @@ struct MacInvestmentsView: View {
                     description: Text("Turn off Privacy Mode to reveal this.")
                 )
                 .padding(.top, 40)
+                .frame(maxWidth: .infinity)
             } else if topHoldings.isEmpty {
                 ContentUnavailableView(
                     "No Investments",
@@ -194,6 +195,7 @@ struct MacInvestmentsView: View {
                     description: Text("Add stocks, ETFs, bonds, or other positions.")
                 )
                 .padding(.top, 40)
+                .frame(maxWidth: .infinity)
             } else {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
                     ForEach(topHoldings) { investment in
@@ -207,31 +209,38 @@ struct MacInvestmentsView: View {
 
     private var investmentTable: some View {
         ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
-                // Privacy before emptiness, as at `topHoldingsSection` above.
-                if settings.isPrivacyMode, finance.data.investments.isEmpty {
-                    ContentUnavailableView(
-                        "Hidden by Privacy Mode",
-                        systemImage: "eye.slash",
-                        description: Text("Turn off Privacy Mode to reveal this.")
-                    )
-                    .padding(.top, 40)
-                } else if finance.data.investments.isEmpty {
-                    ContentUnavailableView(
-                        "No Investments",
-                        systemImage: "chart.line.uptrend.xyaxis",
-                        description: Text("Add stocks, ETFs, bonds, or other positions.")
-                    )
-                    .padding(.top, 40)
-                } else {
+            // Privacy before emptiness, as at `topHoldingsSection` above.
+            if settings.isPrivacyMode, finance.data.investments.isEmpty {
+                    // Outside the grid on purpose. As a grid *cell* this occupied the first
+                    // column and read as left-aligned wherever the layout had two or more; an
+                    // empty state speaks for the whole list, so it spans the whole width.
+                ContentUnavailableView(
+                    "Hidden by Privacy Mode",
+                    systemImage: "eye.slash",
+                    description: Text("Turn off Privacy Mode to reveal this.")
+                )
+                .padding(.top, 40)
+                .frame(maxWidth: .infinity)
+                .padding(32)
+            } else if finance.data.investments.isEmpty {
+                ContentUnavailableView(
+                    "No Investments",
+                    systemImage: "chart.line.uptrend.xyaxis",
+                    description: Text("Add stocks, ETFs, bonds, or other positions.")
+                )
+                .padding(.top, 40)
+                .frame(maxWidth: .infinity)
+                .padding(32)
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
                     // VIEW-10: value-ranked to match iOS + the Overview grid (was insertion order).
                     ForEach(finance.data.investments.rankedByValue(settings.convert)) { investment in
                         investmentCard(for: investment)
                     }
                 }
+                .padding(32)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(32)
-            .frame(maxWidth: .infinity)
         }
     }
 

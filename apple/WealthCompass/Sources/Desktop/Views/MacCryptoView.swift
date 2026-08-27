@@ -239,6 +239,7 @@ struct MacCryptoView: View {
                     description: Text("Turn off Privacy Mode to reveal this.")
                 )
                 .padding(.top, 40)
+                .frame(maxWidth: .infinity)
             } else if topHoldings.isEmpty {
                 ContentUnavailableView(
                     "No Crypto Holdings",
@@ -246,6 +247,7 @@ struct MacCryptoView: View {
                     description: Text("Add a holding to track its value.")
                 )
                 .padding(.top, 40)
+                .frame(maxWidth: .infinity)
             } else {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
                     ForEach(topHoldings) { holding in
@@ -258,31 +260,38 @@ struct MacCryptoView: View {
 
     private var cryptoTable: some View {
         ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
-                // Privacy before emptiness, as at `topHoldingsSection` above.
-                if settings.isPrivacyMode, finance.data.crypto.isEmpty {
-                    ContentUnavailableView(
-                        "Hidden by Privacy Mode",
-                        systemImage: "eye.slash",
-                        description: Text("Turn off Privacy Mode to reveal this.")
-                    )
-                    .padding(.top, 40)
-                } else if finance.data.crypto.isEmpty {
-                    ContentUnavailableView(
-                        "No Crypto Holdings",
-                        systemImage: "bitcoinsign.circle",
-                        description: Text("Add a holding to track its value and performance.")
-                    )
-                    .padding(.top, 40)
-                } else {
+            // Privacy before emptiness, as at `topHoldingsSection` above.
+            if settings.isPrivacyMode, finance.data.crypto.isEmpty {
+                    // Outside the grid on purpose. As a grid *cell* this occupied the first
+                    // column and read as left-aligned wherever the layout had two or more; an
+                    // empty state speaks for the whole list, so it spans the whole width.
+                ContentUnavailableView(
+                    "Hidden by Privacy Mode",
+                    systemImage: "eye.slash",
+                    description: Text("Turn off Privacy Mode to reveal this.")
+                )
+                .padding(.top, 40)
+                .frame(maxWidth: .infinity)
+                .padding(32)
+            } else if finance.data.crypto.isEmpty {
+                ContentUnavailableView(
+                    "No Crypto Holdings",
+                    systemImage: "bitcoinsign.circle",
+                    description: Text("Add a holding to track its value and performance.")
+                )
+                .padding(.top, 40)
+                .frame(maxWidth: .infinity)
+                .padding(32)
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 360), spacing: 16)], alignment: .leading, spacing: 16) {
                     // VIEW-10: value-ranked to match iOS + the Overview grid (was insertion order).
                     ForEach(finance.data.crypto.rankedByValue(settings.convert)) { holding in
                         holdingCard(for: holding)
                     }
                 }
+                .padding(32)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(32)
-            .frame(maxWidth: .infinity)
         }
     }
 
