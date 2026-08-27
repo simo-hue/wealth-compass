@@ -129,6 +129,12 @@ struct MacSettingsView: View {
     @State private var eraseFailureMessage = ""
     @State private var isErasing = false
     @StateObject private var exporter = ExportCoordinator()
+    // iPad-only. `NSOpenPanel`/`NSSavePanel` have no iOS counterpart, so the same two actions drive
+    // SwiftUI's document pickers there instead. The modifiers that read these are attached
+    // unconditionally — `.fileImporter`/`.fileExporter` exist on macOS too — but nothing on macOS
+    // ever sets them, so the Mac keeps its modal panels and these never present.
+    @State private var showingFileImporter = false
+    @State private var pendingExport: DesktopPendingExport?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -156,6 +162,40 @@ struct MacSettingsView: View {
         }
         .background(ScreenBackground())
         // navigationTitle centralized in MacRootView (collapse-aware).
+        .fileImporter(
+            isPresented: $showingFileImporter,
+            allowedContentTypes: [.json, .commaSeparatedText, .plainText, .pdf]
+        ) { result in
+            switch result {
+            case .success(let url):
+                runImport(from: url)
+            case .failure(let error):
+                settingsAlert = MacSettingsAlert(
+                    title: settings.localized("Import Failed"),
+                    message: error.localizedDescription
+                )
+            }
+        }
+        .fileExporter(
+            isPresented: Binding(get: { pendingExport != nil },
+                                 set: { if !$0 { pendingExport = nil } }),
+            document: pendingExport?.document,
+            contentType: pendingExport?.document.contentType ?? .json,
+            defaultFilename: pendingExport?.filename
+        ) { result in
+            // Captured before clearing: the alert's title depends on which export this was.
+            let successTitle = pendingExport?.successTitle
+            pendingExport = nil
+            switch result {
+            case .success(let url):
+                settingsAlert = MacSettingsAlert(title: successTitle ?? "", message: url.path)
+            case .failure(let error):
+                settingsAlert = MacSettingsAlert(
+                    title: settings.localized("Export Failed"),
+                    message: Self.errorMessage(error, appLanguage: settings.appLanguage)
+                )
+            }
+        }
         .onAppear(perform: refreshMarketDataKeyStatus)
         .onChange(of: appModel.exportRequest, initial: true) { _, request in
             // File ▸ Export… (⌘E) selects this page and then asks it to open the sheet. The token
@@ -813,15 +853,31 @@ struct MacSettingsView: View {
     }
 
     private func presentImportPanel() {
+        #if os(macOS)
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.json, .commaSeparatedText, .plainText, .pdf]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
-        // L55: import is async (detects + parses off the MainActor). The open panel above stays on the
+        runImport(from: url)
+        #else
+        showingFileImporter = true
+        #endif
+    }
+
+    /// The import itself, once a URL has been chosen — identical on both platforms.
+    private func runImport(from url: URL) {
+        // L55: import is async (detects + parses off the MainActor). Picking the file happens on the
         // main thread; the async import + summary run in a Task.
         Task {
+            // A URL from `.fileImporter` points outside the app container and is only readable
+            // inside a security scope. It matters here specifically *because* the read is async:
+            // the scope SwiftUI holds open for the callback is long gone by the time
+            // `importFile` reaches the disk. Returns false for URLs that need no scope (every
+            // `NSOpenPanel` URL on macOS), which is why the stop is conditional.
+            let isScoped = url.startAccessingSecurityScopedResource()
+            defer { if isScoped { url.stopAccessingSecurityScopedResource() } }
             do {
                 let result = try await finance.importFile(from: url, mode: importMode, settings: settings)
                 let insertedCount = finance.processDueRecurringTransactions(settings: settings)
@@ -860,16 +916,25 @@ struct MacSettingsView: View {
                 guard let temporaryURL = try await exporter.export(finance: finance, settings: settings) else {
                     return  // cancelled — no alert, the user knows
                 }
+                let successTitle = settings.localized(isPDF ? "Report Exported" : "Backup Exported")
+                #if os(macOS)
                 let panel = NSSavePanel()
                 panel.allowedContentTypes = [isPDF ? .pdf : .json]
                 panel.nameFieldStringValue = temporaryURL.lastPathComponent
 
                 guard panel.runModal() == .OK, let destination = panel.url else { return }
                 try Data(contentsOf: temporaryURL).write(to: destination, options: .atomic)
-                settingsAlert = MacSettingsAlert(
-                    title: settings.localized(isPDF ? "Report Exported" : "Backup Exported"),
-                    message: destination.path
+                settingsAlert = MacSettingsAlert(title: successTitle, message: destination.path)
+                #else
+                pendingExport = DesktopPendingExport(
+                    document: DesktopExportDocument(
+                        data: try Data(contentsOf: temporaryURL),
+                        contentType: isPDF ? .pdf : .json
+                    ),
+                    filename: temporaryURL.lastPathComponent,
+                    successTitle: successTitle
                 )
+                #endif
             } catch {
                 settingsAlert = MacSettingsAlert(
                     title: settings.localized("Export Failed"),
@@ -882,16 +947,25 @@ struct MacSettingsView: View {
     private func exportSyncDiagnostics() {
         do {
             let temporaryURL = try finance.exportSyncDiagnosticsURL()
+            let successTitle = settings.localized("Diagnostics Exported")
+            #if os(macOS)
             let panel = NSSavePanel()
             panel.allowedContentTypes = [.plainText]
             panel.nameFieldStringValue = temporaryURL.lastPathComponent
 
             guard panel.runModal() == .OK, let destination = panel.url else { return }
             try Data(contentsOf: temporaryURL).write(to: destination, options: .atomic)
-            settingsAlert = MacSettingsAlert(
-                title: settings.localized("Diagnostics Exported"),
-                message: destination.path
+            settingsAlert = MacSettingsAlert(title: successTitle, message: destination.path)
+            #else
+            pendingExport = DesktopPendingExport(
+                document: DesktopExportDocument(
+                    data: try Data(contentsOf: temporaryURL),
+                    contentType: .plainText
+                ),
+                filename: temporaryURL.lastPathComponent,
+                successTitle: successTitle
             )
+            #endif
         } catch {
             settingsAlert = MacSettingsAlert(
                 title: settings.localized("Export Failed"),
@@ -953,6 +1027,40 @@ struct MacSettingsView: View {
         if let error = error as? MarketDataError { return error.localizedDescription(appLanguage: appLanguage) }
         if let error = error as? ReportRenderError { return error.localizedDescription(appLanguage: appLanguage) }
         return (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+    }
+}
+
+/// An already-rendered export waiting for the user to choose where it goes. Only reached on iPad;
+/// macOS writes the file itself from `NSSavePanel`'s destination.
+private struct DesktopPendingExport {
+    let document: DesktopExportDocument
+    let filename: String
+    /// Resolved at build time, not save time — the pending export is cleared before the alert is
+    /// composed, and the title differs per export kind.
+    let successTitle: String
+}
+
+/// Carries the bytes of a finished export into `.fileExporter`. Reports and JSON backups are small
+/// enough that holding one in memory for the life of a save panel is not a concern; this type never
+/// reads, so its `init(configuration:)` is unreachable by construction.
+private struct DesktopExportDocument: FileDocument {
+    static let readableContentTypes: [UTType] = []
+    static let writableContentTypes: [UTType] = [.json, .pdf, .plainText]
+
+    let data: Data
+    let contentType: UTType
+
+    init(data: Data, contentType: UTType) {
+        self.data = data
+        self.contentType = contentType
+    }
+
+    init(configuration: ReadConfiguration) throws {
+        throw CocoaError(.fileReadUnsupportedScheme)
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        FileWrapper(regularFileWithContents: data)
     }
 }
 
