@@ -31,6 +31,17 @@ struct WealthCompassMobileApp: App {
                 // language during onboarding no longer resets the flow. (Also stops the root's
                 // `init` re-running on every change — WC-L25.)
         }
+        // iPad gets the Mac's File/Navigate menus and their ⌘ shortcuts — the iPadOS menu bar
+        // draws them, and the shortcut HUD lists them. `isEnabled` keeps them off the iPhone,
+        // where nothing observes `MacAppModel` and they would be dead keys.
+        .commands {
+            DesktopCommands(
+                finance: financeStore,
+                settings: settings,
+                appModel: appModel,
+                isEnabled: DesktopPlatform.isPad
+            )
+        }
     }
 }
 

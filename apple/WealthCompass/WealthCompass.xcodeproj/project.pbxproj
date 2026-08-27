@@ -117,6 +117,8 @@
 		AD0000000000000000000061 /* MacLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000061 /* MacLockView.swift */; };
 		AD0000000000000000000062 /* MacAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000062 /* MacAppDelegate.swift */; };
 		AD0000000000000000000070 /* DesktopPlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000060 /* DesktopPlatform.swift */; };
+		AD0000000000000000000063 /* DesktopCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000063 /* DesktopCommands.swift */; };
+		AD000000000000000000007C /* DesktopCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000063 /* DesktopCommands.swift */; };
 		AD0000000000000000000071 /* MacAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000021 /* MacAppModel.swift */; };
 		AD0000000000000000000072 /* MacRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000022 /* MacRootView.swift */; };
 		AD0000000000000000000073 /* MacLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000061 /* MacLockView.swift */; };
@@ -230,6 +232,7 @@
 		AC0000000000000000000060 /* DesktopPlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPlatform.swift; sourceTree = "<group>"; };
 		AC0000000000000000000061 /* MacLockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacLockView.swift; sourceTree = "<group>"; };
 		AC0000000000000000000062 /* MacAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAppDelegate.swift; sourceTree = "<group>"; };
+		AC0000000000000000000063 /* DesktopCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopCommands.swift; sourceTree = "<group>"; };
 		AC000000000000000000002A /* MacRecurringTransactionEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MacRecurringTransactionEditor.swift; sourceTree = "<group>"; };
 		AC0000000000000000000030 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AC0000000000000000000031 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -448,6 +451,7 @@
 			children = (
 				AC0000000000000000000021 /* MacAppModel.swift */,
 				AC0000000000000000000022 /* MacRootView.swift */,
+				AC0000000000000000000063 /* DesktopCommands.swift */,
 				AC0000000000000000000061 /* MacLockView.swift */,
 				AC0000000000000000000023 /* MacDashboardView.swift */,
 				AC0000000000000000000024 /* MacCashFlowView.swift */,
@@ -770,6 +774,7 @@
 				AD0000000000000000000070 /* DesktopPlatform.swift in Sources */,
 				AD0000000000000000000071 /* MacAppModel.swift in Sources */,
 				AD0000000000000000000072 /* MacRootView.swift in Sources */,
+				AD000000000000000000007C /* DesktopCommands.swift in Sources */,
 				AD0000000000000000000073 /* MacLockView.swift in Sources */,
 				AD0000000000000000000074 /* MacDashboardView.swift in Sources */,
 				AD0000000000000000000075 /* MacCashFlowView.swift in Sources */,
@@ -850,6 +855,7 @@
 				AD0000000000000000000062 /* MacAppDelegate.swift in Sources */,
 				AD0000000000000000000061 /* MacLockView.swift in Sources */,
 				AD0000000000000000000060 /* DesktopPlatform.swift in Sources */,
+				AD0000000000000000000063 /* DesktopCommands.swift in Sources */,
 				AD0000000000000000000033 /* MacDashboardView.swift in Sources */,
 				AD0000000000000000000034 /* MacCashFlowView.swift in Sources */,
 				AD0000000000000000000035 /* MacInvestmentsView.swift in Sources */,
