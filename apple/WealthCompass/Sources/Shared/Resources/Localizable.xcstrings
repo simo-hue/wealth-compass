@@ -1042,6 +1042,7 @@
       }
     },
     "(continued)" : {
+      "extractionState" : "manual"
 
     },
     "\\n\\n%@ due recurring %@ added to Cash Flow." : {
@@ -13081,6 +13082,7 @@
       }
     },
     "+ %lld more" : {
+      "extractionState" : "manual"
 
     },
     "1 %@" : {
@@ -19596,9 +19598,11 @@
       }
     },
     "Allocation" : {
+      "extractionState" : "manual"
 
     },
     "Allocation by Geography" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19807,6 +19811,7 @@
       }
     },
     "Allocation by Sector" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20015,6 +20020,7 @@
       }
     },
     "Allocation by Type" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20438,6 +20444,7 @@
       }
     },
     "Amount" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21267,6 +21274,7 @@
       }
     },
     "Appendix" : {
+      "extractionState" : "manual"
 
     },
     "Apple (AAPL)" : {
@@ -21485,6 +21493,7 @@
       }
     },
     "Application" : {
+      "extractionState" : "manual"
 
     },
     "Asset Allocation" : {
@@ -21703,6 +21712,7 @@
       }
     },
     "Assets" : {
+      "extractionState" : "manual"
 
     },
     "ASSETS" : {
@@ -22334,6 +22344,7 @@
 
     },
     "Avg Buy" : {
+      "extractionState" : "manual"
 
     },
     "Back" : {
@@ -22555,6 +22566,7 @@
       }
     },
     "Balance" : {
+      "extractionState" : "manual"
 
     },
     "Balances derived from your activity and holdings" : {
@@ -22766,6 +22778,7 @@
       }
     },
     "Base Currency" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25484,6 +25497,7 @@
       }
     },
     "Cash" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25900,6 +25914,7 @@
       }
     },
     "Cash Flow" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -26111,6 +26126,7 @@
 
     },
     "Cash in this app is the running total of every income minus every expense, so the closing balance above is the cash figure as at the end of this period. The opening balance carries forward all activity before it." : {
+      "extractionState" : "manual"
 
     },
     "Cash-flow chart concealed" : {
@@ -26332,6 +26348,7 @@
 
     },
     "Category" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -28438,6 +28455,7 @@
       }
     },
     "Closing Balance" : {
+      "extractionState" : "manual"
 
     },
     "CloudKit record %@ has no payload." : {
@@ -30120,6 +30138,7 @@
       }
     },
     "Completed" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -31375,6 +31394,7 @@
       }
     },
     "Contents" : {
+      "extractionState" : "manual"
 
     },
     "Continue" : {
@@ -31586,6 +31606,7 @@
       }
     },
     "Conversion rates, data summary and document details" : {
+      "extractionState" : "manual"
 
     },
     "Convert Amounts" : {
@@ -31810,6 +31831,7 @@
       }
     },
     "Cost Basis" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -32639,6 +32661,7 @@
       }
     },
     "Crypto" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -33686,7 +33709,7 @@
       }
     },
     "Crypto Holdings" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -34529,6 +34552,7 @@
 
     },
     "Currency" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35780,6 +35804,7 @@
       }
     },
     "Custom Range" : {
+      "extractionState" : "manual"
 
     },
     "Custom..." : {
@@ -36830,12 +36855,14 @@
       }
     },
     "Data Summary" : {
+      "extractionState" : "manual"
 
     },
     "Data Unavailable" : {
 
     },
     "Date" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40596,6 +40623,7 @@
       }
     },
     "Description" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -41223,6 +41251,7 @@
 
     },
     "Digital asset holdings and performance" : {
+      "extractionState" : "manual"
 
     },
     "Discard" : {
@@ -41437,6 +41466,7 @@
       }
     },
     "Document" : {
+      "extractionState" : "manual"
 
     },
     "Done" : {
@@ -44355,6 +44385,7 @@
       }
     },
     "Effective Date" : {
+      "extractionState" : "manual"
 
     },
     "Emerging Markets" : {
@@ -44989,6 +45020,7 @@
       }
     },
     "Ends" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -47965,6 +47997,7 @@
       }
     },
     "Every figure in this report is expressed in the base currency, converted at the rates above. Amounts shown in a holding's own currency are unconverted." : {
+      "extractionState" : "manual"
 
     },
     "Everything you own, owe, earn, and spend." : {
@@ -48387,6 +48420,7 @@
       }
     },
     "Exchange Rates" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -50066,6 +50100,7 @@
       }
     },
     "Expenses by Category" : {
+      "extractionState" : "manual"
 
     },
     "Expenses grouped by category" : {
@@ -50277,6 +50312,7 @@
       }
     },
     "Expenses This Month" : {
+      "extractionState" : "manual"
 
     },
     "Export" : {
@@ -51554,9 +51590,11 @@
       }
     },
     "Fees" : {
+      "extractionState" : "manual"
 
     },
     "Fees Paid" : {
+      "extractionState" : "manual"
 
     },
     "Filtered to %@" : {
@@ -52191,6 +52229,7 @@
       }
     },
     "Financial Report" : {
+      "extractionState" : "manual"
 
     },
     "Finish" : {
@@ -55325,6 +55364,7 @@
       }
     },
     "Frequency" : {
+      "extractionState" : "manual"
 
     },
     "Fuel" : {
@@ -55536,6 +55576,7 @@
       }
     },
     "Full Report" : {
+      "extractionState" : "manual"
 
     },
     "Future %@ occurrences for %@ will no longer be created." : {
@@ -55968,9 +56009,11 @@
       }
     },
     "Future-dated — not counted in cash" : {
+      "extractionState" : "manual"
 
     },
     "Gain / Loss" : {
+      "extractionState" : "manual"
 
     },
     "General" : {
@@ -56189,6 +56232,7 @@
       }
     },
     "Generated" : {
+      "extractionState" : "manual"
 
     },
     "Generated from a recurring schedule" : {
@@ -58099,6 +58143,7 @@
       }
     },
     "Holdings, allocation and performance" : {
+      "extractionState" : "manual"
 
     },
     "Housing" : {
@@ -59156,6 +59201,7 @@
       }
     },
     "iCloud is still preparing your sync data. This usually resolves on the next sync." : {
+      "extractionState" : "manual"
 
     },
     "iCloud Sync" : {
@@ -61893,9 +61939,11 @@
       }
     },
     "In %@" : {
+      "extractionState" : "manual"
 
     },
     "Income" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -62520,9 +62568,11 @@
       }
     },
     "Income This Month" : {
+      "extractionState" : "manual"
 
     },
     "Income, expenses, recurring commitments and the full transaction ledger" : {
+      "extractionState" : "manual"
 
     },
     "Invalid API Key" : {
@@ -63788,6 +63838,7 @@
       }
     },
     "Investments" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -65881,6 +65932,7 @@
       }
     },
     "Last 12 Months" : {
+      "extractionState" : "manual"
 
     },
     "Last 30 Days" : {
@@ -67347,6 +67399,7 @@
       }
     },
     "Liabilities" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -67971,6 +68024,7 @@
       }
     },
     "Live rate" : {
+      "extractionState" : "manual"
 
     },
     "Loading your data…" : {
@@ -69453,6 +69507,7 @@
 
     },
     "Market Value" : {
+      "extractionState" : "manual"
 
     },
     "Merge" : {
@@ -70496,6 +70551,7 @@
       }
     },
     "Money Flow" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -70912,6 +70968,7 @@
       }
     },
     "Month" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -71120,6 +71177,7 @@
       }
     },
     "Month-end net worth" : {
+      "extractionState" : "manual"
 
     },
     "Monthly" : {
@@ -71976,9 +72034,11 @@
       }
     },
     "Monthly Trend" : {
+      "extractionState" : "manual"
 
     },
     "Name" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -72395,6 +72455,7 @@
       }
     },
     "Net cash liabilities of %@ are excluded from the allocation ring, because a ring cannot show a negative share. Net worth above accounts for them in full." : {
+      "extractionState" : "manual"
 
     },
     "Net Savings" : {
@@ -72613,6 +72674,7 @@
       }
     },
     "Net Worth" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -73029,6 +73091,7 @@
       }
     },
     "Net Worth History" : {
+      "extractionState" : "manual"
 
     },
     "Net worth range" : {
@@ -73240,9 +73303,11 @@
       }
     },
     "Net Worth Snapshots" : {
+      "extractionState" : "manual"
 
     },
     "Net worth, asset allocation and liabilities" : {
+      "extractionState" : "manual"
 
     },
     "Net-worth history" : {
@@ -75138,6 +75203,7 @@
       }
     },
     "Next Due" : {
+      "extractionState" : "manual"
 
     },
     "Next: %@" : {
@@ -77242,9 +77308,11 @@
       }
     },
     "No entries recorded." : {
+      "extractionState" : "manual"
 
     },
     "No exchange rate snapshot had been retrieved when this report was generated. Foreign-currency amounts were converted using the app's built-in offline fallback rates, which are approximate." : {
+      "extractionState" : "manual"
 
     },
     "No expenses for this period" : {
@@ -81663,6 +81731,7 @@
       }
     },
     "Notifications off" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -82911,6 +82980,7 @@
       }
     },
     "Offline fallback rate" : {
+      "extractionState" : "manual"
 
     },
     "OK" : {
@@ -84377,6 +84447,7 @@
       }
     },
     "Opening Balance" : {
+      "extractionState" : "manual"
 
     },
     "Optic ID" : {
@@ -84796,6 +84867,7 @@
       }
     },
     "Other" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -85004,6 +85076,7 @@
       }
     },
     "Overview" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -85212,6 +85285,7 @@
       }
     },
     "Page %1$@ of %2$@" : {
+      "extractionState" : "manual"
 
     },
     "Paste CoinGecko API key" : {
@@ -86277,6 +86351,7 @@
       }
     },
     "Paused" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -87317,6 +87392,7 @@
       }
     },
     "Period" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -87528,6 +87604,7 @@
 
     },
     "Platform" : {
+      "extractionState" : "manual"
 
     },
     "Please insert at least one API key, or click 'Skip for now' if you wish to proceed without them." : {
@@ -88794,6 +88871,7 @@
       }
     },
     "Prepared from data entered by the account holder. Market values reflect the most recent prices retrieved by the app and are not independently verified. This document is a personal record, not financial advice or a statement from a regulated institution." : {
+      "extractionState" : "manual"
 
     },
     "Preparing Report" : {
@@ -88803,6 +88881,7 @@
 
     },
     "Price" : {
+      "extractionState" : "manual"
 
     },
     "Prices Updated" : {
@@ -90480,9 +90559,11 @@
       }
     },
     "Provider" : {
+      "extractionState" : "manual"
 
     },
     "Quantity" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -90691,6 +90772,7 @@
       }
     },
     "Quote Base" : {
+      "extractionState" : "manual",
       "comment" : "Source column in the PDF appendix rate table, marking the row for the currency all other rates are quoted against — it converts to itself at 1, through no rate at all.",
       "localizations" : {
         "ar" : {
@@ -91108,6 +91190,7 @@
       }
     },
     "Rates applied to convert holdings into the base currency" : {
+      "extractionState" : "manual"
 
     },
     "Rates may be incomplete" : {
@@ -92459,6 +92542,7 @@
 
     },
     "Recurring" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -92875,9 +92959,11 @@
       }
     },
     "Recurring Commitments" : {
+      "extractionState" : "manual"
 
     },
     "Recurring Rules" : {
+      "extractionState" : "manual"
 
     },
     "Recurring Schedules" : {
@@ -96937,6 +97023,7 @@
       }
     },
     "Retrieved" : {
+      "extractionState" : "manual"
 
     },
     "Retrieving %@ price..." : {
@@ -97359,6 +97446,7 @@
       }
     },
     "Sampled at each month end from the app's daily snapshot history." : {
+      "extractionState" : "manual"
 
     },
     "Save" : {
@@ -97576,6 +97664,7 @@
 
     },
     "savings rate" : {
+      "extractionState" : "manual"
 
     },
     "Savings Rate" : {
@@ -98210,6 +98299,7 @@
       }
     },
     "Scope" : {
+      "extractionState" : "manual"
 
     },
     "Search" : {
@@ -99880,6 +99970,7 @@
       }
     },
     "Share" : {
+      "extractionState" : "manual"
 
     },
     "Share Backup" : {
@@ -101691,6 +101782,7 @@
       }
     },
     "Source" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -103707,6 +103799,7 @@
       }
     },
     "subtotal" : {
+      "extractionState" : "manual"
 
     },
     "Surplus" : {
@@ -104342,6 +104435,7 @@
       }
     },
     "Symbol" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -110862,6 +110956,7 @@
       }
     },
     "This Year" : {
+      "extractionState" : "manual"
 
     },
     "Top Expense Categories" : {
@@ -111503,6 +111598,7 @@
       }
     },
     "Total" : {
+      "extractionState" : "manual"
 
     },
     "TOTAL" : {
@@ -111714,6 +111810,7 @@
       }
     },
     "Total Assets" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -112177,9 +112274,11 @@
       }
     },
     "Total Expenses" : {
+      "extractionState" : "manual"
 
     },
     "Total Liabilities" : {
+      "extractionState" : "manual"
 
     },
     "Touch ID" : {
@@ -113055,6 +113154,7 @@
       }
     },
     "Transaction Ledger" : {
+      "extractionState" : "manual"
 
     },
     "Transaction Period" : {
@@ -113689,6 +113789,7 @@
       }
     },
     "Transactions" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -115860,6 +115961,7 @@
       }
     },
     "Units per %@" : {
+      "extractionState" : "manual"
 
     },
     "Unlock" : {
@@ -118050,6 +118152,7 @@
       }
     },
     "Value" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -119558,6 +119661,7 @@
       }
     },
     "Wealth Compass" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -126336,6 +126440,7 @@
       }
     },
     "Allocated" : {
+      "extractionState" : "manual",
       "comment" : "Centre label of the asset-allocation ring in the exported PDF: the sum of the wedges actually drawn, which differs from Total Assets when net-negative cash is clamped out.",
       "localizations" : {
         "ar" : {
