@@ -82,6 +82,7 @@ private struct MacTransactionEditor: View {
 
                     // L20: show the active currency code in the label, matching the recurring editor.
                     TextField("Amount (\(currency.rawValue))", text: $amount)
+                        .desktopDecimalField()
                     Picker("Currency", selection: $currency) {
                         ForEach(Currency.allCases) { currencyOption in
                             (Text(currencyOption.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)
@@ -268,8 +269,10 @@ private struct MacInvestmentEditor: View {
             Form {
                 Section("Identity") {
                     TextField("Symbol", text: $symbol)
+                        .desktopSymbolField()
                     TextField("Name", text: $name)
                     TextField("ISIN / ID", text: $isin)
+                        .desktopSymbolField()
                     Picker("Type", selection: $type) {
                         ForEach(InvestmentType.allCases) { Text($0.title).tag($0) }
                     }
@@ -306,8 +309,11 @@ private struct MacInvestmentEditor: View {
 
                 Section("Position") {
                     TextField("Quantity", text: $quantity)
+                        .desktopDecimalField()
                     TextField("Average Buy Price (\(currency.rawValue))", text: $averagePrice)
+                        .desktopDecimalField()
                     TextField("Current Price (\(currency.rawValue))", text: $currentPrice)
+                        .desktopDecimalField()
                 }
 
                 Section("Investment Transaction Fee") {
@@ -501,6 +507,7 @@ private struct MacCryptoEditor: View {
             Form {
                 Section("Identity") {
                     TextField("Symbol", text: $symbol)
+                        .desktopSymbolField()
                     TextField("Name", text: $name)
                     TextField("CoinGecko ID", text: $coinID)
                 }
@@ -512,8 +519,11 @@ private struct MacCryptoEditor: View {
                         }
                     }
                     TextField("Quantity", text: $quantity)
+                        .desktopDecimalField()
                     TextField("Average Buy Price (\(currency.rawValue))", text: $averagePrice)
+                        .desktopDecimalField()
                     TextField("Current Price (\(currency.rawValue))", text: $currentPrice)
+                        .desktopDecimalField()
                 }
 
                 Section("Transaction Fee") {

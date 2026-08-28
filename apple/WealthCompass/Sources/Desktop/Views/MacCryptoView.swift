@@ -380,9 +380,18 @@ struct MacCryptoView: View {
             }
         }
         .contentShape(Rectangle())
+        // Double-click on a Mac; a single tap on iPad, where a double-tap is a Mac idiom with no
+        // on-card affordance to hint at it — the long-press context menu was the only discoverable
+        // way in, and a single tap did nothing at all.
+        #if os(macOS)
         .onTapGesture(count: 2) {
             appModel.editor = .crypto(holding)
         }
+        #else
+        .onTapGesture {
+            appModel.editor = .crypto(holding)
+        }
+        #endif
         // WC-L24: the double-click-to-edit affordance is invisible to VoiceOver/keyboard, so expose the
         // card as one activatable button whose default action opens the editor (mirrors the Cash Flow card).
         .accessibilityElement(children: .combine)

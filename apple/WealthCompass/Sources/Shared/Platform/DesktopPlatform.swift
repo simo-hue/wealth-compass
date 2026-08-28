@@ -90,6 +90,32 @@ extension View {
     /// layout, it pushes it off the screen. Off macOS this is a no-op and the platform's own
     /// sheet and window sizing wins.
     @ViewBuilder
+    /// Brings up the decimal keypad for a money or quantity field on touch.
+    ///
+    /// `keyboardType` does not exist on macOS, so the Desktop layer had none of these — and it now
+    /// renders on an iPad, where every amount opened the full QWERTY keyboard and needed a manual
+    /// switch to the numeric plane. The iPhone UI sets `.decimalPad` on all eleven of its money
+    /// fields; this is the same thing for the shared layer.
+    func desktopDecimalField() -> some View {
+        #if os(macOS)
+        self
+        #else
+        keyboardType(.decimalPad)
+        #endif
+    }
+
+    /// A ticker / ISIN field: uppercase, and never autocorrected.
+    ///
+    /// Without this an iPad autocapitalises the first letter only and helpfully corrects "VWCE"
+    /// to a dictionary word.
+    func desktopSymbolField() -> some View {
+        #if os(macOS)
+        self
+        #else
+        textInputAutocapitalization(.characters).autocorrectionDisabled()
+        #endif
+    }
+
     /// Widens a borderless icon button to the 44pt minimum on touch.
     ///
     /// The Desktop layer's row actions are `.controlSize(.small)` images — roughly 22pt, and 4pt

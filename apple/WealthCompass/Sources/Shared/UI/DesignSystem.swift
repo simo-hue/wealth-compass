@@ -831,7 +831,16 @@ struct MacSelectorIsland<Tab: MacSelectorTab>: View {
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(selection == tab ? .white : .white.opacity(0.8))
                         .padding(.horizontal, 16)
+                        // ~29pt tall with 6pt of padding, and this is the primary sub-navigation on
+                        // four of the five Desktop pages — comfortably under the 44pt touch minimum
+                        // on the iPad that now renders it. A no-op on macOS, where a taller island
+                        // would just make every page header heavier for a pointer that does not
+                        // need it.
+                        #if os(macOS)
                         .padding(.vertical, 6)
+                        #else
+                        .padding(.vertical, 13)
+                        #endif
                         .background {
                             if selection == tab {
                                 Capsule()

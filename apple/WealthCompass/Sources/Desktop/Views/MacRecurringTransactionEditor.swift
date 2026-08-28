@@ -120,6 +120,7 @@ struct MacRecurringTransactionEditor: View {
                     }
 
                     TextField("Amount (\(currency.rawValue))", text: $amount)
+                        .desktopDecimalField()
                     Picker("Currency", selection: $currency) {
                         ForEach(Currency.allCases) { currencyOption in
                             (Text(currencyOption.localizedDisplayName(appLanguage: settings.appLanguage)) + Text(" (\(currencyOption.rawValue))")).tag(currencyOption)

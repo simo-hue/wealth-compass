@@ -60,6 +60,11 @@ struct DesktopCommands: Commands {
                 appModel.requestExport()
             }
             .keyboardShortcut("e", modifiers: .command)
+            // Same guard the New-item buttons above carry, and for the same reason: with the data
+            // unloaded the root renders `FinanceDataUnavailableView` and never builds the Settings
+            // page, so this sets an export token nothing is listening for — and the token persists,
+            // so the sheet then popped unprompted the moment a retry succeeded.
+            .disabled(finance.loadState != .loaded)
         }
 
         // Sidebar navigation shortcuts (⌘1 through ⌘5).
@@ -96,5 +101,7 @@ struct DesktopCommands: Commands {
             appModel.selection = destination
         }
         .keyboardShortcut(key, modifiers: .command)
+        // Likewise: with nothing loaded these rewrite a selection no view is observing.
+        .disabled(finance.loadState != .loaded)
     }
 }
