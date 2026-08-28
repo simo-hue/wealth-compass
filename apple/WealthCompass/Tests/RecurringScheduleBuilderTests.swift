@@ -65,6 +65,66 @@ final class RecurringScheduleBuilderTests: XCTestCase {
         XCTAssertEqual(rebuilt.id, existing.id)
     }
 
+    /// Editing an unrelated field on a paused schedule must not resume it.
+    ///
+    /// The M21 reactivation used to be unconditional, and the branch above it additionally requires
+    /// `existing.isActive` — so a paused schedule with an unchanged frequency/start fell straight
+    /// through to it. Fixing a typo in the description therefore set `isActive = true`, and within
+    /// 30 seconds `processDueRecurringTransactions` started posting the expense again.
+    func testEditingAPausedScheduleKeepsItPaused() {
+        let start = date(2026, 1, 1)
+        var existing = schedule(start: start, frequency: .monthly, nextDue: date(2026, 7, 1))
+        existing.isActive = false
+
+        let rebuilt = RecurringScheduleBuilder.build(
+            existing: existing, type: .expense, category: "Rent", amount: 500,
+            description: "Rent (landlord: Maria)", // the only change
+            startDate: start, frequency: .monthly, endDate: nil,
+            notificationsEnabled: true, currency: .eur, now: date(2026, 6, 22)
+        )
+
+        XCTAssertFalse(rebuilt.isActive, "A paused schedule must survive an unrelated edit.")
+        XCTAssertEqual(rebuilt.description, "Rent (landlord: Maria)", "The edit must still be saved.")
+    }
+
+    /// ...but M21 itself must still work: extending the end date revives a lapsed schedule.
+    func testExtendingTheEndDateStillRevivesALapsedSchedule() {
+        let start = date(2026, 1, 1)
+        var existing = schedule(start: start, frequency: .monthly, nextDue: date(2026, 7, 1))
+        existing.endDate = date(2026, 3, 1) // ran out, so it auto-deactivated
+        existing.isActive = false
+
+        let rebuilt = RecurringScheduleBuilder.build(
+            existing: existing, type: .expense, category: "Rent", amount: 500, description: "Rent",
+            startDate: start, frequency: .monthly,
+            endDate: date(2027, 1, 1), // extended
+            notificationsEnabled: true, currency: .eur, now: date(2026, 6, 22)
+        )
+
+        XCTAssertTrue(rebuilt.isActive, "Extending the end date must revive a lapsed schedule (M21).")
+        // Asserted as a range, not an instant: `build` resolves occurrences with `Calendar.current`
+        // (it takes no calendar), so pinning the exact `Date` compares a UTC-built fixture against
+        // local-calendar month arithmetic and drifts by the UTC offset across a DST boundary —
+        // a start in January and a due date in July differ by an hour in any European zone.
+        XCTAssertGreaterThan(rebuilt.nextDueDate, date(2026, 6, 22), "The revived due date must be ahead of now.")
+        XCTAssertLessThanOrEqual(rebuilt.nextDueDate, date(2027, 1, 1), "…and within the extended end date.")
+    }
+
+    /// A changed frequency also counts as a revive-worthy edit.
+    func testChangingFrequencyRevivesAnInactiveSchedule() {
+        let start = date(2026, 1, 1)
+        var existing = schedule(start: start, frequency: .monthly, nextDue: date(2026, 7, 1))
+        existing.isActive = false
+
+        let rebuilt = RecurringScheduleBuilder.build(
+            existing: existing, type: .expense, category: "Rent", amount: 500, description: "Rent",
+            startDate: start, frequency: .weekly, endDate: nil,
+            notificationsEnabled: true, currency: .eur, now: date(2026, 6, 22)
+        )
+
+        XCTAssertTrue(rebuilt.isActive, "Rewriting the schedule itself still recomputes isActive.")
+    }
+
     func testFirstOccurrenceMonthlyAnchorsToStartDay() {
         let schedule = schedule(start: date(2026, 1, 15), frequency: .monthly, nextDue: date(2026, 1, 15))
         let occurrence = schedule.firstOccurrence(onOrAfter: date(2026, 6, 22), calendar: utc)
