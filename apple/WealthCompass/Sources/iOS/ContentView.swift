@@ -70,11 +70,20 @@ struct ContentView: View {
         .overlay {
             // WC-L26: opaque privacy shield over the app-switcher snapshot and transient
             // interruptions, so financial data isn't exposed without forcing a re-auth.
+            //
+            // Kept alongside the window below, not replaced by it: this covers the root itself the
+            // instant SwiftUI re-renders, while the window covers whatever is presented *above* the
+            // root — which an overlay structurally cannot reach.
             if scenePhase != .active {
                 PrivacyShield()
             }
         }
         .onChange(of: scenePhase) { _, newPhase in
+            // The overlay above cannot cover a presented sheet: an editor or the export sheet is
+            // presented above this view's hosting controller, so the overlay painted behind it and
+            // the app-switcher snapshot kept the sheet's figures. Same condition, second surface.
+            DesktopPlatform.setPrivacyShieldVisible(newPhase != .active)
+
             // WC-L26: hard-lock only on .background. Transient .inactive events (Control Center,
             // the share sheet, an incoming call) are covered by the shield above instead, so the
             // user isn't forced to re-authenticate after every harmless interruption.

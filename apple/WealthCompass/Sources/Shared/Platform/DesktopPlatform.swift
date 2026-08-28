@@ -31,6 +31,27 @@ enum DesktopPlatform {
         #endif
     }
 
+    /// Shows or hides the privacy cover in its **own window**, above everything the app presents.
+    ///
+    /// The cover used to be a SwiftUI `.overlay` on each root view. Every editor and export sheet is
+    /// presented modally *above* the root's hosting controller, so the overlay painted behind them:
+    /// with "Edit Investment" open — symbol, quantity, average buy price and current price all on
+    /// screen — swiping to the app switcher covered the dashboard behind the sheet and left the
+    /// sheet itself fully visible, and that is what iOS captured for the snapshot.
+    ///
+    /// A separate `UIWindow` is what fixes it rather than a bigger overlay: on iOS a sheet is
+    /// presented *within* the same window, so any window above `.normal` necessarily covers it,
+    /// whatever is presented and however deeply. It is not interactive and never becomes key, so it
+    /// cannot take focus, swallow a touch, or affect what the app restores to.
+    ///
+    /// A no-op on macOS, where there is no snapshot to protect and the roots keep their overlay.
+    @MainActor
+    static func setPrivacyShieldVisible(_ isVisible: Bool) {
+        #if !os(macOS)
+        PrivacyShieldWindow.shared.setVisible(isVisible)
+        #endif
+    }
+
     /// True when this build is running the desktop-class UI on an iPad, rather than on a Mac.
     /// Used only where a control genuinely cannot exist on one of the two (file panels), never to
     /// vary layout — the whole point of sharing the layer is that iPad and Mac look the same.
@@ -139,3 +160,63 @@ extension View {
         #endif
     }
 }
+
+#if !os(macOS)
+import SwiftUI
+
+/// Owns the privacy cover's window. See `DesktopPlatform.setPrivacyShieldVisible(_:)`.
+@MainActor
+final class PrivacyShieldWindow {
+    static let shared = PrivacyShieldWindow()
+
+    private var window: UIWindow?
+
+    private init() {}
+
+    func setVisible(_ isVisible: Bool) {
+        guard isVisible else {
+            window?.isHidden = true
+            window = nil
+            return
+        }
+        guard window == nil else { return }
+
+        // Prefer the scene the user is actually looking at. On an iPad with several windows open,
+        // attaching to a backgrounded scene would cover a window nobody is about to see while
+        // leaving the visible one exposed.
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        guard let scene = scenes.first(where: { $0.activationState != .background }) ?? scenes.first else {
+            return
+        }
+
+        let shield = UIWindow(windowScene: scene)
+        // Above `.alert`, which is where UIKit puts presented alerts and action sheets.
+        shield.windowLevel = .alert + 1
+        // Never interactive and never key: the cover must not swallow the touch that dismisses it,
+        // steal first responder from a field the user was editing, or change what the app restores.
+        shield.isUserInteractionEnabled = false
+        let host = UIHostingController(rootView: PrivacyShieldCover())
+        // The hosting controller's own background is clear by default, which would make the cover
+        // translucent — the one thing it must never be.
+        host.view.backgroundColor = UIColor(WCColor.background)
+        shield.rootViewController = host
+        shield.isHidden = false
+        window = shield
+    }
+
+    /// Test seam: the window currently installed, if any.
+    var installedWindow: UIWindow? { window }
+}
+
+private struct PrivacyShieldCover: View {
+    var body: some View {
+        ZStack {
+            WCColor.background
+            Image(systemName: "lock.shield.fill")
+                .font(.system(size: 56))
+                .foregroundStyle(WCColor.primary.opacity(0.5))
+        }
+        .ignoresSafeArea()
+    }
+}
+#endif

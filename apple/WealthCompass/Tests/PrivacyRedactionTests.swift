@@ -1097,6 +1097,79 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    // MARK: - The app-switcher snapshot
+
+    /// The privacy cover has to sit above anything the app has presented, not just above the root.
+    ///
+    /// It was a SwiftUI `.overlay` on each root view. On iOS a sheet is presented above the root's
+    /// *hosting controller*, so the overlay painted behind it: with "Edit Investment" open — symbol,
+    /// quantity, average buy price and current price all on screen — swiping to the app switcher
+    /// covered the dashboard and left the sheet fully visible, and that is the frame iOS keeps.
+    ///
+    /// What makes the fix work is the window, not the drawing: a sheet is presented *within* a
+    /// window, so any window above `.normal` covers it whatever is presented and however deeply.
+    /// That is the property pinned here, because it is the one that generalises — asserting on the
+    /// cover's appearance would pass just as well for an overlay that hides nothing.
+    @MainActor
+    func testPrivacyShieldIsInstalledInAWindowAboveEveryPresentation() {
+        DesktopPlatform.setPrivacyShieldVisible(false)   // start clean
+        XCTAssertNil(PrivacyShieldWindow.shared.installedWindow)
+
+        DesktopPlatform.setPrivacyShieldVisible(true)
+        defer { DesktopPlatform.setPrivacyShieldVisible(false) }
+
+        guard let shield = PrivacyShieldWindow.shared.installedWindow else {
+            return XCTFail("no cover window was installed — presented sheets stay in the snapshot")
+        }
+
+        XCTAssertGreaterThan(
+            shield.windowLevel.rawValue, UIWindow.Level.normal.rawValue,
+            "a cover at or below .normal is behind everything presented, which is the original bug"
+        )
+        XCTAssertGreaterThan(
+            shield.windowLevel.rawValue, UIWindow.Level.alert.rawValue,
+            "alerts and action sheets are presented at .alert, so the cover has to clear it"
+        )
+        XCTAssertFalse(shield.isHidden, "an installed cover that stays hidden covers nothing")
+        XCTAssertNotNil(shield.rootViewController, "an empty window is transparent")
+        XCTAssertFalse(
+            shield.isUserInteractionEnabled,
+            "the cover must not swallow the touch that dismisses it or steal first responder"
+        )
+        XCTAssertNotEqual(
+            shield.rootViewController?.view.backgroundColor, .clear,
+            "a clear background makes the cover transparent — the one thing it must never be"
+        )
+    }
+
+    /// Hiding it must actually remove the window, not merely leave one lying around.
+    @MainActor
+    func testPrivacyShieldIsTornDownWhenHidden() {
+        DesktopPlatform.setPrivacyShieldVisible(true)
+        XCTAssertNotNil(PrivacyShieldWindow.shared.installedWindow)
+
+        DesktopPlatform.setPrivacyShieldVisible(false)
+        XCTAssertNil(
+            PrivacyShieldWindow.shared.installedWindow,
+            "a cover left installed would sit over the app for the rest of the session"
+        )
+    }
+
+    /// Showing twice must not stack covers, since each one leaks a window for the session.
+    @MainActor
+    func testShowingThePrivacyShieldTwiceInstallsOneWindow() {
+        DesktopPlatform.setPrivacyShieldVisible(false)
+        DesktopPlatform.setPrivacyShieldVisible(true)
+        let first = PrivacyShieldWindow.shared.installedWindow
+        DesktopPlatform.setPrivacyShieldVisible(true)
+        defer { DesktopPlatform.setPrivacyShieldVisible(false) }
+
+        XCTAssertTrue(
+            first === PrivacyShieldWindow.shared.installedWindow,
+            "the second show replaced the window instead of reusing it"
+        )
+    }
+
     // MARK: - Sign leaks
 
     /// Privacy Mode must not spell a redacted figure's sign through its glyph or its tint.

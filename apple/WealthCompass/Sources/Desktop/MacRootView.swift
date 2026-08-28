@@ -73,6 +73,12 @@ struct MacRootView: View {
             await handleAppBecameActive()
         }
         .onChange(of: scenePhase) { _, phase in
+            // The overlay above cannot cover the editor or export sheet: both are presented above
+            // this view's hosting controller, so on iPad the app-switcher snapshot kept them while
+            // the cover sat behind. Same condition, second surface; a no-op on macOS, which has no
+            // snapshot and keeps the overlay alone.
+            DesktopPlatform.setPrivacyShieldVisible(phase != .active)
+
             // Deep-audit H03/H04: hard-lock only on .background (the app hidden via Cmd-H or all
             // windows minimized). Transient .inactive (another app frontmost, Mission Control, screen
             // occlusion) is covered by the privacy shield above instead, so simply switching apps no
