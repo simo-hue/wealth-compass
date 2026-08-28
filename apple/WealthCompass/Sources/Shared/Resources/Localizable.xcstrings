@@ -20115,7 +20115,7 @@
         "ms" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pengagihan"
+            "value" : "Peruntukan"
           }
         },
         "nb" : {
@@ -21070,7 +21070,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Množství"
+            "value" : "Částka"
           }
         },
         "da" : {
@@ -21118,19 +21118,19 @@
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "סְכוּם"
+            "value" : "סכום"
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "मात्रा"
+            "value" : "राशि"
           }
         },
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Iznositi"
+            "value" : "Iznos"
           }
         },
         "hu" : {
@@ -21160,7 +21160,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "양"
+            "value" : "금액"
           }
         },
         "ms" : {
@@ -21208,7 +21208,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Количество"
+            "value" : "Сумма"
           }
         },
         "sk" : {
@@ -21244,7 +21244,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Số lượng"
+            "value" : "Số tiền"
           }
         },
         "zh-Hans" : {
@@ -21256,7 +21256,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "數量"
+            "value" : "金額"
           }
         }
       }
@@ -22328,13 +22328,13 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applikation"
+            "value" : "App"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anwendung"
+            "value" : "App"
           }
         },
         "el" : {
@@ -22424,13 +22424,13 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applikasjon"
+            "value" : "App"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applicatie"
+            "value" : "App"
           }
         },
         "pl" : {
@@ -22472,7 +22472,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applikation"
+            "value" : "App"
           }
         },
         "th" : {
@@ -22764,7 +22764,7 @@
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Περιουσιακά στοιχεία"
+            "value" : "Ενεργητικό"
           }
         },
         "es" : {
@@ -22854,7 +22854,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bezittingen"
+            "value" : "Activa"
           }
         },
         "pl" : {
@@ -22972,7 +22972,7 @@
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ΑΚΙΝΗΤΗ ΠΕΡΙΟΥΣΙΑ"
+            "value" : "ΠΕΡΙΟΥΣΙΑΚΑ ΣΤΟΙΧΕΙΑ"
           }
         },
         "es" : {
@@ -23575,7 +23575,7 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preu mitjà"
+            "value" : "Compra mitjana"
           }
         },
         "cs" : {
@@ -23605,19 +23605,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Precio medio"
+            "value" : "Compra media"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Precio promedio"
+            "value" : "Compra prom."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keskihinta"
+            "value" : "Keskiostohinta"
           }
         },
         "fr" : {
@@ -23629,7 +23629,7 @@
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "קנייה ממוצעת"
+            "value" : "מחיר קנייה ממוצע"
           }
         },
         "hi" : {
@@ -23659,7 +23659,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prezzo medio"
+            "value" : "Acquisto medio"
           }
         },
         "ja" : {
@@ -23701,19 +23701,19 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preço médio"
+            "value" : "Compra média"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preço médio"
+            "value" : "Compra média"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preț mediu"
+            "value" : "Cumpărare medie"
           }
         },
         "ru" : {
@@ -27743,7 +27743,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "現金週轉"
+            "value" : "現金流量"
           }
         }
       }
@@ -27923,7 +27923,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "เงินสดในแอปนี้คือยอดสะสมของรายรับทั้งหมดหักด้วยรายจ่ายทั้งหมด ยอดคงเหลือปลายงวดด้านบนจึงเป็นจำนวนเงินสด ณ วันสิ้นสุดของงวดนี้ ส่วนยอดยกมาต้นงวดได้รวมรายการทั้งหมดก่อนหน้านั้นไว้แล้ว."
+            "value" : "เงินสดในแอปนี้คือยอดสะสมของรายรับทั้งหมดหักด้วยรายจ่ายทั้งหมด ยอดคงเหลือปลายงวดด้านบนจึงเป็นจำนวนเงินสด ณ วันสิ้นสุดของงวดนี้ ส่วนยอดยกมาต้นงวดได้รวมรายการทั้งหมดก่อนหน้านั้นไว้แล้ว"
           }
         },
         "tr" : {
@@ -28240,7 +28240,7 @@
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "קָטֵגוֹרִיָה"
+            "value" : "קטגוריה"
           }
         },
         "hi" : {
@@ -35192,7 +35192,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "暗号"
+            "value" : "暗号資産"
           }
         },
         "ko" : {
@@ -35264,7 +35264,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "การเข้ารหัสลับ"
+            "value" : "คริปโท"
           }
         },
         "tr" : {
@@ -37045,7 +37045,7 @@
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "מַטְבֵּעַ"
+            "value" : "מטבע"
           }
         },
         "hi" : {
@@ -39555,7 +39555,7 @@
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "תַאֲרִיך"
+            "value" : "תאריך"
           }
         },
         "hi" : {
@@ -43312,7 +43312,7 @@
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "תֵאוּר"
+            "value" : "תיאור"
           }
         },
         "hi" : {
@@ -47580,7 +47580,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avstämningsdatum"
+            "value" : "Giltighetsdatum"
           }
         },
         "th" : {
@@ -51275,7 +51275,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toutes les valeurs de ce rapport sont exprimées dans la devise de référence, converties aux taux ci-dessus. Les montants affichés dans la devise propre d'une position ne sont pas convertis."
+            "value" : "Toutes les valeurs de ce rapport sont exprimées dans la devise de base, converties aux taux ci-dessus. Les montants affichés dans la devise propre d'une position ne sont pas convertis."
           }
         },
         "he" : {
@@ -51389,7 +51389,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ทุกจำนวนเงินในรายงานนี้แสดงเป็นสกุลเงินหลัก โดยแปลงค่าตามอัตราด้านบน จำนวนเงินที่แสดงเป็นสกุลเงินของสินทรัพย์นั้นเองไม่ได้ผ่านการแปลงค่า."
+            "value" : "ทุกจำนวนเงินในรายงานนี้แสดงเป็นสกุลเงินหลัก โดยแปลงค่าตามอัตราด้านบน จำนวนเงินที่แสดงเป็นสกุลเงินของสินทรัพย์นั้นเองไม่ได้ผ่านการแปลงค่า"
           }
         },
         "tr" : {
@@ -53134,7 +53134,7 @@
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Εξοδα"
+            "value" : "Έξοδα"
           }
         },
         "en" : {
@@ -55547,7 +55547,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Taxas"
+            "value" : "Tarifas"
           }
         },
         "pt-PT" : {
@@ -55654,7 +55654,7 @@
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Καταβληθείσες προμήθειες"
+            "value" : "Προμήθειες"
           }
         },
         "es" : {
@@ -55756,7 +55756,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Taxas pagas"
+            "value" : "Tarifas pagas"
           }
         },
         "pt-PT" : {
@@ -61664,7 +61664,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oluşturulma"
+            "value" : "Oluşturulma Tarihi"
           }
         },
         "uk" : {
@@ -68703,7 +68703,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revenus, dépenses, engagements récurrents et journal complet des opérations"
+            "value" : "Revenus, dépenses, engagements récurrents et journal complet des transactions"
           }
         },
         "he" : {
@@ -70198,7 +70198,7 @@
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beruházások"
+            "value" : "Befektetések"
           }
         },
         "id" : {
@@ -74327,7 +74327,7 @@
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ζωντανή ισοτιμία"
+            "value" : "Τρέχουσα ισοτιμία"
           }
         },
         "es" : {
@@ -74417,7 +74417,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Live koers"
+            "value" : "Live-koers"
           }
         },
         "pl" : {
@@ -74459,7 +74459,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktuell kurs"
+            "value" : "Livekurs"
           }
         },
         "th" : {
@@ -77705,7 +77705,7 @@
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "חוֹדֶשׁ"
+            "value" : "חודש"
           }
         },
         "hi" : {
@@ -79137,7 +79137,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jméno"
+            "value" : "Název"
           }
         },
         "da" : {
@@ -79155,7 +79155,7 @@
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ονομα"
+            "value" : "Όνομα"
           }
         },
         "es" : {
@@ -79185,7 +79185,7 @@
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "שֵׁם"
+            "value" : "שם"
           }
         },
         "hi" : {
@@ -79197,7 +79197,7 @@
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ime"
+            "value" : "Naziv"
           }
         },
         "hu" : {
@@ -79275,13 +79275,13 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Имя"
+            "value" : "Название"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Meno"
+            "value" : "Názov"
           }
         },
         "sv" : {
@@ -79323,7 +79323,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "姓名"
+            "value" : "名稱"
           }
         }
       }
@@ -79560,7 +79560,7 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Netto kontantforpligtelser på %@ indgår ikke i fordelingsringen, fordi en ring ikke kan vise en negativ andel. Nettoformuen ovenfor medregner dem fuldt ud."
+            "value" : "Nettokontantforpligtelser på %@ indgår ikke i fordelingsringen, fordi en ring ikke kan vise en negativ andel. Nettoformuen ovenfor medregner dem fuldt ud."
           }
         },
         "de" : {
@@ -79644,7 +79644,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "순현금부채 %@는 링에서 음의 비중을 표시할 수 없으므로 자산 배분 링에서 제외했습니다. 위의 순자산에는 전액 반영되어 있습니다."
+            "value" : "순현금부채 %@ 금액은 링에서 음의 비중을 표시할 수 없으므로 자산 배분 링에서 제외했습니다. 위의 순자산에는 전액 반영되어 있습니다."
           }
         },
         "ms" : {
@@ -79656,13 +79656,13 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Netto kontantforpliktelser på %@ er utelatt fra fordelingsringen, fordi en ring ikke kan vise en negativ andel. Nettoformuen ovenfor tar dem fullt ut med i beregningen."
+            "value" : "Nettokontantforpliktelser på %@ er utelatt fra fordelingsringen, fordi en ring ikke kan vise en negativ andel. Nettoformuen ovenfor tar dem fullt ut med i beregningen."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Netto kasverplichtingen van %@ blijven buiten de verdelingsring, omdat een ring geen negatief aandeel kan weergeven. Het nettovermogen hierboven verwerkt ze volledig."
+            "value" : "Nettokasverplichtingen van %@ blijven buiten de verdelingsring, omdat een ring geen negatief aandeel kan weergeven. Het nettovermogen hierboven verwerkt ze volledig."
           }
         },
         "pl" : {
@@ -79710,7 +79710,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "หนี้สินเงินสดสุทธิจำนวน %@ ไม่ถูกนับรวมในวงแหวนการจัดสรร เนื่องจากวงแหวนไม่สามารถแสดงสัดส่วนที่ติดลบได้ ทั้งนี้มูลค่าสุทธิด้านบนได้รวมรายการดังกล่าวไว้เต็มจำนวนแล้ว."
+            "value" : "หนี้สินเงินสดสุทธิจำนวน %@ ไม่ถูกนับรวมในวงแหวนการจัดสรร เนื่องจากวงแหวนไม่สามารถแสดงสัดส่วนที่ติดลบได้ ทั้งนี้มูลค่าสุทธิด้านบนได้รวมรายการดังกล่าวไว้เต็มจำนวนแล้ว"
           }
         },
         "tr" : {
@@ -79972,7 +79972,7 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Valor net"
+            "value" : "Patrimoni net"
           }
         },
         "cs" : {
@@ -79984,13 +79984,13 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nettoværdi"
+            "value" : "Nettoformue"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reinvermögen"
+            "value" : "Nettovermögen"
           }
         },
         "el" : {
@@ -80008,19 +80008,19 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Valor neto"
+            "value" : "Patrimonio neto"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nettoarvo"
+            "value" : "Nettovarallisuus"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Valeur nette"
+            "value" : "Patrimoine net"
           }
         },
         "he" : {
@@ -80080,13 +80080,13 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nettoverdi"
+            "value" : "Nettoformue"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nettowaarde"
+            "value" : "Nettovermogen"
           }
         },
         "pl" : {
@@ -80104,13 +80104,13 @@
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Patrimônio líquido"
+            "value" : "Património líquido"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Valoare netă"
+            "value" : "Patrimoniu net"
           }
         },
         "ru" : {
@@ -80128,7 +80128,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nettovärde"
+            "value" : "Nettoförmögenhet"
           }
         },
         "th" : {
@@ -80192,13 +80192,13 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NETTOVÆRDI"
+            "value" : "NETTOFORMUE"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "REINVERMÖGEN"
+            "value" : "NETTOVERMÖGEN"
           }
         },
         "el" : {
@@ -80222,13 +80222,13 @@
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NETTOARVO"
+            "value" : "NETTOVARALLISUUS"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "VALEUR NETTE"
+            "value" : "PATRIMOINE NET"
           }
         },
         "he" : {
@@ -80288,13 +80288,13 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NETTOVERDI"
+            "value" : "NETTOFORMUE"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NETTOWAARDE"
+            "value" : "NETTOVERMOGEN"
           }
         },
         "pl" : {
@@ -80318,7 +80318,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "NET WORTH"
+            "value" : "PATRIMONIU NET"
           }
         },
         "ru" : {
@@ -80336,7 +80336,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NETTOVÄRDE"
+            "value" : "NETTOFÖRMÖGENHET"
           }
         },
         "th" : {
@@ -83136,19 +83136,19 @@
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Επόμενη πληρωμή"
+            "value" : "Επόμενη ημερομηνία"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Próximo vencimiento"
+            "value" : "Vencimiento"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Próximo vencimiento"
+            "value" : "Vencimiento"
           }
         },
         "fi" : {
@@ -83178,7 +83178,7 @@
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sljedeće dospijeće"
+            "value" : "Sljed. dospijeće"
           }
         },
         "hu" : {
@@ -83214,7 +83214,7 @@
         "ms" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tarikh Seterusnya"
+            "value" : "Tarikh Tempoh"
           }
         },
         "nb" : {
@@ -83250,13 +83250,13 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Următoarea scadență"
+            "value" : "Scadență"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "След. платёж"
+            "value" : "След. дата"
           }
         },
         "sk" : {
@@ -83286,7 +83286,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Наст. платіж"
+            "value" : "Наст. дата"
           }
         },
         "vi" : {
@@ -85584,7 +85584,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ไม่มีรายการที่บันทึกไว้."
+            "value" : "ไม่มีรายการที่บันทึกไว้"
           }
         },
         "tr" : {
@@ -85793,7 +85793,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ยังไม่มีการดึงข้อมูลอัตราแลกเปลี่ยน ณ เวลาที่สร้างรายงานนี้ จำนวนเงินสกุลต่างประเทศจึงถูกแปลงค่าด้วยอัตราสำรองแบบออฟไลน์ที่มาพร้อมกับแอป ซึ่งเป็นค่าโดยประมาณ."
+            "value" : "ยังไม่มีการดึงข้อมูลอัตราแลกเปลี่ยน ณ เวลาที่สร้างรายงานนี้ จำนวนเงินสกุลต่างประเทศจึงถูกแปลงค่าด้วยอัตราสำรองแบบออฟไลน์ที่มาพร้อมกับแอป ซึ่งเป็นค่าโดยประมาณ"
           }
         },
         "tr" : {
@@ -91616,7 +91616,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offline terugvalkoers"
+            "value" : "Offline-terugvalkoers"
           }
         },
         "pl" : {
@@ -98215,7 +98215,7 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Udarbejdet på grundlag af data indtastet af kontohaveren. Markedsværdierne afspejler de senest hentede kurser i appen og er ikke verificeret af en uafhængig part. Dette dokument er en personlig opgørelse, ikke finansiel rådgivning eller en opgørelse fra et reguleret institut."
+            "value" : "Udarbejdet på grundlag af data indtastet af kontohaveren. Markedsværdierne afspejler de senest hentede kurser i appen og er ikke verificeret af en uafhængig part. Dette dokument er en personlig oversigt, ikke finansiel rådgivning eller en opgørelse fra et reguleret institut."
           }
         },
         "de" : {
@@ -98245,7 +98245,7 @@
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Laadittu tilinhaltijan syöttämien tietojen perusteella. Markkina-arvot perustuvat sovelluksen viimeksi hakemiin hintoihin, eikä niitä ole varmennettu riippumattomasti. Tämä asiakirja on henkilökohtainen kirjanpito, ei talousneuvontaa eikä säännellyn laitoksen antama ote."
+            "value" : "Laadittu tilinhaltijan syöttämien tietojen perusteella. Markkina-arvot perustuvat sovelluksen viimeksi hakemiin hintoihin, eikä niitä ole varmennettu riippumattomasti. Tämä asiakirja on henkilökohtainen muistiinpano, ei taloudellista neuvontaa eikä säännellyn laitoksen antama ote."
           }
         },
         "fr" : {
@@ -98365,7 +98365,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "จัดทำจากข้อมูลที่เจ้าของบัญชีเป็นผู้บันทึก มูลค่าตลาดสะท้อนราคาล่าสุดที่แอปดึงมาได้และไม่ได้รับการตรวจสอบโดยอิสระ เอกสารนี้เป็นบันทึกส่วนบุคคล ไม่ใช่คำแนะนำทางการเงินหรือใบแจ้งยอดจากสถาบันที่อยู่ภายใต้การกำกับดูแล."
+            "value" : "จัดทำจากข้อมูลที่เจ้าของบัญชีเป็นผู้บันทึก มูลค่าตลาดสะท้อนราคาล่าสุดที่แอปดึงมาได้และไม่ได้รับการตรวจสอบโดยอิสระ เอกสารนี้เป็นบันทึกส่วนบุคคล ไม่ใช่คำแนะนำทางการเงินหรือใบแจ้งยอดจากสถาบันที่อยู่ภายใต้การกำกับดูแล"
           }
         },
         "tr" : {
@@ -101179,7 +101179,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Taux appliqués pour convertir les positions dans la devise de référence"
+            "value" : "Taux appliqués pour convertir les positions dans la devise de base"
           }
         },
         "he" : {
@@ -103318,13 +103318,13 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tilbagevendende regler"
+            "value" : "Gentagelsesregler"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wiederkehrende Regeln"
+            "value" : "Wiederholungsregeln"
           }
         },
         "el" : {
@@ -103348,7 +103348,7 @@
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toistuvat säännöt"
+            "value" : "Toistosäännöt"
           }
         },
         "fr" : {
@@ -103402,7 +103402,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "정기 규칙"
+            "value" : "정기 수입·지출 규칙"
           }
         },
         "ms" : {
@@ -103414,13 +103414,13 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gjentakende regler"
+            "value" : "Gjentakelsesregler"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Terugkerende regels"
+            "value" : "Herhaalregels"
           }
         },
         "pl" : {
@@ -103462,7 +103462,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Återkommande regler"
+            "value" : "Upprepningsregler"
           }
         },
         "th" : {
@@ -107737,7 +107737,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alınma"
+            "value" : "Alınma Tarihi"
           }
         },
         "uk" : {
@@ -108357,7 +108357,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "เก็บค่า ณ สิ้นเดือนของแต่ละเดือนจากประวัติสแนปช็อตรายวันของแอป."
+            "value" : "เก็บค่า ณ สิ้นเดือนของแต่ละเดือนจากประวัติสแนปช็อตรายวันของแอป"
           }
         },
         "tr" : {
@@ -109568,7 +109568,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bereik"
+            "value" : "Omvang"
           }
         },
         "pl" : {
@@ -111430,7 +111430,7 @@
         "ms" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Peratusan"
+            "value" : "Bahagian"
           }
         },
         "nb" : {
@@ -125560,7 +125560,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Journal des opérations"
+            "value" : "Journal des transactions"
           }
         },
         "he" : {
