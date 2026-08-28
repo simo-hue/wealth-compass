@@ -637,16 +637,12 @@ struct MacDashboardView: View {
 #if os(iOS)
                                         // Hover needs a pointer; on an iPad this ring's per-slice
                                         // readout was unreachable. Same fallback as AllocationChart.
+                                        // A tap, not a drag: see the cash-flow chart below.
                                         .gesture(
-                                            DragGesture(minimumDistance: 0)
-                                                .onChanged { value in
+                                            SpatialTapGesture()
+                                                .onEnded { value in
                                                     withAnimation(.easeInOut(duration: 0.15)) {
                                                         hoveredAssetSlice = slice(at: value.location, in: frame, slices: slices)
-                                                    }
-                                                }
-                                                .onEnded { _ in
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        hoveredAssetSlice = nil
                                                     }
                                                 }
                                         )
@@ -799,19 +795,19 @@ struct MacDashboardView: View {
                                 // per-month income/expense/net figures were unreachable — the
                                 // legend below stayed on the six-month totals whatever you tapped.
                                 // Same fallback shape as `AllocationChart` in DesignSystem.
+                                // A *tap*, not a zero-distance drag. A `DragGesture(minimumDistance: 0)`
+                                // over a chart wins the pan from the enclosing `ScrollView` --
+                                // verified on an iPad: a swipe starting on this card scrolled
+                                // nothing. `SpatialTapGesture` carries the touch location, so it can
+                                // resolve what was tapped without competing with the scroll.
                                 .gesture(
-                                    DragGesture(minimumDistance: 0)
-                                        .onChanged { value in
+                                    SpatialTapGesture()
+                                        .onEnded { value in
                                             guard let plotFrame = proxy.plotFrame else { return }
                                             let frame = geometry[plotFrame]
-                                            guard let monthLabel: String = proxy.value(atX: value.location.x - frame.origin.x) else { return }
+                                            let monthLabel: String? = proxy.value(atX: value.location.x - frame.origin.x)
                                             withAnimation(.easeInOut(duration: 0.15)) {
-                                                hoveredCashFlowMonth = trend.first { $0.monthLabel == monthLabel }
-                                            }
-                                        }
-                                        .onEnded { _ in
-                                            withAnimation(.easeInOut(duration: 0.15)) {
-                                                hoveredCashFlowMonth = nil
+                                                hoveredCashFlowMonth = monthLabel.flatMap { label in trend.first { $0.monthLabel == label } }
                                             }
                                         }
                                 )

@@ -364,19 +364,19 @@ struct MacCashFlowView: View {
 #if os(iOS)
                                 // Hover needs a pointer; on an iPad the per-month readout above
                                 // this chart never changed. Same fallback as AllocationChart.
+                                // A *tap*, not a zero-distance drag. A `DragGesture(minimumDistance: 0)`
+                                // over a chart wins the pan from the enclosing `ScrollView` --
+                                // verified on an iPad: a swipe starting on this card scrolled
+                                // nothing. `SpatialTapGesture` carries the touch location, so it can
+                                // resolve what was tapped without competing with the scroll.
                                 .gesture(
-                                    DragGesture(minimumDistance: 0)
-                                        .onChanged { value in
+                                    SpatialTapGesture()
+                                        .onEnded { value in
                                             guard let plotFrame = proxy.plotFrame else { return }
                                             let frame = geometry[plotFrame]
-                                            guard let monthKey: String = proxy.value(atX: value.location.x - frame.origin.x) else { return }
+                                            let monthKey: String? = proxy.value(atX: value.location.x - frame.origin.x)
                                             withAnimation(.easeInOut(duration: 0.15)) {
-                                                hoveredCashFlowMonth = trend.first { $0.monthKey == monthKey }
-                                            }
-                                        }
-                                        .onEnded { _ in
-                                            withAnimation(.easeInOut(duration: 0.15)) {
-                                                hoveredCashFlowMonth = nil
+                                                hoveredCashFlowMonth = monthKey.flatMap { key in trend.first { $0.monthKey == key } }
                                             }
                                         }
                                 )

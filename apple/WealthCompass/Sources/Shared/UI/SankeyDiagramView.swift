@@ -115,19 +115,26 @@ struct SankeyDiagramView: View {
                     // only from the Desktop layer, so nothing else offered a way in: tapping a
                     // ribbon did nothing and the drill-through was unreachable.
                     //
-                    // A drag with no minimum distance is the same shape `AllocationChart` uses. It
-                    // makes a tap behave like a pointer entering and leaving: track under the
-                    // finger, then resolve at the lift point, so a drag across ribbons highlights
-                    // as it goes and settles on the one released over.
+                    // A *tap*, not a zero-distance drag. The drag was tried first and is wrong
+                    // here: this card sits in a `ScrollView`, and a `DragGesture(minimumDistance: 0)`
+                    // wins the pan, so a swipe that began over the diagram scrolled nothing and
+                    // then drilled through to whatever category the finger happened to lift over.
+                    // Verified on an iPad: swiping up to scroll the page opened the Salary filter.
+                    //
+                    // `SpatialTapGesture` carries the location a plain `onTapGesture` does not, so
+                    // it can hit-test where the user actually touched rather than reading hover
+                    // state that no pointer ever set — and a tap does not compete with a pan, so
+                    // scrolling is untouched.
                     .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                updateHover(SankeyLayout.hitTest(layout, at: value.location, hubID: sankey.hub.id))
-                            }
+                        SpatialTapGesture()
                             .onEnded { value in
-                                let hit = SankeyLayout.hitTest(layout, at: value.location, hubID: sankey.hub.id)
-                                updateHover(nil)
-                                if let hit, let node = nodesByID[hit] { select(node) }
+                                guard let hit = SankeyLayout.hitTest(layout, at: value.location, hubID: sankey.hub.id),
+                                      let node = nodesByID[hit] else { return }
+                                // Light the flow as well as acting on it: a node with no rows
+                                // behind it (surplus, shortfall, the hub) is not drillable, so
+                                // without this a tap on one would give no feedback at all.
+                                updateHover(hit)
+                                select(node)
                             }
                     )
 #endif

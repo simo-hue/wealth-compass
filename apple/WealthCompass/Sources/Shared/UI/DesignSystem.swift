@@ -550,16 +550,19 @@ struct AllocationChart: View {
                                         }
                                     }
 #if os(iOS)
+                                    // A *tap*, not a zero-distance drag. This ring is drawn from
+                                    // nine call sites, all inside a `ScrollView`, and a
+                                    // `DragGesture(minimumDistance: 0)` wins the pan from it --
+                                    // verified on an iPad, where a swipe starting on a chart
+                                    // scrolled nothing. `SpatialTapGesture` carries the touch
+                                    // location, so a slice can still be inspected by tapping it,
+                                    // and the tap does not compete with the scroll. Tapping outside
+                                    // any slice resolves to nil, which clears the selection.
                                     .gesture(
-                                        DragGesture(minimumDistance: 0)
-                                            .onChanged { value in
+                                        SpatialTapGesture()
+                                            .onEnded { value in
                                                 withAnimation(.easeInOut(duration: 0.15)) {
                                                     hoveredSlice = slice(at: value.location, in: frame)
-                                                }
-                                            }
-                                            .onEnded { _ in
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    hoveredSlice = nil
                                                 }
                                             }
                                     )
