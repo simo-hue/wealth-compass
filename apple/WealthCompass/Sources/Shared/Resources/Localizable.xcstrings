@@ -22537,7 +22537,7 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Asset Allocation"
+            "value" : "Aktivfordeling"
           }
         },
         "de" : {
@@ -22639,7 +22639,7 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Asset Allocation"
+            "value" : "Aktivafordeling"
           }
         },
         "nl" : {
@@ -27557,13 +27557,13 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cash Flow"
+            "value" : "Peněžní tok"
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cash Flow"
+            "value" : "Pengestrøm"
           }
         },
         "de" : {
@@ -27701,7 +27701,7 @@
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cash Flow"
+            "value" : "Peňažný tok"
           }
         },
         "sv" : {
@@ -35126,7 +35126,7 @@
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto"
+            "value" : "Κρυπτονομίσματα"
           }
         },
         "es" : {
@@ -35174,7 +35174,7 @@
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto"
+            "value" : "Kripto"
           }
         },
         "id" : {
@@ -35252,7 +35252,7 @@
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto"
+            "value" : "Krypto"
           }
         },
         "sv" : {
@@ -36150,7 +36150,7 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto Holdings"
+            "value" : "Posicions en cripto"
           }
         },
         "cs" : {
@@ -36162,7 +36162,7 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto Holdings"
+            "value" : "Kryptobesiddelser"
           }
         },
         "de" : {
@@ -36174,7 +36174,7 @@
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto Holdings"
+            "value" : "Τοποθετήσεις κρυπτονομισμάτων"
           }
         },
         "es" : {
@@ -36192,7 +36192,7 @@
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto Holdings"
+            "value" : "Kryptovarat"
           }
         },
         "fr" : {
@@ -36222,7 +36222,7 @@
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto Holdings"
+            "value" : "Kriptoállomány"
           }
         },
         "id" : {
@@ -36252,13 +36252,13 @@
         "ms" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto Holdings"
+            "value" : "Pegangan Kripto"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto Holdings"
+            "value" : "Kryptobeholdninger"
           }
         },
         "nl" : {
@@ -36288,7 +36288,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto Holdings"
+            "value" : "Dețineri cripto"
           }
         },
         "ru" : {
@@ -36300,7 +36300,7 @@
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crypto Holdings"
+            "value" : "Kryptoaktíva"
           }
         },
         "sv" : {
@@ -63403,7 +63403,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Holdings"
+            "value" : "Držená aktiva"
           }
         },
         "da" : {
@@ -63469,7 +63469,7 @@
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Holdings"
+            "value" : "Pozicije"
           }
         },
         "hu" : {
@@ -63541,7 +63541,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Holdings"
+            "value" : "Dețineri"
           }
         },
         "ru" : {
@@ -63553,7 +63553,7 @@
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Holdings"
+            "value" : "Držané aktíva"
           }
         },
         "sv" : {
@@ -102679,20 +102679,20 @@
         },
         "ca" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Recurrent"
           }
         },
         "cs" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Pravidelná"
           }
         },
         "da" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Tilbagevendende"
           }
         },
         "de" : {
@@ -102703,8 +102703,8 @@
         },
         "el" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Επαναλαμβανόμενη"
           }
         },
         "es" : {
@@ -102715,14 +102715,14 @@
         },
         "es-419" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Recurrente"
           }
         },
         "fi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Toistuva"
           }
         },
         "fr" : {
@@ -102733,32 +102733,32 @@
         },
         "he" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "חוזרת"
           }
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "आवर्ती"
           }
         },
         "hr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Ponavljajuća"
           }
         },
         "hu" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Ismétlődő"
           }
         },
         "id" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Berulang"
           }
         },
         "it" : {
@@ -102769,98 +102769,98 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "定期"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "정기"
           }
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Berkala"
           }
         },
         "nb" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Gjentakende"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Terugkerend"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Cykliczna"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Recorrente"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Recorrente"
           }
         },
         "ro" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Recurentă"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Регулярная"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Pravidelná"
           }
         },
         "sv" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Återkommande"
           }
         },
         "th" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "รายการประจำ"
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Yinelenen"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Регулярна"
           }
         },
         "vi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "Định kỳ"
           }
         },
         "zh-Hans" : {
@@ -102871,8 +102871,8 @@
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Recurring"
+            "state" : "translated",
+            "value" : "定期"
           }
         }
       }
@@ -113338,20 +113338,20 @@
         },
         "ca" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Font"
           }
         },
         "cs" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Zdroj"
           }
         },
         "da" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Kilde"
           }
         },
         "de" : {
@@ -113362,8 +113362,8 @@
         },
         "el" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Πηγή"
           }
         },
         "es" : {
@@ -113374,14 +113374,14 @@
         },
         "es-419" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Fuente"
           }
         },
         "fi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Lähde"
           }
         },
         "fr" : {
@@ -113392,32 +113392,32 @@
         },
         "he" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "מקור"
           }
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "स्रोत"
           }
         },
         "hr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Izvor"
           }
         },
         "hu" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Forrás"
           }
         },
         "id" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Sumber"
           }
         },
         "it" : {
@@ -113428,98 +113428,98 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "取得元"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "출처"
           }
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Sumber"
           }
         },
         "nb" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Kilde"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Bron"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Źródło"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Fonte"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Fonte"
           }
         },
         "ro" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Sursă"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Источник"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Zdroj"
           }
         },
         "sv" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Källa"
           }
         },
         "th" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "แหล่งที่มา"
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Kaynak"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Джерело"
           }
         },
         "vi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Nguồn"
           }
         },
         "zh-Hans" : {
@@ -113530,8 +113530,8 @@
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "來源"
           }
         }
       }
@@ -116194,19 +116194,19 @@
         },
         "ca" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Símbol"
           }
         },
         "cs" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Symbol"
           }
         },
         "da" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Symbol"
           }
         },
@@ -116218,8 +116218,8 @@
         },
         "el" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Σύμβολο"
           }
         },
         "es" : {
@@ -116230,14 +116230,14 @@
         },
         "es-419" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Símbolo"
           }
         },
         "fi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Symboli"
           }
         },
         "fr" : {
@@ -116248,32 +116248,32 @@
         },
         "he" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "סמל"
           }
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "प्रतीक"
           }
         },
         "hr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Simbol"
           }
         },
         "hu" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Szimbólum"
           }
         },
         "id" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Simbol"
           }
         },
         "it" : {
@@ -116284,98 +116284,98 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "シンボル"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "심볼"
           }
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Simbol"
           }
         },
         "nb" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Symbol"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Symbol"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Symbol"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Símbolo"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Símbolo"
           }
         },
         "ro" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Simbol"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Символ"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Symbol"
           }
         },
         "sv" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Symbol"
           }
         },
         "th" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "สัญลักษณ์"
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Sembol"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Символ"
           }
         },
         "vi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "Ký hiệu"
           }
         },
         "zh-Hans" : {
@@ -116386,8 +116386,8 @@
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Symbol"
+            "state" : "translated",
+            "value" : "代號"
           }
         }
       }
@@ -123784,6 +123784,174 @@
             "state" : "translated",
             "value" : "总资产"
           }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actius totals"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiva celkem"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiver i alt"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Σύνολο ενεργητικού"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activos totales"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varat yhteensä"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "סך הנכסים"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "कुल परिसंपत्तियाँ"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukupna imovina"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eszközök összesen"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Aset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "資産合計"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "총 자산"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jumlah Aset"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sum eiendeler"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Totale activa"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktywa razem"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total de ativos"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total de ativos"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total active"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Итого активов"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktíva spolu"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Summa tillgångar"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "สินทรัพย์รวม"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toplam Varlık"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разом активів"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tổng tài sản"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "資產合計"
+          }
         }
       }
     },
@@ -126351,20 +126519,20 @@
         },
         "ca" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transaccions"
           }
         },
         "cs" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transakce"
           }
         },
         "da" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transaktioner"
           }
         },
         "de" : {
@@ -126375,8 +126543,8 @@
         },
         "el" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Συναλλαγές"
           }
         },
         "es" : {
@@ -126387,14 +126555,14 @@
         },
         "es-419" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transacciones"
           }
         },
         "fi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Tapahtumat"
           }
         },
         "fr" : {
@@ -126405,32 +126573,32 @@
         },
         "he" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "עסקאות"
           }
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "लेन-देन"
           }
         },
         "hr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transakcije"
           }
         },
         "hu" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Tranzakciók"
           }
         },
         "id" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transaksi"
           }
         },
         "it" : {
@@ -126441,98 +126609,98 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "取引"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "거래"
           }
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transaksi"
           }
         },
         "nb" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transaksjoner"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transacties"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transakcje"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transações"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transações"
           }
         },
         "ro" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Tranzacții"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Транзакции"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transakcie"
           }
         },
         "sv" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Transaktioner"
           }
         },
         "th" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "ธุรกรรม"
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "İşlemler"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Транзакції"
           }
         },
         "vi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "Giao dịch"
           }
         },
         "zh-Hans" : {
@@ -126543,8 +126711,8 @@
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transactions"
+            "state" : "translated",
+            "value" : "交易"
           }
         }
       }
@@ -130911,20 +131079,20 @@
         },
         "ca" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Valor"
           }
         },
         "cs" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Hodnota"
           }
         },
         "da" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Værdi"
           }
         },
         "de" : {
@@ -130935,8 +131103,8 @@
         },
         "el" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Αξία"
           }
         },
         "es" : {
@@ -130947,14 +131115,14 @@
         },
         "es-419" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Valor"
           }
         },
         "fi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Arvo"
           }
         },
         "fr" : {
@@ -130965,32 +131133,32 @@
         },
         "he" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "שווי"
           }
         },
         "hi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "मूल्य"
           }
         },
         "hr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Vrijednost"
           }
         },
         "hu" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Érték"
           }
         },
         "id" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Nilai"
           }
         },
         "it" : {
@@ -131001,98 +131169,98 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "評価額"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "평가액"
           }
         },
         "ms" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Nilai"
           }
         },
         "nb" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Verdi"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Waarde"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Wartość"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Valor"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Valor"
           }
         },
         "ro" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Valoare"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Стоимость"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Hodnota"
           }
         },
         "sv" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Värde"
           }
         },
         "th" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "มูลค่า"
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Değer"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Вартість"
           }
         },
         "vi" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "Giá trị"
           }
         },
         "zh-Hans" : {
@@ -131103,8 +131271,8 @@
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Value"
+            "state" : "translated",
+            "value" : "市值"
           }
         }
       }
