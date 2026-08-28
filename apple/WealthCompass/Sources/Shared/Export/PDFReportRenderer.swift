@@ -116,7 +116,6 @@ enum PDFReportRenderer {
         // Honour a Cancel pressed during the last page rather than delivering the file anyway.
         if isCancelled?() == true { throw ReportRenderError.cancelled }
         cg.closePDF()
-        try tick()
         if isCancelled?() == true { throw ReportRenderError.cancelled }
 
         // Second pass: PDFKit attaches the sidebar outline and document attributes. This exists
@@ -126,7 +125,14 @@ enum PDFReportRenderer {
         try attachOutline(to: url,
                           entries: layout.contents,
                           coverAndContentsPageCount: 1 + contentsPages.count,
-                          metadata: document.metadata)
+                          metadata: document.metadata,
+                          isCancelled: isCancelled)
+
+        // The reserved finalisation step is ticked *after* the work it stands for. Ticking it
+        // before `attachOutline` defeated the `+1` above: that pass reloads the whole PDF and
+        // re-serialises it — a large share of a long export's wall-clock — and firing the last tick
+        // first left the bar pinned at 100%, with the last `isCancelled` poll already behind it.
+        try tick()
     }
 
     private static func documentInfo(for document: ReportDocument) -> CFDictionary {
@@ -255,7 +261,8 @@ enum PDFReportRenderer {
             let lineHeight = context.lineHeight(for: role)
             let rowY = y
 
-            let pageString = "\(entry.pageNumber)"
+            // In the reader's digits, like the footer and every other figure — see `drawFooter`.
+            let pageString = entry.pageNumber.formatted(.number.locale(document.chrome.locale))
             let pageWidth = context.width(of: pageString, role: role) + 4
             let titleX = metrics.marginLeading + indent
             let titleWidth = context.width(of: entry.title, role: role)
@@ -340,7 +347,14 @@ enum PDFReportRenderer {
                          color: palette.inkMuted,
                          in: CGRect(x: metrics.marginLeading, y: y, width: theme.contentWidth * 0.7, height: 12))
 
-        let pageText = String(format: document.chrome.pageFormat, "\(page.pageNumber)", "\(totalBodyPages)")
+        // A page number is a figure, and every other figure in this document is set in the reader's
+        // locale. Interpolating the `Int` is `String(describing:)`, which neither groups nor shapes
+        // digits — so an Arabic report printed its money in Arabic-Indic digits and its own footer
+        // in Latin ones, on the same sheet. Same reasoning as `ReportDocumentBuilder.count(_:)`.
+        let locale = document.chrome.locale
+        let pageText = String(format: document.chrome.pageFormat,
+                              page.pageNumber.formatted(.number.locale(locale)),
+                              totalBodyPages.formatted(.number.locale(locale)))
         context.drawLine(pageText,
                          role: .pageNumber,
                          color: palette.inkMuted,
@@ -597,7 +611,8 @@ enum PDFReportRenderer {
     private static func attachOutline(to url: URL,
                                       entries: [ReportContentsEntry],
                                       coverAndContentsPageCount: Int,
-                                      metadata: ReportMetadata) throws {
+                                      metadata: ReportMetadata,
+                                      isCancelled: (@Sendable () -> Bool)?) throws {
         guard let pdf = PDFDocument(url: url) else { throw ReportRenderError.couldNotAttachOutline }
 
         pdf.documentAttributes = [
@@ -635,6 +650,11 @@ enum PDFReportRenderer {
             pdf.outlineRoot = root
         }
 
+        // The reload above and the write below are the two long steps of this pass, and on a long
+        // report the write is a substantial share of the whole render. Nothing polls inside
+        // `write(to:)`, so this is the last moment a Cancel can be honoured at all; without it the
+        // button was inert for that entire stretch.
+        if isCancelled?() == true { throw ReportRenderError.cancelled }
         guard pdf.write(to: url) else { throw ReportRenderError.couldNotAttachOutline }
     }
 }

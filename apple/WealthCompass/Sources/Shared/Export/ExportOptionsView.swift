@@ -478,7 +478,12 @@ struct ExportProgressView: View {
         guard progress.total > 0 else {
             return AppLocalization.string("Preparing…", appLanguage: appLanguage)
         }
+        // The reader's digits, like the identical string in the rendered footer
+        // (`PDFReportRenderer.drawFooter`): interpolating the `Int` shapes nothing, so this sheet
+        // counted pages in Latin digits under a fully Arabic-Indic UI.
+        let locale = AppLocalization.effectiveLocale(appLanguage: appLanguage)
         return String(format: AppLocalization.string("Page %1$@ of %2$@", appLanguage: appLanguage),
-                      "\(progress.completed)", "\(progress.total)")
+                      progress.completed.formatted(.number.locale(locale)),
+                      progress.total.formatted(.number.locale(locale)))
     }
 }

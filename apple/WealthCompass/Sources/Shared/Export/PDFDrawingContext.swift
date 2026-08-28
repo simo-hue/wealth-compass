@@ -245,6 +245,17 @@ struct PDFDrawingContext {
                 if let truncated = CTLineCreateTruncatedLine(line, Double(topDownRect.width), .end, ellipsis) {
                     line = truncated
                     lineWidth = CGFloat(CTLineGetTypographicBounds(line, nil, nil, nil))
+                } else {
+                    // CoreText refuses to truncate into a box narrower than the token itself —
+                    // a shade under 6pt for "…" at the 7pt axis face — and returns NULL. Without
+                    // this branch `line` kept its full width and was drawn anyway, spilling the
+                    // whole string across everything beside it: a multi-year cash-flow chart
+                    // divides its plot into ~5pt clusters and painted every month label in full,
+                    // on top of its neighbours. A box that cannot hold one glyph gets nothing.
+                    let ellipsisWidth = CGFloat(CTLineGetTypographicBounds(ellipsis, nil, nil, nil))
+                    guard ellipsisWidth <= topDownRect.width else { return }
+                    line = ellipsis
+                    lineWidth = ellipsisWidth
                 }
             }
         }

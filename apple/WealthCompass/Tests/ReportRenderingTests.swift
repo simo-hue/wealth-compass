@@ -274,11 +274,12 @@ final class ReportPaginationTests: XCTestCase {
     /// Two sections with anchored subheadings, long enough that the subsections land mid-document
     /// rather than all on one page. Two non-structural sections is what makes the renderer emit a
     /// contents page at all (`ReportPaginator.needsContentsPage`).
-    private func contentsFixture() -> ReportDocument {
+    private func contentsFixture(chrome: ReportChrome = ReportChrome()) -> ReportDocument {
         ReportDocument(
             metadata: ReportMetadata(brandName: "B", documentTitle: "T", scopeLine: "S",
                                      periodLine: nil, baseCurrencyLine: "EUR", generatedLine: "g",
                                      footerNote: "f", appVersion: "1", brandMarkPNG: nil),
+            chrome: chrome,
             sections: [
                 ReportSectionContent(anchor: "section-one", title: "One", blocks: [
                     .sectionTitle("One", subtitle: nil),
@@ -367,6 +368,99 @@ final class ReportPaginationTests: XCTestCase {
             }
         }
     }
+
+    // MARK: - Narrow boxes
+
+    /// Draws one line into a box `width` points wide and reads back what actually reached the page.
+    ///
+    /// Rendering and extracting is the only honest check here: the defect is entirely in the
+    /// drawing layer, and every caller of `drawLine` passes it a rect it has already decided on.
+    private func drawnLine(_ text: String, role: ReportFontRole, width: CGFloat) throws -> String {
+        let theme = ReportTheme()
+        let url = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("wc-drawline-\(UUID().uuidString).pdf")
+        addTeardownBlock { try? FileManager.default.removeItem(at: url) }
+        var box = CGRect(origin: .zero, size: theme.pageSize)
+        let cg = try XCTUnwrap(CGContext(url as CFURL, mediaBox: &box, nil))
+        let context = PDFDrawingContext(cg: cg, theme: theme)
+        cg.beginPDFPage(nil)
+        context.drawLine(text, role: role, color: theme.palette.inkMuted,
+                         in: CGRect(x: 60, y: 80, width: width, height: 12),
+                         alignment: .center)
+        cg.endPDFPage()
+        cg.closePDF()
+        let pdf = try XCTUnwrap(PDFDocument(url: url), "drawing produced an unopenable PDF")
+        return pdf.page(at: 0)?.string ?? ""
+    }
+
+    /// A box too narrow even for the ellipsis must not print the whole string anyway.
+    ///
+    /// `CTLineCreateTruncatedLine` returns NULL when the box cannot hold the truncation token — a
+    /// little under 6pt for "…" at the 7pt axis face. The `if let` around it had no `else`, so the
+    /// full-width line survived and was drawn at its full width, far outside the rect its caller
+    /// reserved. The cash-flow chart is where this bites: a multi-year custom range divides the
+    /// plot into 70-odd clusters ~5pt wide, and every month label was painted over its neighbours.
+    func testALabelTooNarrowForAnEllipsisIsNotDrawnInFull() throws {
+        let label = "September"
+
+        for width in [1, 2, 3, 4, 5] as [CGFloat] {
+            let drawn = try drawnLine(label, role: .chartAxis, width: width)
+            XCTAssertFalse(
+                drawn.contains(label),
+                "the whole \(label.count)-character label reached a \(width)pt box: \"\(drawn)\""
+            )
+            // Whatever survives has to be something that *fits*: an ellipsis at most, or nothing.
+            XCTAssertLessThanOrEqual(
+                drawn.filter { !$0.isWhitespace }.count, 1,
+                "more than one glyph was drawn into a \(width)pt box: \"\(drawn)\""
+            )
+        }
+
+        // The two paths either side of it are unchanged: a box that fits prints the label whole,
+        // and a box between the two prints a real truncation rather than nothing.
+        XCTAssertTrue(try drawnLine(label, role: .chartAxis, width: 200).contains(label),
+                      "a box with room to spare stopped printing the label in full")
+        // Asserted as a prefix rather than by looking for "…": PDFKit's extractor drops the
+        // ellipsis glyph, so a truncated line comes back as its surviving head ("Sept").
+        let middle = try drawnLine(label, role: .chartAxis, width: 20)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        XCTAssertFalse(middle.isEmpty, "a 20pt box drew nothing where a truncation fits")
+        XCTAssertFalse(middle.contains(label), "a 20pt box printed the label in full: \"\(middle)\"")
+        XCTAssertTrue(label.hasPrefix(middle),
+                      "a 20pt box drew \"\(middle)\", which is not a truncation of \(label)")
+    }
+
+    // MARK: - Page numbers
+
+    /// Page numbers are figures, and the report sets every other figure in the reader's locale.
+    ///
+    /// The footer and the contents page built theirs by interpolating an `Int` into a string, which
+    /// is `String(describing:)` — it neither groups nor shapes digits. An `ar_EG` report therefore
+    /// printed its money in Arabic-Indic digits and "Page 3 of 12" in Latin ones on the same sheet.
+    /// `ReportDocumentBuilder.count(_:)` already carries the same warning for entity counts.
+    func testPageNumbersAreSetInTheReadersDigits() throws {
+        let arabic = Locale(identifier: "ar_EG")
+        // Not vacuous: this locale really does shape digits differently. Asserted rather than
+        // assumed, because `ar` and `ar_AE` do not — they would make the whole test pass hollow.
+        XCTAssertEqual(1.formatted(.number.locale(arabic)), "١")
+
+        let pdf = try renderedPDF(contentsFixture(
+            chrome: ReportChrome(pageFormat: "Page %1$@ of %2$@", locale: arabic)))
+
+        let footers = (0..<pdf.pageCount).compactMap { pdf.page(at: $0)?.string }.joined()
+        XCTAssertTrue(footers.contains("Page ١ of"),
+                      "the footer does not number its pages in the reader's digits")
+        XCTAssertFalse(footers.contains("Page 1 of"),
+                       "the footer still prints Latin page numbers into an Arabic-Indic document")
+
+        // Physical page 1 is the contents page (page 0 is the cover, and `drawFooter` runs only on
+        // body pages), so every digit on it is one this document printed against a contents entry.
+        let contents = try XCTUnwrap(pdf.page(at: 1)?.string, "no contents page was rendered")
+        XCTAssertTrue(contents.contains { "٠١٢٣٤٥٦٧٨٩".contains($0) },
+                      "the contents page printed no Arabic-Indic digits at all")
+        XCTAssertFalse(contents.contains { $0.isASCII && $0.isNumber },
+                       "the contents page still cites Latin page numbers: \"\(contents)\"")
+    }
 }
 
 final class ReportReconciliationTests: XCTestCase {
@@ -423,6 +517,7 @@ final class ReportReconciliationTests: XCTestCase {
     private func buildDocument(sections: Set<ReportSection> = Set(ReportSection.allCases),
                                range: ReportDateRange = .allTime,
                                data: FinancialData? = nil,
+                               locale: Locale? = nil,
                                usesLiveRates: Bool = true) -> ReportDocument {
         let snapshot = usesLiveRates ? self.snapshot : nil
         return ReportDocumentBuilder(
@@ -432,7 +527,7 @@ final class ReportReconciliationTests: XCTestCase {
                 baseCurrency: .eur,
                 exchangeRateSnapshot: snapshot,
                 appLanguage: nil,
-                locale: locale,
+                locale: locale ?? self.locale,
                 calendar: calendar,
                 now: now,
                 appVersion: "1", appBuild: "1", platformName: "test",
@@ -722,6 +817,125 @@ final class ReportReconciliationTests: XCTestCase {
 
         let foreignRecords = Decimal(data.transactions.filter { ($0.currency ?? .eur) != .eur }.count)
         XCTAssertLessThanOrEqual(abs(reported - engineCash), Decimal(string: "0.01")! * foreignRecords)
+    }
+
+    // MARK: - Cash-flow tiles
+
+    /// Every block of the cash-flow section under test, in document order.
+    private func cashFlowBlocks(_ document: ReportDocument) throws -> [ReportBlock] {
+        try XCTUnwrap(document.sections.first { $0.anchor == ReportSection.cashFlow.anchor }?.blocks,
+                      "the document has no cash-flow section")
+    }
+
+    /// The value cell of the ledger subtotal row whose label contains `month`.
+    private func monthSubtotal(_ document: ReportDocument, month: String) throws -> String {
+        for block in try cashFlowBlocks(document) {
+            guard case let .table(table) = block else { continue }
+            for row in table.rows where row.style == .subtotal {
+                if row.cells.count > 3, row.cells[1].contains(month) { return row.cells[3] }
+            }
+        }
+        XCTFail("no ledger subtotal row for \(month)")
+        return ""
+    }
+
+    /// An All Time export's headline tiles have to be arithmetic the ledger below them agrees with.
+    ///
+    /// The bounded branch accumulates `signedAmount`, which rounds each conversion to the minor
+    /// unit *before* summing, exactly as `roundedMoney` requires and exactly as the printed rows
+    /// and month subtotals do. The unbounded branch went through `AnalyticsEngine.monthlyCashFlow`,
+    /// which reduces over raw conversions — so an All Time report printed a "This Month" figure
+    /// that did not equal the subtotal of the very rows it was summing, a few inches below it on
+    /// the same page. An all-EUR fixture cannot show this: there has to be a conversion remainder
+    /// to drift, which is why every row here is USD.
+    func testAllTimeCashFlowTilesAgreeWithTheLedgerSubtotalUnderThem() throws {
+        var monthly = FinancialData()
+        monthly.transactions =
+            (0..<120).map { index in
+                Transaction(type: .income, category: "Salary", amount: 200,
+                            description: "in-\(index)", date: day(2026, 7, 10), currency: .usd)
+            } + (0..<80).map { index in
+                Transaction(type: .expense, category: "Rent", amount: 200,
+                            description: "out-\(index)", date: day(2026, 7, 11), currency: .usd)
+            }
+
+        // Guard against the fixture quietly going vacuous. 200 USD at 1.0842 is 184.4678… EUR, so
+        // the rounded and the unrounded accumulations of the net 40 rows have to land on different
+        // printed figures — otherwise this test would pass with the defect still in place.
+        let converter = CurrencyConverter(snapshot: snapshot)
+        var raw = converter.convert(Decimal(200), from: .usd, to: .eur)
+        var perRow = Decimal()
+        NSDecimalRound(&perRow, &raw, 2, .plain)
+        XCTAssertNotEqual(perRow * 40, raw * 40, "the fixture no longer has a rounding remainder")
+
+        let document = buildDocument(sections: [.cashFlow], range: .allTime, data: monthly)
+        let netSavings = try XCTUnwrap(
+            kpi(document, section: ReportSection.cashFlow.anchor, label: "Net Savings"),
+            "the cash-flow section stopped printing a Net Savings tile")
+        let subtotal = try monthSubtotal(document, month: "July 2026")
+
+        XCTAssertEqual(
+            amount(netSavings), amount(subtotal),
+            """
+            the Net Savings tile prints \(netSavings) while the ledger subtotal for the same month, \
+            over the same rows, prints \(subtotal)
+            """
+        )
+        XCTAssertEqual(amount(subtotal), perRow * 40, "the ledger subtotal is not the rounded sum")
+    }
+
+    // MARK: - Calendars
+
+    /// The ledger's year headings and the row dates beneath them reckon in one calendar.
+    ///
+    /// An audit reported these as split — headings on the device calendar, the dates on the report
+    /// *locale*'s — and they are not. `Date.FormatStyle.locale(_:)` sets the locale alone; the
+    /// style's `calendar` stays at its `.autoupdatingCurrent` default, so a Thai locale still
+    /// prints Gregorian years unless the *device* calendar is Buddhist — and the device calendar is
+    /// precisely what `context.calendar` carries, since `FinanceStore.exportReportURL` passes
+    /// `.current`. Grouping and formatting therefore already share one calendar system on every
+    /// device.
+    ///
+    /// Pinned rather than left implicit because the obvious repair — deriving `context.calendar`
+    /// from `context.locale` — would move the grouping to the locale's calendar while leaving the
+    /// printed dates on the device's, manufacturing the exact split it was meant to close.
+    func testLedgerYearHeadingsAgreeWithTheDatesPrintedUnderThem() throws {
+        // The report's date styles format in `Calendar.autoupdatingCurrent` — which is the point
+        // being pinned — so the assertion only means anything while the host agrees with the
+        // Gregorian calendar this context is built with. In the app they cannot disagree, because
+        // `context.calendar` is `.current`; in a test they can, so say so rather than let a host
+        // misconfiguration read as a defect in the report.
+        try XCTSkipUnless(Calendar.current.identifier == .gregorian,
+                          "host calendar is \(Calendar.current.identifier), not Gregorian")
+
+        let thai = Locale(identifier: "th_TH")
+        // Not vacuous: this locale really does carry a different calendar, 543 years ahead of the
+        // Gregorian one the context is built with.
+        XCTAssertEqual(thai.calendar.component(.year, from: day(2024, 3, 15)), 2567)
+        XCTAssertEqual(calendar.component(.year, from: day(2024, 3, 15)), 2024)
+
+        let document = buildDocument(sections: [.cashFlow], range: .allTime, locale: thai)
+
+        var heading: String?
+        var rowsChecked = 0
+        for block in try cashFlowBlocks(document) {
+            switch block {
+            case let .subheading(title, anchor) where anchor?.hasPrefix("ledger-") == true:
+                heading = title
+            case let .table(table):
+                guard let year = heading else { continue }
+                for row in table.rows where row.style != .subtotal {
+                    XCTAssertTrue(
+                        row.cells[0].contains(year),
+                        "row dated \"\(row.cells[0])\" is filed under the heading \"\(year)\""
+                    )
+                    rowsChecked += 1
+                }
+            default:
+                break
+            }
+        }
+        XCTAssertGreaterThan(rowsChecked, 0, "no ledger rows were examined")
     }
 }
 

@@ -551,10 +551,12 @@ struct ReportDocumentBuilder {
         // Nothing in this section counts a future-dated row that the ledger below it prints in grey
         // and excludes — but the three blocks reach that guarantee by different routes, because
         // only the Money Flow block can use one engine for both the bounded and unbounded cases.
-        // `engine` serves the *unbounded* KPI row and trend, plus the Money Flow block either way;
-        // a bounded export sums `settledRanged` inline for its KPI and re-anchors a fresh engine
-        // for its trend. `settledRanged` and that engine's data are both pre-filtered by
-        // `isFutureDated`, so the exclusion holds on every path.
+        // `engine` serves the *unbounded* trend, plus the Money Flow block either way; a bounded
+        // export re-anchors a fresh engine for its trend. Both KPI rows sum `settledRanged` inline
+        // — the unbounded one narrowed to the current month — because the engine's own reduction
+        // is unrounded and would disagree with the ledger (see the branch below).
+        // `settledRanged` and that engine's data are both pre-filtered by `isFutureDated`, so the
+        // exclusion holds on every path.
         let engine = settledAnalytics
         let interval = options.dateRange.resolve(now: context.now, calendar: calendar)
         let settledRanged = rangedTransactions.filter { !isFutureDated($0) }
@@ -589,7 +591,20 @@ struct ReportDocumentBuilder {
                           emphasis: flow.netSavings >= 0 ? .positive : .negative),
             ]
         } else {
-            let flow = engine.monthlyCashFlow(for: context.now)
+            // The bounded branch's rounded accumulation, narrowed to the current month.
+            // `engine.monthlyCashFlow(for:)` reduces over `AnalyticsEngine.displayAmount` — a raw
+            // `converter.convert` with no `roundedMoney` — so these tiles were summing the same
+            // rows the ledger prints a few inches below them and reaching a different figure, by up
+            // to half a cent per foreign-currency row. Defensible on screen, where nothing sits
+            // beside it to contradict; not in a document whose columns the reader can add up.
+            let monthRows = settledRanged.filter {
+                calendar.isDate($0.date, equalTo: context.now, toGranularity: .month)
+            }
+            let income = monthRows.filter { $0.type == .income }
+                .reduce(Decimal(0)) { $0 + signedAmount($1) }
+            let expenses = monthRows.filter { $0.type == .expense }
+                .reduce(Decimal(0)) { $0 - signedAmount($1) }
+            let flow = MonthlyCashFlow(monthlyIncome: income, monthlyExpenses: expenses)
             kpis = [
                 ReportKPI(label: L("Income This Month"), value: money(flow.monthlyIncome), emphasis: .positive),
                 ReportKPI(label: L("Expenses This Month"), value: money(flow.monthlyExpenses), emphasis: .negative),

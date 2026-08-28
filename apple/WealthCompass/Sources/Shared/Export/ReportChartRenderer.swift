@@ -829,14 +829,76 @@ enum ReportChartRenderer {
                                  color: context.palette.chartColor(seriesIndex))
                 }
             }
+        }
 
-            context.drawLine(cluster.label,
+        drawCategoryAxis(clusters.map(\.label),
+                         plot: plot,
+                         clusterWidth: clusterWidth,
+                         y: plotBottom + Layout.axisLabelGap,
+                         labelHeight: axisLabelHeight,
+                         context: context)
+    }
+
+    /// The category axis under a cluster chart, thinned to the labels that actually fit.
+    ///
+    /// `monthsSpanned` is deliberately uncapped — clamping it to twelve silently dropped data, and
+    /// its comment says why — so a multi-year custom range legitimately produces 60-80 clusters.
+    /// At that density a per-cluster label box is about 6pt wide: too narrow for a month name, and
+    /// narrow enough that CoreText cannot even set the ellipsis it degrades to. `drawDateAxis`
+    /// already solved this for the area chart and this is the same rule: keep as many evenly spaced
+    /// labels as fit, endpoints always among them, and give each one a box of its own width rather
+    /// than its cluster's. Below the threshold nothing changes — every label is drawn, centred in
+    /// its own cluster, exactly where it was.
+    ///
+    /// This thins the *axis*. It does not make 80 clusters of 1.8pt bars a good chart; only
+    /// aggregating buckets would, and that is a different decision from a legibility fix.
+    private static func drawCategoryAxis(_ labels: [String],
+                                         plot: CGRect,
+                                         clusterWidth: CGFloat,
+                                         y: CGFloat,
+                                         labelHeight: CGFloat,
+                                         context: PDFDrawingContext) {
+        guard !labels.isEmpty, plot.width > 0, clusterWidth.isFinite else { return }
+
+        // The widest label, not a sample: unlike the area chart's dates these are free-form
+        // category names, and one long name among short ones is what decides whether the row
+        // overprints. The 12pt floor is what a box has to be before a label can be set in it at all.
+        let widest = labels.reduce(CGFloat(0)) { max($0, context.width(of: $1, role: .chartAxis)) }
+        let slot = max(widest + 6, 12)
+        let fits = max(2, Int((plot.width / slot).rounded(.down)))
+
+        var indices: [Int] = []
+        if fits >= labels.count || labels.count <= 2 {
+            indices = Array(labels.indices)
+        } else {
+            for step in 0..<fits {
+                let raw = Double(step) * Double(labels.count - 1) / Double(fits - 1)
+                guard raw.isFinite else { continue }
+                let index = min(max(Int(raw.rounded()), 0), labels.count - 1)
+                if indices.last != index { indices.append(index) }
+            }
+            if indices.first != 0 { indices.insert(0, at: 0) }
+            if indices.last != labels.count - 1 { indices.append(labels.count - 1) }
+        }
+
+        let thinned = indices.count < labels.count
+        for index in indices {
+            let label = labels[index]
+            guard !label.isEmpty else { continue }
+            let centre = plot.minX + (CGFloat(index) + 0.5) * clusterWidth
+            // Thinned, there is empty axis either side of a kept label, so it takes its own width
+            // and is only held inside the plot. Unthinned it keeps its cluster's box, which is what
+            // stops a long name from running into the neighbour still drawn beside it.
+            let width = thinned
+                ? min(context.width(of: label, role: .chartAxis) + 2, plot.width)
+                : max(0, clusterWidth - 2)
+            let x = thinned
+                ? clamp(centre - width / 2, plot.minX, plot.maxX - width)
+                : centre - width / 2
+            context.drawLine(label,
                              role: .chartAxis,
                              color: context.palette.inkMuted,
-                             in: CGRect(x: clusterX + 1,
-                                        y: plotBottom + Layout.axisLabelGap,
-                                        width: max(0, clusterWidth - 2),
-                                        height: axisLabelHeight),
+                             in: CGRect(x: x, y: y, width: width, height: labelHeight),
                              alignment: .center)
         }
     }
