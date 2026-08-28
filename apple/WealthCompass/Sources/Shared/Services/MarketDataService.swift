@@ -212,7 +212,7 @@ final class KeychainCredentialStore {
             // check, a build where `save` took its `errSecMissingEntitlement` fallback would write
             // back into this very keychain and then delete it, losing the user's key outright.
             if let migrated = try? readString(for: credential, dataProtection: true), migrated == legacy {
-                try? deleteLegacy(credential)
+                logLegacyDeleteFailure(deleteLegacyReportingStatus(credential), during: "migration")
             }
             return legacy
         }
@@ -256,7 +256,7 @@ final class KeychainCredentialStore {
         if status == errSecSuccess {
             #if os(macOS)
             // Never leave an older, unprotected duplicate behind after a successful protected write.
-            try? deleteLegacy(credential)
+            logLegacyDeleteFailure(deleteLegacyReportingStatus(credential), during: "save")
             #endif
             return
         }
@@ -301,12 +301,25 @@ final class KeychainCredentialStore {
     }
 
     func delete(_ credential: KeychainCredential) throws {
-        let status = SecItemDelete(baseQuery(for: credential) as CFDictionary)
+        var status = SecItemDelete(baseQuery(for: credential) as CFDictionary)
         #if os(macOS)
         // Clear the legacy login-keychain copy too, whether or not the migration ever ran. Deleting
         // only the data-protection item would leave the backed-up copy behind, so "Erase Everything"
         // would report success while the key survived in Time Machine.
-        try? deleteLegacy(credential)
+        //
+        // Its status is folded into the throw rather than discarded: a swallowed failure here is
+        // exactly the outcome this method exists to prevent — Settings showing "Removed", and
+        // `eraseEverything` reporting `.complete`, over a key that is still on disk and still in
+        // the Time Machine snapshot.
+        let legacyStatus = deleteLegacyReportingStatus(credential)
+        logLegacyDeleteFailure(legacyStatus, during: "delete")
+        if status == errSecMissingEntitlement {
+            // No data protection keychain on this build, so there was never an item there to
+            // remove. The legacy delete above is the whole operation; report on that instead.
+            status = legacyStatus
+        } else if status == errSecSuccess || status == errSecItemNotFound {
+            status = legacyStatus == errSecItemNotFound ? status : legacyStatus
+        }
         #endif
         guard status == errSecSuccess || status == errSecItemNotFound else {
             throw KeychainServiceError.unexpectedStatus(status)
@@ -352,13 +365,23 @@ final class KeychainCredentialStore {
     }
 
     #if os(macOS)
-    /// Removes the pre-migration login-keychain copy. Separate from `delete(_:)` so the migration
-    /// can clear the legacy item without disturbing the one it has just written.
-    private func deleteLegacy(_ credential: KeychainCredential) throws {
-        let status = SecItemDelete(baseQuery(for: credential, dataProtection: false) as CFDictionary)
-        guard status == errSecSuccess || status == errSecItemNotFound else {
-            throw KeychainServiceError.unexpectedStatus(status)
-        }
+    /// Removes the pre-migration login-keychain copy, returning the raw status.
+    ///
+    /// Separate from `delete(_:)` so the migration can clear the legacy item without disturbing the
+    /// one it has just written, and status-returning rather than throwing because every caller has
+    /// to decide for itself whether a failure is fatal — a discarded `try?` here would silently
+    /// leave the unprotected copy in place, which is the whole problem.
+    private func deleteLegacyReportingStatus(_ credential: KeychainCredential) -> OSStatus {
+        SecItemDelete(baseQuery(for: credential, dataProtection: false) as CFDictionary)
+    }
+
+    /// The legacy copy is the one Time Machine and Migration Assistant carry off the device, so a
+    /// failure to remove it is worth a diagnosable trace even where the caller carries on.
+    private func logLegacyDeleteFailure(_ status: OSStatus, during operation: String) {
+        guard status != errSecSuccess, status != errSecItemNotFound else { return }
+        MarketDataLog.logger.warning(
+            "Keychain: could not remove the legacy login-keychain copy during \(operation, privacy: .public) (status \(status, privacy: .public)). The unprotected item is still on disk."
+        )
     }
     #endif
 }

@@ -106,8 +106,8 @@ struct CryptoView: View {
             MetricCard(
                 title: LocalizedStringKey("Profit / Loss"),
                 value: settings.privateCurrency(gain),
-                systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
-                accent: gain >= 0 ? WCColor.primary : WCColor.destructive,
+                systemImage: settings.privateSymbol(isPositive: gain >= 0, positive: "arrow.up.right", negative: "arrow.down.right"),
+                accent: settings.privateAccent(isPositive: gain >= 0),
                 detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(formattedPercent(percent, locale: settings.effectiveLocale)) performance")
             )
 
@@ -191,7 +191,8 @@ struct CryptoView: View {
                     ValueDelta(
                         value: holding.gainLoss.doubleValue,
                         formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
-                        percentText: settings.privatePercent(holding.gainLossPercent)
+                        percentText: settings.privatePercent(holding.gainLossPercent),
+                        isRedacted: settings.isPrivacyMode
                     )
                 }
             }
@@ -276,7 +277,8 @@ struct CryptoView: View {
                     ValueDelta(
                         value: holding.gainLoss.doubleValue,
                         formattedValue: settings.privateCurrency(holding.gainLoss, sourceCurrency: holding.currency),
-                        percentText: settings.privatePercent(holding.gainLossPercent)
+                        percentText: settings.privatePercent(holding.gainLossPercent),
+                        isRedacted: settings.isPrivacyMode
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)

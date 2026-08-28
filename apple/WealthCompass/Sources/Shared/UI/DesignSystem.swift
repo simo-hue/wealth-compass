@@ -390,13 +390,52 @@ struct ValueDelta: View {
     let value: Double
     let formattedValue: String
     let percentText: String
+    /// Deliberately has **no default**, so every call site has to answer it.
+    ///
+    /// The doc on `value` used to say the raw number "is never displayed" — but the tint displayed
+    /// it. Every call site already passes `settings.privateCurrency(...)` and
+    /// `settings.privatePercent(...)`, so under Privacy Mode the text reads `•••• (••••)` while
+    /// green-or-red still spelled out whether the position was up or down. Redacting the figure and
+    /// then colouring it by the figure answers the question the redaction refuses to answer.
+    let isRedacted: Bool
 
     var body: some View {
         Text(verbatim: "\(formattedValue) (\(percentText))")
-            .foregroundStyle(value >= 0 ? WCColor.primary : WCColor.destructive)
+            .foregroundStyle(tint)
             .font(.subheadline.monospacedDigit().weight(.semibold))
             .contentTransition(.numericText())
-            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: value)
+            // Animate on a constant while redacted: animating on `value` would replay a transition
+            // whenever the hidden number moved, which is itself a signal.
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isRedacted ? 0 : value)
+    }
+
+    private var tint: Color {
+        guard !isRedacted else { return WCColor.textSecondary }
+        return value >= 0 ? WCColor.primary : WCColor.destructive
+    }
+}
+
+extension AppSettings {
+    /// Tint for a gain/loss figure, collapsed to neutral under Privacy Mode.
+    ///
+    /// A masked value whose accent still encodes its sign is only half-masked — see `ValueDelta`.
+    func privateAccent(
+        isPositive: Bool,
+        positive: Color = WCColor.primary,
+        negative: Color = WCColor.destructive
+    ) -> Color {
+        isPrivacyMode ? WCColor.textSecondary : (isPositive ? positive : negative)
+    }
+
+    /// Glyph for a gain/loss figure, collapsed to a sign-free symbol under Privacy Mode.
+    /// `plusminus` is the neutral: it reads as "sign withheld" rather than as up or down.
+    func privateSymbol(
+        isPositive: Bool,
+        positive: String,
+        negative: String,
+        neutral: String = "plusminus"
+    ) -> String {
+        isPrivacyMode ? neutral : (isPositive ? positive : negative)
     }
 }
 

@@ -436,8 +436,13 @@ struct DashboardView: View {
                     MetricCard(
                         title: "Net Savings",
                         value: settings.privateCurrency(currentMonthCashFlow.netSavings),
-                        systemImage: currentMonthCashFlow.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
-                        accent: currentMonthCashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive,
+                        systemImage: settings.privateSymbol(
+                            isPositive: currentMonthCashFlow.netSavings >= 0,
+                            positive: "arrow.down.to.line.circle.fill",
+                            negative: "arrow.up.to.line.circle.fill",
+                            neutral: "wallet.pass.fill"
+                        ),
+                        accent: settings.privateAccent(isPositive: currentMonthCashFlow.netSavings >= 0),
                         // WC-L4: `.formatted` ignores the SwiftUI environment locale, so pass the
                         // effective (in-app language) locale explicitly; otherwise the month stayed
                         // in the system language. The result is already-localized data, rendered verbatim.
@@ -527,7 +532,7 @@ struct DashboardView: View {
                             .foregroundStyle(WCColor.textFaint)
                         Text(settings.privateCurrency(totalIncome - totalExpense))
                             .font(.caption.monospacedDigit().weight(.bold))
-                            .foregroundStyle(totalIncome - totalExpense >= 0 ? WCColor.primary : WCColor.destructive)
+                            .foregroundStyle(settings.privateAccent(isPositive: totalIncome - totalExpense >= 0))
                     }
                 }
             }

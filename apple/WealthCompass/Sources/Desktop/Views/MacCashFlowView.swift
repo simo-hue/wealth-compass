@@ -250,7 +250,7 @@ struct MacCashFlowView: View {
                 title: "Net Savings",
                 value: settings.privateCurrency(cashFlow.netSavings),
                 systemImage: "wallet.pass",
-                accent: cashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive
+                accent: settings.privateAccent(isPositive: cashFlow.netSavings >= 0)
             )
             MetricCard(
                 title: "Savings Rate",
@@ -268,7 +268,7 @@ struct MacCashFlowView: View {
                 title: "Total Cash",
                 value: settings.privateCurrency(totals.totalLiquidity),
                 systemImage: "banknote",
-                accent: totals.totalLiquidity >= 0 ? WCColor.primary : WCColor.destructive
+                accent: settings.privateAccent(isPositive: totals.totalLiquidity >= 0)
             )
         }
     }
@@ -396,7 +396,7 @@ struct MacCashFlowView: View {
                         let net = hoveredCashFlowMonth != nil ? (hoveredCashFlowMonth!.income - hoveredCashFlowMonth!.expense) : (totalIncome - totalExpense)
                         Text(settings.privateCurrency(net))
                             .font(.subheadline.monospacedDigit().weight(.bold))
-                            .foregroundStyle(net >= 0 ? WCColor.primary : WCColor.destructive)
+                            .foregroundStyle(settings.privateAccent(isPositive: net >= 0))
                     }
                 }
             }

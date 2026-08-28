@@ -109,8 +109,8 @@ struct InvestmentsView: View {
             MetricCard(
                 title: LocalizedStringKey("Profit / Loss"),
                 value: settings.privateCurrency(gain),
-                systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
-                accent: gain >= 0 ? WCColor.primary : WCColor.destructive,
+                systemImage: settings.privateSymbol(isPositive: gain >= 0, positive: "arrow.up.right", negative: "arrow.down.right"),
+                accent: settings.privateAccent(isPositive: gain >= 0),
                 detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(formattedPercent(percent, locale: settings.effectiveLocale)) performance")
             )
 
@@ -226,7 +226,8 @@ struct InvestmentsView: View {
                     ValueDelta(
                         value: investment.gainLoss.doubleValue,
                         formattedValue: settings.privateCurrency(investment.gainLoss, sourceCurrency: investment.currency),
-                        percentText: settings.privatePercent(investment.gainLossPercent)
+                        percentText: settings.privatePercent(investment.gainLossPercent),
+                        isRedacted: settings.isPrivacyMode
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)

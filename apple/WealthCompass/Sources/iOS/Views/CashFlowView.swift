@@ -161,7 +161,7 @@ struct CashFlowView: View {
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             MetricCard(title: "Monthly Income", value: settings.privateCurrency(cashFlow.monthlyIncome), systemImage: "arrow.down.left", accent: WCColor.primary, detail: "This month")
             MetricCard(title: "Monthly Expenses", value: settings.privateCurrency(cashFlow.monthlyExpenses), systemImage: "arrow.up.right", accent: WCColor.destructive, detail: "This month")
-            MetricCard(title: "Net Savings", value: settings.privateCurrency(cashFlow.netSavings), systemImage: "wallet.pass.fill", accent: cashFlow.netSavings >= 0 ? WCColor.primary : WCColor.destructive, detail: "Income less expenses")
+            MetricCard(title: "Net Savings", value: settings.privateCurrency(cashFlow.netSavings), systemImage: "wallet.pass.fill", accent: settings.privateAccent(isPositive: cashFlow.netSavings >= 0), detail: "Income less expenses")
             MetricCard(title: "Savings Rate", value: settings.isPrivacyMode ? settings.redactionToken : formattedPercent(cashFlow.savingsRate, locale: settings.effectiveLocale), systemImage: "percent", detail: "Of monthly income")
         }
     }

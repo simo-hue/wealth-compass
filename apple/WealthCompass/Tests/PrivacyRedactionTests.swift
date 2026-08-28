@@ -73,12 +73,18 @@ final class PrivacyRedactionTests: XCTestCase {
         let delta = ValueDelta(
             value: investment.gainLoss.doubleValue,
             formattedValue: settings.privateCurrency(investment.gainLoss, sourceCurrency: investment.currency),
-            percentText: settings.privatePercent(investment.gainLossPercent)
+            percentText: settings.privatePercent(investment.gainLossPercent),
+            isRedacted: settings.isPrivacyMode
         )
 
         XCTAssertEqual(delta.formattedValue, settings.redactionToken)
         XCTAssertEqual(delta.percentText, settings.redactionToken)
         XCTAssertNotEqual(investment.gainLossPercent, 0, "the fixture has to carry a percentage worth hiding")
+
+        // Both halves were redacted and the row still tinted itself green-or-red from the live
+        // gain, which is the third half nobody counted. `isRedacted` has no default precisely so a
+        // call site cannot skip this — the compiler rejected this very test when it was added.
+        XCTAssertTrue(delta.isRedacted, "the row must know it is redacted, or it colours itself by the hidden sign")
     }
 
     /// Fails if an entity count is printed without being formatted for the reader's locale.
@@ -1090,6 +1096,192 @@ final class PrivacyRedactionTests: XCTestCase {
             "a privacy check on a sibling card counts as this card's gate again"
         )
     }
+
+    // MARK: - Sign leaks
+
+    /// Privacy Mode must not spell a redacted figure's sign through its glyph or its tint.
+    ///
+    /// `••••` beside a red down-arrow says "you are down" as plainly as the number would. The
+    /// Dashboard's own net-worth hero already reasoned this out — its comment says the arrow and
+    /// tint "spell the sign of that movement while the two figures beside them are already `••••`",
+    /// and it hides both arms under one gate — but the metric cards and `ValueDelta` did not follow.
+    func testPrivateAccentCollapsesToNeutralWhileRedacted() {
+        let settings = makeSettings()
+
+        settings.isPrivacyMode = false
+        XCTAssertEqual(settings.privateAccent(isPositive: true), WCColor.primary)
+        XCTAssertEqual(settings.privateAccent(isPositive: false), WCColor.destructive)
+
+        settings.isPrivacyMode = true
+        XCTAssertEqual(
+            settings.privateAccent(isPositive: true), settings.privateAccent(isPositive: false),
+            "a gain and a loss must be indistinguishable by tint while redacted"
+        )
+        XCTAssertNotEqual(settings.privateAccent(isPositive: true), WCColor.primary)
+        XCTAssertNotEqual(settings.privateAccent(isPositive: false), WCColor.destructive)
+    }
+
+    func testPrivateSymbolCollapsesToNeutralWhileRedacted() {
+        let settings = makeSettings()
+        let up = "arrow.up.right"
+        let down = "arrow.down.right"
+
+        settings.isPrivacyMode = false
+        XCTAssertEqual(settings.privateSymbol(isPositive: true, positive: up, negative: down), up)
+        XCTAssertEqual(settings.privateSymbol(isPositive: false, positive: up, negative: down), down)
+
+        settings.isPrivacyMode = true
+        let shown = settings.privateSymbol(isPositive: true, positive: up, negative: down)
+        XCTAssertEqual(
+            shown, settings.privateSymbol(isPositive: false, positive: up, negative: down),
+            "a gain and a loss must be indistinguishable by glyph while redacted"
+        )
+        XCTAssertNotEqual(shown, up)
+        XCTAssertNotEqual(shown, down)
+    }
+
+    /// Fails if any scanned source picks a tint or a glyph from a sign Privacy Mode is redacting.
+    ///
+    /// The same lint caveats as the percentage sweep above apply, with one difference worth
+    /// stating: `ValueDelta`'s half of this rule is **not** carried by the lint. Its `isRedacted`
+    /// parameter has no default, so a new call site that ignores the rule does not compile. That is
+    /// a stronger guarantee than any sweep, and it is why this one only has to cover the places
+    /// where the tint and glyph are chosen by the caller.
+    func testWorkingTreeSourcesContainNoUnguardedSignRender() throws {
+        let sources = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources")
+
+        var offenders: [PercentRender] = []
+        var filesRead = 0
+
+        for directory in Self.scannedDirectories {
+            let root = sources.appendingPathComponent(directory)
+            let swiftFiles = try FileManager.default
+                .subpathsOfDirectory(atPath: root.path)
+                .filter { $0.hasSuffix(".swift") }
+                .filter { !Self.excludedFiles.contains("\(directory)/\($0)") }
+                .sorted()
+
+            for file in swiftFiles {
+                let text = try String(contentsOf: root.appendingPathComponent(file), encoding: .utf8)
+                let source = Self.stripped(text)
+                filesRead += 1
+
+                for index in source.scan.indices {
+                    guard let match = Self.signMatch(at: index, in: source) else { continue }
+                    guard !Self.isSignGatedAnywhere(at: index, column: match.column, in: source.code) else { continue }
+                    offenders.append(PercentRender(
+                        file: "Sources/\(directory)/\(file)", line: index + 1, pattern: match.pattern,
+                        source: String(source.scan[index]).trimmingCharacters(in: .whitespaces)
+                    ))
+                }
+            }
+        }
+
+        XCTAssertGreaterThan(filesRead, 20, "only \(filesRead) Swift files enumerated — the sweep lost the source tree")
+        XCTAssertEqual(
+            offenders.map(\.description), [],
+            """
+            \(offenders.count) render(s) encode a sign Privacy Mode redacts. Route each through \
+            `settings.privateAccent(isPositive:)` / `settings.privateSymbol(isPositive:…)`:
+            \(offenders.map { "  " + $0.description }.joined(separator: "\n"))
+            """
+        )
+    }
+
+    /// The same alarm the percentage sweep carries: a matcher that silently stops matching is worse
+    /// than no matcher, and a count floor would fire when someone *fixes* a call site instead.
+    func testSignSweepStillCatchesALeak() {
+        let leaks = [
+            #"accent: gain >= 0 ? WCColor.primary : WCColor.destructive"#,
+            #"accent: cf.netSavings >= 0 ? WCColor.primary : WCColor.destructive,"#,
+            #"systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right","#,
+            #".foregroundStyle(net >= 0 ? WCColor.primary : WCColor.destructive)"#,
+            #"Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")"#,
+        ]
+        for leak in leaks {
+            let source = Self.stripped(leak)
+            XCTAssertNotNil(
+                Self.signMatch(at: 0, in: source),
+                "the sign sweep stopped recognising a leak it claims to catch: \(leak)"
+            )
+        }
+
+        let clean = [
+            #"accent: settings.privateAccent(isPositive: gain >= 0)"#,
+            #"systemImage: settings.privateSymbol(isPositive: gain >= 0, positive: "a", negative: "b")"#,
+            #"let isUp = value >= 0"#,
+            #"if total >= 0 { return }"#,
+        ]
+        for line in clean {
+            let source = Self.stripped(line)
+            XCTAssertNil(
+                Self.signMatch(at: 0, in: source),
+                "the sign sweep reported a false positive: \(line)"
+            )
+        }
+    }
+
+    /// `isPrivacyGated` inspects only the *immediately* enclosing block, which is right for a
+    /// percentage rendered directly inside its gate. A tint is usually applied further in: the
+    /// Dashboard hero puts its arrow inside an `HStack` nested in the `if !settings.isPrivacyMode`,
+    /// so the nearest opener is the `HStack` and the gate is a level above it. Walk the ancestor
+    /// chain instead, and treat a gate found at any depth as covering the render.
+    private static func isSignGatedAnywhere(at index: Int, column: Int, in code: [[Character]]) -> Bool {
+        if isPrivacyGated(at: index, column: column, in: code) { return true }
+
+        var line = index
+        var col = column
+        for _ in 0..<12 {
+            let opener = enclosingBlockOpener(at: line, column: col, in: code)
+            guard opener < line else { return false }
+            let header = blockHeader(openedAt: opener, in: code)
+                .map { String(code[$0]) }
+                .joined(separator: " ")
+            if let gate = privacyGate(in: header) {
+                let isGuard = header.trimmingCharacters(in: .whitespaces).hasPrefix("guard")
+                return gate.isNegated != isGuard
+            }
+            line = opener
+            col = 0
+        }
+        return false
+    }
+
+    /// A tint or glyph chosen by comparing a value against zero, on a line that also names one of
+    /// the two sign colours or a directional arrow. Routing through the `private…` helpers clears
+    /// it, because those take the comparison as a parameter rather than branching on it here.
+    private static func signMatch(at index: Int, in source: StrippedSource) -> (column: Int, pattern: String)? {
+        let line = String(source.scan[index])
+        guard !line.contains("privateAccent"), !line.contains("privateSymbol") else { return nil }
+
+        let comparisons = [">= 0 ?", "> 0 ?", "< 0 ?", "<= 0 ?"]
+        guard let comparison = comparisons.first(where: { line.contains($0) }) else { return nil }
+
+        // The line must actually *apply* a tint or a glyph. Without this the sweep also flags
+        // `ValueDelta.tint`'s own `return value >= 0 ? …`, which is the guarded implementation of
+        // this very rule rather than a violation of it.
+        let applicators = ["accent:", "foregroundStyle(", "systemImage:", "Image(systemName:"]
+        guard applicators.contains(where: { line.contains($0) }) else { return nil }
+
+        // Both sign colours, or a directional arrow pair. One colour against a neutral is a
+        // presence cue, not a sign: `count > 0 ? WCColor.primary : WCColor.textFaint` dims an empty
+        // badge and reveals nothing about whether money went up or down.
+        let sink: String
+        if line.contains("WCColor.primary"), line.contains("WCColor.destructive") {
+            sink = "primary/destructive"
+        } else if line.contains("arrow.up"), line.contains("arrow.down") {
+            sink = "arrow up/down"
+        } else {
+            return nil
+        }
+
+        guard let range = line.range(of: comparison) else { return nil }
+        return (line.distance(from: line.startIndex, to: range.lowerBound), "\(comparison) -> \(sink)")
+    }
+
 
     // MARK: - Chart geometry
 

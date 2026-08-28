@@ -141,8 +141,8 @@ struct MacInvestmentsView: View {
             MetricCard(
                 title: LocalizedStringKey("Profit / Loss"),
                 value: settings.privateCurrency(gain),
-                systemImage: gain >= 0 ? "arrow.up.right" : "arrow.down.right",
-                accent: gain >= 0 ? WCColor.primary : WCColor.destructive
+                systemImage: settings.privateSymbol(isPositive: gain >= 0, positive: "arrow.up.right", negative: "arrow.down.right"),
+                accent: settings.privateAccent(isPositive: gain >= 0)
             )
             
             if !settings.isPrivacyMode {
@@ -271,7 +271,8 @@ struct MacInvestmentsView: View {
                         ValueDelta(
                             value: investment.gainLoss.doubleValue,
                             formattedValue: settings.privateCurrency(investment.gainLoss, sourceCurrency: investment.currency),
-                            percentText: settings.privatePercent(investment.gainLossPercent)
+                            percentText: settings.privatePercent(investment.gainLossPercent),
+                            isRedacted: settings.isPrivacyMode
                         )
                     }
                 }

@@ -137,8 +137,13 @@ struct MacDashboardView: View {
             MetricCard(
                 title: "Net Savings",
                 value: settings.privateCurrency(cf.netSavings),
-                systemImage: cf.netSavings >= 0 ? "arrow.down.to.line.circle.fill" : "arrow.up.to.line.circle.fill",
-                accent: cf.netSavings >= 0 ? WCColor.primary : WCColor.destructive,
+                systemImage: settings.privateSymbol(
+                    isPositive: cf.netSavings >= 0,
+                    positive: "arrow.down.to.line.circle.fill",
+                    negative: "arrow.up.to.line.circle.fill",
+                    neutral: "wallet.pass.fill"
+                ),
+                accent: settings.privateAccent(isPositive: cf.netSavings >= 0),
                 detail: "Income less expenses"
             )
             .frame(maxWidth: .infinity)
@@ -174,7 +179,7 @@ struct MacDashboardView: View {
                 title: "Total Cash",
                 value: settings.privateCurrency(totals.totalLiquidity),
                 systemImage: "banknote",
-                accent: totals.totalLiquidity >= 0 ? WCColor.primary : WCColor.destructive,
+                accent: settings.privateAccent(isPositive: totals.totalLiquidity >= 0),
                 detail: "All Time"
             )
             .frame(maxWidth: .infinity)
@@ -814,7 +819,7 @@ struct MacDashboardView: View {
                         let net = hoveredCashFlowMonth != nil ? (hoveredCashFlowMonth!.income - hoveredCashFlowMonth!.expense) : (totalIncome - totalExpense)
                         Text(settings.privateCurrency(net))
                             .font(.subheadline.monospacedDigit().weight(.bold))
-                            .foregroundStyle(net >= 0 ? WCColor.primary : WCColor.destructive)
+                            .foregroundStyle(settings.privateAccent(isPositive: net >= 0))
                     }
                 }
             }
