@@ -680,10 +680,17 @@ final class FinanceImportServiceTests: XCTestCase {
     /// stayed parked, `!container.isAtEnd` stayed true, and `parse` never returned: the detached
     /// task pinned a CPU core with no progress, no summary, no error and no way to cancel.
     ///
-    /// Each literal below reproduced the hang against the shipped decoder, at every depth — a bare
-    /// value, nested in an array, and nested in an object — so the trigger is any out-of-range
-    /// number anywhere in a backup, not a specially crafted top-level one. `1e-400` matters as
-    /// much as `1e400`: an underflowing denormal is something another tool can plausibly write.
+    /// The five scalar and array literals below each reproduced the hang against the shipped
+    /// decoder, so the trigger is any out-of-range number reaching an element `Imported*` cannot
+    /// decode — not a specially crafted top-level one. `1e-400` matters as much as `1e400`: an
+    /// underflowing denormal is something another tool can plausibly write into an export.
+    ///
+    /// The object case is different and is here as a boundary marker, not as a hang repro. Every
+    /// `Imported*` decoder has exactly one throwing call — `try decoder.container(keyedBy:)` — and
+    /// reads every field through a non-throwing `decode…IfPresent` helper. A JSON *object* element
+    /// therefore always succeeds at the container, never reaches `LossyArray`'s catch, and is
+    /// dropped later by `model()` returning nil. It could not have hung, and it pins that the
+    /// out-of-range field is still dropped and still counted by that other route.
     ///
     /// Each case asserts the healthy sibling still arrives, so the skip stays surgical.
     func testOutOfRangeNumbersAreSkippedRatherThanHangingTheImport() throws {
@@ -693,7 +700,7 @@ final class FinanceImportServiceTests: XCTestCase {
             ("underflowing exponent", "1e-400"),
             ("400-digit integer", hugeInteger),
             ("nested in an array", "[1e400]"),
-            ("nested in an object", #"{"amount":1e400}"#),
+            ("nested in an object", #"{"amount":1e400}"#), // dropped via model(), not the skip
             ("negative overflow", "-1e400"),
         ]
 
