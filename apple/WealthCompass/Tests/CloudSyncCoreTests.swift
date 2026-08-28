@@ -586,23 +586,105 @@ final class CloudSyncCoreTests: XCTestCase {
         }
     }
 
-    // MARK: - deep-audit H12: bootstrap tombstone vs local edit
+    // MARK: - #6 / deep-audit H12: one delete-vs-edit rule at all three sites
+    //
+    // The same delete-vs-edit collision used to resolve three different ways, so two devices in
+    // the same state reached opposite outcomes purely on send/fetch ordering. All three sites now
+    // route through `deleteVsEdit`, which is delete-wins: clock-independent, unlike recency, which
+    // compares two devices' wall clocks and hands the collision to whichever clock is skewed.
+    // These tests therefore pin the *absence* of recency as much as the presence of the rule.
 
     private func resurrectionPending() -> CloudSyncPendingMutation {
         .save(modifiedAt: Date(), revision: UUID(), origin: .localChange, allowsResurrection: true)
     }
 
-    /// A local edit made AFTER the remote deletion is a later write and must survive (resurrect).
-    func testTombstoneKeepsLocalEditNewerThanDeletion() {
+    /// The rule itself: the delete wins, and only an explicit resurrection opt-in beats it.
+    func testDeleteVsEditIsDeleteWinsUnlessResurrectionIsAllowed() {
+        XCTAssertEqual(CloudKitSyncService.deleteVsEdit(allowsResurrection: false), .deleteWins)
+        XCTAssertEqual(CloudKitSyncService.deleteVsEdit(allowsResurrection: true), .editWins)
+    }
+
+    /// The point of the unification: one (delete, edit) pair, the same outcome at every site.
+    ///
+    /// The pair is the reported failure — device A deletes R at T1, device B edits R at T2 > T1 —
+    /// with the edit deliberately NEWER than the delete, which is the input that used to split the
+    /// three sites apart. `bootstrapDecision` sees it as a local delete vs the server's live edit
+    /// (B sends first), `tombstoneBootstrapDecision` as a fetched tombstone vs a local edit (B
+    /// fetches first), and `resolveServerConflict` as a rejected upload against a server tombstone.
+    /// The third has no pure entry point of its own — it is an actor method that mutates metadata —
+    /// so the assertion here is on the `deleteVsEdit` call it now makes, with `allowsResurrection`
+    /// read off the same pending it inspects.
+    func testDeleteVsEditAgreesAtAllThreeCallSites() {
+        let deletedAt = Date(timeIntervalSince1970: 1_000)
+        let newerEdit = bootstrapSnapshot(payload: "edit", updatedAt: Date(timeIntervalSince1970: 2_000))
+
+        // Site 1 — `bootstrapDecision`: the delete is the local side, so delete-wins is `.local`.
+        XCTAssertEqual(
+            CloudKitSyncService.bootstrapDecision(pending: deletePending(), local: nil, remote: newerEdit),
+            .local,
+            "A local delete must beat a newer server edit."
+        )
+        // Site 2 — `tombstoneBootstrapDecision`: the delete is the remote side, so it applies.
+        XCTAssertEqual(
+            CloudKitSyncService.tombstoneBootstrapDecision(pending: nil, local: newerEdit, remoteDeletedAt: deletedAt),
+            .applyDelete,
+            "A remote delete must beat a newer local edit — the same collision, the same answer."
+        )
+        // Site 3 — `resolveServerConflict`, via the rule it consults for a server tombstone.
+        XCTAssertEqual(
+            CloudKitSyncService.deleteVsEdit(allowsResurrection: false),
+            .deleteWins,
+            "A server tombstone must beat the local save that collided with it."
+        )
+    }
+
+    /// `allowsResurrection` must be checked BEFORE anything else — this is the test that guards
+    /// `d199fc7` (tombstone compaction keeping the marker) from being silently undone.
+    ///
+    /// A record restored from a backup carries its ORIGINAL `updatedAt`, which is necessarily
+    /// *older* than the `deletedAt` of the tombstone it is colliding with. Under the recency rule
+    /// this decision used to apply, and under plain delete-wins, that restore loses and the record
+    /// is deleted again — the exact bug `d199fc7` fixed by making the compacted tombstone keep the
+    /// marker so the re-created record is flagged `allowsResurrection == true`. That flag is only
+    /// worth keeping if it is consulted first.
+    func testResurrectionOverridesRecency() {
+        let deletedAt = Date(timeIntervalSince1970: 9_000)
+        let restoredFromBackup = bootstrapSnapshot(payload: "restored", updatedAt: Date(timeIntervalSince1970: 1_000))
+        XCTAssertLessThan(restoredFromBackup.updatedAt, deletedAt, "A restore is older than the delete it collides with.")
+
+        XCTAssertEqual(
+            CloudKitSyncService.deleteVsEdit(allowsResurrection: true),
+            .editWins,
+            "Resurrection must outrank the delete, regardless of which side is newer."
+        )
+        XCTAssertEqual(
+            CloudKitSyncService.tombstoneBootstrapDecision(
+                pending: resurrectionPending(),
+                local: restoredFromBackup,
+                remoteDeletedAt: deletedAt
+            ),
+            .keepLocal,
+            "A restored backup must survive the tombstone it was deleted by."
+        )
+    }
+
+    /// A local edit made after the remote deletion no longer survives it.
+    ///
+    /// This test asserted `.keepLocal` — deep-audit H12's recency rule, that a local record newer
+    /// than `remoteDeletedAt` is a later write and resurrects. Unified onto delete-wins, that input
+    /// applies the deletion instead. The inversion is deliberate: recency compared two devices'
+    /// wall clocks, so the outcome turned on clock skew that nothing here can measure, and it was
+    /// the reason this site disagreed with the other two.
+    func testTombstoneAppliesEvenWhenTheLocalEditIsNewerThanTheDeletion() {
         let deletedAt = Date(timeIntervalSince1970: 1_000)
         let newerLocal = bootstrapSnapshot(payload: "local", updatedAt: Date(timeIntervalSince1970: 2_000))
         XCTAssertEqual(
             CloudKitSyncService.tombstoneBootstrapDecision(pending: nil, local: newerLocal, remoteDeletedAt: deletedAt),
-            .keepLocal
+            .applyDelete
         )
     }
 
-    /// A deletion newer than the local record wins.
+    /// A deletion newer than the local record wins — unchanged by the unification.
     func testTombstoneAppliesWhenDeletionNewerThanLocal() {
         let deletedAt = Date(timeIntervalSince1970: 2_000)
         let olderLocal = bootstrapSnapshot(payload: "local", updatedAt: Date(timeIntervalSince1970: 1_000))
@@ -630,7 +712,9 @@ final class CloudSyncCoreTests: XCTestCase {
         )
     }
 
-    /// A tie (local.updatedAt == deletedAt) is not strictly newer → the deletion applies (deterministic).
+    /// A tie (local.updatedAt == deletedAt) applies the deletion. It always did, but for the other
+    /// reason — "not strictly newer" — and it is kept because a timestamp tie is the one input a
+    /// re-introduced recency comparison would be most tempted to resolve the other way.
     func testTombstoneEqualTimestampAppliesDelete() {
         let when = Date(timeIntervalSince1970: 3_000)
         let local = bootstrapSnapshot(payload: "local", updatedAt: when)
@@ -734,7 +818,10 @@ final class CloudSyncCoreTests: XCTestCase {
 
         let settled = compacted["settled"]
         XCTAssertEqual(settled?.isTombstone, true, "the marker survives — this is the whole fix")
-        XCTAssertEqual(settled?.deletedAt, fixedDate, "and the date it was deleted, for recency")
+        // Informational since the delete-vs-edit unification: `deletedAt` was last read for a
+        // decision by `tombstoneBootstrapDecision`'s recency comparison, and a settled tombstone
+        // has no pending, so it is never the value re-uploaded either. Kept as the record of when.
+        XCTAssertEqual(settled?.deletedAt, fixedDate, "and the date it was deleted")
         XCTAssertNil(settled?.systemFields, "but the bulk is gone, which is what compaction is for")
         XCTAssertNil(settled?.pending)
     }
@@ -754,6 +841,30 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertFalse(gate(true, 0, 31), "a manual sync in flight → stand down")
         XCTAssertFalse(gate(false, 1, 31), "an engine-driven automatic sync in flight → stand down (#13)")
         XCTAssertFalse(gate(false, 0, 10), "still within the debounce window → stand down")
+    }
+
+    /// #7: bootstrap may only be latched by a fetch that demonstrably reached the server.
+    ///
+    /// `.didFetchChanges` carries no error, and `automaticallySync = true` schedules an engine
+    /// cycle before connectivity exists, so enabling sync offline used to complete bootstrap on an
+    /// empty fetch — after which `handleFetchedRecordZoneChanges` skips loading local records
+    /// entirely and reconnecting uploads the whole local dataset over the server's copy. `zoneReady`
+    /// is the proof, since only a server round-trip can set it. Thin on purpose: the event wiring
+    /// around this cannot be tested (`CKSyncEngine.Event` has no public initializer), so what is
+    /// pinned here is the condition itself.
+    func testShouldCompleteBootstrapRequiresAZoneRoundTrip() {
+        XCTAssertFalse(
+            CloudKitSyncService.shouldCompleteBootstrap(bootstrapCompleted: false, zoneReady: false),
+            "a fetch that never reached the server must not latch bootstrap"
+        )
+        XCTAssertTrue(
+            CloudKitSyncService.shouldCompleteBootstrap(bootstrapCompleted: false, zoneReady: true),
+            "the zone was delivered, so the merge really did run"
+        )
+        XCTAssertFalse(
+            CloudKitSyncService.shouldCompleteBootstrap(bootstrapCompleted: true, zoneReady: true),
+            "bootstrap is one-shot — already done stays done"
+        )
     }
 
     /// The anti-mislabel guarantee: an account failure resolves to `.accountUnavailable`

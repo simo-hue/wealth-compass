@@ -1114,6 +1114,34 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         !isSynchronizing && engineSyncActivity == 0 && secondsSinceLastSync >= minimumInterval
     }
 
+    /// Whether a finished fetch cycle may latch the one-shot bootstrap merge as done (#7).
+    ///
+    /// `.didFetchChanges` used to set `bootstrapCompleted` with no evidence the zone had ever been
+    /// delivered. The event carries only a `context` — no error — and `automaticallySync = true`
+    /// means the engine schedules a cycle of its own before connectivity exists, so enabling sync
+    /// while offline latched bootstrap on a fetch that never reached the server. Once latched the
+    /// damage is not recoverable by a later fetch: `handleFetchedRecordZoneChanges` short-circuits
+    /// `localRecords` to `[:]` and takes the requeue branch, so on reconnect the device uploads
+    /// every one of its records over whatever the server holds, and the one-shot merge that would
+    /// have reconciled them never runs.
+    ///
+    /// `zoneReady` is the missing proof, because it can only be set by a server round-trip:
+    /// `handleFetchedDatabaseChanges` when the server reports the zone, or `handleSentDatabaseChanges`
+    /// when it accepts creating it. It cannot wedge a fresh device either — `synchronize()` runs
+    /// `ensureZonePending` + `sendChanges()` *before* `fetchChanges` whenever `!zoneReady`, so the
+    /// flag is established on the first online sync, ahead of the fetch this gates.
+    ///
+    /// Deliberately NOT the stronger per-cycle guard (tracking a `.didFetchRecordZoneChanges` for
+    /// our zone within the cycle). If that event does not fire for an existing-but-empty zone,
+    /// bootstrap never completes and the device uploads nothing, ever — worse than the bug. That
+    /// variant needs an airplane-mode + fresh-account device test first; see `TO_IMPROVE.md`.
+    ///
+    /// Pure + `static` so the gate is testable: `CKSyncEngine.Event` has no public initializer, so
+    /// the wiring that calls this cannot be.
+    static func shouldCompleteBootstrap(bootstrapCompleted: Bool, zoneReady: Bool) -> Bool {
+        !bootstrapCompleted && zoneReady
+    }
+
     private func synchronize(generation: Int, using engine: CKSyncEngine) async {
         guard isCurrent(generation, engine: engine), !isSynchronizing else { return }
         isSynchronizing = true
@@ -1213,7 +1241,15 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
 
             case .didFetchChanges:
                 engineSyncActivity = max(0, engineSyncActivity - 1)
-                if !metadataStore.read().bootstrapCompleted {
+                // Gated on `zoneReady`, which is the only signal here that the fetch actually
+                // reached the server — see `shouldCompleteBootstrap`. Latching bootstrap on the
+                // bare event let an engine-scheduled offline cycle mark the merge done, after
+                // which reconnecting uploaded the whole local dataset over the server's copy.
+                let metadata = metadataStore.read()
+                if Self.shouldCompleteBootstrap(
+                    bootstrapCompleted: metadata.bootstrapCompleted,
+                    zoneReady: metadata.zoneReady
+                ) {
                     try metadataStore.update { $0.bootstrapCompleted = true }
                     enqueuePendingRecordChanges(on: syncEngine)
                 }
@@ -1441,14 +1477,16 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
 
                 switch resolution {
                 case .keepLocal:
-                    // Local state wins — a pending resurrection save, or (deep-audit H12) a local
-                    // edit newer than the deletion. Clear the tombstone and make sure a save is
-                    // queued so the survivor re-uploads and clears the server tombstone.
+                    // Local state wins, which under the one delete-vs-edit rule can only mean a
+                    // pending save that opted into resurrection. Clear the tombstone and make sure
+                    // a save is queued so the survivor re-uploads and clears the server tombstone.
                     state.isTombstone = false
                     state.deletedAt = nil
                     if state.pending == nil, let localSnapshot {
-                        // Recency-only resurrection: no pending mutation existed, so synthesize one —
-                        // otherwise the record would be kept only in local metadata and never re-sent.
+                        // Unreachable since `tombstoneBootstrapDecision` stopped resolving `.keepLocal`
+                        // on recency: that outcome now requires a resurrection-flagged pending save, so
+                        // `state.pending` is never nil here. Kept as a guard, because the cost of being
+                        // wrong is a survivor left in local metadata and never re-sent.
                         state.pending = .save(
                             modifiedAt: localSnapshot.updatedAt,
                             revision: UUID(),
@@ -1840,9 +1878,13 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             }
 
             if serverIsDeleted {
-                if case .save(_, _, _, let allowsResurrection)? = state.pending, allowsResurrection {
+                // Routed through the one delete-vs-edit rule (`deleteVsEdit`). The delete is the
+                // *server* side here, so `.deleteWins` applies its deletion locally and `.editWins`
+                // re-sends the local save that opted into resurrection.
+                switch Self.deleteVsEdit(allowsResurrection: Self.pendingAllowsResurrection(state.pending)) {
+                case .editWins:
                     shouldRequeue = true
-                } else {
+                case .deleteWins:
                     shouldApplyServerDelete = true
                 }
             } else {
@@ -1891,6 +1933,55 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         }
     }
 
+    enum DeleteVsEdit: Equatable {
+        case deleteWins
+        case editWins
+    }
+
+    /// The single rule for a delete-vs-edit collision: **the delete wins**, unless the local
+    /// mutation explicitly opted into resurrection (#6).
+    ///
+    /// The same collision used to be resolved three different ways — `tombstoneBootstrapDecision`
+    /// compared recency, `resolveServerConflict` looked only at `allowsResurrection`, and
+    /// `bootstrapDecision` returned `.local` unconditionally — so two devices in the *same* state
+    /// reached opposite outcomes purely on send/fetch ordering. A deletes record R at T1; B edits R
+    /// at T2 > T1. B fetching first during bootstrap resurrected R, B sending first destroyed B's
+    /// edit, and B fetching first post-bootstrap destroyed it as well. All three sites now route
+    /// through this, so the outcome no longer depends on which side of the wire moved first.
+    ///
+    /// Delete-wins rather than recency, **deliberately walking back deep-audit H12's recency
+    /// intent**. Recency compares two *different devices'* wall clocks across the collision, so the
+    /// device with the skewed clock always wins, and nothing here can detect the skew; proving the
+    /// rule correct would need a two-device test with controlled clocks, which this project cannot
+    /// run. Delete-wins is clock-independent — both devices reach the same answer from their own
+    /// metadata alone — and it never resurrects a record the user deliberately deleted, which is
+    /// the failure users actually notice. The price is known and bounded: an edit made on another
+    /// device after the delete is lost rather than winning.
+    ///
+    /// `allowsResurrection` stays the top-priority override, and that ordering is load-bearing.
+    /// `d199fc7` stopped tombstone compaction dropping the marker precisely so a restored backup
+    /// re-creates the record with `allowsResurrection == true` — and a restored record carries its
+    /// ORIGINAL `updatedAt`, which is *older* than the tombstone's `deletedAt`. Check anything else
+    /// first and that fix silently stops working: the restore is deleted again, exactly as it was
+    /// before (`testResurrectionOverridesRecency`).
+    ///
+    /// Orientation is the caller's business: this names which *operation* wins, not which side of
+    /// the wire. The delete is the local side in `bootstrapDecision` and the remote side in
+    /// `tombstoneBootstrapDecision` / `resolveServerConflict`.
+    static func deleteVsEdit(allowsResurrection: Bool) -> DeleteVsEdit {
+        allowsResurrection ? .editWins : .deleteWins
+    }
+
+    /// Whether a pending local mutation opted into resurrecting a record the server has deleted.
+    /// Extracted so the three delete-vs-edit sites cannot drift apart again on how they read the
+    /// flag, which is how they drifted apart on the rule itself.
+    private static func pendingAllowsResurrection(_ pending: CloudSyncPendingMutation?) -> Bool {
+        if case .save(_, _, _, let allowsResurrection)? = pending {
+            return allowsResurrection
+        }
+        return false
+    }
+
     enum BootstrapDecision: Equatable {
         case local
         case remote
@@ -1934,7 +2025,17 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             return .identical
         }
 
-        if case .delete = pending { return .local }
+        if case .delete = pending {
+            // Routed through the one delete-vs-edit rule (`deleteVsEdit`). Here the delete is the
+            // *local* side and the edit is the server's, so `.deleteWins` means `.local`. A
+            // `.delete` pending cannot carry `allowsResurrection` — that flag marks a local *save*
+            // that must beat a remote tombstone, the opposite orientation — so this always resolves
+            // to `.deleteWins`; the other arm is spelled out so the rule stays visible here.
+            switch deleteVsEdit(allowsResurrection: false) {
+            case .deleteWins: return .local
+            case .editWins: return .remote
+            }
+        }
 
         guard let local else { return .remote }
 
@@ -1957,26 +2058,25 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         case keepLocal    // local state wins — clear the tombstone and re-upload the record
     }
 
-    /// Resolves a fetched remote deletion (tombstone) against local state during the bootstrap
-    /// merge (deep-audit H12). Previously a remote tombstone unconditionally deleted the local
-    /// record unless a pending save opted into resurrection — silently dropping a local edit made
-    /// after the deletion. This mirrors `bootstrapDecision`'s last-writer-wins: a local record
-    /// whose `updatedAt` is strictly newer than the remote `deletedAt` is a later write and
-    /// survives; everything else applies the deletion. `local` is `nil` post-bootstrap (local
-    /// records aren't loaded then), so this reduces to `.applyDelete` and remote deletions stay
-    /// authoritative once the first merge is done.
+    /// Resolves a fetched remote deletion (tombstone) against local state (deep-audit H12), through
+    /// the one delete-vs-edit rule: the deletion wins unless a pending save opted into resurrection.
+    ///
+    /// `local` and `remoteDeletedAt` are deliberately **not** consulted. This used to keep a local
+    /// record whose `updatedAt` was strictly newer than `remoteDeletedAt` — the recency rule that
+    /// `deleteVsEdit` walks back; see its doc comment for why, and note that recency here was also
+    /// the reason the same collision resolved differently at the other two sites. They stay in the
+    /// signature because the call site holds them and because the tests pin, input by input, that
+    /// none of them can revive a deleted record any more.
     static func tombstoneBootstrapDecision(
         pending: CloudSyncPendingMutation?,
         local: CloudSyncRecordSnapshot?,
         remoteDeletedAt: Date
     ) -> TombstoneResolution {
-        if case .save(_, _, _, let allowsResurrection)? = pending, allowsResurrection {
-            return .keepLocal
+        // The delete is the *remote* side here, so `.deleteWins` applies the server's deletion.
+        switch deleteVsEdit(allowsResurrection: pendingAllowsResurrection(pending)) {
+        case .editWins: return .keepLocal
+        case .deleteWins: return .applyDelete
         }
-        if let local, local.updatedAt > remoteDeletedAt {
-            return .keepLocal
-        }
-        return .applyDelete
     }
 
     enum ConflictAction: Equatable {
