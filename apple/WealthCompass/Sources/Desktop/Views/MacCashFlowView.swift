@@ -90,6 +90,8 @@ struct MacCashFlowView: View {
     @State private var selectedTab: MacCashFlowTab = .overview
     @State private var cashFlowRange: CashFlowTimeframe = .sixMonths
     @State private var hoveredCashFlowMonth: CashFlowMonth?
+    /// Collapsed by default: finished schedules are a recovery affordance, not daily reading.
+    @State private var isCompletedRecurringExpanded = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -574,8 +576,49 @@ struct MacCashFlowView: View {
                         recurringTransactionRow(schedule)
                     }
                 }
+
+                completedRecurringSection
             }
             .frame(maxHeight: .infinity, alignment: .top)
+        }
+    }
+
+    /// Finished schedules, collapsed by default.
+    ///
+    /// The list above hides them, because the confirmation alert promises the schedule "will
+    /// disappear from Recurring Transactions" and that copy ships in 34 languages. Hiding them is
+    /// also what made finishing irreversible: delete is only reachable from a row, so a schedule
+    /// finished by mistake could not be removed at all. A collapsed section keeps the promise —
+    /// the row is gone from the live list — while giving the record somewhere to be deleted from.
+    ///
+    /// Absent entirely when there is nothing finished, so it costs no space for most people.
+    @ViewBuilder
+    private var completedRecurringSection: some View {
+        let completed = finance.completedRecurringTransactions
+        if !completed.isEmpty, !settings.isPrivacyMode {
+            DisclosureGroup(isExpanded: $isCompletedRecurringExpanded) {
+                VStack(spacing: 10) {
+                    ForEach(completed) { schedule in
+                        recurringTransactionRow(schedule)
+                    }
+                }
+                .padding(.top, 10)
+            } label: {
+                // Reuses the existing `Completed` key rather than introducing a
+                // "Completed (%lld)" one: that key is already translated in 34 locales, and a new
+                // interpolated key would ship English everywhere until someone translated it. The
+                // count is formatted for the reader's locale — a bare "\(count)" is exactly what
+                // `testWorkingTreeRendersNoUnformattedEntityCount` exists to catch.
+                HStack(spacing: 6) {
+                    Text("Completed")
+                    Text(completed.count.formatted(.number.locale(settings.effectiveLocale)))
+                        .monospacedDigit()
+                        .opacity(0.7)
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+            }
+            .padding(.top, 4)
         }
     }
 
@@ -649,7 +692,14 @@ struct MacCashFlowView: View {
 
                 HStack(spacing: 10) {
                     Text(schedule.frequency.title)
-                    if schedule.isActive {
+                    // The completed branch is new here: this row had only active/paused, because until the
+                    // Completed section existed a finished schedule was never rendered. Without it a finished
+                    // schedule reads "Paused", which is wrong and implies it could be resumed. The iPhone row
+                    // has always drawn all three states.
+                    if schedule.isCompleted {
+                        Text("Completed")
+                            .foregroundStyle(WCColor.primary)
+                    } else if schedule.isActive {
                         Text("Next \(settings.date(schedule.nextDueDate, time: .shortened))")
                     } else {
                         Text("Paused")
@@ -697,6 +747,10 @@ struct MacCashFlowView: View {
 
     private func recurringRowActions(_ schedule: RecurringTransaction) -> some View {
         HStack(spacing: 4) {
+            // Pause/resume and finish are inert on a completed schedule — both store methods
+            // guard on `isCompleted` and return — so they would be buttons that do nothing.
+            // Edit and delete stay: delete is the whole point of the Completed section.
+            if !schedule.isCompleted {
                 Button {
                     toggleRecurringTransaction(schedule)
                 } label: {
@@ -720,6 +774,7 @@ struct MacCashFlowView: View {
                 }
                 .help("Finish schedule")
                 .accessibilityLabel(settings.localized("Finish schedule"))
+            }
 
                 Button {
                     editor = .recurring(schedule)

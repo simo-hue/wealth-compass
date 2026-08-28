@@ -50,6 +50,8 @@ struct CashFlowView: View {
     @State private var showingAddTransaction = false
     @State private var transactionToEdit: Transaction?
     @State private var recurringEditor: RecurringTransactionEditor?
+    /// Collapsed by default: finished schedules are a recovery affordance, not daily reading.
+    @State private var isCompletedRecurringExpanded = false
     @State private var period: AnalyticsPeriod = .thirtyDays
     @State private var transactionPeriod: AnalyticsPeriod = .thirtyDays
     @State private var transactionTypeFilter: TransactionListTypeFilter = .all
@@ -346,10 +348,58 @@ struct CashFlowView: View {
                     }
                 }
 
+                completedRecurringSection
+
                 Text("Due schedules are recorded automatically while the app is active and caught up the next time it opens.")
                     .font(.caption)
                     .foregroundStyle(WCColor.textSecondary)
             }
+        }
+    }
+
+    /// Finished schedules, collapsed by default.
+    ///
+    /// The list above hides them, because the confirmation alert promises the schedule "will
+    /// disappear from Recurring Transactions" and that copy ships in 34 languages. Hiding them is
+    /// also what made finishing irreversible: delete is only reachable from a row, so a schedule
+    /// finished by mistake could not be removed at all. A collapsed section keeps the promise —
+    /// the row is gone from the live list — while giving the record somewhere to be deleted from.
+    ///
+    /// Absent entirely when there is nothing finished, so it costs no space for most people.
+    @ViewBuilder
+    private var completedRecurringSection: some View {
+        let completed = finance.completedRecurringTransactions
+        if !completed.isEmpty, !settings.isPrivacyMode {
+            DisclosureGroup(isExpanded: $isCompletedRecurringExpanded) {
+                VStack(spacing: 12) {
+                    ForEach(completed) { schedule in
+                        recurringTransactionRow(schedule)
+                            .contextMenu {
+                                Button(role: .destructive) {
+                                    activeAlert = .deleteRecurringTransaction(schedule)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                    }
+                }
+                .padding(.top, 10)
+            } label: {
+                // Reuses the existing `Completed` key rather than introducing a
+                // "Completed (%lld)" one: that key is already translated in 34 locales, and a new
+                // interpolated key would ship English everywhere until someone translated it. The
+                // count is formatted for the reader's locale — a bare "\(count)" is exactly what
+                // `testWorkingTreeRendersNoUnformattedEntityCount` exists to catch.
+                HStack(spacing: 6) {
+                    Text("Completed")
+                    Text(completed.count.formatted(.number.locale(settings.effectiveLocale)))
+                        .monospacedDigit()
+                        .opacity(0.7)
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(WCColor.textSecondary)
+            }
+            .tint(WCColor.textSecondary)
         }
     }
 

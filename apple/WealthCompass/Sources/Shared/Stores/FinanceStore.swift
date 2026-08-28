@@ -389,6 +389,20 @@ final class FinanceStore: ObservableObject {
             }
     }
 
+    /// Finished schedules, newest first.
+    ///
+    /// The list above deliberately hides these — the confirmation alert promises the schedule "will
+    /// disappear from Recurring Transactions", and that copy is translated into 34 languages. But
+    /// hiding them is what made finishing a one-way door: `deleteRecurringTransaction` is only
+    /// reachable from a row in that list, so a schedule finished by mistake could not be removed by
+    /// any route short of erasing everything. This backs a separate, collapsed section that keeps
+    /// the promise and still offers a way out.
+    var completedRecurringTransactions: [RecurringTransaction] {
+        data.recurringTransactions
+            .filter(\.isCompleted)
+            .sorted { ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast) }
+    }
+
     var storageLocationDescription: String {
         persistence.locationDescription
     }
