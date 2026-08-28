@@ -551,9 +551,10 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
             dataLock.unlock()
             throw error
         }
-        // Compact fully-settled tombstones so the metadata file doesn't accumulate dead per-record
-        // entries (#12) — safe because entity ids are one-shot UUIDs (a pruned id never returns).
-        updated.records = CloudKitSyncService.pruningSettledTombstones(
+        // Compact fully-settled tombstones so the metadata file doesn't accumulate dead weight
+        // (#12). Keeps the tombstone marker — see the function's own note for why dropping it made
+        // a restored backup silently delete itself again.
+        updated.records = CloudKitSyncService.compactingSettledTombstones(
             from: updated.records,
             knownLocalHashes: updated.knownLocalHashes
         )
@@ -801,6 +802,9 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     typealias RemoteMutationHandler = @MainActor @Sendable ([CloudSyncRemoteMutation]) async throws -> Set<CloudSyncRecordKey>
     typealias StatusHandler = @MainActor @Sendable (CloudSyncStatus) -> Void
     typealias DisableHandler = @MainActor @Sendable () -> Void
+    /// The H08 keys the last local decode had to skip. `start()` must reconcile against the same
+    /// set `FinanceStore.performLoad` passes, or a record this build cannot decode reads as drift.
+    typealias SkippedRecordKeysProvider = @MainActor @Sendable () -> [CloudSyncRecordKey]
     typealias AccountStatusProvider = @Sendable () async throws -> CKAccountStatus
     typealias UserRecordIDProvider = @Sendable () async throws -> CKRecord.ID
     typealias EngineFactory = (CKSyncEngine.Configuration) throws -> CKSyncEngine
@@ -821,6 +825,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     private let remoteMutationHandler: RemoteMutationHandler
     private let statusHandler: StatusHandler
     private let disableHandler: DisableHandler
+    private let skippedRecordKeysProvider: SkippedRecordKeysProvider
     private let accountStatusProvider: AccountStatusProvider
     private let userRecordIDProvider: UserRecordIDProvider
     private let engineFactory: EngineFactory
@@ -852,6 +857,9 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         remoteMutationHandler: @escaping RemoteMutationHandler,
         statusHandler: @escaping StatusHandler,
         disableHandler: @escaping DisableHandler,
+        // Defaulted so every existing construction — and every test — keeps compiling; the real
+        // app wires it to `FinanceStore.lastLoadedSkippedRecordKeys`.
+        skippedRecordKeysProvider: @escaping SkippedRecordKeysProvider = { [] },
         accountStatusProvider: AccountStatusProvider? = nil,
         userRecordIDProvider: UserRecordIDProvider? = nil,
         engineFactory: @escaping EngineFactory = { CKSyncEngine($0) },
@@ -865,6 +873,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         self.remoteMutationHandler = remoteMutationHandler
         self.statusHandler = statusHandler
         self.disableHandler = disableHandler
+        self.skippedRecordKeysProvider = skippedRecordKeysProvider
         self.accountStatusProvider = accountStatusProvider ?? {
             try await container.accountStatus()
         }
@@ -947,7 +956,16 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             if metadata.accountRecordName != userRecordID.recordName {
                 try resetMetadata(for: userRecordID.recordName)
             }
-            let inventoryReconciliation = try metadataStore.reconcileLocalInventory(currentRecords)
+            // The skip set matters as much here as it does at load. Without it a record this build
+            // cannot decode is present in `knownLocalHashes` (the load-time reconcile carried it
+            // forward) but absent from `currentRecords`, so it reads as drift: the change token is
+            // discarded and the whole zone re-fetched. The drift branch then clears the hash, so it
+            // is one spurious full re-bootstrap per undecodable record rather than one per launch —
+            // but it also destroys H08's tracking for that record permanently.
+            let inventoryReconciliation = try metadataStore.reconcileLocalInventory(
+                currentRecords,
+                skipped: await skippedRecordKeysProvider()
+            )
             if inventoryReconciliation.didDiscardToken {
                 let count = inventoryReconciliation.driftedRecordKeys.count
                 Self.logger.error("Local finance data drifted from the persisted CloudKit change token: \(count, privacy: .public) record(s) tracked as synced are missing locally. Discarded the token and re-armed bootstrap to re-fetch from iCloud instead of deleting them.")
@@ -1268,10 +1286,27 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     /// `syncRequested` / `engine === syncEngine`); keeping this free of the engine makes it
     /// unit-testable from just the metadata store and an injected snapshot provider.
     func makeRecords(for recordIDs: [CKRecord.ID]) async -> [CKRecord.ID: CKRecord] {
+        // Read the metadata BEFORE the main-actor hop below, so a revision can never be newer than
+        // the payload it is stamped onto.
+        //
+        // The two cannot be made atomic — the metadata is behind an `NSLock`, the snapshot behind
+        // the main actor — so the choice is which way to let them skew. Reading metadata *after*
+        // `await snapshotProvider()` (as this did) means an edit landing inside the window uploads
+        // the OLD payload under the NEW revision: `handleSentRecordZoneChanges` then sees
+        // `pending.revision == savedRevision`, clears pending, and `knownLocalHashes` already holds
+        // the new hash, so `difference` never re-queues it. The server and every other device keep
+        // the stale version while this one reports "Up to Date".
+        //
+        // Reading it first inverts the skew into the self-correcting direction: the NEW payload
+        // goes up under the OLD revision, the revisions do not match, and the record is requeued.
+        // The direction is guaranteed rather than likely — `save()` publishes `data` before
+        // enqueuing, and the coordinator writes the file before `recordLocalChanges`, so the
+        // snapshot is always at least as new as the metadata.
+        let metadata = metadataStore.read()
         let snapshot = (try? await snapshotProvider()) ?? [:]
         var records: [CKRecord.ID: CKRecord] = [:]
         for recordID in recordIDs {
-            if let record = makeRecord(for: recordID, snapshot: snapshot) {
+            if let record = makeRecord(for: recordID, snapshot: snapshot, metadata: metadata) {
                 records[recordID] = record
             }
         }
@@ -1280,13 +1315,13 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
 
     private func makeRecord(
         for recordID: CKRecord.ID,
-        snapshot: [CloudSyncRecordKey: CloudSyncRecordSnapshot]
+        snapshot: [CloudSyncRecordKey: CloudSyncRecordSnapshot],
+        metadata: CloudSyncMetadata
     ) -> CKRecord? {
         guard recordID.zoneID == zoneID, let key = CloudSyncRecordKey(recordName: recordID.recordName) else {
             return nil
         }
 
-        let metadata = metadataStore.read()
         guard let state = metadata.records[key.storageKey], let pending = state.pending else {
             return nil
         }
@@ -1623,6 +1658,9 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         var deletedServerConflicts: [(key: CloudSyncRecordKey, expectedRevision: UUID?, serverRecord: CKRecord)] = []
         var simpleRequeue = Set<CloudSyncRecordKey>()
         var needsZoneRecreation = false
+        /// The first unrecoverable per-record error, rethrown only after every other record in the
+        /// batch has been routed. See the `.fatal` arm below.
+        var firstFatal: Error?
 
         for failure in event.failedRecordSaves where failure.record.recordID.zoneID == zoneID {
             guard let key = CloudSyncRecordKey(recordName: failure.record.recordID.recordName) else { continue }
@@ -1662,7 +1700,13 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 }
                 simpleRequeue.insert(key)
             case .fatal:
-                throw failure.error
+                // Collected, not thrown. Throwing here left the loop before the requeue at the
+                // bottom of this function and before the deleted-conflict resolution, so one
+                // rejected record discarded the routing of every other record in the batch — up
+                // to 49 of them recovering only on the next `synchronize()`'s blanket re-enqueue,
+                // and the abandoned deleted-conflicts leaving the other device showing a record
+                // this one deleted. Rethrown below, after the side effects have run.
+                firstFatal = firstFatal ?? failure.error
             }
         }
 
@@ -1751,12 +1795,24 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         enqueue(keys: Array(simpleRequeue), on: syncEngine)
 
         for conflict in deletedServerConflicts {
-            try await resolveServerConflict(
-                for: conflict.key,
-                expectedPendingRevision: conflict.expectedRevision,
-                serverRecord: conflict.serverRecord,
-                syncEngine: syncEngine
-            )
+            do {
+                try await resolveServerConflict(
+                    for: conflict.key,
+                    expectedPendingRevision: conflict.expectedRevision,
+                    serverRecord: conflict.serverRecord,
+                    syncEngine: syncEngine
+                )
+            } catch {
+                // Same reasoning as the `.fatal` arm: one conflict that cannot be resolved must
+                // not stop the remaining conflicts in the batch from being resolved.
+                firstFatal = firstFatal ?? error
+            }
+        }
+
+        // Every record has now been routed — requeued, conflict-resolved, or applied. Only now is
+        // it safe to surface the failure that would previously have abandoned the rest.
+        if let firstFatal {
+            throw firstFatal
         }
     }
 
@@ -2053,7 +2109,13 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     static func isRetryable(_ error: CKError) -> Bool {
         switch error.code {
         case .networkUnavailable, .networkFailure, .serviceUnavailable, .requestRateLimited,
-             .zoneBusy, .resultsTruncated, .batchRequestFailed:
+             .zoneBusy, .resultsTruncated, .batchRequestFailed,
+             // Both are classified transient by `failureCategory` (.connectionLost /
+             // .temporarilyUnavailable) and reported as `.waiting`, yet reaching `.fatal` here
+             // threw and abandoned the batch. Deliberately NOT `.limitExceeded`: that means "the
+             // request was too large, send a smaller batch", so re-enqueuing the same record
+             // unchanged loops against a permanent rejection.
+             .serverResponseLost, .accountTemporarilyUnavailable:
             true
         default:
             false
@@ -2196,18 +2258,39 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         case unknown                // anything else — fall back to the system description
     }
 
-    /// Drops fully-settled tombstone states — deleted, acknowledged (no pending work), and no longer
-    /// locally present — so the metadata file doesn't accumulate dead per-record entries (#12). Safe
-    /// because every entity id is a one-shot UUID: a pruned id is never re-created, so its tombstone
-    /// can never be needed to suppress a resurrection. Pure + `static` so it stays unit-testable.
-    static func pruningSettledTombstones(
+    /// Compacts fully-settled tombstone states — deleted, acknowledged (no pending work), and no
+    /// longer locally present — so the metadata file doesn't accumulate dead weight (#12).
+    ///
+    /// It **strips the bulk and keeps the marker**, where it used to drop the entry entirely. The
+    /// old justification was that "every entity id is a one-shot UUID: a pruned id is never
+    /// re-created". That is not true: `FinanceImportService` preserves ids when a backup carries
+    /// them (`id ?? UUID()`), so restoring a backup taken before a delete re-creates the record
+    /// under its original id. With the entry gone, `recordLocalChanges` rebuilds it with
+    /// `allowsResurrection: state.isTombstone` == false, the upload collides with the server
+    /// tombstone — which is never removed, deletes being `isDeleted: true` saves — and
+    /// `resolveServerConflict` applies the server delete. The record vanishes again while the
+    /// import reports success.
+    ///
+    /// `systemFields` is the `NSKeyedArchiver` blob that made these entries expensive; the marker
+    /// left behind is roughly a hundred bytes. That does grow without bound over an account's
+    /// lifetime — an age horizon would bound it, but must not be added here: it would re-open this
+    /// exact hazard for exactly the backups most likely to be restored, the old ones.
+    ///
+    /// Pure + `static` so it stays unit-testable.
+    static func compactingSettledTombstones(
         from records: [String: CloudSyncRecordState],
         knownLocalHashes: [String: String]
     ) -> [String: CloudSyncRecordState] {
-        records.filter { key, state in
+        Dictionary(uniqueKeysWithValues: records.map { key, state in
             let settled = state.isTombstone && state.pending == nil && knownLocalHashes[key] == nil
-            return !settled
-        }
+            guard settled else { return (key, state) }
+            return (key, CloudSyncRecordState(
+                systemFields: nil,
+                pending: nil,
+                isTombstone: true,
+                deletedAt: state.deletedAt
+            ))
+        })
     }
 
     static func failureCategory(for error: Error) -> SyncFailureCategory {

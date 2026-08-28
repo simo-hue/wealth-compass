@@ -702,22 +702,41 @@ final class CloudSyncCoreTests: XCTestCase {
         XCTAssertEqual(CloudKitSyncService.failureCategory(for: CloudSyncError.notRunning), .unknown)
     }
 
-    /// #12 metadata compaction: a fully-settled tombstone (deleted, acknowledged, and gone from
-    /// knownLocalHashes) is dropped; a live record or a still-in-flight delete is kept.
-    func testPruningDropsOnlySettledTombstones() {
+    /// #12 metadata compaction: a fully-settled tombstone keeps its **marker** and loses its bulk.
+    ///
+    /// This used to drop the entry outright, on the stated grounds that "every entity id is a
+    /// one-shot UUID: a pruned id is never re-created". `FinanceImportService` preserves ids when a
+    /// backup carries them, so restoring a backup taken before a delete re-creates the record under
+    /// its original id — and with the entry gone `recordLocalChanges` rebuilds it with
+    /// `allowsResurrection: state.isTombstone` == false, the upload collides with the server
+    /// tombstone, and `resolveServerConflict` deletes it again while the import reports success.
+    ///
+    /// `systemFields` is the expensive part (an `NSKeyedArchiver` blob) and is what compaction is
+    /// actually for; the marker it leaves behind is about a hundred bytes.
+    func testCompactionKeepsTheTombstoneMarkerAndDropsTheBulk() {
+        let systemFields = Data(repeating: 0xAB, count: 512)
         let records: [String: CloudSyncRecordState] = [
-            "live": CloudSyncRecordState(systemFields: nil, pending: nil, isTombstone: false, deletedAt: nil),
-            "settled": CloudSyncRecordState(systemFields: nil, pending: nil, isTombstone: true, deletedAt: fixedDate),
-            "pendingDelete": CloudSyncRecordState(systemFields: nil, pending: deletePending(), isTombstone: true, deletedAt: fixedDate)
+            "live": CloudSyncRecordState(systemFields: systemFields, pending: nil, isTombstone: false, deletedAt: nil),
+            "settled": CloudSyncRecordState(systemFields: systemFields, pending: nil, isTombstone: true, deletedAt: fixedDate),
+            "pendingDelete": CloudSyncRecordState(systemFields: systemFields, pending: deletePending(), isTombstone: true, deletedAt: fixedDate)
         ]
         let knownHashes = ["live": "hash"] // settled + pendingDelete are no longer locally present
 
-        let pruned = CloudKitSyncService.pruningSettledTombstones(from: records, knownLocalHashes: knownHashes)
+        let compacted = CloudKitSyncService.compactingSettledTombstones(from: records, knownLocalHashes: knownHashes)
 
-        XCTAssertNotNil(pruned["live"], "a live record is kept")
-        XCTAssertNotNil(pruned["pendingDelete"], "a tombstone whose delete is still in flight is kept")
-        XCTAssertNil(pruned["settled"], "a fully-settled tombstone is compacted away")
-        XCTAssertEqual(pruned.count, 2)
+        XCTAssertEqual(compacted.count, 3, "no entry is dropped — the marker is what stops a resurrection")
+        // `CloudSyncRecordState` is not `Equatable`, so compare the fields that matter.
+        XCTAssertEqual(compacted["live"]?.systemFields, systemFields, "a live record keeps its bulk")
+        XCTAssertEqual(compacted["live"]?.isTombstone, false)
+        XCTAssertEqual(compacted["pendingDelete"]?.systemFields, systemFields,
+                       "an in-flight delete is untouched — it still needs its system fields to send")
+        XCTAssertNotNil(compacted["pendingDelete"]?.pending, "and keeps its pending mutation")
+
+        let settled = compacted["settled"]
+        XCTAssertEqual(settled?.isTombstone, true, "the marker survives — this is the whole fix")
+        XCTAssertEqual(settled?.deletedAt, fixedDate, "and the date it was deleted, for recency")
+        XCTAssertNil(settled?.systemFields, "but the bulk is gone, which is what compaction is for")
+        XCTAssertNil(settled?.pending)
     }
 
     /// #13: the opportunistic foreground sync runs only when nothing is already syncing — manual
@@ -925,29 +944,36 @@ final class CloudSyncCoreTests: XCTestCase {
         }
     }
 
-    /// #22 step 2 (after #12): on a realistic metadata set the prune drives `records.count` down
-    /// toward `knownLocalHashes.count`. Mirrors the original report's numbers — recordsCount 317
-    /// vs knownHashesCount 238 — and asserts the ~80 settled tombstones compact away while every
-    /// live record (each tracked in knownLocalHashes) is kept.
-    func testPruningConvergesRecordCountTowardKnownHashes() {
+    /// #22 step 2 (after #12): on a realistic metadata set compaction reclaims the bytes rather
+    /// than the entries.
+    ///
+    /// The claim this test used to make — `records.count` converging to `knownLocalHashes.count`,
+    /// 317 down to 238 — is the one deliberately given up, because dropping the entry is what let a
+    /// restored backup delete itself again. The saving is now measured where it actually mattered:
+    /// `systemFields`, an `NSKeyedArchiver` blob per record, against a ~100-byte marker.
+    func testCompactionReclaimsBytesRatherThanEntries() {
+        let systemFields = Data(repeating: 0xAB, count: 512)
         var records: [String: CloudSyncRecordState] = [:]
         var knownHashes: [String: String] = [:]
         for i in 0..<238 {
             let k = "live-\(i)"
-            records[k] = CloudSyncRecordState(systemFields: nil, pending: nil, isTombstone: false, deletedAt: nil)
+            records[k] = CloudSyncRecordState(systemFields: systemFields, pending: nil, isTombstone: false, deletedAt: nil)
             knownHashes[k] = "hash-\(i)"
         }
         for i in 0..<79 {
-            records["dead-\(i)"] = CloudSyncRecordState(systemFields: nil, pending: nil, isTombstone: true, deletedAt: fixedDate)
+            records["dead-\(i)"] = CloudSyncRecordState(systemFields: systemFields, pending: nil, isTombstone: true, deletedAt: fixedDate)
         }
         XCTAssertEqual(records.count, 317)
 
-        let pruned = CloudKitSyncService.pruningSettledTombstones(from: records, knownLocalHashes: knownHashes)
+        let compacted = CloudKitSyncService.compactingSettledTombstones(from: records, knownLocalHashes: knownHashes)
 
-        XCTAssertEqual(pruned.count, knownHashes.count,
-                       "settled tombstones compact away; record count converges to the live hash count")
-        XCTAssertEqual(pruned.count, 238)
-        XCTAssertTrue(pruned.keys.allSatisfy { $0.hasPrefix("live-") }, "only live records remain")
+        XCTAssertEqual(compacted.count, 317, "every entry is kept — the marker suppresses resurrection")
+        let deadBytes = (0..<79).compactMap { compacted["dead-\($0)"]?.systemFields?.count }.reduce(0, +)
+        XCTAssertEqual(deadBytes, 0, "but every settled tombstone gave up its systemFields blob")
+        let liveBytes = (0..<238).compactMap { compacted["live-\($0)"]?.systemFields?.count }.reduce(0, +)
+        XCTAssertEqual(liveBytes, 238 * 512, "and no live record lost anything")
+        XCTAssertTrue((0..<79).allSatisfy { compacted["dead-\($0)"]?.isTombstone == true },
+                      "all 79 markers survive")
     }
 
     // MARK: - #23 sync diagnostics export buffer

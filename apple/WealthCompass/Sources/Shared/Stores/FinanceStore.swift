@@ -284,6 +284,12 @@ final class FinanceStore: ObservableObject {
         },
         disableHandler: { [weak self] in
             self?.settings?.isICloudSyncEnabled = false
+        },
+        // H08: `start()` reconciles the local inventory the same way `performLoad` does, so it
+        // needs the same skip set. Without it a record this build cannot decode reads as drift and
+        // costs a full-zone re-fetch.
+        skippedRecordKeysProvider: { [weak self] in
+            self?.lastLoadedSkippedRecordKeys ?? []
         }
     )
 
