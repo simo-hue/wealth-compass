@@ -90,6 +90,20 @@ extension View {
     /// layout, it pushes it off the screen. Off macOS this is a no-op and the platform's own
     /// sheet and window sizing wins.
     @ViewBuilder
+    /// Widens a borderless icon button to the 44pt minimum on touch.
+    ///
+    /// The Desktop layer's row actions are `.controlSize(.small)` images — roughly 22pt, and 4pt
+    /// apart. A pointer hits that precisely; a finger does not, and on the recurring-schedule row
+    /// the pencil and the trash sit side by side, so aiming at Edit regularly opened Delete.
+    /// A no-op on macOS, where 44pt would make a dense row twice as tall for no gain.
+    func desktopTouchTarget() -> some View {
+        #if os(macOS)
+        self
+        #else
+        frame(width: 44, height: 44).contentShape(Rectangle())
+        #endif
+    }
+
     func desktopWindowSize(
         minWidth: CGFloat,
         idealWidth: CGFloat? = nil,

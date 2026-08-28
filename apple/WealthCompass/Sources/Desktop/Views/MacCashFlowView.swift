@@ -580,6 +580,37 @@ struct MacCashFlowView: View {
     }
 
     private func recurringTransactionRow(_ schedule: RecurringTransaction) -> some View {
+        // The rigid children — icon, a 140pt-minimum amount and four buttons — want ~277pt before
+        // the flexible text column gets anything, and the metadata line inside that column needs
+        // ~135pt of its own. On an iPad mini in portrait the card is ~366pt wide, so the title and
+        // the schedule line were squeezed into slivers and spilled over the amount. Same two rules
+        // `transactionFilters` below already follows: pin the fixed controls with `.fixedSize()`
+        // so they cannot be the ones that shrink, and offer a candidate per width tier.
+        ViewThatFits(in: .horizontal) {
+            recurringRowSingleLine(schedule)
+            VStack(alignment: .leading, spacing: 12) {
+                recurringRowLeading(schedule)
+                HStack(spacing: 14) {
+                    recurringRowAmount(schedule)
+                    Spacer(minLength: 8)
+                    recurringRowActions(schedule)
+                }
+            }
+        }
+        .padding(12)
+        .background(WCColor.cardElevated, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private func recurringRowSingleLine(_ schedule: RecurringTransaction) -> some View {
+        HStack(alignment: .center, spacing: 14) {
+            recurringRowLeading(schedule)
+            Spacer()
+            recurringRowAmount(schedule)
+            recurringRowActions(schedule)
+        }
+    }
+
+    private func recurringRowLeading(_ schedule: RecurringTransaction) -> some View {
         HStack(alignment: .center, spacing: 14) {
             // Same direction convention as the summary strip and the transaction rows: down-left is
             // money in, up-right is money out. The `.circle.fill` variants are this row's own
@@ -631,19 +662,25 @@ struct MacCashFlowView: View {
                 }
             }
 
-            Spacer()
+        }
+    }
 
-            let prefix = schedule.type == .income ? "+" : "−"
-            Text("\(prefix)\(settings.privateSourceCurrency(schedule.amount, currency: schedule.currency ?? settings.currency))")
-                .font(.headline.monospacedDigit())
-                .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
-                .frame(minWidth: 140, alignment: .trailing)
+    private func recurringRowAmount(_ schedule: RecurringTransaction) -> some View {
+        let prefix = schedule.type == .income ? "+" : "−"
+        return Text("\(prefix)\(settings.privateSourceCurrency(schedule.amount, currency: schedule.currency ?? settings.currency))")
+            .font(.headline.monospacedDigit())
+            .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
+            .frame(minWidth: 140, alignment: .trailing)
+            .fixedSize()
+    }
 
-            HStack(spacing: 4) {
+    private func recurringRowActions(_ schedule: RecurringTransaction) -> some View {
+        HStack(spacing: 4) {
                 Button {
                     toggleRecurringTransaction(schedule)
                 } label: {
                     Image(systemName: schedule.isActive ? "pause.fill" : "play.fill")
+                        .desktopTouchTarget()
                 }
                 .help(schedule.isActive
                     ? settings.localized("Pause schedule")
@@ -658,6 +695,7 @@ struct MacCashFlowView: View {
                     activeAlert = .finishRecurringTransaction(schedule)
                 } label: {
                     Image(systemName: "checkmark")
+                        .desktopTouchTarget()
                 }
                 .help("Finish schedule")
                 .accessibilityLabel(settings.localized("Finish schedule"))
@@ -666,6 +704,7 @@ struct MacCashFlowView: View {
                     editor = .recurring(schedule)
                 } label: {
                     Image(systemName: "pencil")
+                        .desktopTouchTarget()
                 }
                 .help("Edit schedule")
                 .accessibilityLabel(settings.localized("Edit schedule"))
@@ -674,15 +713,14 @@ struct MacCashFlowView: View {
                     activeAlert = .deleteRecurringTransaction(schedule)
                 } label: {
                     Image(systemName: "trash")
+                        .desktopTouchTarget()
                 }
                 .help("Delete schedule")
                 .accessibilityLabel(settings.localized("Delete schedule"))
             }
-            .buttonStyle(.borderless)
-            .controlSize(.small)
-        }
-        .padding(12)
-        .background(WCColor.cardElevated, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .buttonStyle(.borderless)
+        .controlSize(.small)
+        .fixedSize()
     }
 
     private var transactionFilters: some View {
@@ -1338,7 +1376,11 @@ private struct MacCashFlowTransactionEditor: View {
                 }
             }
         }
-        .frame(minWidth: 480, idealWidth: 540, minHeight: 400, idealHeight: 480)
+        // The seam, not a raw frame. This was the only one of the five Desktop editors still
+        // pinning a Mac window floor directly, and an iPad window is sized by the system: in a
+        // 320pt Slide Over a 480pt floor does not protect the layout, it pushes the Cancel/Save
+        // toolbar and the right edge of every field off-screen with no way to scroll to them.
+        .desktopWindowSize(minWidth: 480, idealWidth: 540, minHeight: 400, idealHeight: 480)
     }
 
     private func saveTransaction() {

@@ -187,42 +187,79 @@ struct MacDashboardView: View {
     }
 
     private var dashboardHeader: some View {
-        HStack(alignment: .center, spacing: 20) {
-            VStack(alignment: .leading, spacing: 5) {
-                Text("Your financial horizon")
-                    .font(.system(size: headerSize, weight: .bold, design: .rounded))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.white, WCColor.primary.opacity(0.92)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                Text("A clear view of what you own, owe, earn, and spend.")
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.58))
+        // A ladder, as `onboardingCard` below already has. This row is on screen on every visit and
+        // was a plain `HStack`: the title block wants ~375pt, the privacy pill ~90pt and the button
+        // ~190pt, against ~426pt of content width on an iPad mini in portrait. The button's `Label`
+        // is the flexible child, so it was the one that shrank — the shape that previously rendered
+        // the action pills as "Cas h Flo w", and worse in German and Italian where the title runs
+        // ~40% longer.
+        ViewThatFits(in: .horizontal) {
+            dashboardHeaderRow
+            VStack(alignment: .leading, spacing: 14) {
+                dashboardHeaderTitle
+                HStack(spacing: 12) {
+                    dashboardHeaderPrivacyPill
+                    dashboardHeaderAddButton
+                }
+                .fixedSize()
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var dashboardHeaderRow: some View {
+        HStack(alignment: .center, spacing: 20) {
+            dashboardHeaderTitle
 
             Spacer(minLength: 16)
 
-            if settings.isPrivacyMode {
-                Label("Privacy on", systemImage: "eye.slash.fill")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.72))
-                    .padding(.horizontal, 11)
-                    .padding(.vertical, 7)
-                    .background(.white.opacity(0.07), in: Capsule())
-            }
-
-            Button {
-                appModel.presentNewItem(for: .cashFlow)
-            } label: {
-                Label("Add Transaction", systemImage: "plus")
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .tint(WCColor.primary)
+            dashboardHeaderPrivacyPill
+            dashboardHeaderAddButton
         }
+    }
+
+    private var dashboardHeaderTitle: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text("Your financial horizon")
+                .font(.system(size: headerSize, weight: .bold, design: .rounded))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.white, WCColor.primary.opacity(0.92)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+            Text("A clear view of what you own, owe, earn, and spend.")
+                .font(.subheadline)
+                .foregroundStyle(.white.opacity(0.58))
+        }
+    }
+
+    @ViewBuilder
+    private var dashboardHeaderPrivacyPill: some View {
+        if settings.isPrivacyMode {
+            Label("Privacy on", systemImage: "eye.slash.fill")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.72))
+                .padding(.horizontal, 11)
+                .padding(.vertical, 7)
+                .background(.white.opacity(0.07), in: Capsule())
+                // Fixed, so it is never the child that absorbs a shortfall.
+                .fixedSize()
+        }
+    }
+
+    private var dashboardHeaderAddButton: some View {
+        Button {
+            appModel.presentNewItem(for: .cashFlow)
+        } label: {
+            Label("Add Transaction", systemImage: "plus")
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
+        .tint(WCColor.primary)
+        // Likewise: without this the label is the flexible child and breaks mid-word.
+        .fixedSize()
     }
 
     private var onboardingCard: some View {

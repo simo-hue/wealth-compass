@@ -139,16 +139,38 @@ struct MacCryptoView: View {
         VStack(alignment: .leading, spacing: 24) {
             summaryCards(width: width)
 
-            HStack(spacing: 24) {
-                AllocationChart(
-                    title: LocalizedStringKey("Crypto Allocation"),
-                    slices: finance.cryptoAllocation(settings: settings),
-                    settings: settings,
-                    showLegend: false
-                )
-                .frame(maxWidth: .infinity)
-                
-                performanceSection
+            // L24, as `MacInvestmentsView` already does: reflow rather than hold a fixed row. The
+            // performance card is pinned at 400pt, so beside a flexible chart this was a plain
+            // `HStack` that took the shortfall out of the chart — on an iPad mini in portrait the
+            // content is ~426pt wide, so 400 + 24 spacing left the donut **2pt** and the row
+            // overflowed. `width` was already threaded in here for the summary cards; it just was
+            // not used for this row.
+            if width >= 760 {
+                HStack(spacing: 24) {
+                    AllocationChart(
+                        title: LocalizedStringKey("Crypto Allocation"),
+                        slices: finance.cryptoAllocation(settings: settings),
+                        settings: settings,
+                        showLegend: false
+                    )
+                    .frame(maxWidth: .infinity)
+
+                    performanceSection(maxWidth: 400)
+                }
+            } else {
+                VStack(spacing: 24) {
+                    AllocationChart(
+                        title: LocalizedStringKey("Crypto Allocation"),
+                        slices: finance.cryptoAllocation(settings: settings),
+                        settings: settings,
+                        showLegend: false
+                    )
+                    .frame(maxWidth: .infinity)
+
+                    // Full width when stacked: the 400pt cap exists to stop the card dominating a
+                    // wide row beside the chart, not to leave it floating narrow underneath one.
+                    performanceSection(maxWidth: .infinity)
+                }
             }
             
             topHoldingsSection
@@ -157,7 +179,7 @@ struct MacCryptoView: View {
     }
 
     @ViewBuilder
-    private var performanceSection: some View {
+    private func performanceSection(maxWidth: CGFloat) -> some View {
         let cryptos = finance.data.crypto
         let best = cryptos.max(by: { $0.gainLossPercent < $1.gainLossPercent })
         let worst = cryptos.min(by: { $0.gainLossPercent < $1.gainLossPercent })
@@ -182,7 +204,7 @@ struct MacCryptoView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(width: 400)
+            .frame(maxWidth: maxWidth)
         }
     }
 
