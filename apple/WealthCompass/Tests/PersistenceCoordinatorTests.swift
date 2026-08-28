@@ -412,6 +412,78 @@ final class PersistenceCoordinatorTests: XCTestCase {
         XCTAssertNotNil(store.persistenceError, "A disk failure must surface the H5 banner.")
     }
 
+    // MARK: - Finishing a recurring schedule
+
+    /// Finishing a schedule must mark it completed, not erase it.
+    ///
+    /// `completeRecurringTransaction` used to be byte-identical to `deleteRecurringTransaction`, so
+    /// the ✓ on a non-destructive alert destroyed the record — and `save()` diffed it as a delete,
+    /// which tombstoned it on every synced device. The amount, frequency and dates must survive.
+    @MainActor
+    func testCompletingRecurringTransactionPreservesTheRecord() async {
+        let persistence = InMemoryPersistence()
+        let store = makeStore(persistence: persistence)
+        let schedule = makeSchedule(id: "60000000-0000-0000-0000-000000000006")
+        store.upsertRecurringTransaction(schedule)
+        await store.waitForPendingSaves()
+
+        store.completeRecurringTransaction(schedule)
+        await store.waitForPendingSaves()
+
+        let stored = persistence.current?.recurringTransactions ?? []
+        XCTAssertEqual(stored.count, 1, "Finishing a schedule must not delete it.")
+        XCTAssertNotNil(stored.first?.completedAt, "Finishing must stamp completedAt.")
+        XCTAssertEqual(stored.first?.isActive, false, "A finished schedule must stop generating.")
+        XCTAssertEqual(stored.first?.amount, Decimal(string: "1200.00"), "The amount must survive.")
+        XCTAssertEqual(stored.first?.frequency, .monthly, "The frequency must survive.")
+
+        // And it disappears from the list the UI renders, which is what the alert promises.
+        XCTAssertTrue(
+            store.recurringTransactions.isEmpty,
+            "A completed schedule must not show in Recurring Transactions."
+        )
+    }
+
+    /// Completing an already-completed schedule must not move its completion date.
+    @MainActor
+    func testCompletingAnAlreadyCompletedScheduleIsANoOp() async {
+        let persistence = InMemoryPersistence()
+        let store = makeStore(persistence: persistence)
+        var schedule = makeSchedule(id: "60000000-0000-0000-0000-000000000007")
+        schedule.completedAt = fixedDate
+        schedule.isActive = false
+        store.upsertRecurringTransaction(schedule)
+        await store.waitForPendingSaves()
+
+        store.completeRecurringTransaction(schedule)
+        await store.waitForPendingSaves()
+
+        XCTAssertEqual(
+            persistence.current?.recurringTransactions.first?.completedAt,
+            fixedDate,
+            "A second completion must not move the original completion date."
+        )
+    }
+
+    private func makeSchedule(id: String) -> RecurringTransaction {
+        RecurringTransaction(
+            id: UUID(uuidString: id)!,
+            type: .expense,
+            category: "Housing",
+            amount: Decimal(string: "1200.00")!,
+            description: "Rent",
+            startDate: fixedDate,
+            frequency: .monthly,
+            nextDueDate: fixedDate,
+            endDate: nil,
+            notificationsEnabled: true,
+            isActive: true,
+            completedAt: nil,
+            createdAt: fixedDate,
+            updatedAt: fixedDate
+        )
+    }
+
     // MARK: - Helpers
 
     private func makeCoordinator(persistence: FinancePersistence) -> PersistenceCoordinator {

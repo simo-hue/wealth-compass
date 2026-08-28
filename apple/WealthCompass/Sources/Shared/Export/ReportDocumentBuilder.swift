@@ -715,7 +715,9 @@ struct ReportDocumentBuilder {
                     rule.description,
                     rule.category,
                     rule.frequency.localizedTitle(appLanguage: context.appLanguage),
-                    dateString(rule.nextDueDate),
+                    // A completed rule keeps its last `nextDueDate`, which will never arrive — printing
+                    // it beside the "Completed" flag reads as a live commitment.
+                    rule.isCompleted ? "—" : dateString(rule.nextDueDate),
                     (rule.type == .expense ? "−" : "+") + sourceMoney(rule.amount, rule.currency ?? context.baseCurrency),
                 ], secondary: flags.isEmpty ? nil : flags.joined(separator: " · "),
                    style: rule.isActive && !rule.isCompleted ? .normal : .excluded)

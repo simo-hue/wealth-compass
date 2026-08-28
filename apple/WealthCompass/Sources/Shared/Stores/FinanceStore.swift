@@ -485,8 +485,25 @@ final class FinanceStore: ObservableObject {
         save()
     }
 
-    func completeRecurringTransaction(_ recurringTransaction: RecurringTransaction) {
-        data.recurringTransactions.removeAll { $0.id == recurringTransaction.id }
+    /// Marks a schedule finished without destroying it.
+    ///
+    /// This used to be byte-identical to `deleteRecurringTransaction`, which erased the record and
+    /// let `save()` diff it as a delete — so a CloudKit tombstone destroyed it on every other device
+    /// too. `completedAt` is honoured everywhere already (the `recurringTransactions` accessor hides
+    /// completed rows, `processDueRecurringTransactions` skips them, the notification service drops
+    /// their reminders, and the report flags them "Completed"), so setting it achieves exactly what
+    /// the confirmation alert promises while keeping the amount, frequency and dates recoverable.
+    func completeRecurringTransaction(_ recurringTransaction: RecurringTransaction, now: Date = Date()) {
+        guard let index = data.recurringTransactions.firstIndex(where: { $0.id == recurringTransaction.id }) else {
+            return
+        }
+
+        var updated = data.recurringTransactions[index]
+        guard !updated.isCompleted else { return }
+        updated.completedAt = now
+        updated.isActive = false
+        updated.updatedAt = now
+        data.recurringTransactions[index] = updated
         save()
     }
 
@@ -512,7 +529,11 @@ final class FinanceStore: ObservableObject {
         // It also can't be correct in principle: with no data read, the already-generated
         // occurrences it de-duplicates against are invisible, so it would double-post on recovery.
         guard isLocalDataReady else { return 0 }
-        guard !data.recurringTransactions.isEmpty else { return 0 }
+        // Match the per-schedule guard below rather than merely testing for emptiness: completed
+        // schedules are now kept rather than deleted, so a user whose schedules are all finished
+        // would otherwise pay the O(transactions) `generatedOccurrences` pass on every 30s tick
+        // for a guaranteed zero result.
+        guard data.recurringTransactions.contains(where: { $0.isActive && !$0.isCompleted }) else { return 0 }
 
         let calendar = Calendar.current
         // Bound retroactive catch-up: occurrences older than this window are skipped
