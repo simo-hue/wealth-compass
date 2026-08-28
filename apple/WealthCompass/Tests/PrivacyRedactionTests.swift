@@ -215,12 +215,20 @@ final class PrivacyRedactionTests: XCTestCase {
     /// itself rather than sharing their filter. `swept` is what says so: drop the export files back
     /// out and this test fails on the assertion below rather than quietly narrowing again.
     ///
-    /// Two integers in those files are **not** offenders and this sweep is right not to report them.
-    /// `ReportDocumentBuilder.swift:761` renders a calendar year with `String(year)`, which must not
-    /// be grouped — `2.024` is not a year. `PDFReportRenderer.swift:343` interpolates page numbers
-    /// into `Page %1$@ of %2$@`; page numbers are ungrouped by typographic convention. Neither
-    /// mentions a `count`, so neither is matched, but the reason they are correct is not the reason
-    /// they are unmatched, and a future reader should not have to rediscover that.
+    /// Two integers in those files are still **not** offenders of *this* sweep, and it is right not
+    /// to report them — but the reason recorded here for two commits was only half of one. Neither
+    /// may be **grouped**: `2.024` is not a year, and page numbers are ungrouped by typographic
+    /// convention. That is true, and it was taken to mean a bare `String` interpolation was fine
+    /// for both, which does not follow — an ungrouped figure still has to be **shaped** in the
+    /// reader's digits, and `String(describing:)` shapes nothing, so an `ar_EG` report set its
+    /// money in Arabic-Indic digits above a Latin "Page 3 of 12" and a Latin ledger heading. Both
+    /// are formatted now: the calendar year through `.number.grouping(.never).locale(_:)`
+    /// (`ReportDocumentBuilder.swift:803`) and the page numbers through `.number.locale(_:)`
+    /// (`PDFReportRenderer.swift:356-357`), pinned by `ReportRenderingTests`'
+    /// `testLedgerYearHeadingsAreSetInTheReadersDigits` and `testPageNumbersAreSetInTheReadersDigits`
+    /// respectively. Neither mentions a `count`, so neither is matched here, but the reason they are
+    /// correct is not the reason they are unmatched, and a future reader should not have to
+    /// rediscover that.
     func testWorkingTreeRendersNoUnformattedEntityCount() throws {
         let sources = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

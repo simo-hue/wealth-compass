@@ -790,7 +790,18 @@ struct ReportDocumentBuilder {
         let byYear = Dictionary(grouping: transactions) { calendar.component(.year, from: $0.date) }
         for year in byYear.keys.sorted() {
             guard let yearTransactions = byYear[year] else { continue }
-            blocks.append(.subheading(String(year), anchor: "ledger-\(year)"))
+            // A year is a figure, and every other figure in this document is set in the reader's
+            // locale. `String(year)` is `String(describing:)`, which neither groups nor shapes
+            // digits, so an `ar_EG` ledger printed Arabic-Indic row dates under a Latin "2024" —
+            // the defect `count(_:)` documents and the footer's page numbers had. Not `count(_:)`
+            // itself: a year is not a quantity, and a grouped "٢٬٠٢٤" would be worse than the bare
+            // interpolation it replaces, which is why the grouping is switched off explicitly.
+            //
+            // The *anchor* keeps unlocalized digits deliberately. It is a PDF named destination,
+            // matched by `PDFReportRenderer.attachOutline` and by the contents-page links; shaping
+            // its digits would break navigation for exactly the readers this fixes.
+            let heading = year.formatted(.number.grouping(.never).locale(context.locale))
+            blocks.append(.subheading(heading, anchor: "ledger-\(year)"))
 
             var rows: [ReportRow] = []
             var monthTotal: Decimal = 0
@@ -849,7 +860,7 @@ struct ReportDocumentBuilder {
             blocks.append(.table(ReportTable(
                 columns: ledgerColumns,
                 rows: rows,
-                caption: "\(L("Transactions")) — \(year)")))
+                caption: "\(L("Transactions")) — \(heading)")))
         }
 
         return blocks

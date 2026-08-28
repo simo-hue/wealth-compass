@@ -937,6 +937,64 @@ final class ReportReconciliationTests: XCTestCase {
         }
         XCTAssertGreaterThan(rowsChecked, 0, "no ledger rows were examined")
     }
+
+    // MARK: - Digits
+
+    /// The ledger's year headings are set in the reader's digits, and its anchors are not.
+    ///
+    /// `String(year)` is `String(describing:)`, which neither groups nor shapes digits, so an
+    /// `ar_EG` ledger printed "١٥ مارس، ٢٠٢٤" in every row under a heading reading "2024", and
+    /// captioned the table below it the same way. Same defect class as the footer's page numbers
+    /// (`testPageNumbersAreSetInTheReadersDigits`) and as the entity counts `count(_:)` documents.
+    ///
+    /// Two further things are pinned, and both would be lost by the obvious repair. A year must not
+    /// be **grouped** — `count(_:)` would render "٢٬٠٢٤", which is worse than the Latin "2024" it
+    /// replaces. And the `anchor` must stay in Latin digits: it is a PDF named destination that
+    /// `PDFReportRenderer.attachOutline` and the contents-page links match on, so localizing it
+    /// would trade a cosmetic defect for dead navigation, for exactly the readers this fixes.
+    func testLedgerYearHeadingsAreSetInTheReadersDigits() throws {
+        let arabic = Locale(identifier: "ar_EG")
+        // Not vacuous: this locale really does shape digits differently. `ar` and `ar_AE` do not,
+        // and either would let every assertion below pass with the defect still in place.
+        XCTAssertEqual(2024.formatted(.number.grouping(.never).locale(arabic)), "٢٠٢٤")
+
+        let document = buildDocument(sections: [.cashFlow], range: .allTime, locale: arabic)
+
+        // Each ledger heading is immediately followed by the table it introduces, so pairing them
+        // in document order attributes every caption to the heading it belongs to.
+        var ledgers: [(heading: String, anchor: String, caption: String)] = []
+        var pending: (heading: String, anchor: String)?
+        for block in try cashFlowBlocks(document) {
+            switch block {
+            case let .subheading(title, anchor) where anchor?.hasPrefix("ledger-") == true:
+                pending = (title, anchor ?? "")
+            case let .table(table):
+                if let ledger = pending {
+                    ledgers.append((ledger.heading, ledger.anchor, table.caption ?? ""))
+                    pending = nil
+                }
+            default:
+                break
+            }
+        }
+
+        XCTAssertEqual(ledgers.map(\.heading), ["٢٠٢٤", "٢٠٢٥", "٢٠٢٦"],
+                       "the ledger year headings are not set in the reader's digits")
+        XCTAssertEqual(ledgers.map(\.anchor), ["ledger-2024", "ledger-2025", "ledger-2026"],
+                       "the ledger anchors are no longer the destinations the outline links to")
+
+        for ledger in ledgers {
+            XCTAssertFalse(ledger.heading.contains("٬"),
+                           "the year heading \"\(ledger.heading)\" is grouped like a quantity")
+            XCTAssertTrue(ledger.caption.hasSuffix(ledger.heading),
+                          """
+                          the table captioned \"\(ledger.caption)\" sits under the heading \
+                          \"\(ledger.heading)\"
+                          """)
+            XCTAssertFalse(ledger.caption.contains { $0.isASCII && $0.isNumber },
+                           "the table caption \"\(ledger.caption)\" still cites a Latin year")
+        }
+    }
 }
 
 /// Every entity count the exported report prints, read in a locale that groups thousands.
