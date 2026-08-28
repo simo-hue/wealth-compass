@@ -197,7 +197,32 @@ final class KeychainCredentialStore {
     private init() {}
 
     func string(for credential: KeychainCredential) throws -> String? {
-        var query = baseQuery(for: credential)
+        if let value = try readString(for: credential, dataProtection: true) {
+            return value
+        }
+
+        #if os(macOS)
+        // One-time migration. Keys written before the data-protection switch live in the file-based
+        // login keychain, where this query cannot see them — without this the user's key would look
+        // lost and have to be re-entered. Move it across, then delete the legacy copy, since that
+        // is precisely the copy Time Machine and Migration Assistant carry off the device.
+        if let legacy = try? readString(for: credential, dataProtection: false) {
+            try? save(legacy, for: credential)
+            // Drop the legacy copy only once the protected one is actually readable. Without this
+            // check, a build where `save` took its `errSecMissingEntitlement` fallback would write
+            // back into this very keychain and then delete it, losing the user's key outright.
+            if let migrated = try? readString(for: credential, dataProtection: true), migrated == legacy {
+                try? deleteLegacy(credential)
+            }
+            return legacy
+        }
+        #endif
+
+        return nil
+    }
+
+    private func readString(for credential: KeychainCredential, dataProtection: Bool) throws -> String? {
+        var query = baseQuery(for: credential, dataProtection: dataProtection)
         query[kSecMatchLimit as String] = kSecMatchLimitOne
         query[kSecReturnData as String] = true
 
@@ -227,32 +252,62 @@ final class KeychainCredentialStore {
             return
         }
 
-        var query = baseQuery(for: credential)
+        let status = write(data, for: credential, dataProtection: true)
+        if status == errSecSuccess {
+            #if os(macOS)
+            // Never leave an older, unprotected duplicate behind after a successful protected write.
+            try? deleteLegacy(credential)
+            #endif
+            return
+        }
+
+        #if os(macOS)
+        // The data protection keychain requires a keychain access group, which the sandboxed app
+        // gets implicitly from its application-identifier. If it is ever absent — an ad-hoc or
+        // unsigned build — fall back rather than leaving the user unable to save a key at all.
+        // Logged, because the item is then not device-bound and the write is the weaker one.
+        if status == errSecMissingEntitlement {
+            MarketDataLog.logger.warning(
+                "Keychain: data protection unavailable (errSecMissingEntitlement); falling back to the login keychain. The stored key will not be device-bound."
+            )
+            let fallback = write(data, for: credential, dataProtection: false)
+            guard fallback == errSecSuccess else {
+                throw KeychainServiceError.unexpectedStatus(fallback)
+            }
+            return
+        }
+        #endif
+
+        throw KeychainServiceError.unexpectedStatus(status)
+    }
+
+    /// Update-then-add against one keychain. Returns the raw status so `save` can branch on
+    /// `errSecMissingEntitlement` rather than turning it straight into a thrown error.
+    private func write(_ data: Data, for credential: KeychainCredential, dataProtection: Bool) -> OSStatus {
+        var query = baseQuery(for: credential, dataProtection: dataProtection)
         let attributes: [String: Any] = [
             kSecValueData as String: data,
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         ]
 
         let updateStatus = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
-        if updateStatus == errSecSuccess {
-            return
-        }
-
-        guard updateStatus == errSecItemNotFound else {
-            throw KeychainServiceError.unexpectedStatus(updateStatus)
+        if updateStatus != errSecItemNotFound {
+            return updateStatus
         }
 
         query[kSecValueData as String] = data
         query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-
-        let addStatus = SecItemAdd(query as CFDictionary, nil)
-        guard addStatus == errSecSuccess else {
-            throw KeychainServiceError.unexpectedStatus(addStatus)
-        }
+        return SecItemAdd(query as CFDictionary, nil)
     }
 
     func delete(_ credential: KeychainCredential) throws {
         let status = SecItemDelete(baseQuery(for: credential) as CFDictionary)
+        #if os(macOS)
+        // Clear the legacy login-keychain copy too, whether or not the migration ever ran. Deleting
+        // only the data-protection item would leave the backed-up copy behind, so "Erase Everything"
+        // would report success while the key survived in Time Machine.
+        try? deleteLegacy(credential)
+        #endif
         guard status == errSecSuccess || status == errSecItemNotFound else {
             throw KeychainServiceError.unexpectedStatus(status)
         }
@@ -275,13 +330,37 @@ final class KeychainCredentialStore {
         }
     }
 
-    private func baseQuery(for credential: KeychainCredential) -> [String: Any] {
-        [
+    /// - Parameter dataProtection: macOS only. `true` targets the data protection keychain, which is
+    ///   the one that honours `kSecAttrAccessible`; `false` reproduces the pre-migration query that
+    ///   reads the legacy login keychain. Ignored on iOS, where the data protection keychain is the
+    ///   only one.
+    private func baseQuery(for credential: KeychainCredential, dataProtection: Bool = true) -> [String: Any] {
+        var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: credential.rawValue
         ]
+        #if os(macOS)
+        // Without this, a generic password on macOS goes into the file-based login keychain, which
+        // does not honour `kSecAttrAccessible` at all — so the `…ThisDeviceOnly` class set on every
+        // write was silently dropped, and the user's API keys were backed up by Time Machine and
+        // copied wholesale by Migration Assistant. They also outlived deleting the app and its
+        // container, so "Erase Everything" only held while the app stayed installed.
+        query[kSecUseDataProtectionKeychain as String] = dataProtection
+        #endif
+        return query
     }
+
+    #if os(macOS)
+    /// Removes the pre-migration login-keychain copy. Separate from `delete(_:)` so the migration
+    /// can clear the legacy item without disturbing the one it has just written.
+    private func deleteLegacy(_ credential: KeychainCredential) throws {
+        let status = SecItemDelete(baseQuery(for: credential, dataProtection: false) as CFDictionary)
+        guard status == errSecSuccess || status == errSecItemNotFound else {
+            throw KeychainServiceError.unexpectedStatus(status)
+        }
+    }
+    #endif
 }
 
 struct FinnhubQuoteClient {
