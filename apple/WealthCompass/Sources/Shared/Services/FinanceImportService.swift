@@ -812,58 +812,35 @@ private struct LossyArray<Element: Decodable>: Decodable {
         var skippedCount = 0
 
         while !container.isAtEnd {
+            let indexBeforeElement = container.currentIndex
             do {
                 elements.append(try container.decode(Element.self))
             } catch {
                 skippedCount += 1
-                _ = try? container.decode(DiscardedJSONValue.self)
+                // The skip must be one that cannot fail. `JSONDecoder`'s unkeyed container advances
+                // `currentIndex` only on a *successful* decode, so the previous sentinel —
+                // `DiscardedJSONValue`, which throws for any number outside `Double`'s range —
+                // left the container parked and `!isAtEnd` spun forever: a single `1e400`,
+                // `1e-400`, or 400-digit integer anywhere in the file (at any depth, including
+                // inside an object) pinned a CPU core with no progress, no error and no way to
+                // cancel, because `parse` runs in a detached task with no timeout.
+                // `superDecoder()` consumes the element whatever it holds.
+                _ = try? container.superDecoder()
+            }
+
+            // Belt and braces. Nothing above should leave the container stuck, but a decoder that
+            // did would hang the app again, so stop instead of spinning. Truncating is the lesser
+            // evil here: this type exists to salvage a file that already contains something
+            // unreadable, and the count below keeps the import summary honest about the loss.
+            if container.currentIndex == indexBeforeElement {
+                let remaining = (container.count ?? 0) - indexBeforeElement
+                if remaining > 1 { skippedCount += remaining - 1 }
+                break
             }
         }
 
         self.elements = elements
         self.skippedCount = skippedCount
-    }
-}
-
-private enum DiscardedJSONValue: Decodable {
-    case string(String)
-    case number(Double)
-    case bool(Bool)
-    case object([String: DiscardedJSONValue])
-    case array([DiscardedJSONValue])
-    case null
-
-    init(from decoder: Decoder) throws {
-        if let container = try? decoder.singleValueContainer() {
-            if container.decodeNil() {
-                self = .null
-                return
-            }
-            if let value = try? container.decode(Bool.self) {
-                self = .bool(value)
-                return
-            }
-            if let value = try? container.decode(Double.self) {
-                self = .number(value)
-                return
-            }
-            if let value = try? container.decode(String.self) {
-                self = .string(value)
-                return
-            }
-        }
-
-        if let values = try? [DiscardedJSONValue](from: decoder) {
-            self = .array(values)
-            return
-        }
-
-        if let values = try? [String: DiscardedJSONValue](from: decoder) {
-            self = .object(values)
-            return
-        }
-
-        throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unsupported JSON value"))
     }
 }
 

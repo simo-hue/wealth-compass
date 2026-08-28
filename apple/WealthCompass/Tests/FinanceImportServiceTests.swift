@@ -669,4 +669,84 @@ final class FinanceImportServiceTests: XCTestCase {
         )
         XCTAssertEqual(result.importedRecordCount, 5 + 2 + 3 + 1 + 4 + 6)
     }
+
+    // MARK: - Unparseable numbers must not hang the import
+
+    /// A number outside `Double`'s range must be skipped, not spun on forever.
+    ///
+    /// `LossyArray` skipped an element it could not decode by decoding a throwaway sentinel over
+    /// it — but `JSONDecoder`'s unkeyed container advances `currentIndex` only on a **successful**
+    /// decode, and the sentinel threw for any number `Double` cannot represent. The container
+    /// stayed parked, `!container.isAtEnd` stayed true, and `parse` never returned: the detached
+    /// task pinned a CPU core with no progress, no summary, no error and no way to cancel.
+    ///
+    /// Each literal below reproduced the hang against the shipped decoder, at every depth — a bare
+    /// value, nested in an array, and nested in an object — so the trigger is any out-of-range
+    /// number anywhere in a backup, not a specially crafted top-level one. `1e-400` matters as
+    /// much as `1e400`: an underflowing denormal is something another tool can plausibly write.
+    ///
+    /// Each case asserts the healthy sibling still arrives, so the skip stays surgical.
+    func testOutOfRangeNumbersAreSkippedRatherThanHangingTheImport() throws {
+        let hugeInteger = String(repeating: "9", count: 400)
+        let cases: [(name: String, element: String)] = [
+            ("overflowing exponent", "1e400"),
+            ("underflowing exponent", "1e-400"),
+            ("400-digit integer", hugeInteger),
+            ("nested in an array", "[1e400]"),
+            ("nested in an object", #"{"amount":1e400}"#),
+            ("negative overflow", "-1e400"),
+        ]
+
+        for testCase in cases {
+            let json = """
+            {"transactions":[
+              \(testCase.element),
+              {"id":"11111111-1111-1111-1111-111111111111","type":"income","category":"Salary",
+               "amount":1234.56,"description":"","date":"2026-01-01T00:00:00.000Z"}
+            ]}
+            """
+
+            let result = try parse(json)
+
+            XCTAssertEqual(
+                result.data.transactions.count, 1,
+                "\(testCase.name): the healthy row beside it must still import"
+            )
+            XCTAssertEqual(
+                result.data.transactions.first?.amount, Decimal(string: "1234.56"),
+                "\(testCase.name): and must keep its exact amount"
+            )
+            XCTAssertEqual(
+                result.skippedRecords, 1,
+                "\(testCase.name): the unreadable row must be reported, not silently dropped"
+            )
+        }
+    }
+
+    /// The healthy rows on *both* sides of an unreadable one must survive.
+    ///
+    /// A skip that consumed too much — or a no-progress guard that bailed out of the loop — would
+    /// silently truncate the rest of the file while still reporting success.
+    func testAnUnreadableNumberDoesNotTruncateTheRestOfTheFile() throws {
+        let json = """
+        {"transactions":[
+          {"id":"11111111-1111-1111-1111-111111111111","type":"income","category":"Salary",
+           "amount":10,"description":"","date":"2026-01-01T00:00:00.000Z"},
+          1e400,
+          {"id":"22222222-2222-2222-2222-222222222222","type":"expense","category":"Rent",
+           "amount":20,"description":"","date":"2026-01-02T00:00:00.000Z"},
+          {"id":"33333333-3333-3333-3333-333333333333","type":"expense","category":"Food",
+           "amount":30,"description":"","date":"2026-01-03T00:00:00.000Z"}
+        ]}
+        """
+
+        let result = try parse(json)
+
+        XCTAssertEqual(result.data.transactions.count, 3, "rows after the bad element were lost")
+        XCTAssertEqual(result.skippedRecords, 1)
+        XCTAssertEqual(
+            Set(result.data.transactions.map(\.amount)), [10, 20, 30],
+            "every healthy row must survive on both sides of the unreadable one"
+        )
+    }
 }
