@@ -66,6 +66,11 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<!-- The launch screen renders before any SwiftUI runs, so it cannot see the app's own
+	     `.preferredColorScheme(.dark)`; with no style pinned it followed the *system* appearance
+	     and a cold launch on a light-mode device flashed white into a dark-only app. -->
+	<key>UIUserInterfaceStyle</key>
+	<string>Dark</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<!-- iPhone stays portrait-only: its TabView layout was designed for one orientation. iPad

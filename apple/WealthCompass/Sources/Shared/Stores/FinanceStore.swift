@@ -190,11 +190,16 @@ final class FinanceStore: ObservableObject {
     /// midnight window. Nothing else invalidates on a day rollover, and since the recurring timer
     /// stopped bumping `dataVersion` on an unchanged ledger there is no incidental flush either.
     private var cachedMonthlyCashFlow: (version: Int, currency: Currency, rateStamp: Date?, month: Date, dayStamp: Date, value: MonthlyCashFlow)?
-    private var cachedCashFlowTrend: (version: Int, currency: Currency, rateStamp: Date?, months: Int, monthStamp: Date, dayStamp: Date, value: [CashFlowMonth])?
+    /// Cash-flow trend. Keyed on `appLanguage` for the same reason the Sankey cache below is: each
+    /// `CashFlowMonth` carries a `monthLabel` the engine formats through
+    /// `AppLocalization.effectiveLocale(appLanguage:)` and the chart's x-axis prints verbatim. The
+    /// root view's `.id(appLanguage)` cannot reach a cache that lives on the store, so without this
+    /// the axis stayed in the previous language until something else moved the key.
+    private var cachedCashFlowTrend: (version: Int, currency: Currency, rateStamp: Date?, months: Int, monthStamp: Date, dayStamp: Date, language: String?, value: [CashFlowMonth])?
     private var cachedExpensesByCategory: (version: Int, currency: Currency, rateStamp: Date?, period: AnalyticsPeriod, dayStamp: Date, value: [CategoryTotal])?
     /// Money Flow diagram. Keyed like the others plus `maxNodes` (the Dashboard's compact card folds
-    /// at a lower threshold than the full one) and `appLanguage` — unlike every cache above it, this
-    /// value carries *localized* strings ("Cash Flow", "Surplus", "Smaller categories"). The in-app
+    /// at a lower threshold than the full one) and `appLanguage` — this value carries *localized*
+    /// strings ("Cash Flow", "Surplus", "Smaller categories"), as does the trend cache. The in-app
     /// language override re-`.id`s the root view to force a re-render, but that alone would re-read a
     /// stale entry here and leave the diagram labelled in the previous language.
     private var cachedCashFlowSankey: (version: Int, currency: Currency, rateStamp: Date?, period: AnalyticsPeriod, maxNodes: Int, language: String?, dayStamp: Date, value: CashFlowSankey)?
@@ -1160,11 +1165,14 @@ final class FinanceStore: ObservableObject {
            cache.rateStamp == rateStamp,
            cache.months == months,
            cache.monthStamp == monthStamp,
-           cache.dayStamp == dayStamp {
+           cache.dayStamp == dayStamp,
+           cache.language == settings.appLanguage {
             return cache.value
         }
         let result = analytics(settings).cashFlowTrend(months: months)
-        cachedCashFlowTrend = (dataVersion, settings.currency, rateStamp, months, monthStamp, dayStamp, result)
+        cachedCashFlowTrend = (
+            dataVersion, settings.currency, rateStamp, months, monthStamp, dayStamp, settings.appLanguage, result
+        )
         return result
     }
 

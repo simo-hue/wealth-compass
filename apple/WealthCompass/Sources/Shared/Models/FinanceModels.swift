@@ -262,6 +262,31 @@ extension AnalyticsPeriod {
             return nil
         }
     }
+
+    /// Whether a row dated `date` falls inside this period — **both** bounds, at calendar-day
+    /// granularity, from one definition.
+    ///
+    /// `firstIncludedDay` above already shared the lower bound. The upper one was not shared, and
+    /// the iOS transaction list applied it *inside* its `firstIncludedDay.map { … }`, so All Time —
+    /// the one period with no lower bound — was unbounded at the top as well. A future-dated
+    /// expense was listed and counted ("Showing 8 of 8") while the analytics donut, the Money Flow
+    /// diagram and Recorded Cash on the same screen all excluded it, because
+    /// `AnalyticsEngine.filteredTransactions` clamps future rows in *every* period including
+    /// `.all`. Applying the clamp unconditionally is what makes the list's "the same window the
+    /// engine uses" comment true rather than half-true.
+    ///
+    /// Day granularity, in the caller's calendar, matches the engine: the boundaries and the
+    /// start-of-day-stored transaction dates stay aligned across a timezone/DST shift instead of a
+    /// raw-instant comparison dropping day-boundary rows (deep-audit L05).
+    ///
+    /// `MacCashFlowView` deliberately does **not** use this: it keeps a wider upper bound so a
+    /// future-dated entry stays visible in its table until the period rolls over (L17 there).
+    func includes(_ date: Date, relativeTo now: Date, calendar: Calendar) -> Bool {
+        let day = calendar.startOfDay(for: date)
+        guard day <= calendar.startOfDay(for: now) else { return false }
+        guard let firstDay = firstIncludedDay(relativeTo: now, calendar: calendar) else { return true }
+        return day >= firstDay
+    }
 }
 
 /// Selectable window for the dashboard / cash-flow trend chart. Hoisted to Shared (was macOS-only in

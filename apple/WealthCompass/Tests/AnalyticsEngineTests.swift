@@ -819,4 +819,205 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertFalse(categories.contains { $0.name == "Overflow" })
         XCTAssertEqual(categories.first?.percentage ?? 0, 100, accuracy: 0.001, "percentages recomputed over the survivors")
     }
+
+    // MARK: - Net-worth movement (dashboard hero)
+
+    private func point(_ year: Int, _ month: Int, _ day: Int, _ value: Double) -> NetWorthPoint {
+        NetWorthPoint(date: date(year, month, day), value: value)
+    }
+
+    /// A window that opens at zero has no baseline, and must not claim one.
+    ///
+    /// The hero printed the amount and the percentage side by side, and the percentage collapsed a
+    /// near-zero opening value to a hard `0` — so a first snapshot of €0 followed by €10 000 of
+    /// positions rendered "↑ €10 000.00 · 0.0% · 1W": a real movement labelled as no movement. The
+    /// amount is still exact; only the ratio is unavailable, and `nil` is how the hero knows to
+    /// draw an em dash instead of a number.
+    func testNetWorthChangeReportsNoPercentageWhenTheWindowOpensAtZero() {
+        let change = AnalyticsEngine.netWorthChange(in: [
+            point(2026, 8, 1, 0),
+            point(2026, 8, 8, 10_000),
+        ])
+
+        XCTAssertEqual(change?.value, 10_000, "the amount moved and must still be reported")
+        XCTAssertNil(change?.percentage, "no baseline to express €10 000 as a share of")
+    }
+
+    /// The `> 1` floor is the definition of "near zero" and is unchanged by the fix — only what
+    /// happens below it moved, from a misleading `0` to `nil`.
+    func testNetWorthChangeReportsNoPercentageForASubUnitBaseline() {
+        XCTAssertNil(
+            AnalyticsEngine.netWorthChange(in: [point(2026, 8, 1, 0.5), point(2026, 8, 8, 500)])?.percentage,
+            "a €0.50 opening value is not a baseline; 99 900% is not a useful number"
+        )
+        XCTAssertEqual(
+            AnalyticsEngine.netWorthChange(in: [point(2026, 8, 1, 100), point(2026, 8, 8, 150)])?.percentage ?? 0,
+            50, accuracy: 0.0001, "an ordinary window still reports its percentage"
+        )
+    }
+
+    /// A negative opening value divides by its magnitude, so recovering toward zero reads positive.
+    func testNetWorthChangeKeepsTheSignOfTheMovementNotOfTheBaseline() {
+        let change = AnalyticsEngine.netWorthChange(in: [point(2026, 8, 1, -200), point(2026, 8, 8, -100)])
+        XCTAssertEqual(change?.value ?? 0, 100, accuracy: 0.0001)
+        XCTAssertEqual(change?.percentage ?? 0, 50, accuracy: 0.0001, "debt halved is a 50% gain, not a loss")
+    }
+
+    /// Nothing at all to measure: no points, one point, or every point on the same day.
+    func testNetWorthChangeIsNilWithoutASpanToMeasure() {
+        XCTAssertNil(AnalyticsEngine.netWorthChange(in: []))
+        XCTAssertNil(AnalyticsEngine.netWorthChange(in: [point(2026, 8, 1, 100)]))
+        XCTAssertNil(
+            AnalyticsEngine.netWorthChange(in: [point(2026, 8, 1, 100), point(2026, 8, 1, 400)]),
+            "same date at both ends is not a window"
+        )
+    }
+
+    // MARK: - Aggregate gain percentage (portfolio summaries)
+
+    /// "No cost basis" is not "0% performance".
+    ///
+    /// The four portfolio summaries guarded on `costBasis > 0` and fell back to `0`, which the
+    /// Performance card rendered as an ordinary "0.0%" under a green up-arrow — beside a Profit /
+    /// Loss card showing a real gain. Reachable without anything exotic: the add form accepts a
+    /// blank average buy price (only *both* prices blank is rejected).
+    func testGainPercentIsUnavailableWithoutACostBasis() {
+        XCTAssertNil(AnalyticsEngine.gainPercent(gain: 1_500, costBasis: 0))
+        XCTAssertNil(AnalyticsEngine.gainPercent(gain: 0, costBasis: 0))
+    }
+
+    /// And where there *is* a basis it must agree with the rows underneath it, which have guarded
+    /// on `!= 0` and divided by the magnitude since M10.
+    func testGainPercentAgreesWithThePerRowGainLossPercent() {
+        let holding = Investment(
+            type: .stock, symbol: "SYM", name: "Name", quantity: 1, costBasis: 800,
+            currentValue: 1_000, currentPrice: 1_000, currency: .eur,
+            geography: "US", sector: "Tech", isin: "", fees: 0
+        )
+        XCTAssertEqual(
+            AnalyticsEngine.gainPercent(gain: holding.gainLoss, costBasis: holding.costBasis) ?? 0,
+            holding.gainLossPercent, accuracy: 0.0001
+        )
+
+        // A negative basis keeps the sign of the *gain*, exactly as the row does.
+        XCTAssertEqual(
+            AnalyticsEngine.gainPercent(gain: 50, costBasis: -100) ?? 0,
+            50, accuracy: 0.0001
+        )
+    }
+
+    // MARK: - Period membership (the transaction list's window)
+
+    /// The list and the analytics beside it must answer the same question about the same day.
+    ///
+    /// The iOS transaction list applied its `<= today` bound only when the period had a lower bound
+    /// too, and All Time has none — so a future-dated expense was listed and counted ("Showing 8 of
+    /// 8") while the category donut, the Money Flow diagram and Recorded Cash on the same screen
+    /// all excluded it. This walks every period and compares the shared predicate against what the
+    /// engine actually returns.
+    func testEveryPeriodAdmitsExactlyWhatTheEngineCounts() {
+        let today = date(2026, 8, 24)
+        let rows = [
+            tx(.expense, 100, "Food", date(2025, 3, 4)),      // long past — All Time / YTD? no
+            tx(.expense, 100, "Food", date(2026, 1, 6)),      // this year
+            tx(.expense, 100, "Food", date(2026, 8, 20)),     // this week
+            tx(.expense, 100, "Food", today),                 // today, the inclusive boundary
+            tx(.expense, 900, "Rent", date(2026, 12, 1)),     // future — no period may admit it
+        ]
+        let data = FinancialData(transactions: rows)
+
+        for period in AnalyticsPeriod.allCases {
+            let admitted = rows
+                .filter { period.includes($0.date, relativeTo: today, calendar: utc) }
+                .map(\.date)
+                .sorted()
+            // `expensesByCategory` runs the engine's own `filteredTransactions`; every row here is
+            // one expense of a known amount, so the total names how many the engine admitted.
+            let engineTotal = engine(data, now: today).expensesByCategory(period: period)
+                .reduce(Decimal(0)) { $0 + Decimal($1.value) }
+            let admittedTotal = rows
+                .filter { period.includes($0.date, relativeTo: today, calendar: utc) }
+                .reduce(Decimal(0)) { $0 + $1.amount }
+
+            XCTAssertEqual(
+                admittedTotal, engineTotal,
+                "\(period) — the list admits \(admittedTotal) while the engine counts \(engineTotal)"
+            )
+            XCTAssertFalse(
+                admitted.contains(date(2026, 12, 1)),
+                "\(period) admitted a future-dated row"
+            )
+            XCTAssertTrue(admitted.contains(today), "\(period) dropped today, its inclusive upper bound")
+        }
+    }
+
+    /// The named case, stated on its own so a regression names itself.
+    func testAllTimeIsBoundedAtTheTopEvenThoughItHasNoLowerBound() {
+        let today = date(2026, 8, 24)
+        XCTAssertNil(AnalyticsPeriod.all.firstIncludedDay(relativeTo: today, calendar: utc))
+        XCTAssertTrue(AnalyticsPeriod.all.includes(date(2020, 1, 1), relativeTo: today, calendar: utc))
+        XCTAssertFalse(
+            AnalyticsPeriod.all.includes(date(2026, 8, 25), relativeTo: today, calendar: utc),
+            "All Time is unbounded below, not above"
+        )
+    }
+
+    // MARK: - Store-level memoization of localized analytics
+
+    /// The cash-flow chart's month labels must follow an in-app language change.
+    ///
+    /// `CashFlowMonth.monthLabel` is formatted through
+    /// `AppLocalization.effectiveLocale(appLanguage:)` — it is *data that is already translated*,
+    /// printed verbatim on the x-axis — but `FinanceStore`'s trend cache keyed only on data
+    /// version, currency, rate stamp, month count and the day. The root views re-`.id` on a
+    /// language change, and a re-render cannot invalidate a cache that lives on the store, so the
+    /// axis kept the old language until something unrelated moved the key: an edit, a currency
+    /// change, or midnight. The sibling Sankey cache has keyed on `appLanguage` all along.
+    ///
+    /// This drives the store rather than the engine on purpose: the engine was never wrong.
+    @MainActor
+    func testCashFlowTrendLabelsFollowAnInAppLanguageChange() {
+        let settings = makeSettings()
+        let store = makeStore(settings: settings)
+
+        settings.appLanguage = "en"
+        let english = store.cashFlowTrend(months: 6, settings: settings).map(\.monthLabel)
+        settings.appLanguage = "it"
+        let italian = store.cashFlowTrend(months: 6, settings: settings).map(\.monthLabel)
+
+        XCTAssertFalse(english.isEmpty, "the trend returned no months to label")
+        XCTAssertNotEqual(english, italian, "the cache re-served the previous language's labels")
+
+        // Ground truth: a store with nothing cached, asked the same question in Italian.
+        let freshSettings = makeSettings()
+        freshSettings.appLanguage = "it"
+        XCTAssertEqual(
+            italian,
+            makeStore(settings: freshSettings).cashFlowTrend(months: 6, settings: freshSettings).map(\.monthLabel),
+            "the labels after the switch are not what an uncached read returns"
+        )
+    }
+
+    @MainActor
+    private func makeSettings() -> AppSettings {
+        AppSettings(userDefaults: UserDefaults(suiteName: "WealthCompassTests-\(UUID().uuidString)")!)
+    }
+
+    @MainActor
+    private func makeStore(settings: AppSettings) -> FinanceStore {
+        FinanceStore(
+            persistence: EmptyPersistence(),
+            settings: settings,
+            syncMetadataStore: CloudSyncMetadataStore(directoryName: "WealthCompassTests-\(UUID().uuidString)")
+        )
+    }
+}
+
+/// Nothing on disk. The trend's month labels come from the calendar and the language, not from the
+/// ledger, so an empty store is enough to ask which language they came back in.
+private final class EmptyPersistence: FinancePersistence, @unchecked Sendable {
+    var locationDescription: String { "in-memory (analytics cache test)" }
+    func load() throws -> FinancePersistenceLoad? { nil }
+    func save(_ data: FinancialData) throws {}
+    func clear() throws {}
 }

@@ -408,7 +408,9 @@ struct MacDashboardView: View {
                                     HStack(spacing: 7) {
                                         Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
                                         Text(settings.privateCurrency(abs(rangeChange.value)))
-                                        Text(settings.privatePercent(abs(rangeChange.percentage)))
+                                        // See DashboardView: an em dash when the window opened at
+                                        // (or near) zero, because there is no baseline to divide by.
+                                        Text(rangeChange.percentage.map { settings.privatePercent(abs($0)) } ?? "—")
                                         Text("for \(timeRange.localizedTitle(appLanguage: settings.appLanguage))")
                                             .foregroundStyle(WCColor.textTertiary)
                                     }
@@ -1062,13 +1064,8 @@ struct MacDashboardView: View {
         }
     }
 
-    private func netWorthChange(in points: [NetWorthPoint]) -> (value: Double, percentage: Double)? {
-        guard let first = points.first, let last = points.last, first.date != last.date else {
-            return nil
-        }
-        let change = last.value - first.value
-        let percentage = abs(first.value) > 1 ? change / abs(first.value) * 100 : 0
-        return (change, percentage)
+    private func netWorthChange(in points: [NetWorthPoint]) -> (value: Double, percentage: Double?)? {
+        AnalyticsEngine.netWorthChange(in: points)
     }
 
     private func chartDomain(for points: [NetWorthPoint]) -> ClosedRange<Double> {

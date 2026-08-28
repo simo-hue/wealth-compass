@@ -54,6 +54,7 @@ struct CashFlowView: View {
     @State private var isCompletedRecurringExpanded = false
     @State private var period: AnalyticsPeriod = .thirtyDays
     @State private var transactionPeriod: AnalyticsPeriod = .thirtyDays
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var transactionTypeFilter: TransactionListTypeFilter = .all
     @State private var transactionSearch = ""
     @State private var selectedTab: CashFlowTab
@@ -160,7 +161,7 @@ struct CashFlowView: View {
 
     private var summaryCards: some View {
         let cashFlow = finance.monthlyCashFlow(for: Date(), settings: settings)
-        return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+        return LazyVGrid(columns: metricCardColumns(dynamicTypeSize), spacing: 12) {
             MetricCard(title: "Monthly Income", value: settings.privateCurrency(cashFlow.monthlyIncome), systemImage: "arrow.down.left", accent: WCColor.primary, detail: "This month")
             MetricCard(title: "Monthly Expenses", value: settings.privateCurrency(cashFlow.monthlyExpenses), systemImage: "arrow.up.right", accent: WCColor.destructive, detail: "This month")
             MetricCard(title: "Net Savings", value: settings.privateCurrency(cashFlow.netSavings), systemImage: "wallet.pass.fill", accent: settings.privateAccent(isPositive: cashFlow.netSavings >= 0), detail: "Income less expenses")
@@ -638,9 +639,17 @@ struct CashFlowView: View {
 
     private var filteredTransactions: [Transaction] {
         let query = transactionSearch.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Hoisted out of the per-row closure, which used to recompute both bounds per transaction.
+        let now = Date()
+        let calendar = Calendar.current
+        let period = transactionPeriod
         return finance.transactions.filter { transaction in
             let matchesType = transactionTypeFilter.transactionType.map { $0 == transaction.type } ?? true
-            let matchesPeriod = transactionStartDate.map { transaction.date >= $0 && transaction.date <= Date() } ?? true
+            // Both bounds, from `AnalyticsPeriod.includes` — which is where the whole window now
+            // lives, rather than only its lower half. The upper bound used to be applied inside
+            // the optional start date, so All Time — the one period with no lower bound — listed
+            // and counted future-dated rows that the analytics on the same screen excluded.
+            let matchesPeriod = period.includes(transaction.date, relativeTo: now, calendar: calendar)
             // Search matches category or description, case-insensitively but *not* diacritic- or
             // width-insensitively: `localizedCaseInsensitiveContains` folds case only, so "cafe"
             // does not find "Café". `MacCashFlowView` matches the same way, so the two lists agree;
@@ -652,14 +661,6 @@ struct CashFlowView: View {
         }
     }
 
-
-    /// The same window `AnalyticsEngine.filteredTransactions` uses, from the same definition.
-    ///
-    /// This was a third copy of the rule and the loosest: it neither counted back N-1 nor snapped
-    /// to the start of the day, so it disagreed with the Mac list as well as with the analytics.
-    private var transactionStartDate: Date? {
-        transactionPeriod.firstIncludedDay(relativeTo: Date(), calendar: .current)
-    }
 
     private func transactionRow(_ transaction: Transaction) -> some View {
         InsetFinanceRow {

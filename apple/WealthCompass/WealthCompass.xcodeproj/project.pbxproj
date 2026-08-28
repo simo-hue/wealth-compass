@@ -679,7 +679,7 @@
 				hu,
 				id,
 				ms,
-				no,
+				nb,
 				pl,
 				ro,
 				sk,

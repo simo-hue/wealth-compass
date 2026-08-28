@@ -228,6 +228,43 @@ struct AnalyticsEngine {
         return (center - minHeight / 2)...(center + minHeight / 2)
     }
 
+    /// The movement across a net-worth series: the absolute change, and the percentage of the
+    /// opening value it represents — **when there is an opening value big enough to divide by**.
+    ///
+    /// The percentage is optional on purpose. Both dashboards used to collapse a near-zero baseline
+    /// to a hard `0`, which renders as an ordinary "0.0%" and is indistinguishable from "this
+    /// window really did not move": a first snapshot of €0 followed by €10,000 of positions printed
+    /// "↑ €10,000.00 · 0.0% · 1W". `nil` says "no baseline to measure against" and the hero renders
+    /// an em dash for it, so the amount beside it is not contradicted.
+    ///
+    /// The `> 1` floor is the pre-existing definition of "near zero" and is deliberately unchanged;
+    /// only what happens below it moved. Returns `nil` overall when there is no span to measure
+    /// (fewer than two dates). Pure + `static` so the rule is unit-tested and shared by both
+    /// dashboards instead of duplicated.
+    static func netWorthChange(in points: [NetWorthPoint]) -> (value: Double, percentage: Double?)? {
+        guard let first = points.first, let last = points.last, first.date != last.date else {
+            return nil
+        }
+        let change = last.value - first.value
+        let baseline = abs(first.value)
+        return (change, baseline > 1 ? change / baseline * 100 : nil)
+    }
+
+    /// An aggregate gain as a percentage of the cost basis it was earned on, or `nil` when there is
+    /// no basis to measure against.
+    ///
+    /// Mirrors `Investment.gainLossPercent` / `CryptoHolding.gainLossPercent` exactly — the same
+    /// `!= 0` guard, and the same `abs()` denominator so a negative basis keeps a gain positive
+    /// (M10). The four portfolio summaries used to guard on `costBasis > 0` and yield `0`, which
+    /// disagreed with the rows underneath them and, worse, printed a live-looking "0.0%" with an
+    /// up-arrow beside a real profit — reachable because the forms accept a blank average buy
+    /// price. `nil` renders as an em dash instead. Pure + `static`: unit-tested, and shared by all
+    /// four summaries.
+    static func gainPercent(gain: Decimal, costBasis: Decimal) -> Double? {
+        guard costBasis != 0 else { return nil }
+        return (gain.doubleValue / abs(costBasis.doubleValue)) * 100
+    }
+
     func cashFlowTrend(months: Int = 6) -> [CashFlowMonth] {
         let monthFormatter = DateFormatter()
         monthFormatter.dateFormat = "yyyy-MM"

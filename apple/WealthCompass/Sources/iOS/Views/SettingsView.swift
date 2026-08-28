@@ -646,7 +646,12 @@ struct SettingsView: View {
                 backupError = nil
                 exportedFile = ExportedFile(url: url)
             } catch {
-                backupError = error.localizedDescription
+                // L26, same as `handleImportSelection` and `MacSettingsView.performExport`:
+                // `error.localizedDescription` resolves in the *system* language, and
+                // `ReportRenderError.errorDescription` deliberately returns raw English — the
+                // translated text is only reachable through `localizedDescription(appLanguage:)`.
+                // So a failed export used to print English into an app-language UI.
+                backupError = Self.errorMessage(error, appLanguage: settings.appLanguage)
             }
         }
     }

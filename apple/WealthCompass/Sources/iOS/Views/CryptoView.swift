@@ -42,6 +42,7 @@ struct CryptoView: View {
     @State private var activeForm: CryptoFormRoute?
     @State private var holdingPendingDeletion: CryptoHolding?
     @State private var selectedTab: CryptoTab = .overview
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         ScrollView {
@@ -97,9 +98,15 @@ struct CryptoView: View {
             $0 + settings.convert($1.costBasis, from: $1.currency)
         }
         let gain = total - costBasis
-        let percent = costBasis > 0 ? (gain.doubleValue / costBasis.doubleValue) * 100 : 0
+        // Nil when there is no cost basis to divide by — the aggregate now guards exactly as
+        // `Investment.gainLossPercent` / `CryptoHolding.gainLossPercent` do, instead of
+        // collapsing "no basis" into a live-looking 0%.
+        let percent = AnalyticsEngine.gainPercent(gain: gain, costBasis: costBasis)
+        // Routed through `privatePercent` rather than `formattedPercent` so this line carries
+        // Privacy Mode itself and needs no gate of its own; "—" when there is no percentage.
+        let percentText = percent.map { settings.privatePercent($0) } ?? "—"
 
-        return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+        return LazyVGrid(columns: metricCardColumns(dynamicTypeSize), spacing: 12) {
             MetricCard(title: LocalizedStringKey("Crypto Value"), value: settings.privateCurrency(total), systemImage: "bitcoinsign.circle.fill", accent: WCColor.warning, detail: LocalizedStringKey("Current market value"))
             MetricCard(title: LocalizedStringKey("Holdings"), value: settings.privateCount(finance.data.crypto.count), systemImage: "square.stack.3d.up.fill", detail: LocalizedStringKey("Tracked assets"))
             MetricCard(title: LocalizedStringKey("Cost Basis"), value: settings.privateCurrency(costBasis), systemImage: "banknote.fill", detail: LocalizedStringKey("Capital invested"))
@@ -108,16 +115,22 @@ struct CryptoView: View {
                 value: settings.privateCurrency(gain),
                 systemImage: settings.privateSymbol(isPositive: gain >= 0, positive: "arrow.up.right", negative: "arrow.down.right"),
                 accent: settings.privateAccent(isPositive: gain >= 0),
-                detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(formattedPercent(percent, locale: settings.effectiveLocale)) performance")
+                detail: settings.isPrivacyMode ? LocalizedStringKey("Performance hidden") : LocalizedStringKey("\(percentText) performance")
             )
 
             // VIEW-07: Performance % + Status (last-update recency + distinct-coin count) cards, matching macOS.
             if !settings.isPrivacyMode {
+                let performance = percent ?? 0
                 MetricCard(
                     title: LocalizedStringKey("Performance"),
-                    value: formattedPercent(percent, locale: settings.effectiveLocale),
-                    systemImage: percent >= 0 ? "arrow.up.right" : "arrow.down.right",
-                    accent: percent >= 0 ? WCColor.primary : WCColor.destructive
+                    value: percentText,
+                    // No cost basis means no sign to point at, so the card takes a neutral
+                    // glyph and tint rather than an up-arrow over an em dash. Spelled without
+                    // a closure on purpose: `PrivacyRedactionTests`' sign sweep stops walking
+                    // for an enclosing privacy gate as soon as the render's own line opens a
+                    // block, and this render's gate is the `if` above it.
+                    systemImage: percent == nil ? "minus" : (performance >= 0 ? "arrow.up.right" : "arrow.down.right"),
+                    accent: percent == nil ? WCColor.textSecondary : (performance >= 0 ? WCColor.primary : WCColor.destructive)
                 )
             }
             let latestUpdate = finance.data.crypto.map(\.updatedAt).max()

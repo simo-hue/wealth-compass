@@ -12,11 +12,11 @@ struct DashboardView: View {
     @State private var cashFlowRange: CashFlowTimeframe = .sixMonths
     @State private var expensePeriod: AnalyticsPeriod = .thirtyDays
     @ScaledMetric(relativeTo: .largeTitle) private var netWorthSize: CGFloat = 35
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    private let columns = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
-    ]
+    // One card per row once the type is large enough that two cannot hold a figure —
+    // `MetricCard`'s value clips below its scale-factor floor rather than shrinking further.
+    private var columns: [GridItem] { metricCardColumns(dynamicTypeSize, spacing: 12) }
 
     private var totals: FinanceTotals {
         finance.calculateTotals(settings: settings)
@@ -166,7 +166,11 @@ struct DashboardView: View {
                                     HStack(spacing: 6) {
                                         Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
                                         Text(settings.privateCurrency(abs(rangeChange.value)))
-                                        Text(settings.privatePercent(abs(rangeChange.percentage)))
+                                        // An em dash when the window opened at (or near) zero:
+                                        // there is no baseline to express the move as a share of,
+                                        // and a hard "0.0%" beside a real amount reads as "it did
+                                        // not move" (`AnalyticsEngine.netWorthChange`).
+                                        Text(rangeChange.percentage.map { settings.privatePercent(abs($0)) } ?? "—")
                                         Text(timeRange.title)
                                             .foregroundStyle(WCColor.textTertiary)
                                     }
@@ -706,13 +710,8 @@ struct DashboardView: View {
         }
     }
 
-    private func netWorthChange(in points: [NetWorthPoint]) -> (value: Double, percentage: Double)? {
-        guard let first = points.first, let last = points.last, first.date != last.date else {
-            return nil
-        }
-        let change = last.value - first.value
-        let percentage = abs(first.value) > 1 ? change / abs(first.value) * 100 : 0
-        return (change, percentage)
+    private func netWorthChange(in points: [NetWorthPoint]) -> (value: Double, percentage: Double?)? {
+        AnalyticsEngine.netWorthChange(in: points)
     }
 
     private func chartDomain(for points: [NetWorthPoint]) -> ClosedRange<Double> {

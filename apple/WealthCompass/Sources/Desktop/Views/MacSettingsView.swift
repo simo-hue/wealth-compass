@@ -681,7 +681,11 @@ struct MacSettingsView: View {
             Label(title, systemImage: systemImage)
             Spacer()
             Text(isConfigured ? "Configured" : "Not Set")
-                .foregroundStyle(isConfigured ? Color.accentColor : .secondary)
+                // The only `Color.accentColor` in the codebase, and neither asset catalog defines
+                // an `AccentColor` (nor is `ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME` set),
+                // so this badge rendered system blue on macOS and iPad while every other tint in
+                // both apps is the app's green.
+                .foregroundStyle(isConfigured ? WCColor.primary : .secondary)
             Image(systemName: "chevron.right")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)

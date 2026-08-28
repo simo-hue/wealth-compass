@@ -316,6 +316,21 @@ struct MetricCard: View {
     }
 }
 
+/// The iPhone metric row's columns: two side by side, collapsing to **one** at accessibility text
+/// sizes.
+///
+/// `MetricCard.value` is `.title3` with `lineLimit(1)` and a `minimumScaleFactor(0.62)` floor, and
+/// its `detail` has `lineLimit(1)` and no scale factor at all — so once the type is large enough,
+/// a half-width ~139pt cell cannot fit "€1.234,56" even scaled to the floor, and the figure clips.
+/// Giving each card the whole width is what the extra type needs, and it is the same move
+/// `fillingFlexibleColumns` makes for the desktop panes by measuring rather than by breakpoint.
+///
+/// `spacing` is passed through to each `GridItem` so call sites keep the column gap they had.
+func metricCardColumns(_ dynamicTypeSize: DynamicTypeSize, spacing: CGFloat? = nil) -> [GridItem] {
+    let column = GridItem(.flexible(), spacing: spacing)
+    return dynamicTypeSize.isAccessibilitySize ? [column] : [column, column]
+}
+
 /// Responsive `.flexible()` columns that stretch to fill the full available width — the same
 /// "use the whole window" behavior the Dashboard's metric row already has. It fits as many columns
 /// as will hold an item at least `minItemWidth` wide, then caps that at `itemCount` so a partly
@@ -679,7 +694,16 @@ struct SectionHeading: View {
 
 struct PrimaryActionButton: View {
     let systemImage: String
-    let accessibilityLabel: String
+    /// A catalog key, not a resolved string.
+    ///
+    /// This was typed `String`, which bound `.accessibilityLabel`'s verbatim `S: StringProtocol`
+    /// overload — so "Add Transaction", "Add Investment" and "Add Crypto Holding" were announced in
+    /// English no matter the in-app language, despite being translated in all 34 locales. Every
+    /// other title in this file is a `LocalizedStringKey` for the same reason: the design system
+    /// holds no `AppSettings` and cannot resolve one itself, so it hands the key to SwiftUI and
+    /// lets the environment locale (which the root view re-sets on a language change) pick the
+    /// table. `MetricCard.verbatimTitle` is the escape hatch for an already-translated string.
+    let accessibilityLabel: LocalizedStringKey
     let action: () -> Void
 
     var body: some View {

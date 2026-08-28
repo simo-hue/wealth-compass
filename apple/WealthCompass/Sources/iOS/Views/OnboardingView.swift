@@ -121,6 +121,7 @@ struct OnboardingView: View {
             }
             .padding(.bottom, 60)
         }
+        .scrollingPage()
     }
     
     private var privacyPage: some View {
@@ -166,6 +167,7 @@ struct OnboardingView: View {
             }
             .padding(.bottom, 60)
         }
+        .scrollingPage()
     }
 
     private var personalizePage: some View {
@@ -247,6 +249,7 @@ struct OnboardingView: View {
             }
             .padding(.bottom, 60)
         }
+        .scrollingPage()
     }
 
     private var apiSetupPage: some View {
@@ -386,6 +389,30 @@ struct OnboardingView: View {
     private func completeOnboarding() {
         withAnimation(.easeInOut(duration: 0.4)) {
             settings.hasSeenOnboarding = true
+        }
+    }
+}
+
+/// Lets a fixed onboarding page scroll once its text outgrows the screen.
+///
+/// `welcomePage`, `personalizePage` and `privacyPage` are `Spacer()`-balanced `VStack`s sized to
+/// the screen — `apiSetupPage` was already wrapped this way. The `.dynamicTypeSize(...accessibility3)`
+/// cap on the `TabView` limits the overflow but does not prevent it, so at AX3 the privacy page's
+/// ~55-word disclosure — the paragraph naming exactly what leaves the device and to whom —
+/// truncated mid-sentence with no way to reach the rest of it.
+///
+/// `minHeight: proxy.size.height` is what keeps the layout identical whenever the content fits:
+/// the stack still fills the page, so the `Spacer()`s still centre it. Only when the content is
+/// taller does the stack grow past the screen and the `ScrollView` become reachable.
+private extension View {
+    func scrollingPage() -> some View {
+        GeometryReader { proxy in
+            ScrollView {
+                self
+                    .frame(minHeight: proxy.size.height)
+                    .frame(maxWidth: .infinity)
+            }
+            .scrollIndicators(.hidden)
         }
     }
 }
