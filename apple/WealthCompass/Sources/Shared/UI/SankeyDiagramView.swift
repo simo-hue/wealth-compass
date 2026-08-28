@@ -96,11 +96,41 @@ struct SankeyDiagramView: View {
                             updateHover(nil)
                         }
                     }
+#if os(macOS)
                     // The pointer already resolved a flow on the way in, so a click needs no
                     // second hit-test — it acts on whatever is currently lit.
+                    //
+                    // macOS only, and that is the fix as much as the drag below is: this tap reads
+                    // `hovered`, which without a pointer is always nil, so on an iPad it did
+                    // nothing — *and* it competed with the drag for the same touch, so adding the
+                    // drag alongside it changed nothing until this became conditional.
                     .onTapGesture {
                         if let id = hovered, let node = nodesByID[id] { select(node) }
                     }
+#else
+                    // Without this the whole diagram is inert on an iPad: `onContinuousHover` never
+                    // fires without a pointer, so `hovered` stays nil and the tap above — which
+                    // reads that state rather than hit-testing its own location — resolves nothing.
+                    // Every drawn layer is behind `.allowsHitTesting(false)`, and this view is used
+                    // only from the Desktop layer, so nothing else offered a way in: tapping a
+                    // ribbon did nothing and the drill-through was unreachable.
+                    //
+                    // A drag with no minimum distance is the same shape `AllocationChart` uses. It
+                    // makes a tap behave like a pointer entering and leaving: track under the
+                    // finger, then resolve at the lift point, so a drag across ribbons highlights
+                    // as it goes and settles on the one released over.
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                updateHover(SankeyLayout.hitTest(layout, at: value.location, hubID: sankey.hub.id))
+                            }
+                            .onEnded { value in
+                                let hit = SankeyLayout.hitTest(layout, at: value.location, hubID: sankey.hub.id)
+                                updateHover(nil)
+                                if let hit, let node = nodesByID[hit] { select(node) }
+                            }
+                    )
+#endif
                     .accessibilityHidden(true)
             }
             .animation(.spring(response: 0.45, dampingFraction: 0.86), value: sankey)

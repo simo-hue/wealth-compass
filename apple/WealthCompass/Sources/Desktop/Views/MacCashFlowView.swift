@@ -361,6 +361,26 @@ struct MacCashFlowView: View {
                                         }
                                     }
                                 }
+#if os(iOS)
+                                // Hover needs a pointer; on an iPad the per-month readout above
+                                // this chart never changed. Same fallback as AllocationChart.
+                                .gesture(
+                                    DragGesture(minimumDistance: 0)
+                                        .onChanged { value in
+                                            guard let plotFrame = proxy.plotFrame else { return }
+                                            let frame = geometry[plotFrame]
+                                            guard let monthKey: String = proxy.value(atX: value.location.x - frame.origin.x) else { return }
+                                            withAnimation(.easeInOut(duration: 0.15)) {
+                                                hoveredCashFlowMonth = trend.first { $0.monthKey == monthKey }
+                                            }
+                                        }
+                                        .onEnded { _ in
+                                            withAnimation(.easeInOut(duration: 0.15)) {
+                                                hoveredCashFlowMonth = nil
+                                            }
+                                        }
+                                )
+#endif
                         }
                     }
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: trend)
@@ -1066,9 +1086,20 @@ struct MacCashFlowView: View {
                 let authorized = await MacRecurringTransactionNotificationService.shared.requestAuthorization()
                 if !authorized {
                     finance.setRecurringNotificationsEnabled(id: schedule.id, isEnabled: false)
+                    // Two literals, because this layer also renders on an iPad, where "System
+                    // Settings" names an app that does not exist. The catalog only extracts
+                    // *literal* keys, so an interpolated app name would register neither — and both
+                    // of these are already translated in all 35 locales (the iOS one is shipped by
+                    // `CashFlowView`), so the split costs nothing. Bound before the call because
+                    // `#if` cannot split an argument list.
+                    #if os(macOS)
+                    let notificationsDisabledMessage = settings.localized("The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.")
+                    #else
+                    let notificationsDisabledMessage = settings.localized("The schedule was saved, but notifications are not authorized. You can enable them in iOS Settings and then edit this schedule.")
+                    #endif
                     activeAlert = .message(
                         title: settings.localized("Notifications Disabled"),
-                        message: settings.localized("The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.")
+                        message: notificationsDisabledMessage
                     )
                 }
             }

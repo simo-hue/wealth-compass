@@ -3,6 +3,26 @@ import SwiftUI
 struct MacRootView: View {
     @Environment(\.locale) private var locale
     @Environment(\.scenePhase) private var scenePhase
+
+    private var shouldCoverForPrivacy: Bool { Self.shouldCoverForPrivacy(scenePhase) }
+
+    /// Whether the privacy cover belongs on screen for this scene phase.
+    ///
+    /// `!= .active` is right on macOS, where `.inactive` means another app is frontmost. It is
+    /// wrong on iPadOS: a Split View or Stage Manager window that is merely *unfocused* reports
+    /// `.inactive` while staying fully visible to its own user, so tapping into Safari beside the
+    /// app turned it into an opaque locked panel — and stopped the 30-second recurring timer and
+    /// the rate refresh with it, since both gate on `.active`.
+    ///
+    /// `.background` is the phase that actually precedes a snapshot on iOS, and it is already what
+    /// the hard lock below keys on, so the cover and the lock now agree about what "away" means.
+    static func shouldCoverForPrivacy(_ phase: ScenePhase) -> Bool {
+        #if os(macOS)
+        phase != .active
+        #else
+        phase == .background
+        #endif
+    }
     @EnvironmentObject private var finance: FinanceStore
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var appModel: MacAppModel
@@ -59,7 +79,7 @@ struct MacRootView: View {
             // Deep-audit H03/H04 + privacy: an opaque cover shown whenever the window isn't active,
             // so financial data isn't exposed during app switching / Mission Control without forcing a
             // re-authentication. Pairs with the lock-only-on-.background policy below; mirrors iOS.
-            if scenePhase != .active {
+            if shouldCoverForPrivacy {
                 MacPrivacyShield()
             }
         }
@@ -77,7 +97,7 @@ struct MacRootView: View {
             // this view's hosting controller, so on iPad the app-switcher snapshot kept them while
             // the cover sat behind. Same condition, second surface; a no-op on macOS, which has no
             // snapshot and keeps the overlay alone.
-            DesktopPlatform.setPrivacyShieldVisible(phase != .active)
+            DesktopPlatform.setPrivacyShieldVisible(Self.shouldCoverForPrivacy(phase))
 
             // Deep-audit H03/H04: hard-lock only on .background (the app hidden via Cmd-H or all
             // windows minimized). Transient .inactive (another app frontmost, Mission Control, screen
