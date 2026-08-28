@@ -16,6 +16,10 @@ struct MacRootView: View {
     ///
     /// `.background` is the phase that actually precedes a snapshot on iOS, and it is already what
     /// the hard lock below keys on, so the cover and the lock now agree about what "away" means.
+    ///
+    /// This fixes the cover only. The 30-second recurring timer and the rate refresh still guard on
+    /// `scenePhase == .active` further down, so on an unfocused iPad window they remain paused —
+    /// separate from this, and left alone deliberately rather than fixed in passing.
     static func shouldCoverForPrivacy(_ phase: ScenePhase) -> Bool {
         #if os(macOS)
         phase != .active
@@ -76,9 +80,11 @@ struct MacRootView: View {
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: finance.persistenceError)
         .overlay {
-            // Deep-audit H03/H04 + privacy: an opaque cover shown whenever the window isn't active,
-            // so financial data isn't exposed during app switching / Mission Control without forcing a
-            // re-authentication. Pairs with the lock-only-on-.background policy below; mirrors iOS.
+            // Deep-audit H03/H04 + privacy: an opaque cover so financial data isn't exposed during
+            // app switching / Mission Control without forcing a re-authentication. The condition is
+            // `shouldCoverForPrivacy(_:)` and differs by platform — it is NOT simply "not active"
+            // any more, and it no longer mirrors the iPhone root, which keeps `!= .active` because
+            // iPhone has no unfocused-but-visible window state to be wrong about.
             if shouldCoverForPrivacy {
                 MacPrivacyShield()
             }
@@ -95,8 +101,8 @@ struct MacRootView: View {
         .onChange(of: scenePhase) { _, phase in
             // The overlay above cannot cover the editor or export sheet: both are presented above
             // this view's hosting controller, so on iPad the app-switcher snapshot kept them while
-            // the cover sat behind. Same condition, second surface; a no-op on macOS, which has no
-            // snapshot and keeps the overlay alone.
+            // the cover sat behind. Second surface, same `shouldCoverForPrivacy` condition as the
+            // overlay; a no-op on macOS, which has no snapshot and keeps the overlay alone.
             DesktopPlatform.setPrivacyShieldVisible(Self.shouldCoverForPrivacy(phase))
 
             // Deep-audit H03/H04: hard-lock only on .background (the app hidden via Cmd-H or all

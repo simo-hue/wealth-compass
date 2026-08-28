@@ -651,6 +651,10 @@ struct MacDashboardView: View {
                             }
                         }
                         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: slices.map(\.value))
+                        // Tap-latched selections do not clear themselves the way a hover did, and
+                        // hold value snapshots rather than ids, so a data change that removes the
+                        // selected item leaves it matching nothing and dims the whole chart.
+                        .onChange(of: slices.map(\.id)) { _, _ in hoveredAssetSlice = nil }
                         .accessibilityElement(children: .contain)
                         .accessibilityLabel(Text("Asset Allocation"))
                     }
@@ -822,6 +826,8 @@ struct MacDashboardView: View {
                     }
                     .chartYAxis(.hidden)
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: trend)
+                    // Same stale-latch guard as the allocation ring above.
+                    .onChange(of: trend) { _, _ in hoveredCashFlowMonth = nil }
                     .frame(height: 244)
                     .accessibilityElement(children: .contain)
                     .accessibilityLabel(Text("Cash Flow"))

@@ -133,7 +133,13 @@ struct SankeyDiagramView: View {
                                 // Light the flow as well as acting on it: a node with no rows
                                 // behind it (surplus, shortfall, the hub) is not drillable, so
                                 // without this a tap on one would give no feedback at all.
-                                updateHover(hit)
+                                //
+                                // Toggling, not setting, because there is no pointer to leave and
+                                // clear it: `hitTest` falls back to the nearest ribbon and finally
+                                // the hub, so it never returns nil for a finite point inside the
+                                // chart. Setting unconditionally left the diagram latched dim —
+                                // every other flow at 0.24-0.38 opacity with no way back.
+                                updateHover(hovered == hit ? nil : hit)
                                 select(node)
                             }
                     )

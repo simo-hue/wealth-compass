@@ -570,7 +570,12 @@ struct AllocationChart: View {
                             }
                         }
                     }
+
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: slices.map(\.value))
+                    // Tap-latched selections do not clear themselves the way a hover did, and hold a value
+                    // snapshot rather than an id, so a refresh that changes the slices leaves the selection
+                    // matching nothing: every wedge dims to 0.3 and the centre keeps the old amount.
+                    .onChange(of: slices.map(\.id)) { _, _ in hoveredSlice = nil }
                     .frame(height: 200)
                     .accessibilityElement(children: .contain)
                     .accessibilityLabel(Text(title))

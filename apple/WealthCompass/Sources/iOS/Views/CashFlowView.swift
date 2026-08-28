@@ -259,16 +259,16 @@ struct CashFlowView: View {
                                     let frame = geometry[plotFrame]
                                     Rectangle().fill(.clear).contentShape(Rectangle())
                                         .accessibilityHidden(true)
+                                        // A tap, not a zero-distance drag: the drag wins the pan
+                                        // from this page's ScrollView, so a swipe starting on the
+                                        // donut scrubbed it instead of scrolling. This donut is
+                                        // hand-written rather than an `AllocationChart`, which is
+                                        // why it survived the first sweep of that pattern.
                                         .gesture(
-                                            DragGesture(minimumDistance: 0)
-                                                .onChanged { value in
+                                            SpatialTapGesture()
+                                                .onEnded { value in
                                                     withAnimation(.easeInOut(duration: 0.15)) {
                                                         hoveredExpenseCategory = categorySlice(at: value.location, in: frame, categories: categories)
-                                                    }
-                                                }
-                                                .onEnded { _ in
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        hoveredExpenseCategory = nil
                                                     }
                                                 }
                                         )

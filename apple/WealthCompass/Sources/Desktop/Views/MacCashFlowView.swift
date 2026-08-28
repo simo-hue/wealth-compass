@@ -385,6 +385,11 @@ struct MacCashFlowView: View {
                     }
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: trend)
                     .frame(height: 244)
+                    // Tap-latched selections do not clear themselves the way a hover did, and these hold
+                    // *value snapshots* rather than ids, so a data change that removes the selected
+                    // item leaves it matching nothing: every bar renders dimmed at 0.3 while the
+                    // readout still shows a month that is no longer on the chart. Clear on change.
+                    .onChange(of: trend) { _, _ in hoveredCashFlowMonth = nil }
                     .accessibilityElement(children: .contain)
                     .accessibilityLabel(Text("Cash Flow"))
                 }
@@ -1088,10 +1093,13 @@ struct MacCashFlowView: View {
                     finance.setRecurringNotificationsEnabled(id: schedule.id, isEnabled: false)
                     // Two literals, because this layer also renders on an iPad, where "System
                     // Settings" names an app that does not exist. The catalog only extracts
-                    // *literal* keys, so an interpolated app name would register neither — and both
-                    // of these are already translated in all 35 locales (the iOS one is shipped by
-                    // `CashFlowView`), so the split costs nothing. Bound before the call because
-                    // `#if` cannot split an argument list.
+                    // *literal* keys, so an interpolated app name would register neither. Both keys
+                    // already exist (the iOS one is shipped by `CashFlowView`), so the split adds no
+                    // new string — though they are not equally covered: the macOS key has all 35
+                    // locales, the iOS one 6. The rest fall back to this English, which is what the
+                    // macOS key's `needs_review` entries were already rendering. Both are marked
+                    // `extractionState: manual` so the export sweep cannot drop either. Bound before
+                    // the call because `#if` cannot split an argument list.
                     #if os(macOS)
                     let notificationsDisabledMessage = settings.localized("The schedule was saved, but notifications are not authorized. You can enable them in System Settings and then edit this schedule.")
                     #else

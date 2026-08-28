@@ -108576,6 +108576,7 @@
 
     },
     "The schedule was saved, but notifications are not authorized. You can enable them in iOS Settings and then edit this schedule." : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

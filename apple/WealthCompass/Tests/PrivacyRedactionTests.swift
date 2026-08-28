@@ -1142,6 +1142,32 @@ final class PrivacyRedactionTests: XCTestCase {
         )
     }
 
+    /// *When* the cover is shown, which the window tests above do not cover.
+    ///
+    /// `!= .active` is right on macOS, where `.inactive` means another app is frontmost. On iPadOS
+    /// it is wrong: a Split View or Stage Manager window that is merely unfocused reports
+    /// `.inactive` while staying fully visible to its own user, so tapping into Safari beside the
+    /// app turned it into an opaque locked panel. `.background` is the phase that actually precedes
+    /// the snapshot, and it is what the hard lock already keys on.
+    func testTheCoverTracksBackgroundNotMerelyUnfocused() {
+        XCTAssertTrue(
+            MacRootView.shouldCoverForPrivacy(.background),
+            "the cover must be up for the app-switcher snapshot — that is its whole job"
+        )
+        XCTAssertFalse(
+            MacRootView.shouldCoverForPrivacy(.active),
+            "an active window must never be covered"
+        )
+        #if os(macOS)
+        XCTAssertTrue(MacRootView.shouldCoverForPrivacy(.inactive), "another app is frontmost")
+        #else
+        XCTAssertFalse(
+            MacRootView.shouldCoverForPrivacy(.inactive),
+            "an unfocused-but-visible iPad window must not be blanked while its user is looking at it"
+        )
+        #endif
+    }
+
     /// Hiding it must actually remove the window, not merely leave one lying around.
     @MainActor
     func testPrivacyShieldIsTornDownWhenHidden() {
