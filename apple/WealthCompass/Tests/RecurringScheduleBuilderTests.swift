@@ -69,8 +69,9 @@ final class RecurringScheduleBuilderTests: XCTestCase {
     ///
     /// The M21 reactivation used to be unconditional, and the branch above it additionally requires
     /// `existing.isActive` — so a paused schedule with an unchanged frequency/start fell straight
-    /// through to it. Fixing a typo in the description therefore set `isActive = true`, and within
-    /// 30 seconds `processDueRecurringTransactions` started posting the expense again.
+    /// through to it. Fixing a typo in the description therefore set `isActive = true`, and
+    /// `processDueRecurringTransactions` posted the expense again on the schedule's next
+    /// occurrence — up to a month or a year later, long after anyone would connect it to the edit.
     func testEditingAPausedScheduleKeepsItPaused() {
         let start = date(2026, 1, 1)
         var existing = schedule(start: start, frequency: .monthly, nextDue: date(2026, 7, 1))
@@ -102,12 +103,50 @@ final class RecurringScheduleBuilderTests: XCTestCase {
         )
 
         XCTAssertTrue(rebuilt.isActive, "Extending the end date must revive a lapsed schedule (M21).")
-        // Asserted as a range, not an instant: `build` resolves occurrences with `Calendar.current`
-        // (it takes no calendar), so pinning the exact `Date` compares a UTC-built fixture against
-        // local-calendar month arithmetic and drifts by the UTC offset across a DST boundary —
-        // a start in January and a due date in July differ by an hour in any European zone.
-        XCTAssertGreaterThan(rebuilt.nextDueDate, date(2026, 6, 22), "The revived due date must be ahead of now.")
-        XCTAssertLessThanOrEqual(rebuilt.nextDueDate, date(2027, 1, 1), "…and within the extended end date.")
+        // Asserted as calendar components, not as an instant: `build` resolves occurrences with
+        // `Calendar.current` (it takes no calendar), so pinning the exact `Date` compares a
+        // UTC-built fixture against local-calendar month arithmetic and drifts by an hour across a
+        // DST boundary — a January anchor is CET, the July occurrence CEST. The day and month are
+        // timezone-stable here and still pin the monthly anchoring a bare range would not.
+        let local = Calendar.current
+        XCTAssertEqual(local.component(.month, from: rebuilt.nextDueDate), 7)
+        XCTAssertEqual(local.component(.day, from: rebuilt.nextDueDate), 1)
+    }
+
+    /// Setting a first end date on a paused schedule must not resume it.
+    ///
+    /// The first cut of the pause fix asked only whether the end date *moved*, which left the same
+    /// bug one gesture over — the reactivation still fired for a schedule that had not run out.
+    func testSettingAnEndDateOnAPausedScheduleKeepsItPaused() {
+        let start = date(2026, 1, 1)
+        var existing = schedule(start: start, frequency: .monthly, nextDue: date(2026, 7, 1))
+        existing.isActive = false // paused by the user; never had an end date
+
+        let rebuilt = RecurringScheduleBuilder.build(
+            existing: existing, type: .expense, category: "Gym", amount: 60, description: "Gym",
+            startDate: start, frequency: .monthly,
+            endDate: date(2026, 12, 31), // winding it down, not restarting it
+            notificationsEnabled: true, currency: .eur, now: date(2026, 6, 22)
+        )
+
+        XCTAssertFalse(rebuilt.isActive, "Giving a paused schedule an end date must not resume it.")
+    }
+
+    /// Shortening the end date is the perverse case: reducing a schedule's life must not start it.
+    func testShorteningTheEndDateOnAPausedScheduleKeepsItPaused() {
+        let start = date(2026, 1, 1)
+        var existing = schedule(start: start, frequency: .monthly, nextDue: date(2026, 7, 1))
+        existing.endDate = date(2027, 6, 1)
+        existing.isActive = false
+
+        let rebuilt = RecurringScheduleBuilder.build(
+            existing: existing, type: .expense, category: "Gym", amount: 60, description: "Gym",
+            startDate: start, frequency: .monthly,
+            endDate: date(2026, 9, 1), // pulled in — still leaves a future occurrence
+            notificationsEnabled: true, currency: .eur, now: date(2026, 6, 22)
+        )
+
+        XCTAssertFalse(rebuilt.isActive, "Shortening a paused schedule must not resume it.")
     }
 
     /// A changed frequency also counts as a revive-worthy edit.

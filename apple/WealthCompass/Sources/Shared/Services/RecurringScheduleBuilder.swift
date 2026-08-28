@@ -26,11 +26,24 @@ enum RecurringScheduleBuilder {
             $0.frequency != frequency || abs($0.startDate.timeIntervalSince(startDate)) >= 1
         } ?? true
 
-        // Whether this edit could plausibly revive a schedule that is currently off. Used by the
-        // M21 reactivation below to tell a schedule that *lapsed* from one the user deliberately
-        // **paused**: reviving is right when the frequency, start or end date moved, and wrong when
-        // the user only fixed a typo — which used to silently restart real spending.
-        let endDateChanged = existing.map { $0.endDate != endDate } ?? true
+        // Compared by calendar day, not by instant: both editors re-derive the end date as 23:59:59
+        // *local* on every save, so an exact `Date` comparison reports a change the user never made
+        // as soon as the saving device sits in a different timezone from the one that stored it.
+        // (`scheduleChanged` above carries a 1-second tolerance on `startDate` for the same reason.)
+        let calendar = Calendar.current
+        let endDateChanged = existing.map { prior -> Bool in
+            switch (prior.endDate, endDate) {
+            case (nil, nil): return false
+            case let (priorEnd?, newEnd?): return !calendar.isDate(priorEnd, inSameDayAs: newEnd)
+            default: return true
+            }
+        } ?? true
+
+        // Whether the schedule had already run out — no occurrence left on or after `now` under its
+        // own start, frequency and end date. This is what separates a schedule that *lapsed* on its
+        // own from one the user deliberately **paused**, a distinction `isActive == false` cannot
+        // express on its own because both write the same flag.
+        let wasExhausted = existing.map { $0.firstOccurrence(onOrAfter: now) == nil } ?? true
 
         let seed = RecurringTransaction(
             id: existing?.id ?? UUID(),
@@ -64,9 +77,15 @@ enum RecurringScheduleBuilder {
             // Only when the edit could have revived it, though. This used to be unconditional, so a
             // schedule the user paused was resumed by any unrelated edit: reopening "Rent, 1200,
             // monthly", fixing the description and saving left `scheduleChanged == false` and
-            // `existing.isActive == false`, which fell through to here and set it running again.
+            // `existing.isActive == false`, which fell through to here and set it running again —
+            // and the charge then landed on the schedule's next occurrence, up to a month or a year
+            // later, far enough from the edit that nobody would connect the two.
+            //
+            // An end-date edit only counts when the schedule had actually run out. Asking merely
+            // whether the end date *moved* left the same bug one gesture over: setting a first end
+            // date on a paused schedule, or even shortening one to wind it down, resumed it.
             // Otherwise the seed's `isActive: existing?.isActive ?? true` stands, preserving pause.
-            if scheduleChanged || endDateChanged {
+            if scheduleChanged || (endDateChanged && wasExhausted) {
                 saved.isActive = true
             }
         } else {
