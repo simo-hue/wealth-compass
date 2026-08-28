@@ -330,6 +330,140 @@ final class PersistenceCoordinatorTests: XCTestCase {
         XCTAssertFalse(outcome.didChange)
     }
 
+    /// #8a: a remote apply that cannot reach disk must leave the baseline exactly where it was.
+    ///
+    /// `applyRemoteMutations` used to publish `data` and clear the sync error *before* calling this,
+    /// so a failed write showed the user records the disk did not have. `handleEvent` is non-throwing
+    /// by protocol, so the throw is swallowed, CKSyncEngine advances its change token anyway, and a
+    /// force-quit then loses the batch for good. Persisting first is only safe if a failure is
+    /// genuinely inert — the baseline un-advanced (so nothing is later diffed as a delete) and no
+    /// sync metadata written.
+    func testFailedRemoteApplyLeavesTheBaselineUnadvanced() async throws {
+        let persistence = ControllablePersistence()
+        let metadataStore = CloudSyncMetadataStore(directoryName: "WealthCompassTests-\(UUID().uuidString)")
+        let coordinator = PersistenceCoordinator(persistence: persistence, metadataStore: metadataStore)
+
+        let s0 = makeData(balance: 10)
+        await coordinator.seed(try s0.cloudSyncRecords())
+
+        let remote = makeData(balance: 20)
+        persistence.shouldThrowOnSave = true
+        do {
+            try await coordinator.applyRemote(remote)
+            XCTFail("Expected the disk write to throw.")
+        } catch {
+            // expected
+        }
+        XCTAssertNil(persistence.current, "Nothing must have reached disk.")
+
+        // It recorded no sync bookkeeping on the way out — nothing for the caller to unwind.
+        let key = try XCTUnwrap(try s0.cloudSyncRecords().keys.first)
+        XCTAssertNil(
+            metadataStore.pendingRevision(for: key),
+            "A failed remote apply must write no sync metadata, so the throw is inert."
+        )
+
+        // The baseline is still S0: saving S0 is a no-op diff, and saving the remote value is a change.
+        persistence.shouldThrowOnSave = false
+        let resaveOfS0 = try await coordinator.save(s0)
+        XCTAssertFalse(resaveOfS0.didChange, "The failed apply advanced the baseline past S0.")
+        let saveOfRemote = try await coordinator.save(remote)
+        XCTAssertTrue(saveOfRemote.didChange)
+    }
+
+    // MARK: - #3b: the same-day collapse has to leave a tombstone
+
+    /// A remote apply whose `sortedForStorage()` collapse dropped a locally-known record must record
+    /// that as a delete.
+    ///
+    /// Nothing did, so the record's hash outlived the record in `knownLocalHashes` — which
+    /// `reconcileLocalInventory` reads as token/data drift, discards the change token for, and
+    /// re-fetches the entire zone over, on every single launch. The tombstone is also the only thing
+    /// that ever removes the dropped row from the server.
+    func testCollapsedRecordIsTombstonedAndLeavesNoDrift() async throws {
+        let persistence = InMemoryPersistence()
+        let metadataStore = CloudSyncMetadataStore(directoryName: "WealthCompassTests-\(UUID().uuidString)")
+        let coordinator = PersistenceCoordinator(persistence: persistence, metadataStore: metadataStore)
+
+        // Two same-day snapshots are already on disk and tracked as synced.
+        let loser = makeSnapshot(id: "70000000-0000-0000-0000-000000000001", updatedAt: fixedDate)
+        let winner = makeSnapshot(id: "70000000-0000-0000-0000-000000000002", updatedAt: fixedDate.addingTimeInterval(60))
+        let both = FinancialData(snapshots: [loser, winner])
+        let loserKey = CloudSyncRecordKey(type: .snapshot, id: loser.id)
+        let bothRecords = try both.cloudSyncRecords()
+        await coordinator.seed(bothRecords)
+        try metadataStore.recordLocalChanges(
+            CloudSyncChangeSet(changed: Array(bothRecords.values), deleted: [], changedAt: fixedDate),
+            currentRecords: bothRecords
+        )
+
+        let winnerKey = CloudSyncRecordKey(type: .snapshot, id: winner.id)
+        let loserBefore = metadataStore.pendingRevision(for: loserKey)
+        let winnerBefore = metadataStore.pendingRevision(for: winnerKey)
+
+        // A remote apply lands and the collapse keeps only the winner.
+        let collapsed = both.sortedForStorage()
+        XCTAssertEqual(collapsed.snapshots.map(\.id), [winner.id], "fixture did not exercise the collapse")
+        try await coordinator.applyRemote(collapsed)
+
+        // Exactly one record was re-recorded: the dropped row, which now carries the delete it never
+        // got. The survivor's pending is untouched — a payload the server sent is never re-recorded
+        // as a local change, which is what keeps this path from echoing back to the server.
+        XCTAssertNotEqual(
+            metadataStore.pendingRevision(for: loserKey), loserBefore,
+            "The collapsed row must be re-recorded as a delete."
+        )
+        XCTAssertEqual(
+            metadataStore.pendingRevision(for: winnerKey), winnerBefore,
+            "A surviving record must not be re-recorded — only deletes are ever recorded here."
+        )
+
+        // And the drift self-heal now has nothing to react to: no hash without a record behind it.
+        let reconciliation = try metadataStore.reconcileLocalInventory(try collapsed.cloudSyncRecords())
+        XCTAssertFalse(
+            reconciliation.didDiscardToken,
+            "A collapsed record still tracked in knownLocalHashes reads as drift — the permanent launch loop."
+        )
+        XCTAssertTrue(reconciliation.driftedRecordKeys.isEmpty)
+    }
+
+    /// The other half of the same call: a record the *server* deleted must not be re-recorded as a
+    /// local delete. The service has already tombstoned it and is about to check the pending
+    /// revision it would bump; recording it again would enqueue a delete for a record the server
+    /// deleted, an echo of its own message.
+    func testRemotelyDeletedRecordIsNotRecordedAsALocalDelete() async throws {
+        let persistence = InMemoryPersistence()
+        let metadataStore = CloudSyncMetadataStore(directoryName: "WealthCompassTests-\(UUID().uuidString)")
+        let coordinator = PersistenceCoordinator(persistence: persistence, metadataStore: metadataStore)
+
+        let before = makeData(balance: 10)
+        let key = try XCTUnwrap(try before.cloudSyncRecords().keys.first)
+        await coordinator.seed(try before.cloudSyncRecords())
+
+        // The server deleted the only record; the apply hands over an empty snapshot.
+        try await coordinator.applyRemote(FinancialData(), remotelyDeleted: [key])
+        XCTAssertNil(
+            metadataStore.pendingRevision(for: key),
+            "A server-sent delete must not be queued back to the server as a local one."
+        )
+    }
+
+    private func makeSnapshot(id: String, updatedAt: Date) -> NetWorthSnapshot {
+        NetWorthSnapshot(
+            id: UUID(uuidString: id)!,
+            date: fixedDate,
+            totalAssets: 100,
+            totalLiabilities: 0,
+            netWorth: 100,
+            liquidity: 100,
+            investments: 0,
+            crypto: 0,
+            currency: .eur,
+            createdAt: fixedDate,
+            updatedAt: updatedAt
+        )
+    }
+
     // MARK: - FinanceStore pipeline
 
     @MainActor

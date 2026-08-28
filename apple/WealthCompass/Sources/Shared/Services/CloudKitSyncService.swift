@@ -252,6 +252,26 @@ extension FinancialData {
         return records
     }
 
+    /// The keys `cloudSyncRecords()` would produce, without encoding a single payload (#3a).
+    ///
+    /// `applyRemoteMutations` needs to know which records survived its `sortedForStorage()` collapse
+    /// on every fetched batch, and asking `cloudSyncRecords()` would put a full-dataset JSON encode
+    /// back on the main actor per batch — the cost `handleFetchedRecordZoneChanges` already goes out
+    /// of its way to avoid once bootstrap is done.
+    ///
+    /// Walks the same six collections as `cloudSyncRecords()` directly above; the two lists must not
+    /// drift apart.
+    func cloudSyncRecordKeys() -> Set<CloudSyncRecordKey> {
+        var keys = Set<CloudSyncRecordKey>()
+        keys.formUnion(transactions.map { CloudSyncRecordKey(type: .transaction, id: $0.id) })
+        keys.formUnion(recurringTransactions.map { CloudSyncRecordKey(type: .recurringTransaction, id: $0.id) })
+        keys.formUnion(investments.map { CloudSyncRecordKey(type: .investment, id: $0.id) })
+        keys.formUnion(crypto.map { CloudSyncRecordKey(type: .crypto, id: $0.id) })
+        keys.formUnion(liabilities.map { CloudSyncRecordKey(type: .liability, id: $0.id) })
+        keys.formUnion(snapshots.map { CloudSyncRecordKey(type: .snapshot, id: $0.id) })
+        return keys
+    }
+
     /// The result of applying a batch of remote mutations: the keys that were applied, and
     /// the keys that were skipped because their payload couldn't be decoded or its embedded
     /// id didn't match the record key (WC-H3). Skipping — rather than throwing — quarantines
@@ -354,6 +374,17 @@ private struct CloudSyncMetadata: Codable, Sendable {
     var records: [String: CloudSyncRecordState] = [:]
     var knownLocalHashes: [String: String] = [:]
     var lastSyncAt: Date?
+    /// Set when a fetched batch could not be written to the local database (#8b), so the next
+    /// `start()` re-fetches the whole zone instead of trusting the change token the engine advanced
+    /// past it. Cleared when a bootstrap completes.
+    ///
+    /// **Optional, and it must stay Optional.** `FinanceJSONCoding.makeDecoder()` is a plain
+    /// `JSONDecoder`, and Swift's synthesized `Decodable` does not fall back to a property's default
+    /// for a missing key: a non-optional stored property here would make every metadata file written
+    /// by an existing build throw `keyNotFound`, which `readMetadata` classifies as `.corrupt` — a
+    /// blank slate, i.e. a full zone re-bootstrap for every user on upgrade. An Optional decodes
+    /// through `decodeIfPresent` and simply reads `nil` (`testExistingMetadataWithoutTheNewKeyStillDecodes`).
+    var needsFullRefetch: Bool?
 }
 
 /// Outcome of reconciling the persisted sync inventory against the current local finance data.
@@ -624,6 +655,29 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
         read().records[key.storageKey]?.pending?.revision
     }
 
+    /// Whether the one-shot bootstrap merge has completed for this account. Read by the WC-M1
+    /// currency backfill (#9a), which must not stamp legacy rows on a device that has never seen
+    /// the server's copy of them.
+    var isBootstrapCompleted: Bool {
+        read().bootstrapCompleted
+    }
+
+    /// #8b: a fetched batch could not be written to the local database, so the records in it are
+    /// lost — CKSyncEngine's change token advanced past them regardless, because `handleEvent` is
+    /// non-throwing by protocol and cannot tell the engine its delegate failed.
+    ///
+    /// Clearing `engineState` here would not work: the engine re-persists the advanced token on its
+    /// next `.stateUpdate`. Persisting the *request* instead survives that, and survives relaunch,
+    /// until a bootstrap actually completes.
+    func requestFullRefetch() throws {
+        try update { $0.needsFullRefetch = true }
+    }
+
+    /// Whether a previous cycle (or a previous launch) asked for the whole zone to be re-fetched.
+    var needsFullRefetch: Bool {
+        read().needsFullRefetch ?? false
+    }
+
     @discardableResult
     func reconcileLocalInventory(
         _ records: [CloudSyncRecordKey: CloudSyncRecordSnapshot],
@@ -797,6 +851,15 @@ enum CloudSyncError: LocalizedError {
     }
 }
 
+/// Wraps a failure thrown by the `@MainActor` remote-apply handler (#8b).
+///
+/// A dedicated type rather than a classification at `handleEvent`'s catch: the response to this is a
+/// full-zone re-fetch, and an unrecognised CloudKit error reaching that catch for some unrelated
+/// reason must not cost one. Only the three sites that hand a batch to the local database throw it.
+struct CloudSyncApplyFailure: Error {
+    let underlying: Error
+}
+
 actor CloudKitSyncService: CKSyncEngineDelegate {
     typealias SnapshotProvider = @MainActor @Sendable () throws -> [CloudSyncRecordKey: CloudSyncRecordSnapshot]
     typealias RemoteMutationHandler = @MainActor @Sendable ([CloudSyncRemoteMutation]) async throws -> Set<CloudSyncRecordKey>
@@ -840,6 +903,12 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
     /// (#13). `isSynchronizing` only covers the manual `synchronize()` path; this covers the
     /// automatic one. Reset to 0 on engine teardown so it can never wedge `requestSync` shut.
     private var engineSyncActivity = 0
+    /// #8c: set when a fetched batch could not be written to the local database, cleared when one
+    /// is written successfully. `synchronize()` checks it before publishing `.upToDate`, because
+    /// that status would otherwise land on top of the error the failure just reported and tell the
+    /// user everything is in sync while records are missing. Actor-isolated, and reset with the
+    /// rest of the engine's live state on teardown.
+    private var remoteApplyFailed = false
     private var isStarting = false
     // CloudKit awaits and CKSyncEngine callbacks can resume after a user toggles sync.
     private var syncRequested = false
@@ -971,6 +1040,19 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                 Self.logger.error("Local finance data drifted from the persisted CloudKit change token: \(count, privacy: .public) record(s) tracked as synced are missing locally. Discarded the token and re-armed bootstrap to re-fetch from iCloud instead of deleting them.")
                 SyncDiagnosticsLog.shared.record("WARN token/data drift — \(count) record(s) missing locally; discarded token + re-fetching from iCloud (no server delete)")
             }
+            // #8b: a previous session failed to write a fetched batch to the local database. The
+            // engine's change token advanced past those records anyway, so the only way to see them
+            // again is to start with no token at all and re-run the merge. Done here, at engine
+            // construction, because clearing `engineState` at the point of failure does not work —
+            // the live engine re-persists the advanced token on its next `.stateUpdate`.
+            if metadataStore.needsFullRefetch {
+                try metadataStore.update {
+                    $0.engineState = nil
+                    $0.bootstrapCompleted = false
+                }
+                Self.logger.error("A previous remote apply failed; discarding the change token and re-fetching the whole zone.")
+                SyncDiagnosticsLog.shared.record("WARN re-fetching whole zone — a previous remote apply never reached disk")
+            }
             let preparedMetadata = metadataStore.read()
             let stateSerialization = preparedMetadata.engineState.flatMap {
                 try? FinanceJSONCoding.decode(CKSyncEngine.State.Serialization.self, from: $0)
@@ -1011,6 +1093,9 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         engine = nil
         isSynchronizing = false
         engineSyncActivity = 0
+        // #8c: live-engine state, cleared with the engine. The durable half of the same signal is
+        // `needsFullRefetch` in the metadata file, which deliberately survives this.
+        remoteApplyFailed = false
         if let existingEngine {
             await existingEngine.cancelOperations()
         }
@@ -1176,7 +1261,14 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
 
             let date = Date()
             try metadataStore.update { $0.lastSyncAt = date }
-            await statusHandler(.upToDate(date))
+            // #8c: never claim "Up to Date" when a batch this cycle fetched could not be written to
+            // disk. `handleEvent` reported that failure a moment ago, and this status would paint
+            // over it — telling the user everything is in sync while records are missing, which is
+            // exactly the state a force-quit then made permanent. The error stands until an apply
+            // succeeds (the full re-fetch armed above re-delivers the batch on the next launch).
+            if !remoteApplyFailed {
+                await statusHandler(.upToDate(date))
+            }
         } catch {
             guard isCurrent(generation, engine: engine) else { return }
             // A partial failure means some records were rejected. The benign cases (first-sync
@@ -1189,7 +1281,11 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             if let ckError = error as? CKError, Self.partialFailureIsBenign(ckError) {
                 let date = Date()
                 try? metadataStore.update { $0.lastSyncAt = date }
-                await statusHandler(.upToDate(date))
+                // #8c: same reasoning as the success path — a benign partial failure still must not
+                // publish "Up to Date" over a batch that never reached disk.
+                if !remoteApplyFailed {
+                    await statusHandler(.upToDate(date))
+                }
             } else {
                 result = "failed"
                 await report(error)
@@ -1250,7 +1346,14 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
                     bootstrapCompleted: metadata.bootstrapCompleted,
                     zoneReady: metadata.zoneReady
                 ) {
-                    try metadataStore.update { $0.bootstrapCompleted = true }
+                    try metadataStore.update {
+                        $0.bootstrapCompleted = true
+                        // #8b: a completed bootstrap is a full-zone re-fetch that reached the
+                        // local database, which is exactly what the request asked for. Clearing it
+                        // only here (never at the point it is honoured) means a crash mid-refetch
+                        // re-arms it on the next launch instead of losing the batch a second time.
+                        $0.needsFullRefetch = nil
+                    }
                     enqueuePendingRecordChanges(on: syncEngine)
                 }
 
@@ -1271,6 +1374,25 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             }
         } catch {
             guard syncRequested, engine === syncEngine else { return }
+            // #8b/#8c: a batch that could not be written to the local database is lost — this
+            // handler cannot propagate a failure to CKSyncEngine (the protocol requirement is
+            // non-throwing), so the engine's change token advances past records the user never
+            // received. Ask the next `start()` for a full re-fetch, and stop `synchronize()` from
+            // reporting "Up to Date" over the error reported just below. Recognised by type, so an
+            // unrelated error reaching this catch cannot cost a spurious re-fetch.
+            let applyFailure = error as? CloudSyncApplyFailure
+            let reportable = applyFailure?.underlying ?? error
+            if applyFailure != nil {
+                remoteApplyFailed = true
+                do {
+                    try metadataStore.requestFullRefetch()
+                } catch {
+                    // Best effort: the metadata store is unreadable, so nothing may be written over
+                    // it. `reconcileLocalInventory`'s drift self-heal is the remaining backstop.
+                    Self.logger.error("Could not record the re-fetch request for a failed remote apply: \(error.localizedDescription, privacy: .public)")
+                }
+                SyncDiagnosticsLog.shared.record("ERROR remote apply failed — full re-fetch armed: \(reportable.localizedDescription)")
+            }
             // WC-M2: only a genuine account change is fatal — tear the engine down (which
             // also disables sync to protect the previous account's data). Every other error
             // reaching this catch (a transient metadata-disk write now that WC-M3's `update`
@@ -1278,13 +1400,16 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             // engine-state encode) is reported but leaves the engine running so CKSyncEngine
             // retries — instead of permanently self-disabling sync over a recoverable
             // condition (which, with WC-H3, it was far too eager to do).
-            if Self.failureCategory(for: error) == .accountChanged {
-                Self.logger.error("CloudKit event handling hit a fatal account change: \(error.localizedDescription, privacy: .public)")
-                SyncDiagnosticsLog.shared.record("ERROR account changed — sync disabled: \(error.localizedDescription)")
-                await stopAfterFatalError(error)
+            //
+            // Classified and reported on the *unwrapped* error, so #8b's wrapper cannot change what
+            // the user is told about a failure that was already reaching this catch.
+            if Self.failureCategory(for: reportable) == .accountChanged {
+                Self.logger.error("CloudKit event handling hit a fatal account change: \(reportable.localizedDescription, privacy: .public)")
+                SyncDiagnosticsLog.shared.record("ERROR account changed — sync disabled: \(reportable.localizedDescription)")
+                await stopAfterFatalError(reportable)
             } else {
-                Self.logger.error("CloudKit event handling failed (non-fatal, will retry): \(error.localizedDescription, privacy: .public)")
-                await report(error)
+                Self.logger.error("CloudKit event handling failed (non-fatal, will retry): \(reportable.localizedDescription, privacy: .public)")
+                await report(reportable)
             }
         }
     }
@@ -1430,6 +1555,24 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             createdAt: record["createdAt"] as? Date ?? Date.distantPast,
             updatedAt: record["updatedAt"] as? Date ?? record.modificationDate ?? Date.distantPast
         )
+    }
+
+    /// The one funnel for handing a batch to the local database (#8b/#8c).
+    ///
+    /// Every call to `remoteMutationHandler` goes through here so the apply-failure signal cannot
+    /// drift between the three sites that raise it: the fetched-batch path, the server-wins conflict
+    /// path, and the server-delete conflict path. A failure is wrapped so `handleEvent`'s catch can
+    /// recognise it by type, and a success clears the "we owe the user records" flag.
+    private func applyFetchedMutations(
+        _ mutations: [CloudSyncRemoteMutation]
+    ) async throws -> Set<CloudSyncRecordKey> {
+        do {
+            let appliedKeys = try await remoteMutationHandler(mutations)
+            remoteApplyFailed = false
+            return appliedKeys
+        } catch {
+            throw CloudSyncApplyFailure(underlying: error)
+        }
     }
 
     private func handleFetchedRecordZoneChanges(
@@ -1598,7 +1741,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
 
         let appliedMutationKeys = mutations.isEmpty
             ? Set<CloudSyncRecordKey>()
-            : try await remoteMutationHandler(mutations)
+            : try await applyFetchedMutations(mutations)
         let mutationKeys = Set(mutations.map(\.key))
 
         try metadataStore.update { currentMetadata in
@@ -1804,7 +1947,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             // record whose local pending changed underneath (or that the apply skipped) is
             // requeued so the local change is re-sent rather than lost.
             if !serverWins.isEmpty {
-                let appliedKeys = try await remoteMutationHandler(serverWins.map {
+                let appliedKeys = try await applyFetchedMutations(serverWins.map {
                     CloudSyncRemoteMutation(key: $0.key, payload: $0.snapshot.payload, expectedPendingRevision: $0.expectedRevision)
                 })
                 var applyRequeue = Set<CloudSyncRecordKey>()
@@ -1899,7 +2042,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         }
 
         if shouldApplyServerDelete {
-            let appliedKeys = try await remoteMutationHandler([
+            let appliedKeys = try await applyFetchedMutations([
                 CloudSyncRemoteMutation(
                     key: key,
                     payload: nil,
@@ -2323,6 +2466,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         }
         isSynchronizing = false
         engineSyncActivity = 0
+        remoteApplyFailed = false
         if let existingEngine {
             // This teardown runs from `handleEvent(_:syncEngine:)`'s catch block, i.e. while a
             // CKSyncEngine delegate callback is still on the current task. Awaiting a re-entrant

@@ -319,6 +319,109 @@ final class AnalyticsEngineTests: XCTestCase {
         XCTAssertEqual(migrated.snapshots.first(where: { $0.id == tagged.id })?.currency, .eur, "already-tagged row untouched")
     }
 
+    // MARK: - #9: the currency backfill must not race across devices
+
+    /// #9a truth table. The backfill stamps legacy rows with THIS device's base currency — a setting
+    /// that deliberately does not sync — and records the result as an authoritative local edit, so a
+    /// sync-enabled device must not run it before it has seen the server's copy of those rows.
+    func testShouldBackfillCurrenciesWaitsForBootstrapOnlyWhenSyncing() {
+        XCTAssertTrue(
+            FinancialData.shouldBackfillCurrencies(isSyncEnabled: false, bootstrapCompleted: false),
+            "With sync off there is no other device to disagree with — stamp immediately, as before."
+        )
+        XCTAssertTrue(FinancialData.shouldBackfillCurrencies(isSyncEnabled: false, bootstrapCompleted: true))
+        XCTAssertFalse(
+            FinancialData.shouldBackfillCurrencies(isSyncEnabled: true, bootstrapCompleted: false),
+            "Syncing but never merged with the server: defer to the next launch rather than guess."
+        )
+        XCTAssertTrue(FinancialData.shouldBackfillCurrencies(isSyncEnabled: true, bootstrapCompleted: true))
+    }
+
+    /// #9b: stamping must bump `updatedAt`, and must leave an already-stamped row completely alone.
+    ///
+    /// Without the bump the stamped copy kept its original timestamp, so the other device's
+    /// unstamped copy of the same record tied it exactly and the merge fell through to its
+    /// payload-hash tie-break — which is how the currency ended up decided by a coin flip.
+    func testBackfillStampsCurrencyAndUpdatedAtInOnePass() throws {
+        let stampedAt = Date(timeIntervalSince1970: 9_000)
+        let original = Date(timeIntervalSince1970: 1_000)
+        let legacyTransaction = Transaction(
+            type: .income, category: "Salary", amount: 10, description: "",
+            date: date(2026, 6, 1), createdAt: original, updatedAt: original
+        )
+        let legacySnapshot = NetWorthSnapshot(
+            date: date(2026, 6, 1), totalAssets: 100, totalLiabilities: 0,
+            netWorth: 100, liquidity: 100, investments: 0, crypto: 0,
+            createdAt: original, updatedAt: original
+        )
+        let alreadyTagged = NetWorthSnapshot(
+            date: date(2026, 6, 2), totalAssets: 100, totalLiabilities: 0,
+            netWorth: 100, liquidity: 100, investments: 0, crypto: 0, currency: .eur,
+            createdAt: original, updatedAt: original
+        )
+
+        let (migrated, changed) = FinancialData(
+            transactions: [legacyTransaction],
+            snapshots: [legacySnapshot, alreadyTagged]
+        ).backfillingCurrencies(base: .usd, now: stampedAt)
+
+        XCTAssertTrue(changed)
+        XCTAssertEqual(migrated.transactions[0].currency, .usd)
+        XCTAssertEqual(migrated.transactions[0].updatedAt, stampedAt, "A stamped row must be strictly newer than the copy it collides with.")
+        let stamped = try XCTUnwrap(migrated.snapshots.first { $0.id == legacySnapshot.id })
+        XCTAssertEqual(stamped.currency, .usd)
+        XCTAssertEqual(stamped.updatedAt, stampedAt)
+        let untouched = try XCTUnwrap(migrated.snapshots.first { $0.id == alreadyTagged.id })
+        XCTAssertEqual(untouched.currency, .eur, "An already-stamped row must not be re-stamped…")
+        XCTAssertEqual(untouched.updatedAt, original, "…and its timestamp must not move either.")
+    }
+
+    /// The edge #9b opens, and the reason every row in the pass shares one `now`.
+    ///
+    /// `updatedAt` is the primary key of `supersedesForCollapse`, so bumping it changes which
+    /// same-day snapshot survives a collapse. Two legacy rows stamped in the same pass must stay
+    /// *tied* there, so the collapse falls through to `date` and then `id` — a rule computed from
+    /// the rows themselves, which every device therefore resolves identically. Per-row timestamps
+    /// would instead hand the decision to iteration order, and two devices would disagree.
+    ///
+    /// The pair here is deliberately arranged so the two rules disagree: the row with the *older*
+    /// original `updatedAt` carries the *greater* id. Recency would keep `recentlyEdited`; the tie
+    /// plus the id tie-break keeps `editedLongAgo`. That is a real change in which legacy same-day
+    /// row survives — it applies only to rows that predate the currency field *and* share a day,
+    /// and what matters is that it is convergent rather than order-dependent.
+    func testStampingLeavesTwoLegacySameDayRowsTiedOnUpdatedAt() throws {
+        let day = date(2026, 6, 1)
+        let recentlyEdited = NetWorthSnapshot(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
+            date: day, totalAssets: 1, totalLiabilities: 0, netWorth: 1, liquidity: 1,
+            investments: 0, crypto: 0, updatedAt: Date(timeIntervalSince1970: 5_000)
+        )
+        let editedLongAgo = NetWorthSnapshot(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!,
+            date: day, totalAssets: 2, totalLiabilities: 0, netWorth: 2, liquidity: 2,
+            investments: 0, crypto: 0, updatedAt: Date(timeIntervalSince1970: 1_000)
+        )
+        XCTAssertEqual(
+            [recentlyEdited, editedLongAgo].collapsedByCalendarDay(calendar: utc).first?.id,
+            recentlyEdited.id,
+            "Unstamped, recency decides."
+        )
+
+        let (migrated, _) = FinancialData(snapshots: [recentlyEdited, editedLongAgo])
+            .backfillingCurrencies(base: .usd, now: Date(timeIntervalSince1970: 9_000))
+        let stampedRecent = try XCTUnwrap(migrated.snapshots.first { $0.id == recentlyEdited.id })
+        let stampedOld = try XCTUnwrap(migrated.snapshots.first { $0.id == editedLongAgo.id })
+
+        XCTAssertEqual(stampedRecent.updatedAt, stampedOld.updatedAt, "One pass, one instant — the pair must stay tied.")
+        XCTAssertTrue(stampedOld.supersedesForCollapse(stampedRecent), "Tied on updatedAt and date, the greater id wins.")
+        // And the same answer whichever order the rows arrive in, on either device.
+        XCTAssertEqual(
+            migrated.snapshots.collapsedByCalendarDay(calendar: utc).first?.id,
+            migrated.snapshots.reversed().collapsedByCalendarDay(calendar: utc).first?.id
+        )
+        XCTAssertEqual(migrated.snapshots.collapsedByCalendarDay(calendar: utc).first?.id, editedLongAgo.id)
+    }
+
     // MARK: - Same-day snapshot collapse (deep-audit H14)
 
     func testCollapsedByCalendarDayKeepsLatestPerDay() {

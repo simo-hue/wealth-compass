@@ -1628,7 +1628,17 @@ final class FinanceStore: ObservableObject {
             // the base currency so old cash stays anchored to it instead of floating when the
             // user later changes their base currency. Records below are taken from the original
             // (pre-migration) `loadedData`, so the post-init save persists exactly these stamps.
-            let (migrated, didBackfill) = loadedData.backfillingCurrencies(base: settings?.currency ?? .eur)
+            //
+            // #9a: deferred on a sync-enabled device until its bootstrap merge has run, because the
+            // stamp uses THIS device's base currency — a setting that does not sync — and is
+            // recorded as an authoritative local edit. See `shouldBackfillCurrencies`.
+            let mayBackfill = FinancialData.shouldBackfillCurrencies(
+                isSyncEnabled: isICloudSyncEnabledResolved,
+                bootstrapCompleted: syncMetadataStore.isBootstrapCompleted
+            )
+            let (migrated, didBackfill) = mayBackfill
+                ? loadedData.backfillingCurrencies(base: settings?.currency ?? .eur)
+                : (loadedData, false)
             needsCurrencyBackfillSave = didBackfill
             // Plain assignment, not withAnimation: `load()` can run during a view update, where
             // animating a `@Published` write emits "Publishing changes from within view updates"
@@ -2054,18 +2064,51 @@ final class FinanceStore: ObservableObject {
         // every key is treated as not-applied by the caller.
         guard !outcome.appliedKeys.isEmpty else { return [] }
         updatedData = updatedData.sortedForStorage()
+        // #3a: `sortedForStorage()` collapses duplicate same-day snapshots, so a record this batch
+        // just applied can be gone from the snapshot we are about to persist. Reporting it as
+        // applied made the service write its hash into `knownLocalHashes` with no record behind it —
+        // the exact signature `reconcileLocalInventory` reads as token/data drift, so every launch
+        // discarded the change token, re-fetched the whole zone, re-applied and re-collapsed it,
+        // forever. Reporting the collapsed-away keys as NOT applied routes them into the service's
+        // conservative branch, which updates `systemFields` only and leaves the hashes untouched.
+        let appliedKeys = outcome.appliedKeys.intersection(updatedData.cloudSyncRecordKeys())
+        guard !appliedKeys.isEmpty else { return [] }
+        // Route the disk write through the coordinator so local + remote writes serialize
+        // and never interleave, and so the diff baseline advances to the applied records.
+        //
+        // #8a: persist BEFORE publishing. `data` used to be assigned first, which showed the user
+        // records the disk did not have — and `handleEvent` is non-throwing by protocol, so a throw
+        // from here is swallowed by its catch: CKSyncEngine never learns the delegate failed, its
+        // change token advances anyway, and `synchronize` publishes `.upToDate` over the error just
+        // reported. A force-quit after a failed write therefore lost the batch permanently, having
+        // already displayed it. A throw leaves the coordinator's baseline un-advanced and writes no
+        // sync metadata (the changeset below it runs only after a successful disk write), so there
+        // is no bookkeeping to unwind — the records are simply not applied.
+        let publishedVersion = dataVersion
+        try await coordinator.applyRemote(
+            updatedData,
+            // Records the server deleted are already tombstoned by the service; see `applyRemote`.
+            remotelyDeleted: Set(applicableMutations.lazy.filter { $0.payload == nil }.map(\.key))
+        )
         // Update the in-memory data synchronously on the main actor so the UI stays
         // responsive and reads stay consistent. Plain assignment (no withAnimation):
         // remote applies are driven from CloudKit callbacks and can land during a SwiftUI
         // view update, which makes `withAnimation` emit "Publishing changes from within
         // view updates" and forces expensive animation transactions during bulk sync.
-        data = updatedData
+        if dataVersion == publishedVersion {
+            data = updatedData
+        } else {
+            // Persisting first introduced a suspension point between reading `data` and writing it
+            // back, so the main actor can now run a user edit (or a re-entrant remote batch) while
+            // the disk write is in flight. Assigning the pre-write copy would silently discard it;
+            // re-applying this batch onto the live value keeps both, and the ordinary save pipeline
+            // writes the union — the disk already holds the remote half.
+            data.applyCloudSyncMutations(applicableMutations)
+            save()
+        }
         iCloudSyncError = nil
-        // Route the disk write through the coordinator so local + remote writes serialize
-        // and never interleave, and so the diff baseline advances to the applied records.
-        try await coordinator.applyRemote(updatedData)
-        applied = outcome.appliedKeys.count
-        return outcome.appliedKeys
+        applied = appliedKeys.count
+        return appliedKeys
     }
 
     private func updateCloudSyncStatus(_ status: CloudSyncStatus) {
@@ -2118,25 +2161,60 @@ extension FinancialData {
             || !crypto.isEmpty || !liabilities.isEmpty || !snapshots.isEmpty
     }
 
+    /// Whether the WC-M1 currency backfill may run on this launch (#9a).
+    ///
+    /// The backfill stamps legacy rows with **this device's** base currency — a per-device setting
+    /// that deliberately does not sync — and `save()` records the result with `origin: .localChange`,
+    /// which the merge treats as an authoritative edit. Two devices with different base currencies
+    /// therefore produced two different payloads for the same record id, and the user's legacy money
+    /// was denominated by whichever one the merge happened to pick.
+    ///
+    /// A sync-enabled device must not guess before it has seen the server's copy, so it waits for
+    /// the bootstrap merge; there is nothing to lose by waiting, because every consumer already
+    /// reads `currency ?? displayCurrency` and the next launch stamps whatever is still legacy. With
+    /// sync off there is no other device to disagree with, so it runs immediately as it always did.
+    ///
+    /// This depends on `e6981cb`: before it, `bootstrapCompleted` latched on a fetch that never
+    /// reached the server, so this gate would have opened on exactly the offline device it is meant
+    /// to hold back. It is also the safe direction when the metadata store is inert (unreadable
+    /// file): that reads as "not bootstrapped", which defers rather than guesses.
+    static func shouldBackfillCurrencies(isSyncEnabled: Bool, bootstrapCompleted: Bool) -> Bool {
+        !isSyncEnabled || bootstrapCompleted
+    }
+
     /// One-time WC-M1 / deep-audit H11 migration: stamps legacy transactions, recurring schedules,
     /// and net-worth snapshots that predate the per-record `currency` field (so their `currency` is
     /// `nil`) with `base`. This freezes pre-existing cash **and stored history** at the base currency
     /// in effect at first launch after the update, instead of letting them silently re-value when the
     /// user later changes their base currency. Stamped snapshots then reconvert correctly on a base
     /// change (`AnalyticsEngine.snapshots`) rather than being read at the wrong scale.
-    func backfillingCurrencies(base: Currency) -> (data: FinancialData, didChange: Bool) {
+    ///
+    /// Stamping also bumps `updatedAt` (#9b). Without it the stamped copy carried the *original*
+    /// timestamp, so a second device's unstamped copy of the same record tied it exactly and the
+    /// merge fell through to its payload-hash tie-break — arbitrary, and the reason the currency was
+    /// decided by a coin flip rather than by which device stamped last. A strictly newer timestamp
+    /// makes the stamped copy win recency on every path (`bootstrapDecision`, `conflictAction`).
+    ///
+    /// Every row in the pass takes the **same** `now`, and that matters: `updatedAt` is the primary
+    /// key of `supersedesForCollapse`, so per-row timestamps would let one legacy same-day snapshot
+    /// beat another on nothing but iteration order. Sharing one instant keeps such a pair tied there
+    /// and lets the collapse fall through to `date`, then `id`, exactly as it did before.
+    func backfillingCurrencies(base: Currency, now: Date = Date()) -> (data: FinancialData, didChange: Bool) {
         var copy = self
         var changed = false
         for index in copy.transactions.indices where copy.transactions[index].currency == nil {
             copy.transactions[index].currency = base
+            copy.transactions[index].updatedAt = now
             changed = true
         }
         for index in copy.recurringTransactions.indices where copy.recurringTransactions[index].currency == nil {
             copy.recurringTransactions[index].currency = base
+            copy.recurringTransactions[index].updatedAt = now
             changed = true
         }
         for index in copy.snapshots.indices where copy.snapshots[index].currency == nil {
             copy.snapshots[index].currency = base
+            copy.snapshots[index].updatedAt = now
             changed = true
         }
         return (copy, changed)
@@ -2249,11 +2327,37 @@ actor PersistenceCoordinator {
     }
 
     /// Persists a snapshot produced by applying remote mutations and advances the baseline
-    /// to match. No changeset is recorded — the change originated remotely, and the sync
-    /// engine has already updated its own metadata for these records.
-    func applyRemote(_ snapshot: FinancialData) throws {
+    /// to match. The change originated remotely and the sync engine has already updated its own
+    /// metadata for these records, so the only changeset recorded is the one nobody else can see:
+    /// the records the caller's `sortedForStorage()` collapse dropped (#3b).
+    func applyRemote(
+        _ snapshot: FinancialData,
+        remotelyDeleted: Set<CloudSyncRecordKey> = []
+    ) throws {
         let newRecords = try snapshot.cloudSyncRecords()
+        // #3b: `applyRemoteMutations` runs `sortedForStorage()` before handing the snapshot over,
+        // and its same-day snapshot collapse can drop a record that is still tracked as synced.
+        // Nothing recorded that as a delete, so the hash outlived the record — which
+        // `reconcileLocalInventory` reads as token/data drift, discarding the change token and
+        // re-fetching the whole zone on every launch. Recording it also gives the dropped row the
+        // tombstone it never got, instead of leaving it on the server forever.
+        //
+        // Only `deleted:` is ever passed here, never `changed:`, so a payload the server just sent
+        // can never be re-uploaded from this path as a local edit. `remotelyDeleted` is subtracted
+        // because the service tombstones those keys itself: recording them again would enqueue a
+        // delete for a record the server already deleted, and bump the pending revision the
+        // service's post-apply write is about to check.
+        let collapsed = Set(lastSavedRecords.keys)
+            .subtracting(newRecords.keys)
+            .subtracting(remotelyDeleted)
         try persistence.save(snapshot, preserving: preservedRecordKeys)
         lastSavedRecords = newRecords
+        // Deliberately after the disk write, so a failed write still leaves sync metadata untouched
+        // and there is nothing for #8a's caller to unwind.
+        guard !collapsed.isEmpty else { return }
+        try metadataStore.recordLocalChanges(
+            CloudSyncChangeSet(changed: [], deleted: Array(collapsed), changedAt: Date()),
+            currentRecords: newRecords
+        )
     }
 }

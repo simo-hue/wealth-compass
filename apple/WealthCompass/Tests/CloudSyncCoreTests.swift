@@ -425,6 +425,187 @@ final class CloudSyncCoreTests: XCTestCase {
         )
     }
 
+    // MARK: - #8b: surviving a failed remote apply
+
+    /// **The upgrade guard.** An existing user's metadata file has no `needsFullRefetch` key, and it
+    /// must still decode.
+    ///
+    /// `FinanceJSONCoding.makeDecoder()` is a plain `JSONDecoder`, and Swift's synthesized
+    /// `Decodable` does NOT fall back to a property's default for a missing key — it throws
+    /// `keyNotFound` (pinned below, because that is the language behaviour the design rests on).
+    /// `readMetadata` classifies a decode failure as `.corrupt`, whose response is a blank slate:
+    /// no change token, no bootstrap flag, no per-record state. So a *non-optional* new property
+    /// here would have handed every existing user a full zone re-bootstrap on upgrade. The field is
+    /// `Bool?` precisely so this file decodes, through `decodeIfPresent`, into `nil`.
+    func testExistingMetadataWithoutTheNewKeyStillDecodes() throws {
+        // First, the mechanism the field's Optionality is defending against.
+        struct WithNonOptionalAddition: Codable { var existing = 0; var added = false }
+        struct WithOptionalAddition: Codable { var existing = 0; var added: Bool? }
+        let legacyRecord = Data(#"{"existing":7}"#.utf8)
+        XCTAssertThrowsError(
+            try FinanceJSONCoding.decode(WithNonOptionalAddition.self, from: legacyRecord),
+            "A non-optional addition must fail on a file that predates it — the whole reason for Bool?."
+        ) { error in
+            guard case DecodingError.keyNotFound = error else {
+                return XCTFail("Expected keyNotFound, got \(error)")
+            }
+        }
+        XCTAssertEqual(try FinanceJSONCoding.decode(WithOptionalAddition.self, from: legacyRecord).existing, 7)
+
+        // And now the real file: every field this build declares except the new one.
+        let directoryName = "WealthCompassTests-\(UUID().uuidString)"
+        let key = CloudSyncRecordKey(
+            type: .transaction,
+            id: UUID(uuidString: "44444444-0000-0000-0000-000000000004")!
+        )
+        try writeSyncMetadata(
+            """
+            {"schemaVersion":1,"accountRecordName":"_userrecordname","bootstrapCompleted":true,
+             "zoneReady":true,"records":{"\(key.storageKey)":{"isTombstone":false}},
+             "knownLocalHashes":{"\(key.storageKey)":"0f0f0f0f"}}
+            """,
+            directoryName: directoryName
+        )
+
+        let store = CloudSyncMetadataStore(directoryName: directoryName)
+        XCTAssertFalse(store.needsFullRefetch, "An absent key must read as 'no re-fetch requested'.")
+        XCTAssertTrue(
+            store.isBootstrapCompleted,
+            "The file was treated as corrupt — a blank slate, i.e. a full re-bootstrap for every existing user."
+        )
+        // The strongest evidence the file was really read: its `knownLocalHashes` still describe a
+        // record, so reconciling against empty local data reports drift for exactly that record. A
+        // blank slate would report none.
+        let reconciliation = try store.reconcileLocalInventory([:])
+        XCTAssertEqual(reconciliation.driftedRecordKeys, [key], "The persisted inventory did not survive the decode.")
+    }
+
+    /// The re-fetch request has to outlive the process: the batch is lost the moment CKSyncEngine
+    /// advances its token, and the only place that can act on it is the next `start()`.
+    func testFullRefetchRequestSurvivesRelaunch() throws {
+        let directoryName = "WealthCompassTests-\(UUID().uuidString)"
+        let store = CloudSyncMetadataStore(directoryName: directoryName)
+        XCTAssertFalse(store.needsFullRefetch)
+
+        try store.requestFullRefetch()
+        XCTAssertTrue(store.needsFullRefetch)
+
+        // A second store over the same file is what the next launch sees.
+        XCTAssertTrue(
+            CloudSyncMetadataStore(directoryName: directoryName).needsFullRefetch,
+            "The request must be persisted — clearing `engineState` in memory does not work, the engine re-persists the advanced token."
+        )
+    }
+
+    // MARK: - #3a: a collapsed-away record must not be reported as applied
+
+    /// `applyRemoteMutations` applies the batch and *then* runs `sortedForStorage()`, whose same-day
+    /// snapshot collapse drops the loser. Reporting that key as applied let the service write its
+    /// hash into `knownLocalHashes` with no record behind it — a hash with nothing under it is the
+    /// drift signature, so every launch discarded the change token and re-fetched the whole zone.
+    func testCollapsedAwaySnapshotIsExcludedFromTheAppliedKeys() throws {
+        // Identical `date`, so the two rows share a calendar day in every time zone.
+        let day = fixedDate
+        let loser = makeSnapshot(
+            id: UUID(uuidString: "77777777-0000-0000-0000-000000000001")!,
+            date: day,
+            netWorth: 100,
+            updatedAt: Date(timeIntervalSince1970: 1_000)
+        )
+        let winner = makeSnapshot(
+            id: UUID(uuidString: "88888888-0000-0000-0000-000000000002")!,
+            date: day,
+            netWorth: 200,
+            updatedAt: Date(timeIntervalSince1970: 2_000)
+        )
+        let loserKey = CloudSyncRecordKey(type: .snapshot, id: loser.id)
+        let winnerKey = CloudSyncRecordKey(type: .snapshot, id: winner.id)
+
+        let stored = FinancialData(snapshots: [loser, winner]).sortedForStorage()
+        XCTAssertEqual(stored.snapshots.count, 1, "Two same-day rows must collapse to one.")
+        XCTAssertEqual(stored.snapshots.first?.id, winner.id)
+        XCTAssertTrue(winner.supersedesForCollapse(loser), "The survivor must be the one the total order picks.")
+
+        // Both keys were applied by `applyCloudSyncMutations`; only one survived to be persisted.
+        let applied: Set<CloudSyncRecordKey> = [loserKey, winnerKey]
+        let reported = applied.intersection(stored.cloudSyncRecordKeys())
+        XCTAssertEqual(reported, [winnerKey], "Only the record that reached the snapshot may be reported as applied.")
+    }
+
+    /// `cloudSyncRecordKeys()` exists to answer "what survived" without a full-dataset JSON encode
+    /// on the main actor, so it walks the six collections a second time. This pins the two walks
+    /// together — a seventh syncable collection added to one and not the other would silently make
+    /// every record of that type read as collapsed-away.
+    func testRecordKeysAgreeWithTheEncodedRecords() throws {
+        let data = FinancialData(
+            transactions: [makeTransaction(id: UUID(uuidString: "10000000-0000-0000-0000-0000000000A1")!, amount: 1)],
+            recurringTransactions: [
+                RecurringTransaction(
+                    id: UUID(uuidString: "20000000-0000-0000-0000-0000000000A2")!,
+                    type: .expense, category: "Housing", amount: 1200, description: "Rent",
+                    startDate: fixedDate, frequency: .monthly, nextDueDate: fixedDate, endDate: nil,
+                    notificationsEnabled: false, isActive: true, completedAt: nil,
+                    createdAt: fixedDate, updatedAt: fixedDate
+                )
+            ],
+            investments: [
+                Investment(
+                    id: UUID(uuidString: "30000000-0000-0000-0000-0000000000A3")!,
+                    type: .stock, symbol: "AAPL", name: "Apple", quantity: 1, costBasis: 100,
+                    currentValue: 120, currentPrice: 120, currency: .usd, geography: "US",
+                    sector: "Tech", isin: "", fees: 0, updatedAt: fixedDate, createdAt: fixedDate
+                )
+            ],
+            crypto: [
+                CryptoHolding(
+                    id: UUID(uuidString: "40000000-0000-0000-0000-0000000000A4")!,
+                    symbol: "BTC", name: "Bitcoin", quantity: 1, avgBuyPrice: 100, currentPrice: 120,
+                    currency: .usd, fees: 0, coinId: "bitcoin", updatedAt: fixedDate, createdAt: fixedDate
+                )
+            ],
+            liabilities: [
+                Liability(
+                    id: UUID(uuidString: "50000000-0000-0000-0000-0000000000A5")!,
+                    name: "Loan", currentBalance: 10, currency: .eur,
+                    createdAt: fixedDate, updatedAt: fixedDate
+                )
+            ],
+            snapshots: [
+                makeSnapshot(
+                    id: UUID(uuidString: "60000000-0000-0000-0000-0000000000A6")!,
+                    date: fixedDate, netWorth: 1, updatedAt: fixedDate
+                )
+            ]
+        )
+        XCTAssertEqual(data.cloudSyncRecordKeys(), Set(try data.cloudSyncRecords().keys))
+        XCTAssertEqual(data.cloudSyncRecordKeys().count, 6, "One key per syncable collection.")
+    }
+
+    private func makeSnapshot(id: UUID, date: Date, netWorth: Decimal, updatedAt: Date) -> NetWorthSnapshot {
+        NetWorthSnapshot(
+            id: id,
+            date: date,
+            totalAssets: netWorth,
+            totalLiabilities: 0,
+            netWorth: netWorth,
+            liquidity: netWorth,
+            investments: 0,
+            crypto: 0,
+            currency: .eur,
+            createdAt: fixedDate,
+            updatedAt: updatedAt
+        )
+    }
+
+    /// Writes a sync-metadata file where `CloudSyncMetadataStore(directoryName:)` will look for it.
+    private func writeSyncMetadata(_ json: String, directoryName: String) throws {
+        let directory = try XCTUnwrap(
+            FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+        ).appendingPathComponent(directoryName, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try Data(json.utf8).write(to: directory.appendingPathComponent("wealth-compass-cloud-sync.json"))
+    }
+
     // MARK: - #8 fetch-first bootstrap: per-record merge decision
     //
     // `bootstrapDecision` is the collision-avoidance heart of the first-sync merge: the
@@ -750,6 +931,65 @@ final class CloudSyncCoreTests: XCTestCase {
 
         // Unreadable server payload (nil) → keep local; never apply nil.
         XCTAssertEqual(CloudKitSyncService.conflictAction(pending: inventoryPending(), local: older, server: nil), .requeueLocal)
+    }
+
+    // MARK: - #9b: a stamped legacy row must win recency, not a coin flip
+
+    /// The failure this fixes, and the fix, on the two decisions that resolve it.
+    ///
+    /// `backfillingCurrencies` stamps legacy rows with this device's base currency — which does not
+    /// sync — and `save()` records that as `origin: .localChange`. Two devices with different base
+    /// currencies therefore produce two different payloads for the same record id. While the stamp
+    /// left `updatedAt` alone, those payloads carried *identical* timestamps, so both
+    /// `bootstrapDecision` and `conflictAction` fell through to the payload-hash tie-break and the
+    /// user's legacy money was denominated by whichever hash happened to sort higher. Bumping
+    /// `updatedAt` makes the stamped copy strictly newer, so it wins on recency instead.
+    func testStampedLegacyRowBeatsTheUnstampedCopyOnRecency() throws {
+        let original = Date(timeIntervalSince1970: 1_000)
+        let legacy = Transaction(
+            id: UUID(uuidString: "99999999-0000-0000-0000-000000000009")!,
+            type: .income, category: "Salary", amount: 1234, description: "",
+            date: fixedDate, currency: nil, createdAt: original, updatedAt: original
+        )
+        let key = CloudSyncRecordKey(type: .transaction, id: legacy.id)
+        let unstamped = try XCTUnwrap(try FinancialData(transactions: [legacy]).cloudSyncRecords()[key])
+
+        // What the other device still holds vs. what this one just stamped.
+        let (migrated, didChange) = FinancialData(transactions: [legacy])
+            .backfillingCurrencies(base: .usd, now: Date(timeIntervalSince1970: 5_000))
+        XCTAssertTrue(didChange)
+        let stamped = try XCTUnwrap(try migrated.cloudSyncRecords()[key])
+        XCTAssertNotEqual(stamped.payloadHash, unstamped.payloadHash, "The stamp changes the payload — that is the collision.")
+        XCTAssertGreaterThan(stamped.updatedAt, unstamped.updatedAt)
+
+        // Both decisions now resolve on recency, from either side of the wire.
+        XCTAssertEqual(
+            CloudKitSyncService.bootstrapDecision(pending: nil, local: stamped, remote: unstamped), .local,
+            "The stamped copy is the later write and must win the bootstrap merge."
+        )
+        XCTAssertEqual(
+            CloudKitSyncService.bootstrapDecision(pending: nil, local: unstamped, remote: stamped), .remote,
+            "…and must win it from the other device's point of view too."
+        )
+        XCTAssertEqual(
+            CloudKitSyncService.conflictAction(pending: nil, local: stamped, server: unstamped), .requeueLocal
+        )
+        XCTAssertEqual(
+            CloudKitSyncService.conflictAction(pending: nil, local: unstamped, server: stamped), .applyServer
+        )
+
+        // And the state before the fix, kept as the record of what "arbitrary" meant here: with the
+        // timestamps tied, nothing but the payload hash separates the two, so the outcome flips with
+        // the bytes rather than with anything the user did.
+        var stampedWithOriginalTimestamp = try XCTUnwrap(migrated.transactions.first)
+        stampedWithOriginalTimestamp.updatedAt = original
+        let tied = try XCTUnwrap(try FinancialData(transactions: [stampedWithOriginalTimestamp]).cloudSyncRecords()[key])
+        XCTAssertEqual(tied.updatedAt, unstamped.updatedAt)
+        XCTAssertEqual(
+            CloudKitSyncService.bootstrapDecision(pending: nil, local: tied, remote: unstamped),
+            tied.payloadHash > unstamped.payloadHash ? .local : .remote,
+            "Tied timestamps hand the currency to a hash comparison — the coin flip #9b removes."
+        )
     }
 
     // MARK: - #14 sync error classification
