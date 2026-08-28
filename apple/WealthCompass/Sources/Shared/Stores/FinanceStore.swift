@@ -1001,11 +1001,13 @@ final class FinanceStore: ObservableObject {
         return result
     }
 
-    /// Single conversion boundary for a freshly fetched market price: converts a `Double` price in
+    /// Single conversion boundary for a freshly fetched market price: converts a `Decimal` price in
     /// `sourceCurrency` — or the holding's own currency when the source is unknown (Finnhub) — into
-    /// `holdingCurrency`, crossing to `Decimal` at the money boundary. Returns nil for a non-finite
-    /// quote so a bad value is dropped, not stored (WC-A1 / WC-H1). The convert is a no-op when
-    /// source == holding currency, so H2 (never re-base a holding's currency) holds.
+    /// `holdingCurrency`. The price arrives as a `Decimal` decoded straight from the provider's JSON
+    /// token, so there is no crossing here at all; only the FX multiply inside `convert` uses
+    /// `Double`, because the rate itself is one. Returns nil for a non-finite quote so a bad value
+    /// is dropped, not stored (WC-A1 / WC-H1). The convert is a no-op when source == holding
+    /// currency, so H2 (never re-base a holding's currency) holds.
     private func storedPrice(
         _ price: Decimal,
         from sourceCurrency: Currency?,

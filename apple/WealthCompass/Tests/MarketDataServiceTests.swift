@@ -42,8 +42,11 @@ final class MarketDataServiceTests: XCTestCase {
     /// Asserted with `Decimal(string:)`, never a float literal: `Decimal`'s
     /// `ExpressibleByFloatLiteral` conformance goes through `Double`, so `Decimal` written as
     /// `1234.56` in source *is* the mangled value and the assertion would pass either way.
+    /// `"0.1"` is the control, not a regression case: it is one of the few short decimals that is
+    /// binary-exact, so `Decimal(0.1) == Decimal(string: "0.1")` and it would pass under the old
+    /// pipeline too. The other four each differ, so they are what actually discriminates.
     func testDecodeChartKeepsThePriceExact() throws {
-        for literal in ["1234.56", "105.07", "0.1", "99999999.99", "1.005"] {
+        for literal in ["1234.56", "105.07", "99999999.99", "1.005", "0.1"] {
             let quote = try YahooQuoteClient.decodeChart(
                 json(#"{"chart":{"result":[{"meta":{"currency":"EUR","regularMarketPrice":\#(literal)}}]}}"#),
                 requestedSymbol: "X"
