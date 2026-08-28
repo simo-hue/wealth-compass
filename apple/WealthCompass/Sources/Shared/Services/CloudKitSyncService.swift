@@ -1861,13 +1861,30 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
         local: CloudSyncRecordSnapshot?,
         remote: CloudSyncRecordSnapshot
     ) -> BootstrapDecision {
-        guard let local else { return .remote }
-        if local.payloadHash == remote.payloadHash {
+        // Evaluated *before* the `local == nil` guard on purpose. A pending delete always implies
+        // there is no local snapshot — removing the record from local data is what created the
+        // delete — so testing `local` first made the `.delete` arm below unreachable in production
+        // and resolved every delete-vs-edit collision to `.remote`/`.applyServer`, silently
+        // resurrecting the record and clearing the user's pending delete. Both callers handle
+        // `.local` by requeuing the pending mutation, which for a delete re-sends the delete.
+        // An identical local copy short-circuits whatever the pending is: there is nothing to
+        // resolve, and dropping the redundant upload is what stops a second already-populated
+        // device re-inserting records that already exist remotely (#8). This stays *above* the
+        // delete check because a pending delete can transiently coexist with a local snapshot —
+        // `processSave` freezes the snapshot and then awaits the coordinator, so a record
+        // re-created with the same id in that window leaves `data` holding it while the metadata
+        // still says `.delete`, and `snapshotProvider` reads `data` live.
+        if let local, local.payloadHash == remote.payloadHash {
             return .identical
         }
 
+        if case .delete = pending { return .local }
+
+        guard let local else { return .remote }
+
         switch pending {
         case .delete:
+            // Unreachable — handled above. Kept so the switch stays exhaustive.
             return .local
         case .save(_, _, .localChange, _):
             return .local

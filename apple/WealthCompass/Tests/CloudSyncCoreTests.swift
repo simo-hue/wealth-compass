@@ -479,7 +479,60 @@ final class CloudSyncCoreTests: XCTestCase {
         let local = bootstrapSnapshot(payload: "local", updatedAt: Date(timeIntervalSince1970: 1_000))
         let remote = bootstrapSnapshot(payload: "remote", updatedAt: Date(timeIntervalSince1970: 9_000))
         XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: localChangePending(), local: local, remote: remote), .local)
-        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: deletePending(), local: local, remote: remote), .local)
+        // `local:` is nil here on purpose — see `testPendingDeleteWithNoLocalSnapshotStillWins`.
+        XCTAssertEqual(CloudKitSyncService.bootstrapDecision(pending: deletePending(), local: nil, remote: remote), .local)
+    }
+
+    /// A pending delete must win even though it carries no local snapshot.
+    ///
+    /// A pending `.delete` *always* implies `local == nil` — removing the record from local data is
+    /// what created the delete — so the `guard let local else { return .remote }` above the switch
+    /// made the `.delete` arm unreachable in production, and every delete-vs-edit collision
+    /// resolved to `.applyServer`. The assertion in the test above used to pass a non-nil `local`
+    /// alongside a delete-pending, a combination that cannot occur, so it was green and proved
+    /// nothing.
+    ///
+    /// Device A edits transaction R and uploads. Device B deletes R and sends before it fetches, so
+    /// CloudKit rejects with `.serverRecordChanged` and hands back A's live record. B then adopted
+    /// it — R reappeared on both devices and B's pending delete was cleared, with no error shown.
+    func testPendingDeleteWithNoLocalSnapshotStillWins() {
+        let remote = bootstrapSnapshot(payload: "remote", updatedAt: Date(timeIntervalSince1970: 9_000))
+
+        XCTAssertEqual(
+            CloudKitSyncService.bootstrapDecision(pending: deletePending(), local: nil, remote: remote),
+            .local,
+            "A deliberate local delete must not lose to the server copy it is deleting."
+        )
+        XCTAssertEqual(
+            CloudKitSyncService.conflictAction(pending: deletePending(), local: nil, server: remote),
+            .requeueLocal,
+            "A delete-vs-edit collision must re-send the delete, not adopt the server record."
+        )
+    }
+
+    /// A pending delete that transiently coexists with an *identical* local copy still short-circuits.
+    ///
+    /// `processSave` freezes the snapshot on the main actor and then awaits the coordinator, which
+    /// writes the pending delete off-main — so a record re-created with the same id in that window
+    /// leaves `data` holding it while the metadata still says `.delete`, and `snapshotProvider`
+    /// reads `data` live. Resolving that to `.local` would upload a tombstone for a record that is
+    /// present and byte-identical to the server's, deleting it on every other device before the
+    /// next save diffed it back in.
+    func testPendingDeleteWithAnIdenticalLocalCopyIsIdentical() {
+        let payload = "same"
+        let local = bootstrapSnapshot(payload: payload, updatedAt: Date(timeIntervalSince1970: 1_000))
+        let remote = bootstrapSnapshot(payload: payload, updatedAt: Date(timeIntervalSince1970: 9_000))
+
+        XCTAssertEqual(
+            CloudKitSyncService.bootstrapDecision(pending: deletePending(), local: local, remote: remote),
+            .identical,
+            "An identical local copy must short-circuit before the delete arm."
+        )
+        XCTAssertEqual(
+            CloudKitSyncService.conflictAction(pending: deletePending(), local: local, server: remote),
+            .adoptServerIdentical,
+            "The redundant upload must be dropped, not turned into a tombstone."
+        )
     }
 
     /// With only inventory-origin pending (or none), the more recently updated side wins.
