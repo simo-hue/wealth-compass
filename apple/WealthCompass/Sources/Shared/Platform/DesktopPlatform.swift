@@ -82,14 +82,6 @@ extension Notification.Name {
 import SwiftUI
 
 extension View {
-    /// A Mac window/sheet size floor, applied only on macOS.
-    ///
-    /// These numbers exist because a Mac window is the *user's* to drag, and the content needs a
-    /// floor below which it stops working. An iPad window is sized by the system instead, and the
-    /// sizes it hands out include a 320pt Slide Over — where a 520pt floor does not protect the
-    /// layout, it pushes it off the screen. Off macOS this is a no-op and the platform's own
-    /// sheet and window sizing wins.
-    @ViewBuilder
     /// Brings up the decimal keypad for a money or quantity field on touch.
     ///
     /// `keyboardType` does not exist on macOS, so the Desktop layer had none of these — and it now
@@ -130,6 +122,14 @@ extension View {
         #endif
     }
 
+    /// A Mac window/sheet size floor, applied only on macOS.
+    ///
+    /// These numbers exist because a Mac window is the *user's* to drag, and the content needs a
+    /// floor below which it stops working. An iPad window is sized by the system instead, and the
+    /// sizes it hands out include a 320pt Slide Over — where a 520pt floor does not protect the
+    /// layout, it pushes it off the screen. Off macOS this is a no-op and the platform's own
+    /// sheet and window sizing wins.
+    @ViewBuilder
     func desktopWindowSize(
         minWidth: CGFloat,
         idealWidth: CGFloat? = nil,

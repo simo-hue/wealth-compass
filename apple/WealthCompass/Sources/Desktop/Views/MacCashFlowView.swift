@@ -619,6 +619,16 @@ struct MacCashFlowView: View {
                 .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
                 .font(.title2)
 
+            // `ViewThatFits` measures a candidate's *ideal* width, and a text column's ideal is the
+            // widest single-line child — the trap CLAUDE.md documents and `onboardingCard` already
+            // works around. Uncapped, the metadata line alone reports ~264-297pt with a real date
+            // (and the description is unbounded), which pushed the single-row candidate's ideal past
+            // 545pt and made it lose on a **Mac** in a ~1310-1580pt window band, where the
+            // two-column split shrinks this card to ~537pt. Rows that had always been one line
+            // started stacking — and only the *active* ones, since a paused row's metadata is
+            // shorter, so one card held two different row shapes.
+            //
+            // Capping the column, not one line inside it, is what actually bounds the candidate.
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 8) {
                     Text(LocalizedStringKey(schedule.category))
@@ -654,6 +664,7 @@ struct MacCashFlowView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
+
                 if !schedule.description.isEmpty {
                     Text(schedule.description)
                         .font(.caption)
@@ -661,6 +672,10 @@ struct MacCashFlowView: View {
                         .lineLimit(1)
                 }
             }
+            // 200, not the ~264-297pt the line naturally reports: on macOS candidate 1's ideal is
+            // then icon 20 + spacing 56 + 200 + amount 140 + actions 92 = 508pt against the 543pt
+            // this card gets in a 1440pt window — a 35pt margin rather than a 15pt one.
+            .frame(idealWidth: 200, alignment: .leading)
 
         }
     }
@@ -671,7 +686,13 @@ struct MacCashFlowView: View {
             .font(.headline.monospacedDigit())
             .foregroundStyle(schedule.type == .income ? WCColor.primary : WCColor.destructive)
             .frame(minWidth: 140, alignment: .trailing)
-            .fixedSize()
+            // Deliberately NOT `.fixedSize()`. The stacked rung is the last one, so nothing catches
+            // it if it overflows: with the action cluster now a fixed 188pt of 44pt targets, a
+            // pinned amount took the row to 364pt against an iPad mini's 366pt of card interior,
+            // and a long value like "−CHF 1,234,567.89" ran the trash button off the card. Scaling
+            // the glyphs is the graceful failure; leaving the pane is not.
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
     }
 
     private func recurringRowActions(_ schedule: RecurringTransaction) -> some View {

@@ -839,7 +839,7 @@ struct MacSelectorIsland<Tab: MacSelectorTab>: View {
                         #if os(macOS)
                         .padding(.vertical, 6)
                         #else
-                        .padding(.vertical, 13)
+                        .padding(.vertical, 14)
                         #endif
                         .background {
                             if selection == tab {

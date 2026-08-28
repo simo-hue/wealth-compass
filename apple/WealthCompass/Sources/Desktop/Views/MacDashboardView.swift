@@ -197,11 +197,23 @@ struct MacDashboardView: View {
             dashboardHeaderRow
             VStack(alignment: .leading, spacing: 14) {
                 dashboardHeaderTitle
+                // No outer `.fixedSize()`: both children already carry their own, and pinning the
+                // row on top of that made it incompressible in the *last* rung, so it overflowed
+                // rather than wrapped. With Privacy Mode on the pill and button measure 431pt in
+                // French and 496pt in Russian against an iPad mini's ~426pt, and the button was
+                // drawn off the pane — worse than the truncation this set out to fix.
                 HStack(spacing: 12) {
                     dashboardHeaderPrivacyPill
                     dashboardHeaderAddButton
                 }
-                .fixedSize()
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            // Last rung: the pill above the button, for the locales where even that row is too wide.
+            VStack(alignment: .leading, spacing: 12) {
+                dashboardHeaderTitle
+                dashboardHeaderPrivacyPill
+                dashboardHeaderAddButton
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }

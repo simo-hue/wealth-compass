@@ -330,6 +330,7 @@ private struct MacInvestmentEditor: View {
                             : settings.localized("Investment Transaction Fee %"),
                         text: $feeValue
                     )
+                    .desktopDecimalField()
 
                     LabeledContent("Investment Fee") {
                         Text(calculatedFee.formatted(.currency(code: currency.rawValue).locale(settings.effectiveLocale)))
@@ -540,6 +541,7 @@ private struct MacCryptoEditor: View {
                             : settings.localized("Fee Percentage"),
                         text: $feeValue
                     )
+                    .desktopDecimalField()
 
                     LabeledContent("Calculated Fee") {
                         Text(calculatedFee.formatted(.currency(code: currency.rawValue).locale(settings.effectiveLocale)))

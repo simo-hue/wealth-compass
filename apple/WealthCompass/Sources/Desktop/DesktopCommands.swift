@@ -86,6 +86,9 @@ struct DesktopCommands: Commands {
                 appModel.selection = .settings
             }
             .keyboardShortcut(",", modifiers: .command)
+            // The same guard as Navigate above: with the data unloaded the root replaces the split
+            // view entirely, so there is no Settings destination for this to select.
+            .disabled(finance.loadState != .loaded)
         }
         #endif
 
