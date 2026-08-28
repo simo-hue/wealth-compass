@@ -15,7 +15,7 @@ final class MarketDataServiceTests: XCTestCase {
             json(#"{"chart":{"result":[{"meta":{"currency":"EUR","symbol":"VWCE.MI","regularMarketPrice":123.45,"regularMarketTime":1717621200}}],"error":null}}"#),
             requestedSymbol: "VWCE.MI"
         )
-        XCTAssertEqual(quote.price, 123.45, accuracy: 0.0001)
+        XCTAssertEqual(quote.price, Decimal(string: "123.45"))
         XCTAssertEqual(quote.currency, .eur)
         XCTAssertEqual(quote.asOf, Date(timeIntervalSince1970: 1_717_621_200))
         XCTAssertEqual(quote.provider, "Yahoo Finance")
@@ -27,8 +27,51 @@ final class MarketDataServiceTests: XCTestCase {
             json(#"{"chart":{"result":[{"meta":{"currency":"GBp","regularMarketPrice":9000.0,"regularMarketTime":1717621200}}]}}"#),
             requestedSymbol: "VWRL.L"
         )
-        XCTAssertEqual(quote.price, 90.0, accuracy: 0.0001)
+        XCTAssertEqual(quote.price, Decimal(string: "90"), "pence must divide exactly, with no binary drift")
         XCTAssertEqual(quote.currency, .gbp)
+    }
+
+    /// A provider price must reach storage with every digit intact (WC-A1).
+    ///
+    /// `MarketPriceQuote.price` was a `Double`, and the refresh wrote it through `Decimal(Double)`
+    /// — which is not exact for ordinary money. Each literal below is one `Decimal(Double)` mangles;
+    /// `1234.56` becomes `1234.5599999999997952`. That value was then stored in the database and
+    /// written to the user's backup, and it is the exact corruption class `FinanceJSONCoding` was
+    /// rewritten to eliminate, reintroduced at the market-data ingest point.
+    ///
+    /// Asserted with `Decimal(string:)`, never a float literal: `Decimal`'s
+    /// `ExpressibleByFloatLiteral` conformance goes through `Double`, so `Decimal` written as
+    /// `1234.56` in source *is* the mangled value and the assertion would pass either way.
+    func testDecodeChartKeepsThePriceExact() throws {
+        for literal in ["1234.56", "105.07", "0.1", "99999999.99", "1.005"] {
+            let quote = try YahooQuoteClient.decodeChart(
+                json(#"{"chart":{"result":[{"meta":{"currency":"EUR","regularMarketPrice":\#(literal)}}]}}"#),
+                requestedSymbol: "X"
+            )
+            XCTAssertEqual(
+                quote.price, Decimal(string: literal),
+                "\(literal) did not survive the decode exactly"
+            )
+            // The drift this guards against is ~1e-13, far below any `accuracy:` an assertion
+            // would plausibly use, so compare the rendered digits too.
+            XCTAssertEqual("\(quote.price)", literal, "\(literal) decoded as \(quote.price)")
+        }
+    }
+
+    /// The I1 no-churn guard compares the stored price against the incoming one, so drift also
+    /// meant a hand-entered price never matched its own refreshed value — every refresh rewrote
+    /// the record, bumped `updatedAt` and re-uploaded it to CloudKit.
+    func testARefreshedPriceMatchesTheSameHandEnteredPrice() throws {
+        let handEntered = Decimal(string: "1234.56")!
+        let quote = try YahooQuoteClient.decodeChart(
+            json(#"{"chart":{"result":[{"meta":{"currency":"EUR","regularMarketPrice":1234.56}}]}}"#),
+            requestedSymbol: "X"
+        )
+        XCTAssertEqual(quote.price, handEntered, "an unchanged price must compare equal, or it churns")
+        XCTAssertNotEqual(
+            handEntered, Decimal(1234.56),
+            "sanity: the old Double bridge really does produce a different value"
+        )
     }
 
     func testDecodeChartThrowsOnProviderError() {

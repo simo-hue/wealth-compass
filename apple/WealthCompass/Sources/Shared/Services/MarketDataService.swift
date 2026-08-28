@@ -18,7 +18,13 @@ private enum MarketDataLog {
 }
 
 struct MarketPriceQuote: Equatable {
-    let price: Double
+    /// `Decimal`, not `Double`, and decoded straight from the JSON token (WC-A1). This is stored
+    /// money: it lands in `Investment.currentPrice` and is written to the database and the backup.
+    /// Crossing `Double` here was not lossless for ordinary prices — `Decimal(1234.56)` is
+    /// `1234.5599999999997952` — and because the I1 no-churn guard compares the stored price to the
+    /// incoming one, the drift also meant a hand-entered `1234.56` never matched, so every refresh
+    /// rewrote the record and re-uploaded it to CloudKit.
+    let price: Decimal
     /// The currency `price` is quoted in, or `nil` when the source doesn't report one (Finnhub's
     /// `/quote`). The refresh pipeline maps a `nil` currency to the holding's own currency at its
     /// single conversion point, so an unknown currency never causes a wrong FX hop.
@@ -363,12 +369,12 @@ struct FinnhubQuoteClient {
 
 /// A coin's live prices from CoinGecko, resolved per requested currency in one call.
 struct CoinGeckoCoinQuote {
-    let prices: [Currency: Double]
+    let prices: [Currency: Decimal]
     let asOf: Date
 
     /// Resolves the price in `currency`, falling back to EUR (then any available
     /// currency) if the provider didn't return the requested one.
-    func resolved(in currency: Currency) -> (price: Double, currency: Currency)? {
+    func resolved(in currency: Currency) -> (price: Decimal, currency: Currency)? {
         if let value = prices[currency] { return (value, currency) }
         if let eur = prices[.eur] { return (eur, .eur) }
         return prices.first.map { ($0.value, $0.key) }
@@ -460,7 +466,7 @@ struct CoinGeckoPriceClient {
 
         let payload = try MarketDataJSON.decoder.decode([String: CoinGeckoSimplePriceResponse].self, from: data)
         return payload.compactMapValues { value in
-            var resolved: [Currency: Double] = [:]
+            var resolved: [Currency: Decimal] = [:]
             for currency in requested {
                 if let price = value.price(for: currency) {
                     resolved[currency] = price
@@ -729,10 +735,11 @@ struct YahooQuoteClient {
         // Yahoo quotes some London listings in pence ("GBp"/"GBX"); normalize to major units so
         // the stored price isn't 100× off. Any currency outside our table fails cleanly (a safe
         // no-update) rather than risking a wrong value.
-        let price: Double
+        let price: Decimal
         let isoCode: String
         if rawCurrency == "GBp" || rawCurrency == "GBX" {
-            price = rawPrice / 100.0
+            // Exact in `Decimal`: a pence quote divided by 100 keeps every digit.
+            price = rawPrice / 100
             isoCode = "GBP"
         } else {
             price = rawPrice
@@ -810,7 +817,7 @@ private struct YahooChartResponse: Decodable {
 
     struct Meta: Decodable {
         let currency: String?
-        let regularMarketPrice: Double?
+        let regularMarketPrice: Decimal?
         let regularMarketTime: TimeInterval?
     }
 }
@@ -839,7 +846,7 @@ private struct YahooSearchResponse: Decodable {
 }
 
 private struct FinnhubQuoteResponse: Decodable {
-    let currentPrice: Double?
+    let currentPrice: Decimal?
     let timestamp: TimeInterval?
 
     private enum CodingKeys: String, CodingKey {
@@ -852,7 +859,7 @@ private struct FinnhubQuoteResponse: Decodable {
 /// requested `vs_currency` (lowercased ISO code) plus `last_updated_at`. Decoded
 /// dynamically so any currency the app requests is supported without code changes.
 private struct CoinGeckoSimplePriceResponse: Decodable {
-    let prices: [String: Double]
+    let prices: [String: Decimal]
     let lastUpdatedAt: TimeInterval?
 
     private struct DynamicKey: CodingKey {
@@ -864,20 +871,20 @@ private struct CoinGeckoSimplePriceResponse: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicKey.self)
-        var collected: [String: Double] = [:]
+        var collected: [String: Decimal] = [:]
         var updatedAt: TimeInterval?
         for key in container.allKeys {
             if key.stringValue == "last_updated_at" {
                 updatedAt = try? container.decode(TimeInterval.self, forKey: key)
             } else {
                 do {
-                    collected[key.stringValue] = try container.decode(Double.self, forKey: key)
+                    collected[key.stringValue] = try container.decode(Decimal.self, forKey: key)
                 } catch {
                     // L46: the key is present (it came from `allKeys`), so a decode failure means the
                     // value is present-but-wrong-type — a provider format drift, not a merely-absent
                     // currency. Log it (still tolerating it: the currency is dropped, not fatal) so a
                     // mass "no price" outage from a payload change is diagnosable instead of silent.
-                    MarketDataLog.logger.warning("CoinGecko /simple/price value for \(key.stringValue, privacy: .public) was present but not a Double: \(String(describing: error), privacy: .public)")
+                    MarketDataLog.logger.warning("CoinGecko /simple/price value for \(key.stringValue, privacy: .public) was present but not a number: \(String(describing: error), privacy: .public)")
                 }
             }
         }
@@ -885,7 +892,7 @@ private struct CoinGeckoSimplePriceResponse: Decodable {
         lastUpdatedAt = updatedAt
     }
 
-    func price(for currency: Currency) -> Double? {
+    func price(for currency: Currency) -> Decimal? {
         guard let value = prices[currency.rawValue.lowercased()], value > 0, value.isFinite else {
             return nil
         }

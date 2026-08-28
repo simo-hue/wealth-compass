@@ -745,7 +745,7 @@ final class FinanceStore: ObservableObject {
         // Each provider yields a price in its own (native) currency; the single conversion to the
         // holding's currency happens once at the apply loop below. H2 (never re-base a holding's
         // currency) holds because that conversion is a no-op when source == holding currency.
-        var cryptoQuotes: [UUID: (id: String, price: Double, currency: Currency, asOf: Date)] = [:]
+        var cryptoQuotes: [UUID: (id: String, price: Decimal, currency: Currency, asOf: Date)] = [:]
 
         if data.investments.isEmpty {
             result.skippedInvestments = []
@@ -1007,13 +1007,17 @@ final class FinanceStore: ObservableObject {
     /// quote so a bad value is dropped, not stored (WC-A1 / WC-H1). The convert is a no-op when
     /// source == holding currency, so H2 (never re-base a holding's currency) holds.
     private func storedPrice(
-        _ price: Double,
+        _ price: Decimal,
         from sourceCurrency: Currency?,
         to holdingCurrency: Currency,
         settings: AppSettings
     ) -> Decimal? {
+        guard price.isFinite else { return nil }
+        // The `Decimal` overload returns the value untouched when source == target, so a holding
+        // quoted in its own currency — the common case — never crosses `Double` at all. Only the
+        // FX multiply does, which is the second sanctioned crossing (the rate is itself a `Double`).
         let converted = settings.convert(price, from: sourceCurrency ?? holdingCurrency, to: holdingCurrency)
-        return Decimal(finite: converted)
+        return converted.isFinite ? converted : nil
     }
 
     private let snapshotEngine = SnapshotEngine()
