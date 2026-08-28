@@ -717,21 +717,25 @@ actor RecurringNotificationService {
         if let seconds = Int(stamp) {
             return Date(timeIntervalSinceReferenceDate: TimeInterval(seconds))
         }
+        // The date components the **superseded** identifier form stamped, in the order it stamped
+        // them. A local rather than a `static`: as type-level storage it needed a `nonisolated`
+        // annotation to satisfy strict concurrency, and `nonisolated(unsafe)` is exactly what
+        // `testTheErasePathNamesEveryReminderItOwns` forbids in this file — rightly, since state
+        // that survives between calls here could filter still-backed banners out of the erase path
+        // and leave wiped data describing itself on the lock screen. Nothing else reads it, so
+        // there is no reason for it to be type-level at all.
+        let legacyStampFields: [WritableKeyPath<DateComponents, Int?>] = [
+            \.year, \.month, \.day, \.hour, \.minute,
+        ]
         let fields = stamp.split(separator: "-", omittingEmptySubsequences: false)
-        guard fields.count == Self.legacyStampFields.count else { return nil }
+        guard fields.count == legacyStampFields.count else { return nil }
         var components = DateComponents()
-        for (field, text) in zip(Self.legacyStampFields, fields) {
+        for (field, text) in zip(legacyStampFields, fields) {
             guard let value = Int(text) else { return nil }
             components[keyPath: field] = value
         }
         return Calendar.current.date(from: components)
     }
-
-    /// The date components the **superseded** identifier form stamped, in the order it stamped them.
-    /// Read only by `coalescedMoment`'s migration branch; nothing writes this shape any more.
-    private nonisolated static let legacyStampFields: [WritableKeyPath<DateComponents, Int?>] = [
-        \.year, \.month, \.day, \.hour, \.minute,
-    ]
 
     /// Drops one schedule's reminder, pending or already delivered.
     ///

@@ -79,6 +79,14 @@ final class AppNotificationDelegate: NSObject, UIApplicationDelegate, UNUserNoti
         cloudKitPushLog.error("Failed to register for remote notifications: \(error.localizedDescription, privacy: .public)")
     }
 
+    // Under `SWIFT_STRICT_CONCURRENCY = targeted` this is the target's one residual warning, and
+    // it is not ours to fix: `[AnyHashable: Any]` is UIKit's signature, it is not `Sendable`, and
+    // it cannot be made so. `nonisolated`, `@preconcurrency` on the conformance and
+    // `@preconcurrency` on the method were all tried and none removes it — the first two move the
+    // wording, the third does nothing. Left plain and documented rather than annotated to look
+    // solved. Harmless in practice: the payload is never read (a silent CloudKit push carries
+    // nothing this app needs, only the fact that the zone changed), so nothing crosses that is
+    // then used. It becomes an error in the Swift 6 language mode and has to be revisited there.
     func application(
         _ application: UIApplication,
         didReceiveRemoteNotification userInfo: [AnyHashable: Any]
