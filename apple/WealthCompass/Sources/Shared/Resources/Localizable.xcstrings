@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "\n\n%lld due recurring transactions were added to Cash Flow." : {
       "localizations" : {
         "ar" : {
@@ -1680,8 +1683,12 @@
         }
       }
     },
-    "%@\n\nWealth Compass Tracker will continue using the built-in offline fallback rates." : {},
-    "%@\n\nWealth Compass Tracker will continue using the last cached rates." : {},
+    "%@\n\nWealth Compass Tracker will continue using the built-in offline fallback rates." : {
+
+    },
+    "%@\n\nWealth Compass Tracker will continue using the last cached rates." : {
+
+    },
     "%@ (%@)" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3808,6 +3815,7 @@
       }
     },
     "%@ is scheduled. Open Wealth Compass Tracker to review it." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4226,6 +4234,215 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "%@ 淨額"
+          }
+        }
+      }
+    },
+    "%@ performance" : {
+      "comment" : "%@ is an already-formatted percentage including its locale-correct percent sign.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ الأداء"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ de rendiment"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Výkon %@"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ ydeevne"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ Leistung"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ απόδοση"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ rendimiento"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ rendimiento"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ suorituskykyä"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ performances"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ ביצועים"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ प्रदर्शन"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ učinak"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ teljesítmény"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ kinerja"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ di prestazioni"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ のパフォーマンス"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ 성능"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ prestasi"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ ytelse"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ prestatie"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ wydajności"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ desempenho"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ desempenho"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ performanță"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ производительность"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Výkon %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ prestanda"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ ประสิทธิภาพ"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ performans"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Продуктивність %@."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ hiệu suất"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ 性能"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ 效能"
           }
         }
       }
@@ -6558,6 +6775,424 @@
         }
       }
     },
+    "%@: no CoinGecko price for %@" : {
+      "comment" : "Market-data refresh summary. %1$@ is the ticker symbol, %2$@ the CoinGecko coin id.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: لا يوجد سعر CoinGecko لـ %2$@"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: cap preu de CoinGecko per a %2$@"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: v CoinGecku není cena pro %2$@"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: ingen CoinGecko-pris for %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: kein CoinGecko-Preis für %2$@"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: δεν υπάρχει τιμή CoinGecko για %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: no hay precio de CoinGecko para %2$@"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: no hay precio de CoinGecko para %2$@"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: ei CoinGecko-hintaa kohteelle %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ : aucun prix CoinGecko pour %2$@"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: אין מחיר CoinGecko עבור %2$@"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%2$@ के लिए %1$@: कोई CoinGecko मूल्य नहीं"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: nema CoinGecko cijene za %2$@"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: nincs CoinGecko-ár ehhez: %2$@"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: tidak ada harga CoinGecko untuk %2$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: nessun prezzo CoinGecko per %2$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: %2$@ の CoinGecko 価格がありません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: %2$@에 대한 CoinGecko 가격 없음"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: tiada harga CoinGecko untuk %2$@"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: ingen CoinGecko-pris for %2$@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: geen CoinGecko-prijs voor %2$@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: brak ceny CoinGecko dla %2$@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: nenhum preço do CoinGecko para %2$@"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: nenhum preço do CoinGecko para %2$@"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: niciun preț CoinGecko pentru %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: нет цены CoinGecko для %2$@"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: v CoinGecku nie je cena pre %2$@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: inget CoinGecko-pris för %2$@"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: ไม่มีราคา CoinGecko สำหรับ %2$@"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: %2$@ için CoinGecko fiyatı yok"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: немає ціни CoinGecko для %2$@"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@: không có giá CoinGecko cho %2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@：没有 %2$@ 的 CoinGecko 价格"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@：沒有 %2$@ 的 CoinGecko 價格"
+          }
+        }
+      }
+    },
+    "%@: no matching CoinGecko coin" : {
+      "comment" : "Shown per holding in the market-data refresh summary. %@ is the ticker symbol.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: لا توجد عملة مطابقة في CoinGecko"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: cap moneda de CoinGecko coincident"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: v CoinGecku nenalezena odpovídající mince"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: ingen matchende CoinGecko-mønt"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: keine passende CoinGecko-Münze"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: δεν βρέθηκε αντίστοιχο νόμισμα CoinGecko"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: no hay una moneda de CoinGecko coincidente"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: no hay una moneda de CoinGecko coincidente"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: ei vastaavaa CoinGecko-kolikkoa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ : aucune cryptomonnaie CoinGecko correspondante"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: לא נמצא מטבע תואם ב-CoinGecko"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: कोई मेल खाता CoinGecko सिक्का नहीं"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: nema odgovarajuće CoinGecko kriptovalute"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: nincs megfelelő CoinGecko-érme"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: tidak ada koin CoinGecko yang cocok"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: nessuna criptovaluta CoinGecko corrispondente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: 一致する CoinGecko の通貨がありません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: 일치하는 CoinGecko 코인 없음"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: tiada syiling CoinGecko yang sepadan"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: ingen samsvarende CoinGecko-mynt"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: geen overeenkomende CoinGecko-munt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: brak pasującej monety w CoinGecko"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: nenhuma moeda do CoinGecko correspondente"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: nenhuma moeda do CoinGecko correspondente"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: nicio monedă CoinGecko corespunzătoare"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: подходящая монета в CoinGecko не найдена"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: v CoinGecku sa nenašla zodpovedajúca minca"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: inget matchande CoinGecko-mynt"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: ไม่พบเหรียญ CoinGecko ที่ตรงกัน"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: eşleşen CoinGecko parası yok"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: відповідну монету в CoinGecko не знайдено"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@: không có đồng CoinGecko phù hợp"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@：未找到匹配的 CoinGecko 币种"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@：找不到相符的 CoinGecko 幣種"
+          }
+        }
+      }
+    },
     "%@. Fetched %@ and cached locally." : {
       "localizations" : {
         "ar" : {
@@ -7847,6 +8482,7 @@
       }
     },
     "%@%%" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8899,24 +9535,6 @@
         "ar" : {
           "variations" : {
             "plural" : {
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "لم تتم إضافة أي معاملات مجدولة إلى التدفق النقدي."
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "تمت إضافة معاملة مجدولة واحدة إلى التدفق النقدي."
-                }
-              },
-              "two" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "تمت إضافة معاملتين مجدولتين إلى التدفق النقدي."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -8929,10 +9547,28 @@
                   "value" : "تمت إضافة %lld معاملة مجدولة إلى التدفق النقدي."
                 }
               },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "تمت إضافة معاملة مجدولة واحدة إلى التدفق النقدي."
+                }
+              },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "تمت إضافة %lld معاملة مجدولة إلى التدفق النقدي."
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "تمت إضافة معاملتين مجدولتين إلى التدفق النقدي."
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لم تتم إضافة أي معاملات مجدولة إلى التدفق النقدي."
                 }
               }
             }
@@ -8959,12 +9595,6 @@
         "cs" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "Do Cash Flow byla přidána %lld naplánovaná transakce."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -8975,6 +9605,12 @@
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "Do Cash Flow bylo přidáno %lld naplánovaných transakcí."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Cash Flow byla přidána %lld naplánovaná transakce."
                 }
               },
               "other" : {
@@ -9169,16 +9805,16 @@
         "hr" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "U Novčani tok dodana je %lld planirana transakcija."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "U Novčani tok dodane su %lld planirane transakcije."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "U Novčani tok dodana je %lld planirana transakcija."
                 }
               },
               "other" : {
@@ -9337,12 +9973,6 @@
         "pl" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "Do Przepływu środków pieniężnych dodano %lld zaplanowaną transakcję."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -9353,6 +9983,12 @@
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "Do Przepływu środków pieniężnych dodano %lld zaplanowanych transakcji."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Przepływu środków pieniężnych dodano %lld zaplanowaną transakcję."
                 }
               },
               "other" : {
@@ -9403,16 +10039,16 @@
         "ro" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "%lld tranzacție programată a fost adăugată la Fluxul de numerar."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "%lld tranzacții programate au fost adăugate la Fluxul de numerar."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld tranzacție programată a fost adăugată la Fluxul de numerar."
                 }
               },
               "other" : {
@@ -9427,12 +10063,6 @@
         "ru" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "В Денежный поток добавлена %lld запланированная транзакция."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -9443,6 +10073,12 @@
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "В Денежный поток добавлено %lld запланированных транзакций."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "В Денежный поток добавлена %lld запланированная транзакция."
                 }
               },
               "other" : {
@@ -9457,12 +10093,6 @@
         "sk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "Do Cash Flow bola pridaná %lld naplánovaná transakcia."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -9473,6 +10103,12 @@
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "Do Cash Flow bolo pridaných %lld naplánovaných transakcií."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Do Cash Flow bola pridaná %lld naplánovaná transakcia."
                 }
               },
               "other" : {
@@ -9541,12 +10177,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "До Грошового потоку додано %lld заплановану транзакцію."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -9557,6 +10187,12 @@
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "До Грошового потоку додано %lld запланованих транзакцій."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "До Грошового потоку додано %lld заплановану транзакцію."
                 }
               },
               "other" : {
@@ -9630,18 +10266,6 @@
         "ar" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "يُدرج إدخال واحد بتاريخ مستقبلي باللون الرمادي. وهو مستبعد من الأرصدة والمجاميع الفرعية أعلاه، بما يطابق طريقة عرض التطبيق للنقد الحالي."
-                }
-              },
-              "two" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "يُدرج إدخالان بتاريخ مستقبلي باللون الرمادي. وهما مستبعدان من الأرصدة والمجاميع الفرعية أعلاه، بما يطابق طريقة عرض التطبيق للنقد الحالي."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -9654,10 +10278,22 @@
                   "value" : "يُدرج %lld إدخالاً بتواريخ مستقبلية باللون الرمادي. وهي مستبعدة من الأرصدة والمجاميع الفرعية أعلاه، بما يطابق طريقة عرض التطبيق للنقد الحالي."
                 }
               },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "يُدرج إدخال واحد بتاريخ مستقبلي باللون الرمادي. وهو مستبعد من الأرصدة والمجاميع الفرعية أعلاه، بما يطابق طريقة عرض التطبيق للنقد الحالي."
+                }
+              },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "يُدرج %lld إدخال بتواريخ مستقبلية باللون الرمادي. وهي مستبعدة من الأرصدة والمجاميع الفرعية أعلاه، بما يطابق طريقة عرض التطبيق للنقد الحالي."
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "يُدرج إدخالان بتاريخ مستقبلي باللون الرمادي. وهما مستبعدان من الأرصدة والمجاميع الفرعية أعلاه، بما يطابق طريقة عرض التطبيق للنقد الحالي."
                 }
               }
             }
@@ -9684,12 +10320,6 @@
         "cs" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "%lld položka s budoucím datem je uvedena šedě. Je vyloučena ze zůstatků a mezisoučtů výše, stejně jako aplikace vykazuje aktuální hotovost."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -9700,6 +10330,12 @@
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "%lld položek s budoucím datem je uvedeno šedě. Jsou vyloučeny ze zůstatků a mezisoučtů výše, stejně jako aplikace vykazuje aktuální hotovost."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld položka s budoucím datem je uvedena šedě. Je vyloučena ze zůstatků a mezisoučtů výše, stejně jako aplikace vykazuje aktuální hotovost."
                 }
               },
               "other" : {
@@ -9894,16 +10530,16 @@
         "hr" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "%lld stavka s budućim datumom prikazana je sivo. Isključena je iz stanja i međuzbrojeva iznad, jednako kao što aplikacija prikazuje trenutačni novac."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "%lld stavke s budućim datumom prikazane su sivo. Isključene su iz stanja i međuzbrojeva iznad, jednako kao što aplikacija prikazuje trenutačni novac."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld stavka s budućim datumom prikazana je sivo. Isključena je iz stanja i međuzbrojeva iznad, jednako kao što aplikacija prikazuje trenutačni novac."
                 }
               },
               "other" : {
@@ -10062,12 +10698,6 @@
         "pl" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "%lld pozycja z przyszłą datą jest wyświetlona na szaro. Jest wyłączona z powyższych sald i sum częściowych, tak samo jak aplikacja liczy bieżącą gotówkę."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -10078,6 +10708,12 @@
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "%lld pozycji z przyszłą datą jest wyświetlonych na szaro. Są wyłączone z powyższych sald i sum częściowych, tak samo jak aplikacja liczy bieżącą gotówkę."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld pozycja z przyszłą datą jest wyświetlona na szaro. Jest wyłączona z powyższych sald i sum częściowych, tak samo jak aplikacja liczy bieżącą gotówkę."
                 }
               },
               "other" : {
@@ -10128,16 +10764,16 @@
         "ro" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "%lld înregistrare cu dată viitoare este afișată cu gri. Este exclusă din soldurile și subtotalurile de mai sus, la fel cum aplicația raportează numerarul curent."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "%lld înregistrări cu dată viitoare sunt afișate cu gri. Sunt excluse din soldurile și subtotalurile de mai sus, la fel cum aplicația raportează numerarul curent."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld înregistrare cu dată viitoare este afișată cu gri. Este exclusă din soldurile și subtotalurile de mai sus, la fel cum aplicația raportează numerarul curent."
                 }
               },
               "other" : {
@@ -10152,12 +10788,6 @@
         "ru" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "%lld запись с будущей датой показана серым. Она исключена из остатков и промежуточных итогов выше — так же, как приложение считает текущие наличные."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -10168,6 +10798,12 @@
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "%lld записей с будущей датой показано серым. Они исключены из остатков и промежуточных итогов выше — так же, как приложение считает текущие наличные."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld запись с будущей датой показана серым. Она исключена из остатков и промежуточных итогов выше — так же, как приложение считает текущие наличные."
                 }
               },
               "other" : {
@@ -10182,12 +10818,6 @@
         "sk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "%lld položka s budúcim dátumom je uvedená sivou. Je vylúčená zo zostatkov a medzisúčtov vyššie, rovnako ako aplikácia vykazuje aktuálnu hotovosť."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -10198,6 +10828,12 @@
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "%lld položiek s budúcim dátumom je uvedených sivou. Sú vylúčené zo zostatkov a medzisúčtov vyššie, rovnako ako aplikácia vykazuje aktuálnu hotovosť."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld položka s budúcim dátumom je uvedená sivou. Je vylúčená zo zostatkov a medzisúčtov vyššie, rovnako ako aplikácia vykazuje aktuálnu hotovosť."
                 }
               },
               "other" : {
@@ -10266,12 +10902,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "%lld запис із майбутньою датою показано сірим. Його виключено з наведених вище залишків і проміжних підсумків — так само, як застосунок обліковує поточну готівку."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -10282,6 +10912,12 @@
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "%lld записів із майбутньою датою показано сірим. Їх виключено з наведених вище залишків і проміжних підсумків — так само, як застосунок обліковує поточну готівку."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld запис із майбутньою датою показано сірим. Його виключено з наведених вище залишків і проміжних підсумків — так само, як застосунок обліковує поточну готівку."
                 }
               },
               "other" : {
@@ -13893,6 +14529,633 @@
         }
       }
     },
+    "1M" : {
+      "comment" : "Compact label for a time RANGE selector (net worth / cash flow history). The letter is a duration unit — W=week, M=month, Y=year — never a magnitude. It was previously mistranslated as 'million' in a dozen locales.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 شهر"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mes"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 měs."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 md."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 Mon."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 μήν."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mes"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mes"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 kk"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mois"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "חודש 1"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 माह"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mj."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 hó"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 bln"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mese"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1か月"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1개월"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 bln"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mnd."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mnd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mies."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mês"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mês"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 lună"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 мес."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mes."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mån"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 เดือน"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 ay"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 міс."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 tháng"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1个月"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1個月"
+          }
+        }
+      }
+    },
+    "1W" : {
+      "comment" : "Compact label for a time RANGE selector (net worth / cash flow history). The letter is a duration unit — W=week, M=month, Y=year — never a magnitude. It was previously mistranslated as 'million' in a dozen locales.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 أسبوع"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 setm."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 týd."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 uge"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 Wo."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 εβδ."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 sem."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 sem."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 vk"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 sem."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "שבוע 1"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 सप्ताह"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 tj."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 hét"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mgg"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 sett."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1週間"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1주"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 mgu"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 uke"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 wk"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 tydz."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 sem."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 sem."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 săpt."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 нед."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 týž."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 v."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 สัปดาห์"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 hf."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 тиж."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 tuần"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1周"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1週"
+          }
+        }
+      }
+    },
+    "1Y" : {
+      "comment" : "Compact label for a time RANGE selector (net worth / cash flow history). The letter is a duration unit — W=week, M=month, Y=year — never a magnitude. It was previously mistranslated as 'million' in a dozen locales.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 سنة"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 any"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 rok"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 år"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 J."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 έτος"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 año"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 año"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 v"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 an"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "שנה 1"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 वर्ष"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 g."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 év"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 thn"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 anno"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1年"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1년"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 thn"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 år"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 jr"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 rok"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 ano"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 ano"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 an"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 год"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 rok"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 år"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 ปี"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 yıl"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 рік"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 năm"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1年"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1年"
+          }
+        }
+      }
+    },
     "3M" : {
       "comment" : "Compact label for a time RANGE selector (net worth / cash flow history). The letter is a duration unit — W=week, M=month, Y=year — never a magnitude. It was previously mistranslated as 'million' in a dozen locales.",
       "extractionState" : "manual",
@@ -15582,7 +16845,9 @@
         }
       }
     },
-    "Action Needed" : {},
+    "Action Needed" : {
+
+    },
     "Add" : {
       "localizations" : {
         "ar" : {
@@ -17040,7 +18305,6 @@
       }
     },
     "Add Crypto Holding" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18940,6 +20204,215 @@
         }
       }
     },
+    "ALL" : {
+      "comment" : "Compact label for a time-range selector meaning 'the entire history'. Not 'all' as a quantifier over items.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "الكل"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TOT"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "VŠE"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ALLE"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ALLE"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ΟΛΑ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TODO"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TODO"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "KAIKKI"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TOUT"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "הכל"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "सभी"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "SVE"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "MIND"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "SEMUA"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TUTTO"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "すべて"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "전체"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "SEMUA"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ALLE"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ALLE"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "WSZYSTKO"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TUDO"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TUDO"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TOATE"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ВСЁ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "VŠETKO"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ALLA"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ทั้งหมด"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TÜMÜ"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "УСЕ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TẤT CẢ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "全部"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "全部"
+          }
+        }
+      }
+    },
     "All Time" : {
       "localizations" : {
         "ar" : {
@@ -19359,6 +20832,216 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "全世界"
+          }
+        }
+      }
+    },
+    "Allocated" : {
+      "comment" : "Centre label of the asset-allocation ring in the exported PDF: the sum of the wedges actually drawn, which differs from Total Assets when net-negative cash is clamped out.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "المُوزَّع"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Assignat"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alokováno"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Allokeret"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zugeordnet"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Κατανεμημένο"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Asignado"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Asignado"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kohdennettu"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Réparti"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "מוקצה"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "आवंटित"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Raspoređeno"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Elosztva"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dialokasikan"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Allocato"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "配分済み"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "배분됨"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diperuntukkan"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fordelt"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toegewezen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Przydzielone"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alocado"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alocado"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alocat"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Распределено"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alokované"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fördelat"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "จัดสรรแล้ว"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dağıtılan"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Розподілено"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Đã phân bổ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "已配置"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "已配置"
           }
         }
       }
@@ -21033,7 +22716,9 @@
         }
       }
     },
-    "API keys are verified against a live quote before they are stored in Keychain." : {},
+    "API keys are verified against a live quote before they are stored in Keychain." : {
+
+    },
     "API keys are verified against a live quote before they are stored in the macOS Keychain." : {
       "localizations" : {
         "ar" : {
@@ -22924,7 +24609,9 @@
         }
       }
     },
-    "Average Buy Price (%@)" : {},
+    "Average Buy Price (%@)" : {
+
+    },
     "Avg Buy" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23134,7 +24821,9 @@
         }
       }
     },
-    "Back" : {},
+    "Back" : {
+
+    },
     "Backup Exported" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -24608,7 +26297,9 @@
         }
       }
     },
-    "Biometric enrollment changed. Unlock again to confirm it's you." : {},
+    "Biometric enrollment changed. Unlock again to confirm it's you." : {
+
+    },
     "Biometrics" : {
       "localizations" : {
         "ar" : {
@@ -27110,7 +28801,9 @@
         }
       }
     },
-    "Cash flow view" : {},
+    "Cash flow view" : {
+
+    },
     "Cash in this app is the running total of every income minus every expense, so the closing balance above is the cash figure as at the end of this period. The opening balance carries forward all activity before it." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -27535,7 +29228,9 @@
         }
       }
     },
-    "Cash-flow range" : {},
+    "Cash-flow range" : {
+
+    },
     "Category" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -27745,7 +29440,9 @@
         }
       }
     },
-    "Change Currency" : {},
+    "Change Currency" : {
+
+    },
     "Change the search, type, or period filters." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -28169,7 +29866,9 @@
         }
       }
     },
-    "Chart shows gross assets; %@ in net cash liabilities is excluded." : {},
+    "Chart shows gross assets; %@ in net cash liabilities is excluded." : {
+
+    },
     "Checking the iCloud account and preparing CloudKit." : {
       "localizations" : {
         "ar" : {
@@ -28801,7 +30500,9 @@
         }
       }
     },
-    "Choose Sections" : {},
+    "Choose Sections" : {
+
+    },
     "Choose the free Demo API tier." : {
       "localizations" : {
         "ar" : {
@@ -29426,7 +31127,9 @@
         }
       }
     },
-    "Clear search" : {},
+    "Clear search" : {
+
+    },
     "Clear the category chip, or change the search, type, or period filters." : {
       "localizations" : {
         "ar" : {
@@ -33405,7 +35108,9 @@
         }
       }
     },
-    "Convert Amounts" : {},
+    "Convert Amounts" : {
+
+    },
     "Convert the entered amounts from %@ to %@ at today's exchange rate, or keep the numbers and just relabel them?" : {
       "localizations" : {
         "en" : {
@@ -33833,7 +35538,425 @@
         }
       }
     },
-    "Couldn't Delete iCloud Data" : {},
+    "Could not create the PDF document." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "تعذّر إنشاء مستند PDF."
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No s’ha pogut crear el document PDF."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dokument PDF se nepodařilo vytvořit."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF-dokumentet kunne ikke oprettes."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das PDF-Dokument konnte nicht erstellt werden."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Δεν ήταν δυνατή η δημιουργία του εγγράφου PDF."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No se pudo crear el documento PDF."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No se pudo crear el documento PDF."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF-tiedostoa ei voitu luoda."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossible de créer le document PDF."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "לא ניתן היה ליצור את מסמך ה-PDF."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF दस्तावेज़ नहीं बनाया जा सका।"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF dokument nije bilo moguće stvoriti."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A PDF-dokumentum létrehozása nem sikerült."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dokumen PDF tidak dapat dibuat."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossibile creare il documento PDF."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF を作成できませんでした。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF 문서를 만들 수 없습니다."
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dokumen PDF tidak dapat dicipta."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF-dokumentet kunne ikke opprettes."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Het PDF-document kon niet worden gemaakt."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie udało się utworzyć dokumentu PDF."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Não foi possível criar o documento PDF."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Não foi possível criar o documento PDF."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Documentul PDF nu a putut fi creat."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не удалось создать документ PDF."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dokument PDF sa nepodarilo vytvoriť."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF-dokumentet kunde inte skapas."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ไม่สามารถสร้างเอกสาร PDF ได้"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF belgesi oluşturulamadı."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдалося створити документ PDF."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Không thể tạo tài liệu PDF."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法创建 PDF 文档。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "無法建立 PDF 文件。"
+          }
+        }
+      }
+    },
+    "Could not finalise the PDF document." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "تعذّر إنهاء مستند PDF."
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No s’ha pogut finalitzar el document PDF."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dokument PDF se nepodařilo dokončit."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF-dokumentet kunne ikke færdiggøres."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das PDF-Dokument konnte nicht fertiggestellt werden."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Δεν ήταν δυνατή η οριστικοποίηση του εγγράφου PDF."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No se pudo finalizar el documento PDF."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No se pudo finalizar el documento PDF."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF-tiedostoa ei voitu viimeistellä."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossible de finaliser le document PDF."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "לא ניתן היה להשלים את מסמך ה-PDF."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF दस्तावेज़ को अंतिम रूप नहीं दिया जा सका।"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF dokument nije bilo moguće dovršiti."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A PDF-dokumentum véglegesítése nem sikerült."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dokumen PDF tidak dapat diselesaikan."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossibile finalizzare il documento PDF."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF を完成できませんでした。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF 문서를 완성할 수 없습니다."
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dokumen PDF tidak dapat dimuktamadkan."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF-dokumentet kunne ikke fullføres."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Het PDF-document kon niet worden voltooid."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie udało się sfinalizować dokumentu PDF."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Não foi possível finalizar o documento PDF."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Não foi possível finalizar o documento PDF."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Documentul PDF nu a putut fi finalizat."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не удалось завершить документ PDF."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dokument PDF sa nepodarilo dokončiť."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF-dokumentet kunde inte slutföras."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ไม่สามารถสรุปเอกสาร PDF ได้"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF belgesi tamamlanamadı."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдалося завершити документ PDF."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Không thể hoàn tất tài liệu PDF."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法完成 PDF 文档。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "無法完成 PDF 文件。"
+          }
+        }
+      }
+    },
+    "Couldn't Delete iCloud Data" : {
+
+    },
     "Couldn't reach iCloud to delete your data. Check your connection and try again." : {
       "localizations" : {
         "ar" : {
@@ -36340,7 +38463,9 @@
         }
       }
     },
-    "Crypto view" : {},
+    "Crypto view" : {
+
+    },
     "Currency" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -36966,7 +39091,9 @@
         }
       }
     },
-    "Current Price (%@)" : {},
+    "Current Price (%@)" : {
+
+    },
     "Custom Categories" : {
       "localizations" : {
         "ar" : {
@@ -38850,7 +40977,9 @@
         }
       }
     },
-    "Data Unavailable" : {},
+    "Data Unavailable" : {
+
+    },
     "Date" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -39060,7 +41189,9 @@
         }
       }
     },
-    "Date Range" : {},
+    "Date Range" : {
+
+    },
     "Delete" : {
       "localizations" : {
         "ar" : {
@@ -41983,7 +44114,9 @@
         }
       }
     },
-    "Delete This Device Only" : {},
+    "Delete This Device Only" : {
+
+    },
     "Delete transaction" : {
       "localizations" : {
         "ar" : {
@@ -43233,7 +45366,9 @@
         }
       }
     },
-    "Diagnostics Exported" : {},
+    "Diagnostics Exported" : {
+
+    },
     "Digital asset holdings and performance" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -43443,7 +45578,9 @@
         }
       }
     },
-    "Discard" : {},
+    "Discard" : {
+
+    },
     "Dividends" : {
       "localizations" : {
         "ar" : {
@@ -43861,7 +45998,9 @@
         }
       }
     },
-    "Done" : {},
+    "Done" : {
+
+    },
     "Drawn from Savings" : {
       "localizations" : {
         "ar" : {
@@ -49099,7 +51238,9 @@
         }
       }
     },
-    "Enter a new key to replace…" : {},
+    "Enter a new key to replace…" : {
+
+    },
     "Enter an amount greater than zero." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -49939,12 +52080,24 @@
         }
       }
     },
-    "Erase" : {},
-    "Erase and Start Over" : {},
-    "Erase Data on This Device?" : {},
-    "Erase Everything" : {},
-    "Erase Everything?" : {},
-    "Erase Everything..." : {},
+    "Erase" : {
+
+    },
+    "Erase and Start Over" : {
+
+    },
+    "Erase Data on This Device?" : {
+
+    },
+    "Erase Everything" : {
+
+    },
+    "Erase Everything?" : {
+
+    },
+    "Erase Everything..." : {
+
+    },
     "ETF" : {
       "localizations" : {
         "ar" : {
@@ -50994,7 +53147,9 @@
         }
       }
     },
-    "Exchange Rate Error" : {},
+    "Exchange Rate Error" : {
+
+    },
     "Exchange Rate Refresh Failed" : {
       "localizations" : {
         "ar" : {
@@ -53509,8 +55664,220 @@
         }
       }
     },
-    "Export" : {},
-    "Export Diagnostics" : {},
+    "Export" : {
+
+    },
+    "Export cancelled." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "تم إلغاء التصدير."
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportació cancel·lada."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Export zrušen."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eksport annulleret."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Export abgebrochen."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Η εξαγωγή ακυρώθηκε."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportación cancelada."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportación cancelada."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vienti peruutettiin."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportation annulée."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "הייצוא בוטל."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "निर्यात रद्द किया गया।"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Izvoz otkazan."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az exportálás megszakítva."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ekspor dibatalkan."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Esportazione annullata."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "書き出しをキャンセルしました。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "내보내기가 취소되었습니다."
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eksport dibatalkan."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eksport avbrutt."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Export geannuleerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eksport anulowany."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportação cancelada."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportação cancelada."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Export anulat."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Экспорт отменён."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Export zrušený."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exporten avbröts."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ยกเลิกการส่งออกแล้ว"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dışa aktarma iptal edildi."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Експорт скасовано."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Đã hủy xuất."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "已取消导出。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "已取消輸出。"
+          }
+        }
+      }
+    },
+    "Export Diagnostics" : {
+
+    },
     "Export Failed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -53935,10 +56302,18 @@
         }
       }
     },
-    "Export Report" : {},
-    "Export Sync Diagnostics" : {},
-    "Export Sync Diagnostics..." : {},
-    "Export..." : {},
+    "Export Report" : {
+
+    },
+    "Export Sync Diagnostics" : {
+
+    },
+    "Export Sync Diagnostics..." : {
+
+    },
+    "Export..." : {
+
+    },
     "Face ID" : {
       "localizations" : {
         "ar" : {
@@ -58949,7 +61324,9 @@
         }
       }
     },
-    "Format" : {},
+    "Format" : {
+
+    },
     "Freelance" : {
       "localizations" : {
         "ar" : {
@@ -69893,7 +72270,9 @@
         }
       }
     },
-    "Investments view" : {},
+    "Investments view" : {
+
+    },
     "ISIN / ID" : {
       "localizations" : {
         "ar" : {
@@ -70102,7 +72481,9 @@
         }
       }
     },
-    "JSON is always a complete backup of every record, so the section and period choices do not apply." : {},
+    "JSON is always a complete backup of every record, so the section and period choices do not apply." : {
+
+    },
     "just now" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -70526,8 +72907,12 @@
         }
       }
     },
-    "Keep Numbers" : {},
-    "Keychain Error" : {},
+    "Keep Numbers" : {
+
+    },
+    "Keychain Error" : {
+
+    },
     "Keychain operation failed with status %d." : {
       "localizations" : {
         "ar" : {
@@ -73862,7 +76247,9 @@
         }
       }
     },
-    "Loading your data…" : {},
+    "Loading your data…" : {
+
+    },
     "Local" : {
       "localizations" : {
         "ar" : {
@@ -74910,7 +77297,9 @@
         }
       }
     },
-    "Make It Yours" : {},
+    "Make It Yours" : {
+
+    },
     "Manual Actions" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -75334,7 +77723,9 @@
         }
       }
     },
-    "Market Data Error" : {},
+    "Market Data Error" : {
+
+    },
     "Market Value" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -80574,7 +82965,9 @@
         }
       }
     },
-    "Net-worth history" : {},
+    "Net-worth history" : {
+
+    },
     "Net-worth history concealed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -80998,7 +83391,9 @@
         }
       }
     },
-    "New categories" : {},
+    "New categories" : {
+
+    },
     "New Crypto Holding" : {
       "localizations" : {
         "ar" : {
@@ -88763,7 +91158,9 @@
         }
       }
     },
-    "Nothing has been changed or deleted. Your data just can't be read until this device is unlocked." : {},
+    "Nothing has been changed or deleted. Your data just can't be read until this device is unlocked." : {
+
+    },
     "Notifications" : {
       "localizations" : {
         "ar" : {
@@ -94200,7 +96597,9 @@
         }
       }
     },
-    "Paste CoinGecko key…" : {},
+    "Paste CoinGecko key…" : {
+
+    },
     "Paste Finnhub API key" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -94625,7 +97024,9 @@
         }
       }
     },
-    "Paste Finnhub key…" : {},
+    "Paste Finnhub key…" : {
+
+    },
     "Pause schedule" : {
       "localizations" : {
         "ar" : {
@@ -96084,7 +98485,9 @@
         }
       }
     },
-    "Pick your base currency and language. You can change both anytime in Settings." : {},
+    "Pick your base currency and language. You can change both anytime in Settings." : {
+
+    },
     "Platform" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -96718,7 +99121,9 @@
         }
       }
     },
-    "Please insert at least one API key, or use 'Skip for now' if you wish to proceed without them." : {},
+    "Please insert at least one API key, or use 'Skip for now' if you wish to proceed without them." : {
+
+    },
     "Portfolio Value" : {
       "localizations" : {
         "ar" : {
@@ -97343,7 +99748,9 @@
         }
       }
     },
-    "Preferences like currency, categories, and language are set per device and don't sync." : {},
+    "Preferences like currency, categories, and language are set per device and don't sync." : {
+
+    },
     "Prepare Backup" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -97762,8 +100169,12 @@
         }
       }
     },
-    "Preparing Report" : {},
-    "Preparing…" : {},
+    "Preparing Report" : {
+
+    },
+    "Preparing…" : {
+
+    },
     "Price" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -98812,7 +101223,9 @@
         }
       }
     },
-    "Privacy Mode hides amounts on screen, but the PDF contains your real figures." : {},
+    "Privacy Mode hides amounts on screen, but the PDF contains your real figures." : {
+
+    },
     "Privacy on" : {
       "localizations" : {
         "ar" : {
@@ -100064,8 +102477,8 @@
       }
     },
     "Quote Base" : {
-      "extractionState" : "manual",
       "comment" : "Source column in the PDF appendix rate table, marking the row for the currency all other rates are quoted against — it converts to itself at 1, through no rate at all.",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -100690,8 +103103,12 @@
         }
       }
     },
-    "Rates may be incomplete" : {},
-    "Rates may be incomplete: %@ aren't in the latest update and use an approximate offline rate." : {},
+    "Rates may be incomplete" : {
+
+    },
+    "Rates may be incomplete: %@ aren't in the latest update and use an approximate offline rate." : {
+
+    },
     "Real Estate" : {
       "localizations" : {
         "ar" : {
@@ -102028,8 +104445,12 @@
         }
       }
     },
-    "Records imported" : {},
-    "Records skipped" : {},
+    "Records imported" : {
+
+    },
+    "Records skipped" : {
+
+    },
     "Recurring" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -106710,7 +109131,9 @@
         }
       }
     },
-    "Report Exported" : {},
+    "Report Exported" : {
+
+    },
     "Resume schedule" : {
       "localizations" : {
         "ar" : {
@@ -107336,7 +109759,9 @@
         }
       }
     },
-    "Retry" : {},
+    "Retry" : {
+
+    },
     "Salary" : {
       "localizations" : {
         "ar" : {
@@ -107962,8 +110387,12 @@
         }
       }
     },
-    "Save & Continue" : {},
-    "Save Failed" : {},
+    "Save & Continue" : {
+
+    },
+    "Save Failed" : {
+
+    },
     "savings rate" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -109637,7 +112066,9 @@
         }
       }
     },
-    "Select at least one section to export." : {},
+    "Select at least one section to export." : {
+
+    },
     "Selected date" : {
       "localizations" : {
         "ar" : {
@@ -111096,8 +113527,12 @@
         }
       }
     },
-    "Share Diagnostics" : {},
-    "Share Sync Diagnostics" : {},
+    "Share Diagnostics" : {
+
+    },
+    "Share Sync Diagnostics" : {
+
+    },
     "Shopping" : {
       "localizations" : {
         "ar" : {
@@ -112480,7 +114915,9 @@
         }
       }
     },
-    "Snapshot generated" : {},
+    "Snapshot generated" : {
+
+    },
     "Snapshots" : {
       "localizations" : {
         "ar" : {
@@ -113153,7 +115590,9 @@
         }
       }
     },
-    "Start Date" : {},
+    "Start Date" : {
+
+    },
     "Status" : {
       "localizations" : {
         "ar" : {
@@ -116385,7 +118824,9 @@
         }
       }
     },
-    "Sync is paused until this device is unlocked." : {},
+    "Sync is paused until this device is unlocked." : {
+
+    },
     "Syncing" : {
       "localizations" : {
         "ar" : {
@@ -117097,7 +119538,9 @@
         }
       }
     },
-    "The API key was removed from Keychain." : {},
+    "The API key was removed from Keychain." : {
+
+    },
     "The API key was removed from the macOS Keychain." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -118480,7 +120923,9 @@
         }
       }
     },
-    "The file is still on this device and has not been deleted. iCloud sync is off, so there is no other copy — export diagnostics before erasing anything." : {},
+    "The file is still on this device and has not been deleted. iCloud sync is off, so there is no other copy — export diagnostics before erasing anything." : {
+
+    },
     "The first occurrence must be in the future." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -119771,7 +122216,9 @@
         }
       }
     },
-    "The period applies to the transaction ledger only. Holdings are point-in-time and are always reported in full." : {},
+    "The period applies to the transaction ledger only. Holdings are point-in-time and are always reported in full." : {
+
+    },
     "The schedule was saved, but notifications are not authorized. You can enable them in iOS Settings and then edit this schedule." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -120316,7 +122763,9 @@
         }
       }
     },
-    "The stored credential will be deleted from Keychain." : {},
+    "The stored credential will be deleted from Keychain." : {
+
+    },
     "The stored credential will be deleted from the macOS Keychain." : {
       "localizations" : {
         "ar" : {
@@ -120820,7 +123269,9 @@
         }
       }
     },
-    "This deletes the unreadable database on this device and returns the app to onboarding. Your iCloud copy is NOT deleted — if iCloud sync was on, turning it back on restores your data from there." : {},
+    "This deletes the unreadable database on this device and returns the app to onboarding. Your iCloud copy is NOT deleted — if iCloud sync was on, turning it back on restores your data from there." : {
+
+    },
     "This file isn't a Wealth Compass Tracker backup or a supported Revolut / Trade Republic statement." : {
       "localizations" : {
         "ar" : {
@@ -121069,8 +123520,12 @@
         }
       }
     },
-    "This permanently deletes all finance data on this device and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data." : {},
-    "This permanently deletes all finance data on this Mac and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data." : {},
+    "This permanently deletes all finance data on this device and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data." : {
+
+    },
+    "This permanently deletes all finance data on this Mac and the copy in iCloud, your Finnhub and CoinGecko API keys, and every preference — returning the app to onboarding. Other devices signed in to the same iCloud account keep their own copy and may restore it to iCloud until you erase it there too. This cannot be undone. Prepare a backup first if you might need this data." : {
+
+    },
     "This permanently removes %@ from your crypto portfolio." : {
       "localizations" : {
         "ar" : {
@@ -123117,36 +125572,6 @@
             "value" : "إجمالي الأصول"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gesamtvermögen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activos totales"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actif total"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Patrimonio totale"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "总资产"
-          }
-        },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
@@ -123165,10 +125590,22 @@
             "value" : "Aktiver i alt"
           }
         },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamtvermögen"
+          }
+        },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Σύνολο ενεργητικού"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activos totales"
           }
         },
         "es-419" : {
@@ -123181,6 +125618,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Varat yhteensä"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actif total"
           }
         },
         "he" : {
@@ -123211,6 +125654,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Total Aset"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patrimonio totale"
           }
         },
         "ja" : {
@@ -123307,6 +125756,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tổng tài sản"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "总资产"
           }
         },
         "zh-Hant" : {
@@ -126502,9 +128957,15 @@
         }
       }
     },
-    "Try Again" : {},
-    "Trying Again…" : {},
-    "Turn off app protection for Wealth Compass Tracker." : {},
+    "Try Again" : {
+
+    },
+    "Trying Again…" : {
+
+    },
+    "Turn off app protection for Wealth Compass Tracker." : {
+
+    },
     "Turn off Privacy Mode to reveal this." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -128869,7 +131330,9 @@
         }
       }
     },
-    "Unsaved API Key" : {},
+    "Unsaved API Key" : {
+
+    },
     "Up to Date" : {
       "localizations" : {
         "ar" : {
@@ -131518,7 +133981,9 @@
         }
       }
     },
-    "Waiting to Sync" : {},
+    "Waiting to Sync" : {
+
+    },
     "We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -134711,7 +137176,9 @@
         }
       }
     },
-    "You entered an API key but haven't saved it. Save and validate it now, or discard it and continue?" : {},
+    "You entered an API key but haven't saved it. Save and validate it now, or discard it and continue?" : {
+
+    },
     "You're not signed in to iCloud, so there's no iCloud copy to delete." : {
       "localizations" : {
         "ar" : {
@@ -134920,10 +137387,18 @@
         }
       }
     },
-    "Your change was saved on this device, but could not be queued for iCloud yet." : {},
-    "Your data has not been deleted. iCloud sync is on, so a copy also exists in iCloud." : {},
-    "Your Data Is Locked" : {},
-    "Your data is protected and can't be read while this device is locked. Unlock the device to continue." : {},
+    "Your change was saved on this device, but could not be queued for iCloud yet." : {
+
+    },
+    "Your data has not been deleted. iCloud sync is on, so a copy also exists in iCloud." : {
+
+    },
+    "Your Data Is Locked" : {
+
+    },
+    "Your data is protected and can't be read while this device is locked. Unlock the device to continue." : {
+
+    },
     "Your data remains on this device." : {
       "localizations" : {
         "ar" : {
@@ -135548,8 +138023,12 @@
         }
       }
     },
-    "Your financial data stays on your device and in your private iCloud — there's no Wealth Compass Tracker server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests." : {},
-    "Your financial data stays on your Mac and in your private iCloud — there's no Wealth Compass Tracker server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests." : {},
+    "Your financial data stays on your device and in your private iCloud — there's no Wealth Compass Tracker server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests." : {
+
+    },
+    "Your financial data stays on your Mac and in your private iCloud — there's no Wealth Compass Tracker server in between. To show live prices, the app talks directly to your chosen market-data providers (Frankfurter, Finnhub, CoinGecko) using API keys you provide; only those providers see those requests." : {
+
+    },
     "Your financial horizon" : {
       "localizations" : {
         "ar" : {
@@ -136175,7 +138654,9 @@
         }
       }
     },
-    "Your latest change could not be saved to this device. %@" : {},
+    "Your latest change could not be saved to this device. %@" : {
+
+    },
     "Your latest income and expenses will appear here." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -137233,2303 +139714,6 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Your preferences"
-          }
-        }
-      }
-    },
-    "1W" : {
-      "comment" : "Compact label for a time RANGE selector (net worth / cash flow history). The letter is a duration unit — W=week, M=month, Y=year — never a magnitude. It was previously mistranslated as 'million' in a dozen locales.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 أسبوع"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 setm."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 týd."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 uge"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 Wo."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 εβδ."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 sem."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 sem."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 vk"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 sem."
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "שבוע 1"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 सप्ताह"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 tj."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 hét"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mgg"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 sett."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1週間"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1주"
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mgu"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 uke"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 wk"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 tydz."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 sem."
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 sem."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 săpt."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 нед."
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 týž."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 v."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 สัปดาห์"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 hf."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 тиж."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 tuần"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1周"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1週"
-          }
-        }
-      }
-    },
-    "1M" : {
-      "comment" : "Compact label for a time RANGE selector (net worth / cash flow history). The letter is a duration unit — W=week, M=month, Y=year — never a magnitude. It was previously mistranslated as 'million' in a dozen locales.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 شهر"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mes"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 měs."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 md."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 Mon."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 μήν."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mes"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mes"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 kk"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mois"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "חודש 1"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 माह"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mj."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 hó"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 bln"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mese"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1か月"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1개월"
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 bln"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mnd."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mnd."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mies."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mês"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mês"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 lună"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 мес."
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mes."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 mån"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 เดือน"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 ay"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 міс."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 tháng"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1个月"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1個月"
-          }
-        }
-      }
-    },
-    "1Y" : {
-      "comment" : "Compact label for a time RANGE selector (net worth / cash flow history). The letter is a duration unit — W=week, M=month, Y=year — never a magnitude. It was previously mistranslated as 'million' in a dozen locales.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 سنة"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 any"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 rok"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 år"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 J."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 έτος"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 año"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 año"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 v"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 an"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "שנה 1"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 वर्ष"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 g."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 év"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 thn"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 anno"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1年"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1년"
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 thn"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 år"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 jr"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 rok"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 ano"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 ano"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 an"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 год"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 rok"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 år"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 ปี"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 yıl"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 рік"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1 năm"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1年"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "1年"
-          }
-        }
-      }
-    },
-    "ALL" : {
-      "comment" : "Compact label for a time-range selector meaning 'the entire history'. Not 'all' as a quantifier over items.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "الكل"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TOT"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "VŠE"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ALLE"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ALLE"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ΟΛΑ"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TODO"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TODO"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "KAIKKI"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TOUT"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "הכל"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "सभी"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "SVE"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "MIND"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "SEMUA"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TUTTO"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "すべて"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "전체"
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "SEMUA"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ALLE"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ALLE"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "WSZYSTKO"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TUDO"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TUDO"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TOATE"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ВСЁ"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "VŠETKO"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ALLA"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ทั้งหมด"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TÜMÜ"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "УСЕ"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TẤT CẢ"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "全部"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "全部"
-          }
-        }
-      }
-    },
-    "%@: no matching CoinGecko coin" : {
-      "comment" : "Shown per holding in the market-data refresh summary. %@ is the ticker symbol.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: لا توجد عملة مطابقة في CoinGecko"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: cap moneda de CoinGecko coincident"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: v CoinGecku nenalezena odpovídající mince"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: ingen matchende CoinGecko-mønt"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: keine passende CoinGecko-Münze"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: δεν βρέθηκε αντίστοιχο νόμισμα CoinGecko"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: no hay una moneda de CoinGecko coincidente"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: no hay una moneda de CoinGecko coincidente"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: ei vastaavaa CoinGecko-kolikkoa"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ : aucune cryptomonnaie CoinGecko correspondante"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: לא נמצא מטבע תואם ב-CoinGecko"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: कोई मेल खाता CoinGecko सिक्का नहीं"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: nema odgovarajuće CoinGecko kriptovalute"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: nincs megfelelő CoinGecko-érme"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: tidak ada koin CoinGecko yang cocok"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: nessuna criptovaluta CoinGecko corrispondente"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: 一致する CoinGecko の通貨がありません"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: 일치하는 CoinGecko 코인 없음"
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: tiada syiling CoinGecko yang sepadan"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: ingen samsvarende CoinGecko-mynt"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: geen overeenkomende CoinGecko-munt"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: brak pasującej monety w CoinGecko"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: nenhuma moeda do CoinGecko correspondente"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: nenhuma moeda do CoinGecko correspondente"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: nicio monedă CoinGecko corespunzătoare"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: подходящая монета в CoinGecko не найдена"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: v CoinGecku sa nenašla zodpovedajúca minca"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: inget matchande CoinGecko-mynt"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: ไม่พบเหรียญ CoinGecko ที่ตรงกัน"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: eşleşen CoinGecko parası yok"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: відповідну монету в CoinGecko не знайдено"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@: không có đồng CoinGecko phù hợp"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@：未找到匹配的 CoinGecko 币种"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@：找不到相符的 CoinGecko 幣種"
-          }
-        }
-      }
-    },
-    "%@: no CoinGecko price for %@" : {
-      "comment" : "Market-data refresh summary. %1$@ is the ticker symbol, %2$@ the CoinGecko coin id.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: لا يوجد سعر CoinGecko لـ %2$@"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: cap preu de CoinGecko per a %2$@"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: v CoinGecku není cena pro %2$@"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: ingen CoinGecko-pris for %2$@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: kein CoinGecko-Preis für %2$@"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: δεν υπάρχει τιμή CoinGecko για %2$@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: no hay precio de CoinGecko para %2$@"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: no hay precio de CoinGecko para %2$@"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: ei CoinGecko-hintaa kohteelle %2$@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@ : aucun prix CoinGecko pour %2$@"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: אין מחיר CoinGecko עבור %2$@"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%2$@ के लिए %1$@: कोई CoinGecko मूल्य नहीं"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: nema CoinGecko cijene za %2$@"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: nincs CoinGecko-ár ehhez: %2$@"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: tidak ada harga CoinGecko untuk %2$@"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: nessun prezzo CoinGecko per %2$@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: %2$@ の CoinGecko 価格がありません"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: %2$@에 대한 CoinGecko 가격 없음"
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: tiada harga CoinGecko untuk %2$@"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: ingen CoinGecko-pris for %2$@"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: geen CoinGecko-prijs voor %2$@"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: brak ceny CoinGecko dla %2$@"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: nenhum preço do CoinGecko para %2$@"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: nenhum preço do CoinGecko para %2$@"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: niciun preț CoinGecko pentru %2$@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: нет цены CoinGecko для %2$@"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: v CoinGecku nie je cena pre %2$@"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: inget CoinGecko-pris för %2$@"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: ไม่มีราคา CoinGecko สำหรับ %2$@"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: %2$@ için CoinGecko fiyatı yok"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: немає ціни CoinGecko для %2$@"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@: không có giá CoinGecko cho %2$@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@：没有 %2$@ 的 CoinGecko 价格"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$@：沒有 %2$@ 的 CoinGecko 價格"
-          }
-        }
-      }
-    },
-    "%@ performance" : {
-      "comment" : "%@ is an already-formatted percentage including its locale-correct percent sign.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ الأداء"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ de rendiment"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Výkon %@"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ ydeevne"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ Leistung"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ απόδοση"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ rendimiento"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ rendimiento"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ suorituskykyä"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ performances"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ ביצועים"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ प्रदर्शन"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ učinak"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ teljesítmény"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ kinerja"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ di prestazioni"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ のパフォーマンス"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ 성능"
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ prestasi"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ ytelse"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ prestatie"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ wydajności"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ desempenho"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ desempenho"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ performanță"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ производительность"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Výkon %@"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ prestanda"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ ประสิทธิภาพ"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ performans"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Продуктивність %@."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ hiệu suất"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ 性能"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ 效能"
-          }
-        }
-      }
-    },
-    "Allocated" : {
-      "extractionState" : "manual",
-      "comment" : "Centre label of the asset-allocation ring in the exported PDF: the sum of the wedges actually drawn, which differs from Total Assets when net-negative cash is clamped out.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "المُوزَّع"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Assignat"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Alokováno"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Allokeret"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zugeordnet"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Κατανεμημένο"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Asignado"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Asignado"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Kohdennettu"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Réparti"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "מוקצה"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "आवंटित"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Raspoređeno"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Elosztva"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dialokasikan"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Allocato"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "配分済み"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "배분됨"
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Diperuntukkan"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Fordelt"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Toegewezen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Przydzielone"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Alocado"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Alocado"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Alocat"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Распределено"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Alokované"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Fördelat"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "จัดสรรแล้ว"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dağıtılan"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Розподілено"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Đã phân bổ"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "已配置"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "已配置"
-          }
-        }
-      }
-    },
-    "Could not create the PDF document." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "تعذّر إنشاء مستند PDF."
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "No s’ha pogut crear el document PDF."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dokument PDF se nepodařilo vytvořit."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF-dokumentet kunne ikke oprettes."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Das PDF-Dokument konnte nicht erstellt werden."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Δεν ήταν δυνατή η δημιουργία του εγγράφου PDF."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "No se pudo crear el documento PDF."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "No se pudo crear el documento PDF."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF-tiedostoa ei voitu luoda."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Impossible de créer le document PDF."
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "לא ניתן היה ליצור את מסמך ה-PDF."
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF दस्तावेज़ नहीं बनाया जा सका।"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF dokument nije bilo moguće stvoriti."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "A PDF-dokumentum létrehozása nem sikerült."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dokumen PDF tidak dapat dibuat."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Impossibile creare il documento PDF."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF を作成できませんでした。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF 문서를 만들 수 없습니다."
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dokumen PDF tidak dapat dicipta."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF-dokumentet kunne ikke opprettes."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Het PDF-document kon niet worden gemaakt."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Nie udało się utworzyć dokumentu PDF."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Não foi possível criar o documento PDF."
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Não foi possível criar o documento PDF."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Documentul PDF nu a putut fi creat."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Не удалось создать документ PDF."
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dokument PDF sa nepodarilo vytvoriť."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF-dokumentet kunde inte skapas."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ไม่สามารถสร้างเอกสาร PDF ได้"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF belgesi oluşturulamadı."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Не вдалося створити документ PDF."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Không thể tạo tài liệu PDF."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "无法创建 PDF 文档。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "無法建立 PDF 文件。"
-          }
-        }
-      }
-    },
-    "Could not finalise the PDF document." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "تعذّر إنهاء مستند PDF."
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "No s’ha pogut finalitzar el document PDF."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dokument PDF se nepodařilo dokončit."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF-dokumentet kunne ikke færdiggøres."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Das PDF-Dokument konnte nicht fertiggestellt werden."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Δεν ήταν δυνατή η οριστικοποίηση του εγγράφου PDF."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "No se pudo finalizar el documento PDF."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "No se pudo finalizar el documento PDF."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF-tiedostoa ei voitu viimeistellä."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Impossible de finaliser le document PDF."
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "לא ניתן היה להשלים את מסמך ה-PDF."
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF दस्तावेज़ को अंतिम रूप नहीं दिया जा सका।"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF dokument nije bilo moguće dovršiti."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "A PDF-dokumentum véglegesítése nem sikerült."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dokumen PDF tidak dapat diselesaikan."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Impossibile finalizzare il documento PDF."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF を完成できませんでした。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF 문서를 완성할 수 없습니다."
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dokumen PDF tidak dapat dimuktamadkan."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF-dokumentet kunne ikke fullføres."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Het PDF-document kon niet worden voltooid."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Nie udało się sfinalizować dokumentu PDF."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Não foi possível finalizar o documento PDF."
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Não foi possível finalizar o documento PDF."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Documentul PDF nu a putut fi finalizat."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Не удалось завершить документ PDF."
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dokument PDF sa nepodarilo dokončiť."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF-dokumentet kunde inte slutföras."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ไม่สามารถสรุปเอกสาร PDF ได้"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "PDF belgesi tamamlanamadı."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Не вдалося завершити документ PDF."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Không thể hoàn tất tài liệu PDF."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "无法完成 PDF 文档。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "無法完成 PDF 文件。"
-          }
-        }
-      }
-    },
-    "Export cancelled." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "تم إلغاء التصدير."
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exportació cancel·lada."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Export zrušen."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Eksport annulleret."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Export abgebrochen."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Η εξαγωγή ακυρώθηκε."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exportación cancelada."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exportación cancelada."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Vienti peruutettiin."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exportation annulée."
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "הייצוא בוטל."
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "निर्यात रद्द किया गया।"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Izvoz otkazan."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Az exportálás megszakítva."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ekspor dibatalkan."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Esportazione annullata."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "書き出しをキャンセルしました。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "내보내기가 취소되었습니다."
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Eksport dibatalkan."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Eksport avbrutt."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Export geannuleerd."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Eksport anulowany."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exportação cancelada."
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exportação cancelada."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Export anulat."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Экспорт отменён."
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Export zrušený."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exporten avbröts."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ยกเลิกการส่งออกแล้ว"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dışa aktarma iptal edildi."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Експорт скасовано."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Đã hủy xuất."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "已取消导出。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "已取消輸出。"
           }
         }
       }

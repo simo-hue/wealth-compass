@@ -1,7 +1,35 @@
-Feilrettinger og forbedret pålitelighet.
+Wealth Compass kjører nå på iPad.
 
-• Rettet et sjeldent problem der appen kunne åpne uten å vise data. Informasjonen din gikk aldri tapt — den kunne bare ikke leses ennå, og appen venter nå og laster den riktig i stedet for å vise tomme tall.
+iPad
+• Den komplette skrivebordsvisningen kommer til iPad: sidepanel, oversikt med flere kolonner og de samme menyene som Mac-appen, med tilpasset oppsett når du holder enheten stående.
+• Diagrammer, tabeller og menyer er laget for berøring, og appsymbolet er tegnet i iPad-størrelser.
+• Trykk på et diagram for å se en verdi; rullingen fungerer fortsatt.
 
+På ditt språk
+• PDF-rapporten er nå oversatt til alle språkene appen støtter, ikke bare engelsk.
+• Datoer, tall og prosenter følger språket som er valgt i appen.
+• Navn på kategorier, sektorer, geografiske områder og valutaer er oversatt.
+• Mange oversettelsesfeil er rettet: fanelinjen vises ikke lenger på engelsk for alle, "NET" oversettes ikke lenger som "nettverk", og periodene 3M/6M/12M leses ikke lenger som millioner.
+
+Personvernmodus skjuler mer
+• Fordelingsdiagrammer skjules, ikke bare beløpene de viser.
+• Antall, statuskort, tomme visninger og varsler røper ikke lenger hva du har registrert.
+• Gjentakende påminnelser nevner ikke lenger navnet på planen på låseskjermen.
+• Øyeblikksbildet i appveksleren dekker nå også åpne ark.
+
+Nøyaktige beløp
+• Importerte og lagrede beløp beholder full desimalpresisjon, så tallene avviker ikke lenger.
+• En importert "1,000" leses som tusen, og indisk lakh-gruppering gjenkjennes.
+• Å importere en Revolut-oversikt på nytt sletter ikke lenger kryptoendringene dine.
+• Import mister ikke lenger valutaen til en transaksjon, og nye investeringer beholder valutaen du valgte i stedet for å bytte til EUR.
+
+Rapporter
+• Kontantstrømdelene holder seg innenfor perioden de oppgir, pengestrømdiagrammet stemmer med tabellene, og trenddiagrammet hopper ikke lenger over måneder.
+• Frakoblede eksporter oppgir vekslingskursene som ble brukt til omregning.
+• Lange beløp blir ikke lenger avkortet.
+
+Også i denne versjonen
+• Gjentakende planer fullføres i stedet for å forsvinne, forblir satt på pause etter urelaterte endringer, og kan slettes når de er ferdige.
 • Mer pålitelig iCloud-synkronisering, også i bakgrunnen.
-
-• Hvis dataene dine ikke kan lastes, forklarer appen nå hvorfor og tilbyr en vei videre i stedet for å vise tomme summer.
+• "Slett alt" etterlater ikke lenger data som kommer tilbake.
+• VoiceOver-etiketter på diagram- og filterkontroller.

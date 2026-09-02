@@ -1,7 +1,35 @@
-Correcciones y mejoras de confiabilidad.
+Wealth Compass ya funciona en iPad.
 
-• Se corrigió un problema poco frecuente por el que la app podía abrirse sin mostrar datos. Tu información nunca se perdió — simplemente aún no podía leerse, y ahora la app espera y la carga correctamente en lugar de mostrar cifras vacías.
+iPad
+• El diseño completo de escritorio llega al iPad: barra lateral, panel de varias columnas y los mismos menús que la app de Mac, que se reacomodan al sostener el dispositivo en vertical.
+• Las gráficas, las tablas y los menús están pensados para el toque, y el ícono de la app está dibujado en tamaños de iPad.
+• Toca una gráfica para examinar un valor; el desplazamiento sigue funcionando.
 
-• Sincronización con iCloud más confiable, incluso en segundo plano.
+En tu idioma
+• El informe PDF ya está traducido a todos los idiomas que admite la app, no solo al inglés.
+• Las fechas, los números y los porcentajes siguen el idioma configurado en la app.
+• Los nombres de categorías, sectores, zonas geográficas y monedas están traducidos.
+• Muchas correcciones de traducción: la barra de pestañas ya no aparece en inglés para todos, "NET" ya no se traduce como "red" y los periodos 3M/6M/12M ya no se leen como millones.
 
-• Si alguna vez no se pueden cargar tus datos, la app ahora explica por qué y ofrece una forma de recuperarlos en lugar de mostrar totales vacíos.
+El modo Privacidad oculta más
+• Las gráficas de distribución se ocultan, no solo las cifras que contienen.
+• Los conteos, las tarjetas de estado, las vistas vacías y las alertas ya no revelan lo que registraste.
+• Los recordatorios periódicos ya no muestran el nombre de la programación en la pantalla bloqueada.
+• La vista previa del selector de apps ahora también cubre las hojas abiertas.
+
+Importes exactos
+• Los importes importados y guardados conservan toda la precisión decimal, así que las cifras ya no se desvían.
+• Un "1,000" importado se lee como mil, y se reconoce la agrupación india en lakhs.
+• Volver a importar un estado de cuenta de Revolut ya no borra tus cambios en las criptomonedas.
+• Las importaciones ya no pierden la moneda de una transacción, y las nuevas inversiones mantienen la moneda elegida en lugar de pasar a EUR.
+
+Informes
+• Las secciones de flujo de efectivo se mantienen dentro del periodo indicado, el diagrama de flujo de dinero cuadra con las tablas y la gráfica de tendencia ya no omite meses.
+• Las exportaciones sin conexión indican los tipos de cambio usados para la conversión.
+• Los importes largos ya no se recortan.
+
+También en esta versión
+• Las programaciones periódicas finalizan en lugar de desaparecer, siguen en pausa tras cambios no relacionados y se pueden eliminar una vez terminadas.
+• Sincronización con iCloud más confiable, también en segundo plano.
+• "Borrar todo" ya no deja datos que vuelven a aparecer.
+• Etiquetas de VoiceOver en los controles de gráficas y filtros.

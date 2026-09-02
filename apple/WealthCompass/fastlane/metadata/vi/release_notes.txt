@@ -1,7 +1,35 @@
-Sửa lỗi và cải thiện độ tin cậy.
+Wealth Compass giờ đã chạy trên iPad.
 
-• Đã khắc phục sự cố hiếm gặp khiến ứng dụng có thể mở ra mà không hiển thị dữ liệu. Thông tin của bạn chưa bao giờ bị mất — chỉ là chưa thể đọc được, và giờ đây ứng dụng sẽ chờ và tải đúng thay vì hiển thị số liệu trống.
+iPad
+• Bố cục máy tính đầy đủ đến với iPad: thanh bên, bảng điều khiển nhiều cột và các trình đơn giống hệt ứng dụng Mac, tự sắp xếp lại khi bạn cầm thiết bị theo chiều dọc.
+• Biểu đồ, bảng và trình đơn được thiết kế cho thao tác chạm, và biểu tượng ứng dụng được vẽ ở kích thước iPad.
+• Chạm vào biểu đồ để xem một giá trị; thao tác cuộn vẫn hoạt động bình thường.
 
+Bằng ngôn ngữ của bạn
+• Báo cáo PDF nay đã được dịch sang mọi ngôn ngữ mà ứng dụng hỗ trợ, không chỉ tiếng Anh.
+• Ngày tháng, số và phần trăm tuân theo ngôn ngữ đã đặt trong ứng dụng.
+• Tên danh mục, ngành, khu vực và tiền tệ đã được dịch.
+• Nhiều lỗi dịch đã được sửa: thanh thẻ không còn hiển thị tiếng Anh cho tất cả mọi người, "NET" không còn bị dịch thành "mạng", và các khoảng 3M/6M/12M không còn bị đọc thành hàng triệu.
+
+Chế độ riêng tư che giấu nhiều hơn
+• Biểu đồ phân bổ được ẩn toàn bộ, chứ không chỉ các số tiền trong đó.
+• Số lượng mục, thẻ trạng thái, màn hình trống và cảnh báo không còn tiết lộ những gì bạn đã ghi lại.
+• Lời nhắc định kỳ không còn nêu tên lịch trên màn hình khóa.
+• Ảnh chụp trong trình chuyển ứng dụng nay che cả các trang đang mở.
+
+Số tiền chính xác
+• Số tiền nhập vào và lưu lại giữ nguyên độ chính xác thập phân, nên các con số không còn sai lệch.
+• Giá trị "1,000" khi nhập được đọc là một nghìn, và cách nhóm lakh của Ấn Độ cũng được nhận diện.
+• Nhập lại sao kê Revolut không còn xóa các chỉnh sửa tiền mã hóa của bạn.
+• Việc nhập không còn làm mất tiền tệ của giao dịch, và khoản đầu tư mới giữ nguyên loại tiền bạn chọn thay vì chuyển sang EUR.
+
+Báo cáo
+• Các phần dòng tiền nằm đúng trong kỳ đã nêu, sơ đồ dòng tiền khớp với các bảng, và biểu đồ xu hướng không còn bỏ sót tháng.
+• Bản xuất ngoại tuyến ghi rõ tỷ giá đã dùng để quy đổi.
+• Số tiền dài không còn bị cắt bớt.
+
+Cũng có trong phiên bản này
+• Lịch định kỳ kết thúc thay vì biến mất, vẫn tạm dừng sau các chỉnh sửa không liên quan, và có thể xóa khi đã hoàn tất.
 • Đồng bộ iCloud đáng tin cậy hơn, kể cả khi chạy nền.
-
-• Nếu dữ liệu không thể tải được, ứng dụng giờ sẽ giải thích lý do và đề xuất cách khôi phục thay vì hiển thị tổng bằng 0.
+• "Xóa tất cả" không còn để lại dữ liệu tự quay về.
+• Nhãn VoiceOver cho các điều khiển biểu đồ và bộ lọc.

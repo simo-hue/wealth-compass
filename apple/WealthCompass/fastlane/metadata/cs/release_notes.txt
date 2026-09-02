@@ -1,7 +1,35 @@
-Opravy a vylepšení spolehlivosti.
+Wealth Compass nyní běží na iPadu.
 
-• Opravili jsme vzácný problém, kdy se aplikace mohla otevřít bez jakýchkoli dat. Vaše údaje se nikdy neztratily — jen je zatím nebylo možné načíst a aplikace nyní počká a načte je správně, místo aby zobrazila nulové hodnoty.
+iPad
+• Kompletní rozvržení z počítače přichází na iPad: postranní panel, vícesloupcový přehled a stejné nabídky jako v aplikaci pro Mac, s přeskládáním, když držíte zařízení na výšku.
+• Grafy, tabulky i nabídky jsou uzpůsobené dotykovému ovládání a ikona aplikace je vykreslená ve velikostech pro iPad.
+• Klepnutím na graf si prohlédnete hodnotu; posouvání dál funguje.
 
+Ve vašem jazyce
+• PDF report je nyní přeložen do všech jazyků, které aplikace podporuje, nejen do angličtiny.
+• Data, čísla a procenta se řídí jazykem nastaveným v aplikaci.
+• Názvy kategorií, sektorů, oblastí a měn jsou přeložené.
+• Řada oprav překladu: panel karet se už všem nezobrazuje anglicky, "NET" se už nepřekládá jako "síť" a období 3M/6M/12M se už nečtou jako miliony.
+
+Režim soukromí skrývá více
+• Grafy rozložení se skryjí, nejen částky, které obsahují.
+• Počty, stavové karty, prázdná zobrazení a upozornění už neprozrazují, co máte zaznamenáno.
+• Opakované připomínky už na zamčené obrazovce neuvádějí název plánu.
+• Náhled v přepínači aplikací nyní zakryje i otevřené listy.
+
+Přesné částky
+• Importované a uložené částky si zachovávají plnou desetinnou přesnost, takže se čísla už neodchylují.
+• Importovaná hodnota "1,000" se čte jako tisíc a rozpozná se i indické seskupení lakh.
+• Opakovaný import výpisu z Revolutu už nepřemaže vaše úpravy kryptoměn.
+• Import už neztrácí měnu transakce a nové investice si ponechají zvolenou měnu místo přepnutí na EUR.
+
+Reporty
+• Části s peněžními toky zůstávají v uvedeném období, diagram toku peněz odpovídá tabulkám a trendový graf už nevynechává měsíce.
+• Offline exporty uvádějí směnné kurzy použité k převodu.
+• Dlouhé částky se už nezkracují.
+
+Také v této verzi
+• Opakované plány se dokončí místo toho, aby zmizely, zůstanou pozastavené i po nesouvisejících úpravách a po skončení je lze smazat.
 • Spolehlivější synchronizace s iCloudem, i na pozadí.
-
-• Pokud data nelze načíst, aplikace nyní vysvětlí proč a nabídne způsob obnovy místo zobrazení prázdných součtů.
+• "Vymazat vše" už nenechává data, která se vrátí.
+• Popisky VoiceOveru u ovládacích prvků grafů a filtrů.

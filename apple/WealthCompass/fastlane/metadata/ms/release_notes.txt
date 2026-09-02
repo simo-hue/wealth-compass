@@ -1,7 +1,35 @@
-Pembaikan dan penambahbaikan kebolehpercayaan.
+Wealth Compass kini berjalan pada iPad.
 
-• Membaiki masalah jarang berlaku apabila apl boleh dibuka tanpa memaparkan data. Maklumat anda tidak pernah hilang — ia cuma belum boleh dibaca, dan kini apl menunggu serta memuatkannya dengan betul dan bukannya memaparkan angka kosong.
+iPad
+• Susun atur desktop penuh hadir pada iPad: bar sisi, papan pemuka berbilang lajur, dan menu yang sama seperti aplikasi Mac, dengan susunan semula apabila peranti dipegang menegak.
+• Carta, jadual dan menu direka untuk sentuhan, dan ikon aplikasi dilukis dalam saiz iPad.
+• Ketik carta untuk meneliti sesuatu nilai; penatalan masih berfungsi seperti biasa.
 
-• Penyegerakan iCloud yang lebih dipercayai, termasuk di latar belakang.
+Dalam bahasa anda
+• Laporan PDF kini diterjemahkan ke semua bahasa yang disokong aplikasi, bukan bahasa Inggeris sahaja.
+• Tarikh, nombor dan peratusan mengikut bahasa yang ditetapkan dalam aplikasi.
+• Nama kategori, sektor, kawasan dan mata wang telah diterjemahkan.
+• Banyak pembetulan terjemahan: bar tab tidak lagi dipaparkan dalam bahasa Inggeris untuk semua orang, "NET" tidak lagi diterjemahkan sebagai "rangkaian", dan tempoh 3M/6M/12M tidak lagi dibaca sebagai juta.
 
-• Jika data anda tidak dapat dimuatkan, apl kini menerangkan sebabnya dan menawarkan cara pemulihan dan bukannya memaparkan jumlah kosong.
+Mod Privasi menyembunyikan lebih banyak
+• Carta peruntukan disembunyikan sepenuhnya, bukan hanya jumlah di dalamnya.
+• Bilangan, kad status, paparan kosong dan amaran tidak lagi mendedahkan apa yang anda rekodkan.
+• Peringatan berulang tidak lagi menyebut nama jadual pada skrin kunci.
+• Petikan skrin dalam penukar aplikasi kini turut menutupi helaian yang terbuka.
+
+Jumlah yang tepat
+• Jumlah yang diimport dan disimpan mengekalkan ketepatan perpuluhan penuh, jadi angka tidak lagi terpesong.
+• "1,000" yang diimport dibaca sebagai seribu, dan pengumpulan lakh India dikenali.
+• Mengimport semula penyata Revolut tidak lagi memadam suntingan kripto anda.
+• Import tidak lagi kehilangan mata wang sesuatu transaksi, dan pelaburan baharu mengekalkan mata wang pilihan anda dan bukannya bertukar kepada EUR.
+
+Laporan
+• Bahagian aliran tunai kekal dalam tempoh yang dinyatakan, rajah aliran wang sepadan dengan jadual, dan carta aliran tidak lagi meninggalkan bulan.
+• Eksport luar talian menyatakan kadar pertukaran yang digunakan untuk penukaran.
+• Jumlah yang panjang tidak lagi dipotong.
+
+Turut hadir dalam versi ini
+• Jadual berulang tamat dan bukannya hilang, kekal dijeda selepas suntingan yang tidak berkaitan, dan boleh dipadam setelah selesai.
+• Penyegerakan iCloud lebih dipercayai, termasuk di latar belakang.
+• "Padam Semua" tidak lagi meninggalkan data yang kembali muncul.
+• Label VoiceOver pada kawalan carta dan penapis.

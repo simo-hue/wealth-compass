@@ -1,7 +1,35 @@
-Remedieri și îmbunătățiri de fiabilitate.
+Wealth Compass funcționează acum pe iPad.
 
-• Am remediat o problemă rară din cauza căreia aplicația se putea deschide fără să afișeze date. Informațiile tale nu au fost niciodată pierdute — doar nu puteau fi încă citite, iar acum aplicația așteaptă și le încarcă corect în loc să afișeze valori goale.
+iPad
+• Aranjamentul complet de desktop ajunge pe iPad: bară laterală, tablou de bord pe mai multe coloane și aceleași meniuri ca în aplicația pentru Mac, cu reașezare atunci când ții dispozitivul pe verticală.
+• Graficele, tabelele și meniurile sunt gândite pentru atingere, iar pictograma aplicației este desenată la dimensiuni de iPad.
+• Atinge un grafic pentru a examina o valoare; derularea continuă să funcționeze.
 
+În limba ta
+• Raportul PDF este acum tradus în toate limbile acceptate de aplicație, nu doar în engleză.
+• Datele, numerele și procentele urmează limba setată în aplicație.
+• Numele categoriilor, sectoarelor, zonelor geografice și valutelor sunt traduse.
+• Multe corecturi de traducere: bara de file nu mai apare în engleză pentru toată lumea, "NET" nu mai este tradus ca "rețea", iar perioadele 3M/6M/12M nu mai sunt citite ca milioane.
+
+Modul Confidențialitate ascunde mai mult
+• Graficele de repartizare sunt ascunse, nu doar sumele pe care le conțin.
+• Numărătorile, fișele de stare, vizualizările goale și alertele nu mai dezvăluie ce ai înregistrat.
+• Mementourile recurente nu mai indică numele programării pe ecranul blocat.
+• Instantaneul din comutatorul de aplicații acoperă acum și foile deschise.
+
+Sume exacte
+• Sumele importate și salvate păstrează precizia zecimală completă, așa că cifrele nu mai deviază.
+• Un "1,000" importat este citit ca o mie, iar gruparea indiană în lakh este recunoscută.
+• Reimportarea unui extras Revolut nu mai șterge modificările tale la cripto.
+• Importurile nu mai pierd valuta unei tranzacții, iar investițiile noi păstrează valuta aleasă în loc să treacă la EUR.
+
+Rapoarte
+• Secțiunile de flux de numerar rămân în perioada indicată, diagrama fluxului de bani corespunde tabelelor, iar graficul de tendință nu mai omite luni.
+• Exporturile offline indică ratele de schimb folosite la conversie.
+• Sumele lungi nu mai sunt trunchiate.
+
+Tot în această versiune
+• Programările recurente se încheie în loc să dispară, rămân în pauză după modificări fără legătură și pot fi șterse după ce s-au terminat.
 • Sincronizare iCloud mai fiabilă, inclusiv în fundal.
-
-• Dacă datele nu pot fi încărcate, aplicația explică acum motivul și oferă o cale de recuperare în loc să afișeze totaluri goale.
+• "Șterge tot" nu mai lasă date care revin.
+• Etichete VoiceOver pe comenzile de grafice și filtre.

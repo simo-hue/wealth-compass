@@ -1,7 +1,35 @@
-Hata düzeltmeleri ve güvenilirlik iyileştirmeleri.
+Wealth Compass artık iPad'de de çalışıyor.
 
-• Uygulamanın hiç veri göstermeden açılabildiği ender bir sorun giderildi. Bilgileriniz asla kaybolmadı — yalnızca henüz okunamıyordu; uygulama artık bekleyip verileri doğru şekilde yüklüyor, boş rakamlar göstermek yerine.
+iPad
+• Tam masaüstü yerleşimi iPad'e geliyor: kenar çubuğu, çok sütunlu gösterge paneli ve Mac uygulamasıyla aynı menüler; cihazı dikey tuttuğunuzda yerleşim yeniden düzenleniyor.
+• Grafikler, tablolar ve menüler dokunmatik kullanım için tasarlandı, uygulama simgesi de iPad boyutlarında çizildi.
+• Bir değeri incelemek için grafiğe dokunun; kaydırma yine çalışmaya devam eder.
 
-• Arka planda da dahil olmak üzere daha güvenilir iCloud eşitlemesi.
+Kendi dilinizde
+• PDF raporu artık yalnızca İngilizce değil, uygulamanın desteklediği tüm dillere çevrildi.
+• Tarihler, sayılar ve yüzdeler uygulamada seçilen dili izliyor.
+• Kategori, sektör, coğrafya ve para birimi adları çevrildi.
+• Çok sayıda çeviri düzeltmesi: sekme çubuğu artık herkese İngilizce görünmüyor, "NET" artık "ağ" olarak çevrilmiyor ve 3M/6M/12M dönemleri artık milyon olarak okunmuyor.
 
-• Verileriniz yüklenemezse uygulama artık nedenini açıklıyor ve boş toplamlar göstermek yerine kurtarma yolu sunuyor.
+Gizlilik Modu daha fazlasını gizliyor
+• Dağılım grafikleri, yalnızca içerdikleri tutarlar değil, tümüyle gizleniyor.
+• Sayımlar, durum kartları, boş görünümler ve uyarılar artık ne kaydettiğinizi ele vermiyor.
+• Yinelenen anımsatıcılar kilit ekranında artık planın adını yazmıyor.
+• Uygulama değiştiricideki anlık görüntü artık açık sayfaların üzerini de örtüyor.
+
+Tutarlar tam doğru
+• İçe aktarılan ve kaydedilen tutarlar ondalık hassasiyetini tümüyle koruyor, böylece rakamlar artık sapmıyor.
+• İçe aktarılan "1,000" bin olarak okunuyor ve Hint lakh gruplaması tanınıyor.
+• Bir Revolut ekstresini yeniden içe aktarmak artık kripto düzenlemelerinizi silmiyor.
+• İçe aktarma artık bir işlemin para birimini kaybetmiyor ve yeni yatırımlar EUR'ya dönmek yerine seçtiğiniz para birimini koruyor.
+
+Raporlar
+• Nakit akışı bölümleri belirtilen dönemin içinde kalıyor, para akışı diyagramı tablolarla tutuyor ve eğilim grafiği artık ay atlamıyor.
+• Çevrimdışı dışa aktarmalar, dönüştürmede kullanılan döviz kurlarını belirtiyor.
+• Uzun tutarlar artık kırpılmıyor.
+
+Bu sürümde ayrıca
+• Yinelenen planlar kaybolmak yerine tamamlanıyor, ilgisiz düzenlemelerden sonra da duraklatılmış kalıyor ve bittiklerinde silinebiliyor.
+• Arka plan dahil olmak üzere daha güvenilir iCloud eşitlemesi.
+• "Her Şeyi Sil" artık geri gelen veri bırakmıyor.
+• Grafik ve filtre denetimlerinde VoiceOver etiketleri.

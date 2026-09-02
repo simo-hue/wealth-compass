@@ -1,7 +1,35 @@
-Correcciones y mejoras de fiabilidad.
+Wealth Compass ya funciona en iPad.
 
-• Se ha corregido un problema poco frecuente por el que la app podía abrirse sin mostrar datos. Tu información nunca se perdió — simplemente aún no podía leerse, y ahora la app espera y la carga correctamente en lugar de mostrar cifras vacías.
+iPad
+• La disposición completa de escritorio llega al iPad: barra lateral, panel de varias columnas y los mismos menús que la app de Mac, que se reorganizan al sostener el dispositivo en vertical.
+• Gráficos, tablas y menús están pensados para el toque, y el icono de la app está dibujado en tamaños de iPad.
+• Toca un gráfico para examinar un valor; el desplazamiento sigue funcionando.
 
+En tu idioma
+• El informe PDF ya está traducido a todos los idiomas que admite la app, no solo al inglés.
+• Las fechas, los números y los porcentajes siguen el idioma configurado en la app.
+• Los nombres de categorías, sectores, zonas geográficas y divisas están traducidos.
+• Muchas correcciones de traducción: la barra de pestañas ya no aparece en inglés para todo el mundo, «NET» ya no se traduce como «red» y los periodos 3M/6M/12M ya no se leen como millones.
+
+El modo Privacidad oculta más
+• Los gráficos de distribución se ocultan, no solo las cifras que contienen.
+• Los recuentos, las tarjetas de estado, las vistas vacías y los avisos ya no revelan lo que has registrado.
+• Los recordatorios periódicos ya no muestran el nombre de la programación en la pantalla bloqueada.
+• La vista previa del selector de apps ahora también cubre las hojas abiertas.
+
+Importes exactos
+• Los importes importados y guardados conservan toda la precisión decimal, así que las cifras ya no se desvían.
+• Un «1,000» importado se lee como mil, y se reconoce la agrupación india en lakhs.
+• Volver a importar un extracto de Revolut ya no borra tus cambios en las criptomonedas.
+• Las importaciones ya no pierden la divisa de una transacción, y las nuevas inversiones mantienen la divisa elegida en lugar de pasar a EUR.
+
+Informes
+• Las secciones de flujo de caja se mantienen dentro del periodo indicado, el diagrama de flujo de dinero cuadra con las tablas y el gráfico de tendencia ya no omite meses.
+• Las exportaciones sin conexión indican los tipos de cambio usados para la conversión.
+• Los importes largos ya no se recortan.
+
+También en esta versión
+• Las programaciones periódicas finalizan en lugar de desaparecer, siguen en pausa tras cambios no relacionados y se pueden eliminar una vez terminadas.
 • Sincronización con iCloud más fiable, también en segundo plano.
-
-• Si alguna vez no se pueden cargar tus datos, la app ahora explica por qué y ofrece una forma de recuperarlos en lugar de mostrar totales vacíos.
+• «Borrar todo» ya no deja datos que vuelven a aparecer.
+• Etiquetas de VoiceOver en los controles de gráficos y filtros.

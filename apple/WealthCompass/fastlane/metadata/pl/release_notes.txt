@@ -1,7 +1,35 @@
-Poprawki i ulepszenia niezawodności.
+Wealth Compass działa teraz na iPadzie.
 
-• Naprawiono rzadki problem, przez który aplikacja mogła otworzyć się bez żadnych danych. Twoje informacje nigdy nie zostały utracone — po prostu nie można ich było jeszcze odczytać, a teraz aplikacja czeka i wczytuje je poprawnie zamiast pokazywać puste wartości.
+iPad
+• Pełny układ znany z komputera trafia na iPada: panel boczny, wielokolumnowy pulpit i te same menu co w aplikacji na Maca, z przebudową układu, gdy trzymasz urządzenie pionowo.
+• Wykresy, tabele i menu są przystosowane do dotyku, a ikona aplikacji jest narysowana w rozmiarach iPada.
+• Stuknij wykres, aby sprawdzić wartość; przewijanie nadal działa.
 
+W Twoim języku
+• Raport PDF jest teraz przetłumaczony na wszystkie języki obsługiwane przez aplikację, nie tylko na angielski.
+• Daty, liczby i wartości procentowe podążają za językiem ustawionym w aplikacji.
+• Nazwy kategorii, sektorów, regionów i walut są przetłumaczone.
+• Wiele poprawek tłumaczeń: pasek kart nie wyświetla się już wszystkim po angielsku, "NET" nie jest już tłumaczone jako "sieć", a okresy 3M/6M/12M nie są już odczytywane jako miliony.
+
+Tryb prywatności ukrywa więcej
+• Wykresy struktury są ukrywane, a nie tylko kwoty, które przedstawiają.
+• Liczniki, karty stanu, puste widoki i alerty nie zdradzają już, co zapisujesz.
+• Cykliczne przypomnienia nie podają już nazwy harmonogramu na ekranie blokady.
+• Podgląd w przełączniku aplikacji zasłania teraz także otwarte arkusze.
+
+Dokładne kwoty
+• Importowane i zapisywane kwoty zachowują pełną precyzję dziesiętną, więc liczby nie odbiegają już od siebie.
+• Zaimportowana wartość "1,000" jest odczytywana jako tysiąc, a indyjskie grupowanie lakh jest rozpoznawane.
+• Ponowny import wyciągu z Revoluta nie kasuje już Twoich zmian w kryptowalutach.
+• Import nie gubi już waluty transakcji, a nowe inwestycje zachowują wybraną walutę zamiast przechodzić na EUR.
+
+Raporty
+• Sekcje przepływów pieniężnych mieszczą się w podanym okresie, diagram przepływu pieniędzy zgadza się z tabelami, a wykres trendu nie pomija już miesięcy.
+• Eksporty offline podają kursy wymiany użyte do przeliczenia.
+• Długie kwoty nie są już ucinane.
+
+Ponadto w tej wersji
+• Cykliczne harmonogramy kończą się, zamiast znikać, pozostają wstrzymane po niepowiązanych zmianach i można je usunąć po zakończeniu.
 • Bardziej niezawodna synchronizacja z iCloud, także w tle.
-
-• Jeśli danych nie da się wczytać, aplikacja wyjaśni teraz dlaczego i zaproponuje sposób odzyskania zamiast pokazywać puste sumy.
+• "Wymaż wszystko" nie zostawia już danych, które wracają.
+• Etykiety VoiceOver przy elementach sterujących wykresami i filtrami.

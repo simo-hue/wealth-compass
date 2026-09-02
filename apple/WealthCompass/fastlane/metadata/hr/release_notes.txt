@@ -1,7 +1,35 @@
-Ispravci i poboljšanja pouzdanosti.
+Wealth Compass sada radi na iPadu.
 
-• Ispravljen je rijedak problem zbog kojeg se aplikacija mogla otvoriti bez prikaza podataka. Vaši podaci nikada nisu izgubljeni — samo se još nisu mogli pročitati, a aplikacija sada pričeka i ispravno ih učita umjesto da prikaže prazne iznose.
+iPad
+• Potpuni raspored s računala stiže na iPad: bočni izbornik, nadzorna ploča s više stupaca i isti izbornici kao u Mac aplikaciji, uz prilagodbu kada uređaj držite uspravno.
+• Grafikoni, tablice i izbornici prilagođeni su dodiru, a ikona aplikacije nacrtana je u iPad veličinama.
+• Dodirnite grafikon da biste pregledali vrijednost; pomicanje i dalje radi.
 
+Na vašem jeziku
+• PDF izvještaj sada je preveden na sve jezike koje aplikacija podržava, ne samo na engleski.
+• Datumi, brojevi i postoci prate jezik postavljen u aplikaciji.
+• Nazivi kategorija, sektora, područja i valuta su prevedeni.
+• Brojni ispravci prijevoda: traka kartica više se ne prikazuje svima na engleskom, "NET" se više ne prevodi kao "mreža", a razdoblja 3M/6M/12M više se ne čitaju kao milijuni.
+
+Način rada za privatnost skriva više
+• Grafikoni raspodjele se skrivaju, a ne samo iznosi koje prikazuju.
+• Brojevi stavki, statusne kartice, prazni prikazi i upozorenja više ne otkrivaju što ste zabilježili.
+• Ponavljajući podsjetnici više ne navode naziv rasporeda na zaključanom zaslonu.
+• Snimka u izborniku aplikacija sada prekriva i otvorene listove.
+
+Točni iznosi
+• Uvezeni i spremljeni iznosi zadržavaju punu decimalnu preciznost pa brojke više ne odstupaju.
+• Uvezeni "1,000" čita se kao tisuću, a prepoznaje se i indijsko grupiranje u lakhe.
+• Ponovni uvoz izvatka iz Revoluta više ne briše vaše izmjene kriptovaluta.
+• Uvoz više ne gubi valutu transakcije, a nova ulaganja zadržavaju odabranu valutu umjesto prelaska na EUR.
+
+Izvještaji
+• Odjeljci novčanog toka ostaju unutar navedenog razdoblja, dijagram toka novca slaže se s tablicama, a grafikon trenda više ne izostavlja mjesece.
+• Izvozi bez mreže navode tečajeve korištene za pretvorbu.
+• Dugi iznosi više se ne skraćuju.
+
+Također u ovoj verziji
+• Ponavljajući rasporedi završavaju umjesto da nestanu, ostaju pauzirani nakon nepovezanih izmjena i mogu se izbrisati kada završe.
 • Pouzdanija iCloud sinkronizacija, i u pozadini.
-
-• Ako se podaci ne mogu učitati, aplikacija sada objašnjava zašto i nudi način oporavka umjesto prikaza praznih ukupnih iznosa.
+• "Izbriši sve" više ne ostavlja podatke koji se vraćaju.
+• VoiceOver oznake na kontrolama grafikona i filtara.

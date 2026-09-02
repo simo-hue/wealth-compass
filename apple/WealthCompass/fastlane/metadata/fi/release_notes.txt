@@ -1,7 +1,35 @@
-Korjauksia ja luotettavuusparannuksia.
+Wealth Compass toimii nyt iPadilla.
 
-• Korjattu harvinainen ongelma, jossa sovellus saattoi avautua ilman tietoja. Tietosi eivät koskaan kadonneet — niitä ei vain vielä voitu lukea, ja nyt sovellus odottaa ja lataa ne oikein sen sijaan, että näyttäisi tyhjiä lukuja.
+iPad
+• Täysi työpöytäasettelu tulee iPadille: sivupalkki, monisarakkeinen kojelauta ja samat valikot kuin Mac-apissa, ja asettelu mukautuu, kun pidät laitetta pystyasennossa.
+• Kaaviot, taulukot ja valikot on tehty kosketuskäyttöön, ja apin symboli on piirretty iPadin koossa.
+• Tarkastele arvoa napauttamalla kaaviota; vieritys toimii edelleen.
 
-• Luotettavampi iCloud-synkronointi myös taustalla.
+Omalla kielelläsi
+• PDF-raportti on nyt käännetty kaikille apin tukemille kielille, ei vain englanniksi.
+• Päivämäärät, luvut ja prosentit noudattavat apissa valittua kieltä.
+• Luokkien, toimialojen, alueiden ja valuuttojen nimet on käännetty.
+• Useita käännösvirheitä korjattu: välilehtipalkki ei näy enää kaikille englanniksi, "NET" ei käänny enää sanaksi "verkko", eikä jaksoja 3M/6M/12M lueta enää miljooniksi.
 
-• Jos tietojasi ei jostain syystä voi ladata, sovellus kertoo nyt syyn ja tarjoaa tavan palautua sen sijaan, että näyttäisi tyhjiä summia.
+Yksityisyystila piilottaa enemmän
+• Jakaumakaaviot piilotetaan, ei vain niiden näyttämiä lukuja.
+• Lukumäärät, tilakortit, tyhjät näkymät ja ilmoitukset eivät enää paljasta, mitä olet kirjannut.
+• Toistuvat muistutukset eivät enää kerro ajastuksen nimeä lukitusnäytöllä.
+• Apin vaihtajan tilannekuva peittää nyt myös avoimet arkit.
+
+Täsmälliset summat
+• Tuodut ja tallennetut summat säilyttävät täyden desimaalitarkkuuden, joten luvut eivät enää poikkea.
+• Tuotu "1,000" luetaan tuhanneksi, ja intialainen lakh-ryhmittely tunnistetaan.
+• Revolut-tiliotteen tuominen uudelleen ei enää pyyhi kryptomuokkauksiasi.
+• Tuonti ei enää hukkaa tapahtuman valuuttaa, ja uudet sijoitukset säilyttävät valitsemasi valuutan sen sijaan, että ne vaihtuisivat euroiksi.
+
+Raportit
+• Kassavirtaosiot pysyvät ilmoitetun jakson sisällä, rahavirtakaavio täsmää taulukoiden kanssa, eikä trendikaavio pudota enää kuukausia pois.
+• Offline-viennit kertovat muuntamiseen käytetyt valuuttakurssit.
+• Pitkiä summia ei enää katkaista.
+
+Myös tässä versiossa
+• Toistuvat ajastukset päättyvät sen sijaan, että katoaisivat, pysyvät tauolla muiden muokkausten jälkeen ja voidaan poistaa, kun ne ovat valmiita.
+• Luotettavampi iCloud-synkronointi, myös taustalla.
+• "Poista kaikki" ei enää jätä tietoja, jotka palaavat takaisin.
+• VoiceOver-nimet kaavioiden ja suodattimien säätimissä.

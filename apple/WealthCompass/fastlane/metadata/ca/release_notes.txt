@@ -1,7 +1,35 @@
-Correccions i millores de fiabilitat.
+Wealth Compass ja funciona a l'iPad.
 
-• S'ha corregit un problema poc freqüent pel qual l'app es podia obrir sense mostrar cap dada. La teva informació mai no s'ha perdut — simplement encara no es podia llegir, i ara l'app espera i la carrega correctament en lloc de mostrar xifres buides.
+iPad
+• La disposició completa d'escriptori arriba a l'iPad: barra lateral, tauler de diverses columnes i els mateixos menús que l'app per a Mac, que es reorganitzen quan subjectes el dispositiu en vertical.
+• Els gràfics, les taules i els menús estan pensats per al tacte, i la icona de l'app està dibuixada en mides d'iPad.
+• Toca un gràfic per examinar-ne un valor; el desplaçament continua funcionant.
 
-• Sincronització amb iCloud més fiable, també en segon pla.
+En la teva llengua
+• L'informe en PDF ja està traduït a totes les llengües compatibles amb l'app, no només a l'anglès.
+• Les dates, els nombres i els percentatges segueixen la llengua configurada a l'app.
+• Els noms de categories, sectors, zones geogràfiques i divises estan traduïts.
+• Moltes correccions de traducció: la barra de pestanyes ja no apareix en anglès per a tothom, «NET» ja no es tradueix com a «xarxa» i els períodes 3M/6M/12M ja no es llegeixen com a milions.
 
-• Si mai no es poden carregar les dades, ara l'app explica per què i ofereix una manera de recuperar-les en lloc de mostrar totals buits.
+El mode Privadesa amaga més coses
+• Els gràfics de distribució queden amagats, no només les xifres que contenen.
+• Els recomptes, les targetes d'estat, les vistes buides i els avisos ja no revelen què has registrat.
+• Els recordatoris periòdics ja no mostren el nom de la planificació a la pantalla bloquejada.
+• La instantània del selector d'apps ara també cobreix els fulls oberts.
+
+Imports exactes
+• Els imports importats i desats conserven tota la precisió decimal, de manera que les xifres ja no es desvien.
+• Un «1,000» importat es llegeix com a mil, i es reconeix l'agrupació índia en lakhs.
+• Tornar a importar un extracte de Revolut ja no esborra els canvis que has fet a les criptomonedes.
+• Les importacions ja no perden la divisa d'una transacció, i les inversions noves mantenen la divisa triada en lloc de passar a EUR.
+
+Informes
+• Les seccions de flux de caixa es mantenen dins del període indicat, el diagrama de flux de diners quadra amb les taules i el gràfic de tendència ja no omet mesos.
+• Les exportacions sense connexió indiquen els tipus de canvi utilitzats per convertir.
+• Els imports llargs ja no es retallen.
+
+També en aquesta versió
+• Les planificacions periòdiques finalitzen en lloc de desaparèixer, es mantenen en pausa després de canvis no relacionats i es poden eliminar un cop acabades.
+• Sincronització amb l'iCloud més fiable, també en segon pla.
+• «Esborra-ho tot» ja no deixa dades que tornen a aparèixer.
+• Etiquetes de VoiceOver als controls de gràfics i filtres.

@@ -1,7 +1,35 @@
-Corrections et améliorations de fiabilité.
+Wealth Compass fonctionne désormais sur iPad.
 
-• Correction d'un problème rare où l'app pouvait s'ouvrir sans afficher de données. Vos informations n'ont jamais été perdues — elles ne pouvaient simplement pas encore être lues, et l'app attend désormais et les charge correctement au lieu d'afficher des montants vides.
+iPad
+• La mise en page complète du bureau arrive sur iPad : barre latérale, tableau de bord multicolonne et les mêmes menus que l'app Mac, qui se réorganisent lorsque vous tenez l'appareil à la verticale.
+• Graphiques, tableaux et menus sont conçus pour le tactile, et l'icône de l'app est dessinée aux tailles iPad.
+• Touchez un graphique pour examiner une valeur ; le défilement continue de fonctionner.
 
+Dans votre langue
+• Le rapport PDF est désormais traduit dans toutes les langues prises en charge par l'app, et plus seulement en anglais.
+• Les dates, les nombres et les pourcentages suivent la langue choisie dans l'app.
+• Les noms de catégories, secteurs, zones géographiques et devises sont traduits.
+• De nombreuses corrections de traduction : la barre d'onglets ne s'affiche plus en anglais pour tout le monde, « NET » n'est plus traduit par « réseau » et les périodes 3M/6M/12M ne sont plus lues comme des millions.
+
+Le mode Confidentialité masque davantage
+• Les graphiques de répartition sont masqués, et pas seulement les montants qu'ils contiennent.
+• Les décomptes, fiches d'état, écrans vides et alertes ne révèlent plus ce que vous avez enregistré.
+• Les rappels récurrents ne nomment plus l'échéancier sur l'écran verrouillé.
+• L'aperçu dans le sélecteur d'apps couvre maintenant aussi les feuilles ouvertes.
+
+Des montants exacts
+• Les montants importés et enregistrés conservent toute leur précision décimale : les chiffres ne dérivent plus.
+• Un « 1,000 » importé est lu comme mille, et le groupement indien en lakh est reconnu.
+• Réimporter un relevé Revolut n'efface plus vos modifications sur les cryptos.
+• Les imports ne perdent plus la devise d'une transaction, et les nouveaux investissements conservent la devise choisie au lieu de passer à l'EUR.
+
+Rapports
+• Les sections de flux de trésorerie restent dans la période indiquée, le diagramme des flux concorde avec les tableaux, et le graphique de tendance n'omet plus de mois.
+• Les exports hors ligne indiquent les taux de change utilisés pour la conversion.
+• Les montants longs ne sont plus tronqués.
+
+Également dans cette version
+• Les échéanciers récurrents se terminent au lieu de disparaître, restent en pause malgré des modifications sans rapport, et peuvent être supprimés une fois terminés.
 • Synchronisation iCloud plus fiable, y compris en arrière-plan.
-
-• Si vos données ne peuvent pas être chargées, l'app explique maintenant pourquoi et propose une solution de récupération au lieu d'afficher des totaux vides.
+• « Tout effacer » ne laisse plus de données qui reviennent.
+• Libellés VoiceOver sur les commandes de graphiques et de filtres.
