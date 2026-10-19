@@ -1,35 +1,3 @@
-Wealth Compass läuft jetzt auf dem iPad.
+Eigene Einnahmen- und Ausgabenkategorien werden jetzt zwischen iPhone, iPad und Mac synchronisiert, wenn die iCloud-Synchronisierung aktiviert ist.
 
-iPad
-• Das vollständige Desktop-Layout kommt auf das iPad – Seitenleiste, mehrspaltiges Dashboard und dieselben Menüs wie in der Mac-App, mit passendem Umbruch im Hochformat.
-• Diagramme, Tabellen und Menüs sind für die Bedienung per Touch ausgelegt, und das App-Symbol ist in iPad-Größen gezeichnet.
-• Tippen Sie auf ein Diagramm, um einen Wert anzusehen – Scrollen funktioniert weiterhin.
-
-In Ihrer Sprache
-• Der PDF-Bericht ist jetzt in alle von der App unterstützten Sprachen übersetzt, nicht mehr nur Englisch.
-• Datums-, Zahlen- und Prozentformate folgen der in der App eingestellten Sprache.
-• Namen von Kategorien, Branchen, Regionen und Währungen sind übersetzt.
-• Viele Übersetzungskorrekturen: Die Tab-Leiste zeigt nicht mehr für alle Englisch, „NET“ wird nicht mehr als „Netzwerk“ übersetzt, und die Zeiträume 3M/6M/12M werden nicht mehr als Millionen gelesen.
-
-Der Privatmodus verbirgt mehr
-• Aufteilungsdiagramme werden verborgen, nicht nur die Zahlen darin.
-• Anzahlen, Statuskarten, leere Ansichten und Hinweise verraten nicht mehr, was Sie erfasst haben.
-• Wiederkehrende Erinnerungen nennen den Namen des Zeitplans nicht mehr auf dem Sperrbildschirm.
-• Die Vorschau im App-Umschalter deckt jetzt auch geöffnete Blätter ab.
-
-Exakte Beträge
-• Importierte und gespeicherte Beträge behalten die volle Dezimalgenauigkeit, sodass Zahlen nicht mehr abweichen.
-• Ein importiertes „1,000“ wird als Eintausend gelesen, und die indische Lakh-Gruppierung wird erkannt.
-• Ein erneuter Import eines Revolut-Auszugs überschreibt Ihre Krypto-Änderungen nicht mehr.
-• Beim Import geht die Währung einer Buchung nicht mehr verloren, und neue Investments behalten die gewählte Währung, statt auf EUR zu wechseln.
-
-Berichte
-• Cashflow-Abschnitte bleiben im angegebenen Zeitraum, das Geldfluss-Diagramm stimmt mit den Tabellen überein, und das Trenddiagramm lässt keine Monate mehr aus.
-• Offline-Exporte weisen die zur Umrechnung verwendeten Wechselkurse aus.
-• Lange Beträge werden nicht mehr abgeschnitten.
-
-Außerdem in dieser Version
-• Wiederkehrende Zeitpläne enden, statt zu verschwinden, bleiben bei nicht zugehörigen Änderungen pausiert und lassen sich nach Abschluss löschen.
-• Zuverlässigere iCloud-Synchronisierung, auch im Hintergrund.
-• „Alles löschen“ hinterlässt keine Daten mehr, die zurückkehren.
-• VoiceOver-Beschriftungen für Diagramm- und Filtersteuerelemente.
+Dieses Update verbessert außerdem die Zuverlässigkeit der Synchronisierung und behebt Lokalisierungsfehler.

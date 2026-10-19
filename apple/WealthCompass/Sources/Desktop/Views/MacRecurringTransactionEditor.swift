@@ -205,7 +205,12 @@ struct MacRecurringTransactionEditor: View {
             .formStyle(.grouped)
             .onAppear {
                 guard !hasInitializedCurrency else { return }
-                if existingSchedule == nil { currency = settings.currency }
+                if TransactionEditorCurrency.seedsBaseCurrency(
+                    rowCurrency: existingSchedule?.currency,
+                    isNewRecord: existingSchedule == nil
+                ) {
+                    currency = settings.currency
+                }
                 hasInitializedCurrency = true
             }
             .navigationTitle(existingSchedule == nil ? "New Recurring Transaction" : "Edit Recurring Transaction")

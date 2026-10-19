@@ -77,32 +77,69 @@ private struct SettingsRow<Content: View>: View {
         self.content = content()
     }
 
+    /// Label on the left, control on the right — until there is no room for both.
+    ///
+    /// The row used to be a plain `HStack { labels; Spacer(minLength: 20); content }`, and the three
+    /// pickers it hosts (Language, Base Currency, Import Behavior) were pinned `.frame(width: 200)`.
+    /// A Slide Over pane gives this row `320 − 64 − 36 = 220pt`, and `200 + 20 = 220` leaves the
+    /// label **exactly zero**. Worse for the rows that carry a subtitle: those use
+    /// `.fixedSize(horizontal: false, vertical: true)`, so rather than truncating they grew into a
+    /// one-character-per-line column running down the pane.
+    ///
+    /// Two things fix it together. The pickers now say `maxWidth: 200`, so they can hand width back
+    /// instead of taking 200pt come what may; and this ladder gives up on the side-by-side shape
+    /// entirely once it stops fitting, stacking the control under its label.
+    ///
+    /// `idealWidth` on the label column is load-bearing, and is the trap `MacDashboardView`'s
+    /// `onboardingCard` documents: a paragraph's *ideal* width is its single-line width, so without
+    /// it a row with a subtitle reports an ideal of several hundred points, the first rung never
+    /// fits, and every Settings row on a full-size Mac window would render stacked.
     var body: some View {
-        HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 4) {
-                if let titleKey {
-                    Text(titleKey)
-                        .font(.body)
-                } else if let titleString {
-                    Text(titleString)
-                        .font(.body)
-                }
-                if let subtitleKey {
-                    Text(subtitleKey)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                } else if let subtitleString {
-                    Text(subtitleString)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .center) {
+                labels
+                    // 140 + 20 + 200 = 360pt, which is the number that decides where this row
+                    // gives up. It fits the 424pt interior of a minimum-width masonry column
+                    // (460 − 2×18 of `FinanceCard` padding) and every wider pane, and does not fit
+                    // Slide Over's 220pt — which is exactly the case where the label had nothing
+                    // left. A row whose control is small (a Toggle, say) still keeps its side-by-side
+                    // shape everywhere, because its own ideal is what is being measured.
+                    .frame(idealWidth: 140, maxWidth: .infinity, alignment: .leading)
+                Spacer(minLength: 20)
+                content
             }
-            Spacer(minLength: 20)
-            content
+
+            VStack(alignment: .leading, spacing: 8) {
+                labels
+                content
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.vertical, 4)
+    }
+
+    @ViewBuilder
+    private var labels: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if let titleKey {
+                Text(titleKey)
+                    .font(.body)
+            } else if let titleString {
+                Text(titleString)
+                    .font(.body)
+            }
+            if let subtitleKey {
+                Text(subtitleKey)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else if let subtitleString {
+                Text(subtitleString)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }
 
@@ -292,7 +329,9 @@ struct MacSettingsView: View {
                         }
                     }
                     .labelsHidden()
-                    .frame(width: 200)
+                    // maxWidth, not width: a Slide Over pane leaves the row 220pt, and a rigid
+                    // 200 left the label exactly nothing. See `SettingsRow.body`.
+                    .frame(maxWidth: 200)
                 }
 
                 Divider().background(WCColor.border)
@@ -304,7 +343,9 @@ struct MacSettingsView: View {
                         }
                     }
                     .labelsHidden()
-                    .frame(width: 200)
+                    // maxWidth, not width: a Slide Over pane leaves the row 220pt, and a rigid
+                    // 200 left the label exactly nothing. See `SettingsRow.body`.
+                    .frame(maxWidth: 200)
                 }
             }
 
@@ -494,7 +535,9 @@ struct MacSettingsView: View {
                         Text("Replace local data").tag(FinanceImportMode.replace)
                     }
                     .labelsHidden()
-                    .frame(width: 200)
+                    // maxWidth, not width: a Slide Over pane leaves the row 220pt, and a rigid
+                    // 200 left the label exactly nothing. See `SettingsRow.body`.
+                    .frame(maxWidth: 200)
                 }
 
                 Divider().background(WCColor.border)
@@ -662,6 +705,9 @@ struct MacSettingsView: View {
                         } label: {
                             Label("Remove \(category)", systemImage: "minus.circle")
                                 .labelStyle(.iconOnly)
+                                // A borderless glyph is ~22pt; on iPad this is a destructive
+                                // action at half Apple's 44pt minimum. No-op on macOS.
+                                .desktopTouchTarget()
                         }
                         .buttonStyle(.borderless)
                         .help("Remove \(category)")
@@ -1008,7 +1054,14 @@ struct MacSettingsView: View {
         case .deleteCustomCategory(let category, let type):
             settings.removeCustomTransactionCategory(category, for: type)
         case .replaceImport:
-            presentImportPanel()
+            // Deferred a turn. This runs from inside the confirmation dialog's own dismissing
+            // action, and on iPad the two presentations contend: `.fileImporter` is asked to
+            // present while the dialog it was invoked from is still being torn down, and the picker
+            // never appears — leaving Replace import with no way to choose a file. macOS is
+            // unaffected either way, because `NSOpenPanel.runModal()` opens its own window rather
+            // than going through the presentation stack. Same `Task { @MainActor in … }` shape this
+            // file already uses for the export request, and `MacCashFlowView` for its sibling token.
+            Task { @MainActor in presentImportPanel() }
         }
         pendingDestructiveAction = nil
     }

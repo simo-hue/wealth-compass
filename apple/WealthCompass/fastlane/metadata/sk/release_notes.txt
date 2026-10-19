@@ -1,35 +1,3 @@
-Wealth Compass teraz beží na iPade.
+Vlastné kategórie príjmov a výdavkov sa teraz synchronizujú medzi iPhonom, iPadom a Macom, keď je zapnutá synchronizácia cez iCloud.
 
-iPad
-• Kompletné rozloženie z počítača prichádza na iPad: bočný panel, viacstĺpcový prehľad a rovnaké ponuky ako v aplikácii pre Mac, s preskladaním, keď držíte zariadenie na výšku.
-• Grafy, tabuľky aj ponuky sú prispôsobené dotykovému ovládaniu a ikona aplikácie je vykreslená vo veľkostiach pre iPad.
-• Klepnutím na graf si pozriete hodnotu; posúvanie naďalej funguje.
-
-Vo vašom jazyku
-• PDF report je teraz preložený do všetkých jazykov, ktoré aplikácia podporuje, nielen do angličtiny.
-• Dátumy, čísla a percentá sa riadia jazykom nastaveným v aplikácii.
-• Názvy kategórií, sektorov, oblastí a mien sú preložené.
-• Množstvo opráv prekladu: panel kariet sa už všetkým nezobrazuje po anglicky, "NET" sa už neprekladá ako "sieť" a obdobia 3M/6M/12M sa už nečítajú ako milióny.
-
-Režim súkromia skrýva viac
-• Grafy rozloženia sa skryjú, nielen sumy, ktoré obsahujú.
-• Počty, stavové karty, prázdne zobrazenia a upozornenia už neprezrádzajú, čo máte zaznamenané.
-• Opakované pripomienky už na uzamknutej obrazovke neuvádzajú názov plánu.
-• Náhľad v prepínači aplikácií teraz zakryje aj otvorené hárky.
-
-Presné sumy
-• Importované a uložené sumy si zachovávajú plnú desatinnú presnosť, takže sa čísla už neodchyľujú.
-• Importovaná hodnota "1,000" sa číta ako tisíc a rozpozná sa aj indické zoskupenie lakh.
-• Opakovaný import výpisu z Revolutu už neprepíše vaše úpravy kryptomien.
-• Import už nestráca menu transakcie a nové investície si ponechajú zvolenú menu namiesto prepnutia na EUR.
-
-Reporty
-• Časti s peňažnými tokmi zostávajú v uvedenom období, diagram toku peňazí sedí s tabuľkami a trendový graf už nevynecháva mesiace.
-• Offline exporty uvádzajú výmenné kurzy použité na prepočet.
-• Dlhé sumy sa už neskracujú.
-
-Aj v tejto verzii
-• Opakované plány sa dokončia namiesto toho, aby zmizli, zostanú pozastavené aj po nesúvisiacich úpravách a po skončení sa dajú vymazať.
-• Spoľahlivejšia synchronizácia s iCloudom, aj na pozadí.
-• "Vymazať všetko" už nenecháva dáta, ktoré sa vrátia.
-• Popisy VoiceOveru pri ovládacích prvkoch grafov a filtrov.
+Táto aktualizácia tiež zlepšuje spoľahlivosť synchronizácie a opravuje chyby lokalizácie.

@@ -75,14 +75,29 @@ struct SnapshotEngine {
     /// it is applied only when `transactionCurrency == displayCurrency` and the target snapshot is
     /// itself in the display currency. Stored snapshots are frozen at their capture-time base
     /// currency and carry no per-day FX rate, so folding a foreign, today-rate delta into them would
-    /// mix rate epochs. A foreign-currency edit is skipped here and left to the render-time
-    /// reconversion each `NetWorthSnapshot.currency` enables (deep-audit H11).
+    /// mix rate epochs.
+    ///
+    /// **What the skip does and does not mean.** This refuses the *retroactive patch* of an
+    /// already-frozen row; it does not keep foreign money out of history, and nothing re-adds it
+    /// later. An earlier version of this comment said the skipped delta was "left to the
+    /// render-time reconversion each `NetWorthSnapshot.currency` enables". That is not a thing:
+    /// `AnalyticsEngine.snapshots(range:)` reconverts a snapshot's own frozen *base* currency into
+    /// the display currency and never walks `data.transactions`, and neither does
+    /// `snapshotsForChart`, the PDF's `monthEndSnapshots`, or any other reader — verified by test.
+    /// Foreign money reaches history by the other door: `appendSnapshot` rewrites *today's* row
+    /// from `AnalyticsEngine.calculateTotals`, which converts and sums every settled transaction
+    /// whatever its currency. So a foreign row entered on the day it happened is in history from
+    /// that day on; only a *back-dated* foreign row is missing from the days before it was entered,
+    /// and stays missing. That asymmetry is the accepted cost of this guard, and it is why
+    /// `FinanceStore.updateTransaction` has to decide the pair of legs together rather than letting
+    /// one of them through.
     func adjustingHistoricalSnapshots(
         _ snapshots: [NetWorthSnapshot],
         from date: Date,
         transactionCurrency: Currency,
         displayCurrency: Currency,
-        liquidityDelta: Decimal
+        liquidityDelta: Decimal,
+        now: Date = Date()
     ) -> [NetWorthSnapshot] {
         // Foreign-currency edit: the converted delta doesn't belong in history frozen at other
         // rates, so skip the retroactive mutation entirely (render-time reconversion handles it).
@@ -96,6 +111,17 @@ struct SnapshotEngine {
             snapshots[index].liquidity += liquidityDelta
             snapshots[index].totalAssets += liquidityDelta
             snapshots[index].netWorth += liquidityDelta
+            // A corrected row has to advertise that it was corrected. `updatedAt` is the primary
+            // key of both `NetWorthSnapshot.supersedesForCollapse` and `Array.mergedByID`, so a row
+            // rewritten here while keeping its old timestamp still claims its pre-correction age —
+            // and loses the same-day collapse, and the merge, to a stale copy carrying exactly the
+            // figures this pass just corrected. `backfillingCurrencies` found the same thing for
+            // itself (note `#9b`). `createdAt` is untouched: an adjustment is not a birth.
+            //
+            // One `now` for the whole pass, threaded in rather than read here so the engine stays
+            // referentially transparent: rows adjusted together must stay tied on `updatedAt` and
+            // fall through to `date`/`id` as before, instead of being ordered by iteration order.
+            snapshots[index].updatedAt = now
         }
         return snapshots
     }

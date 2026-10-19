@@ -1,35 +1,3 @@
-Wealth Compass fungerar nu på iPad.
+Anpassade inkomst- och utgiftskategorier synkroniseras nu mellan iPhone, iPad och Mac när iCloud-synkronisering är aktiverad.
 
-iPad
-• Den kompletta skrivbordslayouten kommer till iPad: sidofält, instrumentpanel med flera kolumner och samma menyer som Mac-appen, med anpassad layout när du håller enheten upprätt.
-• Diagram, tabeller och menyer är gjorda för pekskärm, och appsymbolen är ritad i iPad-storlekar.
-• Tryck på ett diagram för att granska ett värde; rullningen fungerar fortfarande.
-
-På ditt språk
-• PDF-rapporten är nu översatt till alla språk som appen stöder, inte bara engelska.
-• Datum, tal och procenttal följer det språk som är valt i appen.
-• Namn på kategorier, sektorer, geografiska områden och valutor är översatta.
-• Många översättningsfel är rättade: flikfältet visas inte längre på engelska för alla, "NET" översätts inte längre som "nätverk", och perioderna 3M/6M/12M läses inte längre som miljoner.
-
-Integritetsläget döljer mer
-• Fördelningsdiagram döljs, inte bara beloppen i dem.
-• Antal, statuskort, tomma vyer och varningar avslöjar inte längre vad du har registrerat.
-• Återkommande påminnelser nämner inte längre schemats namn på låsskärmen.
-• Ögonblicksbilden i appväxlaren täcker nu även öppna ark.
-
-Exakta belopp
-• Importerade och sparade belopp behåller full decimalprecision, så siffrorna avviker inte längre.
-• Ett importerat "1,000" läses som tusen, och indisk lakh-gruppering känns igen.
-• Att importera ett Revolut-utdrag igen raderar inte längre dina kryptoändringar.
-• Import tappar inte längre en transaktions valuta, och nya investeringar behåller den valda valutan i stället för att byta till EUR.
-
-Rapporter
-• Kassaflödesavsnitten håller sig inom den angivna perioden, penningflödesdiagrammet stämmer med tabellerna, och trenddiagrammet hoppar inte längre över månader.
-• Offlineexporter anger de växelkurser som användes vid omräkningen.
-• Långa belopp kapas inte längre.
-
-Även i den här versionen
-• Återkommande scheman avslutas i stället för att försvinna, förblir pausade efter orelaterade ändringar och kan raderas när de är klara.
-• Mer tillförlitlig iCloud-synkronisering, även i bakgrunden.
-• "Radera allt" lämnar inte längre kvar data som kommer tillbaka.
-• VoiceOver-etiketter på diagram- och filterreglage.
+Den här uppdateringen förbättrar också synkroniseringens tillförlitlighet och åtgärdar lokaliseringsproblem.

@@ -1,35 +1,3 @@
-O Wealth Compass agora funciona no iPad.
+As categorias personalizadas de receitas e despesas agora são sincronizadas entre iPhone, iPad e Mac quando a sincronização com o iCloud está ativada.
 
-iPad
-• O layout completo de desktop chega ao iPad: barra lateral, painel de várias colunas e os mesmos menus do app para Mac, que se reorganizam quando você segura o dispositivo na vertical.
-• Gráficos, tabelas e menus foram feitos para o toque, e o ícone do app é desenhado nos tamanhos de iPad.
-• Toque em um gráfico para examinar um valor; a rolagem continua funcionando.
-
-No seu idioma
-• O relatório em PDF agora está traduzido para todos os idiomas compatíveis com o app, não só o inglês.
-• Datas, números e porcentagens seguem o idioma definido no app.
-• Nomes de categorias, setores, regiões e moedas estão traduzidos.
-• Muitas correções de tradução: a barra de abas não aparece mais em inglês para todo mundo, "NET" não é mais traduzido como "rede" e os períodos 3M/6M/12M não são mais lidos como milhões.
-
-O Modo Privacidade oculta mais
-• Os gráficos de alocação são ocultados, e não apenas os valores que eles mostram.
-• Contagens, cartões de status, telas vazias e alertas não revelam mais o que você registrou.
-• Os lembretes recorrentes não mostram mais o nome do agendamento na tela bloqueada.
-• A prévia no seletor de apps agora também cobre as folhas abertas.
-
-Valores exatos
-• Os valores importados e salvos mantêm toda a precisão decimal, então os números não se desviam mais.
-• Um "1,000" importado é lido como mil, e o agrupamento indiano em lakh é reconhecido.
-• Reimportar um extrato do Revolut não apaga mais as suas edições de cripto.
-• As importações não perdem mais a moeda de uma transação, e os novos investimentos mantêm a moeda escolhida em vez de mudar para EUR.
-
-Relatórios
-• As seções de fluxo de caixa ficam dentro do período informado, o diagrama de fluxo de dinheiro bate com as tabelas e o gráfico de tendência não pula mais meses.
-• As exportações offline informam as taxas de câmbio usadas na conversão.
-• Valores longos não são mais cortados.
-
-Também nesta versão
-• Os agendamentos recorrentes são concluídos em vez de sumir, continuam pausados após edições não relacionadas e podem ser excluídos depois de terminados.
-• Sincronização com o iCloud mais confiável, inclusive em segundo plano.
-• "Apagar tudo" não deixa mais dados que voltam.
-• Rótulos de VoiceOver nos controles de gráficos e filtros.
+Esta atualização também melhora a confiabilidade da sincronização e corrige problemas de localização.

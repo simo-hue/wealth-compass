@@ -30,7 +30,7 @@ struct WealthCompassMacApp: App {
         .defaultSize(width: 1240, height: 780)
         .windowResizability(.contentMinSize)
         .commands {
-            DesktopCommands(finance: finance, settings: settings, appModel: appModel)
+            DesktopCommands(finance: finance, settings: settings, appModel: appModel, appLock: appLock)
         }
     }
 }

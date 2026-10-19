@@ -134,7 +134,9 @@ struct CryptoView: View {
                 )
             }
             let latestUpdate = finance.data.crypto.map(\.updatedAt).max()
-            let coinCount = Set(finance.data.crypto.map(\.symbol).filter { !$0.isEmpty }).count
+            // Trimmed, matching `MacCryptoView.isNonEmpty` — see the sector count in
+            // `InvestmentsView` for the same split.
+            let coinCount = Set(finance.data.crypto.map(\.symbol).filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }).count
             let coinCountLabel = settings.privateCount(coinCount)
             // The card's own title already redacts its count, and then its value said "Never"
             // whenever the portfolio was empty — the same fact, in the same card, in the clear.
@@ -145,7 +147,10 @@ struct CryptoView: View {
                 verbatimTitle: settings.localized("Status • \(coinCountLabel) Coins"),
                 value: settings.isPrivacyMode
                     ? settings.redactionToken
-                    : (latestUpdate.map { settings.date($0) } ?? settings.localized("Never")),
+                    // `time: .shortened`, matching the Desktop twin. On a day with two price
+                    // refreshes a date-only stamp cannot tell them apart. Presentation only —
+                    // both branches already redact identically.
+                    : (latestUpdate.map { settings.date($0, time: .shortened) } ?? settings.localized("Never")),
                 systemImage: "checkmark.circle"
             )
         }
@@ -295,7 +300,7 @@ struct CryptoView: View {
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    Text(settings.localized("Updated \(settings.privateDate(holding.updatedAt))"))
+                    Text(settings.localized("Updated \(settings.privateDate(holding.updatedAt, time: .shortened))"))
                         .font(.caption2)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)

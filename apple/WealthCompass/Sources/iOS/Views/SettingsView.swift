@@ -592,12 +592,27 @@ struct SettingsView: View {
                     HStack {
                         Text(LocalizedStringKey(category))
                         Spacer()
+                        // WC-L24, the same treatment every other iPhone icon button already has
+                        // (`CashFlowView.swift`): a 44pt target and an explicit label.
+                        //
+                        // The glyph is ~22×22pt — half Apple's minimum, on a destructive action —
+                        // and the button carried no `.accessibilityLabel` at all, so VoiceOver
+                        // announced the SF Symbol and every row in the section sounded the same:
+                        // there was no way to tell which category a button removed.
+                        //
+                        // `Remove %@` rather than the flat `Delete Category`: it is the key the
+                        // Desktop twin already uses for this exact button, it carries all 34
+                        // localizations, and it is the half of the choice that actually names the
+                        // category. No new string either way.
                         Button(role: .destructive) {
                             pendingDestructiveAction = .deleteCustomCategory(category: category, type: type)
                         } label: {
                             Image(systemName: "minus.circle")
+                                .frame(width: 44, height: 44)
+                                .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel(settings.localized("Remove \(category)"))
                     }
                 }
             }
@@ -744,7 +759,12 @@ struct SettingsView: View {
             refreshMarketDataKeyStatus()
             settingsAlert = SettingsAlertState(
                 title: settings.localized("\(credential.localizedTitle(appLanguage: settings.appLanguage)) Saved"),
-                message: "\(message)\n\n\(settings.localized("The API key was saved securely in Keychain."))"
+                // The Desktop spelling. Interpolating the already-localized sentence into the
+                // format string produces the `%@`-prefixed catalog key, which carries all 34
+                // localizations; localizing the bare sentence and concatenating it here produced
+                // the flat key instead, which has 6. Same rendered text in English, 28 more
+                // languages everywhere else, and no new string.
+                message: settings.localized("\(message)\n\nThe API key was saved securely in Keychain.")
             )
         } catch {
             credentialEditorAlert = SettingsAlertState(

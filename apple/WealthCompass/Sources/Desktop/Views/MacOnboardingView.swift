@@ -69,6 +69,12 @@ struct MacOnboardingView: View {
             .padding(.bottom, 20)
         }
         .preferredColorScheme(.dark)
+        // Tag A1, ported from the iPhone flow. The first three pages are fixed, `Spacer()`-balanced
+        // layouts; past AX3 they overflow, and on the privacy page that meant the disclosure
+        // truncating mid-sentence and **Continue** leaving the screen — with no Skip on that page,
+        // an onboarding flow the user could not finish. The cap limits the overflow and
+        // `.scrollingPage()` on each of those three pages covers what is left. No-op on macOS.
+        .desktopDynamicTypeCap()
         .onAppear { viewModel.loadConfiguredState() }
         .alert("Validation Failed", isPresented: $showingErrorAlert) {
             Button("OK", role: .cancel) {}
@@ -143,6 +149,7 @@ struct MacOnboardingView: View {
             .buttonStyle(.plain)
             .padding(.bottom, 40)
         }
+        .scrollingPage()
     }
 
     private var personalizePage: some View {
@@ -227,6 +234,7 @@ struct MacOnboardingView: View {
             .buttonStyle(.plain)
             .padding(.bottom, 40)
         }
+        .scrollingPage()
     }
 
     private var privacyPage: some View {
@@ -272,6 +280,7 @@ struct MacOnboardingView: View {
             .buttonStyle(.plain)
             .padding(.bottom, 40)
         }
+        .scrollingPage()
     }
     
     private var apiSetupPage: some View {

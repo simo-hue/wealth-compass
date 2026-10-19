@@ -7,12 +7,12 @@
 #     fastlane ios release         # build + upload binary & metadata (no auto-submit)
 #
 # Versions are managed by hand in project.pbxproj (per CLAUDE.md) — these lanes do NOT
-# bump them. Currently MARKETING_VERSION 1.1.6 / build 22.
+# bump them. Currently MARKETING_VERSION 1.2.1 / build 24.
 #
 # The Deliverfile sets skip_app_version_update(true), so fastlane will never create or
 # retarget a version in App Store Connect. Create the version there FIRST (once per
 # platform — iOS and macOS are separate platforms on the same app record), then run the
-# lane. Without it, deliver fails with "Could not find version 1.1.6" rather than doing
+# lane. Without it, deliver fails with "Could not find version 1.2.1" rather than doing
 # something surprising to 39 locales.
 #
 # Signing uses Xcode automatic signing (DEVELOPMENT_TEAM 8528AN28A3). Sign in with the

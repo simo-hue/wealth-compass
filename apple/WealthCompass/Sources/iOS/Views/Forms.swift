@@ -32,8 +32,10 @@ struct TransactionFormView: View {
         _category = State(initialValue: transaction?.category ?? "Food")
         _note = State(initialValue: transaction?.description ?? "")
         _date = State(initialValue: transaction?.date ?? Date())
-        // Placeholder; a new transaction adopts the base currency in onAppear (the
-        // environment isn't available during init). Existing rows keep their own currency.
+        // Placeholder only — the environment (and so the base currency) isn't available during
+        // init, so `onAppear` re-seeds through `TransactionEditorCurrency.seedsBaseCurrency`.
+        // A row that carries a currency keeps it; a row that carries none — new, or legacy —
+        // adopts the base. This `.eur` is never what a user sees.
         _currency = State(initialValue: transaction?.currency ?? .eur)
     }
 
@@ -59,16 +61,15 @@ struct TransactionFormView: View {
     }
 
     private var customCategoryHint: String {
-        let typeName = type.localizedTitle(appLanguage: settings.appLanguage)
-        if trimmedCustomCategory.isEmpty {
-            return settings.localized("Enter a category name. It will be saved for future \(typeName) transactions.")
-        }
-
-        if let existing = categories.first(where: { $0.caseInsensitiveCompare(trimmedCustomCategory) == .orderedSame }) {
-            return settings.localized("\(existing) already exists and will be selected.")
-        }
-
-        return settings.localized("This category will be added to your \(typeName) categories.")
+        // Not lowercased, exactly as before — see the shared helper's note and
+        // `DECISIONS_DESKTOP.md` §5. The iPhone/Desktop casing split is an open owner decision and
+        // sharing the branch logic deliberately does not settle it.
+        customCategoryHintText(
+            forTypeNamed: type.localizedTitle(appLanguage: settings.appLanguage),
+            draft: trimmedCustomCategory,
+            existingCategories: categories,
+            settings: settings
+        )
     }
 
     private var parsedAmount: Decimal? {
@@ -177,7 +178,12 @@ struct TransactionFormView: View {
         }
         .onAppear {
             guard !hasInitializedCurrency else { return }
-            if transaction == nil { currency = settings.currency }
+            if TransactionEditorCurrency.seedsBaseCurrency(
+                rowCurrency: transaction?.currency,
+                isNewRecord: transaction == nil
+            ) {
+                currency = settings.currency
+            }
             hasInitializedCurrency = true
         }
         .preferredColorScheme(.dark)
@@ -423,7 +429,12 @@ struct RecurringTransactionFormView: View {
         }
         .onAppear {
             guard !hasInitializedCurrency else { return }
-            if existingSchedule == nil { currency = settings.currency }
+            if TransactionEditorCurrency.seedsBaseCurrency(
+                rowCurrency: existingSchedule?.currency,
+                isNewRecord: existingSchedule == nil
+            ) {
+                currency = settings.currency
+            }
             hasInitializedCurrency = true
         }
         .preferredColorScheme(.dark)
@@ -679,8 +690,11 @@ struct InvestmentFormView: View {
         item.currentValue = value
         item.currentPrice = effectiveCurrentPrice
         item.currency = currency
-        item.geography = geography
-        item.sector = sector
+        // Trimmed on write, as `MacInvestmentEditor.save()` already does. Every other text field
+        // here was trimmed and these two were not, so a stray space typed into Sector on iPhone
+        // persisted a value that the Desktop's own writes could never produce.
+        item.geography = geography.trimmingCharacters(in: .whitespacesAndNewlines)
+        item.sector = sector.trimmingCharacters(in: .whitespacesAndNewlines)
         item.isin = isin.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         item.fees = calculatedFee
         // L22: persist the raw fee mode + input alongside the computed absolute `fees`.

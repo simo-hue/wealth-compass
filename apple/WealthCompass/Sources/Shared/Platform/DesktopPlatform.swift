@@ -108,6 +108,23 @@ extension View {
         #endif
     }
 
+    /// Caps Dynamic Type at accessibility3 for a fixed, non-reflowing layout.
+    ///
+    /// Tag A1 on iPhone: the onboarding pages are `Spacer()`-balanced stacks sized to the screen,
+    /// and past AX3 they overflow no matter how the text is laid out. The Desktop flow is the same
+    /// shape and runs on iPad, which has the same Dynamic Type control iPhone does.
+    ///
+    /// A no-op on macOS **by construction** rather than by argument: macOS has no Dynamic Type
+    /// control, so the environment value is always `.large` there and the clamp could never bind —
+    /// but compiling it out is the version of that claim which cannot quietly stop being true.
+    func desktopDynamicTypeCap() -> some View {
+        #if os(macOS)
+        self
+        #else
+        dynamicTypeSize(...DynamicTypeSize.accessibility3)
+        #endif
+    }
+
     /// Widens a borderless icon button to the 44pt minimum on touch.
     ///
     /// The Desktop layer's row actions are `.controlSize(.small)` images — roughly 22pt, and 4pt

@@ -26,7 +26,7 @@ enum FinanceImportService {
     static func parse(_ payload: Data, context: FinanceImportContext) throws -> NormalizedFinanceImport {
         let imported: ImportedFinancialData
         do {
-            imported = try JSONDecoder().decode(ImportedFinancialData.self, from: payload)
+            imported = try FinanceJSONCoding.makeDecoder().decode(ImportedFinancialData.self, from: payload)
         } catch {
             throw FinanceImportError.invalidJSON(error.localizedDescription)
         }
@@ -49,6 +49,7 @@ private struct ImportedFinancialData: Decodable {
     private let transactions: LossyArray<ImportedTransaction>
     private let recurringTransactions: LossyArray<ImportedRecurringTransaction>
     private let snapshots: LossyArray<ImportedSnapshot>
+    private let customCategories: LossyArray<CustomTransactionCategory>
 
     private enum CodingKeys: String, CodingKey {
         case income
@@ -60,6 +61,7 @@ private struct ImportedFinancialData: Decodable {
         case transactions
         case recurringTransactions
         case snapshots
+        case customCategories
     }
 
     init(from decoder: Decoder) throws {
@@ -73,6 +75,7 @@ private struct ImportedFinancialData: Decodable {
         transactions = container.decodeLossyArrayIfPresent(ImportedTransaction.self, forKey: .transactions)
         recurringTransactions = container.decodeLossyArrayIfPresent(ImportedRecurringTransaction.self, forKey: .recurringTransactions)
         snapshots = container.decodeLossyArrayIfPresent(ImportedSnapshot.self, forKey: .snapshots)
+        customCategories = container.decodeLossyArrayIfPresent(CustomTransactionCategory.self, forKey: .customCategories)
     }
 
     func normalized(context: FinanceImportContext) -> NormalizedFinanceImport {
@@ -104,6 +107,7 @@ private struct ImportedFinancialData: Decodable {
         let uniqueCrypto = importedCrypto.uniquedByID()
         let uniqueLiabilities = importedLiabilities.uniquedByID()
         let uniqueSnapshots = importedSnapshots.uniquedByID()
+        let uniqueCategories = customCategories.elements.uniquedByID()
 
         // Broken into simple binary ops to keep the type-checker fast.
         let combinedTransactionCount = importedTransactions.count + importedIncome.count
@@ -119,7 +123,7 @@ private struct ImportedFinancialData: Decodable {
 
         let skippedRecords = skippedTransactions + skippedRecurringTransactions + skippedIncome + skippedExpenses
             + skippedLiquidity + skippedInvestments + skippedCrypto + skippedLiabilities + skippedSnapshots
-            + droppedDuplicates
+            + droppedDuplicates + customCategories.skippedCount + customCategories.elements.count - uniqueCategories.count
 
         return NormalizedFinanceImport(
             data: FinancialData(
@@ -128,7 +132,8 @@ private struct ImportedFinancialData: Decodable {
                 investments: uniqueInvestments,
                 crypto: uniqueCrypto,
                 liabilities: uniqueLiabilities,
-                snapshots: uniqueSnapshots
+                snapshots: uniqueSnapshots,
+                customCategories: uniqueCategories
             ).sortedForStorage(),
             skippedRecords: skippedRecords
         )

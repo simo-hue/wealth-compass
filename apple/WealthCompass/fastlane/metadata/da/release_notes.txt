@@ -1,35 +1,3 @@
-Wealth Compass kører nu på iPad.
+Brugerdefinerede indtægts- og udgiftskategorier synkroniseres nu mellem iPhone, iPad og Mac, når iCloud-synkronisering er slået til.
 
-iPad
-• Det fulde desktoplayout kommer til iPad: sidepanel, dashboard med flere kolonner og de samme menuer som Mac-appen, med en tilpasset opstilling, når du holder enheden lodret.
-• Diagrammer, tabeller og menuer er lavet til berøring, og appsymbolet er tegnet i iPad-størrelser.
-• Tryk på et diagram for at se en værdi; rulning fungerer stadig.
-
-På dit sprog
-• PDF-rapporten er nu oversat til alle de sprog, appen understøtter — ikke kun engelsk.
-• Datoer, tal og procenter følger det sprog, der er valgt i appen.
-• Navne på kategorier, sektorer, geografiske områder og valutaer er oversat.
-• Mange oversættelsesfejl er rettet: fanelinjen vises ikke længere på engelsk for alle, "NET" oversættes ikke længere som "netværk", og perioderne 3M/6M/12M læses ikke længere som millioner.
-
-Privatlivstilstand skjuler mere
-• Fordelingsdiagrammer skjules, ikke kun de beløb, de viser.
-• Antal, statuskort, tomme visninger og advarsler afslører ikke længere, hvad du har registreret.
-• Gentagne påmindelser nævner ikke længere planens navn på låseskærmen.
-• Øjebliksbilledet i appskifteren dækker nu også åbne ark.
-
-Nøjagtige beløb
-• Importerede og gemte beløb bevarer den fulde decimalpræcision, så tallene ikke længere afviger.
-• Et importeret "1,000" læses som tusind, og indisk lakh-gruppering genkendes.
-• Import af en Revolut-oversigt igen sletter ikke længere dine kryptoændringer.
-• Import mister ikke længere en transaktions valuta, og nye investeringer beholder den valgte valuta i stedet for at skifte til EUR.
-
-Rapporter
-• Pengestrømsafsnit holder sig inden for den angivne periode, pengestrømsdiagrammet stemmer med tabellerne, og tendensdiagrammet springer ikke længere måneder over.
-• Offlineeksporter oplyser de vekselkurser, der er brugt til omregning.
-• Lange beløb bliver ikke længere afkortet.
-
-Også i denne version
-• Gentagne planer afsluttes i stedet for at forsvinde, forbliver sat på pause efter ikke-relaterede ændringer og kan slettes, når de er færdige.
-• Mere pålidelig iCloud-synkronisering, også i baggrunden.
-• "Slet alt" efterlader ikke længere data, der vender tilbage.
-• VoiceOver-etiketter på diagram- og filterknapper.
+Denne opdatering forbedrer også synkroniseringens pålidelighed og retter lokaliseringsfejl.

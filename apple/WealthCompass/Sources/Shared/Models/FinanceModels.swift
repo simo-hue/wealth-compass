@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 import SwiftUI
 
 /// ISO-4217 currencies the app can represent and convert.
@@ -350,6 +351,28 @@ struct Transaction: Identifiable, Codable, Equatable {
     var recurringOccurrenceDate: Date?
 }
 
+/// WC-M1 — the rule the four transaction/schedule editors apply to seed their currency picker.
+///
+/// The editors build their `State` in `init`, where the environment (and therefore the base
+/// currency) is not available yet, so they park a `.eur` placeholder and rescue it in `onAppear`.
+/// This is that rescue's condition, extracted so it can be tested: the views themselves cannot be
+/// driven from a unit test, but the decision they make can.
+enum TransactionEditorCurrency {
+    /// Whether the editor must replace its placeholder with the base currency instead of keeping
+    /// what it read off the record.
+    ///
+    /// It is **not** "is this a new record". `Transaction.currency` and
+    /// `RecurringTransaction.currency` are optional and every display site reads them as
+    /// `?? base currency`, so a legacy row — one written before the field existed, or one still
+    /// inside the deliberately-deferred backfill window (`FinanceStore.shouldBackfillCurrencies`)
+    /// — has no currency to carry either. Asking only about newness left those rows showing the
+    /// `.eur` placeholder, and `updateTransaction` then wrote EUR back: for a user whose base is
+    /// not EUR, opening a legacy row and pressing Save silently re-denominated it.
+    static func seedsBaseCurrency(rowCurrency: Currency?, isNewRecord: Bool) -> Bool {
+        isNewRecord || rowCurrency == nil
+    }
+}
+
 enum RecurringTransactionFrequency: String, CaseIterable, Codable, Identifiable {
     case daily
     case weekly
@@ -567,6 +590,51 @@ struct NetWorthSnapshot: Identifiable, Codable, Equatable {
     var updatedAt: Date = Date()
 }
 
+/// One independently syncable picker entry. Its identity is shared across devices, including
+/// when the same category is created offline with different capitalization.
+struct CustomTransactionCategory: Codable, Equatable, Identifiable, Sendable, MergeableRecord {
+    var id: UUID
+    var name: String
+    var type: TransactionType
+    var createdAt: Date
+    var updatedAt: Date
+
+    init(name: String, type: TransactionType, now: Date = Date()) {
+        self.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.type = type
+        self.id = Self.identifier(name: self.name, type: type)
+        self.createdAt = now
+        self.updatedAt = now
+    }
+
+    private enum CodingKeys: String, CodingKey { case id, name, type, createdAt, updatedAt }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name).trimmingCharacters(in: .whitespacesAndNewlines)
+        type = try container.decode(TransactionType.self, forKey: .type)
+        createdAt = try container.decode(Date.self, forKey: .createdAt)
+        updatedAt = try container.decode(Date.self, forKey: .updatedAt)
+        guard !name.isEmpty,
+              id == Self.identifier(name: name, type: type) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .id, in: container,
+                debugDescription: "Category identity must match its nonempty name and transaction type."
+            )
+        }
+    }
+
+    static func identifier(name: String, type: TransactionType) -> UUID {
+        let normalized = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: .caseInsensitive, locale: Locale(identifier: "en_US_POSIX"))
+            .precomposedStringWithCanonicalMapping
+        let bytes = Array(SHA256.hash(data: Data("category:\(type.rawValue):\(normalized)".utf8)).prefix(16))
+        return UUID(uuid: (bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+                           bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]))
+    }
+}
+
 struct FinancialData: Codable, Equatable, Sendable {
     var transactions: [Transaction] = []
     var recurringTransactions: [RecurringTransaction] = []
@@ -574,6 +642,10 @@ struct FinancialData: Codable, Equatable, Sendable {
     var crypto: [CryptoHolding] = []
     var liabilities: [Liability] = []
     var snapshots: [NetWorthSnapshot] = []
+    var customCategories: [CustomTransactionCategory] = []
+    /// Local migration marker; never itself a CloudKit record. Prevents stale preference caches
+    /// from resurrecting a category after its synced deletion.
+    var customCategoriesMigrated = false
 
     private enum CodingKeys: String, CodingKey {
         case transactions
@@ -582,6 +654,8 @@ struct FinancialData: Codable, Equatable, Sendable {
         case crypto
         case liabilities
         case snapshots
+        case customCategories
+        case customCategoriesMigrated
     }
 
     init(
@@ -590,7 +664,9 @@ struct FinancialData: Codable, Equatable, Sendable {
         investments: [Investment] = [],
         crypto: [CryptoHolding] = [],
         liabilities: [Liability] = [],
-        snapshots: [NetWorthSnapshot] = []
+        snapshots: [NetWorthSnapshot] = [],
+        customCategories: [CustomTransactionCategory] = [],
+        customCategoriesMigrated: Bool = false
     ) {
         self.transactions = transactions
         self.recurringTransactions = recurringTransactions
@@ -598,6 +674,8 @@ struct FinancialData: Codable, Equatable, Sendable {
         self.crypto = crypto
         self.liabilities = liabilities
         self.snapshots = snapshots
+        self.customCategories = customCategories
+        self.customCategoriesMigrated = customCategoriesMigrated
     }
 
     init(from decoder: Decoder) throws {
@@ -608,6 +686,8 @@ struct FinancialData: Codable, Equatable, Sendable {
         crypto = try container.decodeIfPresent([CryptoHolding].self, forKey: .crypto) ?? []
         liabilities = try container.decodeIfPresent([Liability].self, forKey: .liabilities) ?? []
         snapshots = try container.decodeIfPresent([NetWorthSnapshot].self, forKey: .snapshots) ?? []
+        customCategories = try container.decodeIfPresent([CustomTransactionCategory].self, forKey: .customCategories) ?? []
+        customCategoriesMigrated = try container.decodeIfPresent(Bool.self, forKey: .customCategoriesMigrated) ?? false
     }
 }
 
@@ -830,7 +910,9 @@ extension FinancialData {
             investments: investments.mergedByID(with: incoming.investments),
             crypto: crypto.mergedByIDKeepingUnstatedFields(with: incoming.crypto),
             liabilities: liabilities.mergedByID(with: incoming.liabilities),
-            snapshots: snapshots.mergedByID(with: incoming.snapshots)
+            snapshots: snapshots.mergedByID(with: incoming.snapshots),
+            customCategories: customCategories.mergedByID(with: incoming.customCategories),
+            customCategoriesMigrated: customCategoriesMigrated
         )
     }
 }

@@ -39,6 +39,7 @@ struct WealthCompassMobileApp: App {
                 finance: financeStore,
                 settings: settings,
                 appModel: appModel,
+                appLock: appLock,
                 isEnabled: DesktopPlatform.isPad
             )
         }

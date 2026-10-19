@@ -203,9 +203,15 @@ final class FinanceStore: ObservableObject {
     /// language override re-`.id`s the root view to force a re-render, but that alone would re-read a
     /// stale entry here and leave the diagram labelled in the previous language.
     private var cachedCashFlowSankey: (version: Int, currency: Currency, rateStamp: Date?, period: AnalyticsPeriod, maxNodes: Int, language: String?, dayStamp: Date, value: CashFlowSankey)?
-    /// Memoized monthly transaction count (deep-audit M27) — keyed by data version + month; avoids the
-    /// O(n) filter re-running on every macOS cash-flow body/resize pass (and the sorted accessor).
-    private var cachedMonthlyTransactionCount: (version: Int, month: Date, value: Int)?
+    /// Memoized monthly transaction count (deep-audit M27) — avoids the O(n) filter re-running on
+    /// every macOS cash-flow body/resize pass (and the sorted accessor).
+    ///
+    /// Keyed by data version + month + **day**. The day stamp was correctly absent while the count
+    /// read the raw array, because the value was then day-independent; it became mandatory the
+    /// moment the count started excluding future-dated rows (deep-audit L51), because a transaction
+    /// dated tomorrow starts counting at midnight with no data mutation to bump `dataVersion`.
+    /// Same reasoning, same key shape, as `cachedTotals` and `cachedMonthlyCashFlow`.
+    private var cachedMonthlyTransactionCount: (version: Int, month: Date, dayStamp: Date, value: Int)?
     @Published private(set) var isRefreshingMarketPrices = false
     /// Per-item progress of the serial, rate-limited investment refresh, for an "x of N" UI
     /// indicator (M7). `total` is every investment, whichever provider prices it — the loop counts
@@ -265,6 +271,7 @@ final class FinanceStore: ObservableObject {
     /// idle — both for correctness reasoning and for deterministic tests.
     private var lastEnqueuedSaveGeneration = 0
     private var lastProcessedSaveGeneration = 0
+    private var hasSeededSaveCoordinator = false
     private var saveIdleWaiters: [CheckedContinuation<Void, Never>] = []
     private var localPersistenceError: Error?
     private var lastMarketPriceRefreshAttemptAt: Date?
@@ -273,6 +280,7 @@ final class FinanceStore: ObservableObject {
     /// Set by `load()` when the one-time WC-M1 currency backfill stamped legacy rows, so
     /// `init` can persist the migration once the save pipeline is up.
     private var needsCurrencyBackfillSave = false
+    private var needsCategoryMigrationSave = false
 
     private lazy var cloudSyncService = CloudKitSyncService(
         metadataStore: syncMetadataStore,
@@ -350,9 +358,23 @@ final class FinanceStore: ObservableObject {
         // action, so a later recovery can hand it a fresh baseline through `reseed` without the
         // pipeline having to be torn down and rebuilt.
         startSaveConsumer(seedRecords: seedRecords, skippedRecordKeys: lastLoadedSkippedRecordKeys)
+        settings?.customCategoryMutationHandler = { [weak self] name, type, isRemoval in
+            guard let self, self.isLocalDataReady else { return false }
+            let id = CustomTransactionCategory.identifier(name: name, type: type)
+            if isRemoval {
+                self.data.customCategories.removeAll {
+                    $0.type == type && $0.name.caseInsensitiveCompare(name) == .orderedSame
+                }
+            } else if !self.data.customCategories.contains(where: { $0.id == id }) {
+                self.data.customCategories.append(CustomTransactionCategory(name: name, type: type))
+            }
+            self.data.customCategoriesMigrated = true
+            self.save()
+            return true
+        }
         // Persist the WC-M1 currency backfill (if any) now that the save pipeline exists; it
         // diffs against the on-disk baseline seeded above, so only the stamped rows are written.
-        if needsCurrencyBackfillSave {
+        if needsCurrencyBackfillSave || needsCategoryMigrationSave {
             save()
         }
         observeProtectedDataAvailability()
@@ -453,11 +475,38 @@ final class FinanceStore: ObservableObject {
 
         let oldDelta: Decimal = transaction.type == .income ? -transaction.amount : transaction.amount
         let oldCurrency = transaction.currency ?? settings.currency
-        adjustHistoricalSnapshots(from: transaction.date, transactionCurrency: oldCurrency, displayCurrency: settings.currency, liquidityDelta: settings.convert(oldDelta, from: oldCurrency))
-
         let newDate = Calendar.current.startOfDay(for: date)
         let newDelta: Decimal = type == .income ? amount : -amount
-        adjustHistoricalSnapshots(from: newDate, transactionCurrency: currency, displayCurrency: settings.currency, liquidityDelta: settings.convert(newDelta, from: currency))
+
+        // An edit is a *pair* of retroactive adjustments — reverse the old row, apply the new one —
+        // and the two must run together or not at all. `adjustingHistoricalSnapshots` skips a
+        // foreign-currency delta by design (rate epochs, deep-audit M22/M23/H11), which is right for
+        // one leg and wrong for a pair: when the currency itself is what changed, exactly one leg
+        // passes that guard, so the reversal and the re-application stop cancelling and every stored
+        // snapshot from that date on moves by the full amount and stays wrong. Today's figure is
+        // recomputed from the ledger and is right, so the Dashboard header and the chart behind it
+        // disagree. Deciding once applies the guard to the edit as a unit. Every other field
+        // (amount, date, type, category) leaves both legs on the same branch, and
+        // `deleteTransaction` is a single leg, so neither is affected.
+        //
+        // Both one-legged outcomes were measured against the engine, and both are worse than
+        // leaving the row alone, because history already holds *some* representation of this
+        // transaction: `appendSnapshot` rewrites today's row from `calculateTotals`, which sums
+        // every settled transaction whatever its currency, so a row entered on its own day is baked
+        // into history in either currency. Running leg 1 alone (base → foreign) therefore erases
+        // the transaction from history outright; running leg 2 alone (foreign → base) books it a
+        // second time. Skipping both leaves the old denomination standing in for the new one — off
+        // by the FX drift, not by the whole amount. The one case it loses is a *back-dated* foreign
+        // row, whose effect the guard above kept out of history in the first place; there is no
+        // provenance flag on a snapshot to tell the two apart. Both directions are pinned in
+        // `SnapshotEngineTests`.
+        let canAdjust = (oldCurrency == settings.currency) && (currency == settings.currency)
+        // One instant for both legs, so the rows this single edit corrects stay tied on `updatedAt`.
+        let editedAt = Date()
+        if canAdjust {
+            adjustHistoricalSnapshots(from: transaction.date, transactionCurrency: oldCurrency, displayCurrency: settings.currency, liquidityDelta: settings.convert(oldDelta, from: oldCurrency), now: editedAt)
+            adjustHistoricalSnapshots(from: newDate, transactionCurrency: currency, displayCurrency: settings.currency, liquidityDelta: settings.convert(newDelta, from: currency), now: editedAt)
+        }
 
         data.transactions[index].type = type
         data.transactions[index].amount = amount
@@ -465,7 +514,7 @@ final class FinanceStore: ObservableObject {
         data.transactions[index].description = description
         data.transactions[index].date = newDate
         data.transactions[index].currency = currency
-        data.transactions[index].updatedAt = Date()
+        data.transactions[index].updatedAt = editedAt
 
         appendSnapshot(settings: settings)
         save()
@@ -952,7 +1001,11 @@ final class FinanceStore: ObservableObject {
                 }
             }
         } else if !data.crypto.isEmpty {
-            result.skippedCrypto = data.crypto.map { "\($0.symbol): CoinGecko key missing" }
+            // L26, same as the two notices above: localized, not an English fragment spliced into a
+            // translated frame. This is the branch most users reach — the CoinGecko key is optional.
+            result.skippedCrypto = data.crypto.map {
+                settings.localized("\($0.symbol): CoinGecko key missing")
+            }
         }
 
         // "Last updated" must reflect when the user refreshed, not the quote's market timestamp.
@@ -1093,8 +1146,13 @@ final class FinanceStore: ObservableObject {
         data.snapshots = snapshotEngine.appendingSnapshot(to: data.snapshots, totals: totals, currency: settings.currency)
     }
 
-    private func adjustHistoricalSnapshots(from date: Date, transactionCurrency: Currency, displayCurrency: Currency, liquidityDelta: Decimal) {
-        data.snapshots = snapshotEngine.adjustingHistoricalSnapshots(data.snapshots, from: date, transactionCurrency: transactionCurrency, displayCurrency: displayCurrency, liquidityDelta: liquidityDelta)
+    /// `now` is a parameter so a caller making more than one adjustment for a single user action —
+    /// `updateTransaction`, which reverses one row and applies another — can stamp every snapshot
+    /// it touches with the same instant. Rows corrected together must stay tied on `updatedAt` and
+    /// fall through to `date`/`id` in `supersedesForCollapse`, exactly as the currency backfill does
+    /// (note `#9b`).
+    private func adjustHistoricalSnapshots(from date: Date, transactionCurrency: Currency, displayCurrency: Currency, liquidityDelta: Decimal, now: Date = Date()) {
+        data.snapshots = snapshotEngine.adjustingHistoricalSnapshots(data.snapshots, from: date, transactionCurrency: transactionCurrency, displayCurrency: displayCurrency, liquidityDelta: liquidityDelta, now: now)
     }
 
     func monthlyCashFlow(for month: Date, settings: AppSettings) -> MonthlyCashFlow {
@@ -1117,16 +1175,33 @@ final class FinanceStore: ObservableObject {
         return result
     }
 
-    func monthlyTransactionCount(for month: Date) -> Int {
+    /// The "Transactions" card's figure.
+    ///
+    /// Clamped to settled rows, like the five cards beside it in the same `LazyVGrid` — those route
+    /// through `AnalyticsEngine.settledTransactions`, the deep-audit L51 rule that every figure
+    /// derived from the ledger has to agree about what has actually happened. Without the clamp a
+    /// single invoice dated later this month put Monthly Income at one figure and the count next to
+    /// it at another.
+    ///
+    /// That clamp is why `dayStamp` joined the cache key: the value is no longer day-independent, so
+    /// it changes at midnight with no data mutation to bump `dataVersion`.
+    func monthlyTransactionCount(for month: Date, now: Date = Date()) -> Int {
         let calendar = Calendar.current
         let monthKey = calendar.date(from: calendar.dateComponents([.year, .month], from: month)) ?? month
-        if let cache = cachedMonthlyTransactionCount, cache.version == dataVersion, cache.month == monthKey {
+        let dayStamp = calendar.startOfDay(for: now)
+        if let cache = cachedMonthlyTransactionCount,
+           cache.version == dataVersion,
+           cache.month == monthKey,
+           cache.dayStamp == dayStamp {
             return cache.value
         }
         // Filter `data.transactions` directly (not the sorted `transactions` accessor) — a count
         // needs no ordering, so this avoids the O(n log n) sort on every cash-flow body pass (M27).
-        let count = data.transactions.filter { calendar.isDate($0.date, equalTo: month, toGranularity: .month) }.count
-        cachedMonthlyTransactionCount = (dataVersion, monthKey, count)
+        let count = data.transactions.filter {
+            calendar.isDate($0.date, equalTo: month, toGranularity: .month)
+                && calendar.startOfDay(for: $0.date) <= dayStamp
+        }.count
+        cachedMonthlyTransactionCount = (dataVersion, monthKey, dayStamp, count)
         return count
     }
 
@@ -1574,6 +1649,9 @@ final class FinanceStore: ObservableObject {
         }
 
         let categoriesAdded = registerImportedCategories(from: normalized.data, settings: settings)
+        // Replacing finance records historically kept the category library. Preserve that
+        // behavior, while also restoring unused categories contained in a newer backup.
+        let categoryLibrary = data.customCategories.mergedByID(with: normalized.data.customCategories)
 
         switch mode {
         case .replace:
@@ -1581,6 +1659,9 @@ final class FinanceStore: ObservableObject {
         case .merge:
             data = data.merged(with: normalized.data).sortedForStorage()
         }
+        data.customCategories = categoryLibrary
+        data.customCategoriesMigrated = true
+        settings.applyCustomCategories(data.customCategories)
 
         let shouldGenerateSnapshot = normalized.data.snapshots.isEmpty
         if shouldGenerateSnapshot {
@@ -1644,6 +1725,8 @@ final class FinanceStore: ObservableObject {
             // animating a `@Published` write emits "Publishing changes from within view updates"
             // warnings — same reasoning as the remote-apply path below (WC-#17).
             self.data = migrated
+            migrateCustomCategoriesIfNeeded()
+            settings?.applyCustomCategories(data.customCategories)
             self.localPersistenceError = nil
             self.iCloudSyncError = nil
 
@@ -1777,7 +1860,7 @@ final class FinanceStore: ObservableObject {
             loadState = .loaded
             SyncDiagnosticsLog.shared.record("RECOVERED load ok — \(records.count) record(s)")
             // Persist the WC-M1 currency backfill if this load was the one that discovered it.
-            if needsCurrencyBackfillSave {
+            if needsCurrencyBackfillSave || needsCategoryMigrationSave {
                 save()
             }
             // The engine was held down (or never started) while data was unreadable — bring it up
@@ -1851,6 +1934,8 @@ final class FinanceStore: ObservableObject {
         saveConsumerTask = Task { [weak self] in
             guard let self else { return }
             await self.coordinator.seed(seedRecords, preserving: skippedRecordKeys)
+            self.hasSeededSaveCoordinator = true
+            self.resumeSaveWaitersIfIdle()
             for await generation in stream {
                 await self.processSave(generation: generation)
             }
@@ -1898,7 +1983,11 @@ final class FinanceStore: ObservableObject {
             )
         }
         lastProcessedSaveGeneration = generation
-        if lastProcessedSaveGeneration == lastEnqueuedSaveGeneration {
+        resumeSaveWaitersIfIdle()
+    }
+
+    private func resumeSaveWaitersIfIdle() {
+        if hasSeededSaveCoordinator && lastProcessedSaveGeneration == lastEnqueuedSaveGeneration {
             let waiters = saveIdleWaiters
             saveIdleWaiters.removeAll()
             waiters.forEach { $0.resume() }
@@ -1923,9 +2012,10 @@ final class FinanceStore: ObservableObject {
         saveContinuation?.yield(lastEnqueuedSaveGeneration)
     }
 
-    /// Test hook: suspends until the save pipeline has drained every enqueued snapshot.
+    /// Waits for the initial diff baseline and all queued saves. Category sync uses this
+    /// barrier before comparing pending revisions; tests also use it for deterministic reads.
     func waitForPendingSaves() async {
-        if lastProcessedSaveGeneration == lastEnqueuedSaveGeneration { return }
+        if hasSeededSaveCoordinator && lastProcessedSaveGeneration == lastEnqueuedSaveGeneration { return }
         await withCheckedContinuation { continuation in
             saveIdleWaiters.append(continuation)
         }
@@ -2020,9 +2110,17 @@ final class FinanceStore: ObservableObject {
         await current?.syncForRemotePush()
     }
 
-    private func applyRemoteMutations(
+    func applyRemoteMutations(
         _ mutations: [CloudSyncRemoteMutation]
     ) async throws -> Set<CloudSyncRecordKey> {
+        // Category edits enter the UI synchronously but acquire a pending revision only when
+        // their queued save runs. Drain that queue before comparing remote expectations; otherwise
+        // an incoming upsert can overtake a local deletion whose metadata still says "no edit".
+        if mutations.contains(where: { $0.key.type == .customCategory }) {
+            while !hasSeededSaveCoordinator || lastProcessedSaveGeneration != lastEnqueuedSaveGeneration {
+                await waitForPendingSaves()
+            }
+        }
         // The guard that saved the user's data in the original incident: with the DB unread,
         // applying remote records would merge them into an empty in-memory dataset and write that
         // back. It now also covers `.notLoaded`, where `localPersistenceError` is nil.
@@ -2049,6 +2147,7 @@ final class FinanceStore: ObservableObject {
         applicable = applicableMutations.count
         guard !applicableMutations.isEmpty else { return [] }
 
+        let categoryBaseline = data.customCategories
         var updatedData = data
         let outcome = updatedData.applyCloudSyncMutations(applicableMutations)
         skipped = outcome.skipped.count
@@ -2071,7 +2170,10 @@ final class FinanceStore: ObservableObject {
         // discarded the change token, re-fetched the whole zone, re-applied and re-collapsed it,
         // forever. Reporting the collapsed-away keys as NOT applied routes them into the service's
         // conservative branch, which updates `systemFields` only and leaves the hashes untouched.
-        let appliedKeys = outcome.appliedKeys.intersection(updatedData.cloudSyncRecordKeys())
+        // A successfully applied deletion is absent from the new inventory by definition.
+        // Keep it acknowledged, including when the batch contains nothing but deletions.
+        let remotelyDeleted = Set(applicableMutations.filter { $0.payload == nil }.map(\.key))
+        var appliedKeys = outcome.appliedKeys.intersection(updatedData.cloudSyncRecordKeys().union(remotelyDeleted))
         guard !appliedKeys.isEmpty else { return [] }
         // Route the disk write through the coordinator so local + remote writes serialize
         // and never interleave, and so the diff baseline advances to the applied records.
@@ -2103,9 +2205,23 @@ final class FinanceStore: ObservableObject {
             // the disk write is in flight. Assigning the pre-write copy would silently discard it;
             // re-applying this batch onto the live value keeps both, and the ordinary save pipeline
             // writes the union — the disk already holds the remote half.
-            data.applyCloudSyncMutations(applicableMutations)
+            let stillApplicable = applicableMutations.filter { mutation in
+                guard mutation.key.type == .customCategory else { return true }
+                let id = mutation.key.id
+                let before = categoryBaseline.first { $0.id == id }
+                let current = data.customCategories.first { $0.id == id }
+                guard before == current else {
+                    // A newer local or re-entrant remote edit owns this category now. Keep it
+                    // and do not let the service acknowledge the stale incoming value.
+                    appliedKeys.remove(mutation.key)
+                    return false
+                }
+                return true
+            }
+            data.applyCloudSyncMutations(stillApplicable)
             save()
         }
+        settings?.applyCustomCategories(data.customCategories)
         iCloudSyncError = nil
         applied = appliedKeys.count
         return appliedKeys
@@ -2136,10 +2252,27 @@ final class FinanceStore: ObservableObject {
         return (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
     }
 
+    private func migrateCustomCategoriesIfNeeded() {
+        needsCategoryMigrationSave = false
+        guard !data.customCategoriesMigrated, let settings else { return }
+        for type in [TransactionType.income, .expense] {
+            let names = type == .income ? settings.customIncomeCategories : settings.customExpenseCategories
+            for name in names {
+                let category = CustomTransactionCategory(name: name, type: type)
+                guard !category.name.isEmpty,
+                      !data.customCategories.contains(where: { $0.id == category.id }) else { continue }
+                data.customCategories.append(category)
+            }
+        }
+        data.customCategoriesMigrated = true
+        needsCategoryMigrationSave = !data.customCategories.isEmpty
+    }
+
     private func registerImportedCategories(from importedData: FinancialData, settings: AppSettings) -> Int {
         var added = 0
         let categories = importedData.transactions.map { ($0.type, $0.category) }
             + importedData.recurringTransactions.map { ($0.type, $0.category) }
+            + importedData.customCategories.map { ($0.type, $0.name) }
 
         for (type, category) in categories {
             let existing = settings.transactionCategories(for: type)
@@ -2158,7 +2291,7 @@ final class FinanceStore: ObservableObject {
 extension FinancialData {
     var hasImportableContent: Bool {
         !transactions.isEmpty || !recurringTransactions.isEmpty || !investments.isEmpty
-            || !crypto.isEmpty || !liabilities.isEmpty || !snapshots.isEmpty
+            || !crypto.isEmpty || !liabilities.isEmpty || !snapshots.isEmpty || !customCategories.isEmpty
     }
 
     /// Whether the WC-M1 currency backfill may run on this launch (#9a).
@@ -2238,7 +2371,9 @@ extension FinancialData {
             // shared chokepoint for replace-import, merge-import, and the remote-apply path, so a
             // cross-device or imported duplicate can't survive to be double-corrected. Already
             // returns rows sorted ascending by date.
-            snapshots: snapshots.collapsedByCalendarDay()
+            snapshots: snapshots.collapsedByCalendarDay(),
+            customCategories: customCategories.sorted { $0.id.uuidString < $1.id.uuidString },
+            customCategoriesMigrated: customCategoriesMigrated
         )
     }
 }

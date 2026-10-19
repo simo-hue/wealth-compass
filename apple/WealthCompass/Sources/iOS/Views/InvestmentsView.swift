@@ -137,7 +137,9 @@ struct InvestmentsView: View {
                 )
             }
             let latestUpdate = finance.data.investments.map(\.updatedAt).max()
-            let sectorCount = Set(finance.data.investments.map(\.sector).filter { !$0.isEmpty }).count
+            // Trimmed, matching `MacInvestmentsView.isNonEmpty`: a sector of " " is not a
+            // sector, and the two platforms were counting the same portfolio differently.
+            let sectorCount = Set(finance.data.investments.map(\.sector).filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }).count
             let sectorCountLabel = settings.privateCount(sectorCount)
             // The card's own title already redacts its count, and then its value said "Never"
             // whenever the portfolio was empty — the same fact, in the same card, in the clear.
@@ -148,7 +150,10 @@ struct InvestmentsView: View {
                 verbatimTitle: settings.localized("Status • \(sectorCountLabel) Sectors"),
                 value: settings.isPrivacyMode
                     ? settings.redactionToken
-                    : (latestUpdate.map { settings.date($0) } ?? settings.localized("Never")),
+                    // `time: .shortened`, matching the Desktop twin. On a day with two price
+                    // refreshes a date-only stamp cannot tell them apart. Presentation only —
+                    // both branches already redact identically.
+                    : (latestUpdate.map { settings.date($0, time: .shortened) } ?? settings.localized("Never")),
                 systemImage: "checkmark.circle"
             )
         }
@@ -244,7 +249,7 @@ struct InvestmentsView: View {
                     )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    Text(settings.localized("Updated \(settings.privateDate(investment.updatedAt))"))
+                    Text(settings.localized("Updated \(settings.privateDate(investment.updatedAt, time: .shortened))"))
                         .font(.caption2)
                         .foregroundStyle(WCColor.textSecondary)
                         .lineLimit(1)

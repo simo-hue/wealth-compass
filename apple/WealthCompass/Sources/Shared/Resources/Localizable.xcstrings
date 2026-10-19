@@ -1046,7 +1046,8 @@
       }
     },
     "%@\n\n%@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1469,7 +1470,8 @@
       }
     },
     "%@\n\nWealth Compass Tracker will continue using %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1690,7 +1692,8 @@
 
     },
     "%@ (%@)" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3815,7 +3818,8 @@
       }
     },
     "%@ is scheduled. Open Wealth Compass Tracker to review it." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6561,7 +6565,8 @@
       }
     },
     "%@: %@. Wealth Compass Tracker records it while the app is active." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6771,6 +6776,18 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "%@：%@。Wealth Compass Tracker 會在應用程式處於活動狀態時記錄它。"
+          }
+        }
+      }
+    },
+    "%@: CoinGecko key missing" : {
+      "comment" : "Shown per holding in the market-data refresh summary when no CoinGecko API key is configured. %@ is the ticker symbol.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@: CoinGecko key missing"
           }
         }
       }
@@ -7622,651 +7639,6 @@
         }
       }
     },
-    "%@))d ago" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))د مضت"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "fa %@)) d"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Před %@))d"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d siden"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d vor"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) ημ. πριν"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d ago"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))hace"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))hace"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))p sitten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "il y a %@))j"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) לפני יום"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d पहले"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "prije %@))d"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) napja"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) hari yang lalu"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d fa"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))日前"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))일 전"
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d lalu"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d siden"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d geleden"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d temu"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d atrás"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d atrás"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d acum"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))д назад"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pred %@))d"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d sedan"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d ที่แล้ว"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d önce"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) дн. тому"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) ngày trước"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d 前"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))d 前"
-          }
-        }
-      }
-    },
-    "%@))h ago" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) منذ ح"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "fa %@))h"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "před %@))h"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) t siden"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h vor"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) ώρα πριν"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h ago"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h hace"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h hace"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h sitten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "il y a %@))h"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) לפני שעה"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) घंटे पहले"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "prije %@))h"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) órával ezelőtt"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) jam yang lalu"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h fa"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))1時間前"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))시간 전"
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h lalu"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) t siden"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))u geleden"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h temu"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h atrás"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h atrás"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h în urmă"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))ч назад"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pred %@))h"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h sedan"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))ชั่วโมงที่ผ่านมา"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@))h önce"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) год тому"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) giờ trước"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) 小时前"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)) 小時前"
-          }
-        }
-      }
-    },
-    "%@)m ago" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)م مضت"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "fa %@) m"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "před %@)min"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@) m siden"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vor %@)m"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@) πριν από λ"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m ago"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hace %@)m"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hace %@)m"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@) min sitten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "il y a %@)m"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "לפני %@) מ'"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m पहले"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "prije %@) min"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@) perce"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m yang lalu"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m fa"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)分前"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)분 전"
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m yang lalu"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@) m siden"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m geleden"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)min temu"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m atrás"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m atrás"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m în urmă"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)м назад"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pred %@) min"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m sedan"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)ม.ที่แล้ว"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)dk önce"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)хв тому"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)phút trước"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m 前"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@)m 前"
-          }
-        }
-      }
-    },
     "%@%@" : {
       "localizations" : {
         "ar" : {
@@ -8482,7 +7854,8 @@
       }
     },
     "%@%%" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9315,7 +8688,8 @@
       }
     },
     "%lld due transaction%@ added to Cash Flow." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11610,7 +10984,8 @@
       }
     },
     "%lld more transactions hidden by this view." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12027,6 +11402,7 @@
       }
     },
     "%lld scheduled transactions were automatically added to Cash Flow." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14322,6 +13698,7 @@
       }
     },
     "1 scheduled transaction was automatically added to Cash Flow." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15589,7 +14966,8 @@
       }
     },
     "6M NET" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24401,7 +23779,8 @@
       }
     },
     "Average Buy Price" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -26089,7 +25468,8 @@
       }
     },
     "Biometric authentication is not available on this Mac." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -26932,7 +26312,8 @@
       }
     },
     "Breakdown of recorded spending" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -27141,7 +26522,8 @@
       }
     },
     "British Pound" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -31548,7 +30930,8 @@
       }
     },
     "CloudKit record %@ has no payload." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -32799,221 +32182,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CoinGecko 回傳了 %@ 的即時比特幣價格。"
-          }
-        }
-      }
-    },
-    "CoinGecko returned a live Bitcoin price at %@))." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أعادت CoinGecko سعر البيتكوين المباشر عند %@))."
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko va retornar un preu de Bitcoin en directe a %@))."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko vrátilo živou cenu bitcoinu na %@))."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko returnerede en live Bitcoin-pris til %@))."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko hat einen Live-Bitcoin-Preis von %@) zurückgegeben."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Το CoinGecko επέστρεψε μια ζωντανή τιμή Bitcoin σε %@))."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko returned a live Bitcoin price at %@))."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko devolvió un precio de Bitcoin en vivo en %@))."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko devolvió un precio de Bitcoin en vivo en %@))."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko palautti reaaliaikaisen Bitcoin-hinnan %@))."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko a renvoyé un prix Bitcoin en direct à %@))."
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko החזיר מחיר ביטקוין חי ב-%@))."
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "कॉइनगेको ने %@) पर लाइव बिटकॉइन मूल्य लौटाया।"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko je vratio živu cijenu Bitcoina na %@))."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A CoinGecko élő Bitcoin árat adott vissza %@))."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko mengembalikan harga Bitcoin langsung di %@))."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko ha restituito un prezzo Bitcoin in tempo reale a %@))."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko は、%@)) でのビットコインのライブ価格を返しました。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko는 %@)에 실시간 비트코인 ​​가격을 반환했습니다."
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko mengembalikan harga Bitcoin secara langsung pada %@))."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko returnerte en live Bitcoin-pris til %@))."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko heeft een live Bitcoin-prijs geretourneerd op %@))."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko zwróciło aktualną cenę Bitcoina na poziomie %@))."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko retornou um preço real do Bitcoin em %@))."
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko retornou um preço real de Bitcoin em %@))."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko a returnat un preț Bitcoin live la %@))."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko вернул текущую цену биткойнов на уровне %@))."
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko vrátilo živú cenu bitcoinu na %@))."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko returnerade ett live Bitcoin-pris på %@))."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko คืนราคา Bitcoin จริงที่ %@))"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko, %@ seviyesinde canlı bir Bitcoin fiyatı döndürdü))."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko повернув реальну ціну біткойна на рівні %@))."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko đã trả lại giá Bitcoin trực tiếp ở mức %@))."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko 返回了实时比特币价格 %@))。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CoinGecko 回傳了即時比特幣價格 %@))。"
           }
         }
       }
@@ -41609,7 +40777,8 @@
       }
     },
     "Delete All Data" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -41818,7 +40987,8 @@
       }
     },
     "Delete All Data?" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -42027,7 +41197,8 @@
       }
     },
     "Delete All Local Data..." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -52307,7 +51478,8 @@
       }
     },
     "Euro" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -54199,7 +53371,8 @@
       }
     },
     "Expense Categories" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -56094,7 +55267,8 @@
       }
     },
     "Export JSON..." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -59863,221 +59037,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Finnhub 在 %@ 回傳了即時 AAPL 報價。"
-          }
-        }
-      }
-    },
-    "Finnhub returned a live AAPL quote at %@))." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أعاد Finnhub عرض أسعار مباشر لـ AAPL على %@))."
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub ha retornat una cotització AAPL en directe a %@))."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub vrátil aktuální nabídku AAPL na %@))."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub returnerede et live AAPL-tilbud på %@))."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub hat ein Live-AAPL-Angebot bei %@)) zurückgegeben."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Η Finnhub επέστρεψε μια ζωντανή προσφορά AAPL στο %@))."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub returned a live AAPL quote at %@))."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub devolvió una cotización de AAPL en vivo en %@))."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub devolvió una cotización de AAPL en vivo en %@))."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub palautti live-AAPL-tarjouksen osoitteessa %@))."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub a renvoyé un devis AAPL en direct à %@))."
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub החזירה הצעת מחיר חיה של AAPL ב-%@))."
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "फ़िनहब ने %@) पर एक लाइव AAPL उद्धरण लौटाया।"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub je vratio AAPL ponudu uživo na %@))."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A Finnhub élő AAPL-ajánlatot adott vissza a következő címen: %@))."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub mengembalikan penawaran AAPL langsung di %@))."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub ha restituito un preventivo AAPL in tempo reale alle %@))."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub は、%@)) に AAPL のライブ引用を返しました。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub는 %@)에서 실시간 AAPL 견적을 반환했습니다."
-          }
-        },
-        "ms" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub mengembalikan petikan AAPL secara langsung di %@))."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub returnerte et direkte AAPL-tilbud på %@))."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub heeft een live AAPL-citaat teruggestuurd op %@))."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub przesłał aktualną wycenę AAPL pod adresem %@))."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub retornou uma cotação AAPL ao vivo em %@))."
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub retornou uma cotação AAPL ao vivo em %@))."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub a returnat o cotație AAPL live la %@))."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub вернул актуальную цитату AAPL на %@))."
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub vrátil aktuálnu cenovú ponuku AAPL na %@))."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub returnerade en live AAPL offert på %@))."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub ส่งคืนใบเสนอราคา AAPL สดที่ %@))"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub %@'da canlı bir AAPL teklifi döndürdü))."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub повернув поточну котирування AAPL о %@))."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub đã trả lại báo giá AAPL trực tiếp tại %@))."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub 在 %@)) 返回了 AAPL 实时报价。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finnhub 在 %@)) 回傳了 AAPL 即時報價。"
           }
         }
       }
@@ -68714,7 +67673,8 @@
       }
     },
     "Import JSON Backup" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -68923,7 +67883,8 @@
       }
     },
     "Import JSON..." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -87801,7 +86762,8 @@
       }
     },
     "No expenses in the last 30 days" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -90111,7 +89073,8 @@
       }
     },
     "No supported finance records were found in the selected JSON file." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -96388,217 +95351,214 @@
         }
       }
     },
-    "Paste CoinGecko key..." : {
-      "extractionState" : "stale",
+    "Paste CoinGecko key…" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لصق مفتاح CoinGecko..."
+            "value" : "لصق مفتاح CoinGecko…"
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enganxa la clau de CoinGecko..."
+            "value" : "Enganxa la clau de CoinGecko…"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vložte klíč CoinGecko..."
+            "value" : "Vložte klíč CoinGecko…"
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Indsæt CoinGecko nøgle..."
+            "value" : "Indsæt CoinGecko nøgle…"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CoinGecko-Schlüssel einfügen..."
+            "value" : "CoinGecko-Schlüssel einfügen…"
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Επικόλληση κλειδιού CoinGecko..."
+            "value" : "Επικόλληση κλειδιού CoinGecko…"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pegue la clave CoinGecko..."
+            "value" : "Pegue la clave CoinGecko…"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pegue la clave CoinGecko..."
+            "value" : "Pegue la clave CoinGecko…"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Liitä CoinGecko-avain..."
+            "value" : "Liitä CoinGecko-avain…"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Coller la clé CoinGecko..."
+            "value" : "Coller la clé CoinGecko…"
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "הדבק את מפתח CoinGecko..."
+            "value" : "הדבק את מפתח CoinGecko…"
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "कॉइनगेको कुंजी चिपकाएँ..."
+            "value" : "कॉइनगेको कुंजी चिपकाएँ…"
           }
         },
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zalijepi CoinGecko ključ..."
+            "value" : "Zalijepi CoinGecko ključ…"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CoinGecko kulcs beillesztése..."
+            "value" : "CoinGecko kulcs beillesztése…"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tempel kunci CoinGecko..."
+            "value" : "Tempel kunci CoinGecko…"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Incolla la chiave CoinGecko..."
+            "value" : "Incolla la chiave CoinGecko…"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CoinGecko キーを貼り付けます..."
+            "value" : "CoinGecko キーを貼り付けます…"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CoinGecko 키 붙여넣기..."
+            "value" : "CoinGecko 키 붙여넣기…"
           }
         },
         "ms" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tampal kunci CoinGecko..."
+            "value" : "Tampal kunci CoinGecko…"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lim inn CoinGecko-nøkkel..."
+            "value" : "Lim inn CoinGecko-nøkkel…"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plak de CoinGecko-sleutel..."
+            "value" : "Plak de CoinGecko-sleutel…"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wklej klucz CoinGecko..."
+            "value" : "Wklej klucz CoinGecko…"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cole a chave CoinGecko..."
+            "value" : "Cole a chave CoinGecko…"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cole a chave CoinGecko..."
+            "value" : "Cole a chave CoinGecko…"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lipiți cheia CoinGecko..."
+            "value" : "Lipiți cheia CoinGecko…"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вставьте ключ CoinGecko..."
+            "value" : "Вставьте ключ CoinGecko…"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prilepiť kľúč CoinGecko..."
+            "value" : "Prilepiť kľúč CoinGecko…"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klistra in CoinGecko-nyckel..."
+            "value" : "Klistra in CoinGecko-nyckel…"
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "วางคีย์ CoinGecko..."
+            "value" : "วางคีย์ CoinGecko…"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CoinGecko anahtarını yapıştırın..."
+            "value" : "CoinGecko anahtarını yapıştırın…"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вставте ключ CoinGecko..."
+            "value" : "Вставте ключ CoinGecko…"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dán khóa CoinGecko..."
+            "value" : "Dán khóa CoinGecko…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "粘贴 CoinGecko 密钥..."
+            "value" : "粘贴 CoinGecko 密钥…"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "貼上 CoinGecko 金鑰..."
+            "value" : "貼上 CoinGecko 金鑰…"
           }
         }
       }
-    },
-    "Paste CoinGecko key…" : {
-
     },
     "Paste Finnhub API key" : {
       "extractionState" : "manual",
@@ -96815,217 +95775,214 @@
         }
       }
     },
-    "Paste Finnhub key..." : {
-      "extractionState" : "stale",
+    "Paste Finnhub key…" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لصق مفتاح Finnhub..."
+            "value" : "لصق مفتاح Finnhub…"
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enganxa la clau de Finnhub..."
+            "value" : "Enganxa la clau de Finnhub…"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vložit klíč Finnhub..."
+            "value" : "Vložit klíč Finnhub…"
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Indsæt Finnhub-nøgle..."
+            "value" : "Indsæt Finnhub-nøgle…"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finnhub-Schlüssel einfügen..."
+            "value" : "Finnhub-Schlüssel einfügen…"
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Επικολλήστε το κλειδί Finnhub..."
+            "value" : "Επικολλήστε το κλειδί Finnhub…"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pegar clave Finnhub..."
+            "value" : "Pegar clave Finnhub…"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pegar clave Finnhub..."
+            "value" : "Pegar clave Finnhub…"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Liitä Finnhub-avain..."
+            "value" : "Liitä Finnhub-avain…"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Coller la clé Finnhub..."
+            "value" : "Coller la clé Finnhub…"
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "הדבק מפתח Finnhub..."
+            "value" : "הדבק מפתח Finnhub…"
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "फिनहब कुंजी चिपकाएँ..."
+            "value" : "फिनहब कुंजी चिपकाएँ…"
           }
         },
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zalijepi Finnhub ključ..."
+            "value" : "Zalijepi Finnhub ključ…"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finnhub kulcs beillesztése..."
+            "value" : "Finnhub kulcs beillesztése…"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tempelkan kunci Finnhub..."
+            "value" : "Tempelkan kunci Finnhub…"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Incolla la chiave Finnhub..."
+            "value" : "Incolla la chiave Finnhub…"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finnhub キーを貼り付けます..."
+            "value" : "Finnhub キーを貼り付けます…"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finnhub 키 붙여넣기..."
+            "value" : "Finnhub 키 붙여넣기…"
           }
         },
         "ms" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tampal kunci Finnhub..."
+            "value" : "Tampal kunci Finnhub…"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lim inn Finnhub-nøkkel..."
+            "value" : "Lim inn Finnhub-nøkkel…"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finnhub-sleutel plakken..."
+            "value" : "Finnhub-sleutel plakken…"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wklej klucz Finnhub..."
+            "value" : "Wklej klucz Finnhub…"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cole a chave Finnhub..."
+            "value" : "Cole a chave Finnhub…"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cole a chave Finnhub..."
+            "value" : "Cole a chave Finnhub…"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lipiți cheia Finnhub..."
+            "value" : "Lipiți cheia Finnhub…"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вставьте ключ Finnhub..."
+            "value" : "Вставьте ключ Finnhub…"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prilepiť kľúč Finnhub..."
+            "value" : "Prilepiť kľúč Finnhub…"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klistra in Finnhub-nyckel..."
+            "value" : "Klistra in Finnhub-nyckel…"
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "วางคีย์ Finnhub..."
+            "value" : "วางคีย์ Finnhub…"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finnhub anahtarını yapıştırın..."
+            "value" : "Finnhub anahtarını yapıştırın…"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вставити ключ Finnhub..."
+            "value" : "Вставити ключ Finnhub…"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dán khóa Finnhub..."
+            "value" : "Dán khóa Finnhub…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "粘贴 Finnhub 密钥..."
+            "value" : "粘贴 Finnhub 密钥…"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "貼上 Finnhub 金鑰..."
+            "value" : "貼上 Finnhub 金鑰…"
           }
         }
       }
-    },
-    "Paste Finnhub key…" : {
-
     },
     "Pause schedule" : {
       "localizations" : {
@@ -98913,7 +97870,8 @@
       }
     },
     "Please insert at least one API key, or tap 'Skip for now' if you wish to proceed without them." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -99752,7 +98710,8 @@
 
     },
     "Prepare Backup" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -103526,7 +102485,8 @@
       }
     },
     "Recent Transactions" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -110395,6 +109355,7 @@
     },
     "savings rate" : {
       "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -113319,7 +112280,8 @@
       }
     },
     "Share Backup" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -114459,7 +113421,8 @@
       }
     },
     "Six-Month Cash Flow" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -117561,7 +116524,8 @@
       }
     },
     "Swiss Franc" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -119757,6 +118721,7 @@
       }
     },
     "The API key was saved securely in Keychain." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -120005,7 +118970,8 @@
       }
     },
     "the built-in offline fallback rates" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -121350,7 +120316,8 @@
       }
     },
     "The iCloud account does not have enough available storage." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -121807,7 +120774,8 @@
       }
     },
     "the last cached rates" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -121968,7 +120936,8 @@
       }
     },
     "The network is unavailable. Local changes are saved and will retry automatically." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -123943,7 +122912,8 @@
       }
     },
     "This permanently removes all local Wealth Compass Tracker data from this device." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -132021,7 +130991,8 @@
       }
     },
     "US Dollar" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -133985,7 +132956,8 @@
 
     },
     "We don't use central servers. All your financial data is stored locally on your device or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -134194,7 +133166,8 @@
       }
     },
     "We don't use central servers. All your financial data is stored locally on your Mac or in your private iCloud. To track live market prices for your assets, you will connect directly to data providers." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -136304,7 +135277,8 @@
       }
     },
     "Where spending was concentrated in the last 30 days" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -136969,6 +135943,7 @@
       }
     },
     "Yes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -138238,7 +137213,8 @@
       }
     },
     "Your financial view is protected" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -139719,5 +138695,5 @@
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.1"
 }

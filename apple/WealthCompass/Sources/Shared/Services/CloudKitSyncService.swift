@@ -123,6 +123,7 @@ enum CloudSyncRecordType: String, Codable, CaseIterable, Sendable {
     case crypto = "WCCryptoHolding"
     case liability = "WCLiability"
     case snapshot = "WCNetWorthSnapshot"
+    case customCategory = "WCCustomCategory"
 
     fileprivate var recordNamePrefix: String {
         switch self {
@@ -132,6 +133,7 @@ enum CloudSyncRecordType: String, Codable, CaseIterable, Sendable {
         case .crypto: "crypto"
         case .liability: "liability"
         case .snapshot: "snapshot"
+        case .customCategory: "category"
         }
     }
 }
@@ -249,6 +251,9 @@ extension FinancialData {
         for value in snapshots {
             try append(value, type: .snapshot, id: value.id, createdAt: value.createdAt, updatedAt: value.updatedAt)
         }
+        for value in customCategories {
+            try append(value, type: .customCategory, id: value.id, createdAt: value.createdAt, updatedAt: value.updatedAt)
+        }
         return records
     }
 
@@ -259,7 +264,7 @@ extension FinancialData {
     /// back on the main actor per batch — the cost `handleFetchedRecordZoneChanges` already goes out
     /// of its way to avoid once bootstrap is done.
     ///
-    /// Walks the same six collections as `cloudSyncRecords()` directly above; the two lists must not
+    /// Walks the same collections as `cloudSyncRecords()` directly above; the two lists must not
     /// drift apart.
     func cloudSyncRecordKeys() -> Set<CloudSyncRecordKey> {
         var keys = Set<CloudSyncRecordKey>()
@@ -269,6 +274,7 @@ extension FinancialData {
         keys.formUnion(crypto.map { CloudSyncRecordKey(type: .crypto, id: $0.id) })
         keys.formUnion(liabilities.map { CloudSyncRecordKey(type: .liability, id: $0.id) })
         keys.formUnion(snapshots.map { CloudSyncRecordKey(type: .snapshot, id: $0.id) })
+        keys.formUnion(customCategories.map { CloudSyncRecordKey(type: .customCategory, id: $0.id) })
         return keys
     }
 
@@ -301,6 +307,8 @@ extension FinancialData {
                     liabilities = try Self.applying(mutation, to: liabilities, decoding: Liability.self)
                 case .snapshot:
                     snapshots = try Self.applying(mutation, to: snapshots, decoding: NetWorthSnapshot.self)
+                case .customCategory:
+                    customCategories = try Self.applying(mutation, to: customCategories, decoding: CustomTransactionCategory.self)
                 }
                 outcome.appliedKeys.insert(mutation.key)
             } catch {
@@ -366,7 +374,8 @@ struct CloudSyncRecordState: Codable, Sendable {
 }
 
 private struct CloudSyncMetadata: Codable, Sendable {
-    var schemaVersion = 1
+    static let currentSchemaVersion = 2
+    var schemaVersion = Self.currentSchemaVersion
     var accountRecordName: String?
     var engineState: Data?
     var bootstrapCompleted = false
@@ -653,6 +662,19 @@ final class CloudSyncMetadataStore: @unchecked Sendable {
 
     func pendingRevision(for key: CloudSyncRecordKey) -> UUID? {
         read().records[key.storageKey]?.pending?.revision
+    }
+
+    /// Older apps advanced their zone token past category records they did not recognize.
+    /// On upgrade, fetch the zone once with the expanded record vocabulary. Preserve account
+    /// ownership, pending edits, hashes, and tombstones so the normal bootstrap can merge safely.
+    fileprivate func prepareForCurrentRecordTypes() throws {
+        guard read().schemaVersion < CloudSyncMetadata.currentSchemaVersion else { return }
+        try update {
+            $0.engineState = nil
+            $0.bootstrapCompleted = false
+            $0.zoneReady = false
+            $0.schemaVersion = CloudSyncMetadata.currentSchemaVersion
+        }
     }
 
     /// Whether the one-shot bootstrap merge has completed for this account. Read by the WC-M1
@@ -1025,6 +1047,7 @@ actor CloudKitSyncService: CKSyncEngineDelegate {
             if metadata.accountRecordName != userRecordID.recordName {
                 try resetMetadata(for: userRecordID.recordName)
             }
+            try metadataStore.prepareForCurrentRecordTypes()
             // The skip set matters as much here as it does at load. Without it a record this build
             // cannot decode is present in `knownLocalHashes` (the load-time reconcile carried it
             // forward) but absent from `currentRecords`, so it reads as drift: the change token is

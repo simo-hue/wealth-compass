@@ -390,15 +390,38 @@ private struct MacGlobalNavBar: View {
     @Binding var selection: MacDestination?
     @Namespace private var namespace
 
+    /// The pill measures 553pt in English and 576pt in German with all five titles and icons —
+    /// comfortably inside a full-screen iPad, and wider than every narrower multitasking size the
+    /// app can be put into. With no ladder it simply ran off the edge, taking **Settings** with it,
+    /// and on iPad this is the *only* page switcher there is: the toolbar copy above is gated
+    /// `!DesktopPlatform.isPad`, so an unreachable item here is an unreachable page.
+    ///
+    /// Three rungs, because two do not cover the middle: dropping the icons alone saves roughly
+    /// 100pt, which is enough for a half-and-half split (~507pt) but nowhere near Slide Over's
+    /// 320pt. Icon-only measures ~234pt and reaches it. The icons are distinct per destination and
+    /// each still carries `destination.title` as its accessibility label — `.labelStyle` changes
+    /// what is *drawn*, not what VoiceOver reads — and `.help` keeps the pointer tooltip.
     var body: some View {
+        ViewThatFits(in: .horizontal) {
+            pill(.titleAndIcon, geometryID: "mac_global_nav_full")
+            pill(.titleOnly, geometryID: "mac_global_nav_titles")
+            pill(.iconOnly, geometryID: "mac_global_nav_icons")
+        }
+    }
+
+    /// One rung of the ladder.
+    ///
+    /// `geometryID` differs per rung on purpose: `ViewThatFits` builds every candidate in order to
+    /// measure it, and two live `matchedGeometryEffect` sources sharing one id in one namespace is
+    /// exactly the "multiple inserted views in matched geometry group" case.
+    private func pill(_ style: NavBarLabelStyle, geometryID: String) -> some View {
         HStack(spacing: 4) {
             ForEach(MacDestination.allCases) { destination in
                 let isSelected = selection == destination
                 Button {
                     selection = destination
                 } label: {
-                    Label(destination.title, systemImage: destination.systemImage)
-                        .labelStyle(.titleAndIcon)
+                    navLabel(for: destination, style: style)
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(isSelected ? .white : .white.opacity(0.75))
                         .padding(.horizontal, 12)
@@ -407,7 +430,7 @@ private struct MacGlobalNavBar: View {
                             if isSelected {
                                 Capsule()
                                     .fill(Color.white.opacity(0.18))
-                                    .matchedGeometryEffect(id: "mac_global_nav", in: namespace)
+                                    .matchedGeometryEffect(id: geometryID, in: namespace)
                             }
                         }
                         .contentShape(Capsule())
@@ -416,6 +439,9 @@ private struct MacGlobalNavBar: View {
                 .help(destination.title)
             }
         }
+        // Titles must never be the thing that shrinks: a wrapped or truncated title here would
+        // hide the ladder's own failure instead of letting the next rung win.
+        .fixedSize()
         .padding(4)
         .background(
             Capsule()
@@ -425,6 +451,22 @@ private struct MacGlobalNavBar: View {
         // Subtle shadow — the pill sits inside the toolbar rather than floating over content.
         .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selection)
+    }
+
+    /// `LabelStyle` is a protocol, and the three concrete styles are different types, so a rung
+    /// cannot take one as a parameter without erasing it. This enum is that choice, spelled out.
+    private enum NavBarLabelStyle {
+        case titleAndIcon, titleOnly, iconOnly
+    }
+
+    @ViewBuilder
+    private func navLabel(for destination: MacDestination, style: NavBarLabelStyle) -> some View {
+        let label = Label(destination.title, systemImage: destination.systemImage)
+        switch style {
+        case .titleAndIcon: label.labelStyle(.titleAndIcon)
+        case .titleOnly: label.labelStyle(.titleOnly)
+        case .iconOnly: label.labelStyle(.iconOnly)
+        }
     }
 }
 

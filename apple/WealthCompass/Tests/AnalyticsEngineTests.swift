@@ -1101,6 +1101,54 @@ final class AnalyticsEngineTests: XCTestCase {
         )
     }
 
+    /// The "Transactions" card must count what the five cards beside it count.
+    ///
+    /// `monthlyTransactionCount` filtered the raw array with no settled clamp, while its five
+    /// neighbours in the same `LazyVGrid` route through `AnalyticsEngine.settledTransactions` — the
+    /// L51 rule whose comment reads that every figure derived from the ledger has to agree about
+    /// what has actually happened. A single invoice dated later this month put Monthly Income at
+    /// one figure and the count beside it at another.
+    ///
+    /// The second half is the cache, and it is not optional. The count used to be keyed on
+    /// `(dataVersion, month)` only, which was correct precisely *because* the value was
+    /// day-independent. Clamping it to settled rows makes it change at midnight with no data
+    /// mutation, so the key has to gain the `dayStamp` every other cache on this store carries —
+    /// otherwise the fix trades a wrong count for a stale one. The second assertion below is that
+    /// half: same store, same data, one day later.
+    @MainActor
+    func testTheMonthlyTransactionCountExcludesFutureRowsAndReRunsAfterMidnight() throws {
+        let calendar = Calendar.current
+        func day(_ day: Int, _ hour: Int = 12) throws -> Date {
+            try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 6, day: day, hour: hour)))
+        }
+        let today = try day(15)
+        let settings = makeSettings()
+        let store = FinanceStore(
+            persistence: SeededLedgerPersistence(FinancialData(transactions: [
+                tx(.expense, 10, "Food", try day(10)),
+                tx(.income, 20, "Salary", try day(20))
+            ])),
+            settings: settings,
+            syncMetadataStore: CloudSyncMetadataStore(directoryName: "WealthCompassTests-\(UUID().uuidString)")
+        )
+
+        XCTAssertEqual(
+            store.monthlyTransactionCount(for: today, now: today), 1,
+            """
+            The count included a transaction dated five days from now, which every other figure in \
+            the same strip excludes. The card said 2 while Monthly Income described 1.
+            """
+        )
+        XCTAssertEqual(
+            store.monthlyTransactionCount(for: today, now: try day(21)), 2,
+            """
+            Six days later the future row has settled and the count must move — but the cache is \
+            keyed on `(dataVersion, month)` and no data changed, so it re-served the stale 1. A \
+            settled figure has to carry a `dayStamp` in its key, like every other cache here.
+            """
+        )
+    }
+
     @MainActor
     private func makeSettings() -> AppSettings {
         AppSettings(userDefaults: UserDefaults(suiteName: "WealthCompassTests-\(UUID().uuidString)")!)
@@ -1123,4 +1171,104 @@ private final class EmptyPersistence: FinancePersistence, @unchecked Sendable {
     func load() throws -> FinancePersistenceLoad? { nil }
     func save(_ data: FinancialData) throws {}
     func clear() throws {}
+}
+
+/// One preloaded dataset, so `FinanceStore.init` — which loads synchronously — comes up with a
+/// ledger already in it.
+private final class SeededLedgerPersistence: FinancePersistence, @unchecked Sendable {
+    private var stored: FinancialData?
+    init(_ data: FinancialData) { stored = data }
+    var locationDescription: String { "in-memory (transaction count test)" }
+    func load() throws -> FinancePersistenceLoad? { stored.map { FinancePersistenceLoad(data: $0) } }
+    func save(_ data: FinancialData) throws { stored = data }
+    func clear() throws { stored = nil }
+}
+
+/// Chart selections must survive the data moving under them.
+///
+/// All three donuts (`AllocationChart`, `MacDashboardView.allocationCard`, and the hand-written
+/// expense ring in `CashFlowView`) used to latch a *value snapshot* of the tapped slice. Tap a
+/// wedge, then run Refresh Prices or change the period, and the centre kept the old amount while
+/// the share under it was old-value ÷ new-total — a percentage matching neither state. If the
+/// selected item disappeared, the snapshot matched no wedge and the entire ring dimmed to 0.3.
+///
+/// The fix is one shared resolution step, `resolvedChartSelection(_:in:)`, exercised here directly.
+/// Note what these tests can and cannot reach: the helper's contract is pure and is pinned below,
+/// but the *wiring* — that each view stores an id rather than a snapshot and calls this on every
+/// render — lives in SwiftUI `@State` inside a `View` and is not reachable from XCTest.
+final class ChartSelectionResolutionTests: XCTestCase {
+
+    private func slice(_ id: String, _ name: String, _ value: Double) -> AllocationSlice {
+        AllocationSlice(id: id, name: name, value: value, color: .blue)
+    }
+
+    /// The core defect: a price refresh changes `value` but not `id`, and the id-keyed reset the
+    /// old code used therefore never fired. Resolving must hand back the *live* figure.
+    func testResolutionReadsTheCurrentValueNotTheOneCapturedAtTapTime() {
+        let atTapTime = [slice("asset-investments", "Investments", 1000), slice("asset-cash", "Cash", 1000)]
+        let captured = atTapTime[0]
+
+        let afterRefresh = [slice("asset-investments", "Investments", 1500), slice("asset-cash", "Cash", 1000)]
+        let resolved = resolvedChartSelection(captured.id, in: afterRefresh)
+
+        XCTAssertEqual(resolved?.id, "asset-investments")
+        XCTAssertEqual(resolved?.value, 1500, "the centre must print the refreshed amount, not the snapshot")
+        XCTAssertNotEqual(
+            resolved?.value, captured.value,
+            "if this is equal the selection is a snapshot again and the share is old-value ÷ new-total"
+        )
+    }
+
+    /// A selected item that no longer exists is the same as nothing being selected — otherwise
+    /// every wedge sits at 0.3 opacity and the ring greys out with nothing lit. This is the case
+    /// the expense donut hits every time the period picker moves.
+    func testAVanishedSelectionResolvesToNothingRatherThanDimmingEveryWedge() {
+        let previousPeriod = [slice("Groceries", "Groceries", 420), slice("Rent", "Rent", 1200)]
+        let captured = previousPeriod[0]
+
+        let newPeriod = [slice("Rent", "Rent", 1200)]
+        XCTAssertNil(resolvedChartSelection(captured.id, in: newPeriod))
+        XCTAssertNil(resolvedChartSelection(captured.id, in: [AllocationSlice]()))
+    }
+
+    /// Identity, not position. Allocation slices are re-sorted by value on every recomputation, so
+    /// an index-keyed selection would silently jump to a different holding after a refresh.
+    func testResolutionFollowsTheIdentityAcrossAReorder() {
+        let before = [slice("asset-cash", "Cash", 900), slice("asset-crypto", "Crypto", 100)]
+        let captured = before[1]
+
+        let afterCryptoRallied = [slice("asset-crypto", "Crypto", 2000), slice("asset-cash", "Cash", 900)]
+        let resolved = resolvedChartSelection(captured.id, in: afterCryptoRallied)
+
+        XCTAssertEqual(resolved?.name, "Crypto")
+        XCTAssertEqual(resolved?.value, 2000)
+    }
+
+    /// No selection stays no selection — the centre falls back to its TOTAL / ASSETS / EXPENSES
+    /// readout and every wedge stays fully lit.
+    func testNoSelectionResolvesToNothing() {
+        let slices = [slice("asset-cash", "Cash", 900), slice("asset-crypto", "Crypto", 100)]
+        XCTAssertNil(resolvedChartSelection(nil, in: slices))
+    }
+
+    /// The iOS expense donut keys on `CategoryTotal`, whose `id` is the category `name` and whose
+    /// `percentage` is precomputed per period — so a stale selection there prints a share belonging
+    /// to a period the user is no longer looking at.
+    func testCategoryTotalsResolveToTheCurrentPeriodsFigures() {
+        let july = [
+            CategoryTotal(name: "Groceries", value: 400, percentage: 40),
+            CategoryTotal(name: "Rent", value: 600, percentage: 60)
+        ]
+        let captured = july[0]
+
+        let august = [
+            CategoryTotal(name: "Groceries", value: 250, percentage: 20),
+            CategoryTotal(name: "Rent", value: 1000, percentage: 80)
+        ]
+        let resolved = resolvedChartSelection(captured.id, in: august)
+
+        XCTAssertEqual(resolved?.name, "Groceries")
+        XCTAssertEqual(resolved?.value, 250)
+        XCTAssertEqual(resolved?.percentage, 20, "the share must belong to the period on screen")
+    }
 }

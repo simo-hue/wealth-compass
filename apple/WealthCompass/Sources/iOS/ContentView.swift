@@ -219,9 +219,15 @@ struct ContentView: View {
         // the notification path two lines up is gated on the same flag
         // (`showDetails: !settings.isPrivacyMode`), which is why this one stood out.
         guard !settings.isPrivacyMode else { return }
-        let message = insertedCount == 1
-            ? settings.localized("1 scheduled transaction was automatically added to Cash Flow.")
-            : settings.localized("\(insertedCount) scheduled transactions were automatically added to Cash Flow.")
+        // WC-L18, and the same key the Desktop uses: one key for every count, not a
+        // singular/plural pair chosen here in Swift. Branching on `insertedCount == 1` can only
+        // express the two categories English has, and it silently imposes them on languages with
+        // more — Czech and Slovak need a distinct form at n=2..4, and Russian, Ukrainian, Polish,
+        // Croatian and Romanian all put 21, 31 and 101 back in the *singular* category. The catalog
+        // key carries `variations.plural`, one of only two keys in it that do, and CLDR selects the
+        // right form per locale. Pointing both platforms at it also ends a wording split: the two
+        // UIs were announcing the same event in two different sentences.
+        let message = settings.localized("\(insertedCount) due transactions were added to Cash Flow.")
         recurringInsertionAlert = RecurringInsertionAlert(
             message: message
         )

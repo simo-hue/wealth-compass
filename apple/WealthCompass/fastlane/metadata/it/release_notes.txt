@@ -1,35 +1,3 @@
-Wealth Compass ora funziona su iPad.
+Le categorie personalizzate di entrate e uscite ora si sincronizzano tra iPhone, iPad e Mac quando la sincronizzazione iCloud è attiva.
 
-iPad
-• Il layout desktop completo arriva su iPad: barra laterale, dashboard a più colonne e gli stessi menu dell'app per Mac, che si riadatta quando tieni il dispositivo in verticale.
-• Grafici, tabelle e menu sono pensati per il tocco, e l'icona dell'app è disegnata nelle dimensioni per iPad.
-• Tocca un grafico per esaminare un valore; lo scorrimento continua a funzionare.
-
-Nella tua lingua
-• Il report PDF è ora tradotto in tutte le lingue supportate dall'app, non solo in inglese.
-• Date, numeri e percentuali seguono la lingua impostata nell'app.
-• I nomi di categorie, settori, aree geografiche e valute sono tradotti.
-• Molte correzioni di traduzione: la barra delle schede non mostra più l'inglese a tutti, "NET" non viene più tradotto come "rete" e gli intervalli 3M/6M/12M non vengono più letti come milioni.
-
-La Modalità Privacy nasconde di più
-• I grafici di allocazione vengono nascosti, non solo le cifre che contengono.
-• Conteggi, schede di stato, viste vuote e avvisi non rivelano più ciò che hai registrato.
-• I promemoria ricorrenti non indicano più il nome della pianificazione sulla schermata di blocco.
-• L'anteprima nel selettore app ora copre anche i pannelli aperti.
-
-Importi esatti
-• Gli importi importati e salvati mantengono la precisione decimale completa, quindi i valori non si discostano più.
-• Un "1,000" importato viene letto come mille e viene riconosciuto anche il raggruppamento indiano in lakh.
-• Reimportare un estratto conto Revolut non cancella più le tue modifiche alle criptovalute.
-• Le importazioni non perdono più la valuta di una transazione e i nuovi investimenti mantengono la valuta scelta invece di passare a EUR.
-
-Report
-• Le sezioni sul flusso di cassa restano nel periodo indicato, il diagramma del flusso di denaro torna con le tabelle e il grafico dell'andamento non salta più i mesi.
-• Le esportazioni offline indicano i tassi di cambio usati per la conversione.
-• Gli importi lunghi non vengono più troncati.
-
-Anche in questa versione
-• Le pianificazioni ricorrenti si concludono invece di sparire, restano in pausa anche dopo modifiche non correlate e possono essere eliminate una volta terminate.
-• Sincronizzazione iCloud più affidabile, anche in background.
-• "Cancella tutto" non lascia più dati che ritornano.
-• Etichette VoiceOver per i controlli di grafici e filtri.
+Questo aggiornamento migliora anche l’affidabilità della sincronizzazione e corregge problemi di localizzazione.

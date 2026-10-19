@@ -1,35 +1,3 @@
-Wealth Compass werkt nu op de iPad.
+Aangepaste inkomsten- en uitgavencategorieën worden nu gesynchroniseerd tussen iPhone, iPad en Mac wanneer iCloud-synchronisatie is ingeschakeld.
 
-iPad
-• De volledige desktopindeling komt naar de iPad: zijbalk, dashboard met meerdere kolommen en dezelfde menu's als de Mac-app, met een aangepaste indeling wanneer je het apparaat rechtop houdt.
-• Grafieken, tabellen en menu's zijn gemaakt voor aanraking, en het app-symbool is getekend op iPad-formaten.
-• Tik op een grafiek om een waarde te bekijken; scrollen blijft gewoon werken.
-
-In jouw taal
-• Het pdf-rapport is nu vertaald in alle talen die de app ondersteunt, niet alleen Engels.
-• Datums, getallen en percentages volgen de taal die in de app is ingesteld.
-• Namen van categorieën, sectoren, regio's en valuta's zijn vertaald.
-• Veel vertaalfouten verholpen: de tabbalk staat niet meer voor iedereen in het Engels, "NET" wordt niet meer vertaald als "netwerk" en de perioden 3M/6M/12M worden niet meer als miljoenen gelezen.
-
-Privémodus verbergt meer
-• Verdelingsgrafieken worden verborgen, niet alleen de bedragen erin.
-• Aantallen, statuskaarten, lege weergaven en meldingen verraden niet langer wat je hebt vastgelegd.
-• Terugkerende herinneringen noemen de naam van het schema niet meer op het toegangsscherm.
-• De momentopname in de app-kiezer bedekt nu ook geopende panelen.
-
-Exacte bedragen
-• Geïmporteerde en bewaarde bedragen behouden hun volledige decimale precisie, zodat cijfers niet meer afwijken.
-• Een geïmporteerde "1,000" wordt gelezen als duizend, en de Indiase lakh-groepering wordt herkend.
-• Een Revolut-afschrift opnieuw importeren wist je crypto-wijzigingen niet meer.
-• Bij importeren gaat de valuta van een transactie niet meer verloren, en nieuwe beleggingen behouden de gekozen valuta in plaats van over te gaan op EUR.
-
-Rapporten
-• Kasstroomsecties blijven binnen de opgegeven periode, het geldstroomdiagram klopt met de tabellen en de trendgrafiek laat geen maanden meer weg.
-• Offline-exports vermelden de gebruikte wisselkoersen.
-• Lange bedragen worden niet meer afgekapt.
-
-Ook in deze versie
-• Terugkerende schema's worden afgerond in plaats van te verdwijnen, blijven gepauzeerd na niet-gerelateerde wijzigingen en kunnen worden verwijderd zodra ze klaar zijn.
-• Betrouwbaardere iCloud-synchronisatie, ook op de achtergrond.
-• "Alles wissen" laat geen gegevens meer achter die terugkomen.
-• VoiceOver-labels op grafiek- en filterregelaars.
+Deze update verbetert ook de betrouwbaarheid van de synchronisatie en verhelpt lokalisatieproblemen.

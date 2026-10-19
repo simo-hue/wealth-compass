@@ -122,13 +122,21 @@ enum FinanceJSONCoding {
             return out
         }
 
+        let categoriesMigrated: Bool
+        if case .bool(let migrated)? = root["customCategoriesMigrated"] {
+            categoriesMigrated = migrated
+        } else {
+            categoriesMigrated = false
+        }
         let financialData = FinancialData(
             transactions: decodeCollection("transactions", as: Transaction.self, recordType: .transaction),
             recurringTransactions: decodeCollection("recurringTransactions", as: RecurringTransaction.self, recordType: .recurringTransaction),
             investments: decodeCollection("investments", as: Investment.self, recordType: .investment),
             crypto: decodeCollection("crypto", as: CryptoHolding.self, recordType: .crypto),
             liabilities: decodeCollection("liabilities", as: Liability.self, recordType: .liability),
-            snapshots: decodeCollection("snapshots", as: NetWorthSnapshot.self, recordType: .snapshot)
+            snapshots: decodeCollection("snapshots", as: NetWorthSnapshot.self, recordType: .snapshot),
+            customCategories: decodeCollection("customCategories", as: CustomTransactionCategory.self, recordType: .customCategory),
+            customCategoriesMigrated: categoriesMigrated
         )
         return (financialData, wasMigrated, skipped)
     }
@@ -157,7 +165,8 @@ enum FinanceJSONCoding {
         ("investments", .investment),
         ("crypto", .crypto),
         ("liabilities", .liability),
-        ("snapshots", .snapshot)
+        ("snapshots", .snapshot),
+        ("customCategories", .customCategory)
     ]
 
     /// Encodes `data`, then splices back the records in `existing` that the matching load had to

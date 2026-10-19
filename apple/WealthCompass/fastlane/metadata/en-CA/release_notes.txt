@@ -1,35 +1,3 @@
-Wealth Compass now runs on iPad.
+Custom income and expense categories now sync across iPhone, iPad and Mac when iCloud sync is enabled.
 
-iPad
-• The full desktop layout comes to iPad — sidebar, multi-column dashboard and the same menus as the Mac app, reflowing when you hold the device upright.
-• Charts, tables and menus are built for touch, and the app icon is drawn at iPad sizes.
-• Tap a chart to inspect a value; scrolling keeps working.
-
-In your language
-• The PDF report is now translated into every language the app supports, not just English.
-• Dates, numbers and percentages follow the language set in the app.
-• Category, sector, geography and currency names are translated.
-• Many translation fixes: the tab bar no longer shows English for everyone, "NET" is no longer translated as "network", and the 3M/6M/12M ranges are no longer read as millions.
-
-Privacy Mode conceals more
-• Allocation charts are hidden, not only the figures they carry.
-• Counts, status cards, empty states and alerts no longer reveal what you have recorded.
-• Recurring reminders no longer name the schedule on the Lock Screen.
-• The app-switcher snapshot now also covers open sheets.
-
-Amounts are exact
-• Imported and saved amounts keep full decimal precision, so figures no longer drift.
-• An imported "1,000" is read as one thousand, and Indian lakh grouping is understood.
-• Re-importing a Revolut statement no longer wipes your crypto edits.
-• Imports no longer lose a transaction's currency, and new investments keep the currency you picked instead of defaulting to EUR.
-
-Reports
-• Cash-flow sections stay inside the period they state, the Money Flow diagram adds up to the tables, and the trend chart no longer drops months.
-• Offline exports disclose the exchange rates used to convert.
-• Long amounts are no longer truncated.
-
-Also in this release
-• Recurring schedules finish instead of vanishing, stay paused through unrelated edits, and can be deleted once they are done.
-• More reliable iCloud sync, including in the background.
-• Erase Everything no longer leaves data that comes back.
-• VoiceOver labels on chart and filter controls.
+This update also improves sync reliability and fixes localization issues.

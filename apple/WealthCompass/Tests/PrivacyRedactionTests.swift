@@ -5158,6 +5158,107 @@ final class PrivacyRedactionTests: XCTestCase {
             slice = code[i]
         }
     }
+
+    /// A reminder due at midnight must survive the hours before it fires.
+    ///
+    /// `sync` tears down first: `clearReminders(supersededBy:)` removes every pending request under
+    /// our prefix unconditionally, and then this filter decides what gets re-added. So a schedule
+    /// the filter drops is a schedule whose reminder is *deleted*, not one left alone.
+    ///
+    /// It filtered on the raw `nextDueDate`, but the reminder does not fire at `nextDueDate`: WC-L5
+    /// pins a midnight due-time to 09:00 local, which is also what `coalescedIdentifier` keys on.
+    /// Between 00:00 and 09:00 on the due day the schedule therefore looked already-past, so the
+    /// 09:00 request scheduled the previous evening was swept away and never re-added. A foreground
+    /// sync is covered by accident — `ContentView` runs `processDueRecurringTransactions` first,
+    /// which advances the schedule — but a background push runs `sync` alone. The sibling teardown
+    /// filter `staleDelivered` deliberately drops this clause and says why.
+    func testAMidnightDueReminderSurvivesTheHoursBeforeItFires() throws {
+        let calendar = Calendar.current
+        // Mid-June, so no zone shifts its clocks across the midnight this depends on.
+        func moment(_ hour: Int) throws -> Date {
+            try XCTUnwrap(calendar.date(
+                from: DateComponents(year: 2031, month: 6, day: 15, hour: hour)
+            ))
+        }
+        let midnight = try moment(0)
+        let schedule = RecurringTransaction(
+            type: .expense, category: "Rent", amount: 1_450, description: "flat",
+            startDate: midnight, frequency: .monthly, nextDueDate: midnight, endDate: nil,
+            currency: .eur
+        )
+
+        XCTAssertEqual(
+            RecurringNotificationService.schedulesStillToFire([schedule], now: try moment(2)).map(\.id),
+            [schedule.id],
+            """
+            At 02:00 the reminder has not fired yet — WC-L5 pins it to 09:00 — but the schedule was \
+            dropped from the set `sync` re-adds, after the teardown had already removed the pending \
+            request. The reminder is deleted rather than re-scheduled, and nothing re-adds it.
+            """
+        )
+        XCTAssertEqual(
+            RecurringNotificationService.schedulesStillToFire([schedule], now: try moment(10)).map(\.id),
+            [],
+            "past its fire moment there is nothing left to schedule, and re-adding it would fire immediately"
+        )
+
+        let evening = try XCTUnwrap(calendar.date(
+            from: DateComponents(year: 2031, month: 6, day: 15, hour: 18, minute: 30)
+        ))
+        var timed = schedule
+        timed.nextDueDate = evening
+        XCTAssertEqual(
+            RecurringNotificationService.schedulesStillToFire([timed], now: try moment(10)).map(\.id),
+            [timed.id],
+            "a schedule with a real time of day keeps it, so at 10:00 it is still to come"
+        )
+        XCTAssertEqual(
+            RecurringNotificationService.schedulesStillToFire([timed], now: try moment(20)).map(\.id),
+            [], "and is past once its own time has gone by"
+        )
+    }
+
+    /// The menu commands must be dead on the app-lock screen, not merely on the "Data Unavailable"
+    /// one.
+    ///
+    /// `DesktopCommands` is attached to the *scene*, so it outlives every branch `MacRootView`'s
+    /// body takes, and the editor sheet is attached to the enclosing `Group` outside those branches
+    /// too — the file documents that exact escape for the `loadState` case. The lock is a view gate
+    /// that sits *before* the loadState branch and leaves `loadState == .loaded` (the store loads
+    /// synchronously in `init`), so every command stayed live over the lock screen: ⌘N opened a New
+    /// Transaction sheet, exposing the user's custom category names and accepting a save; ⌘1-5 and
+    /// ⌘, navigated behind it; ⌘E armed an export token that fired on unlock. The `onChange`
+    /// handlers dismiss a sheet that was already open when the lock engaged — they cannot see a
+    /// command fired while the app is already locked.
+    ///
+    /// Ships on iPad as well as Mac: `DesktopCommands` compiles into both targets. It changes
+    /// nothing on iPhone, where the whole tree is behind `isEnabled == false`.
+    func testMenuCommandsAreDisabledOnTheAppLockScreen() {
+        XCTAssertFalse(
+            DesktopCommands.commandsEnabled(loadState: .loaded, isLockEnabled: true, isUnlocked: false),
+            """
+            Loaded but locked is the lock screen, and every command stayed live over it. ⌘N there \
+            opens a transaction form on top of the lock, listing the user's own category names.
+            """
+        )
+        XCTAssertTrue(
+            DesktopCommands.commandsEnabled(loadState: .loaded, isLockEnabled: true, isUnlocked: true),
+            "an unlocked device with the lock merely *enabled* must keep its menus"
+        )
+        XCTAssertTrue(
+            DesktopCommands.commandsEnabled(loadState: .loaded, isLockEnabled: false, isUnlocked: true),
+            "the ordinary case — no lock configured — must be unaffected"
+        )
+        XCTAssertFalse(
+            DesktopCommands.commandsEnabled(
+                loadState: .failed(message: "unreadable", isLocked: false),
+                isLockEnabled: false,
+                isUnlocked: true
+            ),
+            "the original WC-LOCK1 guard must survive: nothing loaded, nothing to command"
+        )
+    }
+
 }
 
 

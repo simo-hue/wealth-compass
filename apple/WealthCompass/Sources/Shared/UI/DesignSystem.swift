@@ -454,6 +454,88 @@ extension AppSettings {
     }
 }
 
+/// The hint under a transaction editor's "Custom category" field, in its three states: nothing typed
+/// yet, a name that already exists, and a name that is genuinely new.
+///
+/// Three editors show this field. Two of them computed the three branches themselves, and the third
+/// — `MacCashFlowTransactionEditor`, which is the *primary* creation path on both Mac and iPad —
+/// showed one fixed sentence, so the one branch that carries real information ("X already exists and
+/// will be selected") was missing from the editor most people reach first. Typing an existing
+/// category there silently selected it with no explanation.
+///
+/// **`typeName` is a parameter on purpose.** The Desktop sites lowercase the localized noun with
+/// `.lowercased(with:)` and the iPhone sites do not — a live disagreement, recorded as an open
+/// owner decision in `DECISIONS_DESKTOP.md` §5, which this helper must not quietly settle by
+/// picking one. Each caller keeps passing exactly the noun it passed before, so behaviour at every
+/// existing site is unchanged; when the decision is made, it is three arguments to change and they
+/// now sit next to each other.
+@MainActor
+func customCategoryHintText(
+    forTypeNamed typeName: String,
+    draft: String,
+    existingCategories: [String],
+    settings: AppSettings
+) -> String {
+    if draft.isEmpty {
+        return settings.localized("Enter a category name. It will be saved for future \(typeName) transactions.")
+    }
+
+    if let existing = existingCategories.first(where: { $0.caseInsensitiveCompare(draft) == .orderedSame }) {
+        return settings.localized("\(existing) already exists and will be selected.")
+    }
+
+    return settings.localized("This category will be added to your \(typeName) categories.")
+}
+
+/// Lets a fixed onboarding page scroll once its text outgrows the screen.
+///
+/// Both onboarding flows build their first three pages as `Spacer()`-balanced `VStack`s sized to
+/// the screen (only the API-setup page was already wrapped in a `ScrollView`). A Dynamic Type cap
+/// limits the overflow but does not prevent it, so at large accessibility sizes the privacy page's
+/// ~55-word disclosure — the paragraph naming exactly what leaves the device and to whom —
+/// truncated mid-sentence, and **Continue** was pushed off-screen with no Skip on that page: an
+/// onboarding flow that could not be completed.
+///
+/// `minHeight: proxy.size.height` is what keeps the layout identical whenever the content fits:
+/// the stack still fills the page, so the `Spacer()`s still centre it. Only when the content is
+/// taller does the stack grow past the screen and the `ScrollView` become reachable.
+///
+/// Shared rather than iPhone-only: this was `private` to `OnboardingView.swift`, and the Desktop
+/// flow — which is what an iPad runs — needs exactly the same thing.
+extension View {
+    func scrollingPage() -> some View {
+        GeometryReader { proxy in
+            ScrollView {
+                self
+                    .frame(minHeight: proxy.size.height)
+                    .frame(maxWidth: .infinity)
+            }
+            .scrollIndicators(.hidden)
+        }
+    }
+}
+
+/// Resolves a chart's latched selection against the data that is on screen **right now**.
+///
+/// Every donut in the app used to store the selected slice as a *value snapshot*. A snapshot goes
+/// stale the instant the underlying data moves: after a Refresh Prices run the ring re-animated and
+/// the legend updated, but the centre kept printing the old amount over the new total — a share
+/// matching neither the old state nor the new one. And when the selected item disappeared entirely
+/// (a category with no spending in the newly picked period, a holding that was sold) the snapshot
+/// matched nothing, so every wedge dimmed to 0.3 and the whole ring greyed out with nothing lit.
+///
+/// Storing the **id** and resolving it here, at render time, makes the state self-healing: a value
+/// that changed is read live, and an item that vanished resolves to `nil`, which is indistinguishable
+/// from "nothing selected". `SankeyDiagramView.activeHover` derives its hover the same way and for
+/// the same reason; this is that idea, shared by the three donuts that needed it — `AllocationChart`
+/// below, `MacDashboardView.allocationCard`, and the hand-written expense donut in `CashFlowView`.
+///
+/// Because the resolution happens on every render, no `.onChange` reset is needed or wanted.
+func resolvedChartSelection<Item: Identifiable>(_ id: Item.ID?, in items: [Item]) -> Item? {
+    guard let id else { return nil }
+    return items.first { $0.id == id }
+}
+
 /// The shared allocation donut, drawn from **nine** call sites: `DashboardView.swift:48`,
 /// `InvestmentsView.swift:59`, `:62` and `:63`, `CryptoView.swift:60`,
 /// `MacInvestmentsView.swift:47`, `:53` and `:59`, and `MacCryptoView.swift:141`.
@@ -473,7 +555,14 @@ struct AllocationChart: View {
     /// donut can't render a negative wedge). Already-resolved String, so it renders verbatim.
     var footnote: String? = nil
 
-    @State private var hoveredSlice: AllocationSlice?
+    /// The **id** of the latched slice, never a copy of the slice itself — see
+    /// `resolvedChartSelection(_:in:)` above for why a value snapshot went stale.
+    @State private var hoveredSliceID: AllocationSlice.ID?
+
+    /// Re-resolved on every render, so it reads live values and empties itself when its slice goes.
+    private var hoveredSlice: AllocationSlice? {
+        resolvedChartSelection(hoveredSliceID, in: slices)
+    }
 
     var body: some View {
         FinanceCard {
@@ -556,11 +645,11 @@ struct AllocationChart: View {
                                         switch phase {
                                         case .active(let location):
                                             withAnimation(.easeInOut(duration: 0.15)) {
-                                                hoveredSlice = slice(at: location, in: frame)
+                                                hoveredSliceID = slice(at: location, in: frame)?.id
                                             }
                                         case .ended:
                                             withAnimation(.easeInOut(duration: 0.15)) {
-                                                hoveredSlice = nil
+                                                hoveredSliceID = nil
                                             }
                                         }
                                     }
@@ -577,7 +666,7 @@ struct AllocationChart: View {
                                         SpatialTapGesture()
                                             .onEnded { value in
                                                 withAnimation(.easeInOut(duration: 0.15)) {
-                                                    hoveredSlice = slice(at: value.location, in: frame)
+                                                    hoveredSliceID = slice(at: value.location, in: frame)?.id
                                                 }
                                             }
                                     )
@@ -587,10 +676,12 @@ struct AllocationChart: View {
                     }
 
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: slices.map(\.value))
-                    // Tap-latched selections do not clear themselves the way a hover did, and hold a value
-                    // snapshot rather than an id, so a refresh that changes the slices leaves the selection
-                    // matching nothing: every wedge dims to 0.3 and the centre keeps the old amount.
-                    .onChange(of: slices.map(\.id)) { _, _ in hoveredSlice = nil }
+                    // There is deliberately no `.onChange` reset here. There used to be one keyed on
+                    // `slices.map(\.id)`, which only fired when a category appeared or disappeared and
+                    // so never covered the common case — a Refresh Prices run, which changes values and
+                    // leaves every id alone. `hoveredSlice` is now derived from the stored id against the
+                    // current `slices` on every render, which handles both cases and cannot go stale, so
+                    // the modifier would be dead weight rather than a second line of defence.
                     .frame(height: 200)
                     .accessibilityElement(children: .contain)
                     .accessibilityLabel(Text(title))

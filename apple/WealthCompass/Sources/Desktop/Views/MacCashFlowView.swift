@@ -926,6 +926,7 @@ struct MacCashFlowView: View {
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .imageScale(.small)
+                        .desktopTouchTarget()
                 }
                 .buttonStyle(.plain)
                 .help("Clear category filter")
@@ -1059,11 +1060,18 @@ struct MacCashFlowView: View {
                     }
                     Spacer()
 
+                    // `.desktopTouchTarget()` on both, and this pair needs it more than the
+                    // recurring rows that already had it: the whole card also carries an
+                    // `.onTapGesture` that opens the editor, so a finger that misses these ~22pt
+                    // glyphs does not do nothing — it does something else. Missing the trash opens
+                    // Edit; missing the pencil, per the helper's own note, regularly opened Delete.
+                    // A no-op on macOS.
                     HStack(spacing: 4) {
                         Button {
                             editor = .transaction(transaction)
                         } label: {
                             Image(systemName: "pencil")
+                                .desktopTouchTarget()
                         }
                         .help("Edit transaction")
                         .accessibilityLabel(settings.localized("Edit transaction"))
@@ -1072,6 +1080,7 @@ struct MacCashFlowView: View {
                             activeAlert = .deleteTransaction(transaction)
                         } label: {
                             Image(systemName: "trash")
+                                .desktopTouchTarget()
                         }
                         .help("Delete transaction")
                         .accessibilityLabel(settings.localized("Delete transaction"))
@@ -1354,6 +1363,25 @@ private struct MacCashFlowTransactionEditor: View {
         isCustomCategorySelected ? trimmedCustomCategory : category
     }
 
+    /// The same three-branch hint the two editor sheets show.
+    ///
+    /// This editor — the toolbar's New Transaction, and the primary creation path on both Mac and
+    /// iPad — used to show one fixed sentence, so the branch that actually tells the user something
+    /// ("X already exists and will be selected") never appeared where most people create a category.
+    /// Typing a name that already existed silently selected the existing one with no explanation.
+    ///
+    /// The noun is lowercased exactly as this editor's fixed sentence lowercased it, so nothing
+    /// about the casing changes here — that question is open in `DECISIONS_DESKTOP.md` §5.
+    private var customCategoryHint: String {
+        customCategoryHintText(
+            forTypeNamed: type.localizedTitle(appLanguage: settings.appLanguage)
+                .lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage)),
+            draft: trimmedCustomCategory,
+            existingCategories: categories,
+            settings: settings
+        )
+    }
+
     private var parsedAmount: Decimal? {
         MoneyParser.decimal(from: amount)
     }
@@ -1427,7 +1455,7 @@ private struct MacCashFlowTransactionEditor: View {
                         TextField("Custom category name", text: $customCategory)
                             .focused($isCustomCategoryFocused)
 
-                        Text(settings.localized("The category will be saved for future \(type.localizedTitle(appLanguage: settings.appLanguage).lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))) transactions."))
+                        Text(customCategoryHint)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -1436,7 +1464,12 @@ private struct MacCashFlowTransactionEditor: View {
             .formStyle(.grouped)
             .onAppear {
                 guard !hasInitializedCurrency else { return }
-                if transaction == nil { currency = settings.currency }
+                if TransactionEditorCurrency.seedsBaseCurrency(
+                    rowCurrency: transaction?.currency,
+                    isNewRecord: transaction == nil
+                ) {
+                    currency = settings.currency
+                }
                 hasInitializedCurrency = true
             }
             .navigationTitle(transaction == nil ? "New Transaction" : "Edit Transaction")

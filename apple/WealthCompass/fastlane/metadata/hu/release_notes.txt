@@ -1,35 +1,3 @@
-A Wealth Compass mostantól iPaden is fut.
+Az egyéni bevételi és kiadási kategóriák mostantól szinkronizálódnak az iPhone, iPad és Mac között, ha az iCloud-szinkronizálás be van kapcsolva.
 
-iPad
-• A teljes asztali elrendezés megérkezik az iPadre: oldalsáv, többoszlopos áttekintő és ugyanazok a menük, mint a Mac appban, álló tartásnál pedig újrarendeződik.
-• A diagramok, táblázatok és menük érintéses használatra készültek, az app ikonja pedig iPad-méretekben van megrajzolva.
-• Koppintson egy diagramra egy érték megtekintéséhez; a görgetés továbbra is működik.
-
-Az Ön nyelvén
-• A PDF-jelentés mostantól az app által támogatott összes nyelven elérhető, nemcsak angolul.
-• A dátumok, a számok és a százalékok az appban beállított nyelvet követik.
-• A kategóriák, szektorok, régiók és pénznemek nevei le vannak fordítva.
-• Számos fordítási hiba javítva: a lapsáv többé nem jelenik meg mindenkinek angolul, a "NET" már nem "hálózat"-ként fordul, és a 3M/6M/12M időszakokat sem milliónak olvassa.
-
-Az Adatvédelmi mód többet rejt el
-• A megoszlási diagramok elrejtésre kerülnek, nemcsak a bennük szereplő összegek.
-• A darabszámok, állapotkártyák, üres nézetek és értesítések többé nem árulják el, mit rögzített.
-• Az ismétlődő emlékeztetők többé nem írják ki az ütemezés nevét a zárolási képernyőn.
-• Az app-váltó pillanatképe mostantól a megnyitott lapokat is eltakarja.
-
-Pontos összegek
-• Az importált és mentett összegek megőrzik a teljes tizedes pontosságot, így a számok nem térnek el.
-• Az importált "1,000" ezerként olvasódik be, és az indiai lakh csoportosítást is felismeri.
-• Egy Revolut-kivonat ismételt importálása többé nem törli a kriptós módosításait.
-• Az importálás már nem veszíti el a tranzakció pénznemét, az új befektetések pedig megtartják a választott pénznemet EUR helyett.
-
-Jelentések
-• A pénzforgalmi szakaszok a megadott időszakon belül maradnak, a pénzáramlási diagram egyezik a táblázatokkal, a trenddiagram pedig nem hagy ki hónapokat.
-• Az offline exportok feltüntetik az átváltáshoz használt árfolyamokat.
-• A hosszú összegek már nem csonkolódnak.
-
-Ebben a verzióban még
-• Az ismétlődő ütemezések befejeződnek ahelyett, hogy eltűnnének, a nem kapcsolódó módosítások után is szüneteltetve maradnak, és befejezésük után törölhetők.
-• Megbízhatóbb iCloud-szinkronizálás, a háttérben is.
-• A "Minden törlése" többé nem hagy hátra visszatérő adatokat.
-• VoiceOver-címkék a diagram- és szűrővezérlőkön.
+Ez a frissítés a szinkronizálás megbízhatóságát is javítja, és lokalizációs hibákat javít ki.

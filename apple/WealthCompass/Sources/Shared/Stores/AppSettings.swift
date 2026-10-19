@@ -51,6 +51,9 @@ final class AppSettings: ObservableObject {
     @Published private(set) var exchangeRateError: String?
 
     private let userDefaults: UserDefaults
+    /// FinanceStore accepts local edits into its persistence/sync pipeline before the picker
+    /// cache changes. Remote projection bypasses this callback, so it cannot echo an upload.
+    var customCategoryMutationHandler: ((String, TransactionType, Bool) -> Bool)?
     private let exchangeRatePersistence: ExchangeRatePersistence
     private var lastExchangeRateRefreshAttemptAt: Date?
     private var consecutiveExchangeRateFailures: Int
@@ -176,6 +179,8 @@ final class AppSettings: ObservableObject {
             return existing.first { $0.caseInsensitiveCompare(category) == .orderedSame }
         }
 
+        guard customCategoryMutationHandler?(category, type, false) ?? true else { return nil }
+
         if type == .income {
             customIncomeCategories.append(category)
             customIncomeCategories.sort { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
@@ -188,11 +193,31 @@ final class AppSettings: ObservableObject {
     }
 
     func removeCustomTransactionCategory(_ category: String, for type: TransactionType) {
+        guard customCategoryMutationHandler?(category, type, true) ?? true else { return }
         if type == .income {
             customIncomeCategories.removeAll { $0.caseInsensitiveCompare(category) == .orderedSame }
         } else {
             customExpenseCategories.removeAll { $0.caseInsensitiveCompare(category) == .orderedSame }
         }
+    }
+
+    func applyCustomCategories(_ categories: [CustomTransactionCategory]) {
+        func names(for type: TransactionType) -> [String] {
+            let defaults = type == .income ? defaultIncomeCategories : defaultExpenseCategories
+            var result: [String] = []
+            for category in categories.filter({ $0.type == type }).sorted(by: { $0.id.uuidString < $1.id.uuidString }) {
+                let name = category.name.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !name.isEmpty, !(defaults + result).contains(where: {
+                    $0.caseInsensitiveCompare(name) == .orderedSame
+                }) else { continue }
+                result.append(name)
+            }
+            return result.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+        }
+        let income = names(for: .income)
+        let expense = names(for: .expense)
+        if income != customIncomeCategories { customIncomeCategories = income }
+        if expense != customExpenseCategories { customExpenseCategories = expense }
     }
 
     /// Restores every preference to its first-launch default for a factory reset: clears the

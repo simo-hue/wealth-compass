@@ -67,6 +67,15 @@ struct DashboardView: View {
             .padding(.bottom, 28)
         }
         .pageChrome()
+        // Changing the range changes the window, but the scrubbed date survived it and was
+        // re-snapped to whichever point in the new window happened to be nearest — leaving the
+        // marker pinned to a day the user never picked. The Desktop twin already drops the
+        // selection here (`MacDashboardView.swift`); match it. A *date* re-resolved against live
+        // data prints no wrong money, so clearing it is the whole fix — this deliberately does not
+        // need the id-resolution pattern the three donuts use.
+        .onChange(of: timeRange) {
+            selectedNetWorthDate = nil
+        }
         .sheet(isPresented: $showingAddTransaction) {
             TransactionFormView { _, type, amount, category, description, date, currency in
                 finance.addTransaction(
@@ -623,7 +632,18 @@ struct DashboardView: View {
                                     Text(settings.privatePercent(item.percentage))
                                         .font(.caption.monospacedDigit().weight(.medium))
                                         .foregroundStyle(WCColor.textTertiary)
-                                        .frame(width: 44, alignment: .trailing)
+                                        // `minWidth`, not `width`. `.caption` is 12pt at the default
+                                        // Dynamic Type size and "100,0 %" measures ~45.3pt there in
+                                        // the six locales that put a space before the sign (de, fr,
+                                        // ru, sv, cs, fi) — over a rigid 44pt box before the user
+                                        // has touched a single setting, and over it in every locale
+                                        // by the first size step up. A single spending category is
+                                        // the common case for a new user, and that row reads 100%.
+                                        // The floor keeps the column aligned for the ordinary
+                                        // two-and-three-digit values.
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.7)
+                                        .frame(minWidth: 44, alignment: .trailing)
                                 }
 
                                 GeometryReader { geometry in

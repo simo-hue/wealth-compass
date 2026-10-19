@@ -5,6 +5,233 @@ import XCTest
 final class CloudSyncCoreTests: XCTestCase {
     private let fixedDate = Date(timeIntervalSince1970: 1_700_000_000)
 
+    @MainActor
+    func testCategoryUpgradeRefetchesPreviouslyIgnoredRecordsOnce() async throws {
+        for version in [1, 2] {
+            let directory = "WealthCompassTests-\(UUID().uuidString)"
+            let token = Data("previous-engine-state".utf8).base64EncodedString()
+            try writeSyncMetadata("""
+                {"schemaVersion":\(version),"accountRecordName":"category-user","engineState":"\(token)",
+                 "bootstrapCompleted":true,"zoneReady":true,"records":{},"knownLocalHashes":{}}
+                """, directoryName: directory)
+            let root = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+            let directoryURL = root.appendingPathComponent(directory)
+            defer { try? FileManager.default.removeItem(at: directoryURL) }
+            let metadata = CloudSyncMetadataStore(directoryName: directory)
+            let records = try FinancialData(customCategories: [
+                CustomTransactionCategory(name: "Pets", type: .expense, now: fixedDate)
+            ]).cloudSyncRecords()
+            try metadata.recordLocalChanges(CloudSyncChangeSet.difference(from: [:], to: records), currentRecords: records)
+            let key = try XCTUnwrap(records.keys.first)
+            let pending = metadata.pendingRevision(for: key)
+            let service = CloudKitSyncService(
+                metadataStore: metadata, snapshotProvider: { records },
+                remoteMutationHandler: { _ in [] }, statusHandler: { _ in }, disableHandler: {},
+                accountStatusProvider: { .available },
+                userRecordIDProvider: { CKRecord.ID(recordName: "category-user") },
+                engineFactory: { _ in throw TestCloudSyncLifecycleError.engineShouldNotStart }
+            )
+            await service.start(allowAccountReplacement: false)
+            let persisted = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf:
+                directoryURL.appendingPathComponent("wealth-compass-cloud-sync.json"))) as? [String: Any])
+            XCTAssertEqual(persisted["schemaVersion"] as? Int, 2)
+            XCTAssertEqual(metadata.isBootstrapCompleted, version == 2)
+            XCTAssertEqual(persisted["engineState"] as? String, version == 2 ? token : nil)
+            XCTAssertEqual(persisted["accountRecordName"] as? String, "category-user")
+            XCTAssertEqual(metadata.pendingRevision(for: key), pending, "An upgrade must preserve pending local changes.")
+        }
+    }
+
+    @MainActor
+    func testLocalCategoryDeletionDuringRemoteWriteIsNotUndone() async throws {
+        let fixture = makeCategoryFixture()
+        let category = CustomTransactionCategory(name: "Pets", type: .expense, now: fixedDate)
+        let persistence = BlockingCategoryPersistence(initial: FinancialData(
+            customCategories: [category], customCategoriesMigrated: true
+        ))
+        let store = FinanceStore(persistence: persistence, settings: fixture.settings, syncMetadataStore: fixture.metadata)
+        let key = CloudSyncRecordKey(type: .customCategory, id: category.id)
+        var remoteCategory = category
+        remoteCategory.name = "PETS"
+        remoteCategory.updatedAt = fixedDate.addingTimeInterval(60)
+        let mutation = CloudSyncRemoteMutation(
+            key: key, payload: try FinanceJSONCoding.encode(remoteCategory),
+            expectedPendingRevision: fixture.metadata.pendingRevision(for: key)
+        )
+        let entered = expectation(description: "Remote persistence is in flight")
+        persistence.blockNextSave { entered.fulfill() }
+        let applying = Task { try await store.applyRemoteMutations([mutation]) }
+        await fulfillment(of: [entered], timeout: 5)
+        fixture.settings.removeCustomTransactionCategory("Pets", for: .expense)
+        persistence.releaseSave()
+        let applied = try await applying.value
+        await store.waitForPendingSaves()
+        XCTAssertFalse(applied.contains(key), "Do not acknowledge a stale remote value over a newer local edit.")
+        XCTAssertTrue(store.data.customCategories.isEmpty)
+        XCTAssertTrue(fixture.settings.customExpenseCategories.isEmpty)
+        XCTAssertTrue(try XCTUnwrap(persistence.load()).data.customCategories.isEmpty)
+    }
+
+    @MainActor
+    func testUnflushedCategoryDeletionRejectsRemoteUpsert() async throws {
+        let device = makeCategoryFixture()
+        let category = CustomTransactionCategory(name: "Pets", type: .expense, now: fixedDate)
+        let key = CloudSyncRecordKey(type: .customCategory, id: category.id)
+        let mutation = CloudSyncRemoteMutation(
+            key: key, payload: try FinanceJSONCoding.encode(category), expectedPendingRevision: nil
+        )
+        _ = try await device.store.applyRemoteMutations([mutation])
+        device.settings.removeCustomTransactionCategory("Pets", for: .expense)
+        // No waitForPendingSaves here: the local edit has not necessarily acquired its sync revision.
+        let applied = try await device.store.applyRemoteMutations([mutation])
+        await device.store.waitForPendingSaves()
+        XCTAssertTrue(applied.isEmpty)
+        XCTAssertTrue(device.store.data.customCategories.isEmpty)
+        XCTAssertTrue(device.settings.customExpenseCategories.isEmpty)
+        XCTAssertTrue(try XCTUnwrap(try device.persistence.load()).data.customCategories.isEmpty)
+    }
+
+    func testMismatchedCategoryIdentityIsQuarantinedOnSyncAndImport() throws {
+        let category = CustomTransactionCategory(name: "Pets", type: .expense, now: fixedDate)
+        let key = CloudSyncRecordKey(type: .customCategory, id: category.id)
+        var edited = category
+        edited.name = "Car" // An edited backup must not reserve Pets' identity under a different name.
+        var destination = FinancialData()
+        let outcome = destination.applyCloudSyncMutations([
+            CloudSyncRemoteMutation(key: key, payload: try FinanceJSONCoding.encode(edited), expectedPendingRevision: nil)
+        ])
+        XCTAssertEqual(outcome.skipped.map(\.key), [key])
+        XCTAssertTrue(destination.customCategories.isEmpty)
+        let backup = try FinanceJSONCoding.encode(FinancialData(customCategories: [edited]))
+        let imported = try FinanceImportService.parse(backup, context: FinanceImportContext(displayCurrency: .eur, snapshot: nil))
+        XCTAssertTrue(imported.data.customCategories.isEmpty)
+        XCTAssertEqual(imported.skippedRecords, 1)
+
+        edited.name = " Pets " // Valid identity, padded external name: store the picker spelling.
+        let paddedOutcome = destination.applyCloudSyncMutations([
+            CloudSyncRemoteMutation(key: key, payload: try FinanceJSONCoding.encode(edited), expectedPendingRevision: nil)
+        ])
+        XCTAssertEqual(paddedOutcome.appliedKeys, [key])
+        XCTAssertEqual(destination.customCategories.first?.name, "Pets", "The persisted name must match the picker's removal argument.")
+    }
+
+    @MainActor
+    func testCustomCategoryEntersPersistenceAndSyncWithoutATransaction() async throws {
+        let fixture = makeCategoryFixture()
+        fixture.settings.addCustomTransactionCategory("Pets", for: .expense)
+        await fixture.store.waitForPendingSaves()
+
+        let saved = try XCTUnwrap(try fixture.persistence.load())
+        let records = try saved.data.cloudSyncRecords()
+        XCTAssertEqual(records.count, 1, "An unused category must be a syncable record of its own.")
+        let record = try XCTUnwrap(records.values.first)
+        XCTAssertNotNil(fixture.metadata.pendingRevision(for: record.key))
+    }
+
+    @MainActor
+    private func makeCategoryFixture(legacyExpense: [String] = []) -> (
+        settings: AppSettings, store: FinanceStore,
+        persistence: LocalFinancePersistence, metadata: CloudSyncMetadataStore, defaults: UserDefaults
+    ) {
+        let directory = "WealthCompassTests-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: directory)!
+        let settings = AppSettings(
+            userDefaults: defaults,
+            exchangeRatePersistence: LocalExchangeRatePersistence(directoryName: directory)
+        )
+        for name in legacyExpense { settings.addCustomTransactionCategory(name, for: .expense) }
+        let persistence = LocalFinancePersistence(directoryName: directory)
+        let metadata = CloudSyncMetadataStore(directoryName: directory)
+        let store = FinanceStore(persistence: persistence, settings: settings, syncMetadataStore: metadata)
+        addTeardownBlock {
+            defaults.removePersistentDomain(forName: directory)
+            let root = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+            try? FileManager.default.removeItem(at: root.appendingPathComponent(directory))
+        }
+        return (settings, store, persistence, metadata, defaults)
+    }
+
+    @MainActor
+    func testCategoriesReachOtherDeviceWithoutEchoAndDeletionOnlyBatchPersists() async throws {
+        let phone = makeCategoryFixture()
+        let mac = makeCategoryFixture()
+        phone.settings.addCustomTransactionCategory("Pets", for: .expense)
+        phone.settings.addCustomTransactionCategory("Pets", for: .income)
+        mac.settings.addCustomTransactionCategory("Travel", for: .expense)
+        await phone.store.waitForPendingSaves()
+        await mac.store.waitForPendingSaves()
+        let records = try XCTUnwrap(try phone.persistence.load()).data.cloudSyncRecords()
+        let applied = try await mac.store.applyRemoteMutations(records.values.map {
+            CloudSyncRemoteMutation(key: $0.key, payload: $0.payload, expectedPendingRevision: nil)
+        })
+        XCTAssertEqual(applied, Set(records.keys))
+        XCTAssertEqual(mac.settings.customExpenseCategories, ["Pets", "Travel"])
+        XCTAssertEqual(mac.settings.customIncomeCategories, ["Pets"])
+        for key in records.keys { XCTAssertNil(mac.metadata.pendingRevision(for: key), "Remote changes must not echo as local edits.") }
+
+        phone.settings.removeCustomTransactionCategory("Pets", for: .expense)
+        await phone.store.waitForPendingSaves()
+        let removedKey = CloudSyncRecordKey(type: .customCategory, id: CustomTransactionCategory.identifier(name: "Pets", type: .expense))
+        XCTAssertNotNil(phone.metadata.pendingRevision(for: removedKey))
+        let removed = try await mac.store.applyRemoteMutations([
+            CloudSyncRemoteMutation(key: removedKey, payload: nil, expectedPendingRevision: nil)
+        ])
+        XCTAssertEqual(removed, [removedKey])
+        XCTAssertEqual(mac.settings.customExpenseCategories, ["Travel"])
+        XCTAssertEqual(mac.settings.customIncomeCategories, ["Pets"])
+        XCTAssertFalse(try XCTUnwrap(try mac.persistence.load()).data.cloudSyncRecordKeys().contains(removedKey))
+    }
+
+    @MainActor
+    func testLegacyCategoriesMigrateOnceAndDoNotResurrectAfterRemoteDeletion() async throws {
+        let device = makeCategoryFixture(legacyExpense: ["Pets", "Travel"])
+        await device.store.waitForPendingSaves()
+        let saved = try XCTUnwrap(try device.persistence.load()).data
+        XCTAssertTrue(saved.customCategoriesMigrated)
+        XCTAssertEqual(Set(saved.customCategories.map(\.name)), ["Pets", "Travel"])
+
+        let key = CloudSyncRecordKey(type: .customCategory, id: CustomTransactionCategory.identifier(name: "Pets", type: .expense))
+        _ = try await device.store.applyRemoteMutations([
+            CloudSyncRemoteMutation(key: key, payload: nil, expectedPendingRevision: device.metadata.pendingRevision(for: key))
+        ])
+        // Simulate a stale UserDefaults cache surviving a crash after the database write.
+        device.defaults.set(try JSONEncoder().encode(["Pets", "Travel"]), forKey: "wc_mobile_custom_expense_categories")
+        let settings = AppSettings(userDefaults: device.defaults)
+        let restarted = FinanceStore(persistence: device.persistence, settings: settings, syncMetadataStore: device.metadata)
+        await restarted.waitForPendingSaves()
+        XCTAssertEqual(settings.customExpenseCategories, ["Travel"])
+        XCTAssertEqual(try XCTUnwrap(try device.persistence.load()).data.customCategories.map(\.name), ["Travel"])
+    }
+
+    func testCategoryIdentityIsStableAcrossCaseAndDistinctAcrossTransactionTypes() {
+        let first = CustomTransactionCategory(name: " Pets ", type: .expense)
+        let second = CustomTransactionCategory(name: "pets", type: .expense)
+        XCTAssertEqual(first.id, second.id)
+        XCTAssertNotEqual(first.id, CustomTransactionCategory(name: "Pets", type: .income).id)
+        let key = CloudSyncRecordKey(type: .customCategory, id: first.id)
+        XCTAssertEqual(CloudSyncRecordKey(recordName: key.recordName), key)
+    }
+
+    func testCategoryBackupRoundTripAndLossyRecoveryPreserveLibrary() throws {
+        let category = CustomTransactionCategory(name: "Pets", type: .expense, now: fixedDate)
+        let data = FinancialData(customCategories: [category], customCategoriesMigrated: true)
+        let encoded = try FinanceJSONCoding.encode(data)
+        XCTAssertEqual(try FinanceJSONCoding.decodeFinancialData(from: encoded).data, data)
+        let imported = try FinanceImportService.parse(encoded, context: FinanceImportContext(displayCurrency: .eur, snapshot: nil))
+        XCTAssertEqual(imported.data.customCategories, [category])
+        XCTAssertTrue(imported.data.hasImportableContent)
+
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        let badID = UUID()
+        var categories = try XCTUnwrap(root["customCategories"] as? [[String: Any]])
+        categories.append(["id": badID.uuidString, "type": "unsupported", "name": "Bad"])
+        root["customCategories"] = categories
+        let recovered = try FinanceJSONCoding.decodeFinancialData(from: JSONSerialization.data(withJSONObject: root))
+        XCTAssertEqual(recovered.data.customCategories, [category])
+        XCTAssertTrue(recovered.data.customCategoriesMigrated)
+        XCTAssertEqual(recovered.skippedRecordKeys, [CloudSyncRecordKey(type: .customCategory, id: badID)])
+    }
+
     func testRecordKeyRoundTripsThroughCloudKitRecordName() {
         let key = CloudSyncRecordKey(
             type: .recurringTransaction,
@@ -1572,5 +1799,30 @@ private final class ThreadSafeBox<Value>: @unchecked Sendable {
             stored = newValue
             lock.unlock()
         }
+    }
+}
+
+/// Pauses a single disk write so a main-actor category edit can race an incoming sync batch.
+private final class BlockingCategoryPersistence: FinancePersistence, @unchecked Sendable {
+    let locationDescription = "Category sync regression fixture"
+    private let lock = NSLock()
+    private let gate = DispatchSemaphore(value: 0)
+    private var data: FinancialData
+    private var onSave: (@Sendable () -> Void)?
+
+    init(initial: FinancialData) { data = initial }
+    func load() throws -> FinancePersistenceLoad? { lock.withLock { FinancePersistenceLoad(data: data) } }
+    func clear() throws { lock.withLock { data = FinancialData() } }
+    func blockNextSave(_ callback: @escaping @Sendable () -> Void) { lock.withLock { onSave = callback } }
+    func releaseSave() { gate.signal() }
+    func save(_ value: FinancialData) throws {
+        let callback = lock.withLock { let callback = onSave; onSave = nil; return callback }
+        if let callback {
+            callback()
+            guard gate.wait(timeout: .now() + 10) == .success else {
+                throw NSError(domain: "CategorySyncTests", code: 1)
+            }
+        }
+        lock.withLock { data = value }
     }
 }

@@ -1083,3 +1083,24 @@ line could rewrite; and a ninth entity count was tokenised with a lint that pins
 == 0`, `center.add` retains **0 of 5** requests, `deliveredNotifications()` is callable but always empty.
 So Commit A's coverage is a source lint and says so, and the identifier/trigger and coalescing tests
 cover pure functions rather than the real queue. The lock-screen behaviour rests on reading the code.
+
+## 2026-10-18 — Release custom-category synchronization
+
+- [ ] Before distributing the updated iPhone/iPad and Mac builds, deploy the new **WCCustomCategory** record type to Production in CloudKit container **iCloud.com.wealthcompasstracker**. The complete additive schema is in `apple/WealthCompass/cloudkit-development.ckdb`; the new type uses the same fields and permissions as the existing entity record types. Create it in Development by syncing a category from a development build (or import the schema), review the schema diff, then deploy the schema changes. Do not reset the container or remove existing types/data. Apple procedure: https://developer.apple.com/documentation/cloudkit/deploying-an-icloud-container-s-schema
+- [ ] Install the updated build on both devices, using the same iCloud account with app iCloud sync enabled. Verify a new unused income/expense category appears on the other device, additions made offline on each device are retained after reconnection, and removing a category removes it from the other picker without changing historical transactions. Existing local categories migrate automatically when each updated app first opens. Older app versions do not sync category records.
+
+## 2026-10-19 — Upload version 1.2.1 (build 24)
+
+- [ ] Archive and upload the updated iPhone/iPad and Mac app targets with version **1.2.1**, build **24**. Create/select the **1.2.1** version entry for each platform in App Store Connect and attach its corresponding processed build. If using the repository's fastlane release lanes, create those version entries first because `skip_app_version_update(true)` prevents the lanes from creating them.
+- [ ] Complete the existing custom-category CloudKit schema deployment and two-device verification checklist above before releasing this version.
+
+## 2026-10-19 — Upload localized 1.2.1 release notes
+
+- [ ] With the iOS 1.2.1 version already created and the build uploaded, run:
+  ```sh
+  cd /Users/simo/Developer/wealth-compass/apple/WealthCompass
+  fastlane ios metadata
+  ```
+  This uploads the 39 localized What's New files and existing text metadata, without uploading another binary or submitting for review. Use the direct `fastlane` command here: it successfully loads the lanes, whereas `bundle check` currently fails because the pinned Bundler 4.0.18 executable is missing.
+- [ ] Refresh App Store Connect after the upload completes. Confirm the missing What's New errors have cleared, then retry Add for Review. If the generic unexpected error remains, inspect Show Details for additional required fields; the local metadata generation alone cannot confirm the server-side submission succeeds.
+- [ ] If preparing the Mac 1.2.1 listing as well, create/select that platform's 1.2.1 version first and run `fastlane mac metadata` from the same folder.

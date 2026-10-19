@@ -128,4 +128,39 @@ final class CurrencyConverterTests: XCTestCase {
         XCTAssertEqual(seed, "0,125", "it_IT seed must use a comma decimal separator")
         XCTAssertEqual(MoneyParser.decimal(from: seed, locale: locale), Decimal(string: "0.125"))
     }
+
+    /// WC-M1 — a legacy currency-less row must open its editor in the **base** currency, not EUR.
+    ///
+    /// `Transaction.currency` and `RecurringTransaction.currency` are optional and documented to
+    /// read as `?? base currency`, and every display site honours that. The four editors cannot
+    /// reach the environment from `init`, so they park a `.eur` placeholder there and rescue it in
+    /// `onAppear` — but the rescue asked "is this a new record?", which is a different question
+    /// from "does this record carry a currency?". A row written before the field existed, or one
+    /// still inside the deliberately deferred backfill window
+    /// (`FinanceStore.shouldBackfillCurrencies`), is an *existing* row with no currency: it opened
+    /// showing EUR, and `updateTransaction` writes back whatever the picker holds. A user whose
+    /// base currency is not EUR re-denominated the row by opening it and pressing Save, with the
+    /// figure on screen never changing.
+    ///
+    /// This pins the decision, not the wiring. A SwiftUI `State` seeded in `init` is not reachable
+    /// from a unit test, so that all four editors ask this and nothing else is established by
+    /// inspection, not by this assertion.
+    func testALegacyRowsEditorSeedsTheBaseCurrencyRatherThanEuro() {
+        XCTAssertTrue(
+            TransactionEditorCurrency.seedsBaseCurrency(rowCurrency: nil, isNewRecord: false),
+            """
+            An existing row with no currency reads as the base currency everywhere it is displayed, \
+            so its editor has to seed the base too. Left on the `.eur` placeholder, saving the row \
+            unchanged rewrites it as EUR.
+            """
+        )
+        XCTAssertTrue(
+            TransactionEditorCurrency.seedsBaseCurrency(rowCurrency: nil, isNewRecord: true),
+            "a brand-new record still has to adopt the base currency"
+        )
+        XCTAssertFalse(
+            TransactionEditorCurrency.seedsBaseCurrency(rowCurrency: .gbp, isNewRecord: false),
+            "a row that carries its own currency must keep it — that is the whole point of the field"
+        )
+    }
 }

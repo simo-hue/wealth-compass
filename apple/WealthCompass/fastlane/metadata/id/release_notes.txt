@@ -1,35 +1,3 @@
-Wealth Compass kini berjalan di iPad.
+Kategori pemasukan dan pengeluaran khusus kini disinkronkan antara iPhone, iPad, dan Mac saat sinkronisasi iCloud diaktifkan.
 
-iPad
-• Tata letak desktop lengkap hadir di iPad: bilah samping, dasbor multikolom, dan menu yang sama seperti aplikasi Mac, dengan penataan ulang saat perangkat dipegang tegak.
-• Grafik, tabel, dan menu dirancang untuk sentuhan, dan ikon aplikasi digambar dalam ukuran iPad.
-• Ketuk grafik untuk memeriksa suatu nilai; menggulir tetap berfungsi.
-
-Dalam bahasa Anda
-• Laporan PDF kini diterjemahkan ke semua bahasa yang didukung aplikasi, tidak hanya bahasa Inggris.
-• Tanggal, angka, dan persentase mengikuti bahasa yang diatur di aplikasi.
-• Nama kategori, sektor, wilayah, dan mata uang telah diterjemahkan.
-• Banyak perbaikan terjemahan: bilah tab tidak lagi tampil dalam bahasa Inggris untuk semua orang, "NET" tidak lagi diterjemahkan sebagai "jaringan", dan periode 3M/6M/12M tidak lagi dibaca sebagai jutaan.
-
-Mode Privasi menyembunyikan lebih banyak
-• Grafik alokasi disembunyikan seluruhnya, bukan hanya angka di dalamnya.
-• Jumlah item, kartu status, tampilan kosong, dan peringatan tidak lagi mengungkap apa yang Anda catat.
-• Pengingat berulang tidak lagi menyebut nama jadwal di layar terkunci.
-• Cuplikan di pengalih aplikasi kini juga menutupi lembar yang terbuka.
-
-Jumlah yang tepat
-• Jumlah yang diimpor dan disimpan mempertahankan presisi desimal penuh, sehingga angka tidak lagi menyimpang.
-• "1,000" yang diimpor dibaca sebagai seribu, dan pengelompokan lakh India dikenali.
-• Mengimpor ulang rekening koran Revolut tidak lagi menghapus suntingan kripto Anda.
-• Impor tidak lagi kehilangan mata uang transaksi, dan investasi baru mempertahankan mata uang yang Anda pilih alih-alih berubah menjadi EUR.
-
-Laporan
-• Bagian arus kas tetap berada dalam periode yang disebutkan, diagram aliran uang cocok dengan tabel, dan grafik tren tidak lagi melewatkan bulan.
-• Ekspor luring mencantumkan kurs yang digunakan untuk konversi.
-• Jumlah yang panjang tidak lagi terpotong.
-
-Juga dalam versi ini
-• Jadwal berulang berakhir alih-alih menghilang, tetap dijeda setelah suntingan yang tidak terkait, dan dapat dihapus setelah selesai.
-• Sinkronisasi iCloud lebih andal, termasuk di latar belakang.
-• "Hapus Semua" tidak lagi meninggalkan data yang kembali muncul.
-• Label VoiceOver pada kontrol grafik dan filter.
+Pembaruan ini juga meningkatkan keandalan sinkronisasi dan memperbaiki masalah lokalisasi.

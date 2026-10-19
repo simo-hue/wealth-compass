@@ -30,6 +30,31 @@ actor RecurringNotificationService {
         return (try? await center.requestAuthorization(options: [.alert, .sound, .badge])) ?? false
     }
 
+    /// The schedules `sync` still owes a pending reminder for, at the instant `now`.
+    ///
+    /// Pure and `static` so the eligibility rule can be asserted directly: `sync` itself returns
+    /// early behind an authorization guard the test host never clears, so nothing downstream of it
+    /// is observable from a test.
+    ///
+    /// The clause that matters is the last one. `clearReminders(supersededBy:)` has already removed
+    /// every pending request under our prefix by the time this runs, so a schedule this filter drops
+    /// is a schedule whose reminder is *deleted* rather than re-scheduled — there is no "leave the
+    /// existing one alone" branch. It therefore has to be asked about the moment the trigger will
+    /// actually fire, not about the due date: WC-L5 pins a midnight due time to 09:00 local
+    /// (`fireMoment`), which is also what `coalescedIdentifier` keys on.
+    nonisolated static func schedulesStillToFire(
+        _ schedules: [RecurringTransaction],
+        now: Date
+    ) -> [RecurringTransaction] {
+        schedules.filter { schedule in
+            schedule.isActive
+                && !schedule.isCompleted
+                && schedule.notificationsEnabled
+                && fireMoment(for: schedule.nextDueDate) > now
+                && (schedule.endDate.map { schedule.nextDueDate <= $0 } ?? true)
+        }
+    }
+
     /// `.ephemeral` (App Clips) exists only on iOS, so it's guarded per-platform.
     private static func isAuthorized(_ status: UNAuthorizationStatus) -> Bool {
         switch status {
@@ -77,13 +102,7 @@ actor RecurringNotificationService {
 
         // Not sorted here: `requests(for:)` orders by due date itself, because the cap it applies
         // is what makes the order load-bearing and the two must not be able to drift apart.
-        let upcoming = schedules.filter { schedule in
-            schedule.isActive
-                && !schedule.isCompleted
-                && schedule.notificationsEnabled
-                && schedule.nextDueDate > now
-                && (schedule.endDate.map { schedule.nextDueDate <= $0 } ?? true)
-        }
+        let upcoming = Self.schedulesStillToFire(schedules, now: now)
 
         // `requests(for:…)` is the **only** source of anything this actor hands to the notification
         // centre, on both branches of Privacy Mode, and nothing stands between it and `center.add` —
@@ -338,9 +357,10 @@ actor RecurringNotificationService {
     /// other), or when the amount, currency, category or language would now render differently. An
     /// unrelated edit changes none of those, and the banner stays.
     ///
-    /// "Live" here drops the `nextDueDate > now` clause `sync` applies to the *pending* set, and has
-    /// to: a delivered banner is by definition one whose fire time has passed, so filtering to
-    /// future dues would find no schedule behind any of them and take down every one.
+    /// "Live" here drops the still-to-fire clause `sync` applies to the *pending* set
+    /// (`schedulesStillToFire`), and has to: a delivered banner is by definition one whose fire time
+    /// has passed, so filtering to future fire moments would find no schedule behind any of them and
+    /// take down every one.
     ///
     /// **Spent banners are kept, on both branches.** Once `processDueRecurringTransactions` has
     /// recorded the occurrence and advanced `nextDueDate`, the reminder has done its job and has not

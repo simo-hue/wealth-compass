@@ -59,7 +59,13 @@ struct CashFlowView: View {
     @State private var transactionSearch = ""
     @State private var selectedTab: CashFlowTab
     @State private var activeAlert: CashFlowAlert?
-    @State private var hoveredExpenseCategory: CategoryTotal?
+    /// The **id** (the category name) of the latched wedge, never a copy of the `CategoryTotal`.
+    /// This donut sits under a period picker — the control most likely to change the slice set —
+    /// and had no reset at all, so a snapshot survived every period change: the centre kept the
+    /// previous period's amount and share, and if the category had no spending in the new period
+    /// it matched no wedge and the whole ring dropped to 0.3 opacity. Resolved live below; see
+    /// `resolvedChartSelection(_:in:)` in `DesignSystem.swift`.
+    @State private var hoveredExpenseCategoryID: CategoryTotal.ID?
 
     /// The tab the view opens on. The app always takes the default; the parameter exists so the
     /// transaction list can be reached from a test, which is otherwise impossible — the tab lives
@@ -186,6 +192,9 @@ struct CashFlowView: View {
 
                 let categories = finance.expensesByCategory(period: period, settings: settings)
                 let totalExpenses = categories.reduce(0) { $0 + $1.value }
+                // Re-resolved on every render, so changing the period above cannot leave the centre
+                // showing figures from the period the user just left.
+                let hoveredExpenseCategory = resolvedChartSelection(hoveredExpenseCategoryID, in: categories)
                 if settings.isPrivacyMode {
                     // The arcs are the proportions: leaving the donut drawn while its labels
                     // redact still shows a bystander how the spending splits. Same conceal the
@@ -271,7 +280,7 @@ struct CashFlowView: View {
                                             SpatialTapGesture()
                                                 .onEnded { value in
                                                     withAnimation(.easeInOut(duration: 0.15)) {
-                                                        hoveredExpenseCategory = categorySlice(at: value.location, in: frame, categories: categories)
+                                                        hoveredExpenseCategoryID = categorySlice(at: value.location, in: frame, categories: categories)?.id
                                                     }
                                                 }
                                         )
@@ -783,7 +792,10 @@ struct CashFlowView: View {
             return Alert(
                 title: Text("Finish Recurring Transaction?"),
                 message: Text(settings.localized("\(schedule.category) will disappear from Recurring Transactions and no future occurrences will be inserted automatically.")),
-                primaryButton: .default(Text("Yes")) {
+                // "Finish", not "Yes" — the verb the Desktop's otherwise-identical alert already
+                // uses. A button that names its action is the platform convention and is the safer
+                // label on a one-way change; the key is already in the catalog.
+                primaryButton: .default(Text("Finish")) {
                     completeRecurringTransaction(schedule)
                 },
                 secondaryButton: .cancel()

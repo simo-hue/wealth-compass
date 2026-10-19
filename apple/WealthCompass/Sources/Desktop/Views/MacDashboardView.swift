@@ -12,7 +12,10 @@ struct MacDashboardView: View {
     @State private var moneyFlowPeriod: AnalyticsPeriod = .thirtyDays
     @State private var selectedNetWorthDate: Date?
     @State private var cashFlowRange: CashFlowTimeframe = .sixMonths
-    @State private var hoveredAssetSlice: AllocationSlice?
+    /// The **id** of the latched asset slice, never a copy of the slice — a value snapshot went
+    /// stale on every Refresh Prices. Resolved against the live slices in `allocationCard`; see
+    /// `resolvedChartSelection(_:in:)` in `DesignSystem.swift`.
+    @State private var hoveredAssetSliceID: AllocationSlice.ID?
     @State private var hoveredCashFlowMonth: CashFlowMonth?
     @Namespace private var animationNamespace
     @ScaledMetric(relativeTo: .largeTitle) private var headerSize: CGFloat = 30
@@ -383,68 +386,7 @@ struct MacDashboardView: View {
                 HeroScenery()
 
                 VStack(alignment: .leading, spacing: 18) {
-                    HStack(alignment: .top, spacing: 24) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("NET WORTH")
-                                .font(.caption.weight(.bold))
-                                .tracking(1.8)
-                                .foregroundStyle(WCColor.textTertiary)
-                            Text(settings.privateCurrency(totals.netWorth))
-                                .font(.system(size: netWorthSize, weight: .bold, design: .rounded))
-                                .monospacedDigit()
-                                .foregroundStyle(.white)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.65)
-
-                            // Privacy before emptiness, exactly as at the chart below — and here the
-                            // rule bites on *both* arms, so the whole chain has to go behind one
-                            // gate. The `else` says in words that there is no movement to show; the
-                            // `if` says the opposite, and its arrow and tint spell the sign of that
-                            // movement while the two figures beside them are already `••••`. Under
-                            // Privacy Mode neither arm may render, or the card answers the question
-                            // the cover below it refuses to answer.
-                            if !settings.isPrivacyMode {
-                                if let rangeChange {
-                                    HStack(spacing: 7) {
-                                        Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
-                                        Text(settings.privateCurrency(abs(rangeChange.value)))
-                                        // See DashboardView: an em dash when the window opened at
-                                        // (or near) zero, because there is no baseline to divide by.
-                                        Text(rangeChange.percentage.map { settings.privatePercent(abs($0)) } ?? "—")
-                                        Text("for \(timeRange.localizedTitle(appLanguage: settings.appLanguage))")
-                                            .foregroundStyle(WCColor.textTertiary)
-                                    }
-                                    .font(.subheadline.monospacedDigit().weight(.semibold))
-                                    .foregroundStyle(rangeChange.value >= 0 ? WCColor.primary : WCColor.destructive)
-                                } else {
-                                    Text("Add another snapshot to see movement over time")
-                                        .font(.subheadline)
-                                        .foregroundStyle(WCColor.textTertiary)
-                                }
-                            }
-
-                            // L40: subtle cue that the total mixes an approximate offline rate for a
-                            // held currency missing from the latest update (details in Settings).
-                            // Privacy-gated on the same grounds: it appears only when the user holds a
-                            // currency other than the display one, so its presence discloses part of
-                            // the portfolio's composition — and with the total masked to `••••` there
-                            // is no longer a figure for it to qualify.
-                            if !settings.isPrivacyMode, hasIncompleteRates {
-                                Label("Rates may be incomplete", systemImage: "exclamationmark.triangle.fill")
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(WCColor.warning)
-                            }
-                        }
-
-                        Spacer(minLength: 16)
-
-                        VStack(alignment: .trailing, spacing: 12) {
-                            DashboardSegmentedPicker(selection: $timeRange, items: TimeRange.allCases) { $0.title }
-                                .padding(.bottom, 2)
-
-                            snapshotFreshness
-                        }
-                    }
+                    netWorthHeroHeader(rangeChange: rangeChange, hasIncompleteRates: hasIncompleteRates)
 
                     // Privacy before emptiness. The range picker above turns an empty state into a
                     // probe: toggle the ranges and the ones that show it are the ones with no
@@ -556,6 +498,136 @@ struct MacDashboardView: View {
         }
     }
 
+    /// The hero's top row: the headline figure on the left, the range picker and freshness badge
+    /// on the right.
+    ///
+    /// A ladder, like `dashboardHeader` above. This was a plain `HStack` whose right-hand child is
+    /// rigid by construction: `DashboardSegmentedPicker` gives each of five `TimeRange` items
+    /// `.frame(minWidth: 44)` plus `.padding(.horizontal, 10)` at zero spacing and then `.padding(4)`,
+    /// a floor of `5 x 64 + 8 = 328pt` that cannot shrink. The row therefore needed
+    /// `328 + 16 + 48 = 392pt` before the headline figure got a single point — against a card
+    /// interior of 378pt on an iPad mini in portrait and 224pt in Slide Over. The biggest number in
+    /// the app was crushed to its `minimumScaleFactor`, and the picker was drawn past the card's
+    /// `.clipShape`d edge with its last items unreachable.
+    ///
+    /// The picker is deliberately *not* shrunk — five tap targets at 44pt is the floor that keeps
+    /// it usable. Instead the rungs give it its own line, and the last rung lets it scroll, which is
+    /// the only thing that puts 6M / 1Y / ALL back within reach at Slide Over's 224pt.
+    @ViewBuilder
+    private func netWorthHeroHeader(rangeChange: (value: Double, percentage: Double?)?, hasIncompleteRates: Bool) -> some View {
+        let title = netWorthHeroTitle(rangeChange: rangeChange, hasIncompleteRates: hasIncompleteRates)
+
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .top, spacing: 24) {
+                // `idealWidth` is what makes this rung measurable, the same trap `onboardingCard`
+                // documents: the title block contains a sentence ("Add another snapshot to see
+                // movement over time"), and a paragraph's ideal width is its *single-line* width —
+                // ~575pt in German. Left unpinned, rung 1's ideal would be 575 + 16 + 328 = 919pt
+                // and the hero would stack even on a Mac. 380 puts the switch-over at
+                // 380 + 16 + 328 = 724pt: a row on a Mac window and a full-width iPad, stacked from
+                // iPad portrait down.
+                title
+                    .frame(idealWidth: 380, maxWidth: .infinity, alignment: .leading)
+                Spacer(minLength: 16)
+                netWorthHeroControls
+            }
+
+            // Stacked: the title block above, picker and badge together below.
+            VStack(alignment: .leading, spacing: 14) {
+                title
+                HStack(alignment: .firstTextBaseline, spacing: 16) {
+                    netWorthHeroPicker
+                    snapshotFreshness
+                    Spacer(minLength: 0)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            // Last rung: badge on its own line too, and the picker scrolls horizontally. Nothing
+            // else reaches Slide Over — 328pt of picker does not go into 224pt of card, and the
+            // alternative to scrolling is three ranges the user cannot tap.
+            VStack(alignment: .leading, spacing: 12) {
+                title
+                ScrollView(.horizontal) {
+                    netWorthHeroPicker
+                }
+                .scrollIndicators(.hidden)
+                snapshotFreshness
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var netWorthHeroPicker: some View {
+        DashboardSegmentedPicker(selection: $timeRange, items: TimeRange.allCases) { $0.title }
+            // Fixed, so it is never the child a narrow row takes its shortfall out of — the rungs
+            // above re-flow around it instead.
+            .fixedSize()
+    }
+
+    private var netWorthHeroControls: some View {
+        VStack(alignment: .trailing, spacing: 12) {
+            netWorthHeroPicker
+                .padding(.bottom, 2)
+
+            snapshotFreshness
+        }
+    }
+
+    private func netWorthHeroTitle(rangeChange: (value: Double, percentage: Double?)?, hasIncompleteRates: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("NET WORTH")
+                .font(.caption.weight(.bold))
+                .tracking(1.8)
+                .foregroundStyle(WCColor.textTertiary)
+            Text(settings.privateCurrency(totals.netWorth))
+                .font(.system(size: netWorthSize, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
+
+            // Privacy before emptiness, exactly as at the chart below — and here the
+            // rule bites on *both* arms, so the whole chain has to go behind one
+            // gate. The `else` says in words that there is no movement to show; the
+            // `if` says the opposite, and its arrow and tint spell the sign of that
+            // movement while the two figures beside them are already `••••`. Under
+            // Privacy Mode neither arm may render, or the card answers the question
+            // the cover below it refuses to answer.
+            if !settings.isPrivacyMode {
+                if let rangeChange {
+                    HStack(spacing: 7) {
+                        Image(systemName: rangeChange.value >= 0 ? "arrow.up.right" : "arrow.down.right")
+                        Text(settings.privateCurrency(abs(rangeChange.value)))
+                        // See DashboardView: an em dash when the window opened at
+                        // (or near) zero, because there is no baseline to divide by.
+                        Text(rangeChange.percentage.map { settings.privatePercent(abs($0)) } ?? "—")
+                        Text("for \(timeRange.localizedTitle(appLanguage: settings.appLanguage))")
+                            .foregroundStyle(WCColor.textTertiary)
+                    }
+                    .font(.subheadline.monospacedDigit().weight(.semibold))
+                    .foregroundStyle(rangeChange.value >= 0 ? WCColor.primary : WCColor.destructive)
+                } else {
+                    Text("Add another snapshot to see movement over time")
+                        .font(.subheadline)
+                        .foregroundStyle(WCColor.textTertiary)
+                }
+            }
+
+            // L40: subtle cue that the total mixes an approximate offline rate for a
+            // held currency missing from the latest update (details in Settings).
+            // Privacy-gated on the same grounds: it appears only when the user holds a
+            // currency other than the display one, so its presence discloses part of
+            // the portfolio's composition — and with the total masked to `••••` there
+            // is no longer a figure for it to qualify.
+            if !settings.isPrivacyMode, hasIncompleteRates {
+                Label("Rates may be incomplete", systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(WCColor.warning)
+            }
+        }
+    }
+
     /// The freshness badge in the hero's top-right corner.
     ///
     /// Privacy before emptiness, and here the *whole* badge goes. Redacting one arm cannot work:
@@ -594,6 +666,9 @@ struct MacDashboardView: View {
     private var allocationCard: some View {
         let slices = finance.assetAllocation(settings: settings)
         let allocationTotal = slices.reduce(0) { $0 + $1.value }
+        // Re-resolved every time this card is evaluated, so the centre reads live values and the
+        // selection empties itself when its slice goes away.
+        let hoveredAssetSlice = resolvedChartSelection(hoveredAssetSliceID, in: slices)
 
         return DashboardGlassCard {
             VStack(alignment: .leading, spacing: 18) {
@@ -677,11 +752,11 @@ struct MacDashboardView: View {
                                             switch phase {
                                             case .active(let location):
                                                 withAnimation(.easeInOut(duration: 0.15)) {
-                                                    hoveredAssetSlice = slice(at: location, in: frame, slices: slices)
+                                                    hoveredAssetSliceID = slice(at: location, in: frame, slices: slices)?.id
                                                 }
                                             case .ended:
                                                 withAnimation(.easeInOut(duration: 0.15)) {
-                                                    hoveredAssetSlice = nil
+                                                    hoveredAssetSliceID = nil
                                                 }
                                             }
                                         }
@@ -693,7 +768,7 @@ struct MacDashboardView: View {
                                             SpatialTapGesture()
                                                 .onEnded { value in
                                                     withAnimation(.easeInOut(duration: 0.15)) {
-                                                        hoveredAssetSlice = slice(at: value.location, in: frame, slices: slices)
+                                                        hoveredAssetSliceID = slice(at: value.location, in: frame, slices: slices)?.id
                                                     }
                                                 }
                                         )
@@ -702,10 +777,11 @@ struct MacDashboardView: View {
                             }
                         }
                         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: slices.map(\.value))
-                        // Tap-latched selections do not clear themselves the way a hover did, and
-                        // hold value snapshots rather than ids, so a data change that removes the
-                        // selected item leaves it matching nothing and dims the whole chart.
-                        .onChange(of: slices.map(\.id)) { _, _ in hoveredAssetSlice = nil }
+                        // No `.onChange` reset, deliberately. The one that used to be here keyed on
+                        // `slices.map(\.id)` and so only fired when a holding appeared or disappeared —
+                        // never on a Refresh Prices, which changes values and leaves the ids alone.
+                        // `hoveredAssetSlice` is now derived from the stored id against the current
+                        // slices above, which covers both and cannot go stale.
                         .accessibilityElement(children: .contain)
                         .accessibilityLabel(Text("Asset Allocation"))
                     }

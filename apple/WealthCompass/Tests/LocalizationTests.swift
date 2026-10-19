@@ -528,4 +528,162 @@ final class LocalizationTests: XCTestCase {
             """
         )
     }
+
+    /// "CoinGecko key missing" must be a catalog key like its two siblings, not raw English.
+    ///
+    /// `FinanceStore` builds three crypto-refresh notices. Two of them —
+    /// `%@: no matching CoinGecko coin` and `%@: no CoinGecko price for %@` — go through
+    /// `settings.localized(...)` and carry 34 translations. The third was a bare Swift
+    /// interpolation, so it rendered in English in all 35 languages, and it is the branch most
+    /// users hit: the CoinGecko key is optional, so every user who has crypto and has not entered
+    /// one sees exactly this line.
+    ///
+    /// This asserts the catalog half. The call site's `settings.localized(...)` wrapper is what
+    /// makes the key reachable at runtime; that half is established by inspection and the build,
+    /// because the branch it sits in is behind a live market-data refresh.
+    ///
+    /// `extractionState: manual` because a key reached through `settings.localized` /
+    /// `AppLocalization` is invisible to Xcode's extractor — see the `-exportLocalizations` note in
+    /// `apple/CLAUDE.md`, and the 127 keys already marked this way.
+    func testTheMissingCoinGeckoKeyNoticeIsInTheCatalog() throws {
+        let catalog = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources/Shared/Resources/Localizable.xcstrings")
+        let parsed = try JSONSerialization.jsonObject(with: try Data(contentsOf: catalog))
+        let strings = try XCTUnwrap((parsed as? [String: Any])?["strings"] as? [String: Any])
+
+        for sibling in ["%@: no matching CoinGecko coin", "%@: no CoinGecko price for %@"] {
+            XCTAssertNotNil(
+                strings[sibling],
+                "\(sibling) has moved — this test's premise, that these three are siblings, is stale"
+            )
+        }
+
+        let key = "%@: CoinGecko key missing"
+        let entry = try XCTUnwrap(
+            strings[key] as? [String: Any],
+            """
+            `\(key)` is absent from the catalog, so `FinanceStore`'s skipped-crypto notice renders \
+            as raw English in all 35 languages while the two notices either side of it are \
+            translated.
+            """
+        )
+        XCTAssertEqual(
+            entry["extractionState"] as? String, "manual",
+            """
+            The key is reached through `settings.localized(...)`, which Xcode's extractor cannot \
+            see, so `-exportLocalizations` would delete it. `manual` is what protects it.
+            """
+        )
+        let english = (entry["localizations"] as? [String: Any])?["en"] as? [String: Any]
+        XCTAssertEqual(
+            ((english?["stringUnit"] as? [String: Any])?["value"] as? String),
+            "%@: CoinGecko key missing",
+            "the English body must be the source text itself"
+        )
+    }
+
+    /// The API-key validation dialog must format its amount in the app's language.
+    ///
+    /// The sentence around the figure goes through `AppLocalization.string(…, appLanguage:)`, but
+    /// the figure itself was `price.formatted(.currency(code:))` with no `.locale(...)`, so it
+    /// resolved against `Locale.autoupdatingCurrent` — the *system* language, which the in-app
+    /// override deliberately does not follow. An Italian sentence came back carrying `$1,234.56`.
+    /// `RecurringNotificationService.content(for:…)` already does this correctly (the L49 fix).
+    func testTheApiKeyDialogFormatsItsAmountInTheAppsLanguage() {
+        let price = Decimal(string: "1234.56")!
+        let italian = SettingsViewModel.successMessage(
+            .finnhub, price: price, currency: .usd, appLanguage: "it"
+        )
+        let expected = price.formatted(
+            .currency(code: "USD").locale(AppLocalization.effectiveLocale(appLanguage: "it"))
+        )
+        XCTAssertTrue(
+            italian.contains(expected),
+            """
+            The Italian confirmation reads "\(italian)" — it does not contain "\(expected)", the \
+            amount as Italian writes it. The sentence is translated and the number inside it is not.
+            """
+        )
+
+        let german = SettingsViewModel.successMessage(
+            .coingecko, price: price, currency: .eur, appLanguage: "de"
+        )
+        let expectedGerman = price.formatted(
+            .currency(code: "EUR").locale(AppLocalization.effectiveLocale(appLanguage: "de"))
+        )
+        XCTAssertTrue(
+            german.contains(expectedGerman),
+            "the CoinGecko branch has the same defect as the Finnhub one: \"\(german)\""
+        )
+    }
+
+    // MARK: - Onboarding API-key placeholders
+
+    /// The two onboarding placeholders asked for the **typographic** ellipsis spelling, and the 34
+    /// translations sat on the three-dot twin — so every non-English locale saw the English
+    /// sentence. The translations were moved onto the spelling the code actually asks for (and the
+    /// three-dot key deleted, so there is no second place for them to drift back to).
+    ///
+    /// These literals are deliberately byte-identical to the ones in `OnboardingView.swift` and
+    /// `MacOnboardingView.swift`. That duplication is the assertion: a test that computed the key
+    /// would agree with itself no matter which spelling the code used.
+    func testOnboardingKeyPlaceholdersAreTranslated() {
+        for key in ["Paste Finnhub key\u{2026}", "Paste CoinGecko key\u{2026}"] {
+            let english = AppLocalization.string(String.LocalizationValue(key), appLanguage: "en")
+            for language in ["de", "fr", "it", "ru", "ja", "pt-BR"] {
+                let value = AppLocalization.string(String.LocalizationValue(key), appLanguage: language)
+                XCTAssertNotEqual(
+                    value, english,
+                    "\(key) falls back to English in \(language) — the translations are filed under a key nothing asks for"
+                )
+                XCTAssertFalse(value.isEmpty, "\(key) resolved to nothing in \(language)")
+            }
+        }
+    }
+
+    /// The typography half of the same decision: having chosen the single-glyph ellipsis for the
+    /// key, the translated bodies must not still end in three periods, or 34 locales render a
+    /// spelling English does not.
+    func testTranslatedPlaceholdersUseTheTypographicEllipsis() {
+        for key in ["Paste Finnhub key\u{2026}", "Paste CoinGecko key\u{2026}"] {
+            for language in ["de", "fr", "es", "nl", "pl"] {
+                let value = AppLocalization.string(String.LocalizationValue(key), appLanguage: language)
+                XCTAssertFalse(value.hasSuffix("..."), "\(language) still ends in three periods: \(value)")
+                XCTAssertTrue(value.hasSuffix("\u{2026}"), "\(language) lost its ellipsis: \(value)")
+            }
+        }
+    }
+
+    // MARK: - Extractor-mangled catalog keys
+
+    /// Five keys built by a nested-paren interpolation had extractor-mangled twins in the catalog
+    /// (`%@))d ago`, `%@)).` and friends), each carrying a full set of translations that nothing
+    /// could ever reach. Deleting them is catalog hygiene, and this is the guard on that deletion:
+    /// the *real* keys — the ones `DashboardView`, `MacDashboardView` and `SettingsViewModel`
+    /// actually produce — still resolve translated in every locale checked.
+    ///
+    /// This one is a regression guard rather than a red/green pair: it held before the deletion too,
+    /// which is precisely the claim being made.
+    func testTheRealKeysBehindTheMangledTwinsStillResolve() {
+        let cases: [(String.LocalizationValue, String)] = [
+            ("\(3)m ago", "%lldm ago"),
+            ("\(3)h ago", "%lldh ago"),
+            ("\(3)d ago", "%lldd ago"),
+            ("CoinGecko returned a live Bitcoin price at \("X").", "CoinGecko returned a live Bitcoin price at %@."),
+            ("Finnhub returned a live AAPL quote at \("X").", "Finnhub returned a live AAPL quote at %@.")
+        ]
+        for (value, name) in cases {
+            let english = AppLocalization.string(value, appLanguage: "en")
+            for language in ["de", "fr", "it", "ja", "ru"] {
+                let localized = AppLocalization.string(value, appLanguage: language)
+                XCTAssertFalse(localized.isEmpty, "\(name) resolved to nothing in \(language)")
+                XCTAssertNotEqual(
+                    localized, english,
+                    "\(name) no longer resolves in \(language) — the deletion took a live key with it"
+                )
+            }
+        }
+    }
 }

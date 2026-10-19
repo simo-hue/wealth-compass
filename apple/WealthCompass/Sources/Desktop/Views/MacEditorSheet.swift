@@ -173,19 +173,16 @@ private struct MacTransactionEditor: View {
     private var customCategoryHint: String {
         // L21: locale-aware lowercasing so casing follows the in-app language (root-locale
         // .lowercased() mis-cases Turkish I/İ). Full noun-capitalization (e.g. German) would need
-        // per-type full-sentence templates — tracked as a translation follow-up.
-        let typeName = type.localizedTitle(appLanguage: settings.appLanguage).lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage))
-        if trimmedCustomCategory.isEmpty {
-            return settings.localized("Enter a category name. It will be saved for future \(typeName) transactions.")
-        }
-
-        if let existing = categories.first(where: {
-            $0.caseInsensitiveCompare(trimmedCustomCategory) == .orderedSame
-        }) {
-            return settings.localized("\(existing) already exists and will be selected.")
-        }
-
-        return settings.localized("This category will be added to your \(typeName) categories.")
+        // per-type full-sentence templates — tracked as a translation follow-up, and as an open
+        // owner decision in `DECISIONS_DESKTOP.md` §5. Passed in unchanged so lifting the three
+        // branches into a shared helper does not settle that decision by accident.
+        customCategoryHintText(
+            forTypeNamed: type.localizedTitle(appLanguage: settings.appLanguage)
+                .lowercased(with: AppLocalization.effectiveLocale(appLanguage: settings.appLanguage)),
+            draft: trimmedCustomCategory,
+            existingCategories: categories,
+            settings: settings
+        )
     }
 }
 
